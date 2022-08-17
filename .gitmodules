@@ -1,0 +1,3 @@
+[submodule "iwf-idl"]
+	path = iwf-idl
+	url = git@github.com:cadence-oss/iwf-idl.git
