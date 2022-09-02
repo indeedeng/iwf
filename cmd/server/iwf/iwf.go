@@ -21,7 +21,10 @@
 package iwf
 
 import (
+	"context"
 	"fmt"
+	"github.com/cadence-oss/iwf-server/gen/openapi"
+
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -147,5 +150,12 @@ func logIncomingRequest(w http.ResponseWriter, r *http.Request) {
 	default:
 		log.Printf("Only POST methods are supported.")
 		w.WriteHeader(http.StatusBadRequest)
+		client := openapi.NewAPIClient(&openapi.Configuration{})
+		req := client.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
+		wfType := "123"
+		resp, httpResp, err := req.WorkflowStateStartRequest(openapi.WorkflowStateStartRequest{
+			WorkflowType: &wfType,
+		}).Execute()
+		fmt.Println(resp.GetCommandRequest(), httpResp, err)
 	}
 }

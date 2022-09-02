@@ -138,6 +138,11 @@ iwf-server:
 
 .PHONY: bins release clean
 
+idl-code-gen: #generate/refresh go clent code for idl, do this after update the idl file
+	rm -Rf ./gen ; true
+	openapi-generator generate -i iwf-idl/workflowState.yaml -g go -o gen/openapi/ -p generateInterfaces=true -p isGoSubmodule=false --git-user-id cadence-oss --git-repo-id iwf-idl
+	rm ./gen/openapi/go.* ; true
+
 bins: $(BINS)
 
 clean: ## Clean binaries and build folder
