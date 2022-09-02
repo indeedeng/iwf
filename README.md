@@ -3,7 +3,8 @@ interpreter workflow engine for Cadence/Temporal
 
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
-* Then run  `./iwf-server start` to run the service
+* Then run  `./iwf-server start` to run the service . This defaults to test API + Temporal interpreter implementation, require to have local Temporal setup. See Run with local Temporal.
+* Hit http://localhost:8801/ to trigger a test workflow
 
 ## Development
 
@@ -15,7 +16,6 @@ interpreter workflow engine for Cadence/Temporal
 
 ### Run with local Temporal
 1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. 
-2. 
 
 ### Run with local Cadence
 TODO
