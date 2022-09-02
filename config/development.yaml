@@ -1,0 +1,4 @@
+
+service:
+  api:
+    port: 8801 # TODO see cmd/server/iwf/iwf.go
