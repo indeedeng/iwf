@@ -171,12 +171,17 @@ func logIncomingRequest(w http.ResponseWriter, r *http.Request) {
 		log.Printf("[Test server incoming request]: %v, URL: %v", string(body), r.URL.Path)
 		w.WriteHeader(http.StatusOK)
 		break
-	default:
-		log.Printf("Only POST methods are supported.")
-		w.WriteHeader(http.StatusBadRequest)
+	case "GET":
+		// below is for test only, will be removed
 
 		runTestRestApi()
 		runTestTemporalWorkflow()
+		w.Write([]byte("hello, world"))
+		w.WriteHeader(http.StatusOK)
+		break
+	default:
+		log.Printf("Only POST methods are supported.")
+		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 
