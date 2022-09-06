@@ -2,6 +2,7 @@ package temporalimpl
 
 import (
 	"context"
+	"github.com/cadence-oss/iwf-server/service"
 	"time"
 
 	"go.temporal.io/sdk/activity"
@@ -14,29 +15,29 @@ import (
 const TaskQueue = "Interpreter"
 
 // Interpreter is a interpreter workflow definition.
-func Interpreter(ctx workflow.Context, name string) (string, error) {
+func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
 	ao := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
 	}
 	ctx = workflow.WithActivityOptions(ctx, ao)
 
 	logger := workflow.GetLogger(ctx)
-	logger.Info("Interpreter workflow started", "name", name)
+	logger.Info("Interpreter workflow started", "input", input)
 
 	var result string
-	err := workflow.ExecuteActivity(ctx, Activity, name).Get(ctx, &result)
+	err := workflow.ExecuteActivity(ctx, Activity, input).Get(ctx, &result)
 	if err != nil {
 		logger.Error("Activity failed.", "Error", err)
-		return "", err
+		return nil, err
 	}
 
 	logger.Info("Interpreter workflow completed.", "result", result)
 
-	return result, nil
+	return nil, nil
 }
 
-func Activity(ctx context.Context, name string) (string, error) {
+func Activity(ctx context.Context, input service.InterpreterWorkflowInput) (string, error) {
 	logger := activity.GetLogger(ctx)
-	logger.Info("Activity", "name", name)
-	return "Hello " + name + "!", nil
+	logger.Info("Activity", "input", input)
+	return "Hello " + input.StartStateId + "!", nil
 }
