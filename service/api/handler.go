@@ -13,9 +13,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/server/workflow"
+	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
 
 	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
-	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
 	"go.temporal.io/sdk/client"
 	"log"
 	"net/http"
@@ -23,57 +23,57 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type handler struct {
+	temporalClient client.Client
+}
+
+func newHandler() *handler {
+	// The client is a heavyweight object that should be created once per process.
+	temporalClient, err := client.Dial(client.Options{})
+	if err != nil {
+		log.Fatalln("Unable to create client", err)
+	}
+	return &handler{
+		temporalClient: temporalClient,
+	}
+}
+
+func (h *handler) close() {
+	h.temporalClient.Close()
+}
+
 // Index is the index handler.
-func Index(c *gin.Context) {
+func (h *handler) index(c *gin.Context) {
 	// for test only, will be removed
 	runTestRestApi()
-	runTestTemporalWorkflow()
 
 	c.String(http.StatusOK, "Hello World!")
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func ApiV1WorkflowStartPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 	var req workflow.WorkflowStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(req)
-
-	c.JSON(http.StatusOK, gin.H{})
-}
-
-func runTestTemporalWorkflow() {
-
-	fmt.Println("test temporal workflow")
-
-	// The client is a heavyweight object that should be created once per process.
-	c, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
-	defer c.Close()
+	log.Println("received request", req)
 
 	workflowOptions := client.StartWorkflowOptions{
-		ID:        "hello_world_workflowID",
+		ID:        req.WorkflowId,
 		TaskQueue: "hello-world",
 	}
 
-	we, err := c.ExecuteWorkflow(context.Background(), workflowOptions, temporalimpl.Interpreter, "Temporal")
+	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporalimpl.Interpreter, "Temporal")
 	if err != nil {
 		log.Fatalln("Unable to execute workflow", err)
 	}
 
 	log.Println("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
 
-	// Synchronously wait for the workflow completion.
-	var result string
-	err = we.Get(context.Background(), &result)
-	if err != nil {
-		log.Fatalln("Unable get workflow result", err)
-	}
-	log.Println("Workflow result:", result)
+	c.JSON(http.StatusOK, workflow.WorkflowStartResponse{
+		WorkflowRunId: we.GetRunID(),
+	})
 }
 
 func runTestRestApi() {

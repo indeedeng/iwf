@@ -33,6 +33,23 @@ type Routes []Route
 // NewRouter returns a new router.
 func NewRouter() *gin.Engine {
 	router := gin.Default()
+
+	handler := newHandler()
+	routes := Routes{
+		{
+			"Index",
+			http.MethodGet,
+			"/",
+			handler.index,
+		},
+		{
+			"ApiV1WorkflowStartPost",
+			http.MethodPost,
+			"/api/v1/workflow/start",
+			handler.apiV1WorkflowStartPost,
+		},
+	}
+
 	for _, route := range routes {
 		switch route.Method {
 		case http.MethodGet:
@@ -49,20 +66,4 @@ func NewRouter() *gin.Engine {
 	}
 
 	return router
-}
-
-var routes = Routes{
-	{
-		"Index",
-		http.MethodGet,
-		"/",
-		Index,
-	},
-
-	{
-		"ApiV1WorkflowStartPost",
-		http.MethodPost,
-		"/api/v1/workflow/start",
-		ApiV1WorkflowStartPost,
-	},
 }
