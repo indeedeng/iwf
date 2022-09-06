@@ -23,9 +23,6 @@ package iwf
 import (
 	"github.com/cadence-oss/iwf-server/service/api"
 	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
-	"go.temporal.io/sdk/client"
-	"go.temporal.io/sdk/worker"
-
 	"log"
 	"strings"
 	"sync"
@@ -94,30 +91,14 @@ func BuildCLI() *cli.App {
 func launchService(service string, c *cli.Context) {
 	switch service {
 	case "api":
-		startApiServer()
+		router := api.NewRouter()
+		// TODO use port number from config
+		log.Fatal(router.Run(":8801"))
 	case "interpreter-temporal":
-		startTemporalInterpreterWorker()
+		interpreter := temporalimpl.NewInterpreterWorker()
+		interpreter.Start()
 	default:
 		log.Printf("Invalid service: %v", service)
-	}
-}
-
-func startTemporalInterpreterWorker() {
-	// The client and worker are heavyweight objects that should be created once per process.
-	c, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
-	defer c.Close()
-
-	w := worker.New(c, "hello-world", worker.Options{})
-
-	w.RegisterWorkflow(temporalimpl.Interpreter)
-	w.RegisterActivity(temporalimpl.Activity)
-
-	err = w.Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalln("Unable to start worker", err)
 	}
 }
 
@@ -136,12 +117,4 @@ func getServices(c *cli.Context) []string {
 	}
 
 	return services
-}
-
-func startApiServer() {
-	log.Printf("API Server started")
-	router := api.NewRouter()
-
-	// TODO use port number from config
-	log.Fatal(router.Run(":8801"))
 }

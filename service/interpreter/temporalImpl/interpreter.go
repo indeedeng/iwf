@@ -11,6 +11,8 @@ import (
 	_ "go.temporal.io/sdk/contrib/tools/workflowcheck/determinism"
 )
 
+const TaskQueue = "Interpreter"
+
 // Interpreter is a interpreter workflow definition.
 func Interpreter(ctx workflow.Context, name string) (string, error) {
 	ao := workflow.ActivityOptions{

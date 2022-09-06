@@ -29,6 +29,7 @@ type handler struct {
 
 func newHandler() *handler {
 	// The client is a heavyweight object that should be created once per process.
+	// TODO use config for connection options and merge with api handler
 	temporalClient, err := client.Dial(client.Options{})
 	if err != nil {
 		log.Fatalln("Unable to create client", err)
@@ -61,7 +62,7 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 
 	workflowOptions := client.StartWorkflowOptions{
 		ID:        req.WorkflowId,
-		TaskQueue: "hello-world",
+		TaskQueue: temporalimpl.TaskQueue,
 	}
 
 	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporalimpl.Interpreter, "Temporal")
