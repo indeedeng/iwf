@@ -1,0 +1,10 @@
+# test start API
+POST http://localhost:8801/api/v1/workflow/start
+Content-Type: application/json
+
+{
+  "iwfWorkflowType": "test-wf-type"
+}
+
+### test home page
+GET http://localhost:8801/
