@@ -3,11 +3,11 @@ module github.com/cadence-oss/iwf-server
 go 1.17
 
 require (
+	github.com/gorilla/mux v1.8.0
 	github.com/urfave/cli v1.22.5
 	go.temporal.io/sdk v1.16.0
 	go.temporal.io/sdk/contrib/tools/workflowcheck v0.0.0-20220331154559-fd0d1eb548eb
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
-	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 )
 
 require (
@@ -39,5 +39,6 @@ require (
 	google.golang.org/genproto v0.0.0-20220725144611-272f38e5d71b // indirect
 	google.golang.org/grpc v1.48.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

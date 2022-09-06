@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Context** | Pointer to [**Context**](Context.md) |  | [optional] 
 **WorkflowType** | Pointer to **string** |  | [optional] 
 **WorkflowStateId** | Pointer to **string** |  | [optional] 
 **SearchAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -29,6 +30,31 @@ will change when the set of required properties is changed
 NewWorkflowStateDecideRequestWithDefaults instantiates a new WorkflowStateDecideRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetContext
+
+`func (o *WorkflowStateDecideRequest) GetContext() Context`
+
+GetContext returns the Context field if non-nil, zero value otherwise.
+
+### GetContextOk
+
+`func (o *WorkflowStateDecideRequest) GetContextOk() (*Context, bool)`
+
+GetContextOk returns a tuple with the Context field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetContext
+
+`func (o *WorkflowStateDecideRequest) SetContext(v Context)`
+
+SetContext sets Context field to given value.
+
+### HasContext
+
+`func (o *WorkflowStateDecideRequest) HasContext() bool`
+
+HasContext returns a boolean if a field has been set.
 
 ### GetWorkflowType
 

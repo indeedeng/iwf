@@ -18,6 +18,8 @@ import (
 type CommandRequest struct {
 	DeciderTriggerType *string `json:"deciderTriggerType,omitempty"`
 	ActivityCommands []ActivityCommand `json:"activityCommands,omitempty"`
+	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
+	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
 }
 
 // NewCommandRequest instantiates a new CommandRequest object
@@ -101,6 +103,70 @@ func (o *CommandRequest) SetActivityCommands(v []ActivityCommand) {
 	o.ActivityCommands = v
 }
 
+// GetTimerCommands returns the TimerCommands field value if set, zero value otherwise.
+func (o *CommandRequest) GetTimerCommands() []TimerCommand {
+	if o == nil || o.TimerCommands == nil {
+		var ret []TimerCommand
+		return ret
+	}
+	return o.TimerCommands
+}
+
+// GetTimerCommandsOk returns a tuple with the TimerCommands field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandRequest) GetTimerCommandsOk() ([]TimerCommand, bool) {
+	if o == nil || o.TimerCommands == nil {
+		return nil, false
+	}
+	return o.TimerCommands, true
+}
+
+// HasTimerCommands returns a boolean if a field has been set.
+func (o *CommandRequest) HasTimerCommands() bool {
+	if o != nil && o.TimerCommands != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTimerCommands gets a reference to the given []TimerCommand and assigns it to the TimerCommands field.
+func (o *CommandRequest) SetTimerCommands(v []TimerCommand) {
+	o.TimerCommands = v
+}
+
+// GetSignalCommands returns the SignalCommands field value if set, zero value otherwise.
+func (o *CommandRequest) GetSignalCommands() []SignalCommand {
+	if o == nil || o.SignalCommands == nil {
+		var ret []SignalCommand
+		return ret
+	}
+	return o.SignalCommands
+}
+
+// GetSignalCommandsOk returns a tuple with the SignalCommands field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandRequest) GetSignalCommandsOk() ([]SignalCommand, bool) {
+	if o == nil || o.SignalCommands == nil {
+		return nil, false
+	}
+	return o.SignalCommands, true
+}
+
+// HasSignalCommands returns a boolean if a field has been set.
+func (o *CommandRequest) HasSignalCommands() bool {
+	if o != nil && o.SignalCommands != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSignalCommands gets a reference to the given []SignalCommand and assigns it to the SignalCommands field.
+func (o *CommandRequest) SetSignalCommands(v []SignalCommand) {
+	o.SignalCommands = v
+}
+
 func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.DeciderTriggerType != nil {
@@ -108,6 +174,12 @@ func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.ActivityCommands != nil {
 		toSerialize["activityCommands"] = o.ActivityCommands
+	}
+	if o.TimerCommands != nil {
+		toSerialize["timerCommands"] = o.TimerCommands
+	}
+	if o.SignalCommands != nil {
+		toSerialize["signalCommands"] = o.SignalCommands
 	}
 	return json.Marshal(toSerialize)
 }

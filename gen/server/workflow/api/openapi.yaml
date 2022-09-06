@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  description: This APIs for iwf SDKs to operate workflows
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Workflow APIs
+  version: 1.0.0
+servers:
+- url: http://petstore.swagger.io/v2
+paths:
+  /api/v1/workflow/start:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowStartRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowStartResponse'
+          description: successful operation
+        "405":
+          description: Invalid input
+      summary: for a workflow
+components:
+  schemas:
+    WorkflowStartRequest:
+      example:
+        startStateId: startStateId
+        workflowTimeoutSeconds: 0
+        stateOptions:
+          searchAttributesLoadingPolicy:
+            attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            attributeKeys:
+            - attributeKeys
+            - attributeKeys
+          commandCarryOverPolicy:
+            commandCarryOverType: NONE
+          queryAttributesLoadingPolicy:
+            attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            attributeKeys:
+            - attributeKeys
+            - attributeKeys
+        iwfWorkflowType: iwfWorkflowType
+        iwfWorkerUrl: iwfWorkerUrl
+        workflowId: workflowId
+        stateInput:
+          data: data
+          encoding: JSON
+      properties:
+        workflowId:
+          type: string
+        iwfWorkflowType:
+          type: string
+        workflowTimeoutSeconds:
+          type: integer
+        iwfWorkerUrl:
+          type: string
+        startStateId:
+          type: string
+        stateInput:
+          $ref: '#/components/schemas/EncodedObject'
+        stateOptions:
+          $ref: '#/components/schemas/WorkflowStateOptions'
+      type: object
+    WorkflowStartResponse:
+      example:
+        workflowRunId: workflowRunId
+      properties:
+        workflowRunId:
+          type: string
+      type: object
+    EncodedObject:
+      example:
+        data: data
+        encoding: JSON
+      properties:
+        encoding:
+          enum:
+          - JSON
+          type: string
+        data:
+          type: string
+      type: object
+    WorkflowStateOptions:
+      example:
+        searchAttributesLoadingPolicy:
+          attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          attributeKeys:
+          - attributeKeys
+          - attributeKeys
+        commandCarryOverPolicy:
+          commandCarryOverType: NONE
+        queryAttributesLoadingPolicy:
+          attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          attributeKeys:
+          - attributeKeys
+          - attributeKeys
+      properties:
+        searchAttributesLoadingPolicy:
+          $ref: '#/components/schemas/AttributesLoadingPolicy'
+        queryAttributesLoadingPolicy:
+          $ref: '#/components/schemas/AttributesLoadingPolicy'
+        commandCarryOverPolicy:
+          $ref: '#/components/schemas/CommandCarryOverPolicy'
+      type: object
+    AttributesLoadingPolicy:
+      example:
+        attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+        attributeKeys:
+        - attributeKeys
+        - attributeKeys
+      properties:
+        attributeLoadingType:
+          enum:
+          - LOAD_ALL_WITHOUT_LOCKING
+          - LOAD_ALL_WITH_EXCLUSIVE_LOCK
+          - LOAD_PARTIAL_WITHOUT_LOCKING
+          - LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
+          type: string
+        attributeKeys:
+          items:
+            type: string
+          type: array
+      type: object
+    CommandCarryOverPolicy:
+      example:
+        commandCarryOverType: NONE
+      properties:
+        commandCarryOverType:
+          enum:
+          - NONE
+          - ALL_UNFINISHED
+          type: string
+      type: object

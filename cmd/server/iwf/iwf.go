@@ -23,7 +23,7 @@ package iwf
 import (
 	"context"
 	"fmt"
-	"github.com/cadence-oss/iwf-server/gen/openapi"
+	"github.com/cadence-oss/iwf-server/gen/client/workflowState"
 	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"

@@ -140,8 +140,10 @@ iwf-server:
 
 idl-code-gen: #generate/refresh go clent code for idl, do this after update the idl file
 	rm -Rf ./gen ; true
-	openapi-generator generate -i iwf-idl/workflowState.yaml -g go -o gen/openapi/ -p generateInterfaces=true -p isGoSubmodule=false --git-user-id cadence-oss --git-repo-id iwf-idl
-	rm ./gen/openapi/go.* ; true
+	openapi-generator generate -i iwf-idl/workflowState.yaml -g go -o gen/client/workflowState/ -p generateInterfaces=true -p isGoSubmodule=false --git-user-id cadence-oss --git-repo-id iwf-idl
+	rm ./gen/client/workflowState/go.* ; true
+	openapi-generator generate -i iwf-idl/workflow.yaml -g go-server -o gen/server/workflow/ -p packageName=serverapi -p sourceFolder=serverapi  --git-user-id cadence-oss --git-repo-id iwf-idl
+	rm ./gen/server/workflow/*.* ; true
 
 bins: $(BINS)
 

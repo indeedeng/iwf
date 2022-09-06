@@ -58,6 +58,11 @@ components:
             encoding: JSON
           key: key
         workflowStateId: workflowStateId
+        context:
+          workflowStartedTimestamp: 0
+          workflowRunId: workflowRunId
+          workflowId: workflowId
+          stateExecutionId: stateExecutionId
         workflowType: workflowType
         searchAttributes:
         - value:
@@ -72,6 +77,8 @@ components:
           data: data
           encoding: JSON
       properties:
+        context:
+          $ref: '#/components/schemas/Context'
         workflowType:
           type: string
         workflowStateId:
@@ -108,6 +115,16 @@ components:
             encoding: JSON
           key: key
         commandRequest:
+          signalCommands:
+          - signalName: signalName
+            commandId: commandId
+          - signalName: signalName
+            commandId: commandId
+          timerCommands:
+          - firingUnixTimestampSeconds: 6
+            commandId: commandId
+          - firingUnixTimestampSeconds: 6
+            commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
           activityCommands:
           - input:
@@ -204,6 +221,11 @@ components:
             commandId: commandId
           - timerStatus: SCHEDULED
             commandId: commandId
+        context:
+          workflowStartedTimestamp: 0
+          workflowRunId: workflowRunId
+          workflowId: workflowId
+          stateExecutionId: stateExecutionId
         workflowType: workflowType
         searchAttributes:
         - value:
@@ -215,6 +237,8 @@ components:
             encoding: JSON
           key: key
       properties:
+        context:
+          $ref: '#/components/schemas/Context'
         workflowType:
           type: string
         workflowStateId:
@@ -359,6 +383,16 @@ components:
       type: object
     CommandRequest:
       example:
+        signalCommands:
+        - signalName: signalName
+          commandId: commandId
+        - signalName: signalName
+          commandId: commandId
+        timerCommands:
+        - firingUnixTimestampSeconds: 6
+          commandId: commandId
+        - firingUnixTimestampSeconds: 6
+          commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
         activityCommands:
         - input:
@@ -385,6 +419,14 @@ components:
         activityCommands:
           items:
             $ref: '#/components/schemas/ActivityCommand'
+          type: array
+        timerCommands:
+          items:
+            $ref: '#/components/schemas/TimerCommand'
+          type: array
+        signalCommands:
+          items:
+            $ref: '#/components/schemas/SignalCommand'
           type: array
       type: object
     CommandResults:
@@ -436,30 +478,6 @@ components:
             $ref: '#/components/schemas/TimerResult'
           type: array
       type: object
-    KeyValue:
-      example:
-        value:
-          data: data
-          encoding: JSON
-        key: key
-      properties:
-        key:
-          type: string
-        value:
-          $ref: '#/components/schemas/EncodedObject'
-      type: object
-    EncodedObject:
-      example:
-        data: data
-        encoding: JSON
-      properties:
-        encoding:
-          enum:
-          - JSON
-          type: string
-        data:
-          type: string
-      type: object
     ActivityCommand:
       example:
         input:
@@ -478,6 +496,26 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         activityOptions:
           $ref: '#/components/schemas/ActivityOptions'
+      type: object
+    TimerCommand:
+      example:
+        firingUnixTimestampSeconds: 6
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        firingUnixTimestampSeconds:
+          type: integer
+      type: object
+    SignalCommand:
+      example:
+        signalName: signalName
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        signalName:
+          type: string
       type: object
     ActivityOptions:
       example:
@@ -549,5 +587,45 @@ components:
         signalName:
           type: string
         signalValue:
+          $ref: '#/components/schemas/EncodedObject'
+      type: object
+    Context:
+      example:
+        workflowStartedTimestamp: 0
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+        stateExecutionId: stateExecutionId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        workflowStartedTimestamp:
+          type: integer
+        stateExecutionId:
+          type: string
+      type: object
+    EncodedObject:
+      example:
+        data: data
+        encoding: JSON
+      properties:
+        encoding:
+          enum:
+          - JSON
+          type: string
+        data:
+          type: string
+      type: object
+    KeyValue:
+      example:
+        value:
+          data: data
+          encoding: JSON
+        key: key
+      properties:
+        key:
+          type: string
+        value:
           $ref: '#/components/schemas/EncodedObject'
       type: object
