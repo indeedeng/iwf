@@ -19,3 +19,29 @@ interpreter workflow engine for Cadence/Temporal
 
 ### Run with local Cadence
 TODO
+
+# Development Plan
+## 1.0
+- [x] Start workflow API
+- [ ] Timer command
+- [ ] Signal command
+- [ ] SearchAttributeRW
+- [ ] QueryAttributeRW
+- [ ] StateLocalAttribute
+- [ ] Decider trigger types: AnyCommandCompleted
+ 
+## 1.1
+- [ ] Signal workflow API
+- [ ] Query workflow API
+- [ ] List/search workflow API
+- [ ] StateOption: AttributeLoadingPolicy
+- [ ] StateOption: CommandCarryOverPolicy
+- [ ] StateOption: Start/Decide API timeout and retry
+- [ ] LongRunningActivityCommand
+- [ ] Decider trigger types: AnyCommandClosed
+- [ ] Support IdReusePolicy when starting workflow
+- [ ] Unit tests
+
+## 1.3
+- [ ] Skip timer API for testing/operation 
+- [ ] Local integration test with SDK
