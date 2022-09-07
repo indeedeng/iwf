@@ -1,0 +1,16 @@
+# test start API
+POST http://localhost:8801/api/v1/workflow/start
+Content-Type: application/json
+
+{
+  "workflowId": "test-wf",
+  "iwfWorkflowType": "test-wf-type",
+  "workflowTimeoutSeconds": 3600,
+  "iwfWorkerUrl": "http://localhost:8080",
+  "startStateId": "test_state_1",
+  "stateInput": {},
+  "stateOptions": {}
+}
+
+### test home page
+GET http://localhost:8801/

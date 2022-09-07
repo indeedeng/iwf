@@ -21,16 +21,9 @@
 package iwf
 
 import (
-	"context"
-	"fmt"
-	"github.com/cadence-oss/iwf-server/gen/openapi"
+	"github.com/cadence-oss/iwf-server/service/api"
 	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
-	"go.temporal.io/sdk/client"
-	"go.temporal.io/sdk/worker"
-
-	"io/ioutil"
 	"log"
-	"net/http"
 	"strings"
 	"sync"
 
@@ -98,31 +91,14 @@ func BuildCLI() *cli.App {
 func launchService(service string, c *cli.Context) {
 	switch service {
 	case "api":
-		startTestWebhookEndpoint()
-		break
+		router := api.NewRouter()
+		// TODO use port number from config
+		log.Fatal(router.Run(":8801"))
 	case "interpreter-temporal":
-		startTemporalWorker()
+		interpreter := temporalimpl.NewInterpreterWorker()
+		interpreter.Start()
 	default:
 		log.Printf("Invalid service: %v", service)
-	}
-}
-
-func startTemporalWorker() {
-	// The client and worker are heavyweight objects that should be created once per process.
-	c, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
-	defer c.Close()
-
-	w := worker.New(c, "hello-world", worker.Options{})
-
-	w.RegisterWorkflow(temporalimpl.Interpreter)
-	w.RegisterActivity(temporalimpl.Activity)
-
-	err = w.Run(worker.InterruptCh())
-	if err != nil {
-		log.Fatalln("Unable to start worker", err)
 	}
 }
 
@@ -141,88 +117,4 @@ func getServices(c *cli.Context) []string {
 	}
 
 	return services
-}
-
-func startTestWebhookEndpoint() {
-	http.HandleFunc("/", logIncomingRequest)
-
-	fmt.Printf("Starting server for testing...\n")
-	// TODO make api endpoint port configurable
-	if err := http.ListenAndServe(":8801", nil); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func logIncomingRequest(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		log.Printf("Path not supported: %v", r.URL.Path)
-		http.Error(w, "404 not found.", http.StatusNotFound)
-		return
-	}
-
-	switch r.Method {
-	case "POST":
-		var body []byte
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("[Failed to read request body]: %v", err.Error())
-		}
-
-		log.Printf("[Test server incoming request]: %v, URL: %v", string(body), r.URL.Path)
-		w.WriteHeader(http.StatusOK)
-		break
-	case "GET":
-		// below is for test only, will be removed
-
-		runTestRestApi()
-		runTestTemporalWorkflow()
-		w.Write([]byte("hello, world"))
-		w.WriteHeader(http.StatusOK)
-		break
-	default:
-		log.Printf("Only POST methods are supported.")
-		w.WriteHeader(http.StatusBadRequest)
-	}
-}
-
-func runTestTemporalWorkflow() {
-
-	fmt.Println("test temporal workflow")
-
-	// The client is a heavyweight object that should be created once per process.
-	c, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
-	defer c.Close()
-
-	workflowOptions := client.StartWorkflowOptions{
-		ID:        "hello_world_workflowID",
-		TaskQueue: "hello-world",
-	}
-
-	we, err := c.ExecuteWorkflow(context.Background(), workflowOptions, temporalimpl.Interpreter, "Temporal")
-	if err != nil {
-		log.Fatalln("Unable to execute workflow", err)
-	}
-
-	log.Println("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
-
-	// Synchronously wait for the workflow completion.
-	var result string
-	err = we.Get(context.Background(), &result)
-	if err != nil {
-		log.Fatalln("Unable get workflow result", err)
-	}
-	log.Println("Workflow result:", result)
-}
-
-func runTestRestApi() {
-	client := openapi.NewAPIClient(&openapi.Configuration{})
-	req := client.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
-	wfType := "123"
-	resp, httpResp, err := req.WorkflowStateStartRequest(openapi.WorkflowStateStartRequest{
-		WorkflowType: &wfType,
-	}).Execute()
-	fmt.Println("test REST API", resp.GetCommandRequest(), httpResp, err)
 }
