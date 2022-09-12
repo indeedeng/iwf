@@ -91,9 +91,9 @@ func BuildCLI() *cli.App {
 func launchService(service string, c *cli.Context) {
 	switch service {
 	case "api":
-		router := api.NewRouter()
+		svc := api.NewService()
 		// TODO use port number from config
-		log.Fatal(router.Run(":8801"))
+		log.Fatal(svc.Run(":8801"))
 	case "interpreter-temporal":
 		interpreter := temporalimpl.NewInterpreterWorker()
 		interpreter.Start()
