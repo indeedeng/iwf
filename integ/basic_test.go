@@ -6,7 +6,7 @@ import (
 	"github.com/cadence-oss/iwf-server/gen/server/workflow"
 	"github.com/cadence-oss/iwf-server/integ/basic"
 	"github.com/cadence-oss/iwf-server/service/api"
-	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
+	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"log"
 	"net/http"
 	"testing"
@@ -42,7 +42,7 @@ func TestBasicWorkflow(t *testing.T) {
 	}()
 
 	// start iwf interpreter worker
-	interpreter := temporalimpl.NewInterpreterWorker()
+	interpreter := temporal.NewInterpreterWorker()
 	interpreter.Start()
 	defer interpreter.Close()
 

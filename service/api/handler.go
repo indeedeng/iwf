@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/server/workflow"
 	"github.com/cadence-oss/iwf-server/service"
-	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
+	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 
 	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
 	"go.temporal.io/sdk/client"
@@ -63,7 +63,7 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 
 	workflowOptions := client.StartWorkflowOptions{
 		ID:        req.WorkflowId,
-		TaskQueue: temporalimpl.TaskQueue,
+		TaskQueue: temporal.TaskQueue,
 	}
 
 	input := service.InterpreterWorkflowInput{
@@ -73,7 +73,7 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 		StateInput:      req.StateInput,
 		StateOptions:    req.StateOptions,
 	}
-	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporalimpl.Interpreter, input)
+	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporal.Interpreter, input)
 	if err != nil {
 		log.Fatalln("Unable to execute workflow", err)
 	}

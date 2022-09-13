@@ -1,4 +1,4 @@
-package temporalimpl
+package temporal
 
 import (
 	"context"
