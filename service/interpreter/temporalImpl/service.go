@@ -8,6 +8,7 @@ import (
 
 type InterpreterWorker struct {
 	temporalClient client.Client
+	worker         worker.Worker
 }
 
 func NewInterpreterWorker() *InterpreterWorker {
@@ -23,15 +24,16 @@ func NewInterpreterWorker() *InterpreterWorker {
 
 func (iw *InterpreterWorker) Close() {
 	iw.temporalClient.Close()
+	iw.worker.Stop()
 }
 
 func (iw *InterpreterWorker) Start() {
-	w := worker.New(iw.temporalClient, TaskQueue, worker.Options{})
+	iw.worker = worker.New(iw.temporalClient, TaskQueue, worker.Options{})
 
-	w.RegisterWorkflow(Interpreter)
-	w.RegisterActivity(Activity)
+	iw.worker.RegisterWorkflow(Interpreter)
+	iw.worker.RegisterActivity(Activity)
 
-	err := w.Run(worker.InterruptCh())
+	err := iw.worker.Start()
 	if err != nil {
 		log.Fatalln("Unable to start worker", err)
 	}
