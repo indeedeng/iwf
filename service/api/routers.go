@@ -13,6 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const WorkflowStartApiPath = "/api/v1/workflow/start"
+
 // NewService returns a new router.
 func NewService() *gin.Engine {
 	router := gin.Default()
@@ -20,7 +22,7 @@ func NewService() *gin.Engine {
 	handler := newHandler()
 
 	router.GET("/", handler.index)
-	router.POST("/api/v1/workflow/start", handler.apiV1WorkflowStartPost)
+	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStartPost)
 
 	return router
 }
