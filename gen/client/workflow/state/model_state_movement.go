@@ -18,6 +18,7 @@ import (
 type StateMovement struct {
 	StateId *string `json:"stateId,omitempty"`
 	NextStateInput *EncodedObject `json:"nextStateInput,omitempty"`
+	NextStateOptions *WorkflowStateOptions `json:"nextStateOptions,omitempty"`
 }
 
 // NewStateMovement instantiates a new StateMovement object
@@ -101,6 +102,38 @@ func (o *StateMovement) SetNextStateInput(v EncodedObject) {
 	o.NextStateInput = &v
 }
 
+// GetNextStateOptions returns the NextStateOptions field value if set, zero value otherwise.
+func (o *StateMovement) GetNextStateOptions() WorkflowStateOptions {
+	if o == nil || o.NextStateOptions == nil {
+		var ret WorkflowStateOptions
+		return ret
+	}
+	return *o.NextStateOptions
+}
+
+// GetNextStateOptionsOk returns a tuple with the NextStateOptions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StateMovement) GetNextStateOptionsOk() (*WorkflowStateOptions, bool) {
+	if o == nil || o.NextStateOptions == nil {
+		return nil, false
+	}
+	return o.NextStateOptions, true
+}
+
+// HasNextStateOptions returns a boolean if a field has been set.
+func (o *StateMovement) HasNextStateOptions() bool {
+	if o != nil && o.NextStateOptions != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetNextStateOptions gets a reference to the given WorkflowStateOptions and assigns it to the NextStateOptions field.
+func (o *StateMovement) SetNextStateOptions(v WorkflowStateOptions) {
+	o.NextStateOptions = &v
+}
+
 func (o StateMovement) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.StateId != nil {
@@ -108,6 +141,9 @@ func (o StateMovement) MarshalJSON() ([]byte, error) {
 	}
 	if o.NextStateInput != nil {
 		toSerialize["nextStateInput"] = o.NextStateInput
+	}
+	if o.NextStateOptions != nil {
+		toSerialize["nextStateOptions"] = o.NextStateOptions
 	}
 	return json.Marshal(toSerialize)
 }

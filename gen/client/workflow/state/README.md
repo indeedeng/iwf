@@ -87,6 +87,8 @@ Class | Method | HTTP request | Description
  - [ActivityCommand](docs/ActivityCommand.md)
  - [ActivityOptions](docs/ActivityOptions.md)
  - [ActivityResult](docs/ActivityResult.md)
+ - [AttributesLoadingPolicy](docs/AttributesLoadingPolicy.md)
+ - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
  - [CommandRequest](docs/CommandRequest.md)
  - [CommandResults](docs/CommandResults.md)
  - [Context](docs/Context.md)
@@ -100,6 +102,7 @@ Class | Method | HTTP request | Description
  - [TimerResult](docs/TimerResult.md)
  - [WorkflowStateDecideRequest](docs/WorkflowStateDecideRequest.md)
  - [WorkflowStateDecideResponse](docs/WorkflowStateDecideResponse.md)
+ - [WorkflowStateOptions](docs/WorkflowStateOptions.md)
  - [WorkflowStateStartRequest](docs/WorkflowStateStartRequest.md)
  - [WorkflowStateStartResponse](docs/WorkflowStateStartResponse.md)
 

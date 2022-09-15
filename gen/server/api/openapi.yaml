@@ -24,6 +24,10 @@ paths:
                 $ref: '#/components/schemas/WorkflowStartResponse'
           description: successful operation
         "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: for a workflow
 components:
@@ -73,6 +77,9 @@ components:
       properties:
         workflowRunId:
           type: string
+      type: object
+    ErrorResponse:
+      properties: {}
       type: object
     EncodedObject:
       example:

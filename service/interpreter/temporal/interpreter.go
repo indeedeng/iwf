@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"context"
+	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
 	"github.com/cadence-oss/iwf-server/service"
 	"time"
 
@@ -14,8 +15,15 @@ import (
 
 const TaskQueue = "Interpreter"
 
+type stateExecution struct {
+	stateId      string
+	stateInput   state.EncodedObject
+	stateOptions state.WorkflowStateOptions
+}
+
 // Interpreter is a interpreter workflow definition.
 func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+
 	ao := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
 	}
