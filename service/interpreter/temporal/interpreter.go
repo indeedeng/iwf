@@ -3,6 +3,7 @@ package temporal
 import (
 	"context"
 	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
+	iwf "github.com/cadence-oss/iwf-server/gen/server/workflow"
 	"github.com/cadence-oss/iwf-server/service"
 	"time"
 
@@ -23,6 +24,17 @@ type stateExecution struct {
 
 // Interpreter is a interpreter workflow definition.
 func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+	currentStates := []stateExecution{
+		{
+			stateId:      input.StartStateId,
+			stateOptions: convertStateOption(input.StateOptions),
+			stateInput:   convertStateInput(input.StateInput),
+		},
+	}
+
+	for len(currentStates) > 0 {
+
+	}
 
 	ao := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
@@ -42,6 +54,30 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	logger.Info("Interpreter workflow completed.", "result", result)
 
 	return nil, nil
+}
+
+func convertStateInput(input iwf.EncodedObject) state.EncodedObject {
+	return state.EncodedObject{
+		Data:     &input.Data,
+		Encoding: &input.Encoding,
+	}
+}
+
+func convertStateOption(options iwf.WorkflowStateOptions) state.WorkflowStateOptions {
+	return state.WorkflowStateOptions{
+		SearchAttributesLoadingPolicy: convertAttributesLoadingPolicy(options.SearchAttributesLoadingPolicy),
+		QueryAttributesLoadingPolicy:  convertAttributesLoadingPolicy(options.QueryAttributesLoadingPolicy),
+		CommandCarryOverPolicy: &state.CommandCarryOverPolicy{
+			CommandCarryOverType: &options.CommandCarryOverPolicy.CommandCarryOverType,
+		},
+	}
+}
+
+func convertAttributesLoadingPolicy(policy iwf.AttributesLoadingPolicy) *state.AttributesLoadingPolicy {
+	return &state.AttributesLoadingPolicy{
+		AttributeLoadingType: &policy.AttributeLoadingType,
+		AttributeKeys:        policy.AttributeKeys,
+	}
 }
 
 func Activity(ctx context.Context, input service.InterpreterWorkflowInput) (string, error) {

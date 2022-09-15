@@ -23,6 +23,7 @@ TODO
 # Development Plan
 ## 1.0
 - [x] Start workflow API
+- [x] Executing `start` and `decide` APIs
 - [ ] Timer command
 - [ ] Signal command
 - [ ] SearchAttributeRW
