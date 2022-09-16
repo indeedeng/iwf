@@ -1,0 +1,856 @@
+openapi: 3.0.0
+info:
+  description: This APIs for iwf SDKs to operate workflows
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Workflow APIs
+  version: 1.0.0
+servers:
+- url: http://petstore.swagger.io/v2
+paths:
+  /api/v1/workflow/start:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowStartRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowStartResponse'
+          description: successful operation
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: for a workflow
+  /api/v1/workflowState/start:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowStateStartRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowStateStartResponse'
+          description: successful operation
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: for invoking WorkflowState.start API
+  /api/v1/workflowState/decide:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowStateDecideRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowStateDecideResponse'
+          description: successful operation
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: for invoking WorkflowState.decide API
+components:
+  schemas:
+    KeyValue:
+      example:
+        value:
+          data: data
+          encoding: JSON
+        key: key
+      properties:
+        key:
+          type: string
+        value:
+          $ref: '#/components/schemas/EncodedObject'
+      type: object
+    EncodedObject:
+      example:
+        data: data
+        encoding: JSON
+      properties:
+        encoding:
+          enum:
+          - JSON
+          type: string
+        data:
+          type: string
+      type: object
+    WorkflowStateOptions:
+      example:
+        searchAttributesLoadingPolicy:
+          attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          attributeKeys:
+          - attributeKeys
+          - attributeKeys
+        commandCarryOverPolicy:
+          commandCarryOverType: NONE
+        queryAttributesLoadingPolicy:
+          attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          attributeKeys:
+          - attributeKeys
+          - attributeKeys
+      properties:
+        searchAttributesLoadingPolicy:
+          $ref: '#/components/schemas/AttributesLoadingPolicy'
+        queryAttributesLoadingPolicy:
+          $ref: '#/components/schemas/AttributesLoadingPolicy'
+        commandCarryOverPolicy:
+          $ref: '#/components/schemas/CommandCarryOverPolicy'
+      type: object
+    AttributesLoadingPolicy:
+      example:
+        attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+        attributeKeys:
+        - attributeKeys
+        - attributeKeys
+      properties:
+        attributeLoadingType:
+          enum:
+          - LOAD_ALL_WITHOUT_LOCKING
+          - LOAD_ALL_WITH_EXCLUSIVE_LOCK
+          - LOAD_PARTIAL_WITHOUT_LOCKING
+          - LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
+          type: string
+        attributeKeys:
+          items:
+            type: string
+          type: array
+      type: object
+    CommandCarryOverPolicy:
+      example:
+        commandCarryOverType: NONE
+      properties:
+        commandCarryOverType:
+          enum:
+          - NONE
+          - ALL_UNFINISHED
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        detail:
+          type: string
+        subStatus:
+          type: string
+      type: object
+    WorkflowStartRequest:
+      example:
+        startStateId: startStateId
+        workflowTimeoutSeconds: 0
+        stateOptions:
+          searchAttributesLoadingPolicy:
+            attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            attributeKeys:
+            - attributeKeys
+            - attributeKeys
+          commandCarryOverPolicy:
+            commandCarryOverType: NONE
+          queryAttributesLoadingPolicy:
+            attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            attributeKeys:
+            - attributeKeys
+            - attributeKeys
+        iwfWorkflowType: iwfWorkflowType
+        iwfWorkerUrl: iwfWorkerUrl
+        workflowId: workflowId
+        stateInput:
+          data: data
+          encoding: JSON
+      properties:
+        workflowId:
+          type: string
+        iwfWorkflowType:
+          type: string
+        workflowTimeoutSeconds:
+          type: integer
+        iwfWorkerUrl:
+          type: string
+        startStateId:
+          type: string
+        stateInput:
+          $ref: '#/components/schemas/EncodedObject'
+        stateOptions:
+          $ref: '#/components/schemas/WorkflowStateOptions'
+      type: object
+    WorkflowStartResponse:
+      example:
+        workflowRunId: workflowRunId
+      properties:
+        workflowRunId:
+          type: string
+      type: object
+    WorkflowStateStartRequest:
+      example:
+        queryAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        workflowStateId: workflowStateId
+        context:
+          workflowStartedTimestamp: 0
+          workflowRunId: workflowRunId
+          workflowId: workflowId
+          stateExecutionId: stateExecutionId
+        workflowType: workflowType
+        searchAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        stateInput:
+          data: data
+          encoding: JSON
+      properties:
+        context:
+          $ref: '#/components/schemas/Context'
+        workflowType:
+          type: string
+        workflowStateId:
+          type: string
+        stateInput:
+          $ref: '#/components/schemas/EncodedObject'
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        queryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      type: object
+    WorkflowStateStartResponse:
+      example:
+        upsertSearchAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        upsertStateLocalAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        commandRequest:
+          signalCommands:
+          - signalName: signalName
+            commandId: commandId
+          - signalName: signalName
+            commandId: commandId
+          timerCommands:
+          - firingUnixTimestampSeconds: 6
+            commandId: commandId
+          - firingUnixTimestampSeconds: 6
+            commandId: commandId
+          deciderTriggerType: ALL_COMMAND_COMPLETED
+          activityCommands:
+          - input:
+              data: data
+              encoding: JSON
+            activityOptions:
+              startToCloseTimeoutSeconds: 0
+            activityType: activityType
+            commandId: commandId
+          - input:
+              data: data
+              encoding: JSON
+            activityOptions:
+              startToCloseTimeoutSeconds: 0
+            activityType: activityType
+            commandId: commandId
+        upsertQueryAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+      properties:
+        upsertSearchAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        upsertQueryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        commandRequest:
+          $ref: '#/components/schemas/CommandRequest'
+        upsertStateLocalAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      type: object
+    WorkflowStateDecideRequest:
+      example:
+        queryAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        workflowStateId: workflowStateId
+        stateLocalAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        commandResults:
+          signalResults:
+          - signalName: signalName
+            commandId: commandId
+            signalStatus: WAITING
+            signalValue:
+              data: data
+              encoding: JSON
+          - signalName: signalName
+            commandId: commandId
+            signalStatus: WAITING
+            signalValue:
+              data: data
+              encoding: JSON
+          activityResults:
+          - output:
+              data: data
+              encoding: JSON
+            timeoutType: SCHEDULED_TO_START
+            activityStatus: OPEN
+            activityType: activityType
+            commandId: commandId
+          - output:
+              data: data
+              encoding: JSON
+            timeoutType: SCHEDULED_TO_START
+            activityStatus: OPEN
+            activityType: activityType
+            commandId: commandId
+          timerResults:
+          - timerStatus: SCHEDULED
+            commandId: commandId
+          - timerStatus: SCHEDULED
+            commandId: commandId
+        context:
+          workflowStartedTimestamp: 0
+          workflowRunId: workflowRunId
+          workflowId: workflowId
+          stateExecutionId: stateExecutionId
+        workflowType: workflowType
+        searchAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+      properties:
+        context:
+          $ref: '#/components/schemas/Context'
+        workflowType:
+          type: string
+        workflowStateId:
+          type: string
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        queryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        stateLocalAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        commandResults:
+          $ref: '#/components/schemas/CommandResults'
+      type: object
+    WorkflowStateDecideResponse:
+      example:
+        stateDecision:
+        - upsertSearchAttributes:
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          nextStates:
+          - nextStateInput:
+              data: data
+              encoding: JSON
+            stateId: stateId
+            nextStateOptions:
+              searchAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+              commandCarryOverPolicy:
+                commandCarryOverType: NONE
+              queryAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+          - nextStateInput:
+              data: data
+              encoding: JSON
+            stateId: stateId
+            nextStateOptions:
+              searchAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+              commandCarryOverPolicy:
+                commandCarryOverType: NONE
+              queryAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+          upsertQueryAttributes:
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          waitForMoreCommandResults: true
+        - upsertSearchAttributes:
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          nextStates:
+          - nextStateInput:
+              data: data
+              encoding: JSON
+            stateId: stateId
+            nextStateOptions:
+              searchAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+              commandCarryOverPolicy:
+                commandCarryOverType: NONE
+              queryAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+          - nextStateInput:
+              data: data
+              encoding: JSON
+            stateId: stateId
+            nextStateOptions:
+              searchAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+              commandCarryOverPolicy:
+                commandCarryOverType: NONE
+              queryAttributesLoadingPolicy:
+                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                attributeKeys:
+                - attributeKeys
+                - attributeKeys
+          upsertQueryAttributes:
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          - value:
+              data: data
+              encoding: JSON
+            key: key
+          waitForMoreCommandResults: true
+      properties:
+        stateDecision:
+          items:
+            $ref: '#/components/schemas/StateDecision'
+          type: array
+      type: object
+    StateDecision:
+      example:
+        upsertSearchAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        nextStates:
+        - nextStateInput:
+            data: data
+            encoding: JSON
+          stateId: stateId
+          nextStateOptions:
+            searchAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+            commandCarryOverPolicy:
+              commandCarryOverType: NONE
+            queryAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+        - nextStateInput:
+            data: data
+            encoding: JSON
+          stateId: stateId
+          nextStateOptions:
+            searchAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+            commandCarryOverPolicy:
+              commandCarryOverType: NONE
+            queryAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+        upsertQueryAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        waitForMoreCommandResults: true
+      properties:
+        waitForMoreCommandResults:
+          type: boolean
+        nextStates:
+          items:
+            $ref: '#/components/schemas/StateMovement'
+          type: array
+        upsertSearchAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        upsertQueryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      type: object
+    StateMovement:
+      example:
+        nextStateInput:
+          data: data
+          encoding: JSON
+        stateId: stateId
+        nextStateOptions:
+          searchAttributesLoadingPolicy:
+            attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            attributeKeys:
+            - attributeKeys
+            - attributeKeys
+          commandCarryOverPolicy:
+            commandCarryOverType: NONE
+          queryAttributesLoadingPolicy:
+            attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            attributeKeys:
+            - attributeKeys
+            - attributeKeys
+      properties:
+        stateId:
+          type: string
+        nextStateInput:
+          $ref: '#/components/schemas/EncodedObject'
+        nextStateOptions:
+          $ref: '#/components/schemas/WorkflowStateOptions'
+      type: object
+    CommandRequest:
+      example:
+        signalCommands:
+        - signalName: signalName
+          commandId: commandId
+        - signalName: signalName
+          commandId: commandId
+        timerCommands:
+        - firingUnixTimestampSeconds: 6
+          commandId: commandId
+        - firingUnixTimestampSeconds: 6
+          commandId: commandId
+        deciderTriggerType: ALL_COMMAND_COMPLETED
+        activityCommands:
+        - input:
+            data: data
+            encoding: JSON
+          activityOptions:
+            startToCloseTimeoutSeconds: 0
+          activityType: activityType
+          commandId: commandId
+        - input:
+            data: data
+            encoding: JSON
+          activityOptions:
+            startToCloseTimeoutSeconds: 0
+          activityType: activityType
+          commandId: commandId
+      properties:
+        deciderTriggerType:
+          enum:
+          - ALL_COMMAND_COMPLETED
+          - ANY_COMMAND_COMPLETED
+          - ANY_COMMAND_CLOSED
+          type: string
+        activityCommands:
+          items:
+            $ref: '#/components/schemas/ActivityCommand'
+          type: array
+        timerCommands:
+          items:
+            $ref: '#/components/schemas/TimerCommand'
+          type: array
+        signalCommands:
+          items:
+            $ref: '#/components/schemas/SignalCommand'
+          type: array
+      type: object
+    CommandResults:
+      example:
+        signalResults:
+        - signalName: signalName
+          commandId: commandId
+          signalStatus: WAITING
+          signalValue:
+            data: data
+            encoding: JSON
+        - signalName: signalName
+          commandId: commandId
+          signalStatus: WAITING
+          signalValue:
+            data: data
+            encoding: JSON
+        activityResults:
+        - output:
+            data: data
+            encoding: JSON
+          timeoutType: SCHEDULED_TO_START
+          activityStatus: OPEN
+          activityType: activityType
+          commandId: commandId
+        - output:
+            data: data
+            encoding: JSON
+          timeoutType: SCHEDULED_TO_START
+          activityStatus: OPEN
+          activityType: activityType
+          commandId: commandId
+        timerResults:
+        - timerStatus: SCHEDULED
+          commandId: commandId
+        - timerStatus: SCHEDULED
+          commandId: commandId
+      properties:
+        activityResults:
+          items:
+            $ref: '#/components/schemas/ActivityResult'
+          type: array
+        signalResults:
+          items:
+            $ref: '#/components/schemas/SignalResult'
+          type: array
+        timerResults:
+          items:
+            $ref: '#/components/schemas/TimerResult'
+          type: array
+      type: object
+    ActivityCommand:
+      example:
+        input:
+          data: data
+          encoding: JSON
+        activityOptions:
+          startToCloseTimeoutSeconds: 0
+        activityType: activityType
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        activityType:
+          type: string
+        input:
+          $ref: '#/components/schemas/EncodedObject'
+        activityOptions:
+          $ref: '#/components/schemas/ActivityOptions'
+      type: object
+    TimerCommand:
+      example:
+        firingUnixTimestampSeconds: 6
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        firingUnixTimestampSeconds:
+          type: integer
+      type: object
+    SignalCommand:
+      example:
+        signalName: signalName
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        signalName:
+          type: string
+      type: object
+    ActivityOptions:
+      example:
+        startToCloseTimeoutSeconds: 0
+      properties:
+        startToCloseTimeoutSeconds:
+          type: integer
+      type: object
+    ActivityResult:
+      example:
+        output:
+          data: data
+          encoding: JSON
+        timeoutType: SCHEDULED_TO_START
+        activityStatus: OPEN
+        activityType: activityType
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        activityType:
+          type: string
+        output:
+          $ref: '#/components/schemas/EncodedObject'
+        activityStatus:
+          enum:
+          - OPEN
+          - COMPLETED
+          - TIMEOUT
+          - FAILED
+          type: string
+        timeoutType:
+          enum:
+          - SCHEDULED_TO_START
+          - START_TO_CLOSE
+          - SCHEDULE_TO_CLOSE
+          - HEARTBEAT
+          type: string
+      type: object
+    TimerResult:
+      example:
+        timerStatus: SCHEDULED
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        timerStatus:
+          enum:
+          - SCHEDULED
+          - FIRED
+          type: string
+      type: object
+    SignalResult:
+      example:
+        signalName: signalName
+        commandId: commandId
+        signalStatus: WAITING
+        signalValue:
+          data: data
+          encoding: JSON
+      properties:
+        commandId:
+          type: string
+        signalStatus:
+          enum:
+          - WAITING
+          - RECEIVED
+          type: string
+        signalName:
+          type: string
+        signalValue:
+          $ref: '#/components/schemas/EncodedObject'
+      type: object
+    Context:
+      example:
+        workflowStartedTimestamp: 0
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+        stateExecutionId: stateExecutionId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        workflowStartedTimestamp:
+          type: integer
+        stateExecutionId:
+          type: string
+      type: object
