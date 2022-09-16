@@ -38,7 +38,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 
 		for _, state := range statesToExecute {
 			// execute in another thread for parallelism
-			// this must be passed via parameter https://stackoverflow.com/questions/67263092
+			// state must be passed via parameter https://stackoverflow.com/questions/67263092
 			const ctxKey = "stateToExecute"
 			stateCtx := workflow.WithValue(ctx, ctxKey, &state)
 			workflow.Go(stateCtx, func(ctx workflow.Context) {
@@ -66,9 +66,9 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		}
 
 		awaitError := workflow.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToReturn != nil
+			return len(currentStates) > 0 || errToReturn != nil || outputToReturn != nil
 		})
-		if errToReturn != nil {
+		if errToReturn != nil || outputToReturn != nil {
 			return outputToReturn, errToReturn
 		}
 
