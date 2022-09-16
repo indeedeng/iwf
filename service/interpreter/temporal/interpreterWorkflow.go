@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"go.temporal.io/sdk/temporal"
@@ -39,14 +40,15 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		for _, state := range statesToExecute {
 			// execute in another thread for parallelism
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
-			const ctxKey = "stateToExecute"
-			stateCtx := workflow.WithValue(ctx, ctxKey, &state)
-			workflow.Go(stateCtx, func(ctx workflow.Context) {
-				stPtr, ok := ctx.Value(ctxKey).(*iwfidl.StateMovement)
-				if !ok || stPtr == nil {
+			stateCtx := workflow.WithValue(ctx, "state", state)
+			//stateCtx := newParametrizedContext(ctx2, &state)
+			workflow.GoNamed(stateCtx, state.GetStateId(), func(ctx workflow.Context) {
+				thisState, ok := ctx.Value("state").(iwfidl.StateMovement)
+				if !ok {
 					panic("critical code bug")
 				}
-				thisState := *stPtr
+				fmt.Println("check stateId", thisState.GetStateId())
+
 				decision, err := executeState(ctx, thisState, execution, stateExeIdMgr)
 				if err != nil {
 					errToReturn = err
