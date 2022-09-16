@@ -53,7 +53,11 @@ func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		// basic workflow go straight to decide methods without any commands
 		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State2 {
-			c.JSON(http.StatusOK, iwfidl.NewWorkflowStateStartResponse())
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
+				},
+			})
 			return
 		}
 	}

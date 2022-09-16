@@ -70,8 +70,8 @@ func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.Interp
 		if stateId == service.CompletingWorkflowStateId || stateId == service.FailingWorkflowStateId {
 			hasClosingDecision = true
 			output = &service.InterpreterWorkflowOutput{
-				CompletedStateId: stateId,
-				StateOutput:      movement.GetNextStateInput(),
+				CompletedStateExecutionId: "TODO", // TODO get prev state execution Id
+				StateOutput:               movement.GetNextStateInput(),
 			}
 		}
 	}
@@ -126,7 +126,7 @@ func executeState(
 
 	commandReq := startResponse.GetCommandRequest()
 	triggerType := commandReq.GetDeciderTriggerType()
-	if triggerType != "ALL_COMMAND_COMPLETED" {
+	if triggerType != service.DeciderTypeAllCommandCompleted {
 		return nil, temporal.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
 	}
 

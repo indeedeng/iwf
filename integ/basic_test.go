@@ -9,6 +9,7 @@ import (
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"log"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -57,8 +58,8 @@ func TestBasicWorkflow(t *testing.T) {
 	})
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
-		WorkflowId:             iwfidl.PtrString("test-wf-id"),
-		IwfWorkflowType:        iwfidl.PtrString("test-iwf-wf-type"),
+		WorkflowId:             iwfidl.PtrString(strconv.Itoa(int(time.Now().Unix()))),
+		IwfWorkflowType:        iwfidl.PtrString(basic.WorkflowType),
 		WorkflowTimeoutSeconds: iwfidl.PtrInt32(10),
 		IwfWorkerUrl:           iwfidl.PtrString("http://localhost:" + testWorkflowServerPort),
 		StartStateId:           iwfidl.PtrString(basic.State1),
