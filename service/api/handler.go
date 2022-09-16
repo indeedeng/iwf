@@ -11,12 +11,10 @@ package api
 
 import (
 	"context"
-	"fmt"
-	"github.com/cadence-oss/iwf-server/gen/server/workflow"
+	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
-	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
+	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 
-	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
 	"go.temporal.io/sdk/client"
 	"log"
 	"net/http"
@@ -46,15 +44,12 @@ func (h *handler) close() {
 
 // Index is the index handler.
 func (h *handler) index(c *gin.Context) {
-	// for test only, will be removed
-	runTestRestApi()
-
 	c.String(http.StatusOK, "Hello World!")
 }
 
 // ApiV1WorkflowStartPost - for a workflow
 func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
-	var req workflow.WorkflowStartRequest
+	var req iwfidl.WorkflowStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -62,35 +57,25 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 	log.Println("received request", req)
 
 	workflowOptions := client.StartWorkflowOptions{
-		ID:        req.WorkflowId,
-		TaskQueue: temporalimpl.TaskQueue,
+		ID:        req.GetWorkflowId(),
+		TaskQueue: service.TaskQueue,
 	}
 
 	input := service.InterpreterWorkflowInput{
-		IwfWorkflowType: req.IwfWorkflowType,
-		IwfWorkerUrl:    req.IwfWorkerUrl,
-		StartStateId:    req.StartStateId,
-		StateInput:      req.StateInput,
-		StateOptions:    req.StateOptions,
+		IwfWorkflowType: req.GetIwfWorkflowType(),
+		IwfWorkerUrl:    req.GetIwfWorkerUrl(),
+		StartStateId:    req.GetStartStateId(),
+		StateInput:      req.GetStateInput(),
+		StateOptions:    req.GetStateOptions(),
 	}
-	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporalimpl.Interpreter, input)
+	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporal.Interpreter, input)
 	if err != nil {
 		log.Fatalln("Unable to execute workflow", err)
 	}
 
 	log.Println("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
 
-	c.JSON(http.StatusOK, workflow.WorkflowStartResponse{
-		WorkflowRunId: we.GetRunID(),
+	c.JSON(http.StatusOK, iwfidl.WorkflowStartResponse{
+		WorkflowRunId: iwfidl.PtrString(we.GetRunID()),
 	})
-}
-
-func runTestRestApi() {
-	apiClient := state.NewAPIClient(&state.Configuration{})
-	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
-	wfType := "123"
-	resp, httpResp, err := req.WorkflowStateStartRequest(state.WorkflowStateStartRequest{
-		WorkflowType: &wfType,
-	}).Execute()
-	fmt.Println("test REST API", resp.GetCommandRequest(), httpResp, err)
 }

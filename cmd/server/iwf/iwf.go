@@ -22,7 +22,7 @@ package iwf
 
 import (
 	"github.com/cadence-oss/iwf-server/service/api"
-	temporalimpl "github.com/cadence-oss/iwf-server/service/interpreter/temporalImpl"
+	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"log"
 	"strings"
 	"sync"
@@ -91,11 +91,11 @@ func BuildCLI() *cli.App {
 func launchService(service string, c *cli.Context) {
 	switch service {
 	case "api":
-		router := api.NewRouter()
+		svc := api.NewService()
 		// TODO use port number from config
-		log.Fatal(router.Run(":8801"))
+		log.Fatal(svc.Run(":8801"))
 	case "interpreter-temporal":
-		interpreter := temporalimpl.NewInterpreterWorker()
+		interpreter := temporal.NewInterpreterWorker()
 		interpreter.Start()
 	default:
 		log.Printf("Invalid service: %v", service)
