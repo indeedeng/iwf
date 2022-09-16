@@ -11,7 +11,6 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
@@ -45,9 +44,6 @@ func (h *handler) close() {
 
 // Index is the index handler.
 func (h *handler) index(c *gin.Context) {
-	// for test only, will be removed
-	runTestRestApi()
-
 	c.String(http.StatusOK, "Hello World!")
 }
 
@@ -82,14 +78,4 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 	c.JSON(http.StatusOK, iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(we.GetRunID()),
 	})
-}
-
-func runTestRestApi() {
-	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{})
-	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
-	wfType := "123"
-	resp, httpResp, err := req.WorkflowStateStartRequest(iwfidl.WorkflowStateStartRequest{
-		WorkflowType: &wfType,
-	}).Execute()
-	fmt.Println("test REST API", resp.GetCommandRequest(), httpResp, err)
 }

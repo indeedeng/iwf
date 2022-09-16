@@ -1,8 +1,8 @@
 package integ
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
+	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/basic"
 	"github.com/cadence-oss/iwf-server/service/api"
@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestBasicWorkflow(t *testing.T) {
@@ -47,25 +48,29 @@ func TestBasicWorkflow(t *testing.T) {
 	defer interpreter.Close()
 
 	// start a workflow
-	httpClient := &http.Client{}
-
-	reqStr, err := json.Marshal(iwfidl.WorkflowStartRequest{
-		IwfWorkflowType: iwfidl.PtrString(basic.WorkflowType),
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: "http://localhost:" + testIwfServerPort,
+			},
+		},
 	})
+	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
+	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+		WorkflowId:             iwfidl.PtrString("test-wf-id"),
+		IwfWorkflowType:        iwfidl.PtrString("test-iwf-wf-type"),
+		WorkflowTimeoutSeconds: iwfidl.PtrInt32(10),
+		IwfWorkerUrl:           iwfidl.PtrString("http://localhost:" + testWorkflowServerPort),
+		StartStateId:           iwfidl.PtrString(basic.State1),
+	}).Execute()
 	if err != nil {
-		log.Fatalf("Failed to marshal request %v", err)
+		fmt.Println("fail to invoke start api", err)
 	}
-	req, err := http.NewRequest("POST", "http://localhost:"+testIwfServerPort+""+api.WorkflowStartApiPath, bytes.NewBuffer(reqStr))
-	if err != nil {
-		log.Fatalf("Failed to create request %v", err)
+	if httpResp.StatusCode != http.StatusOK {
+		fmt.Println("status not success" + httpResp.Status)
+	}
+	fmt.Println(*resp)
 
-	}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		log.Fatalf("failed to start workflow %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("failed to start workflow, status code: %v", resp.StatusCode)
-	}
+	// give some time for workflow to execute
+	time.Sleep(time.Second * 10)
 }

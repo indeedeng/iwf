@@ -16,7 +16,7 @@ func StateStartActivity(ctx context.Context, input service.StateStartActivityInp
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
-				URL: input.IwfWorkerUrl + service.StateStartApi,
+				URL: input.IwfWorkerUrl,
 			},
 		},
 	})
@@ -38,7 +38,7 @@ func StateDecideActivity(ctx context.Context, input service.StateDecideActivityI
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
-				URL: input.IwfWorkerUrl + service.StateDecideApi,
+				URL: input.IwfWorkerUrl,
 			},
 		},
 	})

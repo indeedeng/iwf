@@ -5,6 +5,7 @@ import (
 	"github.com/cadence-oss/iwf-server/service"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
+	"time"
 
 	// TODO(cretz): Remove when tagged
 	_ "go.temporal.io/sdk/contrib/tools/workflowcheck/determinism"
@@ -87,6 +88,11 @@ func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.Interp
 func executeState(
 	ctx workflow.Context, state iwfidl.StateMovement, execution service.IwfWorkflowExecution, idMgr *stateExecutionIdManager,
 ) (*iwfidl.StateDecision, error) {
+	ao := workflow.ActivityOptions{
+		StartToCloseTimeout: 10 * time.Second,
+	}
+	ctx = workflow.WithActivityOptions(ctx, ao)
+
 	stateExeId := idMgr.incAndGetNextExecutionId(state.GetStateId())
 	exeCtx := iwfidl.Context{
 		WorkflowId:               &execution.WorkflowId,
