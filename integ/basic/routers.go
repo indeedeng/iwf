@@ -73,12 +73,10 @@ func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
 		if req.GetWorkflowStateId() == State1 {
 			// go to S2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				StateDecision: []iwfidl.StateDecision{
-					{
-						NextStates: []iwfidl.StateMovement{
-							{
-								StateId: iwfidl.PtrString(State2),
-							},
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: iwfidl.PtrString(State2),
 						},
 					},
 				},
@@ -87,12 +85,10 @@ func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
 		} else if req.GetWorkflowStateId() == State2 {
 			// go to complete
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				StateDecision: []iwfidl.StateDecision{
-					{
-						NextStates: []iwfidl.StateMovement{
-							{
-								StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
-							},
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
 						},
 					},
 				},
