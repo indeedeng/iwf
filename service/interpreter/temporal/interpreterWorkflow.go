@@ -35,6 +35,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		currentStates = nil
 
 		for _, state := range statesToExecute {
+			// TODO execute in another thread for parallelism
 			decision, err := executeState(ctx, state, execution, stateExeIdMgr)
 			if err != nil {
 				return nil, err
@@ -67,12 +68,18 @@ func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.Interp
 	var output *service.InterpreterWorkflowOutput
 	for _, movement := range decision.GetNextStates() {
 		stateId := movement.GetStateId()
-		if stateId == service.CompletingWorkflowStateId || stateId == service.FailingWorkflowStateId {
+		if stateId == service.CompletingWorkflowStateId {
 			hasClosingDecision = true
 			output = &service.InterpreterWorkflowOutput{
 				CompletedStateExecutionId: "TODO", // TODO get prev state execution Id
 				StateOutput:               movement.GetNextStateInput(),
 			}
+		}
+		if stateId == service.FailingWorkflowStateId {
+			return true, nil, temporal.NewApplicationError(
+				"failing by user workflow decision",
+				"failing on request",
+			)
 		}
 	}
 	if hasClosingDecision && len(decision.NextStates) > 1 {

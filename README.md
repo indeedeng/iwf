@@ -33,7 +33,6 @@ TODO
 - [ ] WaitForMoreResults in StateDecision
 
 ## 1.1
-- [ ] Failing workflow
 - [ ] Signal workflow API
 - [ ] Query workflow API
 - [ ] List/search workflow API
@@ -47,3 +46,4 @@ TODO
 
 ## 1.3
 - [ ] Skip timer API for testing/operation
+- [ ] Failing workflow details
