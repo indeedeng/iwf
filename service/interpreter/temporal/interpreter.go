@@ -2,10 +2,11 @@ package temporal
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
 	iwf "github.com/cadence-oss/iwf-server/gen/server/workflow"
 	"github.com/cadence-oss/iwf-server/service"
-	"time"
 
 	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/workflow"
@@ -33,27 +34,35 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	}
 
 	for len(currentStates) > 0 {
+		statesToExecute := currentStates
+		currentStates = nil //reset to empty slice
+		for _, state := range statesToExecute {
 
+		}
+		workflow.Await(func() bool {
+			len(currentStates) > 0
+		})
 	}
 
-	ao := workflow.ActivityOptions{
-		StartToCloseTimeout: 10 * time.Second,
-	}
-	ctx = workflow.WithActivityOptions(ctx, ao)
+	return nil, fmt.Errorf("we should never run into this line")
+	// ao := workflow.ActivityOptions{
+	// 	StartToCloseTimeout: 10 * time.Second,
+	// }
+	// ctx = workflow.WithActivityOptions(ctx, ao)
 
-	logger := workflow.GetLogger(ctx)
-	logger.Info("Interpreter workflow started", "input", input)
+	// logger := workflow.GetLogger(ctx)
+	// logger.Info("Interpreter workflow started", "input", input)
 
-	var result string
-	err := workflow.ExecuteActivity(ctx, Activity, input).Get(ctx, &result)
-	if err != nil {
-		logger.Error("Activity failed.", "Error", err)
-		return nil, err
-	}
+	// var result string
+	// err := workflow.ExecuteActivity(ctx, Activity, input).Get(ctx, &result)
+	// if err != nil {
+	// 	logger.Error("Activity failed.", "Error", err)
+	// 	return nil, err
+	// }
 
-	logger.Info("Interpreter workflow completed.", "result", result)
+	// logger.Info("Interpreter workflow completed.", "result", result)
 
-	return nil, nil
+	//return nil, nil
 }
 
 func convertStateInput(input iwf.EncodedObject) state.EncodedObject {
