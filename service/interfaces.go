@@ -31,4 +31,12 @@ type (
 		IwfWorkerUrl string
 		Request      iwfidl.WorkflowStateDecideRequest
 	}
+
+	IwfWorkflowExecution struct {
+		IwfWorkerUrl     string
+		WorkflowType     string
+		WorkflowId       string
+		RunId            string
+		StartedTimestamp int32
+	}
 )

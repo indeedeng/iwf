@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**StateDecision** | Pointer to [**[]StateDecision**](StateDecision.md) |  | [optional] 
+**StateDecision** | Pointer to [**StateDecision**](StateDecision.md) |  | [optional] 
 
 ## Methods
 
@@ -27,20 +27,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetStateDecision
 
-`func (o *WorkflowStateDecideResponse) GetStateDecision() []StateDecision`
+`func (o *WorkflowStateDecideResponse) GetStateDecision() StateDecision`
 
 GetStateDecision returns the StateDecision field if non-nil, zero value otherwise.
 
 ### GetStateDecisionOk
 
-`func (o *WorkflowStateDecideResponse) GetStateDecisionOk() (*[]StateDecision, bool)`
+`func (o *WorkflowStateDecideResponse) GetStateDecisionOk() (*StateDecision, bool)`
 
 GetStateDecisionOk returns a tuple with the StateDecision field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStateDecision
 
-`func (o *WorkflowStateDecideResponse) SetStateDecision(v []StateDecision)`
+`func (o *WorkflowStateDecideResponse) SetStateDecision(v StateDecision)`
 
 SetStateDecision sets StateDecision field to given value.
 

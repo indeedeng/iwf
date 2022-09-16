@@ -16,7 +16,7 @@ import (
 
 // WorkflowStateDecideResponse struct for WorkflowStateDecideResponse
 type WorkflowStateDecideResponse struct {
-	StateDecision []StateDecision `json:"stateDecision,omitempty"`
+	StateDecision *StateDecision `json:"stateDecision,omitempty"`
 }
 
 // NewWorkflowStateDecideResponse instantiates a new WorkflowStateDecideResponse object
@@ -37,17 +37,17 @@ func NewWorkflowStateDecideResponseWithDefaults() *WorkflowStateDecideResponse {
 }
 
 // GetStateDecision returns the StateDecision field value if set, zero value otherwise.
-func (o *WorkflowStateDecideResponse) GetStateDecision() []StateDecision {
+func (o *WorkflowStateDecideResponse) GetStateDecision() StateDecision {
 	if o == nil || o.StateDecision == nil {
-		var ret []StateDecision
+		var ret StateDecision
 		return ret
 	}
-	return o.StateDecision
+	return *o.StateDecision
 }
 
 // GetStateDecisionOk returns a tuple with the StateDecision field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateDecideResponse) GetStateDecisionOk() ([]StateDecision, bool) {
+func (o *WorkflowStateDecideResponse) GetStateDecisionOk() (*StateDecision, bool) {
 	if o == nil || o.StateDecision == nil {
 		return nil, false
 	}
@@ -63,9 +63,9 @@ func (o *WorkflowStateDecideResponse) HasStateDecision() bool {
 	return false
 }
 
-// SetStateDecision gets a reference to the given []StateDecision and assigns it to the StateDecision field.
-func (o *WorkflowStateDecideResponse) SetStateDecision(v []StateDecision) {
-	o.StateDecision = v
+// SetStateDecision gets a reference to the given StateDecision and assigns it to the StateDecision field.
+func (o *WorkflowStateDecideResponse) SetStateDecision(v StateDecision) {
+	o.StateDecision = &v
 }
 
 func (o WorkflowStateDecideResponse) MarshalJSON() ([]byte, error) {

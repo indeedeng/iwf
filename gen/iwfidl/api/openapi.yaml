@@ -417,61 +417,7 @@ components:
     WorkflowStateDecideResponse:
       example:
         stateDecision:
-        - upsertSearchAttributes:
-          - value:
-              data: data
-              encoding: JSON
-            key: key
-          - value:
-              data: data
-              encoding: JSON
-            key: key
-          nextStates:
-          - nextStateInput:
-              data: data
-              encoding: JSON
-            stateId: stateId
-            nextStateOptions:
-              searchAttributesLoadingPolicy:
-                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-                attributeKeys:
-                - attributeKeys
-                - attributeKeys
-              commandCarryOverPolicy:
-                commandCarryOverType: NONE
-              queryAttributesLoadingPolicy:
-                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-                attributeKeys:
-                - attributeKeys
-                - attributeKeys
-          - nextStateInput:
-              data: data
-              encoding: JSON
-            stateId: stateId
-            nextStateOptions:
-              searchAttributesLoadingPolicy:
-                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-                attributeKeys:
-                - attributeKeys
-                - attributeKeys
-              commandCarryOverPolicy:
-                commandCarryOverType: NONE
-              queryAttributesLoadingPolicy:
-                attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-                attributeKeys:
-                - attributeKeys
-                - attributeKeys
-          upsertQueryAttributes:
-          - value:
-              data: data
-              encoding: JSON
-            key: key
-          - value:
-              data: data
-              encoding: JSON
-            key: key
-          waitForMoreCommandResults: true
-        - upsertSearchAttributes:
+          upsertSearchAttributes:
           - value:
               data: data
               encoding: JSON
@@ -527,9 +473,7 @@ components:
           waitForMoreCommandResults: true
       properties:
         stateDecision:
-          items:
-            $ref: '#/components/schemas/StateDecision'
-          type: array
+          $ref: '#/components/schemas/StateDecision'
       type: object
     StateDecision:
       example:
