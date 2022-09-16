@@ -1,7 +1,6 @@
 package temporal
 
 import (
-	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"go.temporal.io/sdk/temporal"
@@ -46,7 +45,6 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 				if !ok {
 					panic("critical code bug")
 				}
-				fmt.Println("check stateId", thisState.GetStateId())
 
 				decision, err := executeState(ctx, thisState, execution, stateExeIdMgr)
 				if err != nil {
