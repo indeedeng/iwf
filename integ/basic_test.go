@@ -7,6 +7,8 @@ import (
 	"github.com/cadence-oss/iwf-server/integ/basic"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
+	"github.com/stretchr/testify/assert"
+	"go.temporal.io/sdk/client"
 	"log"
 	"net/http"
 	"strconv"
@@ -16,7 +18,7 @@ import (
 
 func TestBasicWorkflow(t *testing.T) {
 	// start test workflow server
-	basicWorkflow := basic.NewBasicWorkflow()
+	wfHandler, basicWorkflow := basic.NewBasicWorkflow()
 	testWorkflowServerPort := "9714"
 	wfServer := &http.Server{
 		Addr:    ":" + testWorkflowServerPort,
@@ -56,22 +58,37 @@ func TestBasicWorkflow(t *testing.T) {
 			},
 		},
 	})
+	wfId := basic.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
-		WorkflowId:             iwfidl.PtrString(strconv.Itoa(int(time.Now().Unix()))),
+		WorkflowId:             iwfidl.PtrString(wfId),
 		IwfWorkflowType:        iwfidl.PtrString(basic.WorkflowType),
 		WorkflowTimeoutSeconds: iwfidl.PtrInt32(10),
 		IwfWorkerUrl:           iwfidl.PtrString("http://localhost:" + testWorkflowServerPort),
 		StartStateId:           iwfidl.PtrString(basic.State1),
 	}).Execute()
 	if err != nil {
-		fmt.Println("fail to invoke start api", err)
+		log.Fatalf("Fail to invoke start api %v", err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
-		fmt.Println("status not success" + httpResp.Status)
+		log.Fatalf("Status not success" + httpResp.Status)
 	}
 	fmt.Println(*resp)
 
-	// give some time for workflow to execute
-	time.Sleep(time.Second * 10)
+	// wait for the workflow
+	temporalClient, err := client.Dial(client.Options{})
+	if err != nil {
+		log.Fatalln("Unable to create client", err)
+	}
+	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
+	_ = run.Get(context.Background(), nil)
+
+	history := wfHandler.GetTestResult()
+	assertions := assert.New(t)
+	assertions.Equalf(map[string]int{
+		"S1_start":  1,
+		"S1_decide": 1,
+		"S2_start":  1,
+		"S2_decide": 1,
+	}, history, "basic test fail, %v", history)
 }

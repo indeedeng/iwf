@@ -24,7 +24,7 @@ const (
 )
 
 // NewBasicWorkflow returns a new gin server.
-func NewBasicWorkflow() *gin.Engine {
+func NewBasicWorkflow() (*Handler, *gin.Engine) {
 	router := gin.Default()
 
 	handler := newHandler()
@@ -32,17 +32,21 @@ func NewBasicWorkflow() *gin.Engine {
 	router.POST(service.StateStartApi, handler.apiV1WorkflowStateStart)
 	router.POST(service.StateDecideApi, handler.apiV1WorkflowStateDecide)
 
-	return router
+	return handler, router
 }
 
-type handler struct{}
+type Handler struct {
+	invokeHistory map[string]int
+}
 
-func newHandler() *handler {
-	return &handler{}
+func newHandler() *Handler {
+	return &Handler{
+		invokeHistory: make(map[string]int),
+	}
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
+func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -53,6 +57,7 @@ func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		// basic workflow go straight to decide methods without any commands
 		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State2 {
+			h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
@@ -65,7 +70,7 @@ func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
+func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -74,6 +79,7 @@ func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
+		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 			// go to S2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -102,4 +108,8 @@ func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusBadRequest, struct{}{})
+}
+
+func (h *Handler) GetTestResult() map[string]int {
+	return h.invokeHistory
 }
