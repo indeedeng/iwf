@@ -23,15 +23,17 @@ TODO
 # Development Plan
 ## 1.0
 - [x] Start workflow API
-- [x] Executing `start` and `decide` APIs
+- [x] Executing `start`/`decide` APIs and completing workflow
 - [ ] Timer command
 - [ ] Signal command
 - [ ] SearchAttributeRW
 - [ ] QueryAttributeRW
 - [ ] StateLocalAttribute
 - [ ] Decider trigger types: AnyCommandCompleted
- 
+- [ ] WaitForMoreResults in StateDecision
+
 ## 1.1
+- [ ] Failing workflow
 - [ ] Signal workflow API
 - [ ] Query workflow API
 - [ ] List/search workflow API
@@ -44,5 +46,4 @@ TODO
 - [ ] Unit tests
 
 ## 1.3
-- [ ] Skip timer API for testing/operation 
-- [ ] Local integration test with SDK
+- [ ] Skip timer API for testing/operation

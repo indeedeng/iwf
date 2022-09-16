@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"github.com/cadence-oss/iwf-server/service"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 	"log"
@@ -28,10 +29,11 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	iw.worker = worker.New(iw.temporalClient, TaskQueue, worker.Options{})
+	iw.worker = worker.New(iw.temporalClient, service.TaskQueue, worker.Options{})
 
 	iw.worker.RegisterWorkflow(Interpreter)
-	iw.worker.RegisterActivity(Activity)
+	iw.worker.RegisterActivity(StateStartActivity)
+	iw.worker.RegisterActivity(StateDecideActivity)
 
 	err := iw.worker.Start()
 	if err != nil {

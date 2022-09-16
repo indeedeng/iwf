@@ -2,11 +2,10 @@ package temporal
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
-	iwf "github.com/cadence-oss/iwf-server/gen/server/workflow"
+	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
+	"go.temporal.io/sdk/temporal"
+	"net/http"
 
 	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/workflow"
@@ -15,82 +14,116 @@ import (
 	_ "go.temporal.io/sdk/contrib/tools/workflowcheck/determinism"
 )
 
-const TaskQueue = "Interpreter"
-
-type stateExecution struct {
-	stateId      string
-	stateInput   state.EncodedObject
-	stateOptions state.WorkflowStateOptions
-}
-
-// Interpreter is a interpreter workflow definition.
 func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
-	currentStates := []stateExecution{
+	currentStates := []iwfidl.StateMovement{
 		{
-			stateId:      input.StartStateId,
-			stateOptions: convertStateOption(input.StateOptions),
-			stateInput:   convertStateInput(input.StateInput),
+			StateId:          &input.StartStateId,
+			NextStateOptions: &input.StateOptions,
+			NextStateInput:   &input.StateInput,
 		},
 	}
 
+	var err error
 	for len(currentStates) > 0 {
 		statesToExecute := currentStates
-		currentStates = nil //reset to empty slice
+		//reset to empty slice since each iteration will process all current states in the queue
+		currentStates = nil
+
 		for _, state := range statesToExecute {
+			decision, err := executeState(state)
+			if err != nil {
+				return nil, err
+			}
+			// TODO process search attributes
+			// TODO process query attributes
+
+			isClosing, output, err := checkClosingWorkflow(decision)
+			if isClosing {
+				return output, err
+			}
+			if decision.HasNextStates() {
+				currentStates = append(currentStates, decision.GetNextStates()...)
+			}
 
 		}
-		workflow.Await(func() bool {
-			len(currentStates) > 0
+		err = workflow.Await(ctx, func() bool {
+			return len(currentStates) > 0
 		})
+		if err != nil {
+			break
+		}
 	}
 
-	return nil, fmt.Errorf("we should never run into this line")
-	// ao := workflow.ActivityOptions{
-	// 	StartToCloseTimeout: 10 * time.Second,
-	// }
-	// ctx = workflow.WithActivityOptions(ctx, ao)
-
-	// logger := workflow.GetLogger(ctx)
-	// logger.Info("Interpreter workflow started", "input", input)
-
-	// var result string
-	// err := workflow.ExecuteActivity(ctx, Activity, input).Get(ctx, &result)
-	// if err != nil {
-	// 	logger.Error("Activity failed.", "Error", err)
-	// 	return nil, err
-	// }
-
-	// logger.Info("Interpreter workflow completed.", "result", result)
-
-	//return nil, nil
+	return nil, err
 }
 
-func convertStateInput(input iwf.EncodedObject) state.EncodedObject {
-	return state.EncodedObject{
-		Data:     &input.Data,
-		Encoding: &input.Encoding,
+func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.InterpreterWorkflowOutput, error) {
+	hasClosingDecision := false
+	var output *service.InterpreterWorkflowOutput
+	for _, movement := range decision.GetNextStates() {
+		stateId := movement.GetStateId()
+		if stateId == service.CompletingWorkflowStateId || stateId == service.FailingWorkflowStateId {
+			hasClosingDecision = true
+			output = &service.InterpreterWorkflowOutput{
+				CompletedStateId: stateId,
+				StateOutput:      movement.GetNextStateInput(),
+			}
+		}
 	}
-}
-
-func convertStateOption(options iwf.WorkflowStateOptions) state.WorkflowStateOptions {
-	return state.WorkflowStateOptions{
-		SearchAttributesLoadingPolicy: convertAttributesLoadingPolicy(options.SearchAttributesLoadingPolicy),
-		QueryAttributesLoadingPolicy:  convertAttributesLoadingPolicy(options.QueryAttributesLoadingPolicy),
-		CommandCarryOverPolicy: &state.CommandCarryOverPolicy{
-			CommandCarryOverType: &options.CommandCarryOverPolicy.CommandCarryOverType,
-		},
+	if hasClosingDecision && len(decision.NextStates) > 1 {
+		// Illegal decision, should fail the workflow
+		return true, nil, temporal.NewApplicationError(
+			"closing workflow decision shouldn't have other state movements",
+			"Illegal closing workflow decision",
+		)
 	}
+	return hasClosingDecision, output, nil
 }
 
-func convertAttributesLoadingPolicy(policy iwf.AttributesLoadingPolicy) *state.AttributesLoadingPolicy {
-	return &state.AttributesLoadingPolicy{
-		AttributeLoadingType: &policy.AttributeLoadingType,
-		AttributeKeys:        policy.AttributeKeys,
-	}
+func executeState(state iwfidl.StateMovement) (*iwfidl.StateDecision, error) {
+	return nil, nil
 }
 
-func Activity(ctx context.Context, input service.InterpreterWorkflowInput) (string, error) {
+func StateStartActivity(ctx context.Context, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
 	logger := activity.GetLogger(ctx)
-	logger.Info("Activity", "input", input)
-	return "Hello " + input.StartStateId + "!", nil
+	logger.Info("StateStartActivity", "input", input)
+
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: input.IwfWorkerUrl,
+			},
+		},
+	})
+	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
+	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
+	if err != nil {
+		return nil, err
+	}
+	if httpResp.StatusCode != http.StatusOK {
+		return nil, temporal.NewApplicationError("state start API failed", "api failed", httpResp)
+	}
+	return resp, nil
+}
+
+func StateDecideActivity(ctx context.Context, input service.StateDecideActivityInput) (*iwfidl.WorkflowStateDecideResponse, error) {
+	logger := activity.GetLogger(ctx)
+	logger.Info("StateStartActivity", "input", input)
+
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: input.IwfWorkerUrl,
+			},
+		},
+	})
+	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(context.Background())
+	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
+	if err != nil {
+		return nil, err
+	}
+	if httpResp.StatusCode != http.StatusOK {
+		return nil, temporal.NewApplicationError("state decide API failed", "api failed", httpResp)
+	}
+	return resp, nil
 }

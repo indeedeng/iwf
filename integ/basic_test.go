@@ -3,7 +3,7 @@ package integ
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/cadence-oss/iwf-server/gen/server/workflow"
+	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/basic"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
@@ -49,8 +49,8 @@ func TestBasicWorkflow(t *testing.T) {
 	// start a workflow
 	httpClient := &http.Client{}
 
-	reqStr, err := json.Marshal(workflow.WorkflowStartRequest{
-		IwfWorkflowType: basic.WorkflowType,
+	reqStr, err := json.Marshal(iwfidl.WorkflowStartRequest{
+		IwfWorkflowType: iwfidl.PtrString(basic.WorkflowType),
 	})
 	if err != nil {
 		log.Fatalf("Failed to marshal request %v", err)
@@ -68,19 +68,4 @@ func TestBasicWorkflow(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		log.Fatalf("failed to start workflow, status code: %v", resp.StatusCode)
 	}
-
-	// invoke
-	//apiClient := state.NewAPIClient(&state.Configuration{
-	//	Servers: []state.ServerConfiguration{
-	//		{
-	//			URL: "http://localhost:" + testWorkflowServerPort,
-	//		},
-	//	},
-	//})
-	//req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
-	//resp, httpResp, err := req.WorkflowStateStartRequest(state.WorkflowStateStartRequest{
-	//	WorkflowType:    state.PtrString(basic.WorkflowType),
-	//	WorkflowStateId: state.PtrString(basic.State1),
-	//}).Execute()
-	//fmt.Println("test REST API", resp.GetCommandRequest(), httpResp, err)
 }

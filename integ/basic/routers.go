@@ -10,7 +10,7 @@
 package basic
 
 import (
-	"github.com/cadence-oss/iwf-server/gen/client/workflow/state"
+	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -18,9 +18,6 @@ import (
 )
 
 const (
-	stateApi  = "/api/v1/workflowState/start"
-	decideApi = "/api/v1/workflowState/decide"
-
 	WorkflowType = "basic"
 	State1       = "S1"
 	State2       = "S2"
@@ -32,8 +29,8 @@ func NewBasicWorkflow() *gin.Engine {
 
 	handler := newHandler()
 
-	router.POST(stateApi, handler.apiV1WorkflowStateStart)
-	router.POST(decideApi, handler.apiV1WorkflowStateDecide)
+	router.POST(service.StateStartApi, handler.apiV1WorkflowStateStart)
+	router.POST(service.StateDecideApi, handler.apiV1WorkflowStateDecide)
 
 	return router
 }
@@ -46,7 +43,7 @@ func newHandler() *handler {
 
 // ApiV1WorkflowStartPost - for a workflow
 func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
-	var req state.WorkflowStateStartRequest
+	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -56,7 +53,7 @@ func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		// basic workflow go straight to decide methods without any commands
 		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State2 {
-			c.JSON(http.StatusOK, state.NewWorkflowStateStartResponse())
+			c.JSON(http.StatusOK, iwfidl.NewWorkflowStateStartResponse())
 			return
 		}
 	}
@@ -65,7 +62,7 @@ func (h *handler) apiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
-	var req state.WorkflowStateStartRequest
+	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -75,12 +72,12 @@ func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		if req.GetWorkflowStateId() == State1 {
 			// go to S2
-			c.JSON(http.StatusOK, state.WorkflowStateDecideResponse{
-				StateDecision: []state.StateDecision{
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: []iwfidl.StateDecision{
 					{
-						NextStates: []state.StateMovement{
+						NextStates: []iwfidl.StateMovement{
 							{
-								StateId: state.PtrString(State2),
+								StateId: iwfidl.PtrString(State2),
 							},
 						},
 					},
@@ -89,12 +86,12 @@ func (h *handler) apiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		} else if req.GetWorkflowStateId() == State2 {
 			// go to complete
-			c.JSON(http.StatusOK, state.WorkflowStateDecideResponse{
-				StateDecision: []state.StateDecision{
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: []iwfidl.StateDecision{
 					{
-						NextStates: []state.StateMovement{
+						NextStates: []iwfidl.StateMovement{
 							{
-								StateId: state.PtrString(service.CompleteWorkflowStateId),
+								StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
 							},
 						},
 					},

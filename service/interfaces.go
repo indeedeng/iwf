@@ -1,22 +1,34 @@
 package service
 
 import (
-	"github.com/cadence-oss/iwf-server/gen/server/workflow"
+	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 )
 
-type InterpreterWorkflowInput struct {
-	IwfWorkflowType string `json:"iwfWorkflowType,omitempty"`
+type (
+	InterpreterWorkflowInput struct {
+		IwfWorkflowType string `json:"iwfWorkflowType,omitempty"`
 
-	IwfWorkerUrl string `json:"iwfWorkerUrl,omitempty"`
+		IwfWorkerUrl string `json:"iwfWorkerUrl,omitempty"`
 
-	StartStateId string `json:"startStateId,omitempty"`
+		StartStateId string `json:"startStateId,omitempty"`
 
-	StateInput workflow.EncodedObject `json:"stateInput,omitempty"`
+		StateInput iwfidl.EncodedObject `json:"stateInput,omitempty"`
 
-	StateOptions workflow.WorkflowStateOptions `json:"stateOptions,omitempty"`
-}
+		StateOptions iwfidl.WorkflowStateOptions `json:"stateOptions,omitempty"`
+	}
 
-type InterpreterWorkflowOutput struct {
-	CompletedStateId string                 `json:"completedStateId,omitempty"`
-	StateOutput      workflow.EncodedObject `json:"stateOutput,omitempty"`
-}
+	InterpreterWorkflowOutput struct {
+		CompletedStateId string               `json:"completedStateId,omitempty"`
+		StateOutput      iwfidl.EncodedObject `json:"stateOutput,omitempty"`
+	}
+
+	StateStartActivityInput struct {
+		IwfWorkerUrl string
+		Request      iwfidl.WorkflowStateStartRequest
+	}
+
+	StateDecideActivityInput struct {
+		IwfWorkerUrl string
+		Request      iwfidl.WorkflowStateDecideRequest
+	}
+)
