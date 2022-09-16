@@ -31,14 +31,23 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	var errToReturn error
 	var outputToReturn *service.InterpreterWorkflowOutput
 	for len(currentStates) > 0 {
+		// copy the whole slice(pointer)
 		statesToExecute := currentStates
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
 
 		for _, state := range statesToExecute {
 			// execute in another thread for parallelism
-			workflow.Go(ctx, func(ctx workflow.Context) {
-				decision, err := executeState(ctx, state, execution, stateExeIdMgr)
+			// this must be passed via parameter https://stackoverflow.com/questions/67263092
+			const ctxKey = "stateToExecute"
+			stateCtx := workflow.WithValue(ctx, ctxKey, &state)
+			workflow.Go(stateCtx, func(ctx workflow.Context) {
+				stPtr, ok := ctx.Value(ctxKey).(*iwfidl.StateMovement)
+				if !ok || stPtr == nil {
+					panic("critical code bug")
+				}
+				thisState := *stPtr
+				decision, err := executeState(ctx, thisState, execution, stateExeIdMgr)
 				if err != nil {
 					errToReturn = err
 				}
@@ -55,14 +64,16 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 				}
 			})
 		}
+
+		awaitError := workflow.Await(ctx, func() bool {
+			return len(currentStates) > 0 || errToReturn != nil
+		})
 		if errToReturn != nil {
 			return outputToReturn, errToReturn
 		}
 
-		errToReturn = workflow.Await(ctx, func() bool {
-			return len(currentStates) > 0
-		})
-		if errToReturn != nil {
+		if awaitError != nil {
+			errToReturn = awaitError
 			break
 		}
 	}
