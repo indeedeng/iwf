@@ -28,39 +28,46 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		},
 	}
 
-	var err error
+	var errToReturn error
+	var outputToReturn *service.InterpreterWorkflowOutput
 	for len(currentStates) > 0 {
 		statesToExecute := currentStates
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
 
 		for _, state := range statesToExecute {
-			// TODO execute in another thread for parallelism
-			decision, err := executeState(ctx, state, execution, stateExeIdMgr)
-			if err != nil {
-				return nil, err
-			}
-			// TODO process search attributes
-			// TODO process query attributes
+			// execute in another thread for parallelism
+			workflow.Go(ctx, func(ctx workflow.Context) {
+				decision, err := executeState(ctx, state, execution, stateExeIdMgr)
+				if err != nil {
+					errToReturn = err
+				}
+				// TODO process search attributes
+				// TODO process query attributes
 
-			isClosing, output, err := checkClosingWorkflow(decision)
-			if isClosing {
-				return output, err
-			}
-			if decision.HasNextStates() {
-				currentStates = append(currentStates, decision.GetNextStates()...)
-			}
-
+				isClosing, output, err := checkClosingWorkflow(decision)
+				if isClosing {
+					errToReturn = err
+					outputToReturn = output
+				}
+				if decision.HasNextStates() {
+					currentStates = append(currentStates, decision.GetNextStates()...)
+				}
+			})
 		}
-		err = workflow.Await(ctx, func() bool {
+		if errToReturn != nil {
+			return outputToReturn, errToReturn
+		}
+
+		errToReturn = workflow.Await(ctx, func() bool {
 			return len(currentStates) > 0
 		})
-		if err != nil {
+		if errToReturn != nil {
 			break
 		}
 	}
 
-	return nil, err
+	return nil, errToReturn
 }
 
 func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.InterpreterWorkflowOutput, error) {

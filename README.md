@@ -24,6 +24,7 @@ TODO
 ## 1.0
 - [x] Start workflow API
 - [x] Executing `start`/`decide` APIs and completing workflow
+- [x] Parallel execution of multiple states 
 - [ ] Timer command
 - [ ] Signal command
 - [ ] SearchAttributeRW
