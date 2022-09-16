@@ -41,7 +41,6 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 			// execute in another thread for parallelism
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
 			stateCtx := workflow.WithValue(ctx, "state", state)
-			//stateCtx := newParametrizedContext(ctx2, &state)
 			workflow.GoNamed(stateCtx, state.GetStateId(), func(ctx workflow.Context) {
 				thisState, ok := ctx.Value("state").(iwfidl.StateMovement)
 				if !ok {
