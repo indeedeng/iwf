@@ -45,6 +45,6 @@ TODO
 - [ ] Support IdReusePolicy when starting workflow
 - [ ] Unit tests
 
-## 1.3
+## 1.2
 - [ ] Skip timer API for testing/operation
 - [ ] Failing workflow details
