@@ -30,8 +30,7 @@ TODO
 - [ ] SearchAttributeRW
 - [ ] QueryAttributeRW
 - [ ] StateLocalAttribute
-- [ ] Decider trigger types: AnyCommandCompleted
-- [ ] WaitForMoreResults in StateDecision
+- [ ] AnyCommandCompleted Decider trigger type and WaitForMoreResults in StateDecision
 
 ## 1.1
 - [ ] Signal workflow API
