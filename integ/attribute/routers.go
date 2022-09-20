@@ -106,6 +106,28 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
+			sas := req.GetSearchAttributes()
+			kwSaFounds := 0
+			intSaFounds := 0
+			for _, sa := range sas {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+					kwSaFounds++
+				}
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+					intSaFounds++
+				}
+			}
+			h.invokeData["S2_start_kwSaFounds"] = kwSaFounds
+			h.invokeData["S2_start_intSaFounds"] = intSaFounds
+
+			queryAttFound := false
+			queryAtt := req.GetQueryAttributes()[0]
+			value := queryAtt.GetValue()
+			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal2.GetData() && value.GetEncoding() == TestQueryVal2.GetEncoding() {
+				queryAttFound = true
+			}
+			h.invokeData["S2_start_queryAttFound"] = queryAttFound
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
@@ -140,8 +162,8 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 					intSaFounds++
 				}
 			}
-			h.invokeData["S2_kwSaFounds"] = kwSaFounds
-			h.invokeData["S2_intSaFounds"] = intSaFounds
+			h.invokeData["S1_decide_kwSaFounds"] = kwSaFounds
+			h.invokeData["S1_decide_intSaFounds"] = intSaFounds
 
 			queryAttFound := false
 			queryAtt := req.GetQueryAttributes()[0]
@@ -149,7 +171,7 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal1.GetData() && value.GetEncoding() == TestQueryVal1.GetEncoding() {
 				queryAttFound = true
 			}
-			h.invokeData["S2_queryAttFound"] = queryAttFound
+			h.invokeData["S1_decide_queryAttFound"] = queryAttFound
 
 			localAttFound := false
 			localAtt := req.GetStateLocalAttributes()[0]
@@ -157,48 +179,13 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 			if localAtt.GetKey() == TestQueryAttributeKey && value.GetData() == testStateLocalAttributeVal.GetData() && value.GetEncoding() == testStateLocalAttributeVal.GetEncoding() {
 				localAttFound = true
 			}
-			h.invokeData["S2_localAttFound"] = localAttFound
+			h.invokeData["S1_decide_localAttFound"] = localAttFound
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
 							StateId: iwfidl.PtrString(State2),
-						},
-					},
-				},
-			})
-			return
-		} else if req.GetWorkflowStateId() == State2 {
-
-			sas := req.GetSearchAttributes()
-			kwSaFounds := 0
-			intSaFounds := 0
-			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
-					kwSaFounds++
-				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
-					intSaFounds++
-				}
-			}
-			h.invokeData["S2_kwSaFounds"] = kwSaFounds
-			h.invokeData["S2_intSaFounds"] = intSaFounds
-
-			queryAttFound := false
-			queryAtt := req.GetQueryAttributes()[0]
-			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal2.GetData() && value.GetEncoding() == TestQueryVal2.GetEncoding() {
-				queryAttFound = true
-			}
-			h.invokeData["S2_queryAttFound"] = queryAttFound
-
-			// go to complete
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				StateDecision: &iwfidl.StateDecision{
-					NextStates: []iwfidl.StateMovement{
-						{
-							StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
 						},
 					},
 					UpsertQueryAttributes: []iwfidl.KeyValue{
@@ -217,6 +204,40 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 							Key:       iwfidl.PtrString(TestSearchAttributeIntKey),
 							Value:     iwfidl.PtrString(TestSearchAttributeIntValue2),
 							ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+						},
+					},
+				},
+			})
+			return
+		} else if req.GetWorkflowStateId() == State2 {
+			sas := req.GetSearchAttributes()
+			kwSaFounds := 0
+			intSaFounds := 0
+			for _, sa := range sas {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+					kwSaFounds++
+				}
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+					intSaFounds++
+				}
+			}
+			h.invokeData["S2_decide_kwSaFounds"] = kwSaFounds
+			h.invokeData["S2_decide_intSaFounds"] = intSaFounds
+
+			queryAttFound := false
+			queryAtt := req.GetQueryAttributes()[0]
+			value := queryAtt.GetValue()
+			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal2.GetData() && value.GetEncoding() == TestQueryVal2.GetEncoding() {
+				queryAttFound = true
+			}
+			h.invokeData["S2_decide_queryAttFound"] = queryAttFound
+
+			// go to complete
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
 						},
 					},
 				},
