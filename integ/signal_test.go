@@ -74,6 +74,7 @@ func TestSignalWorkflow(t *testing.T) {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
 	fmt.Println(*resp)
+	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
 	// signal the workflow
 	err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, iwfidl.EncodedObject{

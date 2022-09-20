@@ -52,8 +52,6 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 				if err != nil {
 					errToReturn = err
 				}
-				// TODO process search attributes
-				// TODO process query attributes
 
 				isClosing, output, err := checkClosingWorkflow(decision, stateExeId)
 				if isClosing {
@@ -144,17 +142,85 @@ func executeState(
 		return nil, err
 	}
 
-	// TODO process timer command
-	// TODO process signal command
-	// TODO process long running activity command
 	// TODO process upsert search attribute
 	// TODO process upsert query attribute
 	// TODO process state local attribute
 
 	commandReq := startResponse.GetCommandRequest()
+
+	completedTimerCmds := 0
+	if len(commandReq.GetTimerCommands()) > 0 {
+		for _, cmd := range commandReq.GetTimerCommands() {
+			cmdCtx := workflow.WithValue(ctx, "cmd", cmd)
+			workflow.Go(cmdCtx, func(ctx workflow.Context) {
+				cmd, ok := ctx.Value("cmd").(iwfidl.TimerCommand)
+				if !ok {
+					panic("critical code bug")
+				}
+
+				now := workflow.Now(ctx).Unix()
+				fireAt := cmd.GetFiringUnixTimestampSeconds()
+				duration := time.Duration(fireAt-now) * time.Second
+				_ = workflow.Sleep(ctx, duration)
+				completedTimerCmds++
+			})
+		}
+	}
+
+	completedSignalCmds := map[string]*iwfidl.EncodedObject{}
+	if len(commandReq.GetSignalCommands()) > 0 {
+		for _, cmd := range commandReq.GetSignalCommands() {
+			cmdCtx := workflow.WithValue(ctx, "cmd", cmd)
+			workflow.Go(cmdCtx, func(ctx workflow.Context) {
+				cmd, ok := ctx.Value("cmd").(iwfidl.SignalCommand)
+				if !ok {
+					panic("critical code bug")
+				}
+				ch := workflow.GetSignalChannel(ctx, cmd.GetSignalName())
+				value := iwfidl.EncodedObject{}
+				ch.Receive(ctx, &value)
+				completedSignalCmds[cmd.GetCommandId()] = &value
+			})
+		}
+	}
+
+	// TODO process long running activity command
+
 	triggerType := commandReq.GetDeciderTriggerType()
 	if triggerType != service.DeciderTypeAllCommandCompleted {
 		return nil, temporal.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
+	}
+
+	err = workflow.Await(ctx, func() bool {
+		return completedTimerCmds == len(commandReq.GetTimerCommands()) &&
+			len(completedSignalCmds) == len(commandReq.GetSignalCommands())
+	})
+	if err != nil {
+		return nil, err
+	}
+	commandRes := &iwfidl.CommandResults{}
+	if len(commandReq.GetTimerCommands()) > 0 {
+		var timerResults []iwfidl.TimerResult
+		for _, cmd := range commandReq.GetTimerCommands() {
+			timerResults = append(timerResults, iwfidl.TimerResult{
+				CommandId:   iwfidl.PtrString(cmd.GetCommandId()),
+				TimerStatus: iwfidl.PtrString(service.TimerStatusFired),
+			})
+		}
+		commandRes.SetTimerResults(timerResults)
+	}
+
+	if len(commandReq.GetSignalCommands()) > 0 {
+		var signalResults []iwfidl.SignalResult
+		for _, cmd := range commandReq.GetSignalCommands() {
+			signalResults = append(signalResults, iwfidl.SignalResult{
+				CommandId:    iwfidl.PtrString(cmd.GetCommandId()),
+				SignalName:   iwfidl.PtrString(cmd.GetSignalName()),
+				SignalValue:  completedSignalCmds[cmd.GetCommandId()],
+				SignalStatus: iwfidl.PtrString(service.SignalStatusReceived),
+			})
+		}
+		commandRes.SetSignalResults(signalResults)
 	}
 
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
@@ -164,7 +230,7 @@ func executeState(
 			Context:              &exeCtx,
 			WorkflowType:         &execution.WorkflowType,
 			WorkflowStateId:      state.StateId,
-			CommandResults:       nil, // TODO
+			CommandResults:       commandRes,
 			StateLocalAttributes: nil, // TODO
 			SearchAttributes:     nil, // TODO
 			QueryAttributes:      nil, // TODO
@@ -173,6 +239,9 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO process upsert search attribute
+	// TODO process upsert query attribute
 
 	return decideResponse.StateDecision, nil
 }

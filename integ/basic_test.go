@@ -74,7 +74,8 @@ func TestBasicWorkflow(t *testing.T) {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
 	fmt.Println(*resp)
-
+	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
+	
 	// wait for the workflow
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
 	_ = run.Get(context.Background(), nil)

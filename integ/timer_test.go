@@ -74,6 +74,7 @@ func TestTimerWorkflow(t *testing.T) {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
 	fmt.Println(*resp)
+	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
 	// wait for the workflow
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
@@ -87,5 +88,6 @@ func TestTimerWorkflow(t *testing.T) {
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "timer test fail, %v", history)
-	fmt.Println("data:", data)
+	duration := (data["fired_at"]).(int64) - (data["scheduled_at"]).(int64)
+	assertions.True(duration >= 9 && duration <= 11)
 }
