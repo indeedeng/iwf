@@ -21,9 +21,10 @@ const (
 	WorkflowType = "signal"
 	State1       = "S1"
 	State2       = "S2"
+	SignalName   = "test-signal-name"
 )
 
-func NewBasicWorkflow() (*Handler, *gin.Engine) {
+func NewSignalWorkflow() (*Handler, *gin.Engine) {
 	router := gin.Default()
 
 	handler := newHandler()
@@ -62,8 +63,8 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
 						{
-							CommandId:  iwfidl.PtrString("timer-cmd-id"),
-							SignalName: iwfidl.PtrString("test-signal-name"),
+							CommandId:  iwfidl.PtrString("signal-cmd-id"),
+							SignalName: iwfidl.PtrString(SignalName),
 						},
 					},
 					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
@@ -130,6 +131,6 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *Handler) GetTestResult() map[string]int64 {
-	return h.invokeHistory
+func (h *Handler) GetTestResult() (map[string]int64, map[string]interface{}) {
+	return h.invokeHistory, h.invokeData
 }

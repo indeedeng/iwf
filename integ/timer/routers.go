@@ -37,11 +37,13 @@ func NewTimerWorkflow() (*Handler, *gin.Engine) {
 
 type Handler struct {
 	invokeHistory map[string]int64
+	invokeData    map[string]interface{}
 }
 
 func newHandler() *Handler {
 	return &Handler{
 		invokeHistory: make(map[string]int64),
+		invokeData:    make(map[string]interface{}),
 	}
 }
 
@@ -58,7 +60,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
 			now := time.Now().Unix()
-			h.invokeHistory["scheduled_at"] = now
+			h.invokeData["scheduled_at"] = now
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
@@ -97,10 +99,10 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 			now := time.Now().Unix()
-			h.invokeHistory["fired_at"] = now
+			h.invokeData["fired_at"] = now
 			timerResults := req.GetCommandResults()
 			timerId := timerResults.GetTimerResults()[0].GetCommandId()
-			h.invokeHistory["timer_id"+timerId]++
+			h.invokeData["timer_id"] = timerId
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -129,6 +131,6 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *Handler) GetTestResult() map[string]int64 {
-	return h.invokeHistory
+func (h *Handler) GetTestResult() (map[string]int64, map[string]interface{}) {
+	return h.invokeHistory, h.invokeData
 }
