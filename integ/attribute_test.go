@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/attribute"
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
@@ -80,6 +81,33 @@ func TestAttributeWorkflow(t *testing.T) {
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
 	_ = run.Get(context.Background(), nil)
 
+	qres, err := temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, nil)
+	if err != nil {
+		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
+	}
+
+	var queryResult1 service.QueryAttributeResponse
+	err = qres.Get(&queryResult1)
+	if err != nil {
+		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
+	}
+
+	qres, err = temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, service.QueryAttributeRequest{
+		Keys: []string{
+			attribute.TestQueryAttributeKey,
+		},
+	})
+	if err != nil {
+		log.Fatalf("Fail to invoke query workflow for sigle attr %v", err)
+	}
+
+	var queryResult2 service.QueryAttributeResponse
+	err = qres.Get(&queryResult2)
+	if err != nil {
+		log.Fatalf("Fail to invoke query workflow for single attr %v", err)
+	}
+
+	// assertion
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
@@ -121,4 +149,13 @@ func TestAttributeWorkflow(t *testing.T) {
 			"S2_start_queryAttFound":  true,
 		}, data)
 	}
+
+	expected := []iwfidl.KeyValue{
+		{
+			Key:   iwfidl.PtrString(attribute.TestQueryAttributeKey),
+			Value: &attribute.TestQueryVal2,
+		},
+	}
+	assertions.Equal(expected, queryResult2.AttributeValues)
+	assertions.Equal(expected, queryResult1.AttributeValues)
 }

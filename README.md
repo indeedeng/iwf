@@ -32,9 +32,9 @@ TODO
 - [x] Parallel execution of multiple states 
 - [x] Timer command
 - [x] Signal command
-- [ ] SearchAttributeRW
-- [ ] QueryAttributeRW
-- [ ] StateLocalAttribute
+- [x] SearchAttributeRW
+- [x] QueryAttributeRW
+- [x] StateLocalAttribute
 
 ## 1.1
 - [ ] Signal workflow API

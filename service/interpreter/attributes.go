@@ -22,13 +22,17 @@ func NewAttributeManager(searchAttributeUpserter func(attributes map[string]inte
 }
 
 func (am *AttributeManager) GetQueryAttributesByKey(request service.QueryAttributeRequest) service.QueryAttributeResponse {
+	all := false
+	if len(request.Keys) == 0 {
+		all = true
+	}
 	var res []iwfidl.KeyValue
 	keyMap := map[string]bool{}
 	for _, k := range request.Keys {
 		keyMap[k] = true
 	}
 	for key, value := range am.queryAttributes {
-		if keyMap[key] {
+		if keyMap[key] || all {
 			res = append(res, value)
 		}
 	}

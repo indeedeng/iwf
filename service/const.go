@@ -18,4 +18,6 @@ const (
 
 	SearchAttributeValueTypeKeyword = "KEYWORD"
 	SearchAttributeValueTypeInt     = "INT"
+
+	AttributeQueryType = "GetQueryAttributes"
 )

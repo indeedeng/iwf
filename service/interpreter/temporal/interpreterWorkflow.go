@@ -32,7 +32,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		return workflow.UpsertSearchAttributes(ctx, attributes)
 	})
 
-	err := workflow.SetQueryHandler(ctx, "GetQueryAttributes", func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
+	err := workflow.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
 		return attrMgr.GetQueryAttributesByKey(req), nil
 	})
 	if err != nil {
