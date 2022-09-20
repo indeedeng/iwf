@@ -26,13 +26,7 @@ type handler struct {
 	temporalClient client.Client
 }
 
-func newHandler() *handler {
-	// The client is a heavyweight object that should be created once per process.
-	// TODO use config for connection options and merge with api handler
-	temporalClient, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
+func newHandler(temporalClient client.Client) *handler {
 	return &handler{
 		temporalClient: temporalClient,
 	}

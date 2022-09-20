@@ -3,6 +3,7 @@ package temporal
 import (
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
+	"github.com/cadence-oss/iwf-server/service/interpreter"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 	"time"
@@ -19,7 +20,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		RunId:            workflow.GetInfo(ctx).WorkflowExecution.RunID,
 		StartedTimestamp: int32(workflow.GetInfo(ctx).WorkflowStartTime.Unix()),
 	}
-	stateExeIdMgr := newStateExecutionIdManager()
+	stateExeIdMgr := interpreter.NewStateExecutionIdManager()
 	currentStates := []iwfidl.StateMovement{
 		{
 			StateId:          &input.StartStateId,
@@ -46,14 +47,15 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 					panic("critical code bug")
 				}
 
-				decision, err := executeState(ctx, thisState, execution, stateExeIdMgr)
+				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
+				decision, err := executeState(ctx, thisState, execution, stateExeId)
 				if err != nil {
 					errToReturn = err
 				}
 				// TODO process search attributes
 				// TODO process query attributes
 
-				isClosing, output, err := checkClosingWorkflow(decision)
+				isClosing, output, err := checkClosingWorkflow(decision, stateExeId)
 				if isClosing {
 					errToReturn = err
 					outputToReturn = output
@@ -80,7 +82,9 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	return nil, errToReturn
 }
 
-func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.InterpreterWorkflowOutput, error) {
+func checkClosingWorkflow(
+	decision *iwfidl.StateDecision, currentStateExeId string,
+) (bool, *service.InterpreterWorkflowOutput, error) {
 	hasClosingDecision := false
 	var output *service.InterpreterWorkflowOutput
 	for _, movement := range decision.GetNextStates() {
@@ -88,7 +92,7 @@ func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.Interp
 		if stateId == service.CompletingWorkflowStateId {
 			hasClosingDecision = true
 			output = &service.InterpreterWorkflowOutput{
-				CompletedStateExecutionId: "TODO", // TODO get prev state execution Id
+				CompletedStateExecutionId: currentStateExeId,
 				StateOutput:               movement.GetNextStateInput(),
 			}
 		}
@@ -110,14 +114,13 @@ func checkClosingWorkflow(decision *iwfidl.StateDecision) (bool, *service.Interp
 }
 
 func executeState(
-	ctx workflow.Context, state iwfidl.StateMovement, execution service.IwfWorkflowExecution, idMgr *stateExecutionIdManager,
+	ctx workflow.Context, state iwfidl.StateMovement, execution service.IwfWorkflowExecution, stateExeId string,
 ) (*iwfidl.StateDecision, error) {
 	ao := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
 	}
 	ctx = workflow.WithActivityOptions(ctx, ao)
 
-	stateExeId := idMgr.incAndGetNextExecutionId(state.GetStateId())
 	exeCtx := iwfidl.Context{
 		WorkflowId:               &execution.WorkflowId,
 		WorkflowRunId:            &execution.RunId,

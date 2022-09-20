@@ -8,7 +8,6 @@ import (
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
-	"go.temporal.io/sdk/client"
 	"log"
 	"net/http"
 	"strconv"
@@ -32,7 +31,8 @@ func TestBasicWorkflow(t *testing.T) {
 	}()
 
 	// start iwf api server
-	iwfService := api.NewService()
+	temporalClient := createTemporalClient()
+	iwfService := api.NewService(temporalClient)
 	testIwfServerPort := "9715"
 	iwfServer := &http.Server{
 		Addr:    ":" + testIwfServerPort,
@@ -46,7 +46,7 @@ func TestBasicWorkflow(t *testing.T) {
 	}()
 
 	// start iwf interpreter worker
-	interpreter := temporal.NewInterpreterWorker()
+	interpreter := temporal.NewInterpreterWorker(temporalClient)
 	interpreter.Start()
 	defer interpreter.Close()
 
@@ -76,10 +76,6 @@ func TestBasicWorkflow(t *testing.T) {
 	fmt.Println(*resp)
 
 	// wait for the workflow
-	temporalClient, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
 	_ = run.Get(context.Background(), nil)
 
