@@ -144,7 +144,6 @@ func executeState(
 
 	// TODO process upsert search attribute
 	// TODO process upsert query attribute
-	// TODO process state local attribute
 
 	commandReq := startResponse.GetCommandRequest()
 
@@ -231,7 +230,7 @@ func executeState(
 			WorkflowType:         &execution.WorkflowType,
 			WorkflowStateId:      state.StateId,
 			CommandResults:       commandRes,
-			StateLocalAttributes: nil, // TODO
+			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),
 			SearchAttributes:     nil, // TODO
 			QueryAttributes:      nil, // TODO
 		},
