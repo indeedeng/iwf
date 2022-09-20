@@ -698,6 +698,7 @@ components:
         commandId:
           type: string
         firingUnixTimestampSeconds:
+          format: int64
           type: integer
       type: object
     SignalCommand:
@@ -794,6 +795,7 @@ components:
         workflowRunId:
           type: string
         workflowStartedTimestamp:
+          format: int64
           type: integer
         stateExecutionId:
           type: string

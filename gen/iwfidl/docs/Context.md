@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | Pointer to **string** |  | [optional] 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
-**WorkflowStartedTimestamp** | Pointer to **int32** |  | [optional] 
+**WorkflowStartedTimestamp** | Pointer to **int64** |  | [optional] 
 **StateExecutionId** | Pointer to **string** |  | [optional] 
 
 ## Methods
@@ -80,20 +80,20 @@ HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetWorkflowStartedTimestamp
 
-`func (o *Context) GetWorkflowStartedTimestamp() int32`
+`func (o *Context) GetWorkflowStartedTimestamp() int64`
 
 GetWorkflowStartedTimestamp returns the WorkflowStartedTimestamp field if non-nil, zero value otherwise.
 
 ### GetWorkflowStartedTimestampOk
 
-`func (o *Context) GetWorkflowStartedTimestampOk() (*int32, bool)`
+`func (o *Context) GetWorkflowStartedTimestampOk() (*int64, bool)`
 
 GetWorkflowStartedTimestampOk returns a tuple with the WorkflowStartedTimestamp field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWorkflowStartedTimestamp
 
-`func (o *Context) SetWorkflowStartedTimestamp(v int32)`
+`func (o *Context) SetWorkflowStartedTimestamp(v int64)`
 
 SetWorkflowStartedTimestamp sets WorkflowStartedTimestamp field to given value.
 

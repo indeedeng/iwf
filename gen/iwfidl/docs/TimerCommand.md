@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | Pointer to **string** |  | [optional] 
-**FiringUnixTimestampSeconds** | Pointer to **int32** |  | [optional] 
+**FiringUnixTimestampSeconds** | Pointer to **int64** |  | [optional] 
 
 ## Methods
 
@@ -53,20 +53,20 @@ HasCommandId returns a boolean if a field has been set.
 
 ### GetFiringUnixTimestampSeconds
 
-`func (o *TimerCommand) GetFiringUnixTimestampSeconds() int32`
+`func (o *TimerCommand) GetFiringUnixTimestampSeconds() int64`
 
 GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field if non-nil, zero value otherwise.
 
 ### GetFiringUnixTimestampSecondsOk
 
-`func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int32, bool)`
+`func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int64, bool)`
 
 GetFiringUnixTimestampSecondsOk returns a tuple with the FiringUnixTimestampSeconds field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetFiringUnixTimestampSeconds
 
-`func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int32)`
+`func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int64)`
 
 SetFiringUnixTimestampSeconds sets FiringUnixTimestampSeconds field to given value.
 
