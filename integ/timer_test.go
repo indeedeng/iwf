@@ -89,5 +89,6 @@ func TestTimerWorkflow(t *testing.T) {
 		"S2_decide": 1,
 	}, history, "timer test fail, %v", history)
 	duration := (data["fired_at"]).(int64) - (data["scheduled_at"]).(int64)
+	assertions.Equal("timer-cmd-id", data["timer_id"])
 	assertions.True(duration >= 9 && duration <= 11)
 }
