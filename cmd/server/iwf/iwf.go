@@ -67,7 +67,7 @@ func BuildCLI() *cli.App {
 }
 
 func start(c *cli.Context) {
-	configPath := c.String("config")
+	configPath := c.GlobalString("config")
 	config, err := service.NewConfig(configPath)
 	if err != nil {
 		log.Fatalf("Unable to load config for path %v because of error %v", configPath, err)

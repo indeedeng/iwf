@@ -1,4 +1,5 @@
 
-service:
-  api:
-    port: 8801 # TODO see cmd/server/iwf/iwf.go
+api:
+  port: 8801
+temporal:
+  hostPort: localhost:7233
