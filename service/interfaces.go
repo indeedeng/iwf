@@ -45,6 +45,6 @@ type (
 	}
 
 	QueryAttributeResponse struct {
-		AttributeValues map[string]iwfidl.EncodedObject
+		AttributeValues []iwfidl.KeyValue
 	}
 )

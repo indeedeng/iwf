@@ -156,8 +156,14 @@ func executeState(
 		return nil, err
 	}
 
-	attrMgr.ProcessUpsertSearchAttribute(startResponse.GetUpsertSearchAttributes())
-	attrMgr.ProcessUpsertQueryAttribute(startResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertSearchAttribute(startResponse.GetUpsertSearchAttributes())
+	if err != nil {
+		return nil, err
+	}
+	err = attrMgr.ProcessUpsertQueryAttribute(startResponse.GetUpsertQueryAttributes())
+	if err != nil {
+		return nil, err
+	}
 
 	commandReq := startResponse.GetCommandRequest()
 
@@ -254,8 +260,14 @@ func executeState(
 	}
 
 	decision := decideResponse.GetStateDecision()
-	attrMgr.ProcessUpsertSearchAttribute(decision.GetUpsertSearchAttributes())
-	attrMgr.ProcessUpsertQueryAttribute(decision.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertSearchAttribute(decision.GetUpsertSearchAttributes())
+	if err != nil {
+		return nil, err
+	}
+	err = attrMgr.ProcessUpsertQueryAttribute(decision.GetUpsertQueryAttributes())
+	if err != nil {
+		return nil, err
+	}
 
 	return &decision, nil
 }
