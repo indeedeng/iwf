@@ -39,4 +39,12 @@ type (
 		RunId            string
 		StartedTimestamp int64
 	}
+
+	QueryAttributeRequest struct {
+		Keys []string
+	}
+
+	QueryAttributeResponse struct {
+		AttributeValues map[string]iwfidl.EncodedObject
+	}
 )

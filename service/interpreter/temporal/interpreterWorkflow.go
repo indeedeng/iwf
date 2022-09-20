@@ -28,6 +28,16 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 			NextStateInput:   &input.StateInput,
 		},
 	}
+	attrMgr := interpreter.NewAttributeManager(func(attributes map[string]interface{}) error {
+		return workflow.UpsertSearchAttributes(ctx, attributes)
+	})
+
+	err := workflow.SetQueryHandler(ctx, "GetQueryAttributes", func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
+		return attrMgr.GetQueryAttributesByKey(req), nil
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	var errToReturn error
 	var outputToReturn *service.InterpreterWorkflowOutput
@@ -48,7 +58,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 				}
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, thisState, execution, stateExeId)
+				decision, err := executeState(ctx, thisState, execution, stateExeId, attrMgr)
 				if err != nil {
 					errToReturn = err
 				}
@@ -112,7 +122,11 @@ func checkClosingWorkflow(
 }
 
 func executeState(
-	ctx workflow.Context, state iwfidl.StateMovement, execution service.IwfWorkflowExecution, stateExeId string,
+	ctx workflow.Context,
+	state iwfidl.StateMovement,
+	execution service.IwfWorkflowExecution,
+	stateExeId string,
+	attrMgr *interpreter.AttributeManager,
 ) (*iwfidl.StateDecision, error) {
 	ao := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
@@ -134,16 +148,16 @@ func executeState(
 			WorkflowType:     &execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.NextStateInput,
-			SearchAttributes: nil, // TODO
-			QueryAttributes:  nil, // TODO
+			SearchAttributes: attrMgr.GetAllSearchAttributes(),
+			QueryAttributes:  attrMgr.GetAllQueryAttributes(),
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO process upsert search attribute
-	// TODO process upsert query attribute
+	attrMgr.ProcessUpsertSearchAttribute(startResponse.GetUpsertSearchAttributes())
+	attrMgr.ProcessUpsertQueryAttribute(startResponse.GetUpsertQueryAttributes())
 
 	commandReq := startResponse.GetCommandRequest()
 
@@ -231,16 +245,17 @@ func executeState(
 			WorkflowStateId:      state.StateId,
 			CommandResults:       commandRes,
 			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),
-			SearchAttributes:     nil, // TODO
-			QueryAttributes:      nil, // TODO
+			SearchAttributes:     attrMgr.GetAllSearchAttributes(),
+			QueryAttributes:      attrMgr.GetAllQueryAttributes(),
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO process upsert search attribute
-	// TODO process upsert query attribute
+	decision := decideResponse.GetStateDecision()
+	attrMgr.ProcessUpsertSearchAttribute(decision.GetUpsertSearchAttributes())
+	attrMgr.ProcessUpsertQueryAttribute(decision.GetUpsertQueryAttributes())
 
-	return decideResponse.StateDecision, nil
+	return &decision, nil
 }
