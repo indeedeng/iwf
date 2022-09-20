@@ -18,7 +18,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		WorkflowType:     input.IwfWorkflowType,
 		WorkflowId:       workflow.GetInfo(ctx).WorkflowExecution.ID,
 		RunId:            workflow.GetInfo(ctx).WorkflowExecution.RunID,
-		StartedTimestamp: int32(workflow.GetInfo(ctx).WorkflowStartTime.Unix()),
+		StartedTimestamp: workflow.GetInfo(ctx).WorkflowStartTime.Unix(),
 	}
 	stateExeIdMgr := interpreter.NewStateExecutionIdManager()
 	currentStates := []iwfidl.StateMovement{
