@@ -21,8 +21,11 @@
 package iwf
 
 import (
+	"fmt"
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
+	"go.temporal.io/sdk/client"
 	"log"
 	"strings"
 	"sync"
@@ -39,24 +42,9 @@ func BuildCLI() *cli.App {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "root, r",
-			Value: ".",
-			Usage: "root directory of execution environment",
-		},
-		cli.StringFlag{
 			Name:  "config, c",
-			Value: "config",
-			Usage: "config dir is a path relative to root, or an absolute path",
-		},
-		cli.StringFlag{
-			Name:  "env, e",
-			Value: "development",
-			Usage: "runtime environment",
-		},
-		cli.StringFlag{
-			Name:  "zone, az",
-			Value: "",
-			Usage: "availability zone",
+			Value: "config/development.yaml",
+			Usage: "config path is a path relative to root, or an absolute path",
 		},
 	}
 
@@ -71,31 +59,45 @@ func BuildCLI() *cli.App {
 					Usage: "start services/components in this project",
 				},
 			},
-			Usage: "start iwf notification service",
-			Action: func(c *cli.Context) {
-				var wg sync.WaitGroup
-				services := getServices(c)
-
-				for _, service := range services {
-					wg.Add(1)
-					go launchService(service, c)
-				}
-
-				wg.Wait()
-			},
+			Usage:  "start iwf notification service",
+			Action: start,
 		},
 	}
 	return app
 }
 
-func launchService(service string, c *cli.Context) {
+func start(c *cli.Context) {
+	configPath := c.String("config")
+	config, err := service.NewConfig(configPath)
+	if err != nil {
+		log.Fatalf("Unable to load config for path %v because of error %v", configPath, err)
+	}
+
+	// The client is a heavyweight object that should be created once per process.
+	temporalClient, err := client.Dial(client.Options{
+		HostPort: config.Temporal.HostPort,
+	})
+	if err != nil {
+		log.Fatalf("Unable to connect to Temporal because of error %v", err)
+	}
+
+	var wg sync.WaitGroup
+	services := getServices(c)
+
+	for _, service := range services {
+		wg.Add(1)
+		go launchService(service, config, temporalClient, c)
+	}
+
+	wg.Wait()
+}
+func launchService(service string, config *service.Config, temporalClient client.Client, c *cli.Context) {
 	switch service {
 	case "api":
-		svc := api.NewService()
-		// TODO use port number from config
-		log.Fatal(svc.Run(":8801"))
+		svc := api.NewService(temporalClient)
+		log.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case "interpreter-temporal":
-		interpreter := temporal.NewInterpreterWorker()
+		interpreter := temporal.NewInterpreterWorker(temporalClient)
 		interpreter.Start()
 	default:
 		log.Printf("Invalid service: %v", service)

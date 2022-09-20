@@ -12,12 +12,7 @@ type InterpreterWorker struct {
 	worker         worker.Worker
 }
 
-func NewInterpreterWorker() *InterpreterWorker {
-	// TODO use config for connection options and merge with api handler
-	temporalClient, err := client.Dial(client.Options{})
-	if err != nil {
-		log.Fatalln("Unable to create client", err)
-	}
+func NewInterpreterWorker(temporalClient client.Client) *InterpreterWorker {
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
 	}

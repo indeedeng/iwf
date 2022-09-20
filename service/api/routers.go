@@ -11,15 +11,16 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.temporal.io/sdk/client"
 )
 
 const WorkflowStartApiPath = "/api/v1/workflow/start"
 
 // NewService returns a new router.
-func NewService() *gin.Engine {
+func NewService(temporalClient client.Client) *gin.Engine {
 	router := gin.Default()
 
-	handler := newHandler()
+	handler := newHandler(temporalClient)
 
 	router.GET("/", handler.index)
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStartPost)
