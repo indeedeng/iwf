@@ -97,8 +97,8 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 			signalResults := req.GetCommandResults()
-			signalId := signalResults.SignalResults[0].SignalName
-			signalValue := signalResults.SignalResults[0].SignalValue
+			signalId := signalResults.SignalResults[0].GetCommandId()
+			signalValue := signalResults.SignalResults[0].GetSignalValue()
 
 			h.invokeData["signalId"] = signalId
 			h.invokeData["signalValue"] = signalValue

@@ -77,10 +77,11 @@ func TestSignalWorkflow(t *testing.T) {
 	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
 	// signal the workflow
-	err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, iwfidl.EncodedObject{
+	signalVal := iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
 		Data:     iwfidl.PtrString("test-data"),
-	})
+	}
+	err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, signalVal)
 	if err != nil {
 		log.Fatalf("Fail to signal the workflow %v", err)
 	}
@@ -97,5 +98,6 @@ func TestSignalWorkflow(t *testing.T) {
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "signal test fail, %v", history)
-	fmt.Println("data:", data)
+	assertions.Equal("signal-cmd-id", data["signalId"])
+	assertions.Equal(signalVal, data["signalValue"])
 }
