@@ -9,4 +9,10 @@ const (
 	StateDecideApi = "/api/v1/workflowState/decide"
 
 	DeciderTypeAllCommandCompleted = "ALL_COMMAND_COMPLETED"
+
+	TimerStatusFired     = "FIRED"
+	TimerStatusScheduled = "SCHEDULED"
+
+	SignalStatusWaiting  = "WAITING"
+	SignalStatusReceived = "RECEIVED"
 )

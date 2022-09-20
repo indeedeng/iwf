@@ -37,6 +37,6 @@ type (
 		WorkflowType     string
 		WorkflowId       string
 		RunId            string
-		StartedTimestamp int32
+		StartedTimestamp int64
 	}
 )

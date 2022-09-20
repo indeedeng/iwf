@@ -17,7 +17,7 @@ import (
 // TimerCommand struct for TimerCommand
 type TimerCommand struct {
 	CommandId *string `json:"commandId,omitempty"`
-	FiringUnixTimestampSeconds *int32 `json:"firingUnixTimestampSeconds,omitempty"`
+	FiringUnixTimestampSeconds *int64 `json:"firingUnixTimestampSeconds,omitempty"`
 }
 
 // NewTimerCommand instantiates a new TimerCommand object
@@ -70,9 +70,9 @@ func (o *TimerCommand) SetCommandId(v string) {
 }
 
 // GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field value if set, zero value otherwise.
-func (o *TimerCommand) GetFiringUnixTimestampSeconds() int32 {
+func (o *TimerCommand) GetFiringUnixTimestampSeconds() int64 {
 	if o == nil || o.FiringUnixTimestampSeconds == nil {
-		var ret int32
+		var ret int64
 		return ret
 	}
 	return *o.FiringUnixTimestampSeconds
@@ -80,7 +80,7 @@ func (o *TimerCommand) GetFiringUnixTimestampSeconds() int32 {
 
 // GetFiringUnixTimestampSecondsOk returns a tuple with the FiringUnixTimestampSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int32, bool) {
+func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int64, bool) {
 	if o == nil || o.FiringUnixTimestampSeconds == nil {
 		return nil, false
 	}
@@ -96,8 +96,8 @@ func (o *TimerCommand) HasFiringUnixTimestampSeconds() bool {
 	return false
 }
 
-// SetFiringUnixTimestampSeconds gets a reference to the given int32 and assigns it to the FiringUnixTimestampSeconds field.
-func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int32) {
+// SetFiringUnixTimestampSeconds gets a reference to the given int64 and assigns it to the FiringUnixTimestampSeconds field.
+func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int64) {
 	o.FiringUnixTimestampSeconds = &v
 }
 

@@ -1,6 +1,11 @@
 # iwf-server
 interpreter workflow engine for Cadence/Temporal
 
+# What & Why
+See our
+* [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit)  
+* [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56)
+
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
 * Then run  `./iwf-server start` to run the service . This defaults to test API + Temporal interpreter implementation, require to have local Temporal setup. See Run with local Temporal.
@@ -25,12 +30,11 @@ TODO
 - [x] Start workflow API
 - [x] Executing `start`/`decide` APIs and completing workflow
 - [x] Parallel execution of multiple states 
-- [ ] Timer command
-- [ ] Signal command
+- [x] Timer command
+- [x] Signal command
 - [ ] SearchAttributeRW
 - [ ] QueryAttributeRW
 - [ ] StateLocalAttribute
-- [ ] AnyCommandCompleted Decider trigger type and WaitForMoreResults in StateDecision
 
 ## 1.1
 - [ ] Signal workflow API
@@ -45,5 +49,7 @@ TODO
 - [ ] Unit tests
 
 ## 1.2
+- [ ] AnyCommandCompleted Decider trigger type and WaitForMoreResults in StateDecision
 - [ ] Skip timer API for testing/operation
 - [ ] Failing workflow details
+- [ ] Auto ContinueAsNew 

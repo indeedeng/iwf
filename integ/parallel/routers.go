@@ -73,7 +73,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
-	var req iwfidl.WorkflowStateStartRequest
+	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

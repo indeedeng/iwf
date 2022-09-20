@@ -18,7 +18,7 @@ import (
 type Context struct {
 	WorkflowId *string `json:"workflowId,omitempty"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	WorkflowStartedTimestamp *int32 `json:"workflowStartedTimestamp,omitempty"`
+	WorkflowStartedTimestamp *int64 `json:"workflowStartedTimestamp,omitempty"`
 	StateExecutionId *string `json:"stateExecutionId,omitempty"`
 }
 
@@ -104,9 +104,9 @@ func (o *Context) SetWorkflowRunId(v string) {
 }
 
 // GetWorkflowStartedTimestamp returns the WorkflowStartedTimestamp field value if set, zero value otherwise.
-func (o *Context) GetWorkflowStartedTimestamp() int32 {
+func (o *Context) GetWorkflowStartedTimestamp() int64 {
 	if o == nil || o.WorkflowStartedTimestamp == nil {
-		var ret int32
+		var ret int64
 		return ret
 	}
 	return *o.WorkflowStartedTimestamp
@@ -114,7 +114,7 @@ func (o *Context) GetWorkflowStartedTimestamp() int32 {
 
 // GetWorkflowStartedTimestampOk returns a tuple with the WorkflowStartedTimestamp field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Context) GetWorkflowStartedTimestampOk() (*int32, bool) {
+func (o *Context) GetWorkflowStartedTimestampOk() (*int64, bool) {
 	if o == nil || o.WorkflowStartedTimestamp == nil {
 		return nil, false
 	}
@@ -130,8 +130,8 @@ func (o *Context) HasWorkflowStartedTimestamp() bool {
 	return false
 }
 
-// SetWorkflowStartedTimestamp gets a reference to the given int32 and assigns it to the WorkflowStartedTimestamp field.
-func (o *Context) SetWorkflowStartedTimestamp(v int32) {
+// SetWorkflowStartedTimestamp gets a reference to the given int64 and assigns it to the WorkflowStartedTimestamp field.
+func (o *Context) SetWorkflowStartedTimestamp(v int64) {
 	o.WorkflowStartedTimestamp = &v
 }
 
