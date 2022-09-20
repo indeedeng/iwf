@@ -19,7 +19,7 @@ type WorkflowStateDecideRequest struct {
 	Context *Context `json:"context,omitempty"`
 	WorkflowType *string `json:"workflowType,omitempty"`
 	WorkflowStateId *string `json:"workflowStateId,omitempty"`
-	SearchAttributes []KeyValue `json:"searchAttributes,omitempty"`
+	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
 	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
 	StateLocalAttributes []KeyValue `json:"stateLocalAttributes,omitempty"`
 	CommandResults *CommandResults `json:"commandResults,omitempty"`
@@ -139,9 +139,9 @@ func (o *WorkflowStateDecideRequest) SetWorkflowStateId(v string) {
 }
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateDecideRequest) GetSearchAttributes() []KeyValue {
+func (o *WorkflowStateDecideRequest) GetSearchAttributes() []SearchAttribute {
 	if o == nil || o.SearchAttributes == nil {
-		var ret []KeyValue
+		var ret []SearchAttribute
 		return ret
 	}
 	return o.SearchAttributes
@@ -149,7 +149,7 @@ func (o *WorkflowStateDecideRequest) GetSearchAttributes() []KeyValue {
 
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateDecideRequest) GetSearchAttributesOk() ([]KeyValue, bool) {
+func (o *WorkflowStateDecideRequest) GetSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || o.SearchAttributes == nil {
 		return nil, false
 	}
@@ -165,8 +165,8 @@ func (o *WorkflowStateDecideRequest) HasSearchAttributes() bool {
 	return false
 }
 
-// SetSearchAttributes gets a reference to the given []KeyValue and assigns it to the SearchAttributes field.
-func (o *WorkflowStateDecideRequest) SetSearchAttributes(v []KeyValue) {
+// SetSearchAttributes gets a reference to the given []SearchAttribute and assigns it to the SearchAttributes field.
+func (o *WorkflowStateDecideRequest) SetSearchAttributes(v []SearchAttribute) {
 	o.SearchAttributes = v
 }
 

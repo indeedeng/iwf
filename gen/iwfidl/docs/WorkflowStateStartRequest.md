@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **WorkflowType** | Pointer to **string** |  | [optional] 
 **WorkflowStateId** | Pointer to **string** |  | [optional] 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
-**SearchAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 
 ## Methods
@@ -132,20 +132,20 @@ HasStateInput returns a boolean if a field has been set.
 
 ### GetSearchAttributes
 
-`func (o *WorkflowStateStartRequest) GetSearchAttributes() []KeyValue`
+`func (o *WorkflowStateStartRequest) GetSearchAttributes() []SearchAttribute`
 
 GetSearchAttributes returns the SearchAttributes field if non-nil, zero value otherwise.
 
 ### GetSearchAttributesOk
 
-`func (o *WorkflowStateStartRequest) GetSearchAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateStartRequest) GetSearchAttributesOk() (*[]SearchAttribute, bool)`
 
 GetSearchAttributesOk returns a tuple with the SearchAttributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSearchAttributes
 
-`func (o *WorkflowStateStartRequest) SetSearchAttributes(v []KeyValue)`
+`func (o *WorkflowStateStartRequest) SetSearchAttributes(v []SearchAttribute)`
 
 SetSearchAttributes sets SearchAttributes field to given value.
 

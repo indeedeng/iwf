@@ -18,7 +18,7 @@ import (
 type StateDecision struct {
 	WaitForMoreCommandResults *bool `json:"waitForMoreCommandResults,omitempty"`
 	NextStates []StateMovement `json:"nextStates,omitempty"`
-	UpsertSearchAttributes []KeyValue `json:"upsertSearchAttributes,omitempty"`
+	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
 }
 
@@ -104,9 +104,9 @@ func (o *StateDecision) SetNextStates(v []StateMovement) {
 }
 
 // GetUpsertSearchAttributes returns the UpsertSearchAttributes field value if set, zero value otherwise.
-func (o *StateDecision) GetUpsertSearchAttributes() []KeyValue {
+func (o *StateDecision) GetUpsertSearchAttributes() []SearchAttribute {
 	if o == nil || o.UpsertSearchAttributes == nil {
-		var ret []KeyValue
+		var ret []SearchAttribute
 		return ret
 	}
 	return o.UpsertSearchAttributes
@@ -114,7 +114,7 @@ func (o *StateDecision) GetUpsertSearchAttributes() []KeyValue {
 
 // GetUpsertSearchAttributesOk returns a tuple with the UpsertSearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *StateDecision) GetUpsertSearchAttributesOk() ([]KeyValue, bool) {
+func (o *StateDecision) GetUpsertSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || o.UpsertSearchAttributes == nil {
 		return nil, false
 	}
@@ -130,8 +130,8 @@ func (o *StateDecision) HasUpsertSearchAttributes() bool {
 	return false
 }
 
-// SetUpsertSearchAttributes gets a reference to the given []KeyValue and assigns it to the UpsertSearchAttributes field.
-func (o *StateDecision) SetUpsertSearchAttributes(v []KeyValue) {
+// SetUpsertSearchAttributes gets a reference to the given []SearchAttribute and assigns it to the UpsertSearchAttributes field.
+func (o *StateDecision) SetUpsertSearchAttributes(v []SearchAttribute) {
 	o.UpsertSearchAttributes = v
 }
 

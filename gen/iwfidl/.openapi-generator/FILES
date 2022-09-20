@@ -18,6 +18,7 @@ docs/DefaultApi.md
 docs/EncodedObject.md
 docs/ErrorResponse.md
 docs/KeyValue.md
+docs/SearchAttribute.md
 docs/SignalCommand.md
 docs/SignalResult.md
 docs/StateDecision.md
@@ -45,6 +46,7 @@ model_context.go
 model_encoded_object.go
 model_error_response.go
 model_key_value.go
+model_search_attribute.go
 model_signal_command.go
 model_signal_result.go
 model_state_decision.go

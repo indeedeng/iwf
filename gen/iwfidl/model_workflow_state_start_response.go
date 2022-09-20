@@ -16,7 +16,7 @@ import (
 
 // WorkflowStateStartResponse struct for WorkflowStateStartResponse
 type WorkflowStateStartResponse struct {
-	UpsertSearchAttributes []KeyValue `json:"upsertSearchAttributes,omitempty"`
+	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
 	CommandRequest *CommandRequest `json:"commandRequest,omitempty"`
 	UpsertStateLocalAttributes []KeyValue `json:"upsertStateLocalAttributes,omitempty"`
@@ -40,9 +40,9 @@ func NewWorkflowStateStartResponseWithDefaults() *WorkflowStateStartResponse {
 }
 
 // GetUpsertSearchAttributes returns the UpsertSearchAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartResponse) GetUpsertSearchAttributes() []KeyValue {
+func (o *WorkflowStateStartResponse) GetUpsertSearchAttributes() []SearchAttribute {
 	if o == nil || o.UpsertSearchAttributes == nil {
-		var ret []KeyValue
+		var ret []SearchAttribute
 		return ret
 	}
 	return o.UpsertSearchAttributes
@@ -50,7 +50,7 @@ func (o *WorkflowStateStartResponse) GetUpsertSearchAttributes() []KeyValue {
 
 // GetUpsertSearchAttributesOk returns a tuple with the UpsertSearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateStartResponse) GetUpsertSearchAttributesOk() ([]KeyValue, bool) {
+func (o *WorkflowStateStartResponse) GetUpsertSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || o.UpsertSearchAttributes == nil {
 		return nil, false
 	}
@@ -66,8 +66,8 @@ func (o *WorkflowStateStartResponse) HasUpsertSearchAttributes() bool {
 	return false
 }
 
-// SetUpsertSearchAttributes gets a reference to the given []KeyValue and assigns it to the UpsertSearchAttributes field.
-func (o *WorkflowStateStartResponse) SetUpsertSearchAttributes(v []KeyValue) {
+// SetUpsertSearchAttributes gets a reference to the given []SearchAttribute and assigns it to the UpsertSearchAttributes field.
+func (o *WorkflowStateStartResponse) SetUpsertSearchAttributes(v []SearchAttribute) {
 	o.UpsertSearchAttributes = v
 }
 

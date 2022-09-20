@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WaitForMoreCommandResults** | Pointer to **bool** |  | [optional] 
 **NextStates** | Pointer to [**[]StateMovement**](StateMovement.md) |  | [optional] 
-**UpsertSearchAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 
 ## Methods
@@ -80,20 +80,20 @@ HasNextStates returns a boolean if a field has been set.
 
 ### GetUpsertSearchAttributes
 
-`func (o *StateDecision) GetUpsertSearchAttributes() []KeyValue`
+`func (o *StateDecision) GetUpsertSearchAttributes() []SearchAttribute`
 
 GetUpsertSearchAttributes returns the UpsertSearchAttributes field if non-nil, zero value otherwise.
 
 ### GetUpsertSearchAttributesOk
 
-`func (o *StateDecision) GetUpsertSearchAttributesOk() (*[]KeyValue, bool)`
+`func (o *StateDecision) GetUpsertSearchAttributesOk() (*[]SearchAttribute, bool)`
 
 GetUpsertSearchAttributesOk returns a tuple with the UpsertSearchAttributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetUpsertSearchAttributes
 
-`func (o *StateDecision) SetUpsertSearchAttributes(v []KeyValue)`
+`func (o *StateDecision) SetUpsertSearchAttributes(v []SearchAttribute)`
 
 SetUpsertSearchAttributes sets UpsertSearchAttributes field to given value.
 

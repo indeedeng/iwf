@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**UpsertSearchAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
 **UpsertStateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -30,20 +30,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetUpsertSearchAttributes
 
-`func (o *WorkflowStateStartResponse) GetUpsertSearchAttributes() []KeyValue`
+`func (o *WorkflowStateStartResponse) GetUpsertSearchAttributes() []SearchAttribute`
 
 GetUpsertSearchAttributes returns the UpsertSearchAttributes field if non-nil, zero value otherwise.
 
 ### GetUpsertSearchAttributesOk
 
-`func (o *WorkflowStateStartResponse) GetUpsertSearchAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateStartResponse) GetUpsertSearchAttributesOk() (*[]SearchAttribute, bool)`
 
 GetUpsertSearchAttributesOk returns a tuple with the UpsertSearchAttributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetUpsertSearchAttributes
 
-`func (o *WorkflowStateStartResponse) SetUpsertSearchAttributes(v []KeyValue)`
+`func (o *WorkflowStateStartResponse) SetUpsertSearchAttributes(v []SearchAttribute)`
 
 SetUpsertSearchAttributes sets UpsertSearchAttributes field to given value.
 
