@@ -16,6 +16,8 @@ const (
 	TestStateLocalAttributeKey = "test-state-local-attribute"
 
 	// Here use builtin search attribute for testing
+	// NOTE: SA is not supported in temporalite: https://github.com/temporalio/temporalite/pull/28
+	EnableTestingSearchAttribute     = false
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
 	TestSearchAttributeKeywordValue2 = "keyword-value2"
@@ -74,17 +76,9 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
-				},
-				UpsertQueryAttributes: []iwfidl.KeyValue{
-					{
-						Key:   iwfidl.PtrString(TestQueryAttributeKey),
-						Value: &TestQueryVal1,
-					},
-				},
-				UpsertSearchAttributes: []iwfidl.SearchAttribute{
+			var sa []iwfidl.SearchAttribute
+			if EnableTestingSearchAttribute {
+				sa = []iwfidl.SearchAttribute{
 					{
 						Key:       iwfidl.PtrString(TestSearchAttributeKeywordKey),
 						Value:     iwfidl.PtrString(TestSearchAttributeKeywordValue1),
@@ -95,7 +89,20 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 						Value:     iwfidl.PtrString(TestSearchAttributeIntValue1),
 						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
 					},
+				}
+			}
+
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
 				},
+				UpsertQueryAttributes: []iwfidl.KeyValue{
+					{
+						Key:   iwfidl.PtrString(TestQueryAttributeKey),
+						Value: &TestQueryVal1,
+					},
+				},
+				UpsertSearchAttributes: sa,
 				UpsertStateLocalAttributes: []iwfidl.KeyValue{
 					{
 						Key:   iwfidl.PtrString(TestStateLocalAttributeKey),
@@ -176,10 +183,26 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 			localAttFound := false
 			localAtt := req.GetStateLocalAttributes()[0]
 			value = localAtt.GetValue()
-			if localAtt.GetKey() == TestQueryAttributeKey && value.GetData() == testStateLocalAttributeVal.GetData() && value.GetEncoding() == testStateLocalAttributeVal.GetEncoding() {
+			if localAtt.GetKey() == TestStateLocalAttributeKey && value.GetData() == testStateLocalAttributeVal.GetData() && value.GetEncoding() == testStateLocalAttributeVal.GetEncoding() {
 				localAttFound = true
 			}
 			h.invokeData["S1_decide_localAttFound"] = localAttFound
+
+			var sa []iwfidl.SearchAttribute
+			if EnableTestingSearchAttribute {
+				sa = []iwfidl.SearchAttribute{
+					{
+						Key:       iwfidl.PtrString(TestSearchAttributeKeywordKey),
+						Value:     iwfidl.PtrString(TestSearchAttributeKeywordValue2),
+						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+					},
+					{
+						Key:       iwfidl.PtrString(TestSearchAttributeIntKey),
+						Value:     iwfidl.PtrString(TestSearchAttributeIntValue2),
+						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+					},
+				}
+			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
@@ -191,21 +214,10 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 					UpsertQueryAttributes: []iwfidl.KeyValue{
 						{
 							Key:   iwfidl.PtrString(TestQueryAttributeKey),
-							Value: &TestQueryVal1,
+							Value: &TestQueryVal2,
 						},
 					},
-					UpsertSearchAttributes: []iwfidl.SearchAttribute{
-						{
-							Key:       iwfidl.PtrString(TestSearchAttributeKeywordKey),
-							Value:     iwfidl.PtrString(TestSearchAttributeKeywordValue2),
-							ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
-						},
-						{
-							Key:       iwfidl.PtrString(TestSearchAttributeIntKey),
-							Value:     iwfidl.PtrString(TestSearchAttributeIntValue2),
-							ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
-						},
-					},
+					UpsertSearchAttributes: sa,
 				},
 			})
 			return

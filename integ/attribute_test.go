@@ -88,5 +88,37 @@ func TestAttributeWorkflow(t *testing.T) {
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "attribute test fail, %v", history)
-	fmt.Println(data)
+
+	if attribute.EnableTestingSearchAttribute {
+		assertions.Equal(map[string]interface{}{
+			"S1_decide_intSaFounds": 1,
+			"S1_decide_kwSaFounds":  1,
+			"S2_decide_intSaFounds": 1,
+			"S2_decide_kwSaFounds":  1,
+			"S2_start_intSaFounds":  1,
+			"S2_start_kwSaFounds":   1,
+
+			"S1_decide_localAttFound": true,
+			"S1_decide_queryAttFound": true,
+			"S2_decide_queryAttFound": true,
+			"S2_start_queryAttFound":  true,
+		}, data)
+	} else {
+		// map[S1_decide_intSaFounds:0 S1_decide_kwSaFounds:0 S1_decide_localAttFound:false
+		//S1_decide_queryAttFound:true S2_decide_intSaFounds:0 S2_decide_kwSaFounds:0
+		//S2_decide_queryAttFound:false S2_start_intSaFounds:0 S2_start_kwSaFounds:0 S2_start_queryAttFound:false]
+		assertions.Equal(map[string]interface{}{
+			"S1_decide_intSaFounds": 0,
+			"S1_decide_kwSaFounds":  0,
+			"S2_decide_intSaFounds": 0,
+			"S2_decide_kwSaFounds":  0,
+			"S2_start_intSaFounds":  0,
+			"S2_start_kwSaFounds":   0,
+
+			"S1_decide_localAttFound": true,
+			"S1_decide_queryAttFound": true,
+			"S2_decide_queryAttFound": true,
+			"S2_start_queryAttFound":  true,
+		}, data)
+	}
 }

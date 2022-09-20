@@ -54,6 +54,9 @@ func (am *AttributeManager) GetAllQueryAttributes() []iwfidl.KeyValue {
 }
 
 func (am *AttributeManager) ProcessUpsertSearchAttribute(attributes []iwfidl.SearchAttribute) error {
+	if len(attributes) == 0 {
+		return nil
+	}
 	attrsToUpsert := map[string]interface{}{}
 	for _, attr := range attributes {
 		am.searchAttributes[attr.GetKey()] = attr
