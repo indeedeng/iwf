@@ -96,6 +96,7 @@ Class | Method | HTTP request | Description
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
  - [KeyValue](docs/KeyValue.md)
+ - [SearchAttribute](docs/SearchAttribute.md)
  - [SignalCommand](docs/SignalCommand.md)
  - [SignalResult](docs/SignalResult.md)
  - [StateDecision](docs/StateDecision.md)

@@ -98,6 +98,22 @@ components:
         data:
           type: string
       type: object
+    SearchAttribute:
+      example:
+        valueType: KEYWORD
+        value: value
+        key: key
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        valueType:
+          enum:
+          - KEYWORD
+          - INT
+          type: string
+      type: object
     WorkflowStateOptions:
       example:
         searchAttributesLoadingPolicy:
@@ -221,13 +237,11 @@ components:
           stateExecutionId: stateExecutionId
         workflowType: workflowType
         searchAttributes:
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
         stateInput:
           data: data
@@ -243,7 +257,7 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         searchAttributes:
           items:
-            $ref: '#/components/schemas/KeyValue'
+            $ref: '#/components/schemas/SearchAttribute'
           type: array
         queryAttributes:
           items:
@@ -253,13 +267,11 @@ components:
     WorkflowStateStartResponse:
       example:
         upsertSearchAttributes:
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
         upsertStateLocalAttributes:
         - value:
@@ -309,7 +321,7 @@ components:
       properties:
         upsertSearchAttributes:
           items:
-            $ref: '#/components/schemas/KeyValue'
+            $ref: '#/components/schemas/SearchAttribute'
           type: array
         upsertQueryAttributes:
           items:
@@ -384,13 +396,11 @@ components:
           stateExecutionId: stateExecutionId
         workflowType: workflowType
         searchAttributes:
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
       properties:
         context:
@@ -401,7 +411,7 @@ components:
           type: string
         searchAttributes:
           items:
-            $ref: '#/components/schemas/KeyValue'
+            $ref: '#/components/schemas/SearchAttribute'
           type: array
         queryAttributes:
           items:
@@ -418,13 +428,11 @@ components:
       example:
         stateDecision:
           upsertSearchAttributes:
-          - value:
-              data: data
-              encoding: JSON
+          - valueType: KEYWORD
+            value: value
             key: key
-          - value:
-              data: data
-              encoding: JSON
+          - valueType: KEYWORD
+            value: value
             key: key
           nextStates:
           - nextStateInput:
@@ -478,13 +486,11 @@ components:
     StateDecision:
       example:
         upsertSearchAttributes:
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
-        - value:
-            data: data
-            encoding: JSON
+        - valueType: KEYWORD
+          value: value
           key: key
         nextStates:
         - nextStateInput:
@@ -540,7 +546,7 @@ components:
           type: array
         upsertSearchAttributes:
           items:
-            $ref: '#/components/schemas/KeyValue'
+            $ref: '#/components/schemas/SearchAttribute'
           type: array
         upsertQueryAttributes:
           items:

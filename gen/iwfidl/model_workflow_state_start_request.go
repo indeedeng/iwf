@@ -20,7 +20,7 @@ type WorkflowStateStartRequest struct {
 	WorkflowType *string `json:"workflowType,omitempty"`
 	WorkflowStateId *string `json:"workflowStateId,omitempty"`
 	StateInput *EncodedObject `json:"stateInput,omitempty"`
-	SearchAttributes []KeyValue `json:"searchAttributes,omitempty"`
+	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
 	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
 }
 
@@ -170,9 +170,9 @@ func (o *WorkflowStateStartRequest) SetStateInput(v EncodedObject) {
 }
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartRequest) GetSearchAttributes() []KeyValue {
+func (o *WorkflowStateStartRequest) GetSearchAttributes() []SearchAttribute {
 	if o == nil || o.SearchAttributes == nil {
-		var ret []KeyValue
+		var ret []SearchAttribute
 		return ret
 	}
 	return o.SearchAttributes
@@ -180,7 +180,7 @@ func (o *WorkflowStateStartRequest) GetSearchAttributes() []KeyValue {
 
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateStartRequest) GetSearchAttributesOk() ([]KeyValue, bool) {
+func (o *WorkflowStateStartRequest) GetSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || o.SearchAttributes == nil {
 		return nil, false
 	}
@@ -196,8 +196,8 @@ func (o *WorkflowStateStartRequest) HasSearchAttributes() bool {
 	return false
 }
 
-// SetSearchAttributes gets a reference to the given []KeyValue and assigns it to the SearchAttributes field.
-func (o *WorkflowStateStartRequest) SetSearchAttributes(v []KeyValue) {
+// SetSearchAttributes gets a reference to the given []SearchAttribute and assigns it to the SearchAttributes field.
+func (o *WorkflowStateStartRequest) SetSearchAttributes(v []SearchAttribute) {
 	o.SearchAttributes = v
 }
 
