@@ -3,3 +3,4 @@ api:
   port: 8801
 temporal:
   hostPort: localhost:7233
+  namespace: default
