@@ -15,6 +15,8 @@ import (
 )
 
 const WorkflowStartApiPath = "/api/v1/workflow/start"
+const WorkflowSignalApiPath = "/api/v1/workflow/signal"
+const WorkflowQueryApiPath = "/api/v1/workflow/query"
 
 // NewService returns a new router.
 func NewService(temporalClient client.Client) *gin.Engine {
@@ -24,6 +26,8 @@ func NewService(temporalClient client.Client) *gin.Engine {
 
 	router.GET("/", handler.index)
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStartPost)
+	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignalPost)
+	router.POST(WorkflowQueryApiPath, handler.apiV1WorkflowQueryPost)
 
 	return router
 }
