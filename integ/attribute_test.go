@@ -92,13 +92,22 @@ func TestAttributeWorkflow(t *testing.T) {
 		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
 	}
 
-	qres, err = temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, service.QueryAttributeRequest{
-		Keys: []string{
+	//qres, err = temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, service.QueryAttributeRequest{
+	//	Keys: []string{
+	//		attribute.TestQueryAttributeKey,
+	//	},
+	//})
+
+	req2 := apiClient.DefaultApi.ApiV1WorkflowQueryPost(context.Background())
+	_, httpResp2, err := req2.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
+		WorkflowId: iwfidl.PtrString(wfId),
+		AttributeKeys: []string{
 			attribute.TestQueryAttributeKey,
 		},
-	})
-	if err != nil {
-		log.Fatalf("Fail to invoke query workflow for sigle attr %v", err)
+	}).Execute()
+
+	if err != nil || httpResp2.StatusCode != 200 {
+		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpResp2)
 	}
 
 	var queryResult2 service.QueryAttributeResponse
