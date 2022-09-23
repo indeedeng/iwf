@@ -29,7 +29,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
-      summary: for a workflow
+      summary: start a workflow
+  /api/v1/workflow/signal:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSignalRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowSignalResponse'
+          description: successful operation
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: signal a workflow
+  /api/v1/workflow/query:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowQueryRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowQueryResponse'
+          description: successful operation
+        "405":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: query a workflow
   /api/v1/workflowState/start:
     post:
       requestBody:
@@ -217,6 +259,68 @@ components:
       properties:
         workflowRunId:
           type: string
+      type: object
+    WorkflowSignalRequest:
+      example:
+        signalName: signalName
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+        signalValue:
+          data: data
+          encoding: JSON
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        signalName:
+          type: string
+        signalValue:
+          $ref: '#/components/schemas/EncodedObject'
+      type: object
+    WorkflowSignalResponse:
+      example:
+        workflowRunId: workflowRunId
+      properties:
+        workflowRunId:
+          type: string
+      type: object
+    WorkflowQueryRequest:
+      example:
+        attributeKeys:
+        - attributeKeys
+        - attributeKeys
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        attributeKeys:
+          items:
+            type: string
+          type: array
+      type: object
+    WorkflowQueryResponse:
+      example:
+        queryAttributes:
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        - value:
+            data: data
+            encoding: JSON
+          key: key
+        workflowRunId: workflowRunId
+      properties:
+        workflowRunId:
+          type: string
+        queryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
       type: object
     WorkflowStateStartRequest:
       example:

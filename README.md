@@ -1,10 +1,14 @@
-# iwf-server
+# iWF server
 interpreter workflow engine for Cadence/Temporal
 
+Related projects:
+* [iWF Java SDK](https://github.com/cadence-oss/iwf-java)
+* [API schema](https://github.com/cadence-oss/iwf-idl)
+
 # What & Why
-See our
-* [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit)  
-* [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56)
+* See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
+* See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
+
 
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
@@ -35,10 +39,10 @@ TODO
 - [x] SearchAttributeRW
 - [x] QueryAttributeRW
 - [x] StateLocalAttribute
+- [x] Signal workflow API
+- [x] Query workflow API
 
 ## 1.1
-- [ ] Signal workflow API
-- [ ] Query workflow API
 - [ ] List/search workflow API
 - [ ] StateOption: AttributeLoadingPolicy
 - [ ] StateOption: CommandCarryOverPolicy
@@ -46,7 +50,6 @@ TODO
 - [ ] LongRunningActivityCommand
 - [ ] Decider trigger types: AnyCommandClosed
 - [ ] Support IdReusePolicy when starting workflow
-- [ ] Unit tests
 
 ## 1.2
 - [ ] AnyCommandCompleted Decider trigger type and WaitForMoreResults in StateDecision
