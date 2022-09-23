@@ -20,8 +20,10 @@ type (
 	}
 
 	TemporalConfig struct {
-		// HostPort to connect to default to localhost:7233
+		// HostPort to connect to, default to localhost:7233
 		HostPort string `yaml:"hostPort"`
+		// Namespace to connect to, default to default
+		Namespace string `yaml:"namespace"`
 	}
 )
 

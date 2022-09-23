@@ -64,12 +64,71 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 	}
 	we, err := h.temporalClient.ExecuteWorkflow(context.Background(), workflowOptions, temporal.Interpreter, input)
 	if err != nil {
-		log.Fatalln("Unable to execute workflow", err)
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
 	}
 
 	log.Println("Started workflow", "WorkflowID", we.GetID(), "RunID", we.GetRunID())
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(we.GetRunID()),
+	})
+}
+
+func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
+	var req iwfidl.WorkflowSignalRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received request", req)
+
+	err := h.temporalClient.SignalWorkflow(context.Background(),
+		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalName(), req.GetSignalValue())
+	if err != nil {
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
+	}
+	c.JSON(http.StatusOK, iwfidl.WorkflowSignalResponse{
+		WorkflowRunId: iwfidl.PtrString("TODO"),
+	})
+}
+
+func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
+	var req iwfidl.WorkflowQueryRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received request", req)
+
+	qres, err := h.temporalClient.QueryWorkflow(context.Background(),
+		req.GetWorkflowId(), req.GetWorkflowRunId(), service.AttributeQueryType,
+		service.QueryAttributeRequest{
+			Keys: req.AttributeKeys,
+		})
+	if err != nil {
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
+	}
+
+	var queryResult1 service.QueryAttributeResponse
+	err = qres.Get(&queryResult1)
+	if err != nil {
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
+	}
+
+	c.JSON(http.StatusOK, iwfidl.WorkflowQueryResponse{
+		WorkflowRunId:   iwfidl.PtrString("TODO"),
+		QueryAttributes: queryResult1.AttributeValues,
 	})
 }

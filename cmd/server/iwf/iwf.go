@@ -75,7 +75,8 @@ func start(c *cli.Context) {
 
 	// The client is a heavyweight object that should be created once per process.
 	temporalClient, err := client.Dial(client.Options{
-		HostPort: config.Temporal.HostPort,
+		HostPort:  config.Temporal.HostPort,
+		Namespace: config.Temporal.Namespace,
 	})
 	if err != nil {
 		log.Fatalf("Unable to connect to Temporal because of error %v", err)

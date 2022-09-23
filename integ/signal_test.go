@@ -81,9 +81,16 @@ func TestSignalWorkflow(t *testing.T) {
 		Encoding: iwfidl.PtrString("json"),
 		Data:     iwfidl.PtrString("test-data"),
 	}
-	err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, signalVal)
-	if err != nil {
-		log.Fatalf("Fail to signal the workflow %v", err)
+	//err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, signalVal)
+	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
+	_, httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+		WorkflowId:  iwfidl.PtrString(wfId),
+		SignalName:  iwfidl.PtrString(signal.SignalName),
+		SignalValue: &signalVal,
+	}).Execute()
+
+	if err != nil || httpResp2.StatusCode != 200 {
+		log.Fatalf("Fail to signal the workflow %v %v", err, httpResp2)
 	}
 
 	// wait for the workflow

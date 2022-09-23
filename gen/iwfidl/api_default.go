@@ -22,7 +22,31 @@ import (
 type DefaultApi interface {
 
 	/*
-	ApiV1WorkflowStartPost for a workflow
+	ApiV1WorkflowQueryPost query a workflow
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowQueryPostRequest
+	*/
+	ApiV1WorkflowQueryPost(ctx context.Context) ApiApiV1WorkflowQueryPostRequest
+
+	// ApiV1WorkflowQueryPostExecute executes the request
+	//  @return WorkflowQueryResponse
+	ApiV1WorkflowQueryPostExecute(r ApiApiV1WorkflowQueryPostRequest) (*WorkflowQueryResponse, *http.Response, error)
+
+	/*
+	ApiV1WorkflowSignalPost signal a workflow
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowSignalPostRequest
+	*/
+	ApiV1WorkflowSignalPost(ctx context.Context) ApiApiV1WorkflowSignalPostRequest
+
+	// ApiV1WorkflowSignalPostExecute executes the request
+	//  @return WorkflowSignalResponse
+	ApiV1WorkflowSignalPostExecute(r ApiApiV1WorkflowSignalPostRequest) (*WorkflowSignalResponse, *http.Response, error)
+
+	/*
+	ApiV1WorkflowStartPost start a workflow
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiApiV1WorkflowStartPostRequest
@@ -61,6 +85,234 @@ type DefaultApi interface {
 // DefaultApiService DefaultApi service
 type DefaultApiService service
 
+type ApiApiV1WorkflowQueryPostRequest struct {
+	ctx context.Context
+	ApiService DefaultApi
+	workflowQueryRequest *WorkflowQueryRequest
+}
+
+func (r ApiApiV1WorkflowQueryPostRequest) WorkflowQueryRequest(workflowQueryRequest WorkflowQueryRequest) ApiApiV1WorkflowQueryPostRequest {
+	r.workflowQueryRequest = &workflowQueryRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowQueryPostRequest) Execute() (*WorkflowQueryResponse, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowQueryPostExecute(r)
+}
+
+/*
+ApiV1WorkflowQueryPost query a workflow
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowQueryPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowQueryPost(ctx context.Context) ApiApiV1WorkflowQueryPostRequest {
+	return ApiApiV1WorkflowQueryPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return WorkflowQueryResponse
+func (a *DefaultApiService) ApiV1WorkflowQueryPostExecute(r ApiApiV1WorkflowQueryPostRequest) (*WorkflowQueryResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *WorkflowQueryResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowQueryPost")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/query"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowQueryRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 405 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiApiV1WorkflowSignalPostRequest struct {
+	ctx context.Context
+	ApiService DefaultApi
+	workflowSignalRequest *WorkflowSignalRequest
+}
+
+func (r ApiApiV1WorkflowSignalPostRequest) WorkflowSignalRequest(workflowSignalRequest WorkflowSignalRequest) ApiApiV1WorkflowSignalPostRequest {
+	r.workflowSignalRequest = &workflowSignalRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowSignalPostRequest) Execute() (*WorkflowSignalResponse, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowSignalPostExecute(r)
+}
+
+/*
+ApiV1WorkflowSignalPost signal a workflow
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowSignalPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowSignalPost(ctx context.Context) ApiApiV1WorkflowSignalPostRequest {
+	return ApiApiV1WorkflowSignalPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return WorkflowSignalResponse
+func (a *DefaultApiService) ApiV1WorkflowSignalPostExecute(r ApiApiV1WorkflowSignalPostRequest) (*WorkflowSignalResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *WorkflowSignalResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowSignalPost")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/signal"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowSignalRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 405 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiApiV1WorkflowStartPostRequest struct {
 	ctx context.Context
 	ApiService DefaultApi
@@ -77,7 +329,7 @@ func (r ApiApiV1WorkflowStartPostRequest) Execute() (*WorkflowStartResponse, *ht
 }
 
 /*
-ApiV1WorkflowStartPost for a workflow
+ApiV1WorkflowStartPost start a workflow
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiApiV1WorkflowStartPostRequest
