@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Context** | Pointer to [**Context**](Context.md) |  | [optional] 
-**WorkflowType** | Pointer to **string** |  | [optional] 
-**WorkflowStateId** | Pointer to **string** |  | [optional] 
+**Context** | [**Context**](Context.md) |  | 
+**WorkflowType** | **string** |  | 
+**WorkflowStateId** | **string** |  | 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewWorkflowStateStartRequest
 
-`func NewWorkflowStateStartRequest() *WorkflowStateStartRequest`
+`func NewWorkflowStateStartRequest(context Context, workflowType string, workflowStateId string, ) *WorkflowStateStartRequest`
 
 NewWorkflowStateStartRequest instantiates a new WorkflowStateStartRequest object
 This constructor will assign default values to properties that have it defined,
@@ -49,11 +49,6 @@ and a boolean to check if the value has been set.
 
 SetContext sets Context field to given value.
 
-### HasContext
-
-`func (o *WorkflowStateStartRequest) HasContext() bool`
-
-HasContext returns a boolean if a field has been set.
 
 ### GetWorkflowType
 
@@ -74,11 +69,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowType sets WorkflowType field to given value.
 
-### HasWorkflowType
-
-`func (o *WorkflowStateStartRequest) HasWorkflowType() bool`
-
-HasWorkflowType returns a boolean if a field has been set.
 
 ### GetWorkflowStateId
 
@@ -99,11 +89,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowStateId sets WorkflowStateId field to given value.
 
-### HasWorkflowStateId
-
-`func (o *WorkflowStateStartRequest) HasWorkflowStateId() bool`
-
-HasWorkflowStateId returns a boolean if a field has been set.
 
 ### GetStateInput
 

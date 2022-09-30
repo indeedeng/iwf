@@ -16,11 +16,11 @@ import (
 
 // WorkflowStartRequest struct for WorkflowStartRequest
 type WorkflowStartRequest struct {
-	WorkflowId *string `json:"workflowId,omitempty"`
-	IwfWorkflowType *string `json:"iwfWorkflowType,omitempty"`
-	WorkflowTimeoutSeconds *int32 `json:"workflowTimeoutSeconds,omitempty"`
-	IwfWorkerUrl *string `json:"iwfWorkerUrl,omitempty"`
-	StartStateId *string `json:"startStateId,omitempty"`
+	WorkflowId string `json:"workflowId"`
+	IwfWorkflowType string `json:"iwfWorkflowType"`
+	WorkflowTimeoutSeconds int32 `json:"workflowTimeoutSeconds"`
+	IwfWorkerUrl string `json:"iwfWorkerUrl"`
+	StartStateId string `json:"startStateId"`
 	StateInput *EncodedObject `json:"stateInput,omitempty"`
 	StateOptions *WorkflowStateOptions `json:"stateOptions,omitempty"`
 }
@@ -29,8 +29,13 @@ type WorkflowStartRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowStartRequest() *WorkflowStartRequest {
+func NewWorkflowStartRequest(workflowId string, iwfWorkflowType string, workflowTimeoutSeconds int32, iwfWorkerUrl string, startStateId string) *WorkflowStartRequest {
 	this := WorkflowStartRequest{}
+	this.WorkflowId = workflowId
+	this.IwfWorkflowType = iwfWorkflowType
+	this.WorkflowTimeoutSeconds = workflowTimeoutSeconds
+	this.IwfWorkerUrl = iwfWorkerUrl
+	this.StartStateId = startStateId
 	return &this
 }
 
@@ -42,164 +47,124 @@ func NewWorkflowStartRequestWithDefaults() *WorkflowStartRequest {
 	return &this
 }
 
-// GetWorkflowId returns the WorkflowId field value if set, zero value otherwise.
+// GetWorkflowId returns the WorkflowId field value
 func (o *WorkflowStartRequest) GetWorkflowId() string {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowId
+
+	return o.WorkflowId
 }
 
-// GetWorkflowIdOk returns a tuple with the WorkflowId field value if set, nil otherwise
+// GetWorkflowIdOk returns a tuple with the WorkflowId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowIdOk() (*string, bool) {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowId, true
+	return &o.WorkflowId, true
 }
 
-// HasWorkflowId returns a boolean if a field has been set.
-func (o *WorkflowStartRequest) HasWorkflowId() bool {
-	if o != nil && o.WorkflowId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowId gets a reference to the given string and assigns it to the WorkflowId field.
+// SetWorkflowId sets field value
 func (o *WorkflowStartRequest) SetWorkflowId(v string) {
-	o.WorkflowId = &v
+	o.WorkflowId = v
 }
 
-// GetIwfWorkflowType returns the IwfWorkflowType field value if set, zero value otherwise.
+// GetIwfWorkflowType returns the IwfWorkflowType field value
 func (o *WorkflowStartRequest) GetIwfWorkflowType() string {
-	if o == nil || o.IwfWorkflowType == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.IwfWorkflowType
+
+	return o.IwfWorkflowType
 }
 
-// GetIwfWorkflowTypeOk returns a tuple with the IwfWorkflowType field value if set, nil otherwise
+// GetIwfWorkflowTypeOk returns a tuple with the IwfWorkflowType field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetIwfWorkflowTypeOk() (*string, bool) {
-	if o == nil || o.IwfWorkflowType == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.IwfWorkflowType, true
+	return &o.IwfWorkflowType, true
 }
 
-// HasIwfWorkflowType returns a boolean if a field has been set.
-func (o *WorkflowStartRequest) HasIwfWorkflowType() bool {
-	if o != nil && o.IwfWorkflowType != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetIwfWorkflowType gets a reference to the given string and assigns it to the IwfWorkflowType field.
+// SetIwfWorkflowType sets field value
 func (o *WorkflowStartRequest) SetIwfWorkflowType(v string) {
-	o.IwfWorkflowType = &v
+	o.IwfWorkflowType = v
 }
 
-// GetWorkflowTimeoutSeconds returns the WorkflowTimeoutSeconds field value if set, zero value otherwise.
+// GetWorkflowTimeoutSeconds returns the WorkflowTimeoutSeconds field value
 func (o *WorkflowStartRequest) GetWorkflowTimeoutSeconds() int32 {
-	if o == nil || o.WorkflowTimeoutSeconds == nil {
+	if o == nil {
 		var ret int32
 		return ret
 	}
-	return *o.WorkflowTimeoutSeconds
+
+	return o.WorkflowTimeoutSeconds
 }
 
-// GetWorkflowTimeoutSecondsOk returns a tuple with the WorkflowTimeoutSeconds field value if set, nil otherwise
+// GetWorkflowTimeoutSecondsOk returns a tuple with the WorkflowTimeoutSeconds field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowTimeoutSecondsOk() (*int32, bool) {
-	if o == nil || o.WorkflowTimeoutSeconds == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowTimeoutSeconds, true
+	return &o.WorkflowTimeoutSeconds, true
 }
 
-// HasWorkflowTimeoutSeconds returns a boolean if a field has been set.
-func (o *WorkflowStartRequest) HasWorkflowTimeoutSeconds() bool {
-	if o != nil && o.WorkflowTimeoutSeconds != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowTimeoutSeconds gets a reference to the given int32 and assigns it to the WorkflowTimeoutSeconds field.
+// SetWorkflowTimeoutSeconds sets field value
 func (o *WorkflowStartRequest) SetWorkflowTimeoutSeconds(v int32) {
-	o.WorkflowTimeoutSeconds = &v
+	o.WorkflowTimeoutSeconds = v
 }
 
-// GetIwfWorkerUrl returns the IwfWorkerUrl field value if set, zero value otherwise.
+// GetIwfWorkerUrl returns the IwfWorkerUrl field value
 func (o *WorkflowStartRequest) GetIwfWorkerUrl() string {
-	if o == nil || o.IwfWorkerUrl == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.IwfWorkerUrl
+
+	return o.IwfWorkerUrl
 }
 
-// GetIwfWorkerUrlOk returns a tuple with the IwfWorkerUrl field value if set, nil otherwise
+// GetIwfWorkerUrlOk returns a tuple with the IwfWorkerUrl field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetIwfWorkerUrlOk() (*string, bool) {
-	if o == nil || o.IwfWorkerUrl == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.IwfWorkerUrl, true
+	return &o.IwfWorkerUrl, true
 }
 
-// HasIwfWorkerUrl returns a boolean if a field has been set.
-func (o *WorkflowStartRequest) HasIwfWorkerUrl() bool {
-	if o != nil && o.IwfWorkerUrl != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetIwfWorkerUrl gets a reference to the given string and assigns it to the IwfWorkerUrl field.
+// SetIwfWorkerUrl sets field value
 func (o *WorkflowStartRequest) SetIwfWorkerUrl(v string) {
-	o.IwfWorkerUrl = &v
+	o.IwfWorkerUrl = v
 }
 
-// GetStartStateId returns the StartStateId field value if set, zero value otherwise.
+// GetStartStateId returns the StartStateId field value
 func (o *WorkflowStartRequest) GetStartStateId() string {
-	if o == nil || o.StartStateId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.StartStateId
+
+	return o.StartStateId
 }
 
-// GetStartStateIdOk returns a tuple with the StartStateId field value if set, nil otherwise
+// GetStartStateIdOk returns a tuple with the StartStateId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStartStateIdOk() (*string, bool) {
-	if o == nil || o.StartStateId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.StartStateId, true
+	return &o.StartStateId, true
 }
 
-// HasStartStateId returns a boolean if a field has been set.
-func (o *WorkflowStartRequest) HasStartStateId() bool {
-	if o != nil && o.StartStateId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetStartStateId gets a reference to the given string and assigns it to the StartStateId field.
+// SetStartStateId sets field value
 func (o *WorkflowStartRequest) SetStartStateId(v string) {
-	o.StartStateId = &v
+	o.StartStateId = v
 }
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
@@ -268,19 +233,19 @@ func (o *WorkflowStartRequest) SetStateOptions(v WorkflowStateOptions) {
 
 func (o WorkflowStartRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowId != nil {
+	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if o.IwfWorkflowType != nil {
+	if true {
 		toSerialize["iwfWorkflowType"] = o.IwfWorkflowType
 	}
-	if o.WorkflowTimeoutSeconds != nil {
+	if true {
 		toSerialize["workflowTimeoutSeconds"] = o.WorkflowTimeoutSeconds
 	}
-	if o.IwfWorkerUrl != nil {
+	if true {
 		toSerialize["iwfWorkerUrl"] = o.IwfWorkerUrl
 	}
-	if o.StartStateId != nil {
+	if true {
 		toSerialize["startStateId"] = o.StartStateId
 	}
 	if o.StateInput != nil {

@@ -4,8 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | Pointer to **string** |  | [optional] 
-**ActivityType** | Pointer to **string** |  | [optional] 
+**CommandId** | **string** |  | 
+**ActivityType** | **string** |  | 
 **Input** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **ActivityOptions** | Pointer to [**ActivityOptions**](ActivityOptions.md) |  | [optional] 
 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewActivityCommand
 
-`func NewActivityCommand() *ActivityCommand`
+`func NewActivityCommand(commandId string, activityType string, ) *ActivityCommand`
 
 NewActivityCommand instantiates a new ActivityCommand object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
-### HasCommandId
-
-`func (o *ActivityCommand) HasCommandId() bool`
-
-HasCommandId returns a boolean if a field has been set.
 
 ### GetActivityType
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetActivityType sets ActivityType field to given value.
 
-### HasActivityType
-
-`func (o *ActivityCommand) HasActivityType() bool`
-
-HasActivityType returns a boolean if a field has been set.
 
 ### GetInput
 

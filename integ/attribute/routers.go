@@ -94,7 +94,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
 				},
 				UpsertQueryAttributes: []iwfidl.KeyValue{
 					{
@@ -137,7 +137,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
 				},
 			})
 			return
@@ -208,7 +208,7 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: iwfidl.PtrString(State2),
+							StateId: State2,
 						},
 					},
 					UpsertQueryAttributes: []iwfidl.KeyValue{
@@ -249,7 +249,7 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
+							StateId: service.CompletingWorkflowStateId,
 						},
 					},
 				},

@@ -61,11 +61,11 @@ func TestPrallelWorkflow(t *testing.T) {
 	wfId := parallel.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
-		WorkflowId:             iwfidl.PtrString(wfId),
-		IwfWorkflowType:        iwfidl.PtrString(parallel.WorkflowType),
-		WorkflowTimeoutSeconds: iwfidl.PtrInt32(10),
-		IwfWorkerUrl:           iwfidl.PtrString("http://localhost:" + testWorkflowServerPort),
-		StartStateId:           iwfidl.PtrString(parallel.State1),
+		WorkflowId:             wfId,
+		IwfWorkflowType:        parallel.WorkflowType,
+		WorkflowTimeoutSeconds: 10,
+		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
+		StartStateId:           parallel.State1,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)

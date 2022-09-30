@@ -23,7 +23,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	stateExeIdMgr := interpreter.NewStateExecutionIdManager()
 	currentStates := []iwfidl.StateMovement{
 		{
-			StateId:          &input.StartStateId,
+			StateId:          input.StartStateId,
 			NextStateOptions: &input.StateOptions,
 			NextStateInput:   &input.StateInput,
 		},
@@ -134,18 +134,18 @@ func executeState(
 	ctx = workflow.WithActivityOptions(ctx, ao)
 
 	exeCtx := iwfidl.Context{
-		WorkflowId:               &execution.WorkflowId,
-		WorkflowRunId:            &execution.RunId,
-		WorkflowStartedTimestamp: &execution.StartedTimestamp,
-		StateExecutionId:         &stateExeId,
+		WorkflowId:               execution.WorkflowId,
+		WorkflowRunId:            execution.RunId,
+		WorkflowStartedTimestamp: execution.StartedTimestamp,
+		StateExecutionId:         stateExeId,
 	}
 
 	var startResponse *iwfidl.WorkflowStateStartResponse
 	err := workflow.ExecuteActivity(ctx, StateStartActivity, service.StateStartActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateStartRequest{
-			Context:          &exeCtx,
-			WorkflowType:     &execution.WorkflowType,
+			Context:          exeCtx,
+			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.NextStateInput,
 			SearchAttributes: attrMgr.GetAllSearchAttributes(),
@@ -222,8 +222,8 @@ func executeState(
 		var timerResults []iwfidl.TimerResult
 		for _, cmd := range commandReq.GetTimerCommands() {
 			timerResults = append(timerResults, iwfidl.TimerResult{
-				CommandId:   iwfidl.PtrString(cmd.GetCommandId()),
-				TimerStatus: iwfidl.PtrString(service.TimerStatusFired),
+				CommandId:   cmd.GetCommandId(),
+				TimerStatus: service.TimerStatusFired,
 			})
 		}
 		commandRes.SetTimerResults(timerResults)
@@ -233,10 +233,10 @@ func executeState(
 		var signalResults []iwfidl.SignalResult
 		for _, cmd := range commandReq.GetSignalCommands() {
 			signalResults = append(signalResults, iwfidl.SignalResult{
-				CommandId:    iwfidl.PtrString(cmd.GetCommandId()),
-				SignalName:   iwfidl.PtrString(cmd.GetSignalName()),
+				CommandId:    cmd.GetCommandId(),
+				SignalName:   cmd.GetSignalName(),
 				SignalValue:  completedSignalCmds[cmd.GetCommandId()],
-				SignalStatus: iwfidl.PtrString(service.SignalStatusReceived),
+				SignalStatus: service.SignalStatusReceived,
 			})
 		}
 		commandRes.SetSignalResults(signalResults)
@@ -246,8 +246,8 @@ func executeState(
 	err = workflow.ExecuteActivity(ctx, StateDecideActivity, service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
-			Context:              &exeCtx,
-			WorkflowType:         &execution.WorkflowType,
+			Context:              exeCtx,
+			WorkflowType:         execution.WorkflowType,
 			WorkflowStateId:      state.StateId,
 			CommandResults:       commandRes,
 			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),

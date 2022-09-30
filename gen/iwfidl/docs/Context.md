@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowId** | Pointer to **string** |  | [optional] 
-**WorkflowRunId** | Pointer to **string** |  | [optional] 
-**WorkflowStartedTimestamp** | Pointer to **int64** |  | [optional] 
-**StateExecutionId** | Pointer to **string** |  | [optional] 
+**WorkflowId** | **string** |  | 
+**WorkflowRunId** | **string** |  | 
+**WorkflowStartedTimestamp** | **int64** |  | 
+**StateExecutionId** | **string** |  | 
 
 ## Methods
 
 ### NewContext
 
-`func NewContext() *Context`
+`func NewContext(workflowId string, workflowRunId string, workflowStartedTimestamp int64, stateExecutionId string, ) *Context`
 
 NewContext instantiates a new Context object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
-### HasWorkflowId
-
-`func (o *Context) HasWorkflowId() bool`
-
-HasWorkflowId returns a boolean if a field has been set.
 
 ### GetWorkflowRunId
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowRunId sets WorkflowRunId field to given value.
 
-### HasWorkflowRunId
-
-`func (o *Context) HasWorkflowRunId() bool`
-
-HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetWorkflowStartedTimestamp
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowStartedTimestamp sets WorkflowStartedTimestamp field to given value.
 
-### HasWorkflowStartedTimestamp
-
-`func (o *Context) HasWorkflowStartedTimestamp() bool`
-
-HasWorkflowStartedTimestamp returns a boolean if a field has been set.
 
 ### GetStateExecutionId
 
@@ -122,11 +107,6 @@ and a boolean to check if the value has been set.
 
 SetStateExecutionId sets StateExecutionId field to given value.
 
-### HasStateExecutionId
-
-`func (o *Context) HasStateExecutionId() bool`
-
-HasStateExecutionId returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

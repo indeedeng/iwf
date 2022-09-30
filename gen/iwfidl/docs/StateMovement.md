@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**StateId** | Pointer to **string** |  | [optional] 
+**StateId** | **string** |  | 
 **NextStateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **NextStateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 
@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewStateMovement
 
-`func NewStateMovement() *StateMovement`
+`func NewStateMovement(stateId string, ) *StateMovement`
 
 NewStateMovement instantiates a new StateMovement object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetStateId sets StateId field to given value.
 
-### HasStateId
-
-`func (o *StateMovement) HasStateId() bool`
-
-HasStateId returns a boolean if a field has been set.
 
 ### GetNextStateInput
 

@@ -16,7 +16,7 @@ import (
 
 // StateMovement struct for StateMovement
 type StateMovement struct {
-	StateId *string `json:"stateId,omitempty"`
+	StateId string `json:"stateId"`
 	NextStateInput *EncodedObject `json:"nextStateInput,omitempty"`
 	NextStateOptions *WorkflowStateOptions `json:"nextStateOptions,omitempty"`
 }
@@ -25,8 +25,9 @@ type StateMovement struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewStateMovement() *StateMovement {
+func NewStateMovement(stateId string) *StateMovement {
 	this := StateMovement{}
+	this.StateId = stateId
 	return &this
 }
 
@@ -38,36 +39,28 @@ func NewStateMovementWithDefaults() *StateMovement {
 	return &this
 }
 
-// GetStateId returns the StateId field value if set, zero value otherwise.
+// GetStateId returns the StateId field value
 func (o *StateMovement) GetStateId() string {
-	if o == nil || o.StateId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.StateId
+
+	return o.StateId
 }
 
-// GetStateIdOk returns a tuple with the StateId field value if set, nil otherwise
+// GetStateIdOk returns a tuple with the StateId field value
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateIdOk() (*string, bool) {
-	if o == nil || o.StateId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.StateId, true
+	return &o.StateId, true
 }
 
-// HasStateId returns a boolean if a field has been set.
-func (o *StateMovement) HasStateId() bool {
-	if o != nil && o.StateId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetStateId gets a reference to the given string and assigns it to the StateId field.
+// SetStateId sets field value
 func (o *StateMovement) SetStateId(v string) {
-	o.StateId = &v
+	o.StateId = v
 }
 
 // GetNextStateInput returns the NextStateInput field value if set, zero value otherwise.
@@ -136,7 +129,7 @@ func (o *StateMovement) SetNextStateOptions(v WorkflowStateOptions) {
 
 func (o StateMovement) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.StateId != nil {
+	if true {
 		toSerialize["stateId"] = o.StateId
 	}
 	if o.NextStateInput != nil {

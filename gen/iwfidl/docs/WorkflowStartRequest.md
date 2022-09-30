@@ -4,11 +4,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowId** | Pointer to **string** |  | [optional] 
-**IwfWorkflowType** | Pointer to **string** |  | [optional] 
-**WorkflowTimeoutSeconds** | Pointer to **int32** |  | [optional] 
-**IwfWorkerUrl** | Pointer to **string** |  | [optional] 
-**StartStateId** | Pointer to **string** |  | [optional] 
+**WorkflowId** | **string** |  | 
+**IwfWorkflowType** | **string** |  | 
+**WorkflowTimeoutSeconds** | **int32** |  | 
+**IwfWorkerUrl** | **string** |  | 
+**StartStateId** | **string** |  | 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **StateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 
@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 
 ### NewWorkflowStartRequest
 
-`func NewWorkflowStartRequest() *WorkflowStartRequest`
+`func NewWorkflowStartRequest(workflowId string, iwfWorkflowType string, workflowTimeoutSeconds int32, iwfWorkerUrl string, startStateId string, ) *WorkflowStartRequest`
 
 NewWorkflowStartRequest instantiates a new WorkflowStartRequest object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
-### HasWorkflowId
-
-`func (o *WorkflowStartRequest) HasWorkflowId() bool`
-
-HasWorkflowId returns a boolean if a field has been set.
 
 ### GetIwfWorkflowType
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetIwfWorkflowType sets IwfWorkflowType field to given value.
 
-### HasIwfWorkflowType
-
-`func (o *WorkflowStartRequest) HasIwfWorkflowType() bool`
-
-HasIwfWorkflowType returns a boolean if a field has been set.
 
 ### GetWorkflowTimeoutSeconds
 
@@ -100,11 +90,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowTimeoutSeconds sets WorkflowTimeoutSeconds field to given value.
 
-### HasWorkflowTimeoutSeconds
-
-`func (o *WorkflowStartRequest) HasWorkflowTimeoutSeconds() bool`
-
-HasWorkflowTimeoutSeconds returns a boolean if a field has been set.
 
 ### GetIwfWorkerUrl
 
@@ -125,11 +110,6 @@ and a boolean to check if the value has been set.
 
 SetIwfWorkerUrl sets IwfWorkerUrl field to given value.
 
-### HasIwfWorkerUrl
-
-`func (o *WorkflowStartRequest) HasIwfWorkerUrl() bool`
-
-HasIwfWorkerUrl returns a boolean if a field has been set.
 
 ### GetStartStateId
 
@@ -150,11 +130,6 @@ and a boolean to check if the value has been set.
 
 SetStartStateId sets StartStateId field to given value.
 
-### HasStartStateId
-
-`func (o *WorkflowStartRequest) HasStartStateId() bool`
-
-HasStartStateId returns a boolean if a field has been set.
 
 ### GetStateInput
 

@@ -31,7 +31,7 @@ import (
 )
 
 func main() {
-    workflowQueryRequest := *openapiclient.NewWorkflowQueryRequest() // WorkflowQueryRequest |  (optional)
+    workflowQueryRequest := *openapiclient.NewWorkflowQueryRequest("WorkflowId_example") // WorkflowQueryRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -95,7 +95,7 @@ import (
 )
 
 func main() {
-    workflowSignalRequest := *openapiclient.NewWorkflowSignalRequest() // WorkflowSignalRequest |  (optional)
+    workflowSignalRequest := *openapiclient.NewWorkflowSignalRequest("WorkflowId_example", "SignalName_example") // WorkflowSignalRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -159,7 +159,7 @@ import (
 )
 
 func main() {
-    workflowStartRequest := *openapiclient.NewWorkflowStartRequest() // WorkflowStartRequest |  (optional)
+    workflowStartRequest := *openapiclient.NewWorkflowStartRequest("WorkflowId_example", "IwfWorkflowType_example", int32(123), "IwfWorkerUrl_example", "StartStateId_example") // WorkflowStartRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -223,7 +223,7 @@ import (
 )
 
 func main() {
-    workflowStateDecideRequest := *openapiclient.NewWorkflowStateDecideRequest() // WorkflowStateDecideRequest |  (optional)
+    workflowStateDecideRequest := *openapiclient.NewWorkflowStateDecideRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123), "StateExecutionId_example"), "WorkflowType_example", "WorkflowStateId_example") // WorkflowStateDecideRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -287,7 +287,7 @@ import (
 )
 
 func main() {
-    workflowStateStartRequest := *openapiclient.NewWorkflowStateStartRequest() // WorkflowStateStartRequest |  (optional)
+    workflowStateStartRequest := *openapiclient.NewWorkflowStateStartRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123), "StateExecutionId_example"), "WorkflowType_example", "WorkflowStateId_example") // WorkflowStateStartRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

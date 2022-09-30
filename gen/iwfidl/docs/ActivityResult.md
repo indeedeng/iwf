@@ -4,17 +4,17 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | Pointer to **string** |  | [optional] 
-**ActivityType** | Pointer to **string** |  | [optional] 
+**CommandId** | **string** |  | 
+**ActivityType** | **string** |  | 
 **Output** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
-**ActivityStatus** | Pointer to **string** |  | [optional] 
+**ActivityStatus** | **string** |  | 
 **TimeoutType** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
 ### NewActivityResult
 
-`func NewActivityResult() *ActivityResult`
+`func NewActivityResult(commandId string, activityType string, activityStatus string, ) *ActivityResult`
 
 NewActivityResult instantiates a new ActivityResult object
 This constructor will assign default values to properties that have it defined,
@@ -48,11 +48,6 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
-### HasCommandId
-
-`func (o *ActivityResult) HasCommandId() bool`
-
-HasCommandId returns a boolean if a field has been set.
 
 ### GetActivityType
 
@@ -73,11 +68,6 @@ and a boolean to check if the value has been set.
 
 SetActivityType sets ActivityType field to given value.
 
-### HasActivityType
-
-`func (o *ActivityResult) HasActivityType() bool`
-
-HasActivityType returns a boolean if a field has been set.
 
 ### GetOutput
 
@@ -123,11 +113,6 @@ and a boolean to check if the value has been set.
 
 SetActivityStatus sets ActivityStatus field to given value.
 
-### HasActivityStatus
-
-`func (o *ActivityResult) HasActivityStatus() bool`
-
-HasActivityStatus returns a boolean if a field has been set.
 
 ### GetTimeoutType
 

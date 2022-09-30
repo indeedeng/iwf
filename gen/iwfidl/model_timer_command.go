@@ -16,16 +16,18 @@ import (
 
 // TimerCommand struct for TimerCommand
 type TimerCommand struct {
-	CommandId *string `json:"commandId,omitempty"`
-	FiringUnixTimestampSeconds *int64 `json:"firingUnixTimestampSeconds,omitempty"`
+	CommandId string `json:"commandId"`
+	FiringUnixTimestampSeconds int64 `json:"firingUnixTimestampSeconds"`
 }
 
 // NewTimerCommand instantiates a new TimerCommand object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTimerCommand() *TimerCommand {
+func NewTimerCommand(commandId string, firingUnixTimestampSeconds int64) *TimerCommand {
 	this := TimerCommand{}
+	this.CommandId = commandId
+	this.FiringUnixTimestampSeconds = firingUnixTimestampSeconds
 	return &this
 }
 
@@ -37,76 +39,60 @@ func NewTimerCommandWithDefaults() *TimerCommand {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value if set, zero value otherwise.
+// GetCommandId returns the CommandId field value
 func (o *TimerCommand) GetCommandId() string {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.CommandId
+
+	return o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
+// GetCommandIdOk returns a tuple with the CommandId field value
 // and a boolean to check if the value has been set.
 func (o *TimerCommand) GetCommandIdOk() (*string, bool) {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.CommandId, true
+	return &o.CommandId, true
 }
 
-// HasCommandId returns a boolean if a field has been set.
-func (o *TimerCommand) HasCommandId() bool {
-	if o != nil && o.CommandId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
+// SetCommandId sets field value
 func (o *TimerCommand) SetCommandId(v string) {
-	o.CommandId = &v
+	o.CommandId = v
 }
 
-// GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field value if set, zero value otherwise.
+// GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field value
 func (o *TimerCommand) GetFiringUnixTimestampSeconds() int64 {
-	if o == nil || o.FiringUnixTimestampSeconds == nil {
+	if o == nil {
 		var ret int64
 		return ret
 	}
-	return *o.FiringUnixTimestampSeconds
+
+	return o.FiringUnixTimestampSeconds
 }
 
-// GetFiringUnixTimestampSecondsOk returns a tuple with the FiringUnixTimestampSeconds field value if set, nil otherwise
+// GetFiringUnixTimestampSecondsOk returns a tuple with the FiringUnixTimestampSeconds field value
 // and a boolean to check if the value has been set.
 func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int64, bool) {
-	if o == nil || o.FiringUnixTimestampSeconds == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.FiringUnixTimestampSeconds, true
+	return &o.FiringUnixTimestampSeconds, true
 }
 
-// HasFiringUnixTimestampSeconds returns a boolean if a field has been set.
-func (o *TimerCommand) HasFiringUnixTimestampSeconds() bool {
-	if o != nil && o.FiringUnixTimestampSeconds != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetFiringUnixTimestampSeconds gets a reference to the given int64 and assigns it to the FiringUnixTimestampSeconds field.
+// SetFiringUnixTimestampSeconds sets field value
 func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int64) {
-	o.FiringUnixTimestampSeconds = &v
+	o.FiringUnixTimestampSeconds = v
 }
 
 func (o TimerCommand) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CommandId != nil {
+	if true {
 		toSerialize["commandId"] = o.CommandId
 	}
-	if o.FiringUnixTimestampSeconds != nil {
+	if true {
 		toSerialize["firingUnixTimestampSeconds"] = o.FiringUnixTimestampSeconds
 	}
 	return json.Marshal(toSerialize)

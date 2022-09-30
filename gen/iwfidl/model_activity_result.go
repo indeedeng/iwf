@@ -16,10 +16,10 @@ import (
 
 // ActivityResult struct for ActivityResult
 type ActivityResult struct {
-	CommandId *string `json:"commandId,omitempty"`
-	ActivityType *string `json:"activityType,omitempty"`
+	CommandId string `json:"commandId"`
+	ActivityType string `json:"activityType"`
 	Output *EncodedObject `json:"output,omitempty"`
-	ActivityStatus *string `json:"activityStatus,omitempty"`
+	ActivityStatus string `json:"activityStatus"`
 	TimeoutType *string `json:"timeoutType,omitempty"`
 }
 
@@ -27,8 +27,11 @@ type ActivityResult struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewActivityResult() *ActivityResult {
+func NewActivityResult(commandId string, activityType string, activityStatus string) *ActivityResult {
 	this := ActivityResult{}
+	this.CommandId = commandId
+	this.ActivityType = activityType
+	this.ActivityStatus = activityStatus
 	return &this
 }
 
@@ -40,68 +43,52 @@ func NewActivityResultWithDefaults() *ActivityResult {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value if set, zero value otherwise.
+// GetCommandId returns the CommandId field value
 func (o *ActivityResult) GetCommandId() string {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.CommandId
+
+	return o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
+// GetCommandIdOk returns a tuple with the CommandId field value
 // and a boolean to check if the value has been set.
 func (o *ActivityResult) GetCommandIdOk() (*string, bool) {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.CommandId, true
+	return &o.CommandId, true
 }
 
-// HasCommandId returns a boolean if a field has been set.
-func (o *ActivityResult) HasCommandId() bool {
-	if o != nil && o.CommandId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
+// SetCommandId sets field value
 func (o *ActivityResult) SetCommandId(v string) {
-	o.CommandId = &v
+	o.CommandId = v
 }
 
-// GetActivityType returns the ActivityType field value if set, zero value otherwise.
+// GetActivityType returns the ActivityType field value
 func (o *ActivityResult) GetActivityType() string {
-	if o == nil || o.ActivityType == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.ActivityType
+
+	return o.ActivityType
 }
 
-// GetActivityTypeOk returns a tuple with the ActivityType field value if set, nil otherwise
+// GetActivityTypeOk returns a tuple with the ActivityType field value
 // and a boolean to check if the value has been set.
 func (o *ActivityResult) GetActivityTypeOk() (*string, bool) {
-	if o == nil || o.ActivityType == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.ActivityType, true
+	return &o.ActivityType, true
 }
 
-// HasActivityType returns a boolean if a field has been set.
-func (o *ActivityResult) HasActivityType() bool {
-	if o != nil && o.ActivityType != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetActivityType gets a reference to the given string and assigns it to the ActivityType field.
+// SetActivityType sets field value
 func (o *ActivityResult) SetActivityType(v string) {
-	o.ActivityType = &v
+	o.ActivityType = v
 }
 
 // GetOutput returns the Output field value if set, zero value otherwise.
@@ -136,36 +123,28 @@ func (o *ActivityResult) SetOutput(v EncodedObject) {
 	o.Output = &v
 }
 
-// GetActivityStatus returns the ActivityStatus field value if set, zero value otherwise.
+// GetActivityStatus returns the ActivityStatus field value
 func (o *ActivityResult) GetActivityStatus() string {
-	if o == nil || o.ActivityStatus == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.ActivityStatus
+
+	return o.ActivityStatus
 }
 
-// GetActivityStatusOk returns a tuple with the ActivityStatus field value if set, nil otherwise
+// GetActivityStatusOk returns a tuple with the ActivityStatus field value
 // and a boolean to check if the value has been set.
 func (o *ActivityResult) GetActivityStatusOk() (*string, bool) {
-	if o == nil || o.ActivityStatus == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.ActivityStatus, true
+	return &o.ActivityStatus, true
 }
 
-// HasActivityStatus returns a boolean if a field has been set.
-func (o *ActivityResult) HasActivityStatus() bool {
-	if o != nil && o.ActivityStatus != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetActivityStatus gets a reference to the given string and assigns it to the ActivityStatus field.
+// SetActivityStatus sets field value
 func (o *ActivityResult) SetActivityStatus(v string) {
-	o.ActivityStatus = &v
+	o.ActivityStatus = v
 }
 
 // GetTimeoutType returns the TimeoutType field value if set, zero value otherwise.
@@ -202,16 +181,16 @@ func (o *ActivityResult) SetTimeoutType(v string) {
 
 func (o ActivityResult) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CommandId != nil {
+	if true {
 		toSerialize["commandId"] = o.CommandId
 	}
-	if o.ActivityType != nil {
+	if true {
 		toSerialize["activityType"] = o.ActivityType
 	}
 	if o.Output != nil {
 		toSerialize["output"] = o.Output
 	}
-	if o.ActivityStatus != nil {
+	if true {
 		toSerialize["activityStatus"] = o.ActivityStatus
 	}
 	if o.TimeoutType != nil {
