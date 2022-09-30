@@ -16,9 +16,9 @@ import (
 
 // SignalResult struct for SignalResult
 type SignalResult struct {
-	CommandId *string `json:"commandId,omitempty"`
-	SignalStatus *string `json:"signalStatus,omitempty"`
-	SignalName *string `json:"signalName,omitempty"`
+	CommandId string `json:"commandId"`
+	SignalStatus string `json:"signalStatus"`
+	SignalName string `json:"signalName"`
 	SignalValue *EncodedObject `json:"signalValue,omitempty"`
 }
 
@@ -26,8 +26,11 @@ type SignalResult struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSignalResult() *SignalResult {
+func NewSignalResult(commandId string, signalStatus string, signalName string) *SignalResult {
 	this := SignalResult{}
+	this.CommandId = commandId
+	this.SignalStatus = signalStatus
+	this.SignalName = signalName
 	return &this
 }
 
@@ -39,100 +42,76 @@ func NewSignalResultWithDefaults() *SignalResult {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value if set, zero value otherwise.
+// GetCommandId returns the CommandId field value
 func (o *SignalResult) GetCommandId() string {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.CommandId
+
+	return o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
+// GetCommandIdOk returns a tuple with the CommandId field value
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetCommandIdOk() (*string, bool) {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.CommandId, true
+	return &o.CommandId, true
 }
 
-// HasCommandId returns a boolean if a field has been set.
-func (o *SignalResult) HasCommandId() bool {
-	if o != nil && o.CommandId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
+// SetCommandId sets field value
 func (o *SignalResult) SetCommandId(v string) {
-	o.CommandId = &v
+	o.CommandId = v
 }
 
-// GetSignalStatus returns the SignalStatus field value if set, zero value otherwise.
+// GetSignalStatus returns the SignalStatus field value
 func (o *SignalResult) GetSignalStatus() string {
-	if o == nil || o.SignalStatus == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.SignalStatus
+
+	return o.SignalStatus
 }
 
-// GetSignalStatusOk returns a tuple with the SignalStatus field value if set, nil otherwise
+// GetSignalStatusOk returns a tuple with the SignalStatus field value
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalStatusOk() (*string, bool) {
-	if o == nil || o.SignalStatus == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.SignalStatus, true
+	return &o.SignalStatus, true
 }
 
-// HasSignalStatus returns a boolean if a field has been set.
-func (o *SignalResult) HasSignalStatus() bool {
-	if o != nil && o.SignalStatus != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetSignalStatus gets a reference to the given string and assigns it to the SignalStatus field.
+// SetSignalStatus sets field value
 func (o *SignalResult) SetSignalStatus(v string) {
-	o.SignalStatus = &v
+	o.SignalStatus = v
 }
 
-// GetSignalName returns the SignalName field value if set, zero value otherwise.
+// GetSignalName returns the SignalName field value
 func (o *SignalResult) GetSignalName() string {
-	if o == nil || o.SignalName == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.SignalName
+
+	return o.SignalName
 }
 
-// GetSignalNameOk returns a tuple with the SignalName field value if set, nil otherwise
+// GetSignalNameOk returns a tuple with the SignalName field value
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalNameOk() (*string, bool) {
-	if o == nil || o.SignalName == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.SignalName, true
+	return &o.SignalName, true
 }
 
-// HasSignalName returns a boolean if a field has been set.
-func (o *SignalResult) HasSignalName() bool {
-	if o != nil && o.SignalName != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetSignalName gets a reference to the given string and assigns it to the SignalName field.
+// SetSignalName sets field value
 func (o *SignalResult) SetSignalName(v string) {
-	o.SignalName = &v
+	o.SignalName = v
 }
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
@@ -169,13 +148,13 @@ func (o *SignalResult) SetSignalValue(v EncodedObject) {
 
 func (o SignalResult) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CommandId != nil {
+	if true {
 		toSerialize["commandId"] = o.CommandId
 	}
-	if o.SignalStatus != nil {
+	if true {
 		toSerialize["signalStatus"] = o.SignalStatus
 	}
-	if o.SignalName != nil {
+	if true {
 		toSerialize["signalName"] = o.SignalName
 	}
 	if o.SignalValue != nil {

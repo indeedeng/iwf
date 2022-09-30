@@ -16,8 +16,8 @@ import (
 
 // ActivityCommand struct for ActivityCommand
 type ActivityCommand struct {
-	CommandId *string `json:"commandId,omitempty"`
-	ActivityType *string `json:"activityType,omitempty"`
+	CommandId string `json:"commandId"`
+	ActivityType string `json:"activityType"`
 	Input *EncodedObject `json:"input,omitempty"`
 	ActivityOptions *ActivityOptions `json:"activityOptions,omitempty"`
 }
@@ -26,8 +26,10 @@ type ActivityCommand struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewActivityCommand() *ActivityCommand {
+func NewActivityCommand(commandId string, activityType string) *ActivityCommand {
 	this := ActivityCommand{}
+	this.CommandId = commandId
+	this.ActivityType = activityType
 	return &this
 }
 
@@ -39,68 +41,52 @@ func NewActivityCommandWithDefaults() *ActivityCommand {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value if set, zero value otherwise.
+// GetCommandId returns the CommandId field value
 func (o *ActivityCommand) GetCommandId() string {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.CommandId
+
+	return o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
+// GetCommandIdOk returns a tuple with the CommandId field value
 // and a boolean to check if the value has been set.
 func (o *ActivityCommand) GetCommandIdOk() (*string, bool) {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.CommandId, true
+	return &o.CommandId, true
 }
 
-// HasCommandId returns a boolean if a field has been set.
-func (o *ActivityCommand) HasCommandId() bool {
-	if o != nil && o.CommandId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
+// SetCommandId sets field value
 func (o *ActivityCommand) SetCommandId(v string) {
-	o.CommandId = &v
+	o.CommandId = v
 }
 
-// GetActivityType returns the ActivityType field value if set, zero value otherwise.
+// GetActivityType returns the ActivityType field value
 func (o *ActivityCommand) GetActivityType() string {
-	if o == nil || o.ActivityType == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.ActivityType
+
+	return o.ActivityType
 }
 
-// GetActivityTypeOk returns a tuple with the ActivityType field value if set, nil otherwise
+// GetActivityTypeOk returns a tuple with the ActivityType field value
 // and a boolean to check if the value has been set.
 func (o *ActivityCommand) GetActivityTypeOk() (*string, bool) {
-	if o == nil || o.ActivityType == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.ActivityType, true
+	return &o.ActivityType, true
 }
 
-// HasActivityType returns a boolean if a field has been set.
-func (o *ActivityCommand) HasActivityType() bool {
-	if o != nil && o.ActivityType != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetActivityType gets a reference to the given string and assigns it to the ActivityType field.
+// SetActivityType sets field value
 func (o *ActivityCommand) SetActivityType(v string) {
-	o.ActivityType = &v
+	o.ActivityType = v
 }
 
 // GetInput returns the Input field value if set, zero value otherwise.
@@ -169,10 +155,10 @@ func (o *ActivityCommand) SetActivityOptions(v ActivityOptions) {
 
 func (o ActivityCommand) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CommandId != nil {
+	if true {
 		toSerialize["commandId"] = o.CommandId
 	}
-	if o.ActivityType != nil {
+	if true {
 		toSerialize["activityType"] = o.ActivityType
 	}
 	if o.Input != nil {

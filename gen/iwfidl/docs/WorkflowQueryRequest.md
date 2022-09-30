@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowId** | Pointer to **string** |  | [optional] 
+**WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **AttributeKeys** | Pointer to **[]string** |  | [optional] 
 
@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 
 ### NewWorkflowQueryRequest
 
-`func NewWorkflowQueryRequest() *WorkflowQueryRequest`
+`func NewWorkflowQueryRequest(workflowId string, ) *WorkflowQueryRequest`
 
 NewWorkflowQueryRequest instantiates a new WorkflowQueryRequest object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
-### HasWorkflowId
-
-`func (o *WorkflowQueryRequest) HasWorkflowId() bool`
-
-HasWorkflowId returns a boolean if a field has been set.
 
 ### GetWorkflowRunId
 

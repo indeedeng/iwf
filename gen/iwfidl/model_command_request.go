@@ -16,7 +16,7 @@ import (
 
 // CommandRequest struct for CommandRequest
 type CommandRequest struct {
-	DeciderTriggerType *string `json:"deciderTriggerType,omitempty"`
+	DeciderTriggerType string `json:"deciderTriggerType"`
 	ActivityCommands []ActivityCommand `json:"activityCommands,omitempty"`
 	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
 	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
@@ -26,8 +26,9 @@ type CommandRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCommandRequest() *CommandRequest {
+func NewCommandRequest(deciderTriggerType string) *CommandRequest {
 	this := CommandRequest{}
+	this.DeciderTriggerType = deciderTriggerType
 	return &this
 }
 
@@ -39,36 +40,28 @@ func NewCommandRequestWithDefaults() *CommandRequest {
 	return &this
 }
 
-// GetDeciderTriggerType returns the DeciderTriggerType field value if set, zero value otherwise.
+// GetDeciderTriggerType returns the DeciderTriggerType field value
 func (o *CommandRequest) GetDeciderTriggerType() string {
-	if o == nil || o.DeciderTriggerType == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.DeciderTriggerType
+
+	return o.DeciderTriggerType
 }
 
-// GetDeciderTriggerTypeOk returns a tuple with the DeciderTriggerType field value if set, nil otherwise
+// GetDeciderTriggerTypeOk returns a tuple with the DeciderTriggerType field value
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetDeciderTriggerTypeOk() (*string, bool) {
-	if o == nil || o.DeciderTriggerType == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.DeciderTriggerType, true
+	return &o.DeciderTriggerType, true
 }
 
-// HasDeciderTriggerType returns a boolean if a field has been set.
-func (o *CommandRequest) HasDeciderTriggerType() bool {
-	if o != nil && o.DeciderTriggerType != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetDeciderTriggerType gets a reference to the given string and assigns it to the DeciderTriggerType field.
+// SetDeciderTriggerType sets field value
 func (o *CommandRequest) SetDeciderTriggerType(v string) {
-	o.DeciderTriggerType = &v
+	o.DeciderTriggerType = v
 }
 
 // GetActivityCommands returns the ActivityCommands field value if set, zero value otherwise.
@@ -169,7 +162,7 @@ func (o *CommandRequest) SetSignalCommands(v []SignalCommand) {
 
 func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.DeciderTriggerType != nil {
+	if true {
 		toSerialize["deciderTriggerType"] = o.DeciderTriggerType
 	}
 	if o.ActivityCommands != nil {

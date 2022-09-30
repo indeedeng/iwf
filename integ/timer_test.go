@@ -61,11 +61,11 @@ func TestTimerWorkflow(t *testing.T) {
 	wfId := timer.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
-		WorkflowId:             iwfidl.PtrString(wfId),
-		IwfWorkflowType:        iwfidl.PtrString(timer.WorkflowType),
-		WorkflowTimeoutSeconds: iwfidl.PtrInt32(10),
-		IwfWorkerUrl:           iwfidl.PtrString("http://localhost:" + testWorkflowServerPort),
-		StartStateId:           iwfidl.PtrString(timer.State1),
+		WorkflowId:             wfId,
+		IwfWorkflowType:        timer.WorkflowType,
+		WorkflowTimeoutSeconds: 10,
+		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
+		StartStateId:           timer.State1,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)

@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | Pointer to **string** |  | [optional] 
-**SignalStatus** | Pointer to **string** |  | [optional] 
-**SignalName** | Pointer to **string** |  | [optional] 
+**CommandId** | **string** |  | 
+**SignalStatus** | **string** |  | 
+**SignalName** | **string** |  | 
 **SignalValue** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 
 ## Methods
 
 ### NewSignalResult
 
-`func NewSignalResult() *SignalResult`
+`func NewSignalResult(commandId string, signalStatus string, signalName string, ) *SignalResult`
 
 NewSignalResult instantiates a new SignalResult object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
-### HasCommandId
-
-`func (o *SignalResult) HasCommandId() bool`
-
-HasCommandId returns a boolean if a field has been set.
 
 ### GetSignalStatus
 
@@ -72,11 +67,6 @@ and a boolean to check if the value has been set.
 
 SetSignalStatus sets SignalStatus field to given value.
 
-### HasSignalStatus
-
-`func (o *SignalResult) HasSignalStatus() bool`
-
-HasSignalStatus returns a boolean if a field has been set.
 
 ### GetSignalName
 
@@ -97,11 +87,6 @@ and a boolean to check if the value has been set.
 
 SetSignalName sets SignalName field to given value.
 
-### HasSignalName
-
-`func (o *SignalResult) HasSignalName() bool`
-
-HasSignalName returns a boolean if a field has been set.
 
 ### GetSignalValue
 

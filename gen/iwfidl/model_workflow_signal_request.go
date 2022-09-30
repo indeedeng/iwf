@@ -16,9 +16,9 @@ import (
 
 // WorkflowSignalRequest struct for WorkflowSignalRequest
 type WorkflowSignalRequest struct {
-	WorkflowId *string `json:"workflowId,omitempty"`
+	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	SignalName *string `json:"signalName,omitempty"`
+	SignalName string `json:"signalName"`
 	SignalValue *EncodedObject `json:"signalValue,omitempty"`
 }
 
@@ -26,8 +26,10 @@ type WorkflowSignalRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowSignalRequest() *WorkflowSignalRequest {
+func NewWorkflowSignalRequest(workflowId string, signalName string) *WorkflowSignalRequest {
 	this := WorkflowSignalRequest{}
+	this.WorkflowId = workflowId
+	this.SignalName = signalName
 	return &this
 }
 
@@ -39,36 +41,28 @@ func NewWorkflowSignalRequestWithDefaults() *WorkflowSignalRequest {
 	return &this
 }
 
-// GetWorkflowId returns the WorkflowId field value if set, zero value otherwise.
+// GetWorkflowId returns the WorkflowId field value
 func (o *WorkflowSignalRequest) GetWorkflowId() string {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowId
+
+	return o.WorkflowId
 }
 
-// GetWorkflowIdOk returns a tuple with the WorkflowId field value if set, nil otherwise
+// GetWorkflowIdOk returns a tuple with the WorkflowId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetWorkflowIdOk() (*string, bool) {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowId, true
+	return &o.WorkflowId, true
 }
 
-// HasWorkflowId returns a boolean if a field has been set.
-func (o *WorkflowSignalRequest) HasWorkflowId() bool {
-	if o != nil && o.WorkflowId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowId gets a reference to the given string and assigns it to the WorkflowId field.
+// SetWorkflowId sets field value
 func (o *WorkflowSignalRequest) SetWorkflowId(v string) {
-	o.WorkflowId = &v
+	o.WorkflowId = v
 }
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
@@ -103,36 +97,28 @@ func (o *WorkflowSignalRequest) SetWorkflowRunId(v string) {
 	o.WorkflowRunId = &v
 }
 
-// GetSignalName returns the SignalName field value if set, zero value otherwise.
+// GetSignalName returns the SignalName field value
 func (o *WorkflowSignalRequest) GetSignalName() string {
-	if o == nil || o.SignalName == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.SignalName
+
+	return o.SignalName
 }
 
-// GetSignalNameOk returns a tuple with the SignalName field value if set, nil otherwise
+// GetSignalNameOk returns a tuple with the SignalName field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetSignalNameOk() (*string, bool) {
-	if o == nil || o.SignalName == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.SignalName, true
+	return &o.SignalName, true
 }
 
-// HasSignalName returns a boolean if a field has been set.
-func (o *WorkflowSignalRequest) HasSignalName() bool {
-	if o != nil && o.SignalName != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetSignalName gets a reference to the given string and assigns it to the SignalName field.
+// SetSignalName sets field value
 func (o *WorkflowSignalRequest) SetSignalName(v string) {
-	o.SignalName = &v
+	o.SignalName = v
 }
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
@@ -169,13 +155,13 @@ func (o *WorkflowSignalRequest) SetSignalValue(v EncodedObject) {
 
 func (o WorkflowSignalRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowId != nil {
+	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
 	if o.WorkflowRunId != nil {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
-	if o.SignalName != nil {
+	if true {
 		toSerialize["signalName"] = o.SignalName
 	}
 	if o.SignalValue != nil {

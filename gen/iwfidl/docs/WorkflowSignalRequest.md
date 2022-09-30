@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowId** | Pointer to **string** |  | [optional] 
+**WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
-**SignalName** | Pointer to **string** |  | [optional] 
+**SignalName** | **string** |  | 
 **SignalValue** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 
 ## Methods
 
 ### NewWorkflowSignalRequest
 
-`func NewWorkflowSignalRequest() *WorkflowSignalRequest`
+`func NewWorkflowSignalRequest(workflowId string, signalName string, ) *WorkflowSignalRequest`
 
 NewWorkflowSignalRequest instantiates a new WorkflowSignalRequest object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
-### HasWorkflowId
-
-`func (o *WorkflowSignalRequest) HasWorkflowId() bool`
-
-HasWorkflowId returns a boolean if a field has been set.
 
 ### GetWorkflowRunId
 
@@ -97,11 +92,6 @@ and a boolean to check if the value has been set.
 
 SetSignalName sets SignalName field to given value.
 
-### HasSignalName
-
-`func (o *WorkflowSignalRequest) HasSignalName() bool`
-
-HasSignalName returns a boolean if a field has been set.
 
 ### GetSignalValue
 

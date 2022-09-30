@@ -16,16 +16,18 @@ import (
 
 // TimerResult struct for TimerResult
 type TimerResult struct {
-	CommandId *string `json:"commandId,omitempty"`
-	TimerStatus *string `json:"timerStatus,omitempty"`
+	CommandId string `json:"commandId"`
+	TimerStatus string `json:"timerStatus"`
 }
 
 // NewTimerResult instantiates a new TimerResult object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTimerResult() *TimerResult {
+func NewTimerResult(commandId string, timerStatus string) *TimerResult {
 	this := TimerResult{}
+	this.CommandId = commandId
+	this.TimerStatus = timerStatus
 	return &this
 }
 
@@ -37,76 +39,60 @@ func NewTimerResultWithDefaults() *TimerResult {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value if set, zero value otherwise.
+// GetCommandId returns the CommandId field value
 func (o *TimerResult) GetCommandId() string {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.CommandId
+
+	return o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
+// GetCommandIdOk returns a tuple with the CommandId field value
 // and a boolean to check if the value has been set.
 func (o *TimerResult) GetCommandIdOk() (*string, bool) {
-	if o == nil || o.CommandId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.CommandId, true
+	return &o.CommandId, true
 }
 
-// HasCommandId returns a boolean if a field has been set.
-func (o *TimerResult) HasCommandId() bool {
-	if o != nil && o.CommandId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
+// SetCommandId sets field value
 func (o *TimerResult) SetCommandId(v string) {
-	o.CommandId = &v
+	o.CommandId = v
 }
 
-// GetTimerStatus returns the TimerStatus field value if set, zero value otherwise.
+// GetTimerStatus returns the TimerStatus field value
 func (o *TimerResult) GetTimerStatus() string {
-	if o == nil || o.TimerStatus == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.TimerStatus
+
+	return o.TimerStatus
 }
 
-// GetTimerStatusOk returns a tuple with the TimerStatus field value if set, nil otherwise
+// GetTimerStatusOk returns a tuple with the TimerStatus field value
 // and a boolean to check if the value has been set.
 func (o *TimerResult) GetTimerStatusOk() (*string, bool) {
-	if o == nil || o.TimerStatus == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.TimerStatus, true
+	return &o.TimerStatus, true
 }
 
-// HasTimerStatus returns a boolean if a field has been set.
-func (o *TimerResult) HasTimerStatus() bool {
-	if o != nil && o.TimerStatus != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetTimerStatus gets a reference to the given string and assigns it to the TimerStatus field.
+// SetTimerStatus sets field value
 func (o *TimerResult) SetTimerStatus(v string) {
-	o.TimerStatus = &v
+	o.TimerStatus = v
 }
 
 func (o TimerResult) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CommandId != nil {
+	if true {
 		toSerialize["commandId"] = o.CommandId
 	}
-	if o.TimerStatus != nil {
+	if true {
 		toSerialize["timerStatus"] = o.TimerStatus
 	}
 	return json.Marshal(toSerialize)

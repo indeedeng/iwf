@@ -62,11 +62,11 @@ func TestAttributeWorkflow(t *testing.T) {
 	wfId := attribute.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
-		WorkflowId:             iwfidl.PtrString(wfId),
-		IwfWorkflowType:        iwfidl.PtrString(attribute.WorkflowType),
-		WorkflowTimeoutSeconds: iwfidl.PtrInt32(10),
-		IwfWorkerUrl:           iwfidl.PtrString("http://localhost:" + testWorkflowServerPort),
-		StartStateId:           iwfidl.PtrString(attribute.State1),
+		WorkflowId:             wfId,
+		IwfWorkflowType:        attribute.WorkflowType,
+		WorkflowTimeoutSeconds: 10,
+		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
+		StartStateId:           attribute.State1,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
@@ -100,7 +100,7 @@ func TestAttributeWorkflow(t *testing.T) {
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowQueryPost(context.Background())
 	_, httpResp2, err := req2.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
-		WorkflowId: iwfidl.PtrString(wfId),
+		WorkflowId: wfId,
 		AttributeKeys: []string{
 			attribute.TestQueryAttributeKey,
 		},

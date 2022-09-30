@@ -16,9 +16,9 @@ import (
 
 // WorkflowStateDecideRequest struct for WorkflowStateDecideRequest
 type WorkflowStateDecideRequest struct {
-	Context *Context `json:"context,omitempty"`
-	WorkflowType *string `json:"workflowType,omitempty"`
-	WorkflowStateId *string `json:"workflowStateId,omitempty"`
+	Context Context `json:"context"`
+	WorkflowType string `json:"workflowType"`
+	WorkflowStateId string `json:"workflowStateId"`
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
 	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
 	StateLocalAttributes []KeyValue `json:"stateLocalAttributes,omitempty"`
@@ -29,8 +29,11 @@ type WorkflowStateDecideRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowStateDecideRequest() *WorkflowStateDecideRequest {
+func NewWorkflowStateDecideRequest(context Context, workflowType string, workflowStateId string) *WorkflowStateDecideRequest {
 	this := WorkflowStateDecideRequest{}
+	this.Context = context
+	this.WorkflowType = workflowType
+	this.WorkflowStateId = workflowStateId
 	return &this
 }
 
@@ -42,100 +45,76 @@ func NewWorkflowStateDecideRequestWithDefaults() *WorkflowStateDecideRequest {
 	return &this
 }
 
-// GetContext returns the Context field value if set, zero value otherwise.
+// GetContext returns the Context field value
 func (o *WorkflowStateDecideRequest) GetContext() Context {
-	if o == nil || o.Context == nil {
+	if o == nil {
 		var ret Context
 		return ret
 	}
-	return *o.Context
+
+	return o.Context
 }
 
-// GetContextOk returns a tuple with the Context field value if set, nil otherwise
+// GetContextOk returns a tuple with the Context field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetContextOk() (*Context, bool) {
-	if o == nil || o.Context == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.Context, true
+	return &o.Context, true
 }
 
-// HasContext returns a boolean if a field has been set.
-func (o *WorkflowStateDecideRequest) HasContext() bool {
-	if o != nil && o.Context != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetContext gets a reference to the given Context and assigns it to the Context field.
+// SetContext sets field value
 func (o *WorkflowStateDecideRequest) SetContext(v Context) {
-	o.Context = &v
+	o.Context = v
 }
 
-// GetWorkflowType returns the WorkflowType field value if set, zero value otherwise.
+// GetWorkflowType returns the WorkflowType field value
 func (o *WorkflowStateDecideRequest) GetWorkflowType() string {
-	if o == nil || o.WorkflowType == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowType
+
+	return o.WorkflowType
 }
 
-// GetWorkflowTypeOk returns a tuple with the WorkflowType field value if set, nil otherwise
+// GetWorkflowTypeOk returns a tuple with the WorkflowType field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetWorkflowTypeOk() (*string, bool) {
-	if o == nil || o.WorkflowType == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowType, true
+	return &o.WorkflowType, true
 }
 
-// HasWorkflowType returns a boolean if a field has been set.
-func (o *WorkflowStateDecideRequest) HasWorkflowType() bool {
-	if o != nil && o.WorkflowType != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowType gets a reference to the given string and assigns it to the WorkflowType field.
+// SetWorkflowType sets field value
 func (o *WorkflowStateDecideRequest) SetWorkflowType(v string) {
-	o.WorkflowType = &v
+	o.WorkflowType = v
 }
 
-// GetWorkflowStateId returns the WorkflowStateId field value if set, zero value otherwise.
+// GetWorkflowStateId returns the WorkflowStateId field value
 func (o *WorkflowStateDecideRequest) GetWorkflowStateId() string {
-	if o == nil || o.WorkflowStateId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowStateId
+
+	return o.WorkflowStateId
 }
 
-// GetWorkflowStateIdOk returns a tuple with the WorkflowStateId field value if set, nil otherwise
+// GetWorkflowStateIdOk returns a tuple with the WorkflowStateId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetWorkflowStateIdOk() (*string, bool) {
-	if o == nil || o.WorkflowStateId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowStateId, true
+	return &o.WorkflowStateId, true
 }
 
-// HasWorkflowStateId returns a boolean if a field has been set.
-func (o *WorkflowStateDecideRequest) HasWorkflowStateId() bool {
-	if o != nil && o.WorkflowStateId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowStateId gets a reference to the given string and assigns it to the WorkflowStateId field.
+// SetWorkflowStateId sets field value
 func (o *WorkflowStateDecideRequest) SetWorkflowStateId(v string) {
-	o.WorkflowStateId = &v
+	o.WorkflowStateId = v
 }
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
@@ -268,13 +247,13 @@ func (o *WorkflowStateDecideRequest) SetCommandResults(v CommandResults) {
 
 func (o WorkflowStateDecideRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Context != nil {
+	if true {
 		toSerialize["context"] = o.Context
 	}
-	if o.WorkflowType != nil {
+	if true {
 		toSerialize["workflowType"] = o.WorkflowType
 	}
-	if o.WorkflowStateId != nil {
+	if true {
 		toSerialize["workflowStateId"] = o.WorkflowStateId
 	}
 	if o.SearchAttributes != nil {

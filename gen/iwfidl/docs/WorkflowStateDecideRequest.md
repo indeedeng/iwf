@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Context** | Pointer to [**Context**](Context.md) |  | [optional] 
-**WorkflowType** | Pointer to **string** |  | [optional] 
-**WorkflowStateId** | Pointer to **string** |  | [optional] 
+**Context** | [**Context**](Context.md) |  | 
+**WorkflowType** | **string** |  | 
+**WorkflowStateId** | **string** |  | 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **StateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 
 ### NewWorkflowStateDecideRequest
 
-`func NewWorkflowStateDecideRequest() *WorkflowStateDecideRequest`
+`func NewWorkflowStateDecideRequest(context Context, workflowType string, workflowStateId string, ) *WorkflowStateDecideRequest`
 
 NewWorkflowStateDecideRequest instantiates a new WorkflowStateDecideRequest object
 This constructor will assign default values to properties that have it defined,
@@ -50,11 +50,6 @@ and a boolean to check if the value has been set.
 
 SetContext sets Context field to given value.
 
-### HasContext
-
-`func (o *WorkflowStateDecideRequest) HasContext() bool`
-
-HasContext returns a boolean if a field has been set.
 
 ### GetWorkflowType
 
@@ -75,11 +70,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowType sets WorkflowType field to given value.
 
-### HasWorkflowType
-
-`func (o *WorkflowStateDecideRequest) HasWorkflowType() bool`
-
-HasWorkflowType returns a boolean if a field has been set.
 
 ### GetWorkflowStateId
 
@@ -100,11 +90,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowStateId sets WorkflowStateId field to given value.
 
-### HasWorkflowStateId
-
-`func (o *WorkflowStateDecideRequest) HasWorkflowStateId() bool`
-
-HasWorkflowStateId returns a boolean if a field has been set.
 
 ### GetSearchAttributes
 

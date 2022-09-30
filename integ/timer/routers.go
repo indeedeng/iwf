@@ -56,11 +56,11 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
 						{
-							CommandId:                  iwfidl.PtrString("timer-cmd-id"),
-							FiringUnixTimestampSeconds: iwfidl.PtrInt64(now + 10), // fire after 10s
+							CommandId:                  "timer-cmd-id",
+							FiringUnixTimestampSeconds: now + 10, // fire after 10s
 						},
 					},
-					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
 				},
 			})
 			return
@@ -68,7 +68,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State2 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.PtrString(service.DeciderTypeAllCommandCompleted),
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
 				},
 			})
 			return
@@ -98,7 +98,7 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: iwfidl.PtrString(State2),
+							StateId: State2,
 						},
 					},
 				},
@@ -110,7 +110,7 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: iwfidl.PtrString(service.CompletingWorkflowStateId),
+							StateId: service.CompletingWorkflowStateId,
 						},
 					},
 				},

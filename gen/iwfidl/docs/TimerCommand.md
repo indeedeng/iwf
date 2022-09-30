@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | Pointer to **string** |  | [optional] 
-**FiringUnixTimestampSeconds** | Pointer to **int64** |  | [optional] 
+**CommandId** | **string** |  | 
+**FiringUnixTimestampSeconds** | **int64** |  | 
 
 ## Methods
 
 ### NewTimerCommand
 
-`func NewTimerCommand() *TimerCommand`
+`func NewTimerCommand(commandId string, firingUnixTimestampSeconds int64, ) *TimerCommand`
 
 NewTimerCommand instantiates a new TimerCommand object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
-### HasCommandId
-
-`func (o *TimerCommand) HasCommandId() bool`
-
-HasCommandId returns a boolean if a field has been set.
 
 ### GetFiringUnixTimestampSeconds
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetFiringUnixTimestampSeconds sets FiringUnixTimestampSeconds field to given value.
 
-### HasFiringUnixTimestampSeconds
-
-`func (o *TimerCommand) HasFiringUnixTimestampSeconds() bool`
-
-HasFiringUnixTimestampSeconds returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

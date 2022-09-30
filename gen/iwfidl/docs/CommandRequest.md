@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DeciderTriggerType** | Pointer to **string** |  | [optional] 
+**DeciderTriggerType** | **string** |  | 
 **ActivityCommands** | Pointer to [**[]ActivityCommand**](ActivityCommand.md) |  | [optional] 
 **TimerCommands** | Pointer to [**[]TimerCommand**](TimerCommand.md) |  | [optional] 
 **SignalCommands** | Pointer to [**[]SignalCommand**](SignalCommand.md) |  | [optional] 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewCommandRequest
 
-`func NewCommandRequest() *CommandRequest`
+`func NewCommandRequest(deciderTriggerType string, ) *CommandRequest`
 
 NewCommandRequest instantiates a new CommandRequest object
 This constructor will assign default values to properties that have it defined,
@@ -47,11 +47,6 @@ and a boolean to check if the value has been set.
 
 SetDeciderTriggerType sets DeciderTriggerType field to given value.
 
-### HasDeciderTriggerType
-
-`func (o *CommandRequest) HasDeciderTriggerType() bool`
-
-HasDeciderTriggerType returns a boolean if a field has been set.
 
 ### GetActivityCommands
 

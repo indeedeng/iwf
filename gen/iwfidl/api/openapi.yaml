@@ -252,6 +252,12 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         stateOptions:
           $ref: '#/components/schemas/WorkflowStateOptions'
+      required:
+      - iwfWorkerUrl
+      - iwfWorkflowType
+      - startStateId
+      - workflowId
+      - workflowTimeoutSeconds
       type: object
     WorkflowStartResponse:
       example:
@@ -277,6 +283,9 @@ components:
           type: string
         signalValue:
           $ref: '#/components/schemas/EncodedObject'
+      required:
+      - signalName
+      - workflowId
       type: object
     WorkflowSignalResponse:
       example:
@@ -301,6 +310,8 @@ components:
           items:
             type: string
           type: array
+      required:
+      - workflowId
       type: object
     WorkflowQueryResponse:
       example:
@@ -367,6 +378,10 @@ components:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
+      required:
+      - context
+      - workflowStateId
+      - workflowType
       type: object
     WorkflowStateStartResponse:
       example:
@@ -527,6 +542,10 @@ components:
           type: array
         commandResults:
           $ref: '#/components/schemas/CommandResults'
+      required:
+      - context
+      - workflowStateId
+      - workflowType
       type: object
     WorkflowStateDecideResponse:
       example:
@@ -683,6 +702,8 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         nextStateOptions:
           $ref: '#/components/schemas/WorkflowStateOptions'
+      required:
+      - stateId
       type: object
     CommandRequest:
       example:
@@ -731,6 +752,8 @@ components:
           items:
             $ref: '#/components/schemas/SignalCommand'
           type: array
+      required:
+      - deciderTriggerType
       type: object
     CommandResults:
       example:
@@ -799,6 +822,9 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         activityOptions:
           $ref: '#/components/schemas/ActivityOptions'
+      required:
+      - activityType
+      - commandId
       type: object
     TimerCommand:
       example:
@@ -810,6 +836,9 @@ components:
         firingUnixTimestampSeconds:
           format: int64
           type: integer
+      required:
+      - commandId
+      - firingUnixTimestampSeconds
       type: object
     SignalCommand:
       example:
@@ -820,6 +849,9 @@ components:
           type: string
         signalName:
           type: string
+      required:
+      - commandId
+      - signalName
       type: object
     ActivityOptions:
       example:
@@ -858,6 +890,10 @@ components:
           - SCHEDULE_TO_CLOSE
           - HEARTBEAT
           type: string
+      required:
+      - activityStatus
+      - activityType
+      - commandId
       type: object
     TimerResult:
       example:
@@ -871,6 +907,9 @@ components:
           - SCHEDULED
           - FIRED
           type: string
+      required:
+      - commandId
+      - timerStatus
       type: object
     SignalResult:
       example:
@@ -892,6 +931,10 @@ components:
           type: string
         signalValue:
           $ref: '#/components/schemas/EncodedObject'
+      required:
+      - commandId
+      - signalName
+      - signalStatus
       type: object
     Context:
       example:
@@ -909,4 +952,10 @@ components:
           type: integer
         stateExecutionId:
           type: string
+      required:
+      - commandId
+      - stateExecutionId
+      - workflowId
+      - workflowRunId
+      - workflowStartedTimestamp
       type: object

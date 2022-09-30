@@ -16,18 +16,22 @@ import (
 
 // Context struct for Context
 type Context struct {
-	WorkflowId *string `json:"workflowId,omitempty"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	WorkflowStartedTimestamp *int64 `json:"workflowStartedTimestamp,omitempty"`
-	StateExecutionId *string `json:"stateExecutionId,omitempty"`
+	WorkflowId string `json:"workflowId"`
+	WorkflowRunId string `json:"workflowRunId"`
+	WorkflowStartedTimestamp int64 `json:"workflowStartedTimestamp"`
+	StateExecutionId string `json:"stateExecutionId"`
 }
 
 // NewContext instantiates a new Context object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewContext() *Context {
+func NewContext(workflowId string, workflowRunId string, workflowStartedTimestamp int64, stateExecutionId string) *Context {
 	this := Context{}
+	this.WorkflowId = workflowId
+	this.WorkflowRunId = workflowRunId
+	this.WorkflowStartedTimestamp = workflowStartedTimestamp
+	this.StateExecutionId = stateExecutionId
 	return &this
 }
 
@@ -39,146 +43,114 @@ func NewContextWithDefaults() *Context {
 	return &this
 }
 
-// GetWorkflowId returns the WorkflowId field value if set, zero value otherwise.
+// GetWorkflowId returns the WorkflowId field value
 func (o *Context) GetWorkflowId() string {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowId
+
+	return o.WorkflowId
 }
 
-// GetWorkflowIdOk returns a tuple with the WorkflowId field value if set, nil otherwise
+// GetWorkflowIdOk returns a tuple with the WorkflowId field value
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowIdOk() (*string, bool) {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowId, true
+	return &o.WorkflowId, true
 }
 
-// HasWorkflowId returns a boolean if a field has been set.
-func (o *Context) HasWorkflowId() bool {
-	if o != nil && o.WorkflowId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowId gets a reference to the given string and assigns it to the WorkflowId field.
+// SetWorkflowId sets field value
 func (o *Context) SetWorkflowId(v string) {
-	o.WorkflowId = &v
+	o.WorkflowId = v
 }
 
-// GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
+// GetWorkflowRunId returns the WorkflowRunId field value
 func (o *Context) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowRunId
+
+	return o.WorkflowRunId
 }
 
-// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
+// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowRunId, true
+	return &o.WorkflowRunId, true
 }
 
-// HasWorkflowRunId returns a boolean if a field has been set.
-func (o *Context) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
+// SetWorkflowRunId sets field value
 func (o *Context) SetWorkflowRunId(v string) {
-	o.WorkflowRunId = &v
+	o.WorkflowRunId = v
 }
 
-// GetWorkflowStartedTimestamp returns the WorkflowStartedTimestamp field value if set, zero value otherwise.
+// GetWorkflowStartedTimestamp returns the WorkflowStartedTimestamp field value
 func (o *Context) GetWorkflowStartedTimestamp() int64 {
-	if o == nil || o.WorkflowStartedTimestamp == nil {
+	if o == nil {
 		var ret int64
 		return ret
 	}
-	return *o.WorkflowStartedTimestamp
+
+	return o.WorkflowStartedTimestamp
 }
 
-// GetWorkflowStartedTimestampOk returns a tuple with the WorkflowStartedTimestamp field value if set, nil otherwise
+// GetWorkflowStartedTimestampOk returns a tuple with the WorkflowStartedTimestamp field value
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowStartedTimestampOk() (*int64, bool) {
-	if o == nil || o.WorkflowStartedTimestamp == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowStartedTimestamp, true
+	return &o.WorkflowStartedTimestamp, true
 }
 
-// HasWorkflowStartedTimestamp returns a boolean if a field has been set.
-func (o *Context) HasWorkflowStartedTimestamp() bool {
-	if o != nil && o.WorkflowStartedTimestamp != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowStartedTimestamp gets a reference to the given int64 and assigns it to the WorkflowStartedTimestamp field.
+// SetWorkflowStartedTimestamp sets field value
 func (o *Context) SetWorkflowStartedTimestamp(v int64) {
-	o.WorkflowStartedTimestamp = &v
+	o.WorkflowStartedTimestamp = v
 }
 
-// GetStateExecutionId returns the StateExecutionId field value if set, zero value otherwise.
+// GetStateExecutionId returns the StateExecutionId field value
 func (o *Context) GetStateExecutionId() string {
-	if o == nil || o.StateExecutionId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.StateExecutionId
+
+	return o.StateExecutionId
 }
 
-// GetStateExecutionIdOk returns a tuple with the StateExecutionId field value if set, nil otherwise
+// GetStateExecutionIdOk returns a tuple with the StateExecutionId field value
 // and a boolean to check if the value has been set.
 func (o *Context) GetStateExecutionIdOk() (*string, bool) {
-	if o == nil || o.StateExecutionId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.StateExecutionId, true
+	return &o.StateExecutionId, true
 }
 
-// HasStateExecutionId returns a boolean if a field has been set.
-func (o *Context) HasStateExecutionId() bool {
-	if o != nil && o.StateExecutionId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetStateExecutionId gets a reference to the given string and assigns it to the StateExecutionId field.
+// SetStateExecutionId sets field value
 func (o *Context) SetStateExecutionId(v string) {
-	o.StateExecutionId = &v
+	o.StateExecutionId = v
 }
 
 func (o Context) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowId != nil {
+	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if o.WorkflowRunId != nil {
+	if true {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
-	if o.WorkflowStartedTimestamp != nil {
+	if true {
 		toSerialize["workflowStartedTimestamp"] = o.WorkflowStartedTimestamp
 	}
-	if o.StateExecutionId != nil {
+	if true {
 		toSerialize["stateExecutionId"] = o.StateExecutionId
 	}
 	return json.Marshal(toSerialize)
