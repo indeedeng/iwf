@@ -78,7 +78,9 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowQueryPost**](docs/DefaultApi.md#apiv1workflowquerypost) | **Post** /api/v1/workflow/query | query a workflow
+*DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 *DefaultApi* | [**ApiV1WorkflowSignalPost**](docs/DefaultApi.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
 *DefaultApi* | [**ApiV1WorkflowStartPost**](docs/DefaultApi.md#apiv1workflowstartpost) | **Post** /api/v1/workflow/start | start a workflow
 *DefaultApi* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultApi.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
@@ -105,10 +107,15 @@ Class | Method | HTTP request | Description
  - [StateMovement](docs/StateMovement.md)
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
+ - [WorkflowGetRequest](docs/WorkflowGetRequest.md)
+ - [WorkflowGetResponse](docs/WorkflowGetResponse.md)
  - [WorkflowQueryRequest](docs/WorkflowQueryRequest.md)
  - [WorkflowQueryResponse](docs/WorkflowQueryResponse.md)
+ - [WorkflowResult](docs/WorkflowResult.md)
+ - [WorkflowSearchRequest](docs/WorkflowSearchRequest.md)
+ - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
+ - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
  - [WorkflowSignalRequest](docs/WorkflowSignalRequest.md)
- - [WorkflowSignalResponse](docs/WorkflowSignalResponse.md)
  - [WorkflowStartRequest](docs/WorkflowStartRequest.md)
  - [WorkflowStartResponse](docs/WorkflowStartResponse.md)
  - [WorkflowStateDecideRequest](docs/WorkflowStateDecideRequest.md)
