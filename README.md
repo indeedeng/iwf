@@ -1,5 +1,8 @@
-# iWF server
-interpreter workflow engine for Cadence/Temporal
+# iWF project - main & server repo 
+
+A simple and powerful WorkflowAsCode general purpose workflow engine 
+
+Back by Cadence/Temporal as interpreter.
 
 Related projects:
 * [iWF Java SDK](https://github.com/cadence-oss/iwf-java)
