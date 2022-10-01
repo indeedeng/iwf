@@ -15,7 +15,7 @@ Related projects:
 
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
-* Then run  `./iwf-server start` to run the service . This defaults to test API + Temporal interpreter implementation, require to have local Temporal setup. See Run with local Temporal.
+* Then run  `./iwf-server start` to run the service . This defaults to test API + Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
 * Run `make integTests` to run all integration tests
 
 ## Development
@@ -26,8 +26,13 @@ Related projects:
 3. Run the command `git submodule update --remote --merge` to update IDL to the latest commit
 4. Run `make idl-code-gen` to refresh the generated code
 
-### Run with local Temporal
-1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. 
+
+### Run with local Temporalite
+1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. Go to http://localhost:8233/ for Temporal WebUI
+
+### Run with local Temporal server with Search attributes enabled(back by ElasticSearch)
+* WHY: Temporalite doesn't support Search Attributes, which is one of the important features in iWF. 
+Go to (=[Temporal-dockercompose](https://github.com/temporalio/docker-compose) to set it up
 
 ### Run with local Cadence
 TODO
