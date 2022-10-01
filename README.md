@@ -2,7 +2,7 @@
 
 A simple and powerful WorkflowAsCode general purpose workflow engine 
 
-Back by Cadence/Temporal as interpreter.
+Back by Cadence/Temporal as an interpreter.
 
 Related projects:
 * [iWF Java SDK](https://github.com/cadence-oss/iwf-java)
