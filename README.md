@@ -16,7 +16,7 @@ Related projects:
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
 * Then run  `./iwf-server start` to run the service . This defaults to test API + Temporal interpreter implementation, require to have local Temporal setup. See Run with local Temporal.
-* Hit http://localhost:8801/ to trigger a test workflow
+* Run `make integTests` to run all integration tests
 
 ## Development
 
