@@ -16,7 +16,7 @@ import (
 
 // WorkflowSearchResponse struct for WorkflowSearchResponse
 type WorkflowSearchResponse struct {
-	QueryAttributes []WorkflowSearchResponseEntry `json:"queryAttributes,omitempty"`
+	WorkflowExecutions []WorkflowSearchResponseEntry `json:"workflowExecutions,omitempty"`
 }
 
 // NewWorkflowSearchResponse instantiates a new WorkflowSearchResponse object
@@ -36,42 +36,42 @@ func NewWorkflowSearchResponseWithDefaults() *WorkflowSearchResponse {
 	return &this
 }
 
-// GetQueryAttributes returns the QueryAttributes field value if set, zero value otherwise.
-func (o *WorkflowSearchResponse) GetQueryAttributes() []WorkflowSearchResponseEntry {
-	if o == nil || o.QueryAttributes == nil {
+// GetWorkflowExecutions returns the WorkflowExecutions field value if set, zero value otherwise.
+func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchResponseEntry {
+	if o == nil || o.WorkflowExecutions == nil {
 		var ret []WorkflowSearchResponseEntry
 		return ret
 	}
-	return o.QueryAttributes
+	return o.WorkflowExecutions
 }
 
-// GetQueryAttributesOk returns a tuple with the QueryAttributes field value if set, nil otherwise
+// GetWorkflowExecutionsOk returns a tuple with the WorkflowExecutions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowSearchResponse) GetQueryAttributesOk() ([]WorkflowSearchResponseEntry, bool) {
-	if o == nil || o.QueryAttributes == nil {
+func (o *WorkflowSearchResponse) GetWorkflowExecutionsOk() ([]WorkflowSearchResponseEntry, bool) {
+	if o == nil || o.WorkflowExecutions == nil {
 		return nil, false
 	}
-	return o.QueryAttributes, true
+	return o.WorkflowExecutions, true
 }
 
-// HasQueryAttributes returns a boolean if a field has been set.
-func (o *WorkflowSearchResponse) HasQueryAttributes() bool {
-	if o != nil && o.QueryAttributes != nil {
+// HasWorkflowExecutions returns a boolean if a field has been set.
+func (o *WorkflowSearchResponse) HasWorkflowExecutions() bool {
+	if o != nil && o.WorkflowExecutions != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetQueryAttributes gets a reference to the given []WorkflowSearchResponseEntry and assigns it to the QueryAttributes field.
-func (o *WorkflowSearchResponse) SetQueryAttributes(v []WorkflowSearchResponseEntry) {
-	o.QueryAttributes = v
+// SetWorkflowExecutions gets a reference to the given []WorkflowSearchResponseEntry and assigns it to the WorkflowExecutions field.
+func (o *WorkflowSearchResponse) SetWorkflowExecutions(v []WorkflowSearchResponseEntry) {
+	o.WorkflowExecutions = v
 }
 
 func (o WorkflowSearchResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.QueryAttributes != nil {
-		toSerialize["queryAttributes"] = o.QueryAttributes
+	if o.WorkflowExecutions != nil {
+		toSerialize["workflowExecutions"] = o.WorkflowExecutions
 	}
 	return json.Marshal(toSerialize)
 }

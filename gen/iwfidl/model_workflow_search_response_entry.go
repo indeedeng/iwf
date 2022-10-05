@@ -16,16 +16,18 @@ import (
 
 // WorkflowSearchResponseEntry struct for WorkflowSearchResponseEntry
 type WorkflowSearchResponseEntry struct {
-	WorkflowId *string `json:"workflowId,omitempty"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
+	WorkflowId string `json:"workflowId"`
+	WorkflowRunId string `json:"workflowRunId"`
 }
 
 // NewWorkflowSearchResponseEntry instantiates a new WorkflowSearchResponseEntry object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowSearchResponseEntry() *WorkflowSearchResponseEntry {
+func NewWorkflowSearchResponseEntry(workflowId string, workflowRunId string) *WorkflowSearchResponseEntry {
 	this := WorkflowSearchResponseEntry{}
+	this.WorkflowId = workflowId
+	this.WorkflowRunId = workflowRunId
 	return &this
 }
 
@@ -37,76 +39,60 @@ func NewWorkflowSearchResponseEntryWithDefaults() *WorkflowSearchResponseEntry {
 	return &this
 }
 
-// GetWorkflowId returns the WorkflowId field value if set, zero value otherwise.
+// GetWorkflowId returns the WorkflowId field value
 func (o *WorkflowSearchResponseEntry) GetWorkflowId() string {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowId
+
+	return o.WorkflowId
 }
 
-// GetWorkflowIdOk returns a tuple with the WorkflowId field value if set, nil otherwise
+// GetWorkflowIdOk returns a tuple with the WorkflowId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponseEntry) GetWorkflowIdOk() (*string, bool) {
-	if o == nil || o.WorkflowId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowId, true
+	return &o.WorkflowId, true
 }
 
-// HasWorkflowId returns a boolean if a field has been set.
-func (o *WorkflowSearchResponseEntry) HasWorkflowId() bool {
-	if o != nil && o.WorkflowId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowId gets a reference to the given string and assigns it to the WorkflowId field.
+// SetWorkflowId sets field value
 func (o *WorkflowSearchResponseEntry) SetWorkflowId(v string) {
-	o.WorkflowId = &v
+	o.WorkflowId = v
 }
 
-// GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
+// GetWorkflowRunId returns the WorkflowRunId field value
 func (o *WorkflowSearchResponseEntry) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowRunId
+
+	return o.WorkflowRunId
 }
 
-// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
+// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponseEntry) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowRunId, true
+	return &o.WorkflowRunId, true
 }
 
-// HasWorkflowRunId returns a boolean if a field has been set.
-func (o *WorkflowSearchResponseEntry) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
+// SetWorkflowRunId sets field value
 func (o *WorkflowSearchResponseEntry) SetWorkflowRunId(v string) {
-	o.WorkflowRunId = &v
+	o.WorkflowRunId = v
 }
 
 func (o WorkflowSearchResponseEntry) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowId != nil {
+	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if o.WorkflowRunId != nil {
+	if true {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	return json.Marshal(toSerialize)

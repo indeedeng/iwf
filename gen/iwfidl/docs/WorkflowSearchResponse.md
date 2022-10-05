@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**QueryAttributes** | Pointer to [**[]WorkflowSearchResponseEntry**](WorkflowSearchResponseEntry.md) |  | [optional] 
+**WorkflowExecutions** | Pointer to [**[]WorkflowSearchResponseEntry**](WorkflowSearchResponseEntry.md) |  | [optional] 
 
 ## Methods
 
@@ -25,30 +25,30 @@ NewWorkflowSearchResponseWithDefaults instantiates a new WorkflowSearchResponse 
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetQueryAttributes
+### GetWorkflowExecutions
 
-`func (o *WorkflowSearchResponse) GetQueryAttributes() []WorkflowSearchResponseEntry`
+`func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchResponseEntry`
 
-GetQueryAttributes returns the QueryAttributes field if non-nil, zero value otherwise.
+GetWorkflowExecutions returns the WorkflowExecutions field if non-nil, zero value otherwise.
 
-### GetQueryAttributesOk
+### GetWorkflowExecutionsOk
 
-`func (o *WorkflowSearchResponse) GetQueryAttributesOk() (*[]WorkflowSearchResponseEntry, bool)`
+`func (o *WorkflowSearchResponse) GetWorkflowExecutionsOk() (*[]WorkflowSearchResponseEntry, bool)`
 
-GetQueryAttributesOk returns a tuple with the QueryAttributes field if it's non-nil, zero value otherwise
+GetWorkflowExecutionsOk returns a tuple with the WorkflowExecutions field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetQueryAttributes
+### SetWorkflowExecutions
 
-`func (o *WorkflowSearchResponse) SetQueryAttributes(v []WorkflowSearchResponseEntry)`
+`func (o *WorkflowSearchResponse) SetWorkflowExecutions(v []WorkflowSearchResponseEntry)`
 
-SetQueryAttributes sets QueryAttributes field to given value.
+SetWorkflowExecutions sets WorkflowExecutions field to given value.
 
-### HasQueryAttributes
+### HasWorkflowExecutions
 
-`func (o *WorkflowSearchResponse) HasQueryAttributes() bool`
+`func (o *WorkflowSearchResponse) HasWorkflowExecutions() bool`
 
-HasQueryAttributes returns a boolean if a field has been set.
+HasWorkflowExecutions returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
