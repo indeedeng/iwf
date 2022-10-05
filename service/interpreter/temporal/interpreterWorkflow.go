@@ -253,6 +253,7 @@ func executeState(
 			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),
 			SearchAttributes:     attrMgr.GetAllSearchAttributes(),
 			QueryAttributes:      attrMgr.GetAllQueryAttributes(),
+			StateInput:           state.NextStateInput,
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/basic"
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
@@ -59,6 +60,10 @@ func TestBasicWorkflow(t *testing.T) {
 		},
 	})
 	wfId := basic.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfInput := &iwfidl.EncodedObject{
+		Encoding: iwfidl.PtrString("json"),
+		Data:     iwfidl.PtrString("test data"),
+	}
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
@@ -66,6 +71,7 @@ func TestBasicWorkflow(t *testing.T) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           basic.State1,
+		StateInput:             wfInput,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
@@ -76,9 +82,14 @@ func TestBasicWorkflow(t *testing.T) {
 	fmt.Println(*resp)
 	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
-	// wait for the workflow
+	// wait for the workflow TODO: use new workflow/get API
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
-	_ = run.Get(context.Background(), nil)
+	var output service.InterpreterWorkflowOutput
+	err = run.Get(context.Background(), &output)
+	if err != nil {
+		log.Fatalf("Fail to get workflow output %v", err)
+	}
+	fmt.Println("see output", output)
 
 	history := wfHandler.GetTestResult()
 	assertions := assert.New(t)
