@@ -33,7 +33,7 @@ func StateStartActivity(ctx context.Context, input service.StateStartActivityInp
 
 func StateDecideActivity(ctx context.Context, input service.StateDecideActivityInput) (*iwfidl.WorkflowStateDecideResponse, error) {
 	logger := activity.GetLogger(ctx)
-	logger.Info("StateStartActivity", "input", input)
+	logger.Info("StateDecideActivity", "input", input)
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{

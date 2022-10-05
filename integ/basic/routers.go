@@ -76,7 +76,8 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: State2,
+							StateId:        State2,
+							NextStateInput: req.StateInput,
 						},
 					},
 				},
@@ -88,7 +89,8 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: service.CompletingWorkflowStateId,
+							StateId:        service.GracefulCompletingWorkflowStateId,
+							NextStateInput: req.StateInput,
 						},
 					},
 				},

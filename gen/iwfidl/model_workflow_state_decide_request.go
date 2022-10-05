@@ -19,6 +19,7 @@ type WorkflowStateDecideRequest struct {
 	Context Context `json:"context"`
 	WorkflowType string `json:"workflowType"`
 	WorkflowStateId string `json:"workflowStateId"`
+	StateInput *EncodedObject `json:"stateInput,omitempty"`
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
 	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
 	StateLocalAttributes []KeyValue `json:"stateLocalAttributes,omitempty"`
@@ -115,6 +116,38 @@ func (o *WorkflowStateDecideRequest) GetWorkflowStateIdOk() (*string, bool) {
 // SetWorkflowStateId sets field value
 func (o *WorkflowStateDecideRequest) SetWorkflowStateId(v string) {
 	o.WorkflowStateId = v
+}
+
+// GetStateInput returns the StateInput field value if set, zero value otherwise.
+func (o *WorkflowStateDecideRequest) GetStateInput() EncodedObject {
+	if o == nil || o.StateInput == nil {
+		var ret EncodedObject
+		return ret
+	}
+	return *o.StateInput
+}
+
+// GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateDecideRequest) GetStateInputOk() (*EncodedObject, bool) {
+	if o == nil || o.StateInput == nil {
+		return nil, false
+	}
+	return o.StateInput, true
+}
+
+// HasStateInput returns a boolean if a field has been set.
+func (o *WorkflowStateDecideRequest) HasStateInput() bool {
+	if o != nil && o.StateInput != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStateInput gets a reference to the given EncodedObject and assigns it to the StateInput field.
+func (o *WorkflowStateDecideRequest) SetStateInput(v EncodedObject) {
+	o.StateInput = &v
 }
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
@@ -255,6 +288,9 @@ func (o WorkflowStateDecideRequest) MarshalJSON() ([]byte, error) {
 	}
 	if true {
 		toSerialize["workflowStateId"] = o.WorkflowStateId
+	}
+	if o.StateInput != nil {
+		toSerialize["stateInput"] = o.StateInput
 	}
 	if o.SearchAttributes != nil {
 		toSerialize["searchAttributes"] = o.SearchAttributes

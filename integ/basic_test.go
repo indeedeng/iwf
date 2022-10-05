@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/basic"
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
@@ -59,6 +60,10 @@ func TestBasicWorkflow(t *testing.T) {
 		},
 	})
 	wfId := basic.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfInput := &iwfidl.EncodedObject{
+		Encoding: iwfidl.PtrString("json"),
+		Data:     iwfidl.PtrString("test data"),
+	}
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
@@ -66,6 +71,7 @@ func TestBasicWorkflow(t *testing.T) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           basic.State1,
+		StateInput:             wfInput,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
@@ -76,9 +82,17 @@ func TestBasicWorkflow(t *testing.T) {
 	fmt.Println(*resp)
 	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
-	// wait for the workflow
-	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
-	_ = run.Get(context.Background(), nil)
+	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background())
+	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId:   wfId,
+		NeedsResults: iwfidl.PtrBool(true),
+	}).Execute()
+	if err != nil {
+		log.Fatalf("Fail to invoke start api %v", err)
+	}
+	if httpResp.StatusCode != http.StatusOK {
+		log.Fatalf("Fail to get workflow" + httpResp.Status)
+	}
 
 	history := wfHandler.GetTestResult()
 	assertions := assert.New(t)
@@ -88,4 +102,12 @@ func TestBasicWorkflow(t *testing.T) {
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "basic test fail, %v", history)
+
+	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(1, len(resp2.GetResults()))
+	assertions.Equal(iwfidl.StateCompletionOutput{
+		CompletedStateId:          "S2",
+		CompletedStateExecutionId: "S2-1",
+		CompletedStateOutput:      wfInput,
+	}, resp2.GetResults()[0])
 }

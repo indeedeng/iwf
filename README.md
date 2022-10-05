@@ -49,9 +49,10 @@ TODO
 - [x] StateLocalAttribute
 - [x] Signal workflow API
 - [x] Query workflow API
+- [x] Get workflow API
+- [ ] List/search workflow API
 
 ## 1.1
-- [ ] List/search workflow API
 - [ ] StateOption: AttributeLoadingPolicy
 - [ ] StateOption: CommandCarryOverPolicy
 - [ ] StateOption: Start/Decide API timeout and retry

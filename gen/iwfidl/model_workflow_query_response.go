@@ -16,7 +16,6 @@ import (
 
 // WorkflowQueryResponse struct for WorkflowQueryResponse
 type WorkflowQueryResponse struct {
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
 	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
 }
 
@@ -35,38 +34,6 @@ func NewWorkflowQueryResponse() *WorkflowQueryResponse {
 func NewWorkflowQueryResponseWithDefaults() *WorkflowQueryResponse {
 	this := WorkflowQueryResponse{}
 	return &this
-}
-
-// GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
-func (o *WorkflowQueryResponse) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
-		var ret string
-		return ret
-	}
-	return *o.WorkflowRunId
-}
-
-// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowQueryResponse) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
-		return nil, false
-	}
-	return o.WorkflowRunId, true
-}
-
-// HasWorkflowRunId returns a boolean if a field has been set.
-func (o *WorkflowQueryResponse) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
-func (o *WorkflowQueryResponse) SetWorkflowRunId(v string) {
-	o.WorkflowRunId = &v
 }
 
 // GetQueryAttributes returns the QueryAttributes field value if set, zero value otherwise.
@@ -103,9 +70,6 @@ func (o *WorkflowQueryResponse) SetQueryAttributes(v []KeyValue) {
 
 func (o WorkflowQueryResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowRunId != nil {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
 	if o.QueryAttributes != nil {
 		toSerialize["queryAttributes"] = o.QueryAttributes
 	}

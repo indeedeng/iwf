@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/attribute"
-	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
@@ -81,25 +80,8 @@ func TestAttributeWorkflow(t *testing.T) {
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
 	_ = run.Get(context.Background(), nil)
 
-	qres, err := temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, nil)
-	if err != nil {
-		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
-	}
-
-	var queryResult1 service.QueryAttributeResponse
-	err = qres.Get(&queryResult1)
-	if err != nil {
-		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
-	}
-
-	//qres, err = temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, service.QueryAttributeRequest{
-	//	Keys: []string{
-	//		attribute.TestQueryAttributeKey,
-	//	},
-	//})
-
 	req2 := apiClient.DefaultApi.ApiV1WorkflowQueryPost(context.Background())
-	_, httpResp2, err := req2.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
+	queryResult1, httpResp2, err := req2.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
 		WorkflowId: wfId,
 		AttributeKeys: []string{
 			attribute.TestQueryAttributeKey,
@@ -110,10 +92,12 @@ func TestAttributeWorkflow(t *testing.T) {
 		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpResp2)
 	}
 
-	var queryResult2 service.QueryAttributeResponse
-	err = qres.Get(&queryResult2)
-	if err != nil {
-		log.Fatalf("Fail to invoke query workflow for single attr %v", err)
+	queryResult2, httpResp2, err := req2.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
+		WorkflowId: wfId,
+	}).Execute()
+
+	if err != nil || httpResp2.StatusCode != 200 {
+		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpResp2)
 	}
 
 	// assertion
@@ -165,6 +149,6 @@ func TestAttributeWorkflow(t *testing.T) {
 			Value: &attribute.TestQueryVal2,
 		},
 	}
-	assertions.Equal(expected, queryResult2.AttributeValues)
-	assertions.Equal(expected, queryResult1.AttributeValues)
+	assertions.Equal(expected, queryResult2.GetQueryAttributes())
+	assertions.Equal(expected, queryResult1.GetQueryAttributes())
 }

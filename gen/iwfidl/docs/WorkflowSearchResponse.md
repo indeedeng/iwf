@@ -1,52 +1,52 @@
-# WorkflowQueryResponse
+# WorkflowSearchResponse
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**QueryAttributes** | Pointer to [**[]WorkflowSearchResponseEntry**](WorkflowSearchResponseEntry.md) |  | [optional] 
 
 ## Methods
 
-### NewWorkflowQueryResponse
+### NewWorkflowSearchResponse
 
-`func NewWorkflowQueryResponse() *WorkflowQueryResponse`
+`func NewWorkflowSearchResponse() *WorkflowSearchResponse`
 
-NewWorkflowQueryResponse instantiates a new WorkflowQueryResponse object
+NewWorkflowSearchResponse instantiates a new WorkflowSearchResponse object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewWorkflowQueryResponseWithDefaults
+### NewWorkflowSearchResponseWithDefaults
 
-`func NewWorkflowQueryResponseWithDefaults() *WorkflowQueryResponse`
+`func NewWorkflowSearchResponseWithDefaults() *WorkflowSearchResponse`
 
-NewWorkflowQueryResponseWithDefaults instantiates a new WorkflowQueryResponse object
+NewWorkflowSearchResponseWithDefaults instantiates a new WorkflowSearchResponse object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetQueryAttributes
 
-`func (o *WorkflowQueryResponse) GetQueryAttributes() []KeyValue`
+`func (o *WorkflowSearchResponse) GetQueryAttributes() []WorkflowSearchResponseEntry`
 
 GetQueryAttributes returns the QueryAttributes field if non-nil, zero value otherwise.
 
 ### GetQueryAttributesOk
 
-`func (o *WorkflowQueryResponse) GetQueryAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowSearchResponse) GetQueryAttributesOk() (*[]WorkflowSearchResponseEntry, bool)`
 
 GetQueryAttributesOk returns a tuple with the QueryAttributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetQueryAttributes
 
-`func (o *WorkflowQueryResponse) SetQueryAttributes(v []KeyValue)`
+`func (o *WorkflowSearchResponse) SetQueryAttributes(v []WorkflowSearchResponseEntry)`
 
 SetQueryAttributes sets QueryAttributes field to given value.
 
 ### HasQueryAttributes
 
-`func (o *WorkflowQueryResponse) HasQueryAttributes() bool`
+`func (o *WorkflowSearchResponse) HasQueryAttributes() bool`
 
 HasQueryAttributes returns a boolean if a field has been set.
 

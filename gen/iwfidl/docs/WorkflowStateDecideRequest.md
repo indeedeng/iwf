@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Context** | [**Context**](Context.md) |  | 
 **WorkflowType** | **string** |  | 
 **WorkflowStateId** | **string** |  | 
+**StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **StateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -90,6 +91,31 @@ and a boolean to check if the value has been set.
 
 SetWorkflowStateId sets WorkflowStateId field to given value.
 
+
+### GetStateInput
+
+`func (o *WorkflowStateDecideRequest) GetStateInput() EncodedObject`
+
+GetStateInput returns the StateInput field if non-nil, zero value otherwise.
+
+### GetStateInputOk
+
+`func (o *WorkflowStateDecideRequest) GetStateInputOk() (*EncodedObject, bool)`
+
+GetStateInputOk returns a tuple with the StateInput field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStateInput
+
+`func (o *WorkflowStateDecideRequest) SetStateInput(v EncodedObject)`
+
+SetStateInput sets StateInput field to given value.
+
+### HasStateInput
+
+`func (o *WorkflowStateDecideRequest) HasStateInput() bool`
+
+HasStateInput returns a boolean if a field has been set.
 
 ### GetSearchAttributes
 
