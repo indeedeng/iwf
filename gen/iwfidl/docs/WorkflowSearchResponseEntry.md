@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowId** | Pointer to **string** |  | [optional] 
-**WorkflowRunId** | Pointer to **string** |  | [optional] 
+**WorkflowId** | **string** |  | 
+**WorkflowRunId** | **string** |  | 
 
 ## Methods
 
 ### NewWorkflowSearchResponseEntry
 
-`func NewWorkflowSearchResponseEntry() *WorkflowSearchResponseEntry`
+`func NewWorkflowSearchResponseEntry(workflowId string, workflowRunId string, ) *WorkflowSearchResponseEntry`
 
 NewWorkflowSearchResponseEntry instantiates a new WorkflowSearchResponseEntry object
 This constructor will assign default values to properties that have it defined,
@@ -45,11 +45,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
-### HasWorkflowId
-
-`func (o *WorkflowSearchResponseEntry) HasWorkflowId() bool`
-
-HasWorkflowId returns a boolean if a field has been set.
 
 ### GetWorkflowRunId
 
@@ -70,11 +65,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowRunId sets WorkflowRunId field to given value.
 
-### HasWorkflowRunId
-
-`func (o *WorkflowSearchResponseEntry) HasWorkflowRunId() bool`
-
-HasWorkflowRunId returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Query** | **string** |  | 
-**PageSize** | Pointer to **float32** |  | [optional] 
+**PageSize** | Pointer to **int32** |  | [optional] 
 
 ## Methods
 
@@ -48,20 +48,20 @@ SetQuery sets Query field to given value.
 
 ### GetPageSize
 
-`func (o *WorkflowSearchRequest) GetPageSize() float32`
+`func (o *WorkflowSearchRequest) GetPageSize() int32`
 
 GetPageSize returns the PageSize field if non-nil, zero value otherwise.
 
 ### GetPageSizeOk
 
-`func (o *WorkflowSearchRequest) GetPageSizeOk() (*float32, bool)`
+`func (o *WorkflowSearchRequest) GetPageSizeOk() (*int32, bool)`
 
 GetPageSizeOk returns a tuple with the PageSize field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetPageSize
 
-`func (o *WorkflowSearchRequest) SetPageSize(v float32)`
+`func (o *WorkflowSearchRequest) SetPageSize(v int32)`
 
 SetPageSize sets PageSize field to given value.
 

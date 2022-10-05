@@ -16,6 +16,7 @@ import (
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"go.temporal.io/api/enums/v1"
+	"go.temporal.io/api/workflowservice/v1"
 
 	"go.temporal.io/sdk/client"
 	"log"
@@ -96,6 +97,40 @@ func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
 		})
 	}
 	c.JSON(http.StatusOK, struct{}{})
+}
+
+func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
+	var req iwfidl.WorkflowSearchRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received request", req)
+
+	pageSize := int32(1000)
+	if req.GetPageSize() > 0 {
+		pageSize = req.GetPageSize()
+	}
+	resp, err := h.temporalClient.ListWorkflow(context.Background(), &workflowservice.ListWorkflowExecutionsRequest{
+		PageSize: pageSize,
+		Query:    req.GetQuery(),
+	})
+	if err != nil {
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
+	}
+	var entries []iwfidl.WorkflowSearchResponseEntry
+	for _, wf := range resp.GetExecutions() {
+		entries = append(entries, iwfidl.WorkflowSearchResponseEntry{
+			WorkflowId:    wf.GetExecution().GetWorkflowId(),
+			WorkflowRunId: wf.GetExecution().GetRunId(),
+		})
+	}
+	c.JSON(http.StatusOK, iwfidl.WorkflowSearchResponse{
+		WorkflowExecutions: entries,
+	})
 }
 
 func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {

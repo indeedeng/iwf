@@ -50,7 +50,7 @@ TODO
 - [x] Signal workflow API
 - [x] Query workflow API
 - [x] Get workflow API
-- [ ] List/search workflow API
+- [x] Search workflow API
 
 ## 1.1
 - [ ] StateOption: AttributeLoadingPolicy

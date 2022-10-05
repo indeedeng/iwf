@@ -462,24 +462,25 @@ components:
     WorkflowSearchRequest:
       example:
         query: query
-        pageSize: 0.8008281904610115
+        pageSize: 0
       properties:
         query:
           type: string
         pageSize:
-          type: number
+          format: int32
+          type: integer
       required:
       - query
       type: object
     WorkflowSearchResponse:
       example:
-        queryAttributes:
+        workflowExecutions:
         - workflowRunId: workflowRunId
           workflowId: workflowId
         - workflowRunId: workflowRunId
           workflowId: workflowId
       properties:
-        queryAttributes:
+        workflowExecutions:
           items:
             $ref: '#/components/schemas/WorkflowSearchResponseEntry'
           type: array
@@ -493,6 +494,9 @@ components:
           type: string
         workflowRunId:
           type: string
+      required:
+      - workflowId
+      - workflowRunId
       type: object
     WorkflowStateStartRequest:
       example:

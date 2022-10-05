@@ -17,7 +17,7 @@ import (
 // WorkflowSearchRequest struct for WorkflowSearchRequest
 type WorkflowSearchRequest struct {
 	Query string `json:"query"`
-	PageSize *float32 `json:"pageSize,omitempty"`
+	PageSize *int32 `json:"pageSize,omitempty"`
 }
 
 // NewWorkflowSearchRequest instantiates a new WorkflowSearchRequest object
@@ -63,9 +63,9 @@ func (o *WorkflowSearchRequest) SetQuery(v string) {
 }
 
 // GetPageSize returns the PageSize field value if set, zero value otherwise.
-func (o *WorkflowSearchRequest) GetPageSize() float32 {
+func (o *WorkflowSearchRequest) GetPageSize() int32 {
 	if o == nil || o.PageSize == nil {
-		var ret float32
+		var ret int32
 		return ret
 	}
 	return *o.PageSize
@@ -73,7 +73,7 @@ func (o *WorkflowSearchRequest) GetPageSize() float32 {
 
 // GetPageSizeOk returns a tuple with the PageSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowSearchRequest) GetPageSizeOk() (*float32, bool) {
+func (o *WorkflowSearchRequest) GetPageSizeOk() (*int32, bool) {
 	if o == nil || o.PageSize == nil {
 		return nil, false
 	}
@@ -89,8 +89,8 @@ func (o *WorkflowSearchRequest) HasPageSize() bool {
 	return false
 }
 
-// SetPageSize gets a reference to the given float32 and assigns it to the PageSize field.
-func (o *WorkflowSearchRequest) SetPageSize(v float32) {
+// SetPageSize gets a reference to the given int32 and assigns it to the PageSize field.
+func (o *WorkflowSearchRequest) SetPageSize(v int32) {
 	o.PageSize = &v
 }
 
