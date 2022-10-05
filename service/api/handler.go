@@ -113,6 +113,7 @@ func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
 	}
 	resp, err := h.temporalClient.ListWorkflow(context.Background(), &workflowservice.ListWorkflowExecutionsRequest{
 		PageSize: pageSize,
+		Query:    req.GetQuery(),
 	})
 	if err != nil {
 		// TODO differentiate different error for different codes
