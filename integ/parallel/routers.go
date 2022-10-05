@@ -76,14 +76,18 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 		var nexts []string
 		switch req.GetWorkflowStateId() {
 		case State1:
+			// cause graceful complete to wait
+			time.Sleep(time.Second * 1)
 			nexts = append(nexts, State11, State12)
 		case State11:
+			// cause graceful complete to wait
+			time.Sleep(time.Second * 2)
 			nexts = append(nexts, State111, State112)
 		case State12:
+			// cause graceful complete to wait
+			time.Sleep(time.Second * 2)
 			nexts = append(nexts, State121, State122)
 		case State111:
-			// wait for 3 seconds for other states
-			time.Sleep(time.Second * 3)
 			nexts = append(nexts, service.GracefulCompletingWorkflowStateId)
 		case State112, State121, State122:
 			//empty
