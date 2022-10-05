@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/parallel"
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
@@ -77,8 +78,17 @@ func TestPrallelWorkflow(t *testing.T) {
 	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
 	// wait for the workflow
-	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
-	_ = run.Get(context.Background(), nil)
+	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background())
+	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId:   wfId,
+		NeedsResults: iwfidl.PtrBool(true),
+	}).Execute()
+	if err != nil {
+		log.Fatalf("Fail to invoke start api %v", err)
+	}
+	if httpResp.StatusCode != http.StatusOK {
+		log.Fatalf("Fail to get workflow" + httpResp.Status)
+	}
 
 	history := wfHandler.GetTestResult()
 	assertions := assert.New(t)
@@ -103,4 +113,41 @@ func TestPrallelWorkflow(t *testing.T) {
 		"S122_start":  1,
 		"S122_decide": 1,
 	}, history, "parallel test fail, %v", history)
+
+	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(4, len(resp2.GetResults()))
+	//assertions.Equal([]iwfidl.StateCompletionOutput{
+	//	{
+	//		CompletedStateId:          parallel.State111,
+	//		CompletedStateExecutionId: parallel.State111 + "-1",
+	//		CompletedStateOutput: &iwfidl.EncodedObject{
+	//			Encoding: iwfidl.PtrString("json"),
+	//			Data:     iwfidl.PtrString("from " + parallel.State111),
+	//		},
+	//	},
+	//	{
+	//		CompletedStateId:          parallel.State112,
+	//		CompletedStateExecutionId: parallel.State112 + "-1",
+	//		CompletedStateOutput: &iwfidl.EncodedObject{
+	//			Encoding: iwfidl.PtrString("json"),
+	//			Data:     iwfidl.PtrString("from " + parallel.State112),
+	//		},
+	//	},
+	//	{
+	//		CompletedStateId:          parallel.State121,
+	//		CompletedStateExecutionId: parallel.State121 + "-1",
+	//		CompletedStateOutput: &iwfidl.EncodedObject{
+	//			Encoding: iwfidl.PtrString("json"),
+	//			Data:     iwfidl.PtrString("from " + parallel.State121),
+	//		},
+	//	},
+	//	{
+	//		CompletedStateId:          parallel.State122,
+	//		CompletedStateExecutionId: parallel.State122 + "-1",
+	//		CompletedStateOutput: &iwfidl.EncodedObject{
+	//			Encoding: iwfidl.PtrString("json"),
+	//			Data:     iwfidl.PtrString("from " + parallel.State122),
+	//		},
+	//	},
+	//}, resp2.GetResults())
 }

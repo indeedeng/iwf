@@ -5,6 +5,7 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
+[**ApiV1WorkflowGetWithLongWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithLongWaitPost) | **Post** /api/v1/workflow/getWithLongWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 [**ApiV1WorkflowQueryPost**](DefaultApi.md#ApiV1WorkflowQueryPost) | **Post** /api/v1/workflow/query | query a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 [**ApiV1WorkflowSignalPost**](DefaultApi.md#ApiV1WorkflowSignalPost) | **Post** /api/v1/workflow/signal | signal a workflow
@@ -54,6 +55,70 @@ func main() {
 ### Other Parameters
 
 Other parameters are passed through a pointer to a apiApiV1WorkflowGetPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowGetRequest** | [**WorkflowGetRequest**](WorkflowGetRequest.md) |  | 
+
+### Return type
+
+[**WorkflowGetResponse**](WorkflowGetResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowGetWithLongWaitPost
+
+> WorkflowGetResponse ApiV1WorkflowGetWithLongWaitPost(ctx).WorkflowGetRequest(workflowGetRequest).Execute()
+
+get a workflow's status and results(if completed & requested), wait if the workflow is still running
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    workflowGetRequest := *openapiclient.NewWorkflowGetRequest("WorkflowId_example") // WorkflowGetRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background()).WorkflowGetRequest(workflowGetRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowGetWithLongWaitPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowGetWithLongWaitPost`: WorkflowGetResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowGetWithLongWaitPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowGetWithLongWaitPostRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes

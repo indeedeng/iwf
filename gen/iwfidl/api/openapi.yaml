@@ -93,6 +93,28 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: get a workflow's status and results(if completed & requested)
+  /api/v1/workflow/getWithLongWait:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowGetRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowGetResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: "get a workflow's status and results(if completed & requested), wait\
+        \ if the workflow is still running"
   /api/v1/workflow/search:
     post:
       requestBody:
@@ -371,7 +393,6 @@ components:
     WorkflowGetRequest:
       example:
         needsResults: true
-        waitIfStillRunning: true
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -380,8 +401,6 @@ components:
         workflowRunId:
           type: string
         needsResults:
-          type: boolean
-        waitIfStillRunning:
           type: boolean
       required:
       - workflowId

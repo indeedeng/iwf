@@ -82,11 +82,10 @@ func TestBasicWorkflow(t *testing.T) {
 	fmt.Println(*resp)
 	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
-	req2 := apiClient.DefaultApi.ApiV1WorkflowGetPost(context.Background())
+	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
-		WorkflowId:         wfId,
-		NeedsResults:       iwfidl.PtrBool(true),
-		WaitIfStillRunning: iwfidl.PtrBool(true),
+		WorkflowId:   wfId,
+		NeedsResults: iwfidl.PtrBool(true),
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)

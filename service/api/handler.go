@@ -133,6 +133,14 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 }
 
 func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
+	h.doApiV1WorkflowGetPost(c, false)
+}
+
+func (h *handler) apiV1WorkflowGetWithLongWaitPost(c *gin.Context) {
+	h.doApiV1WorkflowGetPost(c, true)
+}
+
+func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool) {
 	var req iwfidl.WorkflowGetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -149,11 +157,12 @@ func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
 	}
 	var output service.InterpreterWorkflowOutput
 	if req.GetNeedsResults() {
-		if resp.GetWorkflowExecutionInfo().GetStatus() == enums.WORKFLOW_EXECUTION_STATUS_COMPLETED || req.GetWaitIfStillRunning() {
+		if resp.GetWorkflowExecutionInfo().GetStatus() == enums.WORKFLOW_EXECUTION_STATUS_COMPLETED || waitIfStillRunning {
 			run := h.temporalClient.GetWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
 			err = run.Get(context.Background(), &output)
 			if err != nil {
 				// TODO differentiate different error for different codes
+				// we need to describe the workflow again to get the right status here
 				c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
 					Detail: iwfidl.PtrString(err.Error()),
 				})
@@ -162,7 +171,7 @@ func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
 	}
 
 	status, err := mapToIwfWorkflowStatus(resp.GetWorkflowExecutionInfo().GetStatus())
-	if req.GetNeedsResults() && req.GetWaitIfStillRunning() {
+	if req.GetNeedsResults() && waitIfStillRunning {
 		status = service.WorkflowStatusCompleted
 	}
 	if err != nil {

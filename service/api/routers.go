@@ -18,6 +18,7 @@ const WorkflowStartApiPath = "/api/v1/workflow/start"
 const WorkflowSignalApiPath = "/api/v1/workflow/signal"
 const WorkflowQueryApiPath = "/api/v1/workflow/query"
 const WorkflowGetApiPath = "/api/v1/workflow/get"
+const WorkflowGetWithLongWaitApiPath = "/api/v1/workflow/getWithLongWait"
 
 // NewService returns a new router.
 func NewService(temporalClient client.Client) *gin.Engine {
@@ -30,6 +31,7 @@ func NewService(temporalClient client.Client) *gin.Engine {
 	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignalPost)
 	router.POST(WorkflowQueryApiPath, handler.apiV1WorkflowQueryPost)
 	router.POST(WorkflowGetApiPath, handler.apiV1WorkflowGetPost)
+	router.POST(WorkflowGetWithLongWaitApiPath, handler.apiV1WorkflowGetWithLongWaitPost)
 
 	return router
 }

@@ -79,6 +79,7 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
+*DefaultApi* | [**ApiV1WorkflowGetWithLongWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithlongwaitpost) | **Post** /api/v1/workflow/getWithLongWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 *DefaultApi* | [**ApiV1WorkflowQueryPost**](docs/DefaultApi.md#apiv1workflowquerypost) | **Post** /api/v1/workflow/query | query a workflow
 *DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 *DefaultApi* | [**ApiV1WorkflowSignalPost**](docs/DefaultApi.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
