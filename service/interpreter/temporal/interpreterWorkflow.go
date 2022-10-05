@@ -43,11 +43,11 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []service.StateCompletionOutput
 	var forceCompleteWf bool
-	executingStateCount := 0
+	inFlightExecutingStateCount := 0
 
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
-		executingStateCount += len(currentStates)
+		inFlightExecutingStateCount += len(currentStates)
 		statesToExecute := currentStates
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
@@ -58,7 +58,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 			stateCtx := workflow.WithValue(ctx, "state", state)
 			workflow.GoNamed(stateCtx, state.GetStateId(), func(ctx workflow.Context) {
 				defer func() {
-					executingStateCount--
+					inFlightExecutingStateCount--
 				}()
 
 				thisState, ok := ctx.Value("state").(iwfidl.StateMovement)
@@ -99,7 +99,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		}
 
 		awaitError := workflow.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || executingStateCount == 0
+			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || inFlightExecutingStateCount == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
