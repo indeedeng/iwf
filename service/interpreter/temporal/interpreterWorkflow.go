@@ -43,8 +43,11 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []service.StateCompletionOutput
 	var forceCompleteWf bool
+	executingStateCount := 0
+
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
+		executingStateCount += len(currentStates)
 		statesToExecute := currentStates
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
@@ -54,9 +57,17 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
 			stateCtx := workflow.WithValue(ctx, "state", state)
 			workflow.GoNamed(stateCtx, state.GetStateId(), func(ctx workflow.Context) {
+				defer func() {
+					executingStateCount--
+				}()
+
 				thisState, ok := ctx.Value("state").(iwfidl.StateMovement)
 				if !ok {
-					panic("critical code bug")
+					errToFailWf = temporal.NewApplicationError(
+						"critical code bug when passing state via context",
+						service.WorkflowErrorTypeUserInternalError,
+					)
+					return
 				}
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
@@ -88,7 +99,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		}
 
 		awaitError := workflow.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf
+			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || executingStateCount == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
@@ -118,7 +129,7 @@ func checkClosingWorkflow(
 			shouldClose = true
 			gracefulComplete = true
 			completeOutput = &service.StateCompletionOutput{
-				StateId:                   currentStateId,
+				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
 				StateOutput:               movement.GetNextStateInput(),
 			}
@@ -127,7 +138,7 @@ func checkClosingWorkflow(
 			shouldClose = true
 			forceComplete = true
 			completeOutput = &service.StateCompletionOutput{
-				StateId:                   currentStateId,
+				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
 				StateOutput:               movement.GetNextStateInput(),
 			}

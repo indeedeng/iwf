@@ -22,8 +22,8 @@ type (
 	}
 
 	StateCompletionOutput struct {
-		StateId                   string               `json:"stateId,omitempty"`
-		CompletedStateExecutionId string               `json:"completedStateId,omitempty"`
+		CompletedStateId          string               `json:"completedStateId,omitempty"`
+		CompletedStateExecutionId string               `json:"completedStateExecutionId,omitempty"`
 		StateOutput               iwfidl.EncodedObject `json:"stateOutput,omitempty"`
 	}
 
