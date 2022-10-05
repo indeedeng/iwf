@@ -18,13 +18,7 @@ type (
 	}
 
 	InterpreterWorkflowOutput struct {
-		StateCompletionOutputs []StateCompletionOutput `json:"stateCompletionOutputs,omitempty"`
-	}
-
-	StateCompletionOutput struct {
-		CompletedStateId          string               `json:"completedStateId,omitempty"`
-		CompletedStateExecutionId string               `json:"completedStateExecutionId,omitempty"`
-		StateOutput               iwfidl.EncodedObject `json:"stateOutput,omitempty"`
+		StateCompletionOutputs []iwfidl.StateCompletionOutput `json:"stateCompletionOutputs,omitempty"`
 	}
 
 	StateStartActivityInput struct {

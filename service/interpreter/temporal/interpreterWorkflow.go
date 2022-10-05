@@ -41,7 +41,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 	}
 
 	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
-	var outputsToReturnWf []service.StateCompletionOutput
+	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
 	inFlightExecutingStateCount := 0
 
@@ -122,25 +122,25 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 
 func checkClosingWorkflow(
 	decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
-) (shouldClose, gracefulComplete, forceComplete, forceFail bool, completeOutput *service.StateCompletionOutput, err error) {
+) (shouldClose, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	for _, movement := range decision.GetNextStates() {
 		stateId := movement.GetStateId()
 		if stateId == service.GracefulCompletingWorkflowStateId {
 			shouldClose = true
 			gracefulComplete = true
-			completeOutput = &service.StateCompletionOutput{
+			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
-				StateOutput:               movement.GetNextStateInput(),
+				CompletedStateOutput:      movement.NextStateInput,
 			}
 		}
 		if stateId == service.ForceCompletingWorkflowStateId {
 			shouldClose = true
 			forceComplete = true
-			completeOutput = &service.StateCompletionOutput{
+			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
-				StateOutput:               movement.GetNextStateInput(),
+				CompletedStateOutput:      movement.NextStateInput,
 			}
 		}
 		if stateId == service.ForceFailingWorkflowStateId {

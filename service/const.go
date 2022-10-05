@@ -25,4 +25,12 @@ const (
 	WorkflowErrorTypeUserWorkflowDecision = "UserWorkflowDecision"
 	WorkflowErrorTypeUserWorkflowError    = "UserWorkflowError"
 	WorkflowErrorTypeUserInternalError    = "InternalError"
+
+	WorkflowStatusRunning       = "RUNNING"
+	WorkflowStatusCompleted     = "COMPLETED"
+	WorkflowStatusFailed        = "FAILED"
+	WorkflowStatusTimeout       = "TIMEOUT"
+	WorkflowStatusTerminated    = "TERMINATED"
+	WorkflowStatusCanceled      = "CANCELED"
+	WorkflowStatusContinueAsNew = "CONTINUED_AS_NEW"
 )

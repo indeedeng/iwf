@@ -73,34 +73,61 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
-		var nexts []string
+		var nextStates []iwfidl.StateMovement
 		switch req.GetWorkflowStateId() {
 		case State1:
 			// cause graceful complete to wait
 			time.Sleep(time.Second * 1)
-			nexts = append(nexts, State11, State12)
+
+			nextStates = []iwfidl.StateMovement{
+				{
+					StateId: State11,
+				},
+				{
+					StateId: State12,
+				},
+			}
 		case State11:
 			// cause graceful complete to wait
 			time.Sleep(time.Second * 2)
-			nexts = append(nexts, State111, State112)
+
+			nextStates = []iwfidl.StateMovement{
+				{
+					StateId: State111,
+				},
+				{
+					StateId: State112,
+				},
+			}
 		case State12:
 			// cause graceful complete to wait
 			time.Sleep(time.Second * 2)
-			nexts = append(nexts, State121, State122)
-		case State111:
-			nexts = append(nexts, service.GracefulCompletingWorkflowStateId)
-		case State112, State121, State122:
-			//empty
+			nextStates = []iwfidl.StateMovement{
+				{
+					StateId: State121,
+				},
+				{
+					StateId: State122,
+				},
+			}
+		case State112, State121, State122, State111:
+			nextStates = []iwfidl.StateMovement{
+				{
+					StateId: service.GracefulCompletingWorkflowStateId,
+					NextStateInput: &iwfidl.EncodedObject{
+						Encoding: iwfidl.PtrString("json"),
+						Data:     iwfidl.PtrString("from " + req.GetWorkflowStateId()),
+					},
+				},
+			}
 		default:
-			nexts = append(nexts, service.ForceFailingWorkflowStateId)
+			nextStates = []iwfidl.StateMovement{
+				{
+					StateId: service.ForceFailingWorkflowStateId,
+				},
+			}
 		}
 
-		var nextStates []iwfidl.StateMovement
-		for _, nextId := range nexts {
-			nextStates = append(nextStates, iwfidl.StateMovement{
-				StateId: nextId,
-			})
-		}
 		c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 			StateDecision: &iwfidl.StateDecision{
 				NextStates: nextStates,

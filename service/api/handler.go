@@ -11,9 +11,11 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
+	"go.temporal.io/api/enums/v1"
 
 	"go.temporal.io/sdk/client"
 	"log"
@@ -129,3 +131,65 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 		QueryAttributes: queryResult1.AttributeValues,
 	})
 }
+
+func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
+	var req iwfidl.WorkflowGetRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received request", req)
+
+	resp, err := h.temporalClient.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+	if err != nil {
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
+	}
+	var output service.InterpreterWorkflowOutput
+	if req.GetNeedsResults() && resp.GetWorkflowExecutionInfo().GetStatus() == enums.WORKFLOW_EXECUTION_STATUS_COMPLETED {
+		run := h.temporalClient.GetWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+		err = run.Get(context.Background(), &output)
+		if err != nil {
+			// TODO differentiate different error for different codes
+			c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+				Detail: iwfidl.PtrString(err.Error()),
+			})
+		}
+	}
+
+	status, err := mapToIwfWorkflowStatus(resp.GetWorkflowExecutionInfo().GetStatus())
+	if err != nil {
+		// TODO differentiate different error for different codes
+		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString(err.Error()),
+		})
+	}
+
+	c.JSON(http.StatusOK, iwfidl.WorkflowGetResponse{
+		WorkflowRunId:  resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		WorkflowStatus: status,
+		Results:        output.StateCompletionOutputs,
+	})
+}
+
+func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (string, error) {
+	switch status {
+	case enums.WORKFLOW_EXECUTION_STATUS_CANCELED:
+		return service.WorkflowStatusCanceled, nil
+	case enums.WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW:
+		return service.WorkflowStatusContinueAsNew, nil
+	case enums.WORKFLOW_EXECUTION_STATUS_FAILED:
+		return service.WorkflowStatusFailed, nil
+	case enums.WORKFLOW_EXECUTION_STATUS_RUNNING:
+		return service.WorkflowStatusRunning, nil
+	case enums.WORKFLOW_EXECUTION_STATUS_TIMED_OUT:
+		return service.WorkflowStatusTimeout, nil
+	case enums.WORKFLOW_EXECUTION_STATUS_TERMINATED:
+		return service.WorkflowStatusTerminated, nil
+	default:
+		return "", fmt.Errorf("not supported status %s", status)
+	}
+}
+

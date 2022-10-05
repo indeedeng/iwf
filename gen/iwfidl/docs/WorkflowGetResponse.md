@@ -4,15 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowRunId** | Pointer to **string** |  | [optional] 
-**WorkflowStatus** | Pointer to **string** |  | [optional] 
-**Results** | Pointer to [**[]WorkflowResult**](WorkflowResult.md) |  | [optional] 
+**WorkflowRunId** | **string** |  | 
+**WorkflowStatus** | **string** |  | 
+**Results** | Pointer to [**[]StateCompletionOutput**](StateCompletionOutput.md) |  | [optional] 
 
 ## Methods
 
 ### NewWorkflowGetResponse
 
-`func NewWorkflowGetResponse() *WorkflowGetResponse`
+`func NewWorkflowGetResponse(workflowRunId string, workflowStatus string, ) *WorkflowGetResponse`
 
 NewWorkflowGetResponse instantiates a new WorkflowGetResponse object
 This constructor will assign default values to properties that have it defined,
@@ -46,11 +46,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowRunId sets WorkflowRunId field to given value.
 
-### HasWorkflowRunId
-
-`func (o *WorkflowGetResponse) HasWorkflowRunId() bool`
-
-HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetWorkflowStatus
 
@@ -71,28 +66,23 @@ and a boolean to check if the value has been set.
 
 SetWorkflowStatus sets WorkflowStatus field to given value.
 
-### HasWorkflowStatus
-
-`func (o *WorkflowGetResponse) HasWorkflowStatus() bool`
-
-HasWorkflowStatus returns a boolean if a field has been set.
 
 ### GetResults
 
-`func (o *WorkflowGetResponse) GetResults() []WorkflowResult`
+`func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput`
 
 GetResults returns the Results field if non-nil, zero value otherwise.
 
 ### GetResultsOk
 
-`func (o *WorkflowGetResponse) GetResultsOk() (*[]WorkflowResult, bool)`
+`func (o *WorkflowGetResponse) GetResultsOk() (*[]StateCompletionOutput, bool)`
 
 GetResultsOk returns a tuple with the Results field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetResults
 
-`func (o *WorkflowGetResponse) SetResults(v []WorkflowResult)`
+`func (o *WorkflowGetResponse) SetResults(v []StateCompletionOutput)`
 
 SetResults sets Results field to given value.
 

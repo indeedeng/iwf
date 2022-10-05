@@ -14,34 +14,34 @@ import (
 	"encoding/json"
 )
 
-// WorkflowResult struct for WorkflowResult
-type WorkflowResult struct {
+// StateCompletionOutput struct for StateCompletionOutput
+type StateCompletionOutput struct {
 	CompletedStateId string `json:"completedStateId"`
 	CompletedStateExecutionId string `json:"completedStateExecutionId"`
 	CompletedStateOutput *EncodedObject `json:"completedStateOutput,omitempty"`
 }
 
-// NewWorkflowResult instantiates a new WorkflowResult object
+// NewStateCompletionOutput instantiates a new StateCompletionOutput object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowResult(completedStateId string, completedStateExecutionId string) *WorkflowResult {
-	this := WorkflowResult{}
+func NewStateCompletionOutput(completedStateId string, completedStateExecutionId string) *StateCompletionOutput {
+	this := StateCompletionOutput{}
 	this.CompletedStateId = completedStateId
 	this.CompletedStateExecutionId = completedStateExecutionId
 	return &this
 }
 
-// NewWorkflowResultWithDefaults instantiates a new WorkflowResult object
+// NewStateCompletionOutputWithDefaults instantiates a new StateCompletionOutput object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewWorkflowResultWithDefaults() *WorkflowResult {
-	this := WorkflowResult{}
+func NewStateCompletionOutputWithDefaults() *StateCompletionOutput {
+	this := StateCompletionOutput{}
 	return &this
 }
 
 // GetCompletedStateId returns the CompletedStateId field value
-func (o *WorkflowResult) GetCompletedStateId() string {
+func (o *StateCompletionOutput) GetCompletedStateId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -52,7 +52,7 @@ func (o *WorkflowResult) GetCompletedStateId() string {
 
 // GetCompletedStateIdOk returns a tuple with the CompletedStateId field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowResult) GetCompletedStateIdOk() (*string, bool) {
+func (o *StateCompletionOutput) GetCompletedStateIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -60,12 +60,12 @@ func (o *WorkflowResult) GetCompletedStateIdOk() (*string, bool) {
 }
 
 // SetCompletedStateId sets field value
-func (o *WorkflowResult) SetCompletedStateId(v string) {
+func (o *StateCompletionOutput) SetCompletedStateId(v string) {
 	o.CompletedStateId = v
 }
 
 // GetCompletedStateExecutionId returns the CompletedStateExecutionId field value
-func (o *WorkflowResult) GetCompletedStateExecutionId() string {
+func (o *StateCompletionOutput) GetCompletedStateExecutionId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -76,7 +76,7 @@ func (o *WorkflowResult) GetCompletedStateExecutionId() string {
 
 // GetCompletedStateExecutionIdOk returns a tuple with the CompletedStateExecutionId field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowResult) GetCompletedStateExecutionIdOk() (*string, bool) {
+func (o *StateCompletionOutput) GetCompletedStateExecutionIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -84,12 +84,12 @@ func (o *WorkflowResult) GetCompletedStateExecutionIdOk() (*string, bool) {
 }
 
 // SetCompletedStateExecutionId sets field value
-func (o *WorkflowResult) SetCompletedStateExecutionId(v string) {
+func (o *StateCompletionOutput) SetCompletedStateExecutionId(v string) {
 	o.CompletedStateExecutionId = v
 }
 
 // GetCompletedStateOutput returns the CompletedStateOutput field value if set, zero value otherwise.
-func (o *WorkflowResult) GetCompletedStateOutput() EncodedObject {
+func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
 	if o == nil || o.CompletedStateOutput == nil {
 		var ret EncodedObject
 		return ret
@@ -99,7 +99,7 @@ func (o *WorkflowResult) GetCompletedStateOutput() EncodedObject {
 
 // GetCompletedStateOutputOk returns a tuple with the CompletedStateOutput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowResult) GetCompletedStateOutputOk() (*EncodedObject, bool) {
+func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, bool) {
 	if o == nil || o.CompletedStateOutput == nil {
 		return nil, false
 	}
@@ -107,7 +107,7 @@ func (o *WorkflowResult) GetCompletedStateOutputOk() (*EncodedObject, bool) {
 }
 
 // HasCompletedStateOutput returns a boolean if a field has been set.
-func (o *WorkflowResult) HasCompletedStateOutput() bool {
+func (o *StateCompletionOutput) HasCompletedStateOutput() bool {
 	if o != nil && o.CompletedStateOutput != nil {
 		return true
 	}
@@ -116,11 +116,11 @@ func (o *WorkflowResult) HasCompletedStateOutput() bool {
 }
 
 // SetCompletedStateOutput gets a reference to the given EncodedObject and assigns it to the CompletedStateOutput field.
-func (o *WorkflowResult) SetCompletedStateOutput(v EncodedObject) {
+func (o *StateCompletionOutput) SetCompletedStateOutput(v EncodedObject) {
 	o.CompletedStateOutput = &v
 }
 
-func (o WorkflowResult) MarshalJSON() ([]byte, error) {
+func (o StateCompletionOutput) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["completedStateId"] = o.CompletedStateId
@@ -134,38 +134,38 @@ func (o WorkflowResult) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableWorkflowResult struct {
-	value *WorkflowResult
+type NullableStateCompletionOutput struct {
+	value *StateCompletionOutput
 	isSet bool
 }
 
-func (v NullableWorkflowResult) Get() *WorkflowResult {
+func (v NullableStateCompletionOutput) Get() *StateCompletionOutput {
 	return v.value
 }
 
-func (v *NullableWorkflowResult) Set(val *WorkflowResult) {
+func (v *NullableStateCompletionOutput) Set(val *StateCompletionOutput) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableWorkflowResult) IsSet() bool {
+func (v NullableStateCompletionOutput) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableWorkflowResult) Unset() {
+func (v *NullableStateCompletionOutput) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableWorkflowResult(val *WorkflowResult) *NullableWorkflowResult {
-	return &NullableWorkflowResult{value: val, isSet: true}
+func NewNullableStateCompletionOutput(val *StateCompletionOutput) *NullableStateCompletionOutput {
+	return &NullableStateCompletionOutput{value: val, isSet: true}
 }
 
-func (v NullableWorkflowResult) MarshalJSON() ([]byte, error) {
+func (v NullableStateCompletionOutput) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableWorkflowResult) UnmarshalJSON(src []byte) error {
+func (v *NullableStateCompletionOutput) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

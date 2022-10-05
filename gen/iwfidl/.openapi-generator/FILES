@@ -21,6 +21,7 @@ docs/KeyValue.md
 docs/SearchAttribute.md
 docs/SignalCommand.md
 docs/SignalResult.md
+docs/StateCompletionOutput.md
 docs/StateDecision.md
 docs/StateMovement.md
 docs/TimerCommand.md
@@ -29,7 +30,6 @@ docs/WorkflowGetRequest.md
 docs/WorkflowGetResponse.md
 docs/WorkflowQueryRequest.md
 docs/WorkflowQueryResponse.md
-docs/WorkflowResult.md
 docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
@@ -58,6 +58,7 @@ model_key_value.go
 model_search_attribute.go
 model_signal_command.go
 model_signal_result.go
+model_state_completion_output.go
 model_state_decision.go
 model_state_movement.go
 model_timer_command.go
@@ -66,7 +67,6 @@ model_workflow_get_request.go
 model_workflow_get_response.go
 model_workflow_query_request.go
 model_workflow_query_response.go
-model_workflow_result.go
 model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go

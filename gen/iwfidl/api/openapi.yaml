@@ -409,13 +409,17 @@ components:
           - TIMEOUT
           - TERMINATED
           - CANCELED
+          - CONTINUED_AS_NEW
           type: string
         results:
           items:
-            $ref: '#/components/schemas/WorkflowResult'
+            $ref: '#/components/schemas/StateCompletionOutput'
           type: array
+      required:
+      - workflowRunId
+      - workflowStatus
       type: object
-    WorkflowResult:
+    StateCompletionOutput:
       example:
         completedStateOutput:
           data: data
