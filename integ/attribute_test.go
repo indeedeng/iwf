@@ -81,22 +81,16 @@ func TestAttributeWorkflow(t *testing.T) {
 	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
 	_ = run.Get(context.Background(), nil)
 
-	qres, err := temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, nil)
-	if err != nil {
-		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
-	}
-
-	var queryResult1 service.QueryAttributeResponse
-	err = qres.Get(&queryResult1)
-	if err != nil {
-		log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
-	}
-
-	//qres, err = temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, service.QueryAttributeRequest{
-	//	Keys: []string{
-	//		attribute.TestQueryAttributeKey,
-	//	},
-	//})
+	//qres, err := temporalClient.QueryWorkflow(context.Background(), wfId, "", service.AttributeQueryType, nil)
+	//if err != nil {
+	//	log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
+	//}
+	//
+	//var queryResult1 service.QueryAttributeResponse
+	//err = qres.Get(&queryResult1)
+	//if err != nil {
+	//	log.Fatalf("Fail to invoke query workflow for all attrs%v", err)
+	//}
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowQueryPost(context.Background())
 	_, httpResp2, err := req2.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{

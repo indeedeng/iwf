@@ -656,6 +656,9 @@ components:
         - valueType: KEYWORD
           value: value
           key: key
+        stateInput:
+          data: data
+          encoding: JSON
       properties:
         context:
           $ref: '#/components/schemas/Context'
@@ -663,6 +666,8 @@ components:
           type: string
         workflowStateId:
           type: string
+        stateInput:
+          $ref: '#/components/schemas/EncodedObject'
         searchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
