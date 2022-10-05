@@ -93,9 +93,7 @@ func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
 			Detail: iwfidl.PtrString(err.Error()),
 		})
 	}
-	c.JSON(http.StatusOK, iwfidl.WorkflowSignalResponse{
-		WorkflowRunId: iwfidl.PtrString("TODO"),
-	})
+	c.JSON(http.StatusOK, struct{}{})
 }
 
 func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
@@ -128,7 +126,6 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowQueryResponse{
-		WorkflowRunId:   iwfidl.PtrString("TODO"),
 		QueryAttributes: queryResult1.AttributeValues,
 	})
 }
