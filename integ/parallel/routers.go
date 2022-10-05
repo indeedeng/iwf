@@ -84,11 +84,11 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 		case State111:
 			// wait for 3 seconds for other states
 			time.Sleep(time.Second * 3)
-			nexts = append(nexts, service.CompletingWorkflowStateId)
+			nexts = append(nexts, service.GracefulCompletingWorkflowStateId)
 		case State112, State121, State122:
 			//empty
 		default:
-			nexts = append(nexts, service.FailingWorkflowStateId)
+			nexts = append(nexts, service.ForceFailingWorkflowStateId)
 		}
 
 		var nextStates []iwfidl.StateMovement

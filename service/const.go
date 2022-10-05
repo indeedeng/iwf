@@ -1,9 +1,10 @@
 package service
 
 const (
-	TaskQueue                 = "Interpreter"
-	CompletingWorkflowStateId = "_SYS_COMPLETING_WORKFLOW"
-	FailingWorkflowStateId    = "_SYS_FAILING_WORKFLOW"
+	TaskQueue                         = "Interpreter"
+	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
+	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
+	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
 
 	StateStartApi  = "/api/v1/workflowState/start"
 	StateDecideApi = "/api/v1/workflowState/decide"
@@ -20,4 +21,8 @@ const (
 	SearchAttributeValueTypeInt     = "INT"
 
 	AttributeQueryType = "GetQueryAttributes"
+
+	WorkflowErrorTypeUserWorkflowDecision = "UserWorkflowDecision"
+	WorkflowErrorTypeUserWorkflowError    = "UserWorkflowError"
+	WorkflowErrorTypeUserInternalError    = "InternalError"
 )

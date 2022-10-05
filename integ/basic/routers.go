@@ -89,7 +89,7 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId:        service.CompletingWorkflowStateId,
+							StateId:        service.GracefulCompletingWorkflowStateId,
 							NextStateInput: req.StateInput,
 						},
 					},

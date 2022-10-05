@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter"
@@ -39,8 +40,9 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		return nil, err
 	}
 
-	var errToReturn error
-	var outputToReturn *service.InterpreterWorkflowOutput
+	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
+	var outputsToReturnWf []service.StateCompletionOutput
+	var forceCompleteWf bool
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
 		statesToExecute := currentStates
@@ -60,65 +62,90 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
 				decision, err := executeState(ctx, thisState, execution, stateExeId, attrMgr)
 				if err != nil {
-					errToReturn = err
+					errToFailWf = err
 				}
 
-				isClosing, output, err := checkClosingWorkflow(decision, stateExeId)
-				if isClosing {
-					errToReturn = err
-					outputToReturn = output
+				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(decision, state.GetStateId(), stateExeId)
+				if err != nil {
+					errToFailWf = err
 				}
-				if decision.HasNextStates() {
+				if gracefulComplete || forceComplete {
+					outputsToReturnWf = append(outputsToReturnWf, *output)
+				}
+				if forceComplete {
+					forceCompleteWf = true
+				}
+				if forceFail {
+					errToFailWf = temporal.NewApplicationError(
+						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", state.GetStateId(), stateExeId),
+						service.WorkflowErrorTypeUserWorkflowDecision,
+					)
+				}
+				if !shouldClose && decision.HasNextStates() {
 					currentStates = append(currentStates, decision.GetNextStates()...)
 				}
 			})
 		}
 
 		awaitError := workflow.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToReturn != nil || outputToReturn != nil
+			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf
 		})
-		if errToReturn != nil || outputToReturn != nil {
-			return outputToReturn, errToReturn
+		if errToFailWf != nil || forceCompleteWf {
+			return &service.InterpreterWorkflowOutput{
+				StateCompletionOutputs: outputsToReturnWf,
+			}, errToFailWf
 		}
 
 		if awaitError != nil {
-			errToReturn = awaitError
+			// this could happen for cancellation
+			errToFailWf = awaitError
 			break
 		}
 	}
 
-	return nil, errToReturn
+	// gracefully complete workflow when all states are executed to dead ends
+	return &service.InterpreterWorkflowOutput{
+		StateCompletionOutputs: outputsToReturnWf,
+	}, errToFailWf
 }
 
 func checkClosingWorkflow(
-	decision *iwfidl.StateDecision, currentStateExeId string,
-) (bool, *service.InterpreterWorkflowOutput, error) {
-	hasClosingDecision := false
-	var output *service.InterpreterWorkflowOutput
+	decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
+) (shouldClose, gracefulComplete, forceComplete, forceFail bool, completeOutput *service.StateCompletionOutput, err error) {
 	for _, movement := range decision.GetNextStates() {
 		stateId := movement.GetStateId()
-		if stateId == service.CompletingWorkflowStateId {
-			hasClosingDecision = true
-			output = &service.InterpreterWorkflowOutput{
+		if stateId == service.GracefulCompletingWorkflowStateId {
+			shouldClose = true
+			gracefulComplete = true
+			completeOutput = &service.StateCompletionOutput{
+				StateId:                   currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
 				StateOutput:               movement.GetNextStateInput(),
 			}
 		}
-		if stateId == service.FailingWorkflowStateId {
-			return true, nil, temporal.NewApplicationError(
-				"failing by user workflow decision",
-				"failing on request",
-			)
+		if stateId == service.ForceCompletingWorkflowStateId {
+			shouldClose = true
+			forceComplete = true
+			completeOutput = &service.StateCompletionOutput{
+				StateId:                   currentStateId,
+				CompletedStateExecutionId: currentStateExeId,
+				StateOutput:               movement.GetNextStateInput(),
+			}
+		}
+		if stateId == service.ForceFailingWorkflowStateId {
+			shouldClose = true
+			forceFail = true
 		}
 	}
-	if hasClosingDecision && len(decision.NextStates) > 1 {
-		// Illegal decision, should fail the workflow
-		return true, nil, temporal.NewApplicationError(
-			"closing workflow decision shouldn't have other state movements",
-			"Illegal closing workflow decision",
+	if shouldClose && len(decision.NextStates) > 1 {
+		// Illegal decision
+		err = temporal.NewApplicationError(
+			"closing workflow decision should have only one state movement, but got more than one",
+			service.WorkflowErrorTypeUserWorkflowError,
 		)
+		return
 	}
-	return hasClosingDecision, output, nil
+	return
 }
 
 func executeState(
