@@ -82,14 +82,18 @@ func TestBasicWorkflow(t *testing.T) {
 	fmt.Println(*resp)
 	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
-	// wait for the workflow TODO: use new workflow/get API
-	run := temporalClient.GetWorkflow(context.Background(), wfId, "")
-	var output service.InterpreterWorkflowOutput
-	err = run.Get(context.Background(), &output)
+	req2 := apiClient.DefaultApi.ApiV1WorkflowGetPost(context.Background())
+	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId:         wfId,
+		NeedsResults:       iwfidl.PtrBool(true),
+		WaitIfStillRunning: iwfidl.PtrBool(true),
+	}).Execute()
 	if err != nil {
-		log.Fatalf("Fail to get workflow output %v", err)
+		log.Fatalf("Fail to invoke start api %v", err)
 	}
-	fmt.Println("see output", output)
+	if httpResp.StatusCode != http.StatusOK {
+		log.Fatalf("Fail to get workflow" + httpResp.Status)
+	}
 
 	history := wfHandler.GetTestResult()
 	assertions := assert.New(t)
@@ -99,4 +103,12 @@ func TestBasicWorkflow(t *testing.T) {
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "basic test fail, %v", history)
+
+	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(1, len(resp2.GetResults()))
+	assertions.Equal(iwfidl.StateCompletionOutput{
+		CompletedStateId:          "S2",
+		CompletedStateExecutionId: "S2-1",
+		CompletedStateOutput:      wfInput,
+	}, resp2.GetResults()[0])
 }

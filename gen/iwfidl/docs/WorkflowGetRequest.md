@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **NeedsResults** | Pointer to **bool** |  | [optional] 
+**WaitIfStillRunning** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -96,6 +97,31 @@ SetNeedsResults sets NeedsResults field to given value.
 `func (o *WorkflowGetRequest) HasNeedsResults() bool`
 
 HasNeedsResults returns a boolean if a field has been set.
+
+### GetWaitIfStillRunning
+
+`func (o *WorkflowGetRequest) GetWaitIfStillRunning() bool`
+
+GetWaitIfStillRunning returns the WaitIfStillRunning field if non-nil, zero value otherwise.
+
+### GetWaitIfStillRunningOk
+
+`func (o *WorkflowGetRequest) GetWaitIfStillRunningOk() (*bool, bool)`
+
+GetWaitIfStillRunningOk returns a tuple with the WaitIfStillRunning field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitIfStillRunning
+
+`func (o *WorkflowGetRequest) SetWaitIfStillRunning(v bool)`
+
+SetWaitIfStillRunning sets WaitIfStillRunning field to given value.
+
+### HasWaitIfStillRunning
+
+`func (o *WorkflowGetRequest) HasWaitIfStillRunning() bool`
+
+HasWaitIfStillRunning returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

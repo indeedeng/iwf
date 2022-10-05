@@ -148,18 +148,23 @@ func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
 		})
 	}
 	var output service.InterpreterWorkflowOutput
-	if req.GetNeedsResults() && resp.GetWorkflowExecutionInfo().GetStatus() == enums.WORKFLOW_EXECUTION_STATUS_COMPLETED {
-		run := h.temporalClient.GetWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
-		err = run.Get(context.Background(), &output)
-		if err != nil {
-			// TODO differentiate different error for different codes
-			c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-				Detail: iwfidl.PtrString(err.Error()),
-			})
+	if req.GetNeedsResults() {
+		if resp.GetWorkflowExecutionInfo().GetStatus() == enums.WORKFLOW_EXECUTION_STATUS_COMPLETED || req.GetWaitIfStillRunning() {
+			run := h.temporalClient.GetWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+			err = run.Get(context.Background(), &output)
+			if err != nil {
+				// TODO differentiate different error for different codes
+				c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+					Detail: iwfidl.PtrString(err.Error()),
+				})
+			}
 		}
 	}
 
 	status, err := mapToIwfWorkflowStatus(resp.GetWorkflowExecutionInfo().GetStatus())
+	if req.GetNeedsResults() && req.GetWaitIfStillRunning() {
+		status = service.WorkflowStatusCompleted
+	}
 	if err != nil {
 		// TODO differentiate different error for different codes
 		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
@@ -192,4 +197,3 @@ func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (string, error
 		return "", fmt.Errorf("not supported status %s", status)
 	}
 }
-
