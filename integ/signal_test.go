@@ -83,7 +83,7 @@ func TestSignalWorkflow(t *testing.T) {
 	}
 	//err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, signalVal)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
-	_, httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+	httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:  wfId,
 		SignalName:  signal.SignalName,
 		SignalValue: &signalVal,

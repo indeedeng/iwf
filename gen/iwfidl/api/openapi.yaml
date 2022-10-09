@@ -39,10 +39,7 @@ paths:
               $ref: '#/components/schemas/WorkflowSignalRequest'
       responses:
         "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkflowSignalResponse'
+          content: {}
           description: successful operation
         "400":
           content:
@@ -184,7 +181,7 @@ components:
       example:
         value:
           data: data
-          encoding: JSON
+          encoding: encoding
         key: key
       properties:
         key:
@@ -195,11 +192,9 @@ components:
     EncodedObject:
       example:
         data: data
-        encoding: JSON
+        encoding: encoding
       properties:
         encoding:
-          enum:
-          - JSON
           type: string
         data:
           type: string
@@ -300,7 +295,7 @@ components:
         workflowId: workflowId
         stateInput:
           data: data
-          encoding: JSON
+          encoding: encoding
       properties:
         workflowId:
           type: string
@@ -337,7 +332,7 @@ components:
         workflowId: workflowId
         signalValue:
           data: data
-          encoding: JSON
+          encoding: encoding
       properties:
         workflowId:
           type: string
@@ -350,9 +345,6 @@ components:
       required:
       - signalName
       - workflowId
-      type: object
-    WorkflowSignalResponse:
-      properties: {}
       type: object
     WorkflowQueryRequest:
       example:
@@ -378,11 +370,11 @@ components:
         queryAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
       properties:
         queryAttributes:
@@ -412,12 +404,12 @@ components:
         results:
         - completedStateOutput:
             data: data
-            encoding: JSON
+            encoding: encoding
           completedStateExecutionId: completedStateExecutionId
           completedStateId: completedStateId
         - completedStateOutput:
             data: data
-            encoding: JSON
+            encoding: encoding
           completedStateExecutionId: completedStateExecutionId
           completedStateId: completedStateId
       properties:
@@ -445,7 +437,7 @@ components:
       example:
         completedStateOutput:
           data: data
-          encoding: JSON
+          encoding: encoding
         completedStateExecutionId: completedStateExecutionId
         completedStateId: completedStateId
       properties:
@@ -503,11 +495,11 @@ components:
         queryAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         workflowStateId: workflowStateId
         context:
@@ -525,7 +517,7 @@ components:
           key: key
         stateInput:
           data: data
-          encoding: JSON
+          encoding: encoding
       properties:
         context:
           $ref: '#/components/schemas/Context'
@@ -560,11 +552,11 @@ components:
         upsertStateLocalAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         commandRequest:
           signalCommands:
@@ -581,14 +573,14 @@ components:
           activityCommands:
           - input:
               data: data
-              encoding: JSON
+              encoding: encoding
             activityOptions:
               startToCloseTimeoutSeconds: 0
             activityType: activityType
             commandId: commandId
           - input:
               data: data
-              encoding: JSON
+              encoding: encoding
             activityOptions:
               startToCloseTimeoutSeconds: 0
             activityType: activityType
@@ -596,11 +588,11 @@ components:
         upsertQueryAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
       properties:
         upsertSearchAttributes:
@@ -623,21 +615,21 @@ components:
         queryAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         workflowStateId: workflowStateId
         stateLocalAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         commandResults:
           signalResults:
@@ -646,24 +638,24 @@ components:
             signalStatus: WAITING
             signalValue:
               data: data
-              encoding: JSON
+              encoding: encoding
           - signalName: signalName
             commandId: commandId
             signalStatus: WAITING
             signalValue:
               data: data
-              encoding: JSON
+              encoding: encoding
           activityResults:
           - output:
               data: data
-              encoding: JSON
+              encoding: encoding
             timeoutType: SCHEDULED_TO_START
             activityStatus: OPEN
             activityType: activityType
             commandId: commandId
           - output:
               data: data
-              encoding: JSON
+              encoding: encoding
             timeoutType: SCHEDULED_TO_START
             activityStatus: OPEN
             activityType: activityType
@@ -688,7 +680,7 @@ components:
           key: key
         stateInput:
           data: data
-          encoding: JSON
+          encoding: encoding
       properties:
         context:
           $ref: '#/components/schemas/Context'
@@ -730,7 +722,7 @@ components:
           nextStates:
           - nextStateInput:
               data: data
-              encoding: JSON
+              encoding: encoding
             stateId: stateId
             nextStateOptions:
               searchAttributesLoadingPolicy:
@@ -747,7 +739,7 @@ components:
                 - attributeKeys
           - nextStateInput:
               data: data
-              encoding: JSON
+              encoding: encoding
             stateId: stateId
             nextStateOptions:
               searchAttributesLoadingPolicy:
@@ -765,11 +757,11 @@ components:
           upsertQueryAttributes:
           - value:
               data: data
-              encoding: JSON
+              encoding: encoding
             key: key
           - value:
               data: data
-              encoding: JSON
+              encoding: encoding
             key: key
           waitForMoreCommandResults: true
       properties:
@@ -788,7 +780,7 @@ components:
         nextStates:
         - nextStateInput:
             data: data
-            encoding: JSON
+            encoding: encoding
           stateId: stateId
           nextStateOptions:
             searchAttributesLoadingPolicy:
@@ -805,7 +797,7 @@ components:
               - attributeKeys
         - nextStateInput:
             data: data
-            encoding: JSON
+            encoding: encoding
           stateId: stateId
           nextStateOptions:
             searchAttributesLoadingPolicy:
@@ -823,11 +815,11 @@ components:
         upsertQueryAttributes:
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         - value:
             data: data
-            encoding: JSON
+            encoding: encoding
           key: key
         waitForMoreCommandResults: true
       properties:
@@ -850,7 +842,7 @@ components:
       example:
         nextStateInput:
           data: data
-          encoding: JSON
+          encoding: encoding
         stateId: stateId
         nextStateOptions:
           searchAttributesLoadingPolicy:
@@ -891,14 +883,14 @@ components:
         activityCommands:
         - input:
             data: data
-            encoding: JSON
+            encoding: encoding
           activityOptions:
             startToCloseTimeoutSeconds: 0
           activityType: activityType
           commandId: commandId
         - input:
             data: data
-            encoding: JSON
+            encoding: encoding
           activityOptions:
             startToCloseTimeoutSeconds: 0
           activityType: activityType
@@ -933,24 +925,24 @@ components:
           signalStatus: WAITING
           signalValue:
             data: data
-            encoding: JSON
+            encoding: encoding
         - signalName: signalName
           commandId: commandId
           signalStatus: WAITING
           signalValue:
             data: data
-            encoding: JSON
+            encoding: encoding
         activityResults:
         - output:
             data: data
-            encoding: JSON
+            encoding: encoding
           timeoutType: SCHEDULED_TO_START
           activityStatus: OPEN
           activityType: activityType
           commandId: commandId
         - output:
             data: data
-            encoding: JSON
+            encoding: encoding
           timeoutType: SCHEDULED_TO_START
           activityStatus: OPEN
           activityType: activityType
@@ -978,7 +970,7 @@ components:
       example:
         input:
           data: data
-          encoding: JSON
+          encoding: encoding
         activityOptions:
           startToCloseTimeoutSeconds: 0
         activityType: activityType
@@ -1034,7 +1026,7 @@ components:
       example:
         output:
           data: data
-          encoding: JSON
+          encoding: encoding
         timeoutType: SCHEDULED_TO_START
         activityStatus: OPEN
         activityType: activityType
@@ -1088,7 +1080,7 @@ components:
         signalStatus: WAITING
         signalValue:
           data: data
-          encoding: JSON
+          encoding: encoding
       properties:
         commandId:
           type: string

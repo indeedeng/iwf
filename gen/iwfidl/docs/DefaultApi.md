@@ -273,7 +273,7 @@ No authorization required
 
 ## ApiV1WorkflowSignalPost
 
-> map[string]interface{} ApiV1WorkflowSignalPost(ctx).WorkflowSignalRequest(workflowSignalRequest).Execute()
+> ApiV1WorkflowSignalPost(ctx).WorkflowSignalRequest(workflowSignalRequest).Execute()
 
 signal a workflow
 
@@ -299,8 +299,6 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowSignalPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `ApiV1WorkflowSignalPost`: map[string]interface{}
-    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowSignalPost`: %v\n", resp)
 }
 ```
 
@@ -319,7 +317,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**map[string]interface{}**
+ (empty response body)
 
 ### Authorization
 
