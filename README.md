@@ -6,6 +6,7 @@ Back by Cadence/Temporal as an interpreter.
 
 Related projects:
 * [iWF Java SDK](https://github.com/cadence-oss/iwf-java)
+* [iWF Java Samples](https://github.com/cadence-oss/iwf-java-samples)
 * [API schema](https://github.com/cadence-oss/iwf-idl)
 
 # What & Why
