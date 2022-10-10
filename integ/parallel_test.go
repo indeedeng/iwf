@@ -3,7 +3,7 @@ package integ
 import (
 	"context"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/integ/parallel"
+	"github.com/cadence-oss/iwf-server/integ/workflow/parallel"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/stretchr/testify/assert"
 	"log"

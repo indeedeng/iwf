@@ -2,7 +2,7 @@ package attribute
 
 import (
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/integ/common"
+	"github.com/cadence-oss/iwf-server/integ/workflow/common"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/gin-gonic/gin"
 	"log"

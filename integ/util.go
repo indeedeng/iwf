@@ -1,7 +1,7 @@
 package integ
 
 import (
-	"github.com/cadence-oss/iwf-server/integ/common"
+	"github.com/cadence-oss/iwf-server/integ/workflow/common"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
