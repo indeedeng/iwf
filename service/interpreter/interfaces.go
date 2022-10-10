@@ -12,18 +12,18 @@ type ActivityProvider interface {
 	NewApplicationError(message, errType string, details ...interface{}) error
 }
 
-type ActivityLogger interface {
-	Debug(msg string, keyvals ...interface{})
-	Info(msg string, keyvals ...interface{})
-	Warn(msg string, keyvals ...interface{})
-	Error(msg string, keyvals ...interface{})
-}
-
 func getActivityProviderByType(backendType service.BackendType) ActivityProvider {
 	if backendType == service.BackendTypeTemporal {
 		return temporal.DefaultActivityProvider
 	}
 	panic("not supported yet: " + backendType)
+}
+
+type ActivityLogger interface {
+	Debug(msg string, keyvals ...interface{})
+	Info(msg string, keyvals ...interface{})
+	Warn(msg string, keyvals ...interface{})
+	Error(msg string, keyvals ...interface{})
 }
 
 // WorkflowExecution details.
@@ -63,17 +63,23 @@ func NewUnifiedContext(ctx interface{}) UnifiedContext {
 type WorkflowProvider interface {
 	NewApplicationError(message, errType string, details ...interface{}) error
 	GetWorkflowInfo(ctx UnifiedContext) WorkflowInfo
+	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
-	ExtendContextWithValue(parent interface{}, key interface{}, val interface{}) interface{}
+	ExtendContextWithValue(parent interface{}, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	Await(ctx UnifiedContext, condition func() bool) error
-	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) interface{}
-	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future interface{})
+	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext
+	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future Future)
 	Now(ctx UnifiedContext) time.Time
 	Sleep(ctx UnifiedContext, d time.Duration) (err error)
 	GetSignalChannel(ctx UnifiedContext, signalName string) (receiveChannel ReceiveChannel)
+	GetContextValue(ctx UnifiedContext, key string) interface{}
 }
 
 type ReceiveChannel interface {
 	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool)
+}
+
+type Future interface {
+	Get(ctx UnifiedContext, valuePtr interface{}) error
 }

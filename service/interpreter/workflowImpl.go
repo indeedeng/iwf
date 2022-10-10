@@ -1,27 +1,22 @@
-package temporal
+package interpreter
 
 import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter"
 	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/workflow"
 	"time"
-
-	// TODO(cretz): Remove when tagged
-	_ "go.temporal.io/sdk/contrib/tools/workflowcheck/determinism"
 )
 
-func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
 	execution := service.IwfWorkflowExecution{
 		IwfWorkerUrl:     input.IwfWorkerUrl,
 		WorkflowType:     input.IwfWorkflowType,
-		WorkflowId:       workflow.GetInfo(ctx).WorkflowExecution.ID,
-		RunId:            workflow.GetInfo(ctx).WorkflowExecution.RunID,
-		StartedTimestamp: workflow.GetInfo(ctx).WorkflowStartTime.Unix(),
+		WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+		RunId:            provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+		StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
 	}
-	stateExeIdMgr := interpreter.NewStateExecutionIdManager()
+	stateExeIdMgr := NewStateExecutionIdManager()
 	currentStates := []iwfidl.StateMovement{
 		{
 			StateId:          input.StartStateId,
@@ -29,11 +24,11 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 			NextStateInput:   &input.StateInput,
 		},
 	}
-	attrMgr := interpreter.NewAttributeManager(func(attributes map[string]interface{}) error {
-		return workflow.UpsertSearchAttributes(ctx, attributes)
+	attrMgr := NewAttributeManager(func(attributes map[string]interface{}) error {
+		return provider.UpsertSearchAttributes(ctx, attributes)
 	})
 
-	err := workflow.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
+	err := provider.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
 		return attrMgr.GetQueryAttributesByKey(req), nil
 	})
 	if err != nil {
@@ -55,13 +50,13 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 		for _, state := range statesToExecute {
 			// execute in another thread for parallelism
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
-			stateCtx := workflow.WithValue(ctx, "state", state)
-			workflow.GoNamed(stateCtx, state.GetStateId(), func(ctx workflow.Context) {
+			stateCtx := provider.ExtendContextWithValue(ctx, "state", state)
+			provider.GoNamed(stateCtx, state.GetStateId(), func(ctx UnifiedContext) {
 				defer func() {
 					inFlightExecutingStateCount--
 				}()
 
-				thisState, ok := ctx.Value("state").(iwfidl.StateMovement)
+				thisState, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = temporal.NewApplicationError(
 						"critical code bug when passing state via context",
@@ -71,7 +66,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 				}
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, thisState, execution, stateExeId, attrMgr)
+				decision, err := executeState(ctx, provider, thisState, execution, stateExeId, attrMgr)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -98,7 +93,7 @@ func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (
 			})
 		}
 
-		awaitError := workflow.Await(ctx, func() bool {
+		awaitError := provider.Await(ctx, func() bool {
 			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || inFlightExecutingStateCount == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
@@ -160,16 +155,17 @@ func checkClosingWorkflow(
 }
 
 func executeState(
-	ctx workflow.Context,
+	ctx UnifiedContext,
+	provider WorkflowProvider,
 	state iwfidl.StateMovement,
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
-	attrMgr *interpreter.AttributeManager,
+	attrMgr *AttributeManager,
 ) (*iwfidl.StateDecision, error) {
-	ao := workflow.ActivityOptions{
+	ao := ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
 	}
-	ctx = workflow.WithActivityOptions(ctx, ao)
+	ctx = provider.WithActivityOptions(ctx, ao)
 
 	exeCtx := iwfidl.Context{
 		WorkflowId:               execution.WorkflowId,
@@ -179,7 +175,7 @@ func executeState(
 	}
 
 	var startResponse *iwfidl.WorkflowStateStartResponse
-	err := workflow.ExecuteActivity(ctx, interpreter.StateStart, service.BackendTypeTemporal, service.StateStartActivityInput{
+	err := provider.ExecuteActivity(ctx, StateStart, service.BackendTypeTemporal, service.StateStartActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateStartRequest{
 			Context:          exeCtx,
@@ -208,17 +204,17 @@ func executeState(
 	completedTimerCmds := 0
 	if len(commandReq.GetTimerCommands()) > 0 {
 		for _, cmd := range commandReq.GetTimerCommands() {
-			cmdCtx := workflow.WithValue(ctx, "cmd", cmd)
-			workflow.Go(cmdCtx, func(ctx workflow.Context) {
-				cmd, ok := ctx.Value("cmd").(iwfidl.TimerCommand)
+			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			provider.GoNamed(cmdCtx, "timer-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.TimerCommand)
 				if !ok {
 					panic("critical code bug")
 				}
 
-				now := workflow.Now(ctx).Unix()
+				now := provider.Now(ctx).Unix()
 				fireAt := cmd.GetFiringUnixTimestampSeconds()
 				duration := time.Duration(fireAt-now) * time.Second
-				_ = workflow.Sleep(ctx, duration)
+				_ = provider.Sleep(ctx, duration)
 				completedTimerCmds++
 			})
 		}
@@ -227,13 +223,13 @@ func executeState(
 	completedSignalCmds := map[string]*iwfidl.EncodedObject{}
 	if len(commandReq.GetSignalCommands()) > 0 {
 		for _, cmd := range commandReq.GetSignalCommands() {
-			cmdCtx := workflow.WithValue(ctx, "cmd", cmd)
-			workflow.Go(cmdCtx, func(ctx workflow.Context) {
-				cmd, ok := ctx.Value("cmd").(iwfidl.SignalCommand)
+			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			provider.GoNamed(cmdCtx, "signal-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
 				if !ok {
 					panic("critical code bug")
 				}
-				ch := workflow.GetSignalChannel(ctx, cmd.GetSignalName())
+				ch := provider.GetSignalChannel(ctx, cmd.GetSignalName())
 				value := iwfidl.EncodedObject{}
 				ch.Receive(ctx, &value)
 				completedSignalCmds[cmd.GetCommandId()] = &value
@@ -248,7 +244,7 @@ func executeState(
 		return nil, temporal.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
 	}
 
-	err = workflow.Await(ctx, func() bool {
+	err = provider.Await(ctx, func() bool {
 		return completedTimerCmds == len(commandReq.GetTimerCommands()) &&
 			len(completedSignalCmds) == len(commandReq.GetSignalCommands())
 	})
@@ -281,7 +277,7 @@ func executeState(
 	}
 
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = workflow.ExecuteActivity(ctx, interpreter.StateDecide, service.BackendTypeTemporal, service.StateDecideActivityInput{
+	err = provider.ExecuteActivity(ctx, StateDecide, service.BackendTypeTemporal, service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:              exeCtx,
