@@ -7,6 +7,7 @@ import (
 	"github.com/cadence-oss/iwf-server/integ/parallel"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
+	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -33,7 +34,7 @@ func TestPrallelWorkflow(t *testing.T) {
 
 	// start iwf api server
 	temporalClient := createTemporalClient()
-	iwfService := api.NewService(temporalClient)
+	iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient))
 	testIwfServerPort := "9715"
 	iwfServer := &http.Server{
 		Addr:    ":" + testIwfServerPort,

@@ -6,6 +6,7 @@ import (
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/timer"
 	"github.com/cadence-oss/iwf-server/service/api"
+	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -32,7 +33,7 @@ func TestTimerWorkflow(t *testing.T) {
 
 	// start iwf api server
 	temporalClient := createTemporalClient()
-	iwfService := api.NewService(temporalClient)
+	iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient))
 	testIwfServerPort := "9715"
 	iwfServer := &http.Server{
 		Addr:    ":" + testIwfServerPort,
@@ -63,7 +64,7 @@ func TestTimerWorkflow(t *testing.T) {
 	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        timer.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 30,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           timer.State1,
 	}).Execute()

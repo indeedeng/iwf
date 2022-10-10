@@ -15,6 +15,12 @@ type temporalClient struct {
 	tClient client.Client
 }
 
+func NewTemporalClient(tClient client.Client) api.UnifiedClient {
+	return &temporalClient{
+		tClient: tClient,
+	}
+}
+
 func (t *temporalClient) Close() {
 	t.tClient.Close()
 }
@@ -103,10 +109,4 @@ func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (string, error
 func (t *temporalClient) GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error {
 	run := t.tClient.GetWorkflow(ctx, workflowID, runID)
 	return run.Get(ctx, valuePtr)
-}
-
-func NewTemporalClient(tClient client.Client) api.UnifiedClient {
-	return &temporalClient{
-		tClient: tClient,
-	}
 }
