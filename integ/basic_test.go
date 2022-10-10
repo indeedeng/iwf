@@ -2,13 +2,9 @@ package integ
 
 import (
 	"context"
-	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/basic"
 	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/api"
-	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
-	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
@@ -19,38 +15,12 @@ import (
 
 func TestBasicWorkflow(t *testing.T) {
 	// start test workflow server
-	wfHandler, basicWorkflow := basic.NewBasicWorkflow()
-	testWorkflowServerPort := "9714"
-	wfServer := &http.Server{
-		Addr:    ":" + testWorkflowServerPort,
-		Handler: basicWorkflow,
-	}
-	defer wfServer.Close()
-	go func() {
-		if err := wfServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
-		}
-	}()
+	wfHandler := basic.NewHandler()
+	closeFunc1 := startWorkflowWorker(wfHandler)
+	defer closeFunc1()
 
-	// start iwf api server
-	temporalClient := createTemporalClient()
-	iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient))
-	testIwfServerPort := "9715"
-	iwfServer := &http.Server{
-		Addr:    ":" + testIwfServerPort,
-		Handler: iwfService,
-	}
-	defer iwfServer.Close()
-	go func() {
-		if err := iwfServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
-		}
-	}()
-
-	// start iwf interpreter worker
-	interpreter := temporal.NewInterpreterWorker(temporalClient)
-	interpreter.Start()
-	defer interpreter.Close()
+	closeFunc2 := startIwfService(service.BackendTypeTemporal)
+	defer closeFunc2()
 
 	// start a workflow
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
@@ -66,7 +36,7 @@ func TestBasicWorkflow(t *testing.T) {
 		Data:     iwfidl.PtrString("test data"),
 	}
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
-	resp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        basic.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
@@ -80,8 +50,6 @@ func TestBasicWorkflow(t *testing.T) {
 	if httpResp.StatusCode != http.StatusOK {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
-	fmt.Println(*resp)
-	defer temporalClient.TerminateWorkflow(context.Background(), wfId, "", "terminate incase not completed")
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -95,9 +63,9 @@ func TestBasicWorkflow(t *testing.T) {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)
 	}
 
-	history := wfHandler.GetTestResult()
+	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)
-	assertions.Equalf(map[string]int{
+	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,
 		"S2_start":  1,

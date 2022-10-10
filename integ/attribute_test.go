@@ -19,10 +19,11 @@ func TestAttributeWorkflowTemporal(t *testing.T) {
 
 func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	wfHandler := attribute.NewHandler()
-	closeFunc := startWorkflowWorker(wfHandler)
-	defer closeFunc()
+	closeFunc1 := startWorkflowWorker(wfHandler)
+	defer closeFunc1()
 
-	startIwfService(backendType)
+	closeFunc2 := startIwfService(backendType)
+	defer closeFunc2()
 
 	// start a workflow
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
