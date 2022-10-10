@@ -29,14 +29,15 @@ Related projects:
 
 
 ### Run with local Temporalite
-1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. Go to http://localhost:8233/ for Temporal WebUI
+1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. 
+2. Go to http://localhost:8233/ for Temporal WebUI
 
-### Run with local Temporal server with Search attributes enabled(back by ElasticSearch)
-* WHY: Temporalite doesn't support Search Attributes, which is one of the important features in iWF. 
-Go to (=[Temporal-dockercompose](https://github.com/temporalio/docker-compose) to set it up
+NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporalio/docker-compose) to run with docker
 
 ### Run with local Cadence
-TODO
+1. Run a local Cadence server following the [instructions](https://github.com/uber/cadence/tree/master/docker)
+2. Register a new domain if not haven `cadence --do default domain register`
+3. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
 # Development Plan
 ## 1.0
