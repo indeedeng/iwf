@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
-	"go.temporal.io/sdk/temporal"
 	"time"
 )
 
@@ -58,7 +57,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 				thisState, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
-					errToFailWf = temporal.NewApplicationError(
+					errToFailWf = provider.NewApplicationError(
 						"critical code bug when passing state via context",
 						service.WorkflowErrorTypeUserInternalError,
 					)
@@ -71,7 +70,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					errToFailWf = err
 				}
 
-				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(decision, state.GetStateId(), stateExeId)
+				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -82,7 +81,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					forceCompleteWf = true
 				}
 				if forceFail {
-					errToFailWf = temporal.NewApplicationError(
+					errToFailWf = provider.NewApplicationError(
 						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", state.GetStateId(), stateExeId),
 						service.WorkflowErrorTypeUserWorkflowDecision,
 					)
@@ -116,7 +115,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 }
 
 func checkClosingWorkflow(
-	decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
+	provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
 ) (shouldClose, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	for _, movement := range decision.GetNextStates() {
 		stateId := movement.GetStateId()
@@ -145,7 +144,7 @@ func checkClosingWorkflow(
 	}
 	if shouldClose && len(decision.NextStates) > 1 {
 		// Illegal decision
-		err = temporal.NewApplicationError(
+		err = provider.NewApplicationError(
 			"closing workflow decision should have only one state movement, but got more than one",
 			service.WorkflowErrorTypeUserWorkflowError,
 		)
@@ -241,7 +240,7 @@ func executeState(
 
 	triggerType := commandReq.GetDeciderTriggerType()
 	if triggerType != service.DeciderTypeAllCommandCompleted {
-		return nil, temporal.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
+		return nil, provider.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
 	}
 
 	err = provider.Await(ctx, func() bool {
