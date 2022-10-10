@@ -179,7 +179,7 @@ func executeState(
 	}
 
 	var startResponse *iwfidl.WorkflowStateStartResponse
-	err := workflow.ExecuteActivity(ctx, StateStartActivity, service.StateStartActivityInput{
+	err := workflow.ExecuteActivity(ctx, interpreter.StateStart, service.BackendTypeTemporal, service.StateStartActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateStartRequest{
 			Context:          exeCtx,
@@ -281,7 +281,7 @@ func executeState(
 	}
 
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = workflow.ExecuteActivity(ctx, StateDecideActivity, service.StateDecideActivityInput{
+	err = workflow.ExecuteActivity(ctx, interpreter.StateDecide, service.BackendTypeTemporal, service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:              exeCtx,
