@@ -15,10 +15,10 @@ func getActivityProvider() interpreter.ActivityProvider {
 	return &activityProvider{}
 }
 
-func (a activityProvider) GetLogger(ctx context.Context) interpreter.ActivityLogger {
+func (a *activityProvider) GetLogger(ctx context.Context) interpreter.ActivityLogger {
 	return activity.GetLogger(ctx)
 }
 
-func (a activityProvider) NewApplicationError(message, errType string, details ...interface{}) error {
-	return temporal.NewApplicationError(message, errType, details)
+func (a *activityProvider) NewApplicationError(message, errType string, details ...interface{}) error {
+	return temporal.NewApplicationError(message, errType, details...)
 }
