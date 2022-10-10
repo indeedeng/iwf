@@ -9,11 +9,7 @@ import (
 
 type workflowProvider struct{}
 
-var DefaultWorkflowProvider = getWorkflowProvider()
-
-func getWorkflowProvider() interpreter.WorkflowProvider {
-	return &workflowProvider{}
-}
+var defaultWorkflowProvider = &workflowProvider{}
 
 func (w *workflowProvider) NewApplicationError(message, errType string, details ...interface{}) error {
 	return temporal.NewApplicationError(message, errType, details...)
