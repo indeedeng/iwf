@@ -14,29 +14,18 @@ const (
 	State2       = "S2"
 )
 
-func NewBasicWorkflow() (*Handler, *gin.Engine) {
-	router := gin.Default()
-
-	handler := newHandler()
-
-	router.POST(service.StateStartApi, handler.apiV1WorkflowStateStart)
-	router.POST(service.StateDecideApi, handler.apiV1WorkflowStateDecide)
-
-	return handler, router
+type handler struct {
+	invokeHistory map[string]int64
 }
 
-type Handler struct {
-	invokeHistory map[string]int
-}
-
-func newHandler() *Handler {
-	return &Handler{
-		invokeHistory: make(map[string]int),
+func NewHandler() *handler {
+	return &handler{
+		invokeHistory: make(map[string]int64),
 	}
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -60,7 +49,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -102,6 +91,6 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *Handler) GetTestResult() map[string]int {
-	return h.invokeHistory
+func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
+	return h.invokeHistory, nil
 }

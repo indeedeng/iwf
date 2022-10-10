@@ -10,13 +10,18 @@ type (
 	Config struct {
 		// Api is the API config
 		Api ApiConfig `yaml:"api"`
-		// Temporal config is the config to connect to Temporal
-		Temporal TemporalConfig `yaml:"temporal"`
+		// Backend is the service behind, either Cadence or Temporal is required
+		Backend Backend `yaml:"backend"`
 	}
 
 	ApiConfig struct {
 		// Port is the port on which the API service will bind to
 		Port int `yaml:"port"`
+	}
+
+	Backend struct {
+		// Temporal config is the config to connect to Temporal
+		Temporal *TemporalConfig `yaml:"temporal"`
 	}
 
 	TemporalConfig struct {

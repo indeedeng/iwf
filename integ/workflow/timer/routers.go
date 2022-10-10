@@ -1,45 +1,35 @@
-package signal
+package timer
 
 import (
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
+	"github.com/cadence-oss/iwf-server/integ/workflow/common"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"time"
 )
 
 const (
-	WorkflowType = "signal"
+	WorkflowType = "timer"
 	State1       = "S1"
 	State2       = "S2"
-	SignalName   = "test-signal-name"
 )
 
-func NewSignalWorkflow() (*Handler, *gin.Engine) {
-	router := gin.Default()
-
-	handler := newHandler()
-
-	router.POST(service.StateStartApi, handler.apiV1WorkflowStateStart)
-	router.POST(service.StateDecideApi, handler.apiV1WorkflowStateDecide)
-
-	return handler, router
-}
-
-type Handler struct {
+type handler struct {
 	invokeHistory map[string]int64
 	invokeData    map[string]interface{}
 }
 
-func newHandler() *Handler {
-	return &Handler{
+func NewHandler() common.WorkflowHandler {
+	return &handler{
 		invokeHistory: make(map[string]int64),
 		invokeData:    make(map[string]interface{}),
 	}
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -50,12 +40,14 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			now := time.Now().Unix()
+			h.invokeData["scheduled_at"] = now
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					SignalCommands: []iwfidl.SignalCommand{
+					TimerCommands: []iwfidl.TimerCommand{
 						{
-							CommandId:  "signal-cmd-id",
-							SignalName: SignalName,
+							CommandId:                  "timer-cmd-id",
+							FiringUnixTimestampSeconds: now + 10, // fire after 10s
 						},
 					},
 					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
@@ -76,7 +68,7 @@ func (h *Handler) apiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -87,13 +79,11 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
-			signalResults := req.GetCommandResults()
-			signalId := signalResults.SignalResults[0].GetCommandId()
-			signalValue := signalResults.SignalResults[0].GetSignalValue()
-
-			h.invokeData["signalId"] = signalId
-			h.invokeData["signalValue"] = signalValue
-
+			now := time.Now().Unix()
+			h.invokeData["fired_at"] = now
+			timerResults := req.GetCommandResults()
+			timerId := timerResults.GetTimerResults()[0].GetCommandId()
+			h.invokeData["timer_id"] = timerId
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -122,6 +112,6 @@ func (h *Handler) apiV1WorkflowStateDecide(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *Handler) GetTestResult() (map[string]int64, map[string]interface{}) {
+func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
 	return h.invokeHistory, h.invokeData
 }

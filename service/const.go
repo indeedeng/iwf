@@ -34,3 +34,8 @@ const (
 	WorkflowStatusCanceled      = "CANCELED"
 	WorkflowStatusContinueAsNew = "CONTINUED_AS_NEW"
 )
+
+type BackendType string
+
+const BackendTypeCadence BackendType = "cadence"
+const BackendTypeTemporal BackendType = "temporal"

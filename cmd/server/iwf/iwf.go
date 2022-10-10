@@ -24,14 +24,16 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
+	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
 	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
+	"github.com/urfave/cli"
 	"go.temporal.io/sdk/client"
 	"log"
 	"strings"
-	"sync"
-
-	"github.com/urfave/cli"
 )
+
+const serviceAPI = "api"
+const serviceInterpreter = "interpreter"
 
 // BuildCLI is the main entry point for the iwf server
 func BuildCLI() *cli.App {
@@ -55,7 +57,7 @@ func BuildCLI() *cli.App {
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "services",
-					Value: "api, interpreter-temporal",
+					Value: fmt.Sprintf("%s, %s", serviceAPI, serviceInterpreter),
 					Usage: "start services/components in this project",
 				},
 			},
@@ -72,36 +74,38 @@ func start(c *cli.Context) {
 	if err != nil {
 		log.Fatalf("Unable to load config for path %v because of error %v", configPath, err)
 	}
-
-	// The client is a heavyweight object that should be created once per process.
-	temporalClient, err := client.Dial(client.Options{
-		HostPort:  config.Temporal.HostPort,
-		Namespace: config.Temporal.Namespace,
-	})
-	if err != nil {
-		log.Fatalf("Unable to connect to Temporal because of error %v", err)
-	}
-
-	var wg sync.WaitGroup
 	services := getServices(c)
 
-	for _, service := range services {
-		wg.Add(1)
-		go launchService(service, config, temporalClient, c)
-	}
+	// The client is a heavyweight object that should be created once per process.
+	var unifiedClient api.UnifiedClient
+	if config.Backend.Temporal != nil {
+		temporalClient, err := client.Dial(client.Options{
+			HostPort:  config.Backend.Temporal.HostPort,
+			Namespace: config.Backend.Temporal.Namespace,
+		})
+		if err != nil {
+			log.Fatalf("Unable to connect to Temporal because of error %v", err)
+		}
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient)
 
-	wg.Wait()
+		for _, svcName := range services {
+			go launchTemporalService(svcName, config, unifiedClient, temporalClient)
+		}
+	} else {
+		panic("only support Temporal today")
+	}
 }
-func launchService(service string, config *service.Config, temporalClient client.Client, c *cli.Context) {
-	switch service {
-	case "api":
-		svc := api.NewService(temporalClient)
+
+func launchTemporalService(svcName string, config *service.Config, unifiedClient api.UnifiedClient, temporalClient client.Client) {
+	switch svcName {
+	case serviceAPI:
+		svc := api.NewService(unifiedClient)
 		log.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
-	case "interpreter-temporal":
+	case serviceInterpreter:
 		interpreter := temporal.NewInterpreterWorker(temporalClient)
 		interpreter.Start()
 	default:
-		log.Printf("Invalid service: %v", service)
+		log.Printf("Invalid service: %v", svcName)
 	}
 }
 
@@ -113,7 +117,7 @@ func getServices(c *cli.Context) []string {
 		log.Fatal("No services specified for starting")
 	}
 
-	services := []string{}
+	var services []string
 	for _, token := range tokens {
 		t := strings.TrimSpace(token)
 		services = append(services, t)
