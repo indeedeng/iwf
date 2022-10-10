@@ -3,7 +3,6 @@ package interpreter
 import (
 	"context"
 	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"time"
 )
 
@@ -12,11 +11,21 @@ type ActivityProvider interface {
 	NewApplicationError(message, errType string, details ...interface{}) error
 }
 
-func getActivityProviderByType(backendType service.BackendType) ActivityProvider {
-	if backendType == service.BackendTypeTemporal {
-		return temporal.DefaultActivityProvider
+var activityProviderRegistry = make(map[service.BackendType]ActivityProvider)
+
+func RegisterActivityProvider(backendType service.BackendType, provider ActivityProvider) {
+	if _, ok := activityProviderRegistry[backendType]; ok {
+		panic("backend type " + backendType + " has been registered")
 	}
-	panic("not supported yet: " + backendType)
+	activityProviderRegistry[backendType] = provider
+}
+
+func getActivityProviderByType(backendType service.BackendType) ActivityProvider {
+	provider := activityProviderRegistry[backendType]
+	if provider == nil {
+		panic("not supported yet: " + backendType)
+	}
+	return provider
 }
 
 type ActivityLogger interface {
@@ -65,7 +74,7 @@ type WorkflowProvider interface {
 	GetWorkflowInfo(ctx UnifiedContext) WorkflowInfo
 	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
-	ExtendContextWithValue(parent interface{}, key string, val interface{}) UnifiedContext
+	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	Await(ctx UnifiedContext, condition func() bool) error
 	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext

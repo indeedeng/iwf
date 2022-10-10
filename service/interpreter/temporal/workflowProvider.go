@@ -50,8 +50,8 @@ func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, query
 	return workflow.SetQueryHandler(wfCtx, queryType, handler)
 }
 
-func (w *workflowProvider) ExtendContextWithValue(parent interface{}, key string, val interface{}) interpreter.UnifiedContext {
-	wfCtx, ok := parent.(workflow.Context)
+func (w *workflowProvider) ExtendContextWithValue(parent interpreter.UnifiedContext, key string, val interface{}) interpreter.UnifiedContext {
+	wfCtx, ok := parent.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
@@ -142,7 +142,7 @@ func (t *temporalReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePt
 }
 
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {
-	wfCtx, ok := ctx.(workflow.Context)
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
@@ -153,7 +153,7 @@ func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, sign
 }
 
 func (w *workflowProvider) GetContextValue(ctx interpreter.UnifiedContext, key string) interface{} {
-	wfCtx, ok := ctx.(workflow.Context)
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
