@@ -13,12 +13,15 @@ import (
 	"time"
 )
 
-func TestAttributeWorkflow(t *testing.T) {
+func TestAttributeWorkflowTemporal(t *testing.T) {
+	doTestAttributeWorkflow(t, service.BackendTypeTemporal)
+}
+
+func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	wfHandler := attribute.NewHandler()
 	closeFunc := startWorkflowWorker(wfHandler)
 	defer closeFunc()
 
-	backendType := service.BackendTypeTemporal
 	startIwfService(backendType)
 
 	// start a workflow
