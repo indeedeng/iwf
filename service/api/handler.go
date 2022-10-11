@@ -200,7 +200,9 @@ func (h *handler) apiV1WorkflowResetPost(c *gin.Context) {
 	}
 	log.Println("received request", req)
 
-	runId, err := h.client.ResetWorkflow(context.Background(), req)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+	runId, err := h.client.ResetWorkflow(ctx, req)
 	if err != nil {
 		handleError(c, err)
 		return

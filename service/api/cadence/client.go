@@ -111,6 +111,8 @@ func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (string
 		return service.WorkflowStatusTimeout, nil
 	case shared.WorkflowExecutionCloseStatusTerminated:
 		return service.WorkflowStatusTerminated, nil
+	case shared.WorkflowExecutionCloseStatusCompleted:
+		return service.WorkflowStatusCompleted, nil
 	default:
 		return "", fmt.Errorf("not supported status %s", status)
 	}
@@ -121,11 +123,21 @@ func (t *cadenceClient) GetWorkflowResult(ctx context.Context, valuePtr interfac
 	return run.Get(ctx, valuePtr)
 }
 
-func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error) {
+func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (newRunId string, err error) {
+
+	reqRunId := request.GetWorkflowRunId()
+	if reqRunId == "" {
+		// set default runId to current
+		resp, err := t.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
+		if err != nil {
+			return "", err
+		}
+		reqRunId = resp.RunId
+	}
 
 	resetType := service.ResetType(request.GetResetType())
 	resetBaseRunID, decisionFinishID, err := getResetIDsByType(ctx, resetType, t.domain, request.GetWorkflowId(),
-		request.GetWorkflowRunId(), t.serviceClient, request.GetResetBadBinaryChecksum(),
+		reqRunId, t.serviceClient, request.GetResetBadBinaryChecksum(),
 		request.GetEarliestTime(), request.GetHistoryEventId(), request.GetDecisionOffset())
 
 	if err != nil {
@@ -133,7 +145,7 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 	}
 
 	requestId := uuid.New().String()
-	resp, err := t.serviceClient.ResetWorkflowExecution(ctx, &shared.ResetWorkflowExecutionRequest{
+	resetReq := &shared.ResetWorkflowExecutionRequest{
 		Domain: &t.domain,
 		WorkflowExecution: &shared.WorkflowExecution{
 			WorkflowId: &request.WorkflowId,
@@ -143,7 +155,8 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 		DecisionFinishEventId: iwfidl.PtrInt64(decisionFinishID),
 		RequestId:             &requestId,
 		SkipSignalReapply:     iwfidl.PtrBool(request.GetSkipSignalReapply()),
-	})
+	}
+	resp, err := t.serviceClient.ResetWorkflowExecution(ctx, resetReq)
 	if err != nil {
 		return "", err
 	}
