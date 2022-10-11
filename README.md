@@ -56,6 +56,7 @@ NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporali
 - [x] Search workflow API
 
 ## 1.1
+- [x] Reset workflow API
 - [ ] StateOption: AttributeLoadingPolicy
 - [ ] StateOption: CommandCarryOverPolicy
 - [ ] StateOption: Start/Decide API timeout and retry
