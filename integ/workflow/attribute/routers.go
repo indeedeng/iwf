@@ -10,21 +10,20 @@ import (
 )
 
 const (
+	EnableTestingSearchAttribute = true
+
 	WorkflowType               = "attribute"
 	State1                     = "S1"
 	State2                     = "S2"
 	TestQueryAttributeKey      = "test-query-attribute"
 	TestStateLocalAttributeKey = "test-state-local-attribute"
 
-	// Here use builtin search attribute for testing
-	// NOTE: TODO need to use tctl to register the Search attribute
-	EnableTestingSearchAttribute     = false
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
 	TestSearchAttributeKeywordValue2 = "keyword-value2"
 	TestSearchAttributeIntKey        = "CustomIntField"
-	TestSearchAttributeIntValue1     = "1"
-	TestSearchAttributeIntValue2     = "2"
+	TestSearchAttributeIntValue1     = 1
+	TestSearchAttributeIntValue2     = 2
 )
 
 var TestQueryVal1 = iwfidl.EncodedObject{
@@ -70,14 +69,14 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			if EnableTestingSearchAttribute {
 				sa = []iwfidl.SearchAttribute{
 					{
-						Key:       iwfidl.PtrString(TestSearchAttributeKeywordKey),
-						Value:     iwfidl.PtrString(TestSearchAttributeKeywordValue1),
-						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue1),
+						ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
 					},
 					{
-						Key:       iwfidl.PtrString(TestSearchAttributeIntKey),
-						Value:     iwfidl.PtrString(TestSearchAttributeIntValue1),
-						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
+						ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
 					},
 				}
 			}
@@ -107,10 +106,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
 					kwSaFounds++
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
 					intSaFounds++
 				}
 			}
@@ -152,10 +151,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetValue() == TestSearchAttributeKeywordValue1 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue1 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
 					kwSaFounds++
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetValue() == TestSearchAttributeIntValue1 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue1 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
 					intSaFounds++
 				}
 			}
@@ -182,14 +181,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			if EnableTestingSearchAttribute {
 				sa = []iwfidl.SearchAttribute{
 					{
-						Key:       iwfidl.PtrString(TestSearchAttributeKeywordKey),
-						Value:     iwfidl.PtrString(TestSearchAttributeKeywordValue2),
-						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue2),
+						ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
 					},
 					{
-						Key:       iwfidl.PtrString(TestSearchAttributeIntKey),
-						Value:     iwfidl.PtrString(TestSearchAttributeIntValue2),
-						ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue2),
+						ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
 					},
 				}
 			}
@@ -216,10 +215,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
 					kwSaFounds++
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
 					intSaFounds++
 				}
 			}

@@ -34,6 +34,11 @@ Related projects:
 2. Go to http://localhost:8233/ for Temporal WebUI
 
 NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporalio/docker-compose) to run with docker
+3. For `attribute_test.go` integTests, you need to register search attributes:
+```bash
+tctl adm cl asa -n CustomKeywordField -t Keyword
+tctl adm cl asa -n CustomIntField -t Int
+```
 
 ### Run with local Cadence
 1. Run a local Cadence server following the [instructions](https://github.com/uber/cadence/tree/master/docker)

@@ -5,7 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Key** | Pointer to **string** |  | [optional] 
-**Value** | Pointer to **string** |  | [optional] 
+**StringValue** | Pointer to **string** |  | [optional] 
+**IntegerValue** | Pointer to **int64** |  | [optional] 
 **ValueType** | Pointer to **string** |  | [optional] 
 
 ## Methods
@@ -52,30 +53,55 @@ SetKey sets Key field to given value.
 
 HasKey returns a boolean if a field has been set.
 
-### GetValue
+### GetStringValue
 
-`func (o *SearchAttribute) GetValue() string`
+`func (o *SearchAttribute) GetStringValue() string`
 
-GetValue returns the Value field if non-nil, zero value otherwise.
+GetStringValue returns the StringValue field if non-nil, zero value otherwise.
 
-### GetValueOk
+### GetStringValueOk
 
-`func (o *SearchAttribute) GetValueOk() (*string, bool)`
+`func (o *SearchAttribute) GetStringValueOk() (*string, bool)`
 
-GetValueOk returns a tuple with the Value field if it's non-nil, zero value otherwise
+GetStringValueOk returns a tuple with the StringValue field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetValue
+### SetStringValue
 
-`func (o *SearchAttribute) SetValue(v string)`
+`func (o *SearchAttribute) SetStringValue(v string)`
 
-SetValue sets Value field to given value.
+SetStringValue sets StringValue field to given value.
 
-### HasValue
+### HasStringValue
 
-`func (o *SearchAttribute) HasValue() bool`
+`func (o *SearchAttribute) HasStringValue() bool`
 
-HasValue returns a boolean if a field has been set.
+HasStringValue returns a boolean if a field has been set.
+
+### GetIntegerValue
+
+`func (o *SearchAttribute) GetIntegerValue() int64`
+
+GetIntegerValue returns the IntegerValue field if non-nil, zero value otherwise.
+
+### GetIntegerValueOk
+
+`func (o *SearchAttribute) GetIntegerValueOk() (*int64, bool)`
+
+GetIntegerValueOk returns a tuple with the IntegerValue field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetIntegerValue
+
+`func (o *SearchAttribute) SetIntegerValue(v int64)`
+
+SetIntegerValue sets IntegerValue field to given value.
+
+### HasIntegerValue
+
+`func (o *SearchAttribute) HasIntegerValue() bool`
+
+HasIntegerValue returns a boolean if a field has been set.
 
 ### GetValueType
 
