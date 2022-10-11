@@ -14,6 +14,7 @@ type UnifiedClient interface {
 	QueryWorkflow(ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{}) error
 	DescribeWorkflowExecution(ctx context.Context, workflowID, runID string) (*DescribeWorkflowExecutionResponse, error)
 	GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error
+	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
 }
 
 type StartWorkflowOptions struct {

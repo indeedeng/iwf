@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowRunId** | Pointer to **string** |  | [optional] 
+**WorkflowRunId** | **string** |  | 
 
 ## Methods
 
 ### NewWorkflowResetResponse
 
-`func NewWorkflowResetResponse() *WorkflowResetResponse`
+`func NewWorkflowResetResponse(workflowRunId string, ) *WorkflowResetResponse`
 
 NewWorkflowResetResponse instantiates a new WorkflowResetResponse object
 This constructor will assign default values to properties that have it defined,
@@ -44,11 +44,6 @@ and a boolean to check if the value has been set.
 
 SetWorkflowRunId sets WorkflowRunId field to given value.
 
-### HasWorkflowRunId
-
-`func (o *WorkflowResetResponse) HasWorkflowRunId() bool`
-
-HasWorkflowRunId returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

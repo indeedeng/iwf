@@ -1,4 +1,7 @@
-# test start API
+### test home page
+GET http://localhost:8801/
+
+### test start API
 POST http://localhost:8801/api/v1/workflow/start
 Content-Type: application/json
 
@@ -12,5 +15,11 @@ Content-Type: application/json
   "stateOptions": {}
 }
 
-### test home page
-GET http://localhost:8801/
+### test reset API
+POST http://localhost:8801/api/v1/workflow/reset
+Content-Type: application/json
+
+{
+  "workflowId": "signal1665468993",
+  "resetType": "FIRST_DECISION_COMPLETED"
+}

@@ -16,15 +16,16 @@ import (
 
 // WorkflowResetResponse struct for WorkflowResetResponse
 type WorkflowResetResponse struct {
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
+	WorkflowRunId string `json:"workflowRunId"`
 }
 
 // NewWorkflowResetResponse instantiates a new WorkflowResetResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowResetResponse() *WorkflowResetResponse {
+func NewWorkflowResetResponse(workflowRunId string) *WorkflowResetResponse {
 	this := WorkflowResetResponse{}
+	this.WorkflowRunId = workflowRunId
 	return &this
 }
 
@@ -36,41 +37,33 @@ func NewWorkflowResetResponseWithDefaults() *WorkflowResetResponse {
 	return &this
 }
 
-// GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
+// GetWorkflowRunId returns the WorkflowRunId field value
 func (o *WorkflowResetResponse) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.WorkflowRunId
+
+	return o.WorkflowRunId
 }
 
-// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
+// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetResponse) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.WorkflowRunId, true
+	return &o.WorkflowRunId, true
 }
 
-// HasWorkflowRunId returns a boolean if a field has been set.
-func (o *WorkflowResetResponse) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
+// SetWorkflowRunId sets field value
 func (o *WorkflowResetResponse) SetWorkflowRunId(v string) {
-	o.WorkflowRunId = &v
+	o.WorkflowRunId = v
 }
 
 func (o WorkflowResetResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowRunId != nil {
+	if true {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	return json.Marshal(toSerialize)

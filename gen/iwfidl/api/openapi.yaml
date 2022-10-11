@@ -518,7 +518,7 @@ components:
         historyEventId: 0
         earliest_time: earliest_time
         decision_offset: 6
-        resetType: HistoryEventId
+        resetType: HISTORY_EVENT_ID
         skip_signal_reapply: true
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -529,14 +529,14 @@ components:
           type: string
         resetType:
           enum:
-          - HistoryEventId
-          - FirstDecisionCompleted
-          - LastDecisionCompleted
-          - LastContinuedAsNew
-          - BadBinary
-          - DecisionCompletedTime
-          - FirstDecisionScheduled
-          - LastDecisionScheduled
+          - HISTORY_EVENT_ID
+          - FIRST_DECISION_COMPLETED
+          - LAST_DECISION_COMPLETED
+          - LAST_CONTINUED_AS_NEW
+          - BAD_BINARY
+          - DECISION_COMPLETED_TIME
+          - FIRST_DECISION_SCHEDULED
+          - LAST_DECISION_SCHEDULED
           type: string
         historyEventId:
           type: integer
@@ -560,6 +560,8 @@ components:
       properties:
         workflowRunId:
           type: string
+      required:
+      - workflowRunId
       type: object
     WorkflowStateStartRequest:
       example:

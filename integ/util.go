@@ -69,7 +69,7 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 
 		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, iwf.DefaultCadenceDomain)
 
-		iwfService := api.NewService(cadenceapi.NewCadenceClient(cadenceClient, closeFunc))
+		iwfService := api.NewService(cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, closeFunc))
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
