@@ -30,6 +30,8 @@ docs/WorkflowGetRequest.md
 docs/WorkflowGetResponse.md
 docs/WorkflowQueryRequest.md
 docs/WorkflowQueryResponse.md
+docs/WorkflowResetRequest.md
+docs/WorkflowResetResponse.md
 docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
@@ -67,6 +69,8 @@ model_workflow_get_request.go
 model_workflow_get_response.go
 model_workflow_query_request.go
 model_workflow_query_response.go
+model_workflow_reset_request.go
+model_workflow_reset_response.go
 model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go

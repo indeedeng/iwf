@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 [**ApiV1WorkflowGetWithLongWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithLongWaitPost) | **Post** /api/v1/workflow/getWithLongWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 [**ApiV1WorkflowQueryPost**](DefaultApi.md#ApiV1WorkflowQueryPost) | **Post** /api/v1/workflow/query | query a workflow
+[**ApiV1WorkflowResetPost**](DefaultApi.md#ApiV1WorkflowResetPost) | **Post** /api/v1/workflow/reset | reset a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 [**ApiV1WorkflowSignalPost**](DefaultApi.md#ApiV1WorkflowSignalPost) | **Post** /api/v1/workflow/signal | signal a workflow
 [**ApiV1WorkflowStartPost**](DefaultApi.md#ApiV1WorkflowStartPost) | **Post** /api/v1/workflow/start | start a workflow
@@ -192,6 +193,70 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowQueryResponse**](WorkflowQueryResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowResetPost
+
+> WorkflowResetResponse ApiV1WorkflowResetPost(ctx).WorkflowResetRequest(workflowResetRequest).Execute()
+
+reset a workflow
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    workflowResetRequest := *openapiclient.NewWorkflowResetRequest("WorkflowId_example", "ResetType_example") // WorkflowResetRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background()).WorkflowResetRequest(workflowResetRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowResetPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowResetPost`: WorkflowResetResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowResetPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowResetPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowResetRequest** | [**WorkflowResetRequest**](WorkflowResetRequest.md) |  | 
+
+### Return type
+
+[**WorkflowResetResponse**](WorkflowResetResponse.md)
 
 ### Authorization
 
