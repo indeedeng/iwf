@@ -10,6 +10,7 @@ const WorkflowQueryApiPath = "/api/v1/workflow/query"
 const WorkflowGetApiPath = "/api/v1/workflow/get"
 const WorkflowGetWithLongWaitApiPath = "/api/v1/workflow/getWithLongWait"
 const WorkflowSearchApiPath = "/api/v1/workflow/search"
+const WorkflowResetApiPath = "/api/v1/workflow/reset"
 
 // NewService returns a new router.
 func NewService(client UnifiedClient) *gin.Engine {
@@ -24,6 +25,7 @@ func NewService(client UnifiedClient) *gin.Engine {
 	router.POST(WorkflowGetApiPath, handler.apiV1WorkflowGetPost)
 	router.POST(WorkflowGetWithLongWaitApiPath, handler.apiV1WorkflowGetWithLongWaitPost)
 	router.POST(WorkflowSearchApiPath, handler.apiV1WorkflowSearchPost)
+	router.POST(WorkflowResetApiPath, handler.apiV1WorkflowResetPost)
 
 	return router
 }

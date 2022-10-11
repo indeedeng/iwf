@@ -111,3 +111,7 @@ func (t *temporalClient) GetWorkflowResult(ctx context.Context, valuePtr interfa
 	run := t.tClient.GetWorkflow(ctx, workflowID, runID)
 	return run.Get(ctx, valuePtr)
 }
+
+func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error) {
+	return "", fmt.Errorf("not supported")
+}

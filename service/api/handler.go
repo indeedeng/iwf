@@ -28,7 +28,7 @@ func (h *handler) close() {
 
 // Index is the index handler.
 func (h *handler) index(c *gin.Context) {
-	c.String(http.StatusOK, "Hello World!")
+	c.String(http.StatusOK, "Hello World from iWF server!")
 }
 
 // ApiV1WorkflowStartPost - for a workflow
@@ -189,5 +189,25 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 		WorkflowRunId:  resp.RunId,
 		WorkflowStatus: status,
 		Results:        output.StateCompletionOutputs,
+	})
+}
+
+func (h *handler) apiV1WorkflowResetPost(c *gin.Context) {
+	var req iwfidl.WorkflowResetRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received request", req)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+	runId, err := h.client.ResetWorkflow(ctx, req)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, iwfidl.WorkflowResetResponse{
+		WorkflowRunId: runId,
 	})
 }

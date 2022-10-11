@@ -7,19 +7,25 @@ import (
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
 	"github.com/cadence-oss/iwf-server/service/interpreter/cadence"
+	"github.com/google/uuid"
+	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
 )
 
 type cadenceClient struct {
-	cClient   client.Client
-	closeFunc func()
+	domain        string
+	cClient       client.Client
+	closeFunc     func()
+	serviceClient workflowserviceclient.Interface
 }
 
-func NewCadenceClient(cClient client.Client, closeFunc func()) api.UnifiedClient {
+func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, closeFunc func()) api.UnifiedClient {
 	return &cadenceClient{
-		cClient:   cClient,
-		closeFunc: closeFunc,
+		domain:        domain,
+		cClient:       cClient,
+		closeFunc:     closeFunc,
+		serviceClient: serviceClient,
 	}
 }
 
@@ -105,6 +111,8 @@ func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (string
 		return service.WorkflowStatusTimeout, nil
 	case shared.WorkflowExecutionCloseStatusTerminated:
 		return service.WorkflowStatusTerminated, nil
+	case shared.WorkflowExecutionCloseStatusCompleted:
+		return service.WorkflowStatusCompleted, nil
 	default:
 		return "", fmt.Errorf("not supported status %s", status)
 	}
@@ -113,4 +121,44 @@ func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (string
 func (t *cadenceClient) GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error {
 	run := t.cClient.GetWorkflow(ctx, workflowID, runID)
 	return run.Get(ctx, valuePtr)
+}
+
+func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (newRunId string, err error) {
+
+	reqRunId := request.GetWorkflowRunId()
+	if reqRunId == "" {
+		// set default runId to current
+		resp, err := t.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
+		if err != nil {
+			return "", err
+		}
+		reqRunId = resp.RunId
+	}
+
+	resetType := service.ResetType(request.GetResetType())
+	resetBaseRunID, decisionFinishID, err := getResetIDsByType(ctx, resetType, t.domain, request.GetWorkflowId(),
+		reqRunId, t.serviceClient, request.GetResetBadBinaryChecksum(),
+		request.GetEarliestTime(), request.GetHistoryEventId(), request.GetDecisionOffset())
+
+	if err != nil {
+		return "", err
+	}
+
+	requestId := uuid.New().String()
+	resetReq := &shared.ResetWorkflowExecutionRequest{
+		Domain: &t.domain,
+		WorkflowExecution: &shared.WorkflowExecution{
+			WorkflowId: &request.WorkflowId,
+			RunId:      &resetBaseRunID,
+		},
+		Reason:                request.Reason,
+		DecisionFinishEventId: iwfidl.PtrInt64(decisionFinishID),
+		RequestId:             &requestId,
+		SkipSignalReapply:     iwfidl.PtrBool(request.GetSkipSignalReapply()),
+	}
+	resp, err := t.serviceClient.ResetWorkflowExecution(ctx, resetReq)
+	if err != nil {
+		return "", err
+	}
+	return resp.GetRunId(), nil
 }

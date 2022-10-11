@@ -120,7 +120,7 @@ func start(c *cli.Context) {
 		if err != nil {
 			log.Fatalf("Unable to connect to Cadence because of error %v", err)
 		}
-		unifiedClient = cadenceapi.NewCadenceClient(cadenceClient, closeFunc)
+		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, closeFunc)
 
 		for _, svcName := range services {
 			go launchCadenceService(svcName, config, unifiedClient, serviceClient, domain, closeFunc)

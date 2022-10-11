@@ -133,6 +133,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: search for workflows by a search attribute query
+  /api/v1/workflow/reset:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowResetRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowResetResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: reset a workflow
   /api/v1/workflowState/start:
     post:
       requestBody:
@@ -488,6 +509,58 @@ components:
           type: string
       required:
       - workflowId
+      - workflowRunId
+      type: object
+    WorkflowResetRequest:
+      example:
+        reason: reason
+        reset_bad_binary_checksum: reset_bad_binary_checksum
+        historyEventId: 0
+        earliest_time: earliest_time
+        decision_offset: 6
+        resetType: HISTORY_EVENT_ID
+        skip_signal_reapply: true
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        resetType:
+          enum:
+          - HISTORY_EVENT_ID
+          - FIRST_DECISION_COMPLETED
+          - LAST_DECISION_COMPLETED
+          - LAST_CONTINUED_AS_NEW
+          - BAD_BINARY
+          - DECISION_COMPLETED_TIME
+          - FIRST_DECISION_SCHEDULED
+          - LAST_DECISION_SCHEDULED
+          type: string
+        historyEventId:
+          type: integer
+        reason:
+          type: string
+        decision_offset:
+          type: integer
+        reset_bad_binary_checksum:
+          type: string
+        earliest_time:
+          type: string
+        skip_signal_reapply:
+          type: boolean
+      required:
+      - resetType
+      - workflowId
+      type: object
+    WorkflowResetResponse:
+      example:
+        workflowRunId: workflowRunId
+      properties:
+        workflowRunId:
+          type: string
+      required:
       - workflowRunId
       type: object
     WorkflowStateStartRequest:
