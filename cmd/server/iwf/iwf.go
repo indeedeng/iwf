@@ -30,6 +30,7 @@ import (
 	"go.temporal.io/sdk/client"
 	"log"
 	"strings"
+	"sync"
 )
 
 const serviceAPI = "api"
@@ -94,6 +95,9 @@ func start(c *cli.Context) {
 	} else {
 		panic("only support Temporal today")
 	}
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	wg.Wait()
 }
 
 func launchTemporalService(svcName string, config *service.Config, unifiedClient api.UnifiedClient, temporalClient client.Client) {
