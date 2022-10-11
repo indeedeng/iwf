@@ -222,14 +222,18 @@ components:
       type: object
     SearchAttribute:
       example:
+        stringValue: stringValue
         valueType: KEYWORD
-        value: value
+        integerValue: 0
         key: key
       properties:
         key:
           type: string
-        value:
+        stringValue:
           type: string
+        integerValue:
+          format: int64
+          type: integer
         valueType:
           enum:
           - KEYWORD
@@ -582,11 +586,13 @@ components:
           stateExecutionId: stateExecutionId
         workflowType: workflowType
         searchAttributes:
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
         stateInput:
           data: data
@@ -616,11 +622,13 @@ components:
     WorkflowStateStartResponse:
       example:
         upsertSearchAttributes:
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
         upsertStateLocalAttributes:
         - value:
@@ -638,9 +646,9 @@ components:
           - signalName: signalName
             commandId: commandId
           timerCommands:
-          - firingUnixTimestampSeconds: 6
+          - firingUnixTimestampSeconds: 1
             commandId: commandId
-          - firingUnixTimestampSeconds: 6
+          - firingUnixTimestampSeconds: 1
             commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
           activityCommands:
@@ -648,14 +656,14 @@ components:
               data: data
               encoding: encoding
             activityOptions:
-              startToCloseTimeoutSeconds: 0
+              startToCloseTimeoutSeconds: 6
             activityType: activityType
             commandId: commandId
           - input:
               data: data
               encoding: encoding
             activityOptions:
-              startToCloseTimeoutSeconds: 0
+              startToCloseTimeoutSeconds: 6
             activityType: activityType
             commandId: commandId
         upsertQueryAttributes:
@@ -745,11 +753,13 @@ components:
           stateExecutionId: stateExecutionId
         workflowType: workflowType
         searchAttributes:
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
         stateInput:
           data: data
@@ -786,11 +796,13 @@ components:
       example:
         stateDecision:
           upsertSearchAttributes:
-          - valueType: KEYWORD
-            value: value
+          - stringValue: stringValue
+            valueType: KEYWORD
+            integerValue: 0
             key: key
-          - valueType: KEYWORD
-            value: value
+          - stringValue: stringValue
+            valueType: KEYWORD
+            integerValue: 0
             key: key
           nextStates:
           - nextStateInput:
@@ -844,11 +856,13 @@ components:
     StateDecision:
       example:
         upsertSearchAttributes:
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
-        - valueType: KEYWORD
-          value: value
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
         nextStates:
         - nextStateInput:
@@ -948,9 +962,9 @@ components:
         - signalName: signalName
           commandId: commandId
         timerCommands:
-        - firingUnixTimestampSeconds: 6
+        - firingUnixTimestampSeconds: 1
           commandId: commandId
-        - firingUnixTimestampSeconds: 6
+        - firingUnixTimestampSeconds: 1
           commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
         activityCommands:
@@ -958,14 +972,14 @@ components:
             data: data
             encoding: encoding
           activityOptions:
-            startToCloseTimeoutSeconds: 0
+            startToCloseTimeoutSeconds: 6
           activityType: activityType
           commandId: commandId
         - input:
             data: data
             encoding: encoding
           activityOptions:
-            startToCloseTimeoutSeconds: 0
+            startToCloseTimeoutSeconds: 6
           activityType: activityType
           commandId: commandId
       properties:
@@ -1045,7 +1059,7 @@ components:
           data: data
           encoding: encoding
         activityOptions:
-          startToCloseTimeoutSeconds: 0
+          startToCloseTimeoutSeconds: 6
         activityType: activityType
         commandId: commandId
       properties:
@@ -1063,7 +1077,7 @@ components:
       type: object
     TimerCommand:
       example:
-        firingUnixTimestampSeconds: 6
+        firingUnixTimestampSeconds: 1
         commandId: commandId
       properties:
         commandId:
@@ -1090,7 +1104,7 @@ components:
       type: object
     ActivityOptions:
       example:
-        startToCloseTimeoutSeconds: 0
+        startToCloseTimeoutSeconds: 6
       properties:
         startToCloseTimeoutSeconds:
           type: integer

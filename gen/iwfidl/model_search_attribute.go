@@ -17,7 +17,8 @@ import (
 // SearchAttribute struct for SearchAttribute
 type SearchAttribute struct {
 	Key *string `json:"key,omitempty"`
-	Value *string `json:"value,omitempty"`
+	StringValue *string `json:"stringValue,omitempty"`
+	IntegerValue *int64 `json:"integerValue,omitempty"`
 	ValueType *string `json:"valueType,omitempty"`
 }
 
@@ -70,36 +71,68 @@ func (o *SearchAttribute) SetKey(v string) {
 	o.Key = &v
 }
 
-// GetValue returns the Value field value if set, zero value otherwise.
-func (o *SearchAttribute) GetValue() string {
-	if o == nil || o.Value == nil {
+// GetStringValue returns the StringValue field value if set, zero value otherwise.
+func (o *SearchAttribute) GetStringValue() string {
+	if o == nil || o.StringValue == nil {
 		var ret string
 		return ret
 	}
-	return *o.Value
+	return *o.StringValue
 }
 
-// GetValueOk returns a tuple with the Value field value if set, nil otherwise
+// GetStringValueOk returns a tuple with the StringValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *SearchAttribute) GetValueOk() (*string, bool) {
-	if o == nil || o.Value == nil {
+func (o *SearchAttribute) GetStringValueOk() (*string, bool) {
+	if o == nil || o.StringValue == nil {
 		return nil, false
 	}
-	return o.Value, true
+	return o.StringValue, true
 }
 
-// HasValue returns a boolean if a field has been set.
-func (o *SearchAttribute) HasValue() bool {
-	if o != nil && o.Value != nil {
+// HasStringValue returns a boolean if a field has been set.
+func (o *SearchAttribute) HasStringValue() bool {
+	if o != nil && o.StringValue != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetValue gets a reference to the given string and assigns it to the Value field.
-func (o *SearchAttribute) SetValue(v string) {
-	o.Value = &v
+// SetStringValue gets a reference to the given string and assigns it to the StringValue field.
+func (o *SearchAttribute) SetStringValue(v string) {
+	o.StringValue = &v
+}
+
+// GetIntegerValue returns the IntegerValue field value if set, zero value otherwise.
+func (o *SearchAttribute) GetIntegerValue() int64 {
+	if o == nil || o.IntegerValue == nil {
+		var ret int64
+		return ret
+	}
+	return *o.IntegerValue
+}
+
+// GetIntegerValueOk returns a tuple with the IntegerValue field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SearchAttribute) GetIntegerValueOk() (*int64, bool) {
+	if o == nil || o.IntegerValue == nil {
+		return nil, false
+	}
+	return o.IntegerValue, true
+}
+
+// HasIntegerValue returns a boolean if a field has been set.
+func (o *SearchAttribute) HasIntegerValue() bool {
+	if o != nil && o.IntegerValue != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetIntegerValue gets a reference to the given int64 and assigns it to the IntegerValue field.
+func (o *SearchAttribute) SetIntegerValue(v int64) {
+	o.IntegerValue = &v
 }
 
 // GetValueType returns the ValueType field value if set, zero value otherwise.
@@ -139,8 +172,11 @@ func (o SearchAttribute) MarshalJSON() ([]byte, error) {
 	if o.Key != nil {
 		toSerialize["key"] = o.Key
 	}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
+	if o.StringValue != nil {
+		toSerialize["stringValue"] = o.StringValue
+	}
+	if o.IntegerValue != nil {
+		toSerialize["integerValue"] = o.IntegerValue
 	}
 	if o.ValueType != nil {
 		toSerialize["valueType"] = o.ValueType

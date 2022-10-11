@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
-	"strconv"
 )
 
 type AttributeManager struct {
@@ -66,9 +65,9 @@ func (am *AttributeManager) ProcessUpsertSearchAttribute(attributes []iwfidl.Sea
 		am.searchAttributes[attr.GetKey()] = attr
 		switch attr.GetValueType() {
 		case service.SearchAttributeValueTypeKeyword:
-			attrsToUpsert[attr.GetKey()] = attr.GetValue()
+			attrsToUpsert[attr.GetKey()] = attr.GetStringValue()
 		case service.SearchAttributeValueTypeInt:
-			num, _ := strconv.Atoi(attr.GetValue())
+			num := attr.GetIntegerValue()
 			attrsToUpsert[attr.GetKey()] = num
 		default:
 			return fmt.Errorf("unsupported search attribute value type %v", attr.GetValueType())
