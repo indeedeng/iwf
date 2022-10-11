@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
+	"github.com/cadence-oss/iwf-server/service/interpreter/cadence"
 	"time"
 
 	"log"
@@ -54,18 +54,24 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 		StateInput:      req.GetStateInput(),
 		StateOptions:    req.GetStateOptions(),
 	}
-	runId, err := h.client.ExecuteWorkflow(context.Background(), workflowOptions, temporal.Interpreter, input)
+	runId, err := h.client.ExecuteWorkflow(context.Background(), workflowOptions, cadence.Interpreter, input)
 	if err != nil {
-		// TODO differentiate different error for different codes
-		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		})
+		handleError(c, err)
+		return
 	}
 
 	log.Println("Started workflow", "WorkflowID", req.WorkflowId, "RunID", runId)
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
+	})
+}
+
+func handleError(c *gin.Context, err error) {
+	// TODO differentiate different error for different codes
+	log.Println("encounter error for API", err)
+	c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
+		Detail: iwfidl.PtrString(err.Error()),
 	})
 }
 
@@ -80,10 +86,8 @@ func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
 	err := h.client.SignalWorkflow(context.Background(),
 		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalName(), req.GetSignalValue())
 	if err != nil {
-		// TODO differentiate different error for different codes
-		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		})
+		handleError(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, struct{}{})
 }
@@ -105,10 +109,8 @@ func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
 		Query:    req.GetQuery(),
 	})
 	if err != nil {
-		// TODO differentiate different error for different codes
-		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		})
+		handleError(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, iwfidl.WorkflowSearchResponse{
 		WorkflowExecutions: resp.Executions,
@@ -131,10 +133,8 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 		})
 
 	if err != nil {
-		// TODO differentiate different error for different codes
-		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		})
+		handleError(c, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowQueryResponse{
@@ -160,10 +160,8 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 
 	resp, err := h.client.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
 	if err != nil {
-		// TODO differentiate different error for different codes
-		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		})
+		handleError(c, err)
+		return
 	}
 
 	var output service.InterpreterWorkflowOutput
@@ -171,11 +169,8 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 		if resp.Status == service.WorkflowStatusCompleted || waitIfStillRunning {
 			err := h.client.GetWorkflowResult(context.Background(), &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 			if err != nil {
-				// TODO differentiate different error for different codes
-				// we need to describe the workflow again to get the right status here
-				c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-					Detail: iwfidl.PtrString(err.Error()),
-				})
+				handleError(c, err)
+				return
 			}
 		}
 	}
@@ -187,10 +182,8 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 	}
 
 	if err != nil {
-		// TODO differentiate different error for different codes
-		c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		})
+		handleError(c, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowGetResponse{

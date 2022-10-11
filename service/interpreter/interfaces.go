@@ -83,6 +83,7 @@ type WorkflowProvider interface {
 	Sleep(ctx UnifiedContext, d time.Duration) (err error)
 	GetSignalChannel(ctx UnifiedContext, signalName string) (receiveChannel ReceiveChannel)
 	GetContextValue(ctx UnifiedContext, key string) interface{}
+	GetBackendType() service.BackendType
 }
 
 type ReceiveChannel interface {

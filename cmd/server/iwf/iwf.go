@@ -77,6 +77,9 @@ func BuildCLI() *cli.App {
 	return app
 }
 
+const DefaultCadenceDomain = "default"
+const DefaultCadenceHostPort = "127.0.0.1:7833"
+
 func start(c *cli.Context) {
 	configPath := c.GlobalString("config")
 	config, err := service.NewConfig(configPath)
@@ -101,19 +104,19 @@ func start(c *cli.Context) {
 			go launchTemporalService(svcName, config, unifiedClient, temporalClient)
 		}
 	} else if config.Backend.Cadence != nil {
-		hostPort := "127.0.0.1:7833"
-		domain := "default"
+		hostPort := DefaultCadenceHostPort
+		domain := DefaultCadenceDomain
 		if config.Backend.Cadence.HostPort != "" {
 			hostPort = config.Backend.Cadence.HostPort
 		}
 		if config.Backend.Cadence.Domain != "" {
 			domain = config.Backend.Cadence.Domain
 		}
-		serviceClient, closeFunc, err := buildCadenceServiceClient(hostPort)
+		serviceClient, closeFunc, err := BuildCadenceServiceClient(hostPort)
 		if err != nil {
 			log.Fatalf("Unable to connect to Cadence because of error %v", err)
 		}
-		cadenceClient, err := buildCadenceClient(serviceClient, domain)
+		cadenceClient, err := BuildCadenceClient(serviceClient, domain)
 		if err != nil {
 			log.Fatalf("Unable to connect to Cadence because of error %v", err)
 		}
@@ -184,7 +187,7 @@ func getServices(c *cli.Context) []string {
 const _cadenceFrontendService = "cadence-frontend"
 const _cadenceClientName = "cadence-client"
 
-func buildCadenceClient(service workflowserviceclient.Interface, domain string) (cclient.Client, error) {
+func BuildCadenceClient(service workflowserviceclient.Interface, domain string) (cclient.Client, error) {
 	return cclient.NewClient(
 		service,
 		domain,
@@ -195,7 +198,7 @@ func buildCadenceClient(service workflowserviceclient.Interface, domain string) 
 		}), nil
 }
 
-func buildCadenceServiceClient(hostPort string) (workflowserviceclient.Interface, func(), error) {
+func BuildCadenceServiceClient(hostPort string) (workflowserviceclient.Interface, func(), error) {
 
 	dispatcher := yarpc.NewDispatcher(yarpc.Config{
 		Name: _cadenceClientName,

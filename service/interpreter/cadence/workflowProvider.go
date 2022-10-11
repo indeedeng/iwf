@@ -2,6 +2,7 @@ package cadence
 
 import (
 	"fmt"
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter"
 	"go.uber.org/cadence/workflow"
 	"time"
@@ -9,7 +10,11 @@ import (
 
 type workflowProvider struct{}
 
-var defaultWorkflowProvider = &workflowProvider{}
+var defaultWorkflowProvider interpreter.WorkflowProvider = &workflowProvider{}
+
+func (w *workflowProvider) GetBackendType() service.BackendType {
+	return service.BackendTypeCadence
+}
 
 func (w *workflowProvider) NewApplicationError(message, errType string, details ...interface{}) error {
 	return fmt.Errorf("application error: error type: %v, message %v, details %v", errType, message, details)
@@ -79,8 +84,20 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
+
+	// unlimited to match Temporal
+	unlimited := time.Hour * 24 * 365 * 1
+
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
-		StartToCloseTimeout: options.StartToCloseTimeout,
+		StartToCloseTimeout:    options.StartToCloseTimeout,
+		ScheduleToStartTimeout: unlimited,
+		RetryPolicy: &workflow.RetryPolicy{
+			InitialInterval:    time.Second,
+			BackoffCoefficient: 2,
+			MaximumInterval:    time.Second * 100,
+			MaximumAttempts:    0,
+			ExpirationInterval: unlimited,
+		},
 	})
 	return interpreter.NewUnifiedContext(wfCtx2)
 }

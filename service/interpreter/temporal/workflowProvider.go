@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
@@ -9,7 +10,11 @@ import (
 
 type workflowProvider struct{}
 
-var defaultWorkflowProvider = &workflowProvider{}
+var defaultWorkflowProvider interpreter.WorkflowProvider = &workflowProvider{}
+
+func (w *workflowProvider) GetBackendType() service.BackendType {
+	return service.BackendTypeTemporal
+}
 
 func (w *workflowProvider) NewApplicationError(message, errType string, details ...interface{}) error {
 	return temporal.NewApplicationError(message, errType, details...)
