@@ -5,7 +5,7 @@ A simple and powerful WorkflowAsCode general purpose workflow engine
 Back by Cadence/Temporal as an interpreter.
 
 Related projects:
-* [iWF Java SDK](https://github.com/cadence-oss/iwf-java)
+* [iWF Java SDK](https://github.com/cadence-oss/iwf-java) and [Java SDK API preview](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
 * [iWF Java Samples](https://github.com/cadence-oss/iwf-java-samples)
 * [API schema](https://github.com/cadence-oss/iwf-idl)
 
@@ -16,8 +16,9 @@ Related projects:
 
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
-* Then run  `./iwf-server start` to run the service . This defaults to searve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
-* Run `make integTests` to run all integration tests
+* Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
+* Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below instructions for setting up local Cadence. 
+* Run `make integTests` to run all integration tests. This by default requires to have both local Cadence and Temporal to be set up.
 
 ## Development
 
