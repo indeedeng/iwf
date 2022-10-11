@@ -17,6 +17,10 @@ func TestAttributeWorkflowTemporal(t *testing.T) {
 	doTestAttributeWorkflow(t, service.BackendTypeTemporal)
 }
 
+func TestAttributeWorkflowCadence(t *testing.T) {
+	doTestAttributeWorkflow(t, service.BackendTypeCadence)
+}
+
 func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	wfHandler := attribute.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)

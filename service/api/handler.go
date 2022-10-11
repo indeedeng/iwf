@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter/cadence"
 	"time"
 
 	"log"
@@ -54,7 +53,7 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 		StateInput:      req.GetStateInput(),
 		StateOptions:    req.GetStateOptions(),
 	}
-	runId, err := h.client.ExecuteWorkflow(context.Background(), workflowOptions, cadence.Interpreter, input)
+	runId, err := h.client.StartInterpreterWorkflow(context.Background(), workflowOptions, input)
 	if err != nil {
 		handleError(c, err)
 		return

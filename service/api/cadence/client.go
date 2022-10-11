@@ -6,6 +6,7 @@ import (
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
+	"github.com/cadence-oss/iwf-server/service/interpreter/cadence"
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
 )
@@ -26,14 +27,14 @@ func (t *cadenceClient) Close() {
 	t.closeFunc()
 }
 
-func (t *cadenceClient) ExecuteWorkflow(ctx context.Context, options api.StartWorkflowOptions, workflow interface{}, args ...interface{}) (runId string, err error) {
+func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
 		ExecutionStartToCloseTimeout: options.WorkflowRunTimeout,
 	}
 
-	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, workflow, args...)
+	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
 	if err != nil {
 		return "", err
 	}

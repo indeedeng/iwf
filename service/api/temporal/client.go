@@ -6,6 +6,7 @@ import (
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/api"
+	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/sdk/client"
@@ -25,14 +26,14 @@ func (t *temporalClient) Close() {
 	t.tClient.Close()
 }
 
-func (t *temporalClient) ExecuteWorkflow(ctx context.Context, options api.StartWorkflowOptions, workflow interface{}, args ...interface{}) (runId string, err error) {
+func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                 options.ID,
 		TaskQueue:          options.TaskQueue,
 		WorkflowRunTimeout: options.WorkflowRunTimeout,
 	}
 
-	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, workflow, args...)
+	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)
 	if err != nil {
 		return "", err
 	}

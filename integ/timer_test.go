@@ -13,7 +13,15 @@ import (
 	"time"
 )
 
-func TestTimerWorkflow(t *testing.T) {
+func TestTimerWorkflowTemporal(t *testing.T) {
+	doTestTimerWorkflow(t, service.BackendTypeTemporal)
+}
+
+func TestTimerWorkflowCadence(t *testing.T) {
+	doTestTimerWorkflow(t, service.BackendTypeCadence)
+}
+
+func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
 	wfHandler := timer.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
