@@ -13,13 +13,21 @@ import (
 	"time"
 )
 
-func TestSignalWorkflow(t *testing.T) {
+func TestSignalWorkflowTemporal(t *testing.T) {
+	doTestSignalWorkflow(t, service.BackendTypeTemporal)
+}
+
+func TestSignalWorkflowCadence(t *testing.T) {
+	doTestSignalWorkflow(t, service.BackendTypeCadence)
+}
+
+func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(service.BackendTypeTemporal)
+	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
 
 	// start a workflow

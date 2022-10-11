@@ -5,7 +5,7 @@ A simple and powerful WorkflowAsCode general purpose workflow engine
 Back by Cadence/Temporal as an interpreter.
 
 Related projects:
-* [iWF Java SDK](https://github.com/cadence-oss/iwf-java)
+* [iWF Java SDK](https://github.com/cadence-oss/iwf-java) and [Java SDK API preview](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
 * [iWF Java Samples](https://github.com/cadence-oss/iwf-java-samples)
 * [API schema](https://github.com/cadence-oss/iwf-idl)
 
@@ -16,8 +16,9 @@ Related projects:
 
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
-* Then run  `./iwf-server start` to run the service . This defaults to searve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
-* Run `make integTests` to run all integration tests
+* Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
+* Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below instructions for setting up local Cadence. 
+* Run `make integTests` to run all integration tests. This by default requires to have both local Cadence and Temporal to be set up.
 
 ## Development
 
@@ -29,14 +30,15 @@ Related projects:
 
 
 ### Run with local Temporalite
-1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. Go to http://localhost:8233/ for Temporal WebUI
+1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. 
+2. Go to http://localhost:8233/ for Temporal WebUI
 
-### Run with local Temporal server with Search attributes enabled(back by ElasticSearch)
-* WHY: Temporalite doesn't support Search Attributes, which is one of the important features in iWF. 
-Go to (=[Temporal-dockercompose](https://github.com/temporalio/docker-compose) to set it up
+NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporalio/docker-compose) to run with docker
 
 ### Run with local Cadence
-TODO
+1. Run a local Cadence server following the [instructions](https://github.com/uber/cadence/tree/master/docker)
+2. Register a new domain if not haven `cadence --do default domain register`
+3. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
 # Development Plan
 ## 1.0

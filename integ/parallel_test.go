@@ -13,13 +13,21 @@ import (
 	"time"
 )
 
-func TestPrallelWorkflow(t *testing.T) {
+func TestParallelWorkflowTemporal(t *testing.T) {
+	doTestParallelWorkflow(t, service.BackendTypeTemporal)
+}
+
+func TestParallelWorkflowCadence(t *testing.T) {
+	doTestParallelWorkflow(t, service.BackendTypeCadence)
+}
+
+func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
 	wfHandler := parallel.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(service.BackendTypeTemporal)
+	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
 
 	// start a workflow
@@ -53,7 +61,7 @@ func TestPrallelWorkflow(t *testing.T) {
 		NeedsResults: iwfidl.PtrBool(true),
 	}).Execute()
 	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
+		log.Fatalf("Fail to invoke get with long wait api %v", err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)

@@ -1,10 +1,10 @@
-package temporal
+package cadence
 
 import (
+	"fmt"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/cadence-oss/iwf-server/service/interpreter"
-	"go.temporal.io/sdk/temporal"
-	"go.temporal.io/sdk/workflow"
+	"go.uber.org/cadence/workflow"
 	"time"
 )
 
@@ -13,11 +13,11 @@ type workflowProvider struct{}
 var defaultWorkflowProvider interpreter.WorkflowProvider = &workflowProvider{}
 
 func (w *workflowProvider) GetBackendType() service.BackendType {
-	return service.BackendTypeTemporal
+	return service.BackendTypeCadence
 }
 
 func (w *workflowProvider) NewApplicationError(message, errType string, details ...interface{}) error {
-	return temporal.NewApplicationError(message, errType, details...)
+	return fmt.Errorf("application error: error type: %v, message %v, details %v", errType, message, details)
 }
 
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {
@@ -39,7 +39,7 @@ func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) inter
 			ID:    info.WorkflowExecution.ID,
 			RunID: info.WorkflowExecution.RunID,
 		},
-		WorkflowStartTime: info.WorkflowStartTime,
+		WorkflowStartTime: time.UnixMilli(0), // TODO need to file a ticket to support this in Cadence
 	}
 }
 
@@ -84,8 +84,20 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
+
+	// unlimited to match Temporal
+	unlimited := time.Hour * 24 * 365 * 1
+
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
-		StartToCloseTimeout: options.StartToCloseTimeout,
+		StartToCloseTimeout:    options.StartToCloseTimeout,
+		ScheduleToStartTimeout: unlimited,
+		RetryPolicy: &workflow.RetryPolicy{
+			InitialInterval:    time.Second,
+			BackoffCoefficient: 2,
+			MaximumInterval:    time.Second * 100,
+			MaximumAttempts:    0,
+			ExpirationInterval: unlimited,
+		},
 	})
 	return interpreter.NewUnifiedContext(wfCtx2)
 }
@@ -130,11 +142,11 @@ func (w *workflowProvider) Sleep(ctx interpreter.UnifiedContext, d time.Duration
 	return workflow.Sleep(wfCtx, d)
 }
 
-type temporalReceiveChannel struct {
-	channel workflow.ReceiveChannel
+type cadenceReceiveChannel struct {
+	channel workflow.Channel
 }
 
-func (t *temporalReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr interface{}) (more bool) {
+func (t *cadenceReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr interface{}) (more bool) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
@@ -148,7 +160,7 @@ func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, sign
 		panic("cannot convert to temporal workflow context")
 	}
 	wfChan := workflow.GetSignalChannel(wfCtx, signalName)
-	return &temporalReceiveChannel{
+	return &cadenceReceiveChannel{
 		channel: wfChan,
 	}
 }
