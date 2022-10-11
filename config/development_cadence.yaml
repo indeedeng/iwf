@@ -1,0 +1,7 @@
+
+api:
+  port: 8801
+backend:
+  cadence:
+    hostPort: 127.0.0.1:7833
+    domain: default

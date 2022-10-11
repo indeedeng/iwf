@@ -8,6 +8,7 @@ require (
 	go.temporal.io/sdk v1.16.0
 	go.temporal.io/sdk/contrib/tools/workflowcheck v0.0.0-20220331154559-fd0d1eb548eb
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
+	go.uber.org/cadence v0.19.0
 )
 
 require (

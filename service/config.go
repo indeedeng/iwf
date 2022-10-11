@@ -22,6 +22,8 @@ type (
 	Backend struct {
 		// Temporal config is the config to connect to Temporal
 		Temporal *TemporalConfig `yaml:"temporal"`
+		// Cadence config is the config to connect to Cadence
+		Cadence *CadenceConfig `yaml:"cadence"`
 	}
 
 	TemporalConfig struct {
@@ -29,6 +31,13 @@ type (
 		HostPort string `yaml:"hostPort"`
 		// Namespace to connect to, default to default
 		Namespace string `yaml:"namespace"`
+	}
+
+	CadenceConfig struct {
+		// HostPort to connect to, default to 127.0.0.1:7833
+		HostPort string `yaml:"hostPort"`
+		// Domain to connect to, default to default
+		Domain string `yaml:"domain"`
 	}
 )
 

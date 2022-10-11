@@ -92,8 +92,18 @@ func start(c *cli.Context) {
 		for _, svcName := range services {
 			go launchTemporalService(svcName, config, unifiedClient, temporalClient)
 		}
+	} else if config.Backend.Cadence != nil {
+		hostPort := "127.0.0.1:7833"
+		domain := "default"
+		if config.Backend.Cadence.HostPort != "" {
+			hostPort = config.Backend.Cadence.HostPort
+		}
+		if config.Backend.Cadence.Domain != "" {
+			domain = config.Backend.Cadence.Domain
+		}
+
 	} else {
-		panic("only support Temporal today")
+		panic("must provide either Cadence or Temporal config")
 	}
 	wg := sync.WaitGroup{}
 	wg.Add(1)
