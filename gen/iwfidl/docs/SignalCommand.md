@@ -5,13 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | **string** |  | 
-**SignalName** | **string** |  | 
+**SignalChannelName** | **string** |  | 
 
 ## Methods
 
 ### NewSignalCommand
 
-`func NewSignalCommand(commandId string, signalName string, ) *SignalCommand`
+`func NewSignalCommand(commandId string, signalChannelName string, ) *SignalCommand`
 
 NewSignalCommand instantiates a new SignalCommand object
 This constructor will assign default values to properties that have it defined,
@@ -46,24 +46,24 @@ and a boolean to check if the value has been set.
 SetCommandId sets CommandId field to given value.
 
 
-### GetSignalName
+### GetSignalChannelName
 
-`func (o *SignalCommand) GetSignalName() string`
+`func (o *SignalCommand) GetSignalChannelName() string`
 
-GetSignalName returns the SignalName field if non-nil, zero value otherwise.
+GetSignalChannelName returns the SignalChannelName field if non-nil, zero value otherwise.
 
-### GetSignalNameOk
+### GetSignalChannelNameOk
 
-`func (o *SignalCommand) GetSignalNameOk() (*string, bool)`
+`func (o *SignalCommand) GetSignalChannelNameOk() (*string, bool)`
 
-GetSignalNameOk returns a tuple with the SignalName field if it's non-nil, zero value otherwise
+GetSignalChannelNameOk returns a tuple with the SignalChannelName field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetSignalName
+### SetSignalChannelName
 
-`func (o *SignalCommand) SetSignalName(v string)`
+`func (o *SignalCommand) SetSignalChannelName(v string)`
 
-SetSignalName sets SignalName field to given value.
+SetSignalChannelName sets SignalChannelName field to given value.
 
 
 

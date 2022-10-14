@@ -44,8 +44,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
 						{
-							CommandId:  "signal-cmd-id",
-							SignalName: SignalName,
+							CommandId:         "signal-cmd-id",
+							SignalChannelName: SignalName,
 						},
 					},
 					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,

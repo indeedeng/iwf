@@ -352,7 +352,7 @@ components:
       type: object
     WorkflowSignalRequest:
       example:
-        signalName: signalName
+        signalChannelName: signalChannelName
         workflowRunId: workflowRunId
         workflowId: workflowId
         signalValue:
@@ -363,12 +363,12 @@ components:
           type: string
         workflowRunId:
           type: string
-        signalName:
+        signalChannelName:
           type: string
         signalValue:
           $ref: '#/components/schemas/EncodedObject'
       required:
-      - signalName
+      - signalChannelName
       - workflowId
       type: object
     WorkflowQueryRequest:
@@ -641,9 +641,9 @@ components:
           key: key
         commandRequest:
           signalCommands:
-          - signalName: signalName
+          - signalChannelName: signalChannelName
             commandId: commandId
-          - signalName: signalName
+          - signalChannelName: signalChannelName
             commandId: commandId
           timerCommands:
           - firingUnixTimestampSeconds: 1
@@ -714,15 +714,15 @@ components:
           key: key
         commandResults:
           signalResults:
-          - signalName: signalName
+          - signalRequestStatus: WAITING
+            signalChannelName: signalChannelName
             commandId: commandId
-            signalStatus: WAITING
             signalValue:
               data: data
               encoding: encoding
-          - signalName: signalName
+          - signalRequestStatus: WAITING
+            signalChannelName: signalChannelName
             commandId: commandId
-            signalStatus: WAITING
             signalValue:
               data: data
               encoding: encoding
@@ -957,9 +957,9 @@ components:
     CommandRequest:
       example:
         signalCommands:
-        - signalName: signalName
+        - signalChannelName: signalChannelName
           commandId: commandId
-        - signalName: signalName
+        - signalChannelName: signalChannelName
           commandId: commandId
         timerCommands:
         - firingUnixTimestampSeconds: 1
@@ -1007,15 +1007,15 @@ components:
     CommandResults:
       example:
         signalResults:
-        - signalName: signalName
+        - signalRequestStatus: WAITING
+          signalChannelName: signalChannelName
           commandId: commandId
-          signalStatus: WAITING
           signalValue:
             data: data
             encoding: encoding
-        - signalName: signalName
+        - signalRequestStatus: WAITING
+          signalChannelName: signalChannelName
           commandId: commandId
-          signalStatus: WAITING
           signalValue:
             data: data
             encoding: encoding
@@ -1091,16 +1091,16 @@ components:
       type: object
     SignalCommand:
       example:
-        signalName: signalName
+        signalChannelName: signalChannelName
         commandId: commandId
       properties:
         commandId:
           type: string
-        signalName:
+        signalChannelName:
           type: string
       required:
       - commandId
-      - signalName
+      - signalChannelName
       type: object
     ActivityOptions:
       example:
@@ -1162,28 +1162,28 @@ components:
       type: object
     SignalResult:
       example:
-        signalName: signalName
+        signalRequestStatus: WAITING
+        signalChannelName: signalChannelName
         commandId: commandId
-        signalStatus: WAITING
         signalValue:
           data: data
           encoding: encoding
       properties:
         commandId:
           type: string
-        signalStatus:
+        signalRequestStatus:
           enum:
           - WAITING
           - RECEIVED
           type: string
-        signalName:
+        signalChannelName:
           type: string
         signalValue:
           $ref: '#/components/schemas/EncodedObject'
       required:
       - commandId
-      - signalName
-      - signalStatus
+      - signalChannelName
+      - signalRequestStatus
       type: object
     Context:
       example:

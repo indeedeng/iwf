@@ -5,15 +5,15 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | **string** |  | 
-**SignalStatus** | **string** |  | 
-**SignalName** | **string** |  | 
+**SignalRequestStatus** | **string** |  | 
+**SignalChannelName** | **string** |  | 
 **SignalValue** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 
 ## Methods
 
 ### NewSignalResult
 
-`func NewSignalResult(commandId string, signalStatus string, signalName string, ) *SignalResult`
+`func NewSignalResult(commandId string, signalRequestStatus string, signalChannelName string, ) *SignalResult`
 
 NewSignalResult instantiates a new SignalResult object
 This constructor will assign default values to properties that have it defined,
@@ -48,44 +48,44 @@ and a boolean to check if the value has been set.
 SetCommandId sets CommandId field to given value.
 
 
-### GetSignalStatus
+### GetSignalRequestStatus
 
-`func (o *SignalResult) GetSignalStatus() string`
+`func (o *SignalResult) GetSignalRequestStatus() string`
 
-GetSignalStatus returns the SignalStatus field if non-nil, zero value otherwise.
+GetSignalRequestStatus returns the SignalRequestStatus field if non-nil, zero value otherwise.
 
-### GetSignalStatusOk
+### GetSignalRequestStatusOk
 
-`func (o *SignalResult) GetSignalStatusOk() (*string, bool)`
+`func (o *SignalResult) GetSignalRequestStatusOk() (*string, bool)`
 
-GetSignalStatusOk returns a tuple with the SignalStatus field if it's non-nil, zero value otherwise
+GetSignalRequestStatusOk returns a tuple with the SignalRequestStatus field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetSignalStatus
+### SetSignalRequestStatus
 
-`func (o *SignalResult) SetSignalStatus(v string)`
+`func (o *SignalResult) SetSignalRequestStatus(v string)`
 
-SetSignalStatus sets SignalStatus field to given value.
+SetSignalRequestStatus sets SignalRequestStatus field to given value.
 
 
-### GetSignalName
+### GetSignalChannelName
 
-`func (o *SignalResult) GetSignalName() string`
+`func (o *SignalResult) GetSignalChannelName() string`
 
-GetSignalName returns the SignalName field if non-nil, zero value otherwise.
+GetSignalChannelName returns the SignalChannelName field if non-nil, zero value otherwise.
 
-### GetSignalNameOk
+### GetSignalChannelNameOk
 
-`func (o *SignalResult) GetSignalNameOk() (*string, bool)`
+`func (o *SignalResult) GetSignalChannelNameOk() (*string, bool)`
 
-GetSignalNameOk returns a tuple with the SignalName field if it's non-nil, zero value otherwise
+GetSignalChannelNameOk returns a tuple with the SignalChannelName field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetSignalName
+### SetSignalChannelName
 
-`func (o *SignalResult) SetSignalName(v string)`
+`func (o *SignalResult) SetSignalChannelName(v string)`
 
-SetSignalName sets SignalName field to given value.
+SetSignalChannelName sets SignalChannelName field to given value.
 
 
 ### GetSignalValue

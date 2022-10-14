@@ -17,17 +17,17 @@ import (
 // SignalCommand struct for SignalCommand
 type SignalCommand struct {
 	CommandId string `json:"commandId"`
-	SignalName string `json:"signalName"`
+	SignalChannelName string `json:"signalChannelName"`
 }
 
 // NewSignalCommand instantiates a new SignalCommand object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSignalCommand(commandId string, signalName string) *SignalCommand {
+func NewSignalCommand(commandId string, signalChannelName string) *SignalCommand {
 	this := SignalCommand{}
 	this.CommandId = commandId
-	this.SignalName = signalName
+	this.SignalChannelName = signalChannelName
 	return &this
 }
 
@@ -63,28 +63,28 @@ func (o *SignalCommand) SetCommandId(v string) {
 	o.CommandId = v
 }
 
-// GetSignalName returns the SignalName field value
-func (o *SignalCommand) GetSignalName() string {
+// GetSignalChannelName returns the SignalChannelName field value
+func (o *SignalCommand) GetSignalChannelName() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.SignalName
+	return o.SignalChannelName
 }
 
-// GetSignalNameOk returns a tuple with the SignalName field value
+// GetSignalChannelNameOk returns a tuple with the SignalChannelName field value
 // and a boolean to check if the value has been set.
-func (o *SignalCommand) GetSignalNameOk() (*string, bool) {
+func (o *SignalCommand) GetSignalChannelNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.SignalName, true
+	return &o.SignalChannelName, true
 }
 
-// SetSignalName sets field value
-func (o *SignalCommand) SetSignalName(v string) {
-	o.SignalName = v
+// SetSignalChannelName sets field value
+func (o *SignalCommand) SetSignalChannelName(v string) {
+	o.SignalChannelName = v
 }
 
 func (o SignalCommand) MarshalJSON() ([]byte, error) {
@@ -93,7 +93,7 @@ func (o SignalCommand) MarshalJSON() ([]byte, error) {
 		toSerialize["commandId"] = o.CommandId
 	}
 	if true {
-		toSerialize["signalName"] = o.SignalName
+		toSerialize["signalChannelName"] = o.SignalChannelName
 	}
 	return json.Marshal(toSerialize)
 }

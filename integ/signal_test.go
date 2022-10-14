@@ -62,9 +62,9 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	//err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, signalVal)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 	httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
-		WorkflowId:  wfId,
-		SignalName:  signal.SignalName,
-		SignalValue: &signalVal,
+		WorkflowId:        wfId,
+		SignalChannelName: signal.SignalName,
+		SignalValue:       &signalVal,
 	}).Execute()
 
 	if err != nil || httpResp2.StatusCode != 200 {
