@@ -5,9 +5,10 @@ A simple and powerful WorkflowAsCode general purpose workflow engine
 Back by Cadence/Temporal as an interpreter.
 
 Related projects:
-* [iWF Java SDK](https://github.com/cadence-oss/iwf-java) and [Java SDK API preview](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
-* [iWF Java Samples](https://github.com/cadence-oss/iwf-java-samples)
-* [API schema](https://github.com/cadence-oss/iwf-idl)
+* [iWF Java SDK](https://github.com/indeedeng/iwf-java) and [Java SDK API preview](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
+* [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
+* [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk)
+* [API schema](https://github.com/indeedeng/iwf-idl)
 
 # What & Why
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
