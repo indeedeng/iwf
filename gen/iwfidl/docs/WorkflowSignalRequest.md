@@ -6,14 +6,14 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
-**SignalName** | **string** |  | 
+**SignalChannelName** | **string** |  | 
 **SignalValue** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 
 ## Methods
 
 ### NewWorkflowSignalRequest
 
-`func NewWorkflowSignalRequest(workflowId string, signalName string, ) *WorkflowSignalRequest`
+`func NewWorkflowSignalRequest(workflowId string, signalChannelName string, ) *WorkflowSignalRequest`
 
 NewWorkflowSignalRequest instantiates a new WorkflowSignalRequest object
 This constructor will assign default values to properties that have it defined,
@@ -73,24 +73,24 @@ SetWorkflowRunId sets WorkflowRunId field to given value.
 
 HasWorkflowRunId returns a boolean if a field has been set.
 
-### GetSignalName
+### GetSignalChannelName
 
-`func (o *WorkflowSignalRequest) GetSignalName() string`
+`func (o *WorkflowSignalRequest) GetSignalChannelName() string`
 
-GetSignalName returns the SignalName field if non-nil, zero value otherwise.
+GetSignalChannelName returns the SignalChannelName field if non-nil, zero value otherwise.
 
-### GetSignalNameOk
+### GetSignalChannelNameOk
 
-`func (o *WorkflowSignalRequest) GetSignalNameOk() (*string, bool)`
+`func (o *WorkflowSignalRequest) GetSignalChannelNameOk() (*string, bool)`
 
-GetSignalNameOk returns a tuple with the SignalName field if it's non-nil, zero value otherwise
+GetSignalChannelNameOk returns a tuple with the SignalChannelName field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetSignalName
+### SetSignalChannelName
 
-`func (o *WorkflowSignalRequest) SetSignalName(v string)`
+`func (o *WorkflowSignalRequest) SetSignalChannelName(v string)`
 
-SetSignalName sets SignalName field to given value.
+SetSignalChannelName sets SignalChannelName field to given value.
 
 
 ### GetSignalValue

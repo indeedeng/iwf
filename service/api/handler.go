@@ -83,7 +83,7 @@ func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
 	log.Println("received request", req)
 
 	err := h.client.SignalWorkflow(context.Background(),
-		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalName(), req.GetSignalValue())
+		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalChannelName(), req.GetSignalValue())
 	if err != nil {
 		handleError(c, err)
 		return

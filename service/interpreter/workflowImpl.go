@@ -228,7 +228,7 @@ func executeState(
 				if !ok {
 					panic("critical code bug")
 				}
-				ch := provider.GetSignalChannel(ctx, cmd.GetSignalName())
+				ch := provider.GetSignalChannel(ctx, cmd.GetSignalChannelName())
 				value := iwfidl.EncodedObject{}
 				ch.Receive(ctx, &value)
 				completedSignalCmds[cmd.GetCommandId()] = &value
@@ -266,10 +266,10 @@ func executeState(
 		var signalResults []iwfidl.SignalResult
 		for _, cmd := range commandReq.GetSignalCommands() {
 			signalResults = append(signalResults, iwfidl.SignalResult{
-				CommandId:    cmd.GetCommandId(),
-				SignalName:   cmd.GetSignalName(),
-				SignalValue:  completedSignalCmds[cmd.GetCommandId()],
-				SignalStatus: service.SignalStatusReceived,
+				CommandId:           cmd.GetCommandId(),
+				SignalChannelName:   cmd.GetSignalChannelName(),
+				SignalValue:         completedSignalCmds[cmd.GetCommandId()],
+				SignalRequestStatus: service.SignalStatusReceived,
 			})
 		}
 		commandRes.SetSignalResults(signalResults)

@@ -18,7 +18,7 @@ import (
 type WorkflowSignalRequest struct {
 	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	SignalName string `json:"signalName"`
+	SignalChannelName string `json:"signalChannelName"`
 	SignalValue *EncodedObject `json:"signalValue,omitempty"`
 }
 
@@ -26,10 +26,10 @@ type WorkflowSignalRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowSignalRequest(workflowId string, signalName string) *WorkflowSignalRequest {
+func NewWorkflowSignalRequest(workflowId string, signalChannelName string) *WorkflowSignalRequest {
 	this := WorkflowSignalRequest{}
 	this.WorkflowId = workflowId
-	this.SignalName = signalName
+	this.SignalChannelName = signalChannelName
 	return &this
 }
 
@@ -97,28 +97,28 @@ func (o *WorkflowSignalRequest) SetWorkflowRunId(v string) {
 	o.WorkflowRunId = &v
 }
 
-// GetSignalName returns the SignalName field value
-func (o *WorkflowSignalRequest) GetSignalName() string {
+// GetSignalChannelName returns the SignalChannelName field value
+func (o *WorkflowSignalRequest) GetSignalChannelName() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.SignalName
+	return o.SignalChannelName
 }
 
-// GetSignalNameOk returns a tuple with the SignalName field value
+// GetSignalChannelNameOk returns a tuple with the SignalChannelName field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowSignalRequest) GetSignalNameOk() (*string, bool) {
+func (o *WorkflowSignalRequest) GetSignalChannelNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.SignalName, true
+	return &o.SignalChannelName, true
 }
 
-// SetSignalName sets field value
-func (o *WorkflowSignalRequest) SetSignalName(v string) {
-	o.SignalName = v
+// SetSignalChannelName sets field value
+func (o *WorkflowSignalRequest) SetSignalChannelName(v string) {
+	o.SignalChannelName = v
 }
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
@@ -162,7 +162,7 @@ func (o WorkflowSignalRequest) MarshalJSON() ([]byte, error) {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	if true {
-		toSerialize["signalName"] = o.SignalName
+		toSerialize["signalChannelName"] = o.SignalChannelName
 	}
 	if o.SignalValue != nil {
 		toSerialize["signalValue"] = o.SignalValue

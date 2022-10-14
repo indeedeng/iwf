@@ -17,8 +17,8 @@ import (
 // SignalResult struct for SignalResult
 type SignalResult struct {
 	CommandId string `json:"commandId"`
-	SignalStatus string `json:"signalStatus"`
-	SignalName string `json:"signalName"`
+	SignalRequestStatus string `json:"signalRequestStatus"`
+	SignalChannelName string `json:"signalChannelName"`
 	SignalValue *EncodedObject `json:"signalValue,omitempty"`
 }
 
@@ -26,11 +26,11 @@ type SignalResult struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSignalResult(commandId string, signalStatus string, signalName string) *SignalResult {
+func NewSignalResult(commandId string, signalRequestStatus string, signalChannelName string) *SignalResult {
 	this := SignalResult{}
 	this.CommandId = commandId
-	this.SignalStatus = signalStatus
-	this.SignalName = signalName
+	this.SignalRequestStatus = signalRequestStatus
+	this.SignalChannelName = signalChannelName
 	return &this
 }
 
@@ -66,52 +66,52 @@ func (o *SignalResult) SetCommandId(v string) {
 	o.CommandId = v
 }
 
-// GetSignalStatus returns the SignalStatus field value
-func (o *SignalResult) GetSignalStatus() string {
+// GetSignalRequestStatus returns the SignalRequestStatus field value
+func (o *SignalResult) GetSignalRequestStatus() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.SignalStatus
+	return o.SignalRequestStatus
 }
 
-// GetSignalStatusOk returns a tuple with the SignalStatus field value
+// GetSignalRequestStatusOk returns a tuple with the SignalRequestStatus field value
 // and a boolean to check if the value has been set.
-func (o *SignalResult) GetSignalStatusOk() (*string, bool) {
+func (o *SignalResult) GetSignalRequestStatusOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.SignalStatus, true
+	return &o.SignalRequestStatus, true
 }
 
-// SetSignalStatus sets field value
-func (o *SignalResult) SetSignalStatus(v string) {
-	o.SignalStatus = v
+// SetSignalRequestStatus sets field value
+func (o *SignalResult) SetSignalRequestStatus(v string) {
+	o.SignalRequestStatus = v
 }
 
-// GetSignalName returns the SignalName field value
-func (o *SignalResult) GetSignalName() string {
+// GetSignalChannelName returns the SignalChannelName field value
+func (o *SignalResult) GetSignalChannelName() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.SignalName
+	return o.SignalChannelName
 }
 
-// GetSignalNameOk returns a tuple with the SignalName field value
+// GetSignalChannelNameOk returns a tuple with the SignalChannelName field value
 // and a boolean to check if the value has been set.
-func (o *SignalResult) GetSignalNameOk() (*string, bool) {
+func (o *SignalResult) GetSignalChannelNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.SignalName, true
+	return &o.SignalChannelName, true
 }
 
-// SetSignalName sets field value
-func (o *SignalResult) SetSignalName(v string) {
-	o.SignalName = v
+// SetSignalChannelName sets field value
+func (o *SignalResult) SetSignalChannelName(v string) {
+	o.SignalChannelName = v
 }
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
@@ -152,10 +152,10 @@ func (o SignalResult) MarshalJSON() ([]byte, error) {
 		toSerialize["commandId"] = o.CommandId
 	}
 	if true {
-		toSerialize["signalStatus"] = o.SignalStatus
+		toSerialize["signalRequestStatus"] = o.SignalRequestStatus
 	}
 	if true {
-		toSerialize["signalName"] = o.SignalName
+		toSerialize["signalChannelName"] = o.SignalChannelName
 	}
 	if o.SignalValue != nil {
 		toSerialize["signalValue"] = o.SignalValue
