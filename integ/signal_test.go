@@ -72,7 +72,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	}
 
 	// wait for the workflow
-	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background())
+	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId:   wfId,
 		NeedsResults: iwfidl.PtrBool(true),

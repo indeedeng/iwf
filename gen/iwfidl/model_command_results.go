@@ -19,6 +19,7 @@ type CommandResults struct {
 	ActivityResults []ActivityResult `json:"activityResults,omitempty"`
 	SignalResults []SignalResult `json:"signalResults,omitempty"`
 	TimerResults []TimerResult `json:"timerResults,omitempty"`
+	OnQueryAttributeChangeResults []OnQueryAttributeChangeResult `json:"onQueryAttributeChangeResults,omitempty"`
 }
 
 // NewCommandResults instantiates a new CommandResults object
@@ -134,6 +135,38 @@ func (o *CommandResults) SetTimerResults(v []TimerResult) {
 	o.TimerResults = v
 }
 
+// GetOnQueryAttributeChangeResults returns the OnQueryAttributeChangeResults field value if set, zero value otherwise.
+func (o *CommandResults) GetOnQueryAttributeChangeResults() []OnQueryAttributeChangeResult {
+	if o == nil || o.OnQueryAttributeChangeResults == nil {
+		var ret []OnQueryAttributeChangeResult
+		return ret
+	}
+	return o.OnQueryAttributeChangeResults
+}
+
+// GetOnQueryAttributeChangeResultsOk returns a tuple with the OnQueryAttributeChangeResults field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandResults) GetOnQueryAttributeChangeResultsOk() ([]OnQueryAttributeChangeResult, bool) {
+	if o == nil || o.OnQueryAttributeChangeResults == nil {
+		return nil, false
+	}
+	return o.OnQueryAttributeChangeResults, true
+}
+
+// HasOnQueryAttributeChangeResults returns a boolean if a field has been set.
+func (o *CommandResults) HasOnQueryAttributeChangeResults() bool {
+	if o != nil && o.OnQueryAttributeChangeResults != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetOnQueryAttributeChangeResults gets a reference to the given []OnQueryAttributeChangeResult and assigns it to the OnQueryAttributeChangeResults field.
+func (o *CommandResults) SetOnQueryAttributeChangeResults(v []OnQueryAttributeChangeResult) {
+	o.OnQueryAttributeChangeResults = v
+}
+
 func (o CommandResults) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.ActivityResults != nil {
@@ -144,6 +177,9 @@ func (o CommandResults) MarshalJSON() ([]byte, error) {
 	}
 	if o.TimerResults != nil {
 		toSerialize["timerResults"] = o.TimerResults
+	}
+	if o.OnQueryAttributeChangeResults != nil {
+		toSerialize["onQueryAttributeChangeResults"] = o.OnQueryAttributeChangeResults
 	}
 	return json.Marshal(toSerialize)
 }

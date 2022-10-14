@@ -34,28 +34,28 @@ type DefaultApi interface {
 	ApiV1WorkflowGetPostExecute(r ApiApiV1WorkflowGetPostRequest) (*WorkflowGetResponse, *http.Response, error)
 
 	/*
-	ApiV1WorkflowGetWithLongWaitPost get a workflow's status and results(if completed & requested), wait if the workflow is still running
+	ApiV1WorkflowGetWithWaitPost get a workflow's status and results(if completed & requested), wait if the workflow is still running
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowGetWithLongWaitPostRequest
+	@return ApiApiV1WorkflowGetWithWaitPostRequest
 	*/
-	ApiV1WorkflowGetWithLongWaitPost(ctx context.Context) ApiApiV1WorkflowGetWithLongWaitPostRequest
+	ApiV1WorkflowGetWithWaitPost(ctx context.Context) ApiApiV1WorkflowGetWithWaitPostRequest
 
-	// ApiV1WorkflowGetWithLongWaitPostExecute executes the request
+	// ApiV1WorkflowGetWithWaitPostExecute executes the request
 	//  @return WorkflowGetResponse
-	ApiV1WorkflowGetWithLongWaitPostExecute(r ApiApiV1WorkflowGetWithLongWaitPostRequest) (*WorkflowGetResponse, *http.Response, error)
+	ApiV1WorkflowGetWithWaitPostExecute(r ApiApiV1WorkflowGetWithWaitPostRequest) (*WorkflowGetResponse, *http.Response, error)
 
 	/*
-	ApiV1WorkflowQueryPost query a workflow
+	ApiV1WorkflowQueryattributesGetPost get workflow query attributes
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowQueryPostRequest
+	@return ApiApiV1WorkflowQueryattributesGetPostRequest
 	*/
-	ApiV1WorkflowQueryPost(ctx context.Context) ApiApiV1WorkflowQueryPostRequest
+	ApiV1WorkflowQueryattributesGetPost(ctx context.Context) ApiApiV1WorkflowQueryattributesGetPostRequest
 
-	// ApiV1WorkflowQueryPostExecute executes the request
-	//  @return WorkflowQueryResponse
-	ApiV1WorkflowQueryPostExecute(r ApiApiV1WorkflowQueryPostRequest) (*WorkflowQueryResponse, *http.Response, error)
+	// ApiV1WorkflowQueryattributesGetPostExecute executes the request
+	//  @return WorkflowGetQueryAttributesResponse
+	ApiV1WorkflowQueryattributesGetPostExecute(r ApiApiV1WorkflowQueryattributesGetPostRequest) (*WorkflowGetQueryAttributesResponse, *http.Response, error)
 
 	/*
 	ApiV1WorkflowResetPost reset a workflow
@@ -80,6 +80,18 @@ type DefaultApi interface {
 	// ApiV1WorkflowSearchPostExecute executes the request
 	//  @return WorkflowSearchResponse
 	ApiV1WorkflowSearchPostExecute(r ApiApiV1WorkflowSearchPostRequest) (*WorkflowSearchResponse, *http.Response, error)
+
+	/*
+	ApiV1WorkflowSearchattributesGetPost get workflow search attributes
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowSearchattributesGetPostRequest
+	*/
+	ApiV1WorkflowSearchattributesGetPost(ctx context.Context) ApiApiV1WorkflowSearchattributesGetPostRequest
+
+	// ApiV1WorkflowSearchattributesGetPostExecute executes the request
+	//  @return WorkflowGetQueryAttributesResponse
+	ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetQueryAttributesResponse, *http.Response, error)
 
 	/*
 	ApiV1WorkflowSignalPost signal a workflow
@@ -246,29 +258,29 @@ func (a *DefaultApiService) ApiV1WorkflowGetPostExecute(r ApiApiV1WorkflowGetPos
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiApiV1WorkflowGetWithLongWaitPostRequest struct {
+type ApiApiV1WorkflowGetWithWaitPostRequest struct {
 	ctx context.Context
 	ApiService DefaultApi
 	workflowGetRequest *WorkflowGetRequest
 }
 
-func (r ApiApiV1WorkflowGetWithLongWaitPostRequest) WorkflowGetRequest(workflowGetRequest WorkflowGetRequest) ApiApiV1WorkflowGetWithLongWaitPostRequest {
+func (r ApiApiV1WorkflowGetWithWaitPostRequest) WorkflowGetRequest(workflowGetRequest WorkflowGetRequest) ApiApiV1WorkflowGetWithWaitPostRequest {
 	r.workflowGetRequest = &workflowGetRequest
 	return r
 }
 
-func (r ApiApiV1WorkflowGetWithLongWaitPostRequest) Execute() (*WorkflowGetResponse, *http.Response, error) {
-	return r.ApiService.ApiV1WorkflowGetWithLongWaitPostExecute(r)
+func (r ApiApiV1WorkflowGetWithWaitPostRequest) Execute() (*WorkflowGetResponse, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowGetWithWaitPostExecute(r)
 }
 
 /*
-ApiV1WorkflowGetWithLongWaitPost get a workflow's status and results(if completed & requested), wait if the workflow is still running
+ApiV1WorkflowGetWithWaitPost get a workflow's status and results(if completed & requested), wait if the workflow is still running
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiApiV1WorkflowGetWithLongWaitPostRequest
+ @return ApiApiV1WorkflowGetWithWaitPostRequest
 */
-func (a *DefaultApiService) ApiV1WorkflowGetWithLongWaitPost(ctx context.Context) ApiApiV1WorkflowGetWithLongWaitPostRequest {
-	return ApiApiV1WorkflowGetWithLongWaitPostRequest{
+func (a *DefaultApiService) ApiV1WorkflowGetWithWaitPost(ctx context.Context) ApiApiV1WorkflowGetWithWaitPostRequest {
+	return ApiApiV1WorkflowGetWithWaitPostRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
@@ -276,7 +288,7 @@ func (a *DefaultApiService) ApiV1WorkflowGetWithLongWaitPost(ctx context.Context
 
 // Execute executes the request
 //  @return WorkflowGetResponse
-func (a *DefaultApiService) ApiV1WorkflowGetWithLongWaitPostExecute(r ApiApiV1WorkflowGetWithLongWaitPostRequest) (*WorkflowGetResponse, *http.Response, error) {
+func (a *DefaultApiService) ApiV1WorkflowGetWithWaitPostExecute(r ApiApiV1WorkflowGetWithWaitPostRequest) (*WorkflowGetResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -284,12 +296,12 @@ func (a *DefaultApiService) ApiV1WorkflowGetWithLongWaitPostExecute(r ApiApiV1Wo
 		localVarReturnValue  *WorkflowGetResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowGetWithLongWaitPost")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowGetWithWaitPost")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/workflow/getWithLongWait"
+	localVarPath := localBasePath + "/api/v1/workflow/getWithWait"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -360,50 +372,50 @@ func (a *DefaultApiService) ApiV1WorkflowGetWithLongWaitPostExecute(r ApiApiV1Wo
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiApiV1WorkflowQueryPostRequest struct {
+type ApiApiV1WorkflowQueryattributesGetPostRequest struct {
 	ctx context.Context
 	ApiService DefaultApi
-	workflowQueryRequest *WorkflowQueryRequest
+	workflowGetQueryAttributesRequest *WorkflowGetQueryAttributesRequest
 }
 
-func (r ApiApiV1WorkflowQueryPostRequest) WorkflowQueryRequest(workflowQueryRequest WorkflowQueryRequest) ApiApiV1WorkflowQueryPostRequest {
-	r.workflowQueryRequest = &workflowQueryRequest
+func (r ApiApiV1WorkflowQueryattributesGetPostRequest) WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest WorkflowGetQueryAttributesRequest) ApiApiV1WorkflowQueryattributesGetPostRequest {
+	r.workflowGetQueryAttributesRequest = &workflowGetQueryAttributesRequest
 	return r
 }
 
-func (r ApiApiV1WorkflowQueryPostRequest) Execute() (*WorkflowQueryResponse, *http.Response, error) {
-	return r.ApiService.ApiV1WorkflowQueryPostExecute(r)
+func (r ApiApiV1WorkflowQueryattributesGetPostRequest) Execute() (*WorkflowGetQueryAttributesResponse, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowQueryattributesGetPostExecute(r)
 }
 
 /*
-ApiV1WorkflowQueryPost query a workflow
+ApiV1WorkflowQueryattributesGetPost get workflow query attributes
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiApiV1WorkflowQueryPostRequest
+ @return ApiApiV1WorkflowQueryattributesGetPostRequest
 */
-func (a *DefaultApiService) ApiV1WorkflowQueryPost(ctx context.Context) ApiApiV1WorkflowQueryPostRequest {
-	return ApiApiV1WorkflowQueryPostRequest{
+func (a *DefaultApiService) ApiV1WorkflowQueryattributesGetPost(ctx context.Context) ApiApiV1WorkflowQueryattributesGetPostRequest {
+	return ApiApiV1WorkflowQueryattributesGetPostRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return WorkflowQueryResponse
-func (a *DefaultApiService) ApiV1WorkflowQueryPostExecute(r ApiApiV1WorkflowQueryPostRequest) (*WorkflowQueryResponse, *http.Response, error) {
+//  @return WorkflowGetQueryAttributesResponse
+func (a *DefaultApiService) ApiV1WorkflowQueryattributesGetPostExecute(r ApiApiV1WorkflowQueryattributesGetPostRequest) (*WorkflowGetQueryAttributesResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *WorkflowQueryResponse
+		localVarReturnValue  *WorkflowGetQueryAttributesResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowQueryPost")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowQueryattributesGetPost")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/workflow/query"
+	localVarPath := localBasePath + "/api/v1/workflow/queryattributes/get"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -427,7 +439,7 @@ func (a *DefaultApiService) ApiV1WorkflowQueryPostExecute(r ApiApiV1WorkflowQuer
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.workflowQueryRequest
+	localVarPostBody = r.workflowGetQueryAttributesRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -656,6 +668,120 @@ func (a *DefaultApiService) ApiV1WorkflowSearchPostExecute(r ApiApiV1WorkflowSea
 	}
 	// body params
 	localVarPostBody = r.workflowSearchRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiApiV1WorkflowSearchattributesGetPostRequest struct {
+	ctx context.Context
+	ApiService DefaultApi
+	workflowGetQueryAttributesRequest *WorkflowGetQueryAttributesRequest
+}
+
+func (r ApiApiV1WorkflowSearchattributesGetPostRequest) WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest WorkflowGetQueryAttributesRequest) ApiApiV1WorkflowSearchattributesGetPostRequest {
+	r.workflowGetQueryAttributesRequest = &workflowGetQueryAttributesRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowSearchattributesGetPostRequest) Execute() (*WorkflowGetQueryAttributesResponse, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowSearchattributesGetPostExecute(r)
+}
+
+/*
+ApiV1WorkflowSearchattributesGetPost get workflow search attributes
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowSearchattributesGetPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPost(ctx context.Context) ApiApiV1WorkflowSearchattributesGetPostRequest {
+	return ApiApiV1WorkflowSearchattributesGetPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return WorkflowGetQueryAttributesResponse
+func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetQueryAttributesResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *WorkflowGetQueryAttributesResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowSearchattributesGetPost")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/searchattributes/get"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowGetQueryAttributesRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

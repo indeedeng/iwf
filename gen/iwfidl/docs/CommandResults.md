@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **ActivityResults** | Pointer to [**[]ActivityResult**](ActivityResult.md) |  | [optional] 
 **SignalResults** | Pointer to [**[]SignalResult**](SignalResult.md) |  | [optional] 
 **TimerResults** | Pointer to [**[]TimerResult**](TimerResult.md) |  | [optional] 
+**OnQueryAttributeChangeResults** | Pointer to [**[]OnQueryAttributeChangeResult**](OnQueryAttributeChangeResult.md) |  | [optional] 
 
 ## Methods
 
@@ -101,6 +102,31 @@ SetTimerResults sets TimerResults field to given value.
 `func (o *CommandResults) HasTimerResults() bool`
 
 HasTimerResults returns a boolean if a field has been set.
+
+### GetOnQueryAttributeChangeResults
+
+`func (o *CommandResults) GetOnQueryAttributeChangeResults() []OnQueryAttributeChangeResult`
+
+GetOnQueryAttributeChangeResults returns the OnQueryAttributeChangeResults field if non-nil, zero value otherwise.
+
+### GetOnQueryAttributeChangeResultsOk
+
+`func (o *CommandResults) GetOnQueryAttributeChangeResultsOk() (*[]OnQueryAttributeChangeResult, bool)`
+
+GetOnQueryAttributeChangeResultsOk returns a tuple with the OnQueryAttributeChangeResults field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOnQueryAttributeChangeResults
+
+`func (o *CommandResults) SetOnQueryAttributeChangeResults(v []OnQueryAttributeChangeResult)`
+
+SetOnQueryAttributeChangeResults sets OnQueryAttributeChangeResults field to given value.
+
+### HasOnQueryAttributeChangeResults
+
+`func (o *CommandResults) HasOnQueryAttributeChangeResults() bool`
+
+HasOnQueryAttributeChangeResults returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

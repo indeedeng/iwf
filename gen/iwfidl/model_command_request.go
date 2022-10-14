@@ -20,6 +20,7 @@ type CommandRequest struct {
 	ActivityCommands []ActivityCommand `json:"activityCommands,omitempty"`
 	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
 	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
+	OnQueryAttributeChangeCommands []OnQueryAttributeChangeCommand `json:"onQueryAttributeChangeCommands,omitempty"`
 }
 
 // NewCommandRequest instantiates a new CommandRequest object
@@ -160,6 +161,38 @@ func (o *CommandRequest) SetSignalCommands(v []SignalCommand) {
 	o.SignalCommands = v
 }
 
+// GetOnQueryAttributeChangeCommands returns the OnQueryAttributeChangeCommands field value if set, zero value otherwise.
+func (o *CommandRequest) GetOnQueryAttributeChangeCommands() []OnQueryAttributeChangeCommand {
+	if o == nil || o.OnQueryAttributeChangeCommands == nil {
+		var ret []OnQueryAttributeChangeCommand
+		return ret
+	}
+	return o.OnQueryAttributeChangeCommands
+}
+
+// GetOnQueryAttributeChangeCommandsOk returns a tuple with the OnQueryAttributeChangeCommands field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandRequest) GetOnQueryAttributeChangeCommandsOk() ([]OnQueryAttributeChangeCommand, bool) {
+	if o == nil || o.OnQueryAttributeChangeCommands == nil {
+		return nil, false
+	}
+	return o.OnQueryAttributeChangeCommands, true
+}
+
+// HasOnQueryAttributeChangeCommands returns a boolean if a field has been set.
+func (o *CommandRequest) HasOnQueryAttributeChangeCommands() bool {
+	if o != nil && o.OnQueryAttributeChangeCommands != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetOnQueryAttributeChangeCommands gets a reference to the given []OnQueryAttributeChangeCommand and assigns it to the OnQueryAttributeChangeCommands field.
+func (o *CommandRequest) SetOnQueryAttributeChangeCommands(v []OnQueryAttributeChangeCommand) {
+	o.OnQueryAttributeChangeCommands = v
+}
+
 func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -173,6 +206,9 @@ func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.SignalCommands != nil {
 		toSerialize["signalCommands"] = o.SignalCommands
+	}
+	if o.OnQueryAttributeChangeCommands != nil {
+		toSerialize["onQueryAttributeChangeCommands"] = o.OnQueryAttributeChangeCommands
 	}
 	return json.Marshal(toSerialize)
 }

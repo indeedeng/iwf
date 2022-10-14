@@ -14,33 +14,33 @@ import (
 	"encoding/json"
 )
 
-// WorkflowQueryRequest struct for WorkflowQueryRequest
-type WorkflowQueryRequest struct {
+// WorkflowGetSearchAttributesRequest struct for WorkflowGetSearchAttributesRequest
+type WorkflowGetSearchAttributesRequest struct {
 	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	AttributeKeys []string `json:"attributeKeys,omitempty"`
+	AttributeKeys []SearchAttributeKeyAndType `json:"attributeKeys,omitempty"`
 }
 
-// NewWorkflowQueryRequest instantiates a new WorkflowQueryRequest object
+// NewWorkflowGetSearchAttributesRequest instantiates a new WorkflowGetSearchAttributesRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowQueryRequest(workflowId string) *WorkflowQueryRequest {
-	this := WorkflowQueryRequest{}
+func NewWorkflowGetSearchAttributesRequest(workflowId string) *WorkflowGetSearchAttributesRequest {
+	this := WorkflowGetSearchAttributesRequest{}
 	this.WorkflowId = workflowId
 	return &this
 }
 
-// NewWorkflowQueryRequestWithDefaults instantiates a new WorkflowQueryRequest object
+// NewWorkflowGetSearchAttributesRequestWithDefaults instantiates a new WorkflowGetSearchAttributesRequest object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewWorkflowQueryRequestWithDefaults() *WorkflowQueryRequest {
-	this := WorkflowQueryRequest{}
+func NewWorkflowGetSearchAttributesRequestWithDefaults() *WorkflowGetSearchAttributesRequest {
+	this := WorkflowGetSearchAttributesRequest{}
 	return &this
 }
 
 // GetWorkflowId returns the WorkflowId field value
-func (o *WorkflowQueryRequest) GetWorkflowId() string {
+func (o *WorkflowGetSearchAttributesRequest) GetWorkflowId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -51,7 +51,7 @@ func (o *WorkflowQueryRequest) GetWorkflowId() string {
 
 // GetWorkflowIdOk returns a tuple with the WorkflowId field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowQueryRequest) GetWorkflowIdOk() (*string, bool) {
+func (o *WorkflowGetSearchAttributesRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -59,12 +59,12 @@ func (o *WorkflowQueryRequest) GetWorkflowIdOk() (*string, bool) {
 }
 
 // SetWorkflowId sets field value
-func (o *WorkflowQueryRequest) SetWorkflowId(v string) {
+func (o *WorkflowGetSearchAttributesRequest) SetWorkflowId(v string) {
 	o.WorkflowId = v
 }
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
-func (o *WorkflowQueryRequest) GetWorkflowRunId() string {
+func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string {
 	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
@@ -74,7 +74,7 @@ func (o *WorkflowQueryRequest) GetWorkflowRunId() string {
 
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowQueryRequest) GetWorkflowRunIdOk() (*string, bool) {
+func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
@@ -82,7 +82,7 @@ func (o *WorkflowQueryRequest) GetWorkflowRunIdOk() (*string, bool) {
 }
 
 // HasWorkflowRunId returns a boolean if a field has been set.
-func (o *WorkflowQueryRequest) HasWorkflowRunId() bool {
+func (o *WorkflowGetSearchAttributesRequest) HasWorkflowRunId() bool {
 	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
@@ -91,14 +91,14 @@ func (o *WorkflowQueryRequest) HasWorkflowRunId() bool {
 }
 
 // SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
-func (o *WorkflowQueryRequest) SetWorkflowRunId(v string) {
+func (o *WorkflowGetSearchAttributesRequest) SetWorkflowRunId(v string) {
 	o.WorkflowRunId = &v
 }
 
 // GetAttributeKeys returns the AttributeKeys field value if set, zero value otherwise.
-func (o *WorkflowQueryRequest) GetAttributeKeys() []string {
+func (o *WorkflowGetSearchAttributesRequest) GetAttributeKeys() []SearchAttributeKeyAndType {
 	if o == nil || o.AttributeKeys == nil {
-		var ret []string
+		var ret []SearchAttributeKeyAndType
 		return ret
 	}
 	return o.AttributeKeys
@@ -106,7 +106,7 @@ func (o *WorkflowQueryRequest) GetAttributeKeys() []string {
 
 // GetAttributeKeysOk returns a tuple with the AttributeKeys field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowQueryRequest) GetAttributeKeysOk() ([]string, bool) {
+func (o *WorkflowGetSearchAttributesRequest) GetAttributeKeysOk() ([]SearchAttributeKeyAndType, bool) {
 	if o == nil || o.AttributeKeys == nil {
 		return nil, false
 	}
@@ -114,7 +114,7 @@ func (o *WorkflowQueryRequest) GetAttributeKeysOk() ([]string, bool) {
 }
 
 // HasAttributeKeys returns a boolean if a field has been set.
-func (o *WorkflowQueryRequest) HasAttributeKeys() bool {
+func (o *WorkflowGetSearchAttributesRequest) HasAttributeKeys() bool {
 	if o != nil && o.AttributeKeys != nil {
 		return true
 	}
@@ -122,12 +122,12 @@ func (o *WorkflowQueryRequest) HasAttributeKeys() bool {
 	return false
 }
 
-// SetAttributeKeys gets a reference to the given []string and assigns it to the AttributeKeys field.
-func (o *WorkflowQueryRequest) SetAttributeKeys(v []string) {
+// SetAttributeKeys gets a reference to the given []SearchAttributeKeyAndType and assigns it to the AttributeKeys field.
+func (o *WorkflowGetSearchAttributesRequest) SetAttributeKeys(v []SearchAttributeKeyAndType) {
 	o.AttributeKeys = v
 }
 
-func (o WorkflowQueryRequest) MarshalJSON() ([]byte, error) {
+func (o WorkflowGetSearchAttributesRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
@@ -141,38 +141,38 @@ func (o WorkflowQueryRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableWorkflowQueryRequest struct {
-	value *WorkflowQueryRequest
+type NullableWorkflowGetSearchAttributesRequest struct {
+	value *WorkflowGetSearchAttributesRequest
 	isSet bool
 }
 
-func (v NullableWorkflowQueryRequest) Get() *WorkflowQueryRequest {
+func (v NullableWorkflowGetSearchAttributesRequest) Get() *WorkflowGetSearchAttributesRequest {
 	return v.value
 }
 
-func (v *NullableWorkflowQueryRequest) Set(val *WorkflowQueryRequest) {
+func (v *NullableWorkflowGetSearchAttributesRequest) Set(val *WorkflowGetSearchAttributesRequest) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableWorkflowQueryRequest) IsSet() bool {
+func (v NullableWorkflowGetSearchAttributesRequest) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableWorkflowQueryRequest) Unset() {
+func (v *NullableWorkflowGetSearchAttributesRequest) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableWorkflowQueryRequest(val *WorkflowQueryRequest) *NullableWorkflowQueryRequest {
-	return &NullableWorkflowQueryRequest{value: val, isSet: true}
+func NewNullableWorkflowGetSearchAttributesRequest(val *WorkflowGetSearchAttributesRequest) *NullableWorkflowGetSearchAttributesRequest {
+	return &NullableWorkflowGetSearchAttributesRequest{value: val, isSet: true}
 }
 
-func (v NullableWorkflowQueryRequest) MarshalJSON() ([]byte, error) {
+func (v NullableWorkflowGetSearchAttributesRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableWorkflowQueryRequest) UnmarshalJSON(src []byte) error {
+func (v *NullableWorkflowGetSearchAttributesRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
