@@ -1,6 +1,8 @@
 # iWF project - main & server repo 
 
-A simple and powerful WorkflowAsCode general purpose workflow engine 
+For most long running applications, iWF is a All-In-One solution to replace Database, MessageQueue and ElasticSearch. It will not make you a 10x developer...but you may feel like one!
+
+It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 
 Back by Cadence/Temporal as an interpreter.
 
