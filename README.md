@@ -1,13 +1,15 @@
 # iWF project - main & server repo 
 
-For most long running applications, iWF is a All-In-One solution to replace Database, MessageQueue and ElasticSearch. It will not make you a 10x developer...but you may feel like one!
+For most long running applications, iWF is a All-In-One solution to replace Database, MessageQueue and ElasticSearch. 
+
+**It will not make you a 10x developer...but you may feel like one!**
 
 It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 
 Back by Cadence/Temporal as an interpreter.
 
 Related projects:
-* [iWF Java SDK](https://github.com/indeedeng/iwf-java) and [Java SDK API preview](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
+* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) and [Java SDK API review](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
 * [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk)
 * [API schema](https://github.com/indeedeng/iwf-idl)
