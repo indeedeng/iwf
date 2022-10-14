@@ -19,6 +19,7 @@ type WorkflowGetRequest struct {
 	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
 	NeedsResults *bool `json:"needsResults,omitempty"`
+	WaitTimeSeconds *int32 `json:"waitTimeSeconds,omitempty"`
 }
 
 // NewWorkflowGetRequest instantiates a new WorkflowGetRequest object
@@ -127,6 +128,38 @@ func (o *WorkflowGetRequest) SetNeedsResults(v bool) {
 	o.NeedsResults = &v
 }
 
+// GetWaitTimeSeconds returns the WaitTimeSeconds field value if set, zero value otherwise.
+func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32 {
+	if o == nil || o.WaitTimeSeconds == nil {
+		var ret int32
+		return ret
+	}
+	return *o.WaitTimeSeconds
+}
+
+// GetWaitTimeSecondsOk returns a tuple with the WaitTimeSeconds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool) {
+	if o == nil || o.WaitTimeSeconds == nil {
+		return nil, false
+	}
+	return o.WaitTimeSeconds, true
+}
+
+// HasWaitTimeSeconds returns a boolean if a field has been set.
+func (o *WorkflowGetRequest) HasWaitTimeSeconds() bool {
+	if o != nil && o.WaitTimeSeconds != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitTimeSeconds gets a reference to the given int32 and assigns it to the WaitTimeSeconds field.
+func (o *WorkflowGetRequest) SetWaitTimeSeconds(v int32) {
+	o.WaitTimeSeconds = &v
+}
+
 func (o WorkflowGetRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -137,6 +170,9 @@ func (o WorkflowGetRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.NeedsResults != nil {
 		toSerialize["needsResults"] = o.NeedsResults
+	}
+	if o.WaitTimeSeconds != nil {
+		toSerialize["waitTimeSeconds"] = o.WaitTimeSeconds
 	}
 	return json.Marshal(toSerialize)
 }

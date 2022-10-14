@@ -6,9 +6,9 @@ import (
 
 const WorkflowStartApiPath = "/api/v1/workflow/start"
 const WorkflowSignalApiPath = "/api/v1/workflow/signal"
-const WorkflowQueryApiPath = "/api/v1/workflow/query"
+const WorkflowGetQueryAttributesApiPath = "/api/v1/workflow/queryattributes/get"
 const WorkflowGetApiPath = "/api/v1/workflow/get"
-const WorkflowGetWithLongWaitApiPath = "/api/v1/workflow/getWithLongWait"
+const WorkflowGetWithWaitApiPath = "/api/v1/workflow/getWithWait"
 const WorkflowSearchApiPath = "/api/v1/workflow/search"
 const WorkflowResetApiPath = "/api/v1/workflow/reset"
 
@@ -21,9 +21,9 @@ func NewService(client UnifiedClient) *gin.Engine {
 	router.GET("/", handler.index)
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStartPost)
 	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignalPost)
-	router.POST(WorkflowQueryApiPath, handler.apiV1WorkflowQueryPost)
+	router.POST(WorkflowGetQueryAttributesApiPath, handler.apiV1WorkflowQueryPost)
 	router.POST(WorkflowGetApiPath, handler.apiV1WorkflowGetPost)
-	router.POST(WorkflowGetWithLongWaitApiPath, handler.apiV1WorkflowGetWithLongWaitPost)
+	router.POST(WorkflowGetWithWaitApiPath, handler.apiV1WorkflowGetWithWaitPost)
 	router.POST(WorkflowSearchApiPath, handler.apiV1WorkflowSearchPost)
 	router.POST(WorkflowResetApiPath, handler.apiV1WorkflowResetPost)
 

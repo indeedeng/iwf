@@ -48,19 +48,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: signal a workflow
-  /api/v1/workflow/query:
+  /api/v1/workflow/queryattributes/get:
     post:
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkflowQueryRequest'
+              $ref: '#/components/schemas/WorkflowGetQueryAttributesRequest'
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkflowQueryResponse'
+                $ref: '#/components/schemas/WorkflowGetQueryAttributesResponse'
           description: successful operation
         "400":
           content:
@@ -68,7 +68,28 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
-      summary: query a workflow
+      summary: get workflow query attributes
+  /api/v1/workflow/searchattributes/get:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowGetQueryAttributesRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowGetQueryAttributesResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: get workflow search attributes
   /api/v1/workflow/get:
     post:
       requestBody:
@@ -90,7 +111,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: get a workflow's status and results(if completed & requested)
-  /api/v1/workflow/getWithLongWait:
+  /api/v1/workflow/getWithWait:
     post:
       requestBody:
         content:
@@ -218,6 +239,16 @@ components:
         encoding:
           type: string
         data:
+          type: string
+      type: object
+    SearchAttributeKeyAndType:
+      properties:
+        key:
+          type: string
+        valueType:
+          enum:
+          - KEYWORD
+          - INT
           type: string
       type: object
     SearchAttribute:
@@ -371,7 +402,7 @@ components:
       - signalChannelName
       - workflowId
       type: object
-    WorkflowQueryRequest:
+    WorkflowGetQueryAttributesRequest:
       example:
         attributeKeys:
         - attributeKeys
@@ -390,7 +421,7 @@ components:
       required:
       - workflowId
       type: object
-    WorkflowQueryResponse:
+    WorkflowGetQueryAttributesResponse:
       example:
         queryAttributes:
         - value:
@@ -407,8 +438,29 @@ components:
             $ref: '#/components/schemas/KeyValue'
           type: array
       type: object
+    WorkflowGetSearchAttributesRequest:
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        attributeKeys:
+          items:
+            $ref: '#/components/schemas/SearchAttributeKeyAndType'
+          type: array
+      required:
+      - workflowId
+      type: object
+    WorkflowGetSearchAttributesResponse:
+      properties:
+        queryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      type: object
     WorkflowGetRequest:
       example:
+        waitTimeSeconds: 0
         needsResults: true
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -419,6 +471,8 @@ components:
           type: string
         needsResults:
           type: boolean
+        waitTimeSeconds:
+          type: integer
       required:
       - workflowId
       type: object
@@ -651,6 +705,11 @@ components:
           - firingUnixTimestampSeconds: 1
             commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
+          onQueryAttributeChangeCommands:
+          - attributeKey: attributeKey
+            commandId: commandId
+          - attributeKey: attributeKey
+            commandId: commandId
           activityCommands:
           - input:
               data: data
@@ -741,6 +800,11 @@ components:
             activityStatus: OPEN
             activityType: activityType
             commandId: commandId
+          onQueryAttributeChangeResults:
+          - commandId: commandId
+            status: WAITING
+          - commandId: commandId
+            status: WAITING
           timerResults:
           - timerStatus: SCHEDULED
             commandId: commandId
@@ -967,6 +1031,11 @@ components:
         - firingUnixTimestampSeconds: 1
           commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
+        onQueryAttributeChangeCommands:
+        - attributeKey: attributeKey
+          commandId: commandId
+        - attributeKey: attributeKey
+          commandId: commandId
         activityCommands:
         - input:
             data: data
@@ -1001,6 +1070,10 @@ components:
           items:
             $ref: '#/components/schemas/SignalCommand'
           type: array
+        onQueryAttributeChangeCommands:
+          items:
+            $ref: '#/components/schemas/OnQueryAttributeChangeCommand'
+          type: array
       required:
       - deciderTriggerType
       type: object
@@ -1034,6 +1107,11 @@ components:
           activityStatus: OPEN
           activityType: activityType
           commandId: commandId
+        onQueryAttributeChangeResults:
+        - commandId: commandId
+          status: WAITING
+        - commandId: commandId
+          status: WAITING
         timerResults:
         - timerStatus: SCHEDULED
           commandId: commandId
@@ -1051,6 +1129,10 @@ components:
         timerResults:
           items:
             $ref: '#/components/schemas/TimerResult'
+          type: array
+        onQueryAttributeChangeResults:
+          items:
+            $ref: '#/components/schemas/OnQueryAttributeChangeResult'
           type: array
       type: object
     ActivityCommand:
@@ -1101,6 +1183,19 @@ components:
       required:
       - commandId
       - signalChannelName
+      type: object
+    OnQueryAttributeChangeCommand:
+      example:
+        attributeKey: attributeKey
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        attributeKey:
+          type: string
+      required:
+      - attributeKey
+      - commandId
       type: object
     ActivityOptions:
       example:
@@ -1159,6 +1254,22 @@ components:
       required:
       - commandId
       - timerStatus
+      type: object
+    OnQueryAttributeChangeResult:
+      example:
+        commandId: commandId
+        status: WAITING
+      properties:
+        commandId:
+          type: string
+        status:
+          enum:
+          - WAITING
+          - COMPLETED
+          type: string
+      required:
+      - commandId
+      - status
       type: object
     SignalResult:
       example:

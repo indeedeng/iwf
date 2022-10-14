@@ -117,7 +117,7 @@ func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
 }
 
 func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
-	var req iwfidl.WorkflowQueryRequest
+	var req iwfidl.WorkflowGetQueryAttributesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -136,7 +136,7 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, iwfidl.WorkflowQueryResponse{
+	c.JSON(http.StatusOK, iwfidl.WorkflowGetQueryAttributesResponse{
 		QueryAttributes: queryResult1.AttributeValues,
 	})
 }
@@ -145,7 +145,7 @@ func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
 	h.doApiV1WorkflowGetPost(c, false)
 }
 
-func (h *handler) apiV1WorkflowGetWithLongWaitPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowGetWithWaitPost(c *gin.Context) {
 	h.doApiV1WorkflowGetPost(c, true)
 }
 
