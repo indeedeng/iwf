@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **ActivityCommands** | Pointer to [**[]ActivityCommand**](ActivityCommand.md) |  | [optional] 
 **TimerCommands** | Pointer to [**[]TimerCommand**](TimerCommand.md) |  | [optional] 
 **SignalCommands** | Pointer to [**[]SignalCommand**](SignalCommand.md) |  | [optional] 
+**OnQueryAttributeChangeCommands** | Pointer to [**[]OnQueryAttributeChangeCommand**](OnQueryAttributeChangeCommand.md) |  | [optional] 
 
 ## Methods
 
@@ -122,6 +123,31 @@ SetSignalCommands sets SignalCommands field to given value.
 `func (o *CommandRequest) HasSignalCommands() bool`
 
 HasSignalCommands returns a boolean if a field has been set.
+
+### GetOnQueryAttributeChangeCommands
+
+`func (o *CommandRequest) GetOnQueryAttributeChangeCommands() []OnQueryAttributeChangeCommand`
+
+GetOnQueryAttributeChangeCommands returns the OnQueryAttributeChangeCommands field if non-nil, zero value otherwise.
+
+### GetOnQueryAttributeChangeCommandsOk
+
+`func (o *CommandRequest) GetOnQueryAttributeChangeCommandsOk() (*[]OnQueryAttributeChangeCommand, bool)`
+
+GetOnQueryAttributeChangeCommandsOk returns a tuple with the OnQueryAttributeChangeCommands field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOnQueryAttributeChangeCommands
+
+`func (o *CommandRequest) SetOnQueryAttributeChangeCommands(v []OnQueryAttributeChangeCommand)`
+
+SetOnQueryAttributeChangeCommands sets OnQueryAttributeChangeCommands field to given value.
+
+### HasOnQueryAttributeChangeCommands
+
+`func (o *CommandRequest) HasOnQueryAttributeChangeCommands() bool`
+
+HasOnQueryAttributeChangeCommands returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

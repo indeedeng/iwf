@@ -5,10 +5,11 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
-[**ApiV1WorkflowGetWithLongWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithLongWaitPost) | **Post** /api/v1/workflow/getWithLongWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
-[**ApiV1WorkflowQueryPost**](DefaultApi.md#ApiV1WorkflowQueryPost) | **Post** /api/v1/workflow/query | query a workflow
+[**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
+[**ApiV1WorkflowQueryattributesGetPost**](DefaultApi.md#ApiV1WorkflowQueryattributesGetPost) | **Post** /api/v1/workflow/queryattributes/get | get workflow query attributes
 [**ApiV1WorkflowResetPost**](DefaultApi.md#ApiV1WorkflowResetPost) | **Post** /api/v1/workflow/reset | reset a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
+[**ApiV1WorkflowSearchattributesGetPost**](DefaultApi.md#ApiV1WorkflowSearchattributesGetPost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
 [**ApiV1WorkflowSignalPost**](DefaultApi.md#ApiV1WorkflowSignalPost) | **Post** /api/v1/workflow/signal | signal a workflow
 [**ApiV1WorkflowStartPost**](DefaultApi.md#ApiV1WorkflowStartPost) | **Post** /api/v1/workflow/start | start a workflow
 [**ApiV1WorkflowStateDecidePost**](DefaultApi.md#ApiV1WorkflowStateDecidePost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
@@ -80,9 +81,9 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## ApiV1WorkflowGetWithLongWaitPost
+## ApiV1WorkflowGetWithWaitPost
 
-> WorkflowGetResponse ApiV1WorkflowGetWithLongWaitPost(ctx).WorkflowGetRequest(workflowGetRequest).Execute()
+> WorkflowGetResponse ApiV1WorkflowGetWithWaitPost(ctx).WorkflowGetRequest(workflowGetRequest).Execute()
 
 get a workflow's status and results(if completed & requested), wait if the workflow is still running
 
@@ -103,13 +104,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background()).WorkflowGetRequest(workflowGetRequest).Execute()
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background()).WorkflowGetRequest(workflowGetRequest).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowGetWithLongWaitPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowGetWithWaitPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `ApiV1WorkflowGetWithLongWaitPost`: WorkflowGetResponse
-    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowGetWithLongWaitPost`: %v\n", resp)
+    // response from `ApiV1WorkflowGetWithWaitPost`: WorkflowGetResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowGetWithWaitPost`: %v\n", resp)
 }
 ```
 
@@ -119,7 +120,7 @@ func main() {
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiApiV1WorkflowGetWithLongWaitPostRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiApiV1WorkflowGetWithWaitPostRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
@@ -144,11 +145,11 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## ApiV1WorkflowQueryPost
+## ApiV1WorkflowQueryattributesGetPost
 
-> WorkflowQueryResponse ApiV1WorkflowQueryPost(ctx).WorkflowQueryRequest(workflowQueryRequest).Execute()
+> WorkflowGetQueryAttributesResponse ApiV1WorkflowQueryattributesGetPost(ctx).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
 
-query a workflow
+get workflow query attributes
 
 ### Example
 
@@ -163,17 +164,17 @@ import (
 )
 
 func main() {
-    workflowQueryRequest := *openapiclient.NewWorkflowQueryRequest("WorkflowId_example") // WorkflowQueryRequest |  (optional)
+    workflowGetQueryAttributesRequest := *openapiclient.NewWorkflowGetQueryAttributesRequest("WorkflowId_example") // WorkflowGetQueryAttributesRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowQueryPost(context.Background()).WorkflowQueryRequest(workflowQueryRequest).Execute()
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowQueryattributesGetPost(context.Background()).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowQueryPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowQueryattributesGetPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `ApiV1WorkflowQueryPost`: WorkflowQueryResponse
-    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowQueryPost`: %v\n", resp)
+    // response from `ApiV1WorkflowQueryattributesGetPost`: WorkflowGetQueryAttributesResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowQueryattributesGetPost`: %v\n", resp)
 }
 ```
 
@@ -183,16 +184,16 @@ func main() {
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiApiV1WorkflowQueryPostRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiApiV1WorkflowQueryattributesGetPostRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **workflowQueryRequest** | [**WorkflowQueryRequest**](WorkflowQueryRequest.md) |  | 
+ **workflowGetQueryAttributesRequest** | [**WorkflowGetQueryAttributesRequest**](WorkflowGetQueryAttributesRequest.md) |  | 
 
 ### Return type
 
-[**WorkflowQueryResponse**](WorkflowQueryResponse.md)
+[**WorkflowGetQueryAttributesResponse**](WorkflowGetQueryAttributesResponse.md)
 
 ### Authorization
 
@@ -321,6 +322,70 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowSearchResponse**](WorkflowSearchResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowSearchattributesGetPost
+
+> WorkflowGetQueryAttributesResponse ApiV1WorkflowSearchattributesGetPost(ctx).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
+
+get workflow search attributes
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    workflowGetQueryAttributesRequest := *openapiclient.NewWorkflowGetQueryAttributesRequest("WorkflowId_example") // WorkflowGetQueryAttributesRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background()).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowSearchattributesGetPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowSearchattributesGetPost`: WorkflowGetQueryAttributesResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowSearchattributesGetPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowSearchattributesGetPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowGetQueryAttributesRequest** | [**WorkflowGetQueryAttributesRequest**](WorkflowGetQueryAttributesRequest.md) |  | 
+
+### Return type
+
+[**WorkflowGetQueryAttributesResponse**](WorkflowGetQueryAttributesResponse.md)
 
 ### Authorization
 

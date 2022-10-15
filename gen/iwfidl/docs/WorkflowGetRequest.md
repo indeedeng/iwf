@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **NeedsResults** | Pointer to **bool** |  | [optional] 
+**WaitTimeSeconds** | Pointer to **int32** |  | [optional] 
 
 ## Methods
 
@@ -96,6 +97,31 @@ SetNeedsResults sets NeedsResults field to given value.
 `func (o *WorkflowGetRequest) HasNeedsResults() bool`
 
 HasNeedsResults returns a boolean if a field has been set.
+
+### GetWaitTimeSeconds
+
+`func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32`
+
+GetWaitTimeSeconds returns the WaitTimeSeconds field if non-nil, zero value otherwise.
+
+### GetWaitTimeSecondsOk
+
+`func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool)`
+
+GetWaitTimeSecondsOk returns a tuple with the WaitTimeSeconds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitTimeSeconds
+
+`func (o *WorkflowGetRequest) SetWaitTimeSeconds(v int32)`
+
+SetWaitTimeSeconds sets WaitTimeSeconds field to given value.
+
+### HasWaitTimeSeconds
+
+`func (o *WorkflowGetRequest) HasWaitTimeSeconds() bool`
+
+HasWaitTimeSeconds returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

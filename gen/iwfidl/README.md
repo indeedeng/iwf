@@ -79,10 +79,11 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
-*DefaultApi* | [**ApiV1WorkflowGetWithLongWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithlongwaitpost) | **Post** /api/v1/workflow/getWithLongWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
-*DefaultApi* | [**ApiV1WorkflowQueryPost**](docs/DefaultApi.md#apiv1workflowquerypost) | **Post** /api/v1/workflow/query | query a workflow
+*DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
+*DefaultApi* | [**ApiV1WorkflowQueryattributesGetPost**](docs/DefaultApi.md#apiv1workflowqueryattributesgetpost) | **Post** /api/v1/workflow/queryattributes/get | get workflow query attributes
 *DefaultApi* | [**ApiV1WorkflowResetPost**](docs/DefaultApi.md#apiv1workflowresetpost) | **Post** /api/v1/workflow/reset | reset a workflow
 *DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
+*DefaultApi* | [**ApiV1WorkflowSearchattributesGetPost**](docs/DefaultApi.md#apiv1workflowsearchattributesgetpost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
 *DefaultApi* | [**ApiV1WorkflowSignalPost**](docs/DefaultApi.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
 *DefaultApi* | [**ApiV1WorkflowStartPost**](docs/DefaultApi.md#apiv1workflowstartpost) | **Post** /api/v1/workflow/start | start a workflow
 *DefaultApi* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultApi.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
@@ -102,7 +103,10 @@ Class | Method | HTTP request | Description
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
  - [KeyValue](docs/KeyValue.md)
+ - [OnQueryAttributeChangeCommand](docs/OnQueryAttributeChangeCommand.md)
+ - [OnQueryAttributeChangeResult](docs/OnQueryAttributeChangeResult.md)
  - [SearchAttribute](docs/SearchAttribute.md)
+ - [SearchAttributeKeyAndType](docs/SearchAttributeKeyAndType.md)
  - [SignalCommand](docs/SignalCommand.md)
  - [SignalResult](docs/SignalResult.md)
  - [StateCompletionOutput](docs/StateCompletionOutput.md)
@@ -110,10 +114,12 @@ Class | Method | HTTP request | Description
  - [StateMovement](docs/StateMovement.md)
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
+ - [WorkflowGetQueryAttributesRequest](docs/WorkflowGetQueryAttributesRequest.md)
+ - [WorkflowGetQueryAttributesResponse](docs/WorkflowGetQueryAttributesResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)
  - [WorkflowGetResponse](docs/WorkflowGetResponse.md)
- - [WorkflowQueryRequest](docs/WorkflowQueryRequest.md)
- - [WorkflowQueryResponse](docs/WorkflowQueryResponse.md)
+ - [WorkflowGetSearchAttributesRequest](docs/WorkflowGetSearchAttributesRequest.md)
+ - [WorkflowGetSearchAttributesResponse](docs/WorkflowGetSearchAttributesResponse.md)
  - [WorkflowResetRequest](docs/WorkflowResetRequest.md)
  - [WorkflowResetResponse](docs/WorkflowResetResponse.md)
  - [WorkflowSearchRequest](docs/WorkflowSearchRequest.md)

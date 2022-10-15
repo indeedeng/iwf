@@ -53,7 +53,7 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
 
-	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithLongWaitPost(context.Background())
+	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId:   wfId,
 		NeedsResults: iwfidl.PtrBool(true),
@@ -65,8 +65,8 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)
 	}
 
-	reqQry := apiClient.DefaultApi.ApiV1WorkflowQueryPost(context.Background())
-	queryResult1, httpResp2, err := reqQry.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
+	reqQry := apiClient.DefaultApi.ApiV1WorkflowQueryattributesGetPost(context.Background())
+	queryResult1, httpResp2, err := reqQry.WorkflowGetQueryAttributesRequest(iwfidl.WorkflowGetQueryAttributesRequest{
 		WorkflowId: wfId,
 		AttributeKeys: []string{
 			attribute.TestQueryAttributeKey,
@@ -77,7 +77,7 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpResp2)
 	}
 
-	queryResult2, httpResp2, err := reqQry.WorkflowQueryRequest(iwfidl.WorkflowQueryRequest{
+	queryResult2, httpResp2, err := reqQry.WorkflowGetQueryAttributesRequest(iwfidl.WorkflowGetQueryAttributesRequest{
 		WorkflowId: wfId,
 	}).Execute()
 
