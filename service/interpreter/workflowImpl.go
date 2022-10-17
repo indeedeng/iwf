@@ -16,6 +16,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
 	}
 	stateExeIdMgr := NewStateExecutionIdManager()
+	interStateChannel := NewInterStateChannel()
 	currentStates := []iwfidl.StateMovement{
 		{
 			StateId:          input.StartStateId,
@@ -65,7 +66,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, thisState, execution, stateExeId, attrMgr)
+				decision, err := executeState(ctx, provider, thisState, execution, stateExeId, attrMgr, interStateChannel)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -160,6 +161,7 @@ func executeState(
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
 	attrMgr *AttributeManager,
+	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
 	ao := ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
@@ -197,6 +199,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
+	interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
 	commandReq := startResponse.GetCommandRequest()
 
@@ -236,6 +239,24 @@ func executeState(
 		}
 	}
 
+	completedInterStateChannelCmds := map[string]*iwfidl.EncodedObject{}
+	if len(commandReq.GetInterStateChannelCommands()) > 0 {
+		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			provider.GoNamed(cmdCtx, "signal-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
+				if !ok {
+					panic("critical code bug")
+				}
+				_ = provider.Await(ctx, func() bool {
+					return interStateChannel.HasData(cmd.ChannelName)
+				})
+
+				completedSignalCmds[cmd.GetCommandId()] = interStateChannel.Retrieve(cmd.ChannelName)
+			})
+		}
+	}
+
 	// TODO process long running activity command
 
 	triggerType := commandReq.GetDeciderTriggerType()
@@ -245,7 +266,8 @@ func executeState(
 
 	err = provider.Await(ctx, func() bool {
 		return completedTimerCmds == len(commandReq.GetTimerCommands()) &&
-			len(completedSignalCmds) == len(commandReq.GetSignalCommands())
+			len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
+			len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
 	})
 	if err != nil {
 		return nil, err
@@ -302,6 +324,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
+	interStateChannel.ProcessPublishing(decision.GetPublishToInterStateChannel())
 
 	return &decision, nil
 }
