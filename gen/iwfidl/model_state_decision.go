@@ -20,6 +20,7 @@ type StateDecision struct {
 	NextStates []StateMovement `json:"nextStates,omitempty"`
 	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
+	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
 }
 
 // NewStateDecision instantiates a new StateDecision object
@@ -167,6 +168,38 @@ func (o *StateDecision) SetUpsertQueryAttributes(v []KeyValue) {
 	o.UpsertQueryAttributes = v
 }
 
+// GetPublishToInterStateChannel returns the PublishToInterStateChannel field value if set, zero value otherwise.
+func (o *StateDecision) GetPublishToInterStateChannel() []InterStateChannelPublishing {
+	if o == nil || o.PublishToInterStateChannel == nil {
+		var ret []InterStateChannelPublishing
+		return ret
+	}
+	return o.PublishToInterStateChannel
+}
+
+// GetPublishToInterStateChannelOk returns a tuple with the PublishToInterStateChannel field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StateDecision) GetPublishToInterStateChannelOk() ([]InterStateChannelPublishing, bool) {
+	if o == nil || o.PublishToInterStateChannel == nil {
+		return nil, false
+	}
+	return o.PublishToInterStateChannel, true
+}
+
+// HasPublishToInterStateChannel returns a boolean if a field has been set.
+func (o *StateDecision) HasPublishToInterStateChannel() bool {
+	if o != nil && o.PublishToInterStateChannel != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetPublishToInterStateChannel gets a reference to the given []InterStateChannelPublishing and assigns it to the PublishToInterStateChannel field.
+func (o *StateDecision) SetPublishToInterStateChannel(v []InterStateChannelPublishing) {
+	o.PublishToInterStateChannel = v
+}
+
 func (o StateDecision) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.WaitForMoreCommandResults != nil {
@@ -180,6 +213,9 @@ func (o StateDecision) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpsertQueryAttributes != nil {
 		toSerialize["upsertQueryAttributes"] = o.UpsertQueryAttributes
+	}
+	if o.PublishToInterStateChannel != nil {
+		toSerialize["publishToInterStateChannel"] = o.PublishToInterStateChannel
 	}
 	return json.Marshal(toSerialize)
 }

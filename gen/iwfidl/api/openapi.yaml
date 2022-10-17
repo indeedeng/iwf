@@ -934,6 +934,15 @@ components:
                 attributeKeys:
                 - attributeKeys
                 - attributeKeys
+          publishToInterStateChannel:
+          - channelName: channelName
+            value:
+              data: data
+              encoding: encoding
+          - channelName: channelName
+            value:
+              data: data
+              encoding: encoding
           upsertQueryAttributes:
           - value:
               data: data
@@ -994,6 +1003,15 @@ components:
               attributeKeys:
               - attributeKeys
               - attributeKeys
+        publishToInterStateChannel:
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
         upsertQueryAttributes:
         - value:
             data: data
@@ -1018,6 +1036,10 @@ components:
         upsertQueryAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
+          type: array
+        publishToInterStateChannel:
+          items:
+            $ref: '#/components/schemas/InterStateChannelPublishing'
           type: array
       type: object
     StateMovement:

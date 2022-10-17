@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"time"
 )
 
 const (
@@ -14,7 +15,20 @@ const (
 	State21      = "S21"
 	State22      = "S22"
 	State31      = "S31"
+
+	channel1 = "channel1"
+	channel2 = "channel2"
 )
+
+var TestVal1 = iwfidl.EncodedObject{
+	Encoding: iwfidl.PtrString("json"),
+	Data:     iwfidl.PtrString("test-value1"),
+}
+
+var TestVal2 = iwfidl.EncodedObject{
+	Encoding: iwfidl.PtrString("json"),
+	Data:     iwfidl.PtrString("test-value2"),
+}
 
 type handler struct {
 	invokeHistory map[string]int64
@@ -36,12 +50,57 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		// basic workflow go straight to decide methods without any commands
-		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State21 {
-			h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
+		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+				},
+			})
+			return
+		}
+		if req.GetWorkflowStateId() == State21 {
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+						{
+							CommandId:   "cmd-1",
+							ChannelName: channel1,
+						},
+					},
+				},
+			})
+			return
+		}
+		if req.GetWorkflowStateId() == State31 {
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+						{
+							CommandId:   "cmd-2",
+							ChannelName: channel2,
+						},
+					},
+				},
+			})
+			return
+		}
+
+		if req.GetWorkflowStateId() == State22 {
+			time.Sleep(time.Second * 2)
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+				},
+
+				PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+					{
+						ChannelName: channel1,
+						Value:       &TestVal1,
+					},
 				},
 			})
 			return
@@ -62,26 +121,51 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
-			// go to S2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId:        State21,
-							NextStateInput: req.StateInput,
+							StateId: State21,
+						},
+						{
+							StateId: State22,
 						},
 					},
 				},
 			})
 			return
-		} else if req.GetWorkflowStateId() == State21 {
-			// go to complete
+		}
+
+		if req.GetWorkflowStateId() == State21 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId:        service.GracefulCompletingWorkflowStateId,
-							NextStateInput: req.StateInput,
+							StateId: State31,
+						},
+					},
+				},
+			})
+			return
+		}
+
+		if req.GetWorkflowStateId() == State31 {
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				// dead end
+				StateDecision: &iwfidl.StateDecision{},
+			})
+			return
+		}
+
+		if req.GetWorkflowStateId() == State22 {
+			time.Sleep(time.Second * 2)
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				// dead end
+				StateDecision: &iwfidl.StateDecision{
+					PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+						{
+							ChannelName: channel2,
+							Value:       &TestVal2,
 						},
 					},
 				},
