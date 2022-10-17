@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	WorkflowType = "basic"
+	WorkflowType = "interstate"
 	State1       = "S1"
 	State21      = "S21"
 	State22      = "S22"
