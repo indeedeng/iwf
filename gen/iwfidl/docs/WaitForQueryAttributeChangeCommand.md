@@ -1,4 +1,4 @@
-# OnQueryAttributeChangeCommand
+# WaitForQueryAttributeChangeCommand
 
 ## Properties
 
@@ -9,59 +9,59 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewOnQueryAttributeChangeCommand
+### NewWaitForQueryAttributeChangeCommand
 
-`func NewOnQueryAttributeChangeCommand(commandId string, attributeKey string, ) *OnQueryAttributeChangeCommand`
+`func NewWaitForQueryAttributeChangeCommand(commandId string, attributeKey string, ) *WaitForQueryAttributeChangeCommand`
 
-NewOnQueryAttributeChangeCommand instantiates a new OnQueryAttributeChangeCommand object
+NewWaitForQueryAttributeChangeCommand instantiates a new WaitForQueryAttributeChangeCommand object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewOnQueryAttributeChangeCommandWithDefaults
+### NewWaitForQueryAttributeChangeCommandWithDefaults
 
-`func NewOnQueryAttributeChangeCommandWithDefaults() *OnQueryAttributeChangeCommand`
+`func NewWaitForQueryAttributeChangeCommandWithDefaults() *WaitForQueryAttributeChangeCommand`
 
-NewOnQueryAttributeChangeCommandWithDefaults instantiates a new OnQueryAttributeChangeCommand object
+NewWaitForQueryAttributeChangeCommandWithDefaults instantiates a new WaitForQueryAttributeChangeCommand object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetCommandId
 
-`func (o *OnQueryAttributeChangeCommand) GetCommandId() string`
+`func (o *WaitForQueryAttributeChangeCommand) GetCommandId() string`
 
 GetCommandId returns the CommandId field if non-nil, zero value otherwise.
 
 ### GetCommandIdOk
 
-`func (o *OnQueryAttributeChangeCommand) GetCommandIdOk() (*string, bool)`
+`func (o *WaitForQueryAttributeChangeCommand) GetCommandIdOk() (*string, bool)`
 
 GetCommandIdOk returns a tuple with the CommandId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCommandId
 
-`func (o *OnQueryAttributeChangeCommand) SetCommandId(v string)`
+`func (o *WaitForQueryAttributeChangeCommand) SetCommandId(v string)`
 
 SetCommandId sets CommandId field to given value.
 
 
 ### GetAttributeKey
 
-`func (o *OnQueryAttributeChangeCommand) GetAttributeKey() string`
+`func (o *WaitForQueryAttributeChangeCommand) GetAttributeKey() string`
 
 GetAttributeKey returns the AttributeKey field if non-nil, zero value otherwise.
 
 ### GetAttributeKeyOk
 
-`func (o *OnQueryAttributeChangeCommand) GetAttributeKeyOk() (*string, bool)`
+`func (o *WaitForQueryAttributeChangeCommand) GetAttributeKeyOk() (*string, bool)`
 
 GetAttributeKeyOk returns a tuple with the AttributeKey field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAttributeKey
 
-`func (o *OnQueryAttributeChangeCommand) SetAttributeKey(v string)`
+`func (o *WaitForQueryAttributeChangeCommand) SetAttributeKey(v string)`
 
 SetAttributeKey sets AttributeKey field to given value.
 

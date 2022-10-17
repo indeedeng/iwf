@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
 **UpsertStateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**PublishToInterStateChannel** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
 
 ## Methods
 
@@ -127,6 +128,31 @@ SetUpsertStateLocalAttributes sets UpsertStateLocalAttributes field to given val
 `func (o *WorkflowStateStartResponse) HasUpsertStateLocalAttributes() bool`
 
 HasUpsertStateLocalAttributes returns a boolean if a field has been set.
+
+### GetPublishToInterStateChannel
+
+`func (o *WorkflowStateStartResponse) GetPublishToInterStateChannel() []InterStateChannelPublishing`
+
+GetPublishToInterStateChannel returns the PublishToInterStateChannel field if non-nil, zero value otherwise.
+
+### GetPublishToInterStateChannelOk
+
+`func (o *WorkflowStateStartResponse) GetPublishToInterStateChannelOk() (*[]InterStateChannelPublishing, bool)`
+
+GetPublishToInterStateChannelOk returns a tuple with the PublishToInterStateChannel field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPublishToInterStateChannel
+
+`func (o *WorkflowStateStartResponse) SetPublishToInterStateChannel(v []InterStateChannelPublishing)`
+
+SetPublishToInterStateChannel sets PublishToInterStateChannel field to given value.
+
+### HasPublishToInterStateChannel
+
+`func (o *WorkflowStateStartResponse) HasPublishToInterStateChannel() bool`
+
+HasPublishToInterStateChannel returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

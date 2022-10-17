@@ -20,6 +20,7 @@ type WorkflowStateStartResponse struct {
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
 	CommandRequest *CommandRequest `json:"commandRequest,omitempty"`
 	UpsertStateLocalAttributes []KeyValue `json:"upsertStateLocalAttributes,omitempty"`
+	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
 }
 
 // NewWorkflowStateStartResponse instantiates a new WorkflowStateStartResponse object
@@ -167,6 +168,38 @@ func (o *WorkflowStateStartResponse) SetUpsertStateLocalAttributes(v []KeyValue)
 	o.UpsertStateLocalAttributes = v
 }
 
+// GetPublishToInterStateChannel returns the PublishToInterStateChannel field value if set, zero value otherwise.
+func (o *WorkflowStateStartResponse) GetPublishToInterStateChannel() []InterStateChannelPublishing {
+	if o == nil || o.PublishToInterStateChannel == nil {
+		var ret []InterStateChannelPublishing
+		return ret
+	}
+	return o.PublishToInterStateChannel
+}
+
+// GetPublishToInterStateChannelOk returns a tuple with the PublishToInterStateChannel field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateStartResponse) GetPublishToInterStateChannelOk() ([]InterStateChannelPublishing, bool) {
+	if o == nil || o.PublishToInterStateChannel == nil {
+		return nil, false
+	}
+	return o.PublishToInterStateChannel, true
+}
+
+// HasPublishToInterStateChannel returns a boolean if a field has been set.
+func (o *WorkflowStateStartResponse) HasPublishToInterStateChannel() bool {
+	if o != nil && o.PublishToInterStateChannel != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetPublishToInterStateChannel gets a reference to the given []InterStateChannelPublishing and assigns it to the PublishToInterStateChannel field.
+func (o *WorkflowStateStartResponse) SetPublishToInterStateChannel(v []InterStateChannelPublishing) {
+	o.PublishToInterStateChannel = v
+}
+
 func (o WorkflowStateStartResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.UpsertSearchAttributes != nil {
@@ -180,6 +213,9 @@ func (o WorkflowStateStartResponse) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpsertStateLocalAttributes != nil {
 		toSerialize["upsertStateLocalAttributes"] = o.UpsertStateLocalAttributes
+	}
+	if o.PublishToInterStateChannel != nil {
+		toSerialize["publishToInterStateChannel"] = o.PublishToInterStateChannel
 	}
 	return json.Marshal(toSerialize)
 }

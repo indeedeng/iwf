@@ -18,8 +18,9 @@ import (
 type CommandResults struct {
 	ActivityResults []ActivityResult `json:"activityResults,omitempty"`
 	SignalResults []SignalResult `json:"signalResults,omitempty"`
+	InterStateChannelResults []InterStateChannelResult `json:"interStateChannelResults,omitempty"`
 	TimerResults []TimerResult `json:"timerResults,omitempty"`
-	OnQueryAttributeChangeResults []OnQueryAttributeChangeResult `json:"onQueryAttributeChangeResults,omitempty"`
+	WaitForQueryAttributeChangeResults []WaitForQueryAttributeChangeResult `json:"waitForQueryAttributeChangeResults,omitempty"`
 }
 
 // NewCommandResults instantiates a new CommandResults object
@@ -103,6 +104,38 @@ func (o *CommandResults) SetSignalResults(v []SignalResult) {
 	o.SignalResults = v
 }
 
+// GetInterStateChannelResults returns the InterStateChannelResults field value if set, zero value otherwise.
+func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult {
+	if o == nil || o.InterStateChannelResults == nil {
+		var ret []InterStateChannelResult
+		return ret
+	}
+	return o.InterStateChannelResults
+}
+
+// GetInterStateChannelResultsOk returns a tuple with the InterStateChannelResults field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandResults) GetInterStateChannelResultsOk() ([]InterStateChannelResult, bool) {
+	if o == nil || o.InterStateChannelResults == nil {
+		return nil, false
+	}
+	return o.InterStateChannelResults, true
+}
+
+// HasInterStateChannelResults returns a boolean if a field has been set.
+func (o *CommandResults) HasInterStateChannelResults() bool {
+	if o != nil && o.InterStateChannelResults != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetInterStateChannelResults gets a reference to the given []InterStateChannelResult and assigns it to the InterStateChannelResults field.
+func (o *CommandResults) SetInterStateChannelResults(v []InterStateChannelResult) {
+	o.InterStateChannelResults = v
+}
+
 // GetTimerResults returns the TimerResults field value if set, zero value otherwise.
 func (o *CommandResults) GetTimerResults() []TimerResult {
 	if o == nil || o.TimerResults == nil {
@@ -135,36 +168,36 @@ func (o *CommandResults) SetTimerResults(v []TimerResult) {
 	o.TimerResults = v
 }
 
-// GetOnQueryAttributeChangeResults returns the OnQueryAttributeChangeResults field value if set, zero value otherwise.
-func (o *CommandResults) GetOnQueryAttributeChangeResults() []OnQueryAttributeChangeResult {
-	if o == nil || o.OnQueryAttributeChangeResults == nil {
-		var ret []OnQueryAttributeChangeResult
+// GetWaitForQueryAttributeChangeResults returns the WaitForQueryAttributeChangeResults field value if set, zero value otherwise.
+func (o *CommandResults) GetWaitForQueryAttributeChangeResults() []WaitForQueryAttributeChangeResult {
+	if o == nil || o.WaitForQueryAttributeChangeResults == nil {
+		var ret []WaitForQueryAttributeChangeResult
 		return ret
 	}
-	return o.OnQueryAttributeChangeResults
+	return o.WaitForQueryAttributeChangeResults
 }
 
-// GetOnQueryAttributeChangeResultsOk returns a tuple with the OnQueryAttributeChangeResults field value if set, nil otherwise
+// GetWaitForQueryAttributeChangeResultsOk returns a tuple with the WaitForQueryAttributeChangeResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CommandResults) GetOnQueryAttributeChangeResultsOk() ([]OnQueryAttributeChangeResult, bool) {
-	if o == nil || o.OnQueryAttributeChangeResults == nil {
+func (o *CommandResults) GetWaitForQueryAttributeChangeResultsOk() ([]WaitForQueryAttributeChangeResult, bool) {
+	if o == nil || o.WaitForQueryAttributeChangeResults == nil {
 		return nil, false
 	}
-	return o.OnQueryAttributeChangeResults, true
+	return o.WaitForQueryAttributeChangeResults, true
 }
 
-// HasOnQueryAttributeChangeResults returns a boolean if a field has been set.
-func (o *CommandResults) HasOnQueryAttributeChangeResults() bool {
-	if o != nil && o.OnQueryAttributeChangeResults != nil {
+// HasWaitForQueryAttributeChangeResults returns a boolean if a field has been set.
+func (o *CommandResults) HasWaitForQueryAttributeChangeResults() bool {
+	if o != nil && o.WaitForQueryAttributeChangeResults != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetOnQueryAttributeChangeResults gets a reference to the given []OnQueryAttributeChangeResult and assigns it to the OnQueryAttributeChangeResults field.
-func (o *CommandResults) SetOnQueryAttributeChangeResults(v []OnQueryAttributeChangeResult) {
-	o.OnQueryAttributeChangeResults = v
+// SetWaitForQueryAttributeChangeResults gets a reference to the given []WaitForQueryAttributeChangeResult and assigns it to the WaitForQueryAttributeChangeResults field.
+func (o *CommandResults) SetWaitForQueryAttributeChangeResults(v []WaitForQueryAttributeChangeResult) {
+	o.WaitForQueryAttributeChangeResults = v
 }
 
 func (o CommandResults) MarshalJSON() ([]byte, error) {
@@ -175,11 +208,14 @@ func (o CommandResults) MarshalJSON() ([]byte, error) {
 	if o.SignalResults != nil {
 		toSerialize["signalResults"] = o.SignalResults
 	}
+	if o.InterStateChannelResults != nil {
+		toSerialize["interStateChannelResults"] = o.InterStateChannelResults
+	}
 	if o.TimerResults != nil {
 		toSerialize["timerResults"] = o.TimerResults
 	}
-	if o.OnQueryAttributeChangeResults != nil {
-		toSerialize["onQueryAttributeChangeResults"] = o.OnQueryAttributeChangeResults
+	if o.WaitForQueryAttributeChangeResults != nil {
+		toSerialize["waitForQueryAttributeChangeResults"] = o.WaitForQueryAttributeChangeResults
 	}
 	return json.Marshal(toSerialize)
 }

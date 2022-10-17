@@ -20,7 +20,8 @@ type CommandRequest struct {
 	ActivityCommands []ActivityCommand `json:"activityCommands,omitempty"`
 	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
 	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
-	OnQueryAttributeChangeCommands []OnQueryAttributeChangeCommand `json:"onQueryAttributeChangeCommands,omitempty"`
+	InterStateChannelCommands []InterStateChannelCommand `json:"interStateChannelCommands,omitempty"`
+	WaitForQueryAttributeChangeCommands []WaitForQueryAttributeChangeCommand `json:"waitForQueryAttributeChangeCommands,omitempty"`
 }
 
 // NewCommandRequest instantiates a new CommandRequest object
@@ -161,36 +162,68 @@ func (o *CommandRequest) SetSignalCommands(v []SignalCommand) {
 	o.SignalCommands = v
 }
 
-// GetOnQueryAttributeChangeCommands returns the OnQueryAttributeChangeCommands field value if set, zero value otherwise.
-func (o *CommandRequest) GetOnQueryAttributeChangeCommands() []OnQueryAttributeChangeCommand {
-	if o == nil || o.OnQueryAttributeChangeCommands == nil {
-		var ret []OnQueryAttributeChangeCommand
+// GetInterStateChannelCommands returns the InterStateChannelCommands field value if set, zero value otherwise.
+func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelCommand {
+	if o == nil || o.InterStateChannelCommands == nil {
+		var ret []InterStateChannelCommand
 		return ret
 	}
-	return o.OnQueryAttributeChangeCommands
+	return o.InterStateChannelCommands
 }
 
-// GetOnQueryAttributeChangeCommandsOk returns a tuple with the OnQueryAttributeChangeCommands field value if set, nil otherwise
+// GetInterStateChannelCommandsOk returns a tuple with the InterStateChannelCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CommandRequest) GetOnQueryAttributeChangeCommandsOk() ([]OnQueryAttributeChangeCommand, bool) {
-	if o == nil || o.OnQueryAttributeChangeCommands == nil {
+func (o *CommandRequest) GetInterStateChannelCommandsOk() ([]InterStateChannelCommand, bool) {
+	if o == nil || o.InterStateChannelCommands == nil {
 		return nil, false
 	}
-	return o.OnQueryAttributeChangeCommands, true
+	return o.InterStateChannelCommands, true
 }
 
-// HasOnQueryAttributeChangeCommands returns a boolean if a field has been set.
-func (o *CommandRequest) HasOnQueryAttributeChangeCommands() bool {
-	if o != nil && o.OnQueryAttributeChangeCommands != nil {
+// HasInterStateChannelCommands returns a boolean if a field has been set.
+func (o *CommandRequest) HasInterStateChannelCommands() bool {
+	if o != nil && o.InterStateChannelCommands != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetOnQueryAttributeChangeCommands gets a reference to the given []OnQueryAttributeChangeCommand and assigns it to the OnQueryAttributeChangeCommands field.
-func (o *CommandRequest) SetOnQueryAttributeChangeCommands(v []OnQueryAttributeChangeCommand) {
-	o.OnQueryAttributeChangeCommands = v
+// SetInterStateChannelCommands gets a reference to the given []InterStateChannelCommand and assigns it to the InterStateChannelCommands field.
+func (o *CommandRequest) SetInterStateChannelCommands(v []InterStateChannelCommand) {
+	o.InterStateChannelCommands = v
+}
+
+// GetWaitForQueryAttributeChangeCommands returns the WaitForQueryAttributeChangeCommands field value if set, zero value otherwise.
+func (o *CommandRequest) GetWaitForQueryAttributeChangeCommands() []WaitForQueryAttributeChangeCommand {
+	if o == nil || o.WaitForQueryAttributeChangeCommands == nil {
+		var ret []WaitForQueryAttributeChangeCommand
+		return ret
+	}
+	return o.WaitForQueryAttributeChangeCommands
+}
+
+// GetWaitForQueryAttributeChangeCommandsOk returns a tuple with the WaitForQueryAttributeChangeCommands field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandRequest) GetWaitForQueryAttributeChangeCommandsOk() ([]WaitForQueryAttributeChangeCommand, bool) {
+	if o == nil || o.WaitForQueryAttributeChangeCommands == nil {
+		return nil, false
+	}
+	return o.WaitForQueryAttributeChangeCommands, true
+}
+
+// HasWaitForQueryAttributeChangeCommands returns a boolean if a field has been set.
+func (o *CommandRequest) HasWaitForQueryAttributeChangeCommands() bool {
+	if o != nil && o.WaitForQueryAttributeChangeCommands != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitForQueryAttributeChangeCommands gets a reference to the given []WaitForQueryAttributeChangeCommand and assigns it to the WaitForQueryAttributeChangeCommands field.
+func (o *CommandRequest) SetWaitForQueryAttributeChangeCommands(v []WaitForQueryAttributeChangeCommand) {
+	o.WaitForQueryAttributeChangeCommands = v
 }
 
 func (o CommandRequest) MarshalJSON() ([]byte, error) {
@@ -207,8 +240,11 @@ func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	if o.SignalCommands != nil {
 		toSerialize["signalCommands"] = o.SignalCommands
 	}
-	if o.OnQueryAttributeChangeCommands != nil {
-		toSerialize["onQueryAttributeChangeCommands"] = o.OnQueryAttributeChangeCommands
+	if o.InterStateChannelCommands != nil {
+		toSerialize["interStateChannelCommands"] = o.InterStateChannelCommands
+	}
+	if o.WaitForQueryAttributeChangeCommands != nil {
+		toSerialize["waitForQueryAttributeChangeCommands"] = o.WaitForQueryAttributeChangeCommands
 	}
 	return json.Marshal(toSerialize)
 }

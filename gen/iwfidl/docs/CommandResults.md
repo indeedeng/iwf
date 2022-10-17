@@ -6,8 +6,9 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ActivityResults** | Pointer to [**[]ActivityResult**](ActivityResult.md) |  | [optional] 
 **SignalResults** | Pointer to [**[]SignalResult**](SignalResult.md) |  | [optional] 
+**InterStateChannelResults** | Pointer to [**[]InterStateChannelResult**](InterStateChannelResult.md) |  | [optional] 
 **TimerResults** | Pointer to [**[]TimerResult**](TimerResult.md) |  | [optional] 
-**OnQueryAttributeChangeResults** | Pointer to [**[]OnQueryAttributeChangeResult**](OnQueryAttributeChangeResult.md) |  | [optional] 
+**WaitForQueryAttributeChangeResults** | Pointer to [**[]WaitForQueryAttributeChangeResult**](WaitForQueryAttributeChangeResult.md) |  | [optional] 
 
 ## Methods
 
@@ -78,6 +79,31 @@ SetSignalResults sets SignalResults field to given value.
 
 HasSignalResults returns a boolean if a field has been set.
 
+### GetInterStateChannelResults
+
+`func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult`
+
+GetInterStateChannelResults returns the InterStateChannelResults field if non-nil, zero value otherwise.
+
+### GetInterStateChannelResultsOk
+
+`func (o *CommandResults) GetInterStateChannelResultsOk() (*[]InterStateChannelResult, bool)`
+
+GetInterStateChannelResultsOk returns a tuple with the InterStateChannelResults field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetInterStateChannelResults
+
+`func (o *CommandResults) SetInterStateChannelResults(v []InterStateChannelResult)`
+
+SetInterStateChannelResults sets InterStateChannelResults field to given value.
+
+### HasInterStateChannelResults
+
+`func (o *CommandResults) HasInterStateChannelResults() bool`
+
+HasInterStateChannelResults returns a boolean if a field has been set.
+
 ### GetTimerResults
 
 `func (o *CommandResults) GetTimerResults() []TimerResult`
@@ -103,30 +129,30 @@ SetTimerResults sets TimerResults field to given value.
 
 HasTimerResults returns a boolean if a field has been set.
 
-### GetOnQueryAttributeChangeResults
+### GetWaitForQueryAttributeChangeResults
 
-`func (o *CommandResults) GetOnQueryAttributeChangeResults() []OnQueryAttributeChangeResult`
+`func (o *CommandResults) GetWaitForQueryAttributeChangeResults() []WaitForQueryAttributeChangeResult`
 
-GetOnQueryAttributeChangeResults returns the OnQueryAttributeChangeResults field if non-nil, zero value otherwise.
+GetWaitForQueryAttributeChangeResults returns the WaitForQueryAttributeChangeResults field if non-nil, zero value otherwise.
 
-### GetOnQueryAttributeChangeResultsOk
+### GetWaitForQueryAttributeChangeResultsOk
 
-`func (o *CommandResults) GetOnQueryAttributeChangeResultsOk() (*[]OnQueryAttributeChangeResult, bool)`
+`func (o *CommandResults) GetWaitForQueryAttributeChangeResultsOk() (*[]WaitForQueryAttributeChangeResult, bool)`
 
-GetOnQueryAttributeChangeResultsOk returns a tuple with the OnQueryAttributeChangeResults field if it's non-nil, zero value otherwise
+GetWaitForQueryAttributeChangeResultsOk returns a tuple with the WaitForQueryAttributeChangeResults field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOnQueryAttributeChangeResults
+### SetWaitForQueryAttributeChangeResults
 
-`func (o *CommandResults) SetOnQueryAttributeChangeResults(v []OnQueryAttributeChangeResult)`
+`func (o *CommandResults) SetWaitForQueryAttributeChangeResults(v []WaitForQueryAttributeChangeResult)`
 
-SetOnQueryAttributeChangeResults sets OnQueryAttributeChangeResults field to given value.
+SetWaitForQueryAttributeChangeResults sets WaitForQueryAttributeChangeResults field to given value.
 
-### HasOnQueryAttributeChangeResults
+### HasWaitForQueryAttributeChangeResults
 
-`func (o *CommandResults) HasOnQueryAttributeChangeResults() bool`
+`func (o *CommandResults) HasWaitForQueryAttributeChangeResults() bool`
 
-HasOnQueryAttributeChangeResults returns a boolean if a field has been set.
+HasWaitForQueryAttributeChangeResults returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
