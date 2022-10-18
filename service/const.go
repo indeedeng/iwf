@@ -17,6 +17,9 @@ const (
 	SignalStatusWaiting  = "WAITING"
 	SignalStatusReceived = "RECEIVED"
 
+	InternStateChannelCommandStatusWaiting = "WAITING"
+	InternStateChannelCommandReceived      = "RECEIVED"
+
 	SearchAttributeValueTypeKeyword = "KEYWORD"
 	SearchAttributeValueTypeInt     = "INT"
 

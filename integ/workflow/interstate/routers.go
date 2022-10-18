@@ -32,11 +32,13 @@ var TestVal2 = iwfidl.EncodedObject{
 
 type handler struct {
 	invokeHistory map[string]int64
+	invokeData    map[string]interface{}
 }
 
 func NewHandler() *handler {
 	return &handler{
 		invokeHistory: make(map[string]int64),
+		invokeData:    make(map[string]interface{}),
 	}
 }
 
@@ -137,6 +139,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		}
 
 		if req.GetWorkflowStateId() == State21 {
+			results := req.GetCommandResults()
+			h.invokeData[State21+"received"] = results.GetInterStateChannelResults()[0].GetValue()
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -150,6 +155,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		}
 
 		if req.GetWorkflowStateId() == State31 {
+			results := req.GetCommandResults()
+			h.invokeData[State31+"received"] = results.GetInterStateChannelResults()[0].GetValue()
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				// dead end
 				StateDecision: &iwfidl.StateDecision{},
@@ -178,5 +186,5 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, nil
+	return h.invokeHistory, h.invokeData
 }

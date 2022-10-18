@@ -66,7 +66,7 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)
 	}
 
-	history, _ := wfHandler.GetTestResult()
+	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
 		"S1_start":   1,
@@ -81,4 +81,8 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 
 	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
 	assertions.Equal(0, len(resp2.GetResults()))
+	assertions.Equal(map[string]interface{}{
+		interstate.State21 + "received": interstate.TestVal1,
+		interstate.State31 + "received": interstate.TestVal2,
+	}, data)
 }

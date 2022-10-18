@@ -65,13 +65,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					return
 				}
 
-				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
+				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(thisState.GetStateId())
 				decision, err := executeState(ctx, provider, thisState, execution, stateExeId, attrMgr, interStateChannel)
 				if err != nil {
 					errToFailWf = err
 				}
 
-				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
+				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, thisState.GetStateId(), stateExeId)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -83,7 +83,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 				if forceFail {
 					errToFailWf = provider.NewApplicationError(
-						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", state.GetStateId(), stateExeId),
+						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", thisState.GetStateId(), stateExeId),
 						service.WorkflowErrorTypeUserWorkflowDecision,
 					)
 				}
@@ -249,10 +249,11 @@ func executeState(
 					panic("critical code bug")
 				}
 				_ = provider.Await(ctx, func() bool {
-					return interStateChannel.HasData(cmd.ChannelName)
+					res := interStateChannel.HasData(cmd.ChannelName)
+					return res
 				})
 
-				completedSignalCmds[cmd.GetCommandId()] = interStateChannel.Retrieve(cmd.ChannelName)
+				completedInterStateChannelCmds[cmd.GetCommandId()] = interStateChannel.Retrieve(cmd.ChannelName)
 			})
 		}
 	}
@@ -269,6 +270,7 @@ func executeState(
 			len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
 			len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
 	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -295,6 +297,19 @@ func executeState(
 			})
 		}
 		commandRes.SetSignalResults(signalResults)
+	}
+
+	if len(commandReq.GetInterStateChannelCommands()) > 0 {
+		var interStateChannelResults []iwfidl.InterStateChannelResult
+		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+			interStateChannelResults = append(interStateChannelResults, iwfidl.InterStateChannelResult{
+				CommandId:     cmd.CommandId,
+				RequestStatus: service.InternStateChannelCommandReceived,
+				ChannelName:   cmd.ChannelName,
+				Value:         completedInterStateChannelCmds[cmd.CommandId],
+			})
+		}
+		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
