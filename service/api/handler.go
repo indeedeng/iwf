@@ -164,7 +164,7 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 	}
 
 	var output service.InterpreterWorkflowOutput
-	if req.GetNeedsResults() {
+	if req.GetNeedsResults() || waitIfStillRunning {
 		if resp.Status == service.WorkflowStatusCompleted || waitIfStillRunning {
 			err := h.client.GetWorkflowResult(context.Background(), &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 			if err != nil {

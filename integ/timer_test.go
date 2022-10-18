@@ -57,8 +57,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
-		WorkflowId:   wfId,
-		NeedsResults: iwfidl.PtrBool(true),
+		WorkflowId: wfId,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
