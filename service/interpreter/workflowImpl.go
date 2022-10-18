@@ -47,16 +47,16 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
 
-		for _, state := range statesToExecute {
+		for _, stateToExecute := range statesToExecute {
 			// execute in another thread for parallelism
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
-			stateCtx := provider.ExtendContextWithValue(ctx, "state", state)
-			provider.GoNamed(stateCtx, state.GetStateId(), func(ctx UnifiedContext) {
+			stateCtx := provider.ExtendContextWithValue(ctx, "state", stateToExecute)
+			provider.GoNamed(stateCtx, stateToExecute.GetStateId(), func(ctx UnifiedContext) {
 				defer func() {
 					inFlightExecutingStateCount--
 				}()
 
-				thisState, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
+				state, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = provider.NewApplicationError(
 						"critical code bug when passing state via context",
@@ -65,13 +65,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					return
 				}
 
-				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(thisState.GetStateId())
-				decision, err := executeState(ctx, provider, thisState, execution, stateExeId, attrMgr, interStateChannel)
+				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, attrMgr, interStateChannel)
 				if err != nil {
 					errToFailWf = err
 				}
 
-				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, thisState.GetStateId(), stateExeId)
+				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -83,7 +83,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 				if forceFail {
 					errToFailWf = provider.NewApplicationError(
-						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", thisState.GetStateId(), stateExeId),
+						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", state.GetStateId(), stateExeId),
 						service.WorkflowErrorTypeUserWorkflowDecision,
 					)
 				}
