@@ -3,7 +3,7 @@ package integ
 import (
 	"context"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/integ/workflow/timer"
+	"github.com/cadence-oss/iwf-server/integ/workflow/interstate"
 	"github.com/cadence-oss/iwf-server/service"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -13,21 +13,21 @@ import (
 	"time"
 )
 
-func TestTimerWorkflowTemporal(t *testing.T) {
-	doTestTimerWorkflow(t, service.BackendTypeTemporal)
+func TestInterStateWorkflowTemporal(t *testing.T) {
+	doTestInterStateWorkflow(t, service.BackendTypeTemporal)
 }
 
-func TestTimerWorkflowCadence(t *testing.T) {
-	doTestTimerWorkflow(t, service.BackendTypeCadence)
+func TestInterStateWorkflowCadence(t *testing.T) {
+	doTestInterStateWorkflow(t, service.BackendTypeCadence)
 }
 
-func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
-	wfHandler := timer.NewHandler()
+	wfHandler := interstate.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(service.BackendTypeTemporal)
+	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
 
 	// start a workflow
@@ -38,14 +38,14 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := timer.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := interstate.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        timer.WorkflowType,
-		WorkflowTimeoutSeconds: 30,
+		IwfWorkflowType:        interstate.WorkflowType,
+		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           timer.State1,
+		StartStateId:           interstate.State1,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
@@ -54,9 +54,8 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
 
-	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
-	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	if err != nil {
@@ -69,12 +68,20 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
-		"S1_start":  1,
-		"S1_decide": 1,
-		"S2_start":  1,
-		"S2_decide": 1,
-	}, history, "timer test fail, %v", history)
-	duration := (data["fired_at"]).(int64) - (data["scheduled_at"]).(int64)
-	assertions.Equal("timer-cmd-id", data["timer_id"])
-	assertions.True(duration >= 9 && duration <= 11)
+		"S1_start":   1,
+		"S1_decide":  1,
+		"S21_start":  1,
+		"S21_decide": 1,
+		"S22_start":  1,
+		"S22_decide": 1,
+		"S31_start":  1,
+		"S31_decide": 1,
+	}, history, "interstate test fail, %v", history)
+
+	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(0, len(resp2.GetResults()))
+	assertions.Equal(map[string]interface{}{
+		interstate.State21 + "received": interstate.TestVal1,
+		interstate.State31 + "received": interstate.TestVal2,
+	}, data)
 }

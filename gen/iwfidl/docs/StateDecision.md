@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **NextStates** | Pointer to [**[]StateMovement**](StateMovement.md) |  | [optional] 
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**PublishToInterStateChannel** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
 
 ## Methods
 
@@ -127,6 +128,31 @@ SetUpsertQueryAttributes sets UpsertQueryAttributes field to given value.
 `func (o *StateDecision) HasUpsertQueryAttributes() bool`
 
 HasUpsertQueryAttributes returns a boolean if a field has been set.
+
+### GetPublishToInterStateChannel
+
+`func (o *StateDecision) GetPublishToInterStateChannel() []InterStateChannelPublishing`
+
+GetPublishToInterStateChannel returns the PublishToInterStateChannel field if non-nil, zero value otherwise.
+
+### GetPublishToInterStateChannelOk
+
+`func (o *StateDecision) GetPublishToInterStateChannelOk() (*[]InterStateChannelPublishing, bool)`
+
+GetPublishToInterStateChannelOk returns a tuple with the PublishToInterStateChannel field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPublishToInterStateChannel
+
+`func (o *StateDecision) SetPublishToInterStateChannel(v []InterStateChannelPublishing)`
+
+SetPublishToInterStateChannel sets PublishToInterStateChannel field to given value.
+
+### HasPublishToInterStateChannel
+
+`func (o *StateDecision) HasPublishToInterStateChannel() bool`
+
+HasPublishToInterStateChannel returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -705,7 +705,7 @@ components:
           - firingUnixTimestampSeconds: 1
             commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
-          onQueryAttributeChangeCommands:
+          waitForQueryAttributeChangeCommands:
           - attributeKey: attributeKey
             commandId: commandId
           - attributeKey: attributeKey
@@ -725,6 +725,20 @@ components:
               startToCloseTimeoutSeconds: 6
             activityType: activityType
             commandId: commandId
+          interStateChannelCommands:
+          - channelName: channelName
+            commandId: commandId
+          - channelName: channelName
+            commandId: commandId
+        publishToInterStateChannel:
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
         upsertQueryAttributes:
         - value:
             data: data
@@ -748,6 +762,10 @@ components:
         upsertStateLocalAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
+          type: array
+        publishToInterStateChannel:
+          items:
+            $ref: '#/components/schemas/InterStateChannelPublishing'
           type: array
       type: object
     WorkflowStateDecideRequest:
@@ -785,6 +803,11 @@ components:
             signalValue:
               data: data
               encoding: encoding
+          waitForQueryAttributeChangeResults:
+          - commandId: commandId
+            status: WAITING
+          - commandId: commandId
+            status: WAITING
           activityResults:
           - output:
               data: data
@@ -800,11 +823,19 @@ components:
             activityStatus: OPEN
             activityType: activityType
             commandId: commandId
-          onQueryAttributeChangeResults:
-          - commandId: commandId
-            status: WAITING
-          - commandId: commandId
-            status: WAITING
+          interStateChannelResults:
+          - channelName: channelName
+            commandId: commandId
+            value:
+              data: data
+              encoding: encoding
+            requestStatus: WAITING
+          - channelName: channelName
+            commandId: commandId
+            value:
+              data: data
+              encoding: encoding
+            requestStatus: WAITING
           timerResults:
           - timerStatus: SCHEDULED
             commandId: commandId
@@ -903,6 +934,15 @@ components:
                 attributeKeys:
                 - attributeKeys
                 - attributeKeys
+          publishToInterStateChannel:
+          - channelName: channelName
+            value:
+              data: data
+              encoding: encoding
+          - channelName: channelName
+            value:
+              data: data
+              encoding: encoding
           upsertQueryAttributes:
           - value:
               data: data
@@ -963,6 +1003,15 @@ components:
               attributeKeys:
               - attributeKeys
               - attributeKeys
+        publishToInterStateChannel:
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
         upsertQueryAttributes:
         - value:
             data: data
@@ -987,6 +1036,10 @@ components:
         upsertQueryAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
+          type: array
+        publishToInterStateChannel:
+          items:
+            $ref: '#/components/schemas/InterStateChannelPublishing'
           type: array
       type: object
     StateMovement:
@@ -1031,7 +1084,7 @@ components:
         - firingUnixTimestampSeconds: 1
           commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
-        onQueryAttributeChangeCommands:
+        waitForQueryAttributeChangeCommands:
         - attributeKey: attributeKey
           commandId: commandId
         - attributeKey: attributeKey
@@ -1050,6 +1103,11 @@ components:
           activityOptions:
             startToCloseTimeoutSeconds: 6
           activityType: activityType
+          commandId: commandId
+        interStateChannelCommands:
+        - channelName: channelName
+          commandId: commandId
+        - channelName: channelName
           commandId: commandId
       properties:
         deciderTriggerType:
@@ -1070,9 +1128,13 @@ components:
           items:
             $ref: '#/components/schemas/SignalCommand'
           type: array
-        onQueryAttributeChangeCommands:
+        interStateChannelCommands:
           items:
-            $ref: '#/components/schemas/OnQueryAttributeChangeCommand'
+            $ref: '#/components/schemas/InterStateChannelCommand'
+          type: array
+        waitForQueryAttributeChangeCommands:
+          items:
+            $ref: '#/components/schemas/WaitForQueryAttributeChangeCommand'
           type: array
       required:
       - deciderTriggerType
@@ -1092,6 +1154,11 @@ components:
           signalValue:
             data: data
             encoding: encoding
+        waitForQueryAttributeChangeResults:
+        - commandId: commandId
+          status: WAITING
+        - commandId: commandId
+          status: WAITING
         activityResults:
         - output:
             data: data
@@ -1107,11 +1174,19 @@ components:
           activityStatus: OPEN
           activityType: activityType
           commandId: commandId
-        onQueryAttributeChangeResults:
-        - commandId: commandId
-          status: WAITING
-        - commandId: commandId
-          status: WAITING
+        interStateChannelResults:
+        - channelName: channelName
+          commandId: commandId
+          value:
+            data: data
+            encoding: encoding
+          requestStatus: WAITING
+        - channelName: channelName
+          commandId: commandId
+          value:
+            data: data
+            encoding: encoding
+          requestStatus: WAITING
         timerResults:
         - timerStatus: SCHEDULED
           commandId: commandId
@@ -1126,13 +1201,17 @@ components:
           items:
             $ref: '#/components/schemas/SignalResult'
           type: array
+        interStateChannelResults:
+          items:
+            $ref: '#/components/schemas/InterStateChannelResult'
+          type: array
         timerResults:
           items:
             $ref: '#/components/schemas/TimerResult'
           type: array
-        onQueryAttributeChangeResults:
+        waitForQueryAttributeChangeResults:
           items:
-            $ref: '#/components/schemas/OnQueryAttributeChangeResult'
+            $ref: '#/components/schemas/WaitForQueryAttributeChangeResult'
           type: array
       type: object
     ActivityCommand:
@@ -1184,7 +1263,20 @@ components:
       - commandId
       - signalChannelName
       type: object
-    OnQueryAttributeChangeCommand:
+    InterStateChannelCommand:
+      example:
+        channelName: channelName
+        commandId: commandId
+      properties:
+        commandId:
+          type: string
+        channelName:
+          type: string
+      required:
+      - channelName
+      - commandId
+      type: object
+    WaitForQueryAttributeChangeCommand:
       example:
         attributeKey: attributeKey
         commandId: commandId
@@ -1255,7 +1347,7 @@ components:
       - commandId
       - timerStatus
       type: object
-    OnQueryAttributeChangeResult:
+    WaitForQueryAttributeChangeResult:
       example:
         commandId: commandId
         status: WAITING
@@ -1295,6 +1387,45 @@ components:
       - commandId
       - signalChannelName
       - signalRequestStatus
+      type: object
+    InterStateChannelResult:
+      example:
+        channelName: channelName
+        commandId: commandId
+        value:
+          data: data
+          encoding: encoding
+        requestStatus: WAITING
+      properties:
+        commandId:
+          type: string
+        requestStatus:
+          enum:
+          - WAITING
+          - RECEIVED
+          type: string
+        channelName:
+          type: string
+        value:
+          $ref: '#/components/schemas/EncodedObject'
+      required:
+      - channelName
+      - commandId
+      - requestStatus
+      type: object
+    InterStateChannelPublishing:
+      example:
+        channelName: channelName
+        value:
+          data: data
+          encoding: encoding
+      properties:
+        channelName:
+          type: string
+        value:
+          $ref: '#/components/schemas/EncodedObject'
+      required:
+      - channelName
       type: object
     Context:
       example:

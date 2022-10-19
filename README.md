@@ -67,9 +67,10 @@ tctl adm cl asa -n CustomIntField -t Int
 
 ## 1.1
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
+- [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [ ] Support IdReusePolicy when starting workflow
 - [ ] StateOption: Start/Decide API timeout and retry
-- [ ] Command type(s) for inter-state communications (e.g. internal channel)
+- [ ] Reset workflow by stateId
 
 ## 1.2
 - [ ] AnyCommandCompleted Decider trigger type and WaitForMoreResults in StateDecision
@@ -78,5 +79,5 @@ tctl adm cl asa -n CustomIntField -t Int
 - [ ] LongRunningActivityCommand
 - [ ] Failing workflow details
 - [ ] Auto ContinueAsNew 
-- [ ] StateOption: AttributeLoadingPolicy
-- [ ] StateOption: CommandCarryOverPolicy
+- [ ] StateOption: more AttributeLoadingPolicy
+- [ ] StateOption: more CommandCarryOverPolicy

@@ -38,7 +38,7 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received request", req)
+	log.Println("received API request", req)
 
 	workflowOptions := StartWorkflowOptions{
 		ID:                 req.GetWorkflowId(),
@@ -80,7 +80,7 @@ func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received request", req)
+	log.Println("received API request", req)
 
 	err := h.client.SignalWorkflow(context.Background(),
 		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalChannelName(), req.GetSignalValue())
@@ -97,7 +97,7 @@ func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received request", req)
+	log.Println("received API request", req)
 
 	pageSize := int32(1000)
 	if req.GetPageSize() > 0 {
@@ -122,7 +122,7 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received request", req)
+	log.Println("received API request", req)
 
 	var queryResult1 service.QueryAttributeResponse
 	err := h.client.QueryWorkflow(context.Background(), &queryResult1,
@@ -155,7 +155,7 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received request", req)
+	log.Println("received API request", req)
 
 	resp, err := h.client.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
 	if err != nil {
@@ -164,7 +164,7 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 	}
 
 	var output service.InterpreterWorkflowOutput
-	if req.GetNeedsResults() {
+	if req.GetNeedsResults() || waitIfStillRunning {
 		if resp.Status == service.WorkflowStatusCompleted || waitIfStillRunning {
 			err := h.client.GetWorkflowResult(context.Background(), &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 			if err != nil {
@@ -198,7 +198,7 @@ func (h *handler) apiV1WorkflowResetPost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received request", req)
+	log.Println("received API request", req)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()

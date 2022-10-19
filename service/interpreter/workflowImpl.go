@@ -16,6 +16,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
 	}
 	stateExeIdMgr := NewStateExecutionIdManager()
+	interStateChannel := NewInterStateChannel()
 	currentStates := []iwfidl.StateMovement{
 		{
 			StateId:          input.StartStateId,
@@ -46,16 +47,16 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
 
-		for _, state := range statesToExecute {
+		for _, stateToExecute := range statesToExecute {
 			// execute in another thread for parallelism
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
-			stateCtx := provider.ExtendContextWithValue(ctx, "state", state)
-			provider.GoNamed(stateCtx, state.GetStateId(), func(ctx UnifiedContext) {
+			stateCtx := provider.ExtendContextWithValue(ctx, "state", stateToExecute)
+			provider.GoNamed(stateCtx, stateToExecute.GetStateId(), func(ctx UnifiedContext) {
 				defer func() {
 					inFlightExecutingStateCount--
 				}()
 
-				thisState, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
+				state, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = provider.NewApplicationError(
 						"critical code bug when passing state via context",
@@ -65,7 +66,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, thisState, execution, stateExeId, attrMgr)
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, attrMgr, interStateChannel)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -160,6 +161,7 @@ func executeState(
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
 	attrMgr *AttributeManager,
+	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
 	ao := ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
@@ -197,6 +199,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
+	interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
 	commandReq := startResponse.GetCommandRequest()
 
@@ -236,6 +239,25 @@ func executeState(
 		}
 	}
 
+	completedInterStateChannelCmds := map[string]*iwfidl.EncodedObject{}
+	if len(commandReq.GetInterStateChannelCommands()) > 0 {
+		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			provider.GoNamed(cmdCtx, "signal-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
+				if !ok {
+					panic("critical code bug")
+				}
+				_ = provider.Await(ctx, func() bool {
+					res := interStateChannel.HasData(cmd.ChannelName)
+					return res
+				})
+
+				completedInterStateChannelCmds[cmd.GetCommandId()] = interStateChannel.Retrieve(cmd.ChannelName)
+			})
+		}
+	}
+
 	// TODO process long running activity command
 
 	triggerType := commandReq.GetDeciderTriggerType()
@@ -245,8 +267,10 @@ func executeState(
 
 	err = provider.Await(ctx, func() bool {
 		return completedTimerCmds == len(commandReq.GetTimerCommands()) &&
-			len(completedSignalCmds) == len(commandReq.GetSignalCommands())
+			len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
+			len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
 	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -273,6 +297,19 @@ func executeState(
 			})
 		}
 		commandRes.SetSignalResults(signalResults)
+	}
+
+	if len(commandReq.GetInterStateChannelCommands()) > 0 {
+		var interStateChannelResults []iwfidl.InterStateChannelResult
+		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+			interStateChannelResults = append(interStateChannelResults, iwfidl.InterStateChannelResult{
+				CommandId:     cmd.CommandId,
+				RequestStatus: service.InternStateChannelCommandReceived,
+				ChannelName:   cmd.ChannelName,
+				Value:         completedInterStateChannelCmds[cmd.CommandId],
+			})
+		}
+		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
@@ -302,6 +339,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
+	interStateChannel.ProcessPublishing(decision.GetPublishToInterStateChannel())
 
 	return &decision, nil
 }

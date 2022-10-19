@@ -8,7 +8,8 @@ Name | Type | Description | Notes
 **ActivityCommands** | Pointer to [**[]ActivityCommand**](ActivityCommand.md) |  | [optional] 
 **TimerCommands** | Pointer to [**[]TimerCommand**](TimerCommand.md) |  | [optional] 
 **SignalCommands** | Pointer to [**[]SignalCommand**](SignalCommand.md) |  | [optional] 
-**OnQueryAttributeChangeCommands** | Pointer to [**[]OnQueryAttributeChangeCommand**](OnQueryAttributeChangeCommand.md) |  | [optional] 
+**InterStateChannelCommands** | Pointer to [**[]InterStateChannelCommand**](InterStateChannelCommand.md) |  | [optional] 
+**WaitForQueryAttributeChangeCommands** | Pointer to [**[]WaitForQueryAttributeChangeCommand**](WaitForQueryAttributeChangeCommand.md) |  | [optional] 
 
 ## Methods
 
@@ -124,30 +125,55 @@ SetSignalCommands sets SignalCommands field to given value.
 
 HasSignalCommands returns a boolean if a field has been set.
 
-### GetOnQueryAttributeChangeCommands
+### GetInterStateChannelCommands
 
-`func (o *CommandRequest) GetOnQueryAttributeChangeCommands() []OnQueryAttributeChangeCommand`
+`func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelCommand`
 
-GetOnQueryAttributeChangeCommands returns the OnQueryAttributeChangeCommands field if non-nil, zero value otherwise.
+GetInterStateChannelCommands returns the InterStateChannelCommands field if non-nil, zero value otherwise.
 
-### GetOnQueryAttributeChangeCommandsOk
+### GetInterStateChannelCommandsOk
 
-`func (o *CommandRequest) GetOnQueryAttributeChangeCommandsOk() (*[]OnQueryAttributeChangeCommand, bool)`
+`func (o *CommandRequest) GetInterStateChannelCommandsOk() (*[]InterStateChannelCommand, bool)`
 
-GetOnQueryAttributeChangeCommandsOk returns a tuple with the OnQueryAttributeChangeCommands field if it's non-nil, zero value otherwise
+GetInterStateChannelCommandsOk returns a tuple with the InterStateChannelCommands field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOnQueryAttributeChangeCommands
+### SetInterStateChannelCommands
 
-`func (o *CommandRequest) SetOnQueryAttributeChangeCommands(v []OnQueryAttributeChangeCommand)`
+`func (o *CommandRequest) SetInterStateChannelCommands(v []InterStateChannelCommand)`
 
-SetOnQueryAttributeChangeCommands sets OnQueryAttributeChangeCommands field to given value.
+SetInterStateChannelCommands sets InterStateChannelCommands field to given value.
 
-### HasOnQueryAttributeChangeCommands
+### HasInterStateChannelCommands
 
-`func (o *CommandRequest) HasOnQueryAttributeChangeCommands() bool`
+`func (o *CommandRequest) HasInterStateChannelCommands() bool`
 
-HasOnQueryAttributeChangeCommands returns a boolean if a field has been set.
+HasInterStateChannelCommands returns a boolean if a field has been set.
+
+### GetWaitForQueryAttributeChangeCommands
+
+`func (o *CommandRequest) GetWaitForQueryAttributeChangeCommands() []WaitForQueryAttributeChangeCommand`
+
+GetWaitForQueryAttributeChangeCommands returns the WaitForQueryAttributeChangeCommands field if non-nil, zero value otherwise.
+
+### GetWaitForQueryAttributeChangeCommandsOk
+
+`func (o *CommandRequest) GetWaitForQueryAttributeChangeCommandsOk() (*[]WaitForQueryAttributeChangeCommand, bool)`
+
+GetWaitForQueryAttributeChangeCommandsOk returns a tuple with the WaitForQueryAttributeChangeCommands field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitForQueryAttributeChangeCommands
+
+`func (o *CommandRequest) SetWaitForQueryAttributeChangeCommands(v []WaitForQueryAttributeChangeCommand)`
+
+SetWaitForQueryAttributeChangeCommands sets WaitForQueryAttributeChangeCommands field to given value.
+
+### HasWaitForQueryAttributeChangeCommands
+
+`func (o *CommandRequest) HasWaitForQueryAttributeChangeCommands() bool`
+
+HasWaitForQueryAttributeChangeCommands returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

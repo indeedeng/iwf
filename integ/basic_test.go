@@ -61,8 +61,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
-		WorkflowId:   wfId,
-		NeedsResults: iwfidl.PtrBool(true),
+		WorkflowId: wfId,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
