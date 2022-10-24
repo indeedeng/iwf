@@ -1,11 +1,7 @@
 package api
 
 import (
-	"context"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/service"
-	"time"
-
 	"log"
 	"net/http"
 
@@ -13,17 +9,21 @@ import (
 )
 
 type handler struct {
-	client UnifiedClient
+	svc ApiService
 }
 
 func newHandler(client UnifiedClient) *handler {
+	svc, err := NewApiService(client)
+	if err != nil {
+		panic(err)
+	}
 	return &handler{
-		client: client,
+		svc: svc,
 	}
 }
 
 func (h *handler) close() {
-	h.client.Close()
+	h.svc.Close()
 }
 
 // Index is the index handler.
@@ -32,7 +32,7 @@ func (h *handler) index(c *gin.Context) {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 	var req iwfidl.WorkflowStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,41 +40,16 @@ func (h *handler) apiV1WorkflowStartPost(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	workflowOptions := StartWorkflowOptions{
-		ID:                 req.GetWorkflowId(),
-		TaskQueue:          service.TaskQueue,
-		WorkflowRunTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
-	}
-
-	input := service.InterpreterWorkflowInput{
-		IwfWorkflowType: req.GetIwfWorkflowType(),
-		IwfWorkerUrl:    req.GetIwfWorkerUrl(),
-		StartStateId:    req.GetStartStateId(),
-		StateInput:      req.GetStateInput(),
-		StateOptions:    req.GetStateOptions(),
-	}
-	runId, err := h.client.StartInterpreterWorkflow(context.Background(), workflowOptions, input)
-	if err != nil {
-		handleError(c, err)
+	resp, errResp := h.svc.ApiV1WorkflowStartPost(req)
+	if errResp != nil {
+		h.processError(c, errResp)
 		return
 	}
-
-	log.Println("Started workflow", "WorkflowID", req.WorkflowId, "RunID", runId)
-
-	c.JSON(http.StatusOK, iwfidl.WorkflowStartResponse{
-		WorkflowRunId: iwfidl.PtrString(runId),
-	})
+	c.JSON(http.StatusOK, resp)
+	return
 }
 
-func handleError(c *gin.Context, err error) {
-	// TODO differentiate different error for different codes
-	log.Println("encounter error for API", err)
-	c.JSON(http.StatusInternalServerError, iwfidl.ErrorResponse{
-		Detail: iwfidl.PtrString(err.Error()),
-	})
-}
-
-func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 	var req iwfidl.WorkflowSignalRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -82,16 +57,16 @@ func (h *handler) apiV1WorkflowSignalPost(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	err := h.client.SignalWorkflow(context.Background(),
-		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalChannelName(), req.GetSignalValue())
-	if err != nil {
-		handleError(c, err)
+	errResp := h.svc.ApiV1WorkflowSignalPost(req)
+	if errResp != nil {
+		h.processError(c, errResp)
 		return
 	}
 	c.JSON(http.StatusOK, struct{}{})
+	return
 }
 
-func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	var req iwfidl.WorkflowSearchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -99,24 +74,16 @@ func (h *handler) apiV1WorkflowSearchPost(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	pageSize := int32(1000)
-	if req.GetPageSize() > 0 {
-		pageSize = req.GetPageSize()
-	}
-	resp, err := h.client.ListWorkflow(context.Background(), &ListWorkflowExecutionsRequest{
-		PageSize: pageSize,
-		Query:    req.GetQuery(),
-	})
-	if err != nil {
-		handleError(c, err)
+	resp, errResp := h.svc.ApiV1WorkflowSearchPost(req)
+	if errResp != nil {
+		h.processError(c, errResp)
 		return
 	}
-	c.JSON(http.StatusOK, iwfidl.WorkflowSearchResponse{
-		WorkflowExecutions: resp.Executions,
-	})
+	c.JSON(http.StatusOK, resp)
+	return
 }
 
-func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowGetQueryAttributes(c *gin.Context) {
 	var req iwfidl.WorkflowGetQueryAttributesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -124,28 +91,20 @@ func (h *handler) apiV1WorkflowQueryPost(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	var queryResult1 service.QueryAttributeResponse
-	err := h.client.QueryWorkflow(context.Background(), &queryResult1,
-		req.GetWorkflowId(), req.GetWorkflowRunId(), service.AttributeQueryType,
-		service.QueryAttributeRequest{
-			Keys: req.AttributeKeys,
-		})
-
-	if err != nil {
-		handleError(c, err)
+	resp, errResp := h.svc.ApiV1WorkflowGetQueryAttributesPost(req)
+	if errResp != nil {
+		h.processError(c, errResp)
 		return
 	}
-
-	c.JSON(http.StatusOK, iwfidl.WorkflowGetQueryAttributesResponse{
-		QueryAttributes: queryResult1.AttributeValues,
-	})
+	c.JSON(http.StatusOK, resp)
+	return
 }
 
-func (h *handler) apiV1WorkflowGetPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowGet(c *gin.Context) {
 	h.doApiV1WorkflowGetPost(c, false)
 }
 
-func (h *handler) apiV1WorkflowGetWithWaitPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowGetWithWait(c *gin.Context) {
 	h.doApiV1WorkflowGetPost(c, true)
 }
 
@@ -157,42 +116,23 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 	}
 	log.Println("received API request", req)
 
-	resp, err := h.client.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
-	if err != nil {
-		handleError(c, err)
-		return
-	}
-
-	var output service.InterpreterWorkflowOutput
-	if req.GetNeedsResults() || waitIfStillRunning {
-		if resp.Status == service.WorkflowStatusCompleted || waitIfStillRunning {
-			err := h.client.GetWorkflowResult(context.Background(), &output, req.GetWorkflowId(), req.GetWorkflowRunId())
-			if err != nil {
-				handleError(c, err)
-				return
-			}
-		}
-	}
-
-	status := resp.Status
+	var resp *iwfidl.WorkflowGetResponse
+	var errResp *ErrorAndStatus
 	if waitIfStillRunning {
-		// override because when GetWorkflowResult, the workflow is completed
-		status = service.WorkflowStatusCompleted
+		resp, errResp = h.svc.ApiV1WorkflowGetWithWaitPost(req)
+	} else {
+		resp, errResp = h.svc.ApiV1WorkflowGetPost(req)
 	}
 
-	if err != nil {
-		handleError(c, err)
+	if errResp != nil {
+		h.processError(c, errResp)
 		return
 	}
-
-	c.JSON(http.StatusOK, iwfidl.WorkflowGetResponse{
-		WorkflowRunId:  resp.RunId,
-		WorkflowStatus: status,
-		Results:        output.StateCompletionOutputs,
-	})
+	c.JSON(http.StatusOK, resp)
+	return
 }
 
-func (h *handler) apiV1WorkflowResetPost(c *gin.Context) {
+func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 	var req iwfidl.WorkflowResetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -200,14 +140,15 @@ func (h *handler) apiV1WorkflowResetPost(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
-	defer cancel()
-	runId, err := h.client.ResetWorkflow(ctx, req)
-	if err != nil {
-		handleError(c, err)
+	resp, errResp := h.svc.ApiV1WorkflowResetPost(req)
+	if errResp != nil {
+		h.processError(c, errResp)
 		return
 	}
-	c.JSON(http.StatusOK, iwfidl.WorkflowResetResponse{
-		WorkflowRunId: runId,
-	})
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *handler) processError(c *gin.Context, resp *ErrorAndStatus) {
+	c.JSON(resp.StatusCode, resp.Error)
 }
