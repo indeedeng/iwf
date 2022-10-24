@@ -19,13 +19,13 @@ func NewService(client UnifiedClient) *gin.Engine {
 	handler := newHandler(client)
 
 	router.GET("/", handler.index)
-	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStartPost)
-	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignalPost)
-	router.POST(WorkflowGetQueryAttributesApiPath, handler.apiV1WorkflowQueryPost)
-	router.POST(WorkflowGetApiPath, handler.apiV1WorkflowGetPost)
-	router.POST(WorkflowGetWithWaitApiPath, handler.apiV1WorkflowGetWithWaitPost)
-	router.POST(WorkflowSearchApiPath, handler.apiV1WorkflowSearchPost)
-	router.POST(WorkflowResetApiPath, handler.apiV1WorkflowResetPost)
+	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStart)
+	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignal)
+	router.POST(WorkflowGetQueryAttributesApiPath, handler.apiV1WorkflowGetQueryAttributes)
+	router.POST(WorkflowGetApiPath, handler.apiV1WorkflowGet)
+	router.POST(WorkflowGetWithWaitApiPath, handler.apiV1WorkflowGetWithWait)
+	router.POST(WorkflowSearchApiPath, handler.apiV1WorkflowSearch)
+	router.POST(WorkflowResetApiPath, handler.apiV1WorkflowReset)
 
 	return router
 }
