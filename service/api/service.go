@@ -135,6 +135,8 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(req iwfidl.WorkflowSearchRequest) 
 }
 
 func (s *serviceImpl) ApiV1WorkflowResetPost(req iwfidl.WorkflowResetRequest) (*iwfidl.WorkflowResetResponse, *ErrorAndStatus) {
+	// TODO https://github.com/indeedeng/iwf/issues/52
+	// this is required otherwise Cadence won't accept a reset request
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 	runId, err := s.client.ResetWorkflow(ctx, req)
