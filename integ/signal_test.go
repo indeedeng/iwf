@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/workflow/signal"
 	"github.com/cadence-oss/iwf-server/service"
@@ -55,20 +56,24 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	}
 
 	// signal the workflow
-	signalVal := iwfidl.EncodedObject{
-		Encoding: iwfidl.PtrString("json"),
-		Data:     iwfidl.PtrString("test-data"),
-	}
-	//err = temporalClient.SignalWorkflow(context.Background(), wfId, "", signal.SignalName, signalVal)
-	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
-	httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
-		WorkflowId:        wfId,
-		SignalChannelName: signal.SignalName,
-		SignalValue:       &signalVal,
-	}).Execute()
+	var signalVals []iwfidl.EncodedObject
+	for i := 0; i < 4; i++ {
+		signalVal := iwfidl.EncodedObject{
+			Encoding: iwfidl.PtrString("json"),
+			Data:     iwfidl.PtrString(fmt.Sprintf("test-data-%v", i)),
+		}
+		signalVals = append(signalVals, signalVal)
 
-	if err != nil || httpResp2.StatusCode != 200 {
-		log.Fatalf("Fail to signal the workflow %v %v", err, httpResp2)
+		req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
+		httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+			WorkflowId:        wfId,
+			SignalChannelName: signal.SignalName,
+			SignalValue:       &signalVal,
+		}).Execute()
+
+		if err != nil || httpResp2.StatusCode != 200 {
+			log.Fatalf("Fail to signal the workflow %v %v", err, httpResp2)
+		}
 	}
 
 	// wait for the workflow
@@ -91,6 +96,12 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "signal test fail, %v", history)
-	assertions.Equal("signal-cmd-id", data["signalId"])
-	assertions.Equal(signalVal, data["signalValue"])
+
+	assertions.Equal(fmt.Sprintf("signal-cmd-id%v", 0), data[fmt.Sprintf("signalId%v", 0)])
+	assertions.Equal(fmt.Sprintf("signal-cmd-id%v", 1), data[fmt.Sprintf("signalId%v", 1)])
+	assertions.Equal("", data[fmt.Sprintf("signalId%v", 2)])
+	assertions.Equal("", data[fmt.Sprintf("signalId%v", 3)])
+	for i := 0; i < 4; i++ {
+		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
+	}
 }
