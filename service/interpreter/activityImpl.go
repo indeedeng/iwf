@@ -27,7 +27,6 @@ func StateStart(ctx context.Context, backendType service.BackendType, input serv
 	if httpResp.StatusCode != http.StatusOK {
 		return nil, provider.NewApplicationError("state start API failed", "api failed", httpResp)
 	}
-	// TODO validate commandId here
 
 	return resp, nil
 }

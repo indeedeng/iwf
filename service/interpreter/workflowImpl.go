@@ -205,9 +205,9 @@ func executeState(
 
 	completedTimerCmds := 0
 	if len(commandReq.GetTimerCommands()) > 0 {
-		for _, cmd := range commandReq.GetTimerCommands() {
+		for idx, cmd := range commandReq.GetTimerCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
-			provider.GoNamed(cmdCtx, "timer-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+			provider.GoNamed(cmdCtx, getThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.TimerCommand)
 				if !ok {
 					panic("critical code bug")
@@ -222,11 +222,11 @@ func executeState(
 		}
 	}
 
-	completedSignalCmds := map[string]*iwfidl.EncodedObject{}
+	completedSignalCmds := map[int]*iwfidl.EncodedObject{}
 	if len(commandReq.GetSignalCommands()) > 0 {
-		for _, cmd := range commandReq.GetSignalCommands() {
+		for idx, cmd := range commandReq.GetSignalCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
-			provider.GoNamed(cmdCtx, "signal-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+			provider.GoNamed(cmdCtx, getThreadName("signal", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
 				if !ok {
 					panic("critical code bug")
@@ -234,16 +234,16 @@ func executeState(
 				ch := provider.GetSignalChannel(ctx, cmd.GetSignalChannelName())
 				value := iwfidl.EncodedObject{}
 				ch.Receive(ctx, &value)
-				completedSignalCmds[cmd.GetCommandId()] = &value
+				completedSignalCmds[idx] = &value
 			})
 		}
 	}
 
-	completedInterStateChannelCmds := map[string]*iwfidl.EncodedObject{}
+	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 	if len(commandReq.GetInterStateChannelCommands()) > 0 {
-		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
-			provider.GoNamed(cmdCtx, "signal-"+cmd.GetCommandId(), func(ctx UnifiedContext) {
+			provider.GoNamed(cmdCtx, getThreadName("interstate", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
 				if !ok {
 					panic("critical code bug")
@@ -253,7 +253,7 @@ func executeState(
 					return res
 				})
 
-				completedInterStateChannelCmds[cmd.GetCommandId()] = interStateChannel.Retrieve(cmd.ChannelName)
+				completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
 			})
 		}
 	}
@@ -288,11 +288,11 @@ func executeState(
 
 	if len(commandReq.GetSignalCommands()) > 0 {
 		var signalResults []iwfidl.SignalResult
-		for _, cmd := range commandReq.GetSignalCommands() {
+		for idx, cmd := range commandReq.GetSignalCommands() {
 			signalResults = append(signalResults, iwfidl.SignalResult{
 				CommandId:           cmd.GetCommandId(),
 				SignalChannelName:   cmd.GetSignalChannelName(),
-				SignalValue:         completedSignalCmds[cmd.GetCommandId()],
+				SignalValue:         completedSignalCmds[idx],
 				SignalRequestStatus: service.SignalStatusReceived,
 			})
 		}
@@ -301,12 +301,12 @@ func executeState(
 
 	if len(commandReq.GetInterStateChannelCommands()) > 0 {
 		var interStateChannelResults []iwfidl.InterStateChannelResult
-		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
 			interStateChannelResults = append(interStateChannelResults, iwfidl.InterStateChannelResult{
 				CommandId:     cmd.CommandId,
 				RequestStatus: service.InternStateChannelCommandReceived,
 				ChannelName:   cmd.ChannelName,
-				Value:         completedInterStateChannelCmds[cmd.CommandId],
+				Value:         completedInterStateChannelCmds[idx],
 			})
 		}
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
@@ -342,4 +342,8 @@ func executeState(
 	interStateChannel.ProcessPublishing(decision.GetPublishToInterStateChannel())
 
 	return &decision, nil
+}
+
+func getThreadName(prefix string, cmdId string, idx int) string {
+	return fmt.Sprintf("%v-%v-%v", prefix, cmdId, idx)
 }
