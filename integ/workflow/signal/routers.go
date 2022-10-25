@@ -1,6 +1,7 @@
 package signal
 
 import (
+	"fmt"
 	"github.com/cadence-oss/iwf-server/gen/iwfidl"
 	"github.com/cadence-oss/iwf-server/integ/workflow/common"
 	"github.com/cadence-oss/iwf-server/service"
@@ -44,7 +45,19 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
 						{
-							CommandId:         "signal-cmd-id",
+							CommandId:         "signal-cmd-id0",
+							SignalChannelName: SignalName,
+						},
+						{
+							CommandId:         "signal-cmd-id1",
+							SignalChannelName: SignalName,
+						},
+						{
+							CommandId:         "",
+							SignalChannelName: SignalName,
+						},
+						{
+							CommandId:         "",
 							SignalChannelName: SignalName,
 						},
 					},
@@ -78,11 +91,13 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 			signalResults := req.GetCommandResults()
-			signalId := signalResults.SignalResults[0].GetCommandId()
-			signalValue := signalResults.SignalResults[0].GetSignalValue()
+			for i := 0; i < 4; i++ {
+				signalId := signalResults.SignalResults[i].GetCommandId()
+				signalValue := signalResults.SignalResults[i].GetSignalValue()
 
-			h.invokeData["signalId"] = signalId
-			h.invokeData["signalValue"] = signalValue
+				h.invokeData[fmt.Sprintf("signalId%v", i)] = signalId
+				h.invokeData[fmt.Sprintf("signalValue%v", i)] = signalValue
+			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
