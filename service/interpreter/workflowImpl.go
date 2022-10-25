@@ -207,6 +207,7 @@ func executeState(
 	if len(commandReq.GetTimerCommands()) > 0 {
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.TimerCommand)
 				if !ok {
@@ -226,8 +227,13 @@ func executeState(
 	if len(commandReq.GetSignalCommands()) > 0 {
 		for idx, cmd := range commandReq.GetSignalCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("signal", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
+				if !ok {
+					panic("critical code bug")
+				}
+				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
 					panic("critical code bug")
 				}
@@ -243,11 +249,17 @@ func executeState(
 	if len(commandReq.GetInterStateChannelCommands()) > 0 {
 		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
+			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("interstate", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
 				if !ok {
 					panic("critical code bug")
 				}
+				idx, ok := provider.GetContextValue(ctx, "idx").(int)
+				if !ok {
+					panic("critical code bug")
+				}
+
 				_ = provider.Await(ctx, func() bool {
 					res := interStateChannel.HasData(cmd.ChannelName)
 					return res

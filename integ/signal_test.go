@@ -97,8 +97,11 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 		"S2_decide": 1,
 	}, history, "signal test fail, %v", history)
 
+	assertions.Equal(fmt.Sprintf("signal-cmd-id%v", 0), data[fmt.Sprintf("signalId%v", 0)])
+	assertions.Equal(fmt.Sprintf("signal-cmd-id%v", 1), data[fmt.Sprintf("signalId%v", 1)])
+	assertions.Equal("", data[fmt.Sprintf("signalId%v", 2)])
+	assertions.Equal("", data[fmt.Sprintf("signalId%v", 3)])
 	for i := 0; i < 4; i++ {
-		assertions.Equal(fmt.Sprintf("signal-cmd-id%v", i), data[fmt.Sprintf("signalId%v", i)])
 		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
 	}
 }
