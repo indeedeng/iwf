@@ -2,9 +2,9 @@ package integ
 
 import (
 	"context"
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/integ/workflow/attribute"
-	"github.com/cadence-oss/iwf-server/service"
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/workflow/attribute"
+	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"

@@ -2,7 +2,7 @@ package interpreter
 
 import (
 	"context"
-	"github.com/cadence-oss/iwf-server/service"
+	"github.com/indeedeng/iwf/service"
 	"time"
 )
 

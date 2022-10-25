@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/service"
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 	"time"

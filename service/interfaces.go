@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 )
 
 type (

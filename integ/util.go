@@ -1,15 +1,15 @@
 package integ
 
 import (
-	"github.com/cadence-oss/iwf-server/cmd/server/iwf"
-	"github.com/cadence-oss/iwf-server/integ/workflow/common"
-	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/api"
-	cadenceapi "github.com/cadence-oss/iwf-server/service/api/cadence"
-	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
-	"github.com/cadence-oss/iwf-server/service/interpreter/cadence"
-	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
 	"github.com/gin-gonic/gin"
+	"github.com/indeedeng/iwf/cmd/server/iwf"
+	"github.com/indeedeng/iwf/integ/workflow/common"
+	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/api"
+	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
+	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
+	"github.com/indeedeng/iwf/service/interpreter/cadence"
+	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/sdk/client"
 	"log"
 	"net/http"

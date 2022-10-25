@@ -1,8 +1,8 @@
 package temporal
 
 import (
-	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter"
+	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter"
 	"go.temporal.io/sdk/workflow"
 	// TODO(cretz): Remove when tagged
 	_ "go.temporal.io/sdk/contrib/tools/workflowcheck/determinism"

@@ -1,6 +1,6 @@
 package interpreter
 
-import "github.com/cadence-oss/iwf-server/gen/iwfidl"
+import "github.com/indeedeng/iwf/gen/iwfidl"
 
 type InterStateChannel struct {
 	// key is channel name

@@ -2,10 +2,10 @@ package signal
 
 import (
 	"fmt"
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/integ/workflow/common"
-	"github.com/cadence-oss/iwf-server/service"
 	"github.com/gin-gonic/gin"
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/workflow/common"
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 )

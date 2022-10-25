@@ -22,7 +22,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```golang
-import iwfidl "github.com/cadence-oss/iwf-idl"
+import iwfidl "github.com/indeedeng/iwf-idl"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:

@@ -1,4 +1,4 @@
-module github.com/cadence-oss/iwf-server
+module github.com/indeedeng/iwf
 
 go 1.17
 

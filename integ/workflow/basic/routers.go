@@ -1,9 +1,9 @@
 package basic
 
 import (
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/service"
 	"github.com/gin-gonic/gin"
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 )

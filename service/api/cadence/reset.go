@@ -3,8 +3,8 @@ package cadence
 import (
 	"context"
 	"fmt"
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
-	"github.com/cadence-oss/iwf-server/service"
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"math"

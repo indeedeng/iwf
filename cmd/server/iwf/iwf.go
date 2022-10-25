@@ -22,12 +22,12 @@ package iwf
 
 import (
 	"fmt"
-	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/api"
-	cadenceapi "github.com/cadence-oss/iwf-server/service/api/cadence"
-	temporalapi "github.com/cadence-oss/iwf-server/service/api/temporal"
-	"github.com/cadence-oss/iwf-server/service/interpreter/cadence"
-	"github.com/cadence-oss/iwf-server/service/interpreter/temporal"
+	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/api"
+	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
+	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
+	"github.com/indeedeng/iwf/service/interpreter/cadence"
+	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	apiv1 "github.com/uber/cadence-idl/go/proto/api/v1"
 	"github.com/urfave/cli"
 	"go.temporal.io/sdk/client"

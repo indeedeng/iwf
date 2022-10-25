@@ -1,8 +1,8 @@
 package cadence
 
 import (
-	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter"
+	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
 	"log"

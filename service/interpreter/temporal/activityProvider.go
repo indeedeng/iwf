@@ -2,8 +2,8 @@ package temporal
 
 import (
 	"context"
-	"github.com/cadence-oss/iwf-server/service"
-	"github.com/cadence-oss/iwf-server/service/interpreter"
+	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter"
 	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/temporal"
 )

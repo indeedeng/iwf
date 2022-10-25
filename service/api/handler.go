@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/cadence-oss/iwf-server/gen/iwfidl"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"log"
 	"net/http"
 
