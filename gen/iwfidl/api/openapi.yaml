@@ -722,9 +722,6 @@ components:
           - firingUnixTimestampSeconds: 6
             commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
-          activityCommands:
-          - "{}"
-          - "{}"
           interStateChannelCommands:
           - channelName: channelName
             commandId: commandId
@@ -1060,9 +1057,6 @@ components:
         - firingUnixTimestampSeconds: 6
           commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
-        activityCommands:
-        - "{}"
-        - "{}"
         interStateChannelCommands:
         - channelName: channelName
           commandId: commandId
@@ -1073,10 +1067,6 @@ components:
           enum:
           - ALL_COMMAND_COMPLETED
           type: string
-        activityCommands:
-          items:
-            $ref: '#/components/schemas/ActivityCommand'
-          type: array
         timerCommands:
           items:
             $ref: '#/components/schemas/TimerCommand'
