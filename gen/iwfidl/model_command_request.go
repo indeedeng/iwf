@@ -21,7 +21,6 @@ type CommandRequest struct {
 	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
 	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
 	InterStateChannelCommands []InterStateChannelCommand `json:"interStateChannelCommands,omitempty"`
-	WaitForQueryAttributeChangeCommands []WaitForQueryAttributeChangeCommand `json:"waitForQueryAttributeChangeCommands,omitempty"`
 }
 
 // NewCommandRequest instantiates a new CommandRequest object
@@ -194,38 +193,6 @@ func (o *CommandRequest) SetInterStateChannelCommands(v []InterStateChannelComma
 	o.InterStateChannelCommands = v
 }
 
-// GetWaitForQueryAttributeChangeCommands returns the WaitForQueryAttributeChangeCommands field value if set, zero value otherwise.
-func (o *CommandRequest) GetWaitForQueryAttributeChangeCommands() []WaitForQueryAttributeChangeCommand {
-	if o == nil || o.WaitForQueryAttributeChangeCommands == nil {
-		var ret []WaitForQueryAttributeChangeCommand
-		return ret
-	}
-	return o.WaitForQueryAttributeChangeCommands
-}
-
-// GetWaitForQueryAttributeChangeCommandsOk returns a tuple with the WaitForQueryAttributeChangeCommands field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *CommandRequest) GetWaitForQueryAttributeChangeCommandsOk() ([]WaitForQueryAttributeChangeCommand, bool) {
-	if o == nil || o.WaitForQueryAttributeChangeCommands == nil {
-		return nil, false
-	}
-	return o.WaitForQueryAttributeChangeCommands, true
-}
-
-// HasWaitForQueryAttributeChangeCommands returns a boolean if a field has been set.
-func (o *CommandRequest) HasWaitForQueryAttributeChangeCommands() bool {
-	if o != nil && o.WaitForQueryAttributeChangeCommands != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWaitForQueryAttributeChangeCommands gets a reference to the given []WaitForQueryAttributeChangeCommand and assigns it to the WaitForQueryAttributeChangeCommands field.
-func (o *CommandRequest) SetWaitForQueryAttributeChangeCommands(v []WaitForQueryAttributeChangeCommand) {
-	o.WaitForQueryAttributeChangeCommands = v
-}
-
 func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -242,9 +209,6 @@ func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.InterStateChannelCommands != nil {
 		toSerialize["interStateChannelCommands"] = o.InterStateChannelCommands
-	}
-	if o.WaitForQueryAttributeChangeCommands != nil {
-		toSerialize["waitForQueryAttributeChangeCommands"] = o.WaitForQueryAttributeChangeCommands
 	}
 	return json.Marshal(toSerialize)
 }

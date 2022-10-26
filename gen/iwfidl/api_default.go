@@ -90,8 +90,8 @@ type DefaultApi interface {
 	ApiV1WorkflowSearchattributesGetPost(ctx context.Context) ApiApiV1WorkflowSearchattributesGetPostRequest
 
 	// ApiV1WorkflowSearchattributesGetPostExecute executes the request
-	//  @return WorkflowGetQueryAttributesResponse
-	ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetQueryAttributesResponse, *http.Response, error)
+	//  @return WorkflowGetSearchAttributesResponse
+	ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetSearchAttributesResponse, *http.Response, error)
 
 	/*
 	ApiV1WorkflowSignalPost signal a workflow
@@ -717,15 +717,15 @@ func (a *DefaultApiService) ApiV1WorkflowSearchPostExecute(r ApiApiV1WorkflowSea
 type ApiApiV1WorkflowSearchattributesGetPostRequest struct {
 	ctx context.Context
 	ApiService DefaultApi
-	workflowGetQueryAttributesRequest *WorkflowGetQueryAttributesRequest
+	workflowGetSearchAttributesRequest *WorkflowGetSearchAttributesRequest
 }
 
-func (r ApiApiV1WorkflowSearchattributesGetPostRequest) WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest WorkflowGetQueryAttributesRequest) ApiApiV1WorkflowSearchattributesGetPostRequest {
-	r.workflowGetQueryAttributesRequest = &workflowGetQueryAttributesRequest
+func (r ApiApiV1WorkflowSearchattributesGetPostRequest) WorkflowGetSearchAttributesRequest(workflowGetSearchAttributesRequest WorkflowGetSearchAttributesRequest) ApiApiV1WorkflowSearchattributesGetPostRequest {
+	r.workflowGetSearchAttributesRequest = &workflowGetSearchAttributesRequest
 	return r
 }
 
-func (r ApiApiV1WorkflowSearchattributesGetPostRequest) Execute() (*WorkflowGetQueryAttributesResponse, *http.Response, error) {
+func (r ApiApiV1WorkflowSearchattributesGetPostRequest) Execute() (*WorkflowGetSearchAttributesResponse, *http.Response, error) {
 	return r.ApiService.ApiV1WorkflowSearchattributesGetPostExecute(r)
 }
 
@@ -743,13 +743,13 @@ func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPost(ctx context.Con
 }
 
 // Execute executes the request
-//  @return WorkflowGetQueryAttributesResponse
-func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetQueryAttributesResponse, *http.Response, error) {
+//  @return WorkflowGetSearchAttributesResponse
+func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetSearchAttributesResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *WorkflowGetQueryAttributesResponse
+		localVarReturnValue  *WorkflowGetSearchAttributesResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowSearchattributesGetPost")
@@ -781,7 +781,7 @@ func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApi
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.workflowGetQueryAttributesRequest
+	localVarPostBody = r.workflowGetSearchAttributesRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

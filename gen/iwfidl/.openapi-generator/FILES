@@ -6,9 +6,6 @@ api/openapi.yaml
 api_default.go
 client.go
 configuration.go
-docs/ActivityCommand.md
-docs/ActivityOptions.md
-docs/ActivityResult.md
 docs/AttributesLoadingPolicy.md
 docs/CommandCarryOverPolicy.md
 docs/CommandRequest.md
@@ -30,8 +27,6 @@ docs/StateDecision.md
 docs/StateMovement.md
 docs/TimerCommand.md
 docs/TimerResult.md
-docs/WaitForQueryAttributeChangeCommand.md
-docs/WaitForQueryAttributeChangeResult.md
 docs/WorkflowGetQueryAttributesRequest.md
 docs/WorkflowGetQueryAttributesResponse.md
 docs/WorkflowGetRequest.md
@@ -54,9 +49,6 @@ docs/WorkflowStateStartResponse.md
 git_push.sh
 go.mod
 go.sum
-model_activity_command.go
-model_activity_options.go
-model_activity_result.go
 model_attributes_loading_policy.go
 model_command_carry_over_policy.go
 model_command_request.go
@@ -77,8 +69,6 @@ model_state_decision.go
 model_state_movement.go
 model_timer_command.go
 model_timer_result.go
-model_wait_for_query_attribute_change_command.go
-model_wait_for_query_attribute_change_result.go
 model_workflow_get_query_attributes_request.go
 model_workflow_get_query_attributes_response.go
 model_workflow_get_request.go

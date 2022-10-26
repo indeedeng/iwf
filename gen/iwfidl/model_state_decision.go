@@ -16,7 +16,6 @@ import (
 
 // StateDecision struct for StateDecision
 type StateDecision struct {
-	WaitForMoreCommandResults *bool `json:"waitForMoreCommandResults,omitempty"`
 	NextStates []StateMovement `json:"nextStates,omitempty"`
 	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
@@ -38,38 +37,6 @@ func NewStateDecision() *StateDecision {
 func NewStateDecisionWithDefaults() *StateDecision {
 	this := StateDecision{}
 	return &this
-}
-
-// GetWaitForMoreCommandResults returns the WaitForMoreCommandResults field value if set, zero value otherwise.
-func (o *StateDecision) GetWaitForMoreCommandResults() bool {
-	if o == nil || o.WaitForMoreCommandResults == nil {
-		var ret bool
-		return ret
-	}
-	return *o.WaitForMoreCommandResults
-}
-
-// GetWaitForMoreCommandResultsOk returns a tuple with the WaitForMoreCommandResults field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *StateDecision) GetWaitForMoreCommandResultsOk() (*bool, bool) {
-	if o == nil || o.WaitForMoreCommandResults == nil {
-		return nil, false
-	}
-	return o.WaitForMoreCommandResults, true
-}
-
-// HasWaitForMoreCommandResults returns a boolean if a field has been set.
-func (o *StateDecision) HasWaitForMoreCommandResults() bool {
-	if o != nil && o.WaitForMoreCommandResults != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWaitForMoreCommandResults gets a reference to the given bool and assigns it to the WaitForMoreCommandResults field.
-func (o *StateDecision) SetWaitForMoreCommandResults(v bool) {
-	o.WaitForMoreCommandResults = &v
 }
 
 // GetNextStates returns the NextStates field value if set, zero value otherwise.
@@ -202,9 +169,6 @@ func (o *StateDecision) SetPublishToInterStateChannel(v []InterStateChannelPubli
 
 func (o StateDecision) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WaitForMoreCommandResults != nil {
-		toSerialize["waitForMoreCommandResults"] = o.WaitForMoreCommandResults
-	}
 	if o.NextStates != nil {
 		toSerialize["nextStates"] = o.NextStates
 	}

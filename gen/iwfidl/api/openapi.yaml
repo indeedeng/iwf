@@ -75,13 +75,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkflowGetQueryAttributesRequest'
+              $ref: '#/components/schemas/WorkflowGetSearchAttributesRequest'
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkflowGetQueryAttributesResponse'
+                $ref: '#/components/schemas/WorkflowGetSearchAttributesResponse'
           description: successful operation
         "400":
           content:
@@ -242,6 +242,9 @@ components:
           type: string
       type: object
     SearchAttributeKeyAndType:
+      example:
+        valueType: KEYWORD
+        key: key
       properties:
         key:
           type: string
@@ -303,9 +306,6 @@ components:
         attributeLoadingType:
           enum:
           - LOAD_ALL_WITHOUT_LOCKING
-          - LOAD_ALL_WITH_EXCLUSIVE_LOCK
-          - LOAD_PARTIAL_WITHOUT_LOCKING
-          - LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
           type: string
         attributeKeys:
           items:
@@ -319,7 +319,6 @@ components:
         commandCarryOverType:
           enum:
           - NONE
-          - ALL_UNFINISHED
           type: string
       type: object
     ErrorResponse:
@@ -439,6 +438,14 @@ components:
           type: array
       type: object
     WorkflowGetSearchAttributesRequest:
+      example:
+        attributeKeys:
+        - valueType: KEYWORD
+          key: key
+        - valueType: KEYWORD
+          key: key
+        workflowRunId: workflowRunId
+        workflowId: workflowId
       properties:
         workflowId:
           type: string
@@ -452,6 +459,16 @@ components:
       - workflowId
       type: object
     WorkflowGetSearchAttributesResponse:
+      example:
+        queryAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
       properties:
         queryAttributes:
           items:
@@ -700,31 +717,14 @@ components:
           - signalChannelName: signalChannelName
             commandId: commandId
           timerCommands:
-          - firingUnixTimestampSeconds: 1
+          - firingUnixTimestampSeconds: 6
             commandId: commandId
-          - firingUnixTimestampSeconds: 1
+          - firingUnixTimestampSeconds: 6
             commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
-          waitForQueryAttributeChangeCommands:
-          - attributeKey: attributeKey
-            commandId: commandId
-          - attributeKey: attributeKey
-            commandId: commandId
           activityCommands:
-          - input:
-              data: data
-              encoding: encoding
-            activityOptions:
-              startToCloseTimeoutSeconds: 6
-            activityType: activityType
-            commandId: commandId
-          - input:
-              data: data
-              encoding: encoding
-            activityOptions:
-              startToCloseTimeoutSeconds: 6
-            activityType: activityType
-            commandId: commandId
+          - "{}"
+          - "{}"
           interStateChannelCommands:
           - channelName: channelName
             commandId: commandId
@@ -803,26 +803,6 @@ components:
             signalValue:
               data: data
               encoding: encoding
-          waitForQueryAttributeChangeResults:
-          - commandId: commandId
-            status: WAITING
-          - commandId: commandId
-            status: WAITING
-          activityResults:
-          - output:
-              data: data
-              encoding: encoding
-            timeoutType: SCHEDULED_TO_START
-            activityStatus: OPEN
-            activityType: activityType
-            commandId: commandId
-          - output:
-              data: data
-              encoding: encoding
-            timeoutType: SCHEDULED_TO_START
-            activityStatus: OPEN
-            activityType: activityType
-            commandId: commandId
           interStateChannelResults:
           - channelName: channelName
             commandId: commandId
@@ -952,7 +932,6 @@ components:
               data: data
               encoding: encoding
             key: key
-          waitForMoreCommandResults: true
       properties:
         stateDecision:
           $ref: '#/components/schemas/StateDecision'
@@ -1021,10 +1000,7 @@ components:
             data: data
             encoding: encoding
           key: key
-        waitForMoreCommandResults: true
       properties:
-        waitForMoreCommandResults:
-          type: boolean
         nextStates:
           items:
             $ref: '#/components/schemas/StateMovement'
@@ -1079,31 +1055,14 @@ components:
         - signalChannelName: signalChannelName
           commandId: commandId
         timerCommands:
-        - firingUnixTimestampSeconds: 1
+        - firingUnixTimestampSeconds: 6
           commandId: commandId
-        - firingUnixTimestampSeconds: 1
+        - firingUnixTimestampSeconds: 6
           commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
-        waitForQueryAttributeChangeCommands:
-        - attributeKey: attributeKey
-          commandId: commandId
-        - attributeKey: attributeKey
-          commandId: commandId
         activityCommands:
-        - input:
-            data: data
-            encoding: encoding
-          activityOptions:
-            startToCloseTimeoutSeconds: 6
-          activityType: activityType
-          commandId: commandId
-        - input:
-            data: data
-            encoding: encoding
-          activityOptions:
-            startToCloseTimeoutSeconds: 6
-          activityType: activityType
-          commandId: commandId
+        - "{}"
+        - "{}"
         interStateChannelCommands:
         - channelName: channelName
           commandId: commandId
@@ -1113,8 +1072,6 @@ components:
         deciderTriggerType:
           enum:
           - ALL_COMMAND_COMPLETED
-          - ANY_COMMAND_COMPLETED
-          - ANY_COMMAND_CLOSED
           type: string
         activityCommands:
           items:
@@ -1131,10 +1088,6 @@ components:
         interStateChannelCommands:
           items:
             $ref: '#/components/schemas/InterStateChannelCommand'
-          type: array
-        waitForQueryAttributeChangeCommands:
-          items:
-            $ref: '#/components/schemas/WaitForQueryAttributeChangeCommand'
           type: array
       required:
       - deciderTriggerType
@@ -1154,26 +1107,6 @@ components:
           signalValue:
             data: data
             encoding: encoding
-        waitForQueryAttributeChangeResults:
-        - commandId: commandId
-          status: WAITING
-        - commandId: commandId
-          status: WAITING
-        activityResults:
-        - output:
-            data: data
-            encoding: encoding
-          timeoutType: SCHEDULED_TO_START
-          activityStatus: OPEN
-          activityType: activityType
-          commandId: commandId
-        - output:
-            data: data
-            encoding: encoding
-          timeoutType: SCHEDULED_TO_START
-          activityStatus: OPEN
-          activityType: activityType
-          commandId: commandId
         interStateChannelResults:
         - channelName: channelName
           commandId: commandId
@@ -1193,10 +1126,6 @@ components:
         - timerStatus: SCHEDULED
           commandId: commandId
       properties:
-        activityResults:
-          items:
-            $ref: '#/components/schemas/ActivityResult'
-          type: array
         signalResults:
           items:
             $ref: '#/components/schemas/SignalResult'
@@ -1209,36 +1138,10 @@ components:
           items:
             $ref: '#/components/schemas/TimerResult'
           type: array
-        waitForQueryAttributeChangeResults:
-          items:
-            $ref: '#/components/schemas/WaitForQueryAttributeChangeResult'
-          type: array
-      type: object
-    ActivityCommand:
-      example:
-        input:
-          data: data
-          encoding: encoding
-        activityOptions:
-          startToCloseTimeoutSeconds: 6
-        activityType: activityType
-        commandId: commandId
-      properties:
-        commandId:
-          type: string
-        activityType:
-          type: string
-        input:
-          $ref: '#/components/schemas/EncodedObject'
-        activityOptions:
-          $ref: '#/components/schemas/ActivityOptions'
-      required:
-      - activityType
-      - commandId
       type: object
     TimerCommand:
       example:
-        firingUnixTimestampSeconds: 1
+        firingUnixTimestampSeconds: 6
         commandId: commandId
       properties:
         commandId:
@@ -1276,61 +1179,6 @@ components:
       - channelName
       - commandId
       type: object
-    WaitForQueryAttributeChangeCommand:
-      example:
-        attributeKey: attributeKey
-        commandId: commandId
-      properties:
-        commandId:
-          type: string
-        attributeKey:
-          type: string
-      required:
-      - attributeKey
-      - commandId
-      type: object
-    ActivityOptions:
-      example:
-        startToCloseTimeoutSeconds: 6
-      properties:
-        startToCloseTimeoutSeconds:
-          type: integer
-      type: object
-    ActivityResult:
-      example:
-        output:
-          data: data
-          encoding: encoding
-        timeoutType: SCHEDULED_TO_START
-        activityStatus: OPEN
-        activityType: activityType
-        commandId: commandId
-      properties:
-        commandId:
-          type: string
-        activityType:
-          type: string
-        output:
-          $ref: '#/components/schemas/EncodedObject'
-        activityStatus:
-          enum:
-          - OPEN
-          - COMPLETED
-          - TIMEOUT
-          - FAILED
-          type: string
-        timeoutType:
-          enum:
-          - SCHEDULED_TO_START
-          - START_TO_CLOSE
-          - SCHEDULE_TO_CLOSE
-          - HEARTBEAT
-          type: string
-      required:
-      - activityStatus
-      - activityType
-      - commandId
-      type: object
     TimerResult:
       example:
         timerStatus: SCHEDULED
@@ -1346,22 +1194,6 @@ components:
       required:
       - commandId
       - timerStatus
-      type: object
-    WaitForQueryAttributeChangeResult:
-      example:
-        commandId: commandId
-        status: WAITING
-      properties:
-        commandId:
-          type: string
-        status:
-          enum:
-          - WAITING
-          - COMPLETED
-          type: string
-      required:
-      - commandId
-      - status
       type: object
     SignalResult:
       example:
