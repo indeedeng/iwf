@@ -5,11 +5,9 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DeciderTriggerType** | **string** |  | 
-**ActivityCommands** | Pointer to [**[]ActivityCommand**](ActivityCommand.md) |  | [optional] 
 **TimerCommands** | Pointer to [**[]TimerCommand**](TimerCommand.md) |  | [optional] 
 **SignalCommands** | Pointer to [**[]SignalCommand**](SignalCommand.md) |  | [optional] 
 **InterStateChannelCommands** | Pointer to [**[]InterStateChannelCommand**](InterStateChannelCommand.md) |  | [optional] 
-**WaitForQueryAttributeChangeCommands** | Pointer to [**[]WaitForQueryAttributeChangeCommand**](WaitForQueryAttributeChangeCommand.md) |  | [optional] 
 
 ## Methods
 
@@ -49,31 +47,6 @@ and a boolean to check if the value has been set.
 
 SetDeciderTriggerType sets DeciderTriggerType field to given value.
 
-
-### GetActivityCommands
-
-`func (o *CommandRequest) GetActivityCommands() []ActivityCommand`
-
-GetActivityCommands returns the ActivityCommands field if non-nil, zero value otherwise.
-
-### GetActivityCommandsOk
-
-`func (o *CommandRequest) GetActivityCommandsOk() (*[]ActivityCommand, bool)`
-
-GetActivityCommandsOk returns a tuple with the ActivityCommands field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetActivityCommands
-
-`func (o *CommandRequest) SetActivityCommands(v []ActivityCommand)`
-
-SetActivityCommands sets ActivityCommands field to given value.
-
-### HasActivityCommands
-
-`func (o *CommandRequest) HasActivityCommands() bool`
-
-HasActivityCommands returns a boolean if a field has been set.
 
 ### GetTimerCommands
 
@@ -149,31 +122,6 @@ SetInterStateChannelCommands sets InterStateChannelCommands field to given value
 `func (o *CommandRequest) HasInterStateChannelCommands() bool`
 
 HasInterStateChannelCommands returns a boolean if a field has been set.
-
-### GetWaitForQueryAttributeChangeCommands
-
-`func (o *CommandRequest) GetWaitForQueryAttributeChangeCommands() []WaitForQueryAttributeChangeCommand`
-
-GetWaitForQueryAttributeChangeCommands returns the WaitForQueryAttributeChangeCommands field if non-nil, zero value otherwise.
-
-### GetWaitForQueryAttributeChangeCommandsOk
-
-`func (o *CommandRequest) GetWaitForQueryAttributeChangeCommandsOk() (*[]WaitForQueryAttributeChangeCommand, bool)`
-
-GetWaitForQueryAttributeChangeCommandsOk returns a tuple with the WaitForQueryAttributeChangeCommands field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetWaitForQueryAttributeChangeCommands
-
-`func (o *CommandRequest) SetWaitForQueryAttributeChangeCommands(v []WaitForQueryAttributeChangeCommand)`
-
-SetWaitForQueryAttributeChangeCommands sets WaitForQueryAttributeChangeCommands field to given value.
-
-### HasWaitForQueryAttributeChangeCommands
-
-`func (o *CommandRequest) HasWaitForQueryAttributeChangeCommands() bool`
-
-HasWaitForQueryAttributeChangeCommands returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

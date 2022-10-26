@@ -4,7 +4,6 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WaitForMoreCommandResults** | Pointer to **bool** |  | [optional] 
 **NextStates** | Pointer to [**[]StateMovement**](StateMovement.md) |  | [optional] 
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -28,31 +27,6 @@ will change when the set of required properties is changed
 NewStateDecisionWithDefaults instantiates a new StateDecision object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
-
-### GetWaitForMoreCommandResults
-
-`func (o *StateDecision) GetWaitForMoreCommandResults() bool`
-
-GetWaitForMoreCommandResults returns the WaitForMoreCommandResults field if non-nil, zero value otherwise.
-
-### GetWaitForMoreCommandResultsOk
-
-`func (o *StateDecision) GetWaitForMoreCommandResultsOk() (*bool, bool)`
-
-GetWaitForMoreCommandResultsOk returns a tuple with the WaitForMoreCommandResults field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetWaitForMoreCommandResults
-
-`func (o *StateDecision) SetWaitForMoreCommandResults(v bool)`
-
-SetWaitForMoreCommandResults sets WaitForMoreCommandResults field to given value.
-
-### HasWaitForMoreCommandResults
-
-`func (o *StateDecision) HasWaitForMoreCommandResults() bool`
-
-HasWaitForMoreCommandResults returns a boolean if a field has been set.
 
 ### GetNextStates
 

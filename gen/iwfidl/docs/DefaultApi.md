@@ -339,7 +339,7 @@ No authorization required
 
 ## ApiV1WorkflowSearchattributesGetPost
 
-> WorkflowGetQueryAttributesResponse ApiV1WorkflowSearchattributesGetPost(ctx).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
+> WorkflowGetSearchAttributesResponse ApiV1WorkflowSearchattributesGetPost(ctx).WorkflowGetSearchAttributesRequest(workflowGetSearchAttributesRequest).Execute()
 
 get workflow search attributes
 
@@ -356,16 +356,16 @@ import (
 )
 
 func main() {
-    workflowGetQueryAttributesRequest := *openapiclient.NewWorkflowGetQueryAttributesRequest("WorkflowId_example") // WorkflowGetQueryAttributesRequest |  (optional)
+    workflowGetSearchAttributesRequest := *openapiclient.NewWorkflowGetSearchAttributesRequest("WorkflowId_example") // WorkflowGetSearchAttributesRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background()).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background()).WorkflowGetSearchAttributesRequest(workflowGetSearchAttributesRequest).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowSearchattributesGetPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `ApiV1WorkflowSearchattributesGetPost`: WorkflowGetQueryAttributesResponse
+    // response from `ApiV1WorkflowSearchattributesGetPost`: WorkflowGetSearchAttributesResponse
     fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowSearchattributesGetPost`: %v\n", resp)
 }
 ```
@@ -381,11 +381,11 @@ Other parameters are passed through a pointer to a apiApiV1WorkflowSearchattribu
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **workflowGetQueryAttributesRequest** | [**WorkflowGetQueryAttributesRequest**](WorkflowGetQueryAttributesRequest.md) |  | 
+ **workflowGetSearchAttributesRequest** | [**WorkflowGetSearchAttributesRequest**](WorkflowGetSearchAttributesRequest.md) |  | 
 
 ### Return type
 
-[**WorkflowGetQueryAttributesResponse**](WorkflowGetQueryAttributesResponse.md)
+[**WorkflowGetSearchAttributesResponse**](WorkflowGetSearchAttributesResponse.md)
 
 ### Authorization
 

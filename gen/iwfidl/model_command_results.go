@@ -16,11 +16,9 @@ import (
 
 // CommandResults struct for CommandResults
 type CommandResults struct {
-	ActivityResults []ActivityResult `json:"activityResults,omitempty"`
 	SignalResults []SignalResult `json:"signalResults,omitempty"`
 	InterStateChannelResults []InterStateChannelResult `json:"interStateChannelResults,omitempty"`
 	TimerResults []TimerResult `json:"timerResults,omitempty"`
-	WaitForQueryAttributeChangeResults []WaitForQueryAttributeChangeResult `json:"waitForQueryAttributeChangeResults,omitempty"`
 }
 
 // NewCommandResults instantiates a new CommandResults object
@@ -38,38 +36,6 @@ func NewCommandResults() *CommandResults {
 func NewCommandResultsWithDefaults() *CommandResults {
 	this := CommandResults{}
 	return &this
-}
-
-// GetActivityResults returns the ActivityResults field value if set, zero value otherwise.
-func (o *CommandResults) GetActivityResults() []ActivityResult {
-	if o == nil || o.ActivityResults == nil {
-		var ret []ActivityResult
-		return ret
-	}
-	return o.ActivityResults
-}
-
-// GetActivityResultsOk returns a tuple with the ActivityResults field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *CommandResults) GetActivityResultsOk() ([]ActivityResult, bool) {
-	if o == nil || o.ActivityResults == nil {
-		return nil, false
-	}
-	return o.ActivityResults, true
-}
-
-// HasActivityResults returns a boolean if a field has been set.
-func (o *CommandResults) HasActivityResults() bool {
-	if o != nil && o.ActivityResults != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetActivityResults gets a reference to the given []ActivityResult and assigns it to the ActivityResults field.
-func (o *CommandResults) SetActivityResults(v []ActivityResult) {
-	o.ActivityResults = v
 }
 
 // GetSignalResults returns the SignalResults field value if set, zero value otherwise.
@@ -168,43 +134,8 @@ func (o *CommandResults) SetTimerResults(v []TimerResult) {
 	o.TimerResults = v
 }
 
-// GetWaitForQueryAttributeChangeResults returns the WaitForQueryAttributeChangeResults field value if set, zero value otherwise.
-func (o *CommandResults) GetWaitForQueryAttributeChangeResults() []WaitForQueryAttributeChangeResult {
-	if o == nil || o.WaitForQueryAttributeChangeResults == nil {
-		var ret []WaitForQueryAttributeChangeResult
-		return ret
-	}
-	return o.WaitForQueryAttributeChangeResults
-}
-
-// GetWaitForQueryAttributeChangeResultsOk returns a tuple with the WaitForQueryAttributeChangeResults field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *CommandResults) GetWaitForQueryAttributeChangeResultsOk() ([]WaitForQueryAttributeChangeResult, bool) {
-	if o == nil || o.WaitForQueryAttributeChangeResults == nil {
-		return nil, false
-	}
-	return o.WaitForQueryAttributeChangeResults, true
-}
-
-// HasWaitForQueryAttributeChangeResults returns a boolean if a field has been set.
-func (o *CommandResults) HasWaitForQueryAttributeChangeResults() bool {
-	if o != nil && o.WaitForQueryAttributeChangeResults != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetWaitForQueryAttributeChangeResults gets a reference to the given []WaitForQueryAttributeChangeResult and assigns it to the WaitForQueryAttributeChangeResults field.
-func (o *CommandResults) SetWaitForQueryAttributeChangeResults(v []WaitForQueryAttributeChangeResult) {
-	o.WaitForQueryAttributeChangeResults = v
-}
-
 func (o CommandResults) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.ActivityResults != nil {
-		toSerialize["activityResults"] = o.ActivityResults
-	}
 	if o.SignalResults != nil {
 		toSerialize["signalResults"] = o.SignalResults
 	}
@@ -213,9 +144,6 @@ func (o CommandResults) MarshalJSON() ([]byte, error) {
 	}
 	if o.TimerResults != nil {
 		toSerialize["timerResults"] = o.TimerResults
-	}
-	if o.WaitForQueryAttributeChangeResults != nil {
-		toSerialize["waitForQueryAttributeChangeResults"] = o.WaitForQueryAttributeChangeResults
 	}
 	return json.Marshal(toSerialize)
 }

@@ -92,9 +92,6 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
- - [ActivityCommand](docs/ActivityCommand.md)
- - [ActivityOptions](docs/ActivityOptions.md)
- - [ActivityResult](docs/ActivityResult.md)
  - [AttributesLoadingPolicy](docs/AttributesLoadingPolicy.md)
  - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
  - [CommandRequest](docs/CommandRequest.md)
@@ -115,8 +112,6 @@ Class | Method | HTTP request | Description
  - [StateMovement](docs/StateMovement.md)
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
- - [WaitForQueryAttributeChangeCommand](docs/WaitForQueryAttributeChangeCommand.md)
- - [WaitForQueryAttributeChangeResult](docs/WaitForQueryAttributeChangeResult.md)
  - [WorkflowGetQueryAttributesRequest](docs/WorkflowGetQueryAttributesRequest.md)
  - [WorkflowGetQueryAttributesResponse](docs/WorkflowGetQueryAttributesResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)
