@@ -6,7 +6,7 @@ For most long running applications, iWF is a All-In-One solution to replace Data
 
 It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 
-Back by Cadence/Temporal as an interpreter.
+Back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter.
 
 Related projects:
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) and [Java SDK API review](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
@@ -15,9 +15,24 @@ Related projects:
 * [API schema](https://github.com/indeedeng/iwf-idl)
 
 # What & Why
+
+### If you are familar with [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal)
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
 * See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
 
+## If you are not
+* Check out this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) to understand some history
+
+iWF is a application platform that provides you a comprehensive tooling:
+* WorkflowAsCode for highly flexibile/customizable business logic
+* Parallel execution of multiple threads of business
+* Intermidiate states stored as "QueryAttributes" and can be retrived by APIs
+* Receiving data from external system by Signal
+* Searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch 
+* Durable timer, and cron job scheduling
+* Reset workflow to let you recover the workflows from bad states easily 
+* ...
+* Basically with iWF, you mostly don't need any database, messageQueue or even ElasticSearch to build your applications
 
 ## How to build & run
 * Run `make bins` to build the binary `iwf-server`
@@ -39,6 +54,7 @@ Related projects:
 2. Go to http://localhost:8233/ for Temporal WebUI
 
 NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporalio/docker-compose) to run with docker
+
 3. For `attribute_test.go` integTests, you need to register search attributes:
 ```bash
 tctl adm cl asa -n CustomKeywordField -t Keyword
@@ -68,7 +84,7 @@ tctl adm cl asa -n CustomIntField -t Int
 ## 1.1
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
-- [ ] Support IdReusePolicy when starting workflow
+- [ ] More workflow start options: IdReusePolicy, initial earch attributes, cron schedule, retry, etc
 - [ ] StateOption: Start/Decide API timeout and retry
 - [ ] Reset workflow by stateId
 
