@@ -203,7 +203,7 @@ func executeState(
 
 	commandReq := startResponse.GetCommandRequest()
 
-	completedTimerCmds := 0
+	completedTimerCmds := map[int]bool{}
 	if len(commandReq.GetTimerCommands()) > 0 {
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
@@ -213,12 +213,16 @@ func executeState(
 				if !ok {
 					panic("critical code bug")
 				}
+				idx, ok := provider.GetContextValue(ctx, "idx").(int)
+				if !ok {
+					panic("critical code bug")
+				}
 
 				now := provider.Now(ctx).Unix()
 				fireAt := cmd.GetFiringUnixTimestampSeconds()
 				duration := time.Duration(fireAt-now) * time.Second
 				_ = provider.Sleep(ctx, duration)
-				completedTimerCmds++
+				completedTimerCmds[idx] = true
 			})
 		}
 	}
@@ -273,15 +277,21 @@ func executeState(
 	// TODO process long running activity command
 
 	triggerType := commandReq.GetDeciderTriggerType()
-	if triggerType != service.DeciderTypeAllCommandCompleted {
+	if triggerType == service.DeciderTypeAllCommandCompleted {
+		err = provider.Await(ctx, func() bool {
+			return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
+				len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
+				len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
+		})
+	} else if triggerType == service.DeciderTypeAnyCommandCompleted {
+		err = provider.Await(ctx, func() bool {
+			return len(completedTimerCmds)+
+				len(completedSignalCmds)+
+				len(completedInterStateChannelCmds) > 0
+		})
+	} else {
 		return nil, provider.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
 	}
-
-	err = provider.Await(ctx, func() bool {
-		return completedTimerCmds == len(commandReq.GetTimerCommands()) &&
-			len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
-			len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
-	})
 
 	if err != nil {
 		return nil, err
@@ -289,10 +299,14 @@ func executeState(
 	commandRes := &iwfidl.CommandResults{}
 	if len(commandReq.GetTimerCommands()) > 0 {
 		var timerResults []iwfidl.TimerResult
-		for _, cmd := range commandReq.GetTimerCommands() {
+		for idx, cmd := range commandReq.GetTimerCommands() {
+			status := service.TimerStatusFired
+			if !completedTimerCmds[idx] {
+				status = service.TimerStatusScheduled
+			}
 			timerResults = append(timerResults, iwfidl.TimerResult{
 				CommandId:   cmd.GetCommandId(),
-				TimerStatus: service.TimerStatusFired,
+				TimerStatus: status,
 			})
 		}
 		commandRes.SetTimerResults(timerResults)
@@ -301,11 +315,17 @@ func executeState(
 	if len(commandReq.GetSignalCommands()) > 0 {
 		var signalResults []iwfidl.SignalResult
 		for idx, cmd := range commandReq.GetSignalCommands() {
+			status := service.SignalStatusReceived
+			result, completed := completedSignalCmds[idx]
+			if !completed {
+				status = service.TimerStatusScheduled
+			}
+
 			signalResults = append(signalResults, iwfidl.SignalResult{
 				CommandId:           cmd.GetCommandId(),
 				SignalChannelName:   cmd.GetSignalChannelName(),
-				SignalValue:         completedSignalCmds[idx],
-				SignalRequestStatus: service.SignalStatusReceived,
+				SignalValue:         result,
+				SignalRequestStatus: status,
 			})
 		}
 		commandRes.SetSignalResults(signalResults)
@@ -314,11 +334,17 @@ func executeState(
 	if len(commandReq.GetInterStateChannelCommands()) > 0 {
 		var interStateChannelResults []iwfidl.InterStateChannelResult
 		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
+			status := service.InternStateChannelCommandReceived
+			result, completed := completedInterStateChannelCmds[idx]
+			if !completed {
+				status = service.InternStateChannelCommandStatusWaiting
+			}
+
 			interStateChannelResults = append(interStateChannelResults, iwfidl.InterStateChannelResult{
 				CommandId:     cmd.CommandId,
-				RequestStatus: service.InternStateChannelCommandReceived,
 				ChannelName:   cmd.ChannelName,
-				Value:         completedInterStateChannelCmds[idx],
+				RequestStatus: status,
+				Value:         result,
 			})
 		}
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
