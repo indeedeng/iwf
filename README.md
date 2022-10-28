@@ -84,13 +84,14 @@ tctl adm cl asa -n CustomIntField -t Int
 ## 1.1
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
+- [x] AnyCommandCompleted Decider trigger type
 - [ ] More workflow start options: IdReusePolicy, initial earch attributes, cron schedule, retry, etc
 - [ ] StateOption: Start/Decide API timeout and retry
 - [ ] Reset workflow by stateId
 
 ## 1.2
-- [ ] AnyCommandCompleted Decider trigger type and WaitForMoreResults in StateDecision
-- [ ] Decider trigger types: AnyCommandClosed
+- [ ] Decider trigger type: AnyCommandClosed
+- [ ] WaitForMoreResults in StateDecision
 - [ ] Skip timer API for testing/operation
 - [ ] LongRunningActivityCommand
 - [ ] Failing workflow details
