@@ -85,9 +85,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			signalResults := req.GetCommandResults()
 			h.invokeData["signalCommandResultsLength"] = len(signalResults.SignalResults)
 
-			h.invokeData["signalChannelName"] = signalResults.SignalResults[0].GetSignalChannelName()
-			h.invokeData["signalCommandId"] = signalResults.SignalResults[0].GetCommandId()
-			h.invokeData["signalValue"] = signalResults.SignalResults[0].GetSignalValue()
+			h.invokeData["signalChannelName0"] = signalResults.SignalResults[0].GetSignalChannelName()
+			h.invokeData["signalCommandId0"] = signalResults.SignalResults[0].GetCommandId()
+			h.invokeData["signalStatus0"] = signalResults.SignalResults[0].GetSignalRequestStatus()
+
+			h.invokeData["signalChannelName1"] = signalResults.SignalResults[1].GetSignalChannelName()
+			h.invokeData["signalCommandId1"] = signalResults.SignalResults[1].GetCommandId()
+			h.invokeData["signalStatus1"] = signalResults.SignalResults[1].GetSignalRequestStatus()
+			h.invokeData["signalValue1"] = signalResults.SignalResults[1].GetSignalValue()
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{

@@ -76,7 +76,12 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 		"S2_decide": 1,
 	}, history, "anycommandclose test fail, %v", history)
 
-	assertions.Equal(anycommandclose.SignalName2, data["signalChannelName"])
-	assertions.Equal("signal-cmd-id2", data["signalCommandId"])
-	assertions.Equal(signalValue, data["signalValue"])
+	assertions.Equal(anycommandclose.SignalName2, data["signalChannelName1"])
+	assertions.Equal("signal-cmd-id2", data["signalCommandId1"])
+	assertions.Equal(signalValue, data["signalValue1"])
+	assertions.Equal(service.SignalStatusReceived, data["signalStatus1"])
+
+	assertions.Equal(anycommandclose.SignalName1, data["signalChannelName0"])
+	assertions.Equal("signal-cmd-id1", data["signalCommandId0"])
+	assertions.Equal(service.SignalStatusWaiting, data["signalStatus0"])
 }

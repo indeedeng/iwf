@@ -318,7 +318,7 @@ func executeState(
 			status := service.SignalStatusReceived
 			result, completed := completedSignalCmds[idx]
 			if !completed {
-				status = service.TimerStatusScheduled
+				status = service.SignalStatusWaiting
 			}
 
 			signalResults = append(signalResults, iwfidl.SignalResult{
