@@ -91,3 +91,12 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 		panic("not supported backend type " + backendType)
 	}
 }
+
+func panicAtHttpError(err error, httpResp *http.Response) {
+	if err != nil {
+		panic(err)
+	}
+	if httpResp.StatusCode != http.StatusOK {
+		panic("Status not success" + httpResp.Status)
+	}
+}

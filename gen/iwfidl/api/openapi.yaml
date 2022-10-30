@@ -1066,6 +1066,7 @@ components:
         deciderTriggerType:
           enum:
           - ALL_COMMAND_COMPLETED
+          - ANY_COMMAND_COMPLETED
           type: string
         timerCommands:
           items:
