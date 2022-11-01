@@ -2,15 +2,16 @@ package integ
 
 import (
 	"context"
-	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/attribute"
-	"github.com/indeedeng/iwf/service"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/workflow/attribute"
+	"github.com/indeedeng/iwf/service"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAttributeWorkflowTemporal(t *testing.T) {
@@ -54,7 +55,7 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	}
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
-	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+	wfResponse, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	if err != nil {
@@ -82,6 +83,37 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 
 	if err != nil || httpResp2.StatusCode != 200 {
 		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpResp2)
+	}
+
+	reqSearch := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
+	searchResult1, httpSearchResponse1, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
+		WorkflowId:    wfId,
+		WorkflowRunId: &wfResponse.WorkflowRunId,
+		AttributeKeys: []iwfidl.SearchAttributeKeyAndType{
+			{
+				Key:       iwfidl.PtrString(attribute.TestSearchAttributeKeywordKey),
+				ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+			},
+		},
+	}).Execute()
+
+	if err != nil || httpSearchResponse1.StatusCode != 200 {
+		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpSearchResponse1)
+	}
+
+	searchResult2, httpSearchResponse2, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
+		WorkflowId:    wfId,
+		WorkflowRunId: &wfResponse.WorkflowRunId,
+		AttributeKeys: []iwfidl.SearchAttributeKeyAndType{
+			{
+				Key:       iwfidl.PtrString(attribute.TestSearchAttributeIntKey),
+				ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+			},
+		},
+	}).Execute()
+
+	if err != nil || httpSearchResponse2.StatusCode != 200 {
+		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpSearchResponse2)
 	}
 
 	// assertion
@@ -135,4 +167,19 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	}
 	assertions.Equal(expected, queryResult2.GetQueryAttributes())
 	assertions.Equal(expected, queryResult1.GetQueryAttributes())
+
+	expectedSearchAttributeInt := iwfidl.SearchAttribute{
+		Key:          iwfidl.PtrString(attribute.TestSearchAttributeIntKey),
+		ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+		IntegerValue: iwfidl.PtrInt64(attribute.TestSearchAttributeIntValue2),
+	}
+
+	expectedSearchAttributeKeyword := iwfidl.SearchAttribute{
+		Key:         iwfidl.PtrString(attribute.TestSearchAttributeKeywordKey),
+		ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+		StringValue: iwfidl.PtrString(attribute.TestSearchAttributeKeywordValue2),
+	}
+
+	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeKeyword}, searchResult1.GetSearchAttributes())
+	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
 }

@@ -3,13 +3,16 @@ package temporal
 import (
 	"context"
 	"fmt"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
+	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
 )
 
 type temporalClient struct {
@@ -82,16 +85,59 @@ func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflow
 	if err != nil {
 		return nil, err
 	}
+
+	searchAttributes, err := mapToIwfSearchAttributes(resp.GetWorkflowExecutionInfo().GetSearchAttributes())
+	if err != nil {
+		return nil, err
+	}
+
 	return &api.DescribeWorkflowExecutionResponse{
-		RunId:  resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
-		Status: status,
+		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		Status:           status,
+		SearchAttributes: searchAttributes,
 	}, nil
+}
+
+func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[string]iwfidl.SearchAttribute, error) {
+	result := make(map[string]iwfidl.SearchAttribute)
+	if searchAttributes == nil {
+		return result, nil
+	}
+
+	for key, value := range searchAttributes.IndexedFields {
+		var object interface{}
+		err := converter.GetDefaultDataConverter().FromPayload(value, &object)
+		if err != nil {
+			return make(map[string]iwfidl.SearchAttribute), nil
+		}
+
+		str, isString := object.(string)
+		if isString {
+			result[key] = iwfidl.SearchAttribute{
+				Key:         iwfidl.PtrString(key),
+				StringValue: &str,
+				ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+			}
+		}
+		integer, isInt := object.(float64)
+		if isInt {
+			result[key] = iwfidl.SearchAttribute{
+				Key:          iwfidl.PtrString(key),
+				IntegerValue: iwfidl.PtrInt64(int64(integer)),
+				ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+			}
+		}
+	}
+
+	return result, nil
 }
 
 func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (string, error) {
 	switch status {
 	case enums.WORKFLOW_EXECUTION_STATUS_CANCELED:
 		return service.WorkflowStatusCanceled, nil
+	case enums.WORKFLOW_EXECUTION_STATUS_COMPLETED:
+		return service.WorkflowStatusCompleted, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW:
 		return service.WorkflowStatusContinueAsNew, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_FAILED:

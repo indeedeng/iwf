@@ -2,14 +2,16 @@ package api
 
 import (
 	"context"
-	"github.com/indeedeng/iwf/gen/iwfidl"
 	"time"
+
+	"github.com/indeedeng/iwf/gen/iwfidl"
 )
 
 type ApiService interface {
 	ApiV1WorkflowStartPost(request iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus)
 	ApiV1WorkflowSignalPost(request iwfidl.WorkflowSignalRequest) *ErrorAndStatus
 	ApiV1WorkflowGetQueryAttributesPost(request iwfidl.WorkflowGetQueryAttributesRequest) (*iwfidl.WorkflowGetQueryAttributesResponse, *ErrorAndStatus)
+	ApiV1WorkflowGetSearchAttributesPost(request iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus)
 	ApiV1WorkflowGetPost(request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
 	ApiV1WorkflowGetWithWaitPost(request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
 	ApiV1WorkflowSearchPost(request iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *ErrorAndStatus)
@@ -49,6 +51,7 @@ type ListWorkflowExecutionsResponse struct {
 }
 
 type DescribeWorkflowExecutionResponse struct {
-	Status string
-	RunId  string
+	Status           string
+	RunId            string
+	SearchAttributes map[string]iwfidl.SearchAttribute
 }

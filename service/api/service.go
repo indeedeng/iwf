@@ -2,11 +2,12 @@ package api
 
 import (
 	"context"
-	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service"
 )
 
 type serviceImpl struct {
@@ -73,6 +74,25 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGet
 
 	return &iwfidl.WorkflowGetQueryAttributesResponse{
 		QueryAttributes: queryResult1.AttributeValues,
+	}, nil
+}
+
+func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(req iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus) {
+	response, err := s.client.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	searchAttributes := []iwfidl.SearchAttribute{}
+	for _, v := range req.AttributeKeys {
+		searchAttribute, exist := response.SearchAttributes[*v.Key]
+		if exist {
+			searchAttributes = append(searchAttributes, searchAttribute)
+		}
+	}
+
+	return &iwfidl.WorkflowGetSearchAttributesResponse{
+		SearchAttributes: searchAttributes,
 	}, nil
 }
 

@@ -460,19 +460,19 @@ components:
       type: object
     WorkflowGetSearchAttributesResponse:
       example:
-        queryAttributes:
-        - value:
-            data: data
-            encoding: encoding
+        searchAttributes:
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
-        - value:
-            data: data
-            encoding: encoding
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
           key: key
       properties:
-        queryAttributes:
+        searchAttributes:
           items:
-            $ref: '#/components/schemas/KeyValue'
+            $ref: '#/components/schemas/SearchAttribute'
           type: array
       type: object
     WorkflowGetRequest:
@@ -717,9 +717,9 @@ components:
           - signalChannelName: signalChannelName
             commandId: commandId
           timerCommands:
-          - firingUnixTimestampSeconds: 6
+          - firingUnixTimestampSeconds: 0
             commandId: commandId
-          - firingUnixTimestampSeconds: 6
+          - firingUnixTimestampSeconds: 0
             commandId: commandId
           deciderTriggerType: ALL_COMMAND_COMPLETED
           interStateChannelCommands:
@@ -1052,9 +1052,9 @@ components:
         - signalChannelName: signalChannelName
           commandId: commandId
         timerCommands:
-        - firingUnixTimestampSeconds: 6
+        - firingUnixTimestampSeconds: 0
           commandId: commandId
-        - firingUnixTimestampSeconds: 6
+        - firingUnixTimestampSeconds: 0
           commandId: commandId
         deciderTriggerType: ALL_COMMAND_COMPLETED
         interStateChannelCommands:
@@ -1132,7 +1132,7 @@ components:
       type: object
     TimerCommand:
       example:
-        firingUnixTimestampSeconds: 6
+        firingUnixTimestampSeconds: 0
         commandId: commandId
       properties:
         commandId:
