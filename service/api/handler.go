@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/indeedeng/iwf/gen/iwfidl"
 	"log"
 	"net/http"
+
+	"github.com/indeedeng/iwf/gen/iwfidl"
 
 	"github.com/gin-gonic/gin"
 )
@@ -92,6 +93,23 @@ func (h *handler) apiV1WorkflowGetQueryAttributes(c *gin.Context) {
 	log.Println("received API request", req)
 
 	resp, errResp := h.svc.ApiV1WorkflowGetQueryAttributesPost(req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
+	var req iwfidl.WorkflowGetSearchAttributesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received API request", req)
+
+	resp, errResp := h.svc.ApiV1WorkflowGetSearchAttributesPost(req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return

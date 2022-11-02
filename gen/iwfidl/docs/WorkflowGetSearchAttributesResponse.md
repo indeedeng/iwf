@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 
 ## Methods
 
@@ -25,30 +25,30 @@ NewWorkflowGetSearchAttributesResponseWithDefaults instantiates a new WorkflowGe
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetQueryAttributes
+### GetSearchAttributes
 
-`func (o *WorkflowGetSearchAttributesResponse) GetQueryAttributes() []KeyValue`
+`func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributes() []SearchAttribute`
 
-GetQueryAttributes returns the QueryAttributes field if non-nil, zero value otherwise.
+GetSearchAttributes returns the SearchAttributes field if non-nil, zero value otherwise.
 
-### GetQueryAttributesOk
+### GetSearchAttributesOk
 
-`func (o *WorkflowGetSearchAttributesResponse) GetQueryAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributesOk() (*[]SearchAttribute, bool)`
 
-GetQueryAttributesOk returns a tuple with the QueryAttributes field if it's non-nil, zero value otherwise
+GetSearchAttributesOk returns a tuple with the SearchAttributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetQueryAttributes
+### SetSearchAttributes
 
-`func (o *WorkflowGetSearchAttributesResponse) SetQueryAttributes(v []KeyValue)`
+`func (o *WorkflowGetSearchAttributesResponse) SetSearchAttributes(v []SearchAttribute)`
 
-SetQueryAttributes sets QueryAttributes field to given value.
+SetSearchAttributes sets SearchAttributes field to given value.
 
-### HasQueryAttributes
+### HasSearchAttributes
 
-`func (o *WorkflowGetSearchAttributesResponse) HasQueryAttributes() bool`
+`func (o *WorkflowGetSearchAttributesResponse) HasSearchAttributes() bool`
 
-HasQueryAttributes returns a boolean if a field has been set.
+HasSearchAttributes returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -2,7 +2,9 @@ package cadence
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -89,10 +91,52 @@ func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowI
 	if err != nil {
 		return nil, err
 	}
+	searchAttributes, err := mapToIwfSearchAttributes(resp.GetWorkflowExecutionInfo().GetSearchAttributes())
+	if err != nil {
+		return nil, err
+	}
+
 	return &api.DescribeWorkflowExecutionResponse{
-		RunId:  resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
-		Status: status,
+		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		Status:           status,
+		SearchAttributes: searchAttributes,
 	}, nil
+}
+
+func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[string]iwfidl.SearchAttribute, error) {
+	result := make(map[string]iwfidl.SearchAttribute)
+	if searchAttributes == nil {
+		return result, nil
+	}
+
+	for key, value := range searchAttributes.IndexedFields {
+		var object interface{}
+		err := client.NewValue(value).Get(&object)
+		if err != nil {
+			return make(map[string]iwfidl.SearchAttribute), nil
+		}
+
+		str, ok := object.(string)
+		if ok {
+			result[key] = iwfidl.SearchAttribute{
+				Key:         iwfidl.PtrString(key),
+				StringValue: iwfidl.PtrString(str),
+				ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+			}
+		} else {
+			number, ok := object.(json.Number)
+			if ok {
+				integer, _ := number.Int64()
+				result[key] = iwfidl.SearchAttribute{
+					Key:          iwfidl.PtrString(key),
+					IntegerValue: iwfidl.PtrInt64(integer),
+					ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+				}
+			}
+		}
+	}
+
+	return result, nil
 }
 
 func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (string, error) {
