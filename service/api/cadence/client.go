@@ -2,6 +2,7 @@ package cadence
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -119,15 +120,16 @@ func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[st
 		if ok {
 			result[key] = iwfidl.SearchAttribute{
 				Key:         iwfidl.PtrString(key),
-				StringValue: &str,
+				StringValue: iwfidl.PtrString(str),
 				ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
 			}
 		} else {
-			integer, ok := object.(int64)
+			number, ok := object.(json.Number)
 			if ok {
+				integer, _ := number.Int64()
 				result[key] = iwfidl.SearchAttribute{
 					Key:          iwfidl.PtrString(key),
-					IntegerValue: &integer,
+					IntegerValue: iwfidl.PtrInt64(integer),
 					ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
 				}
 			}

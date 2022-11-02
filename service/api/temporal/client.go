@@ -115,15 +115,15 @@ func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[st
 		if isString {
 			result[key] = iwfidl.SearchAttribute{
 				Key:         iwfidl.PtrString(key),
-				StringValue: &str,
+				StringValue: iwfidl.PtrString(str),
 				ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
 			}
 		}
-		integer, isInt := object.(float64)
+		number, isInt := object.(float64)
 		if isInt {
 			result[key] = iwfidl.SearchAttribute{
 				Key:          iwfidl.PtrString(key),
-				IntegerValue: iwfidl.PtrInt64(int64(integer)),
+				IntegerValue: iwfidl.PtrInt64(int64(number)),
 				ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
 			}
 		}
