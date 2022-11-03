@@ -164,7 +164,7 @@ func executeState(
 	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
 	ao := ActivityOptions{
-		StartToCloseTimeout: 10 * time.Second,
+		StartToCloseTimeout: 30 * time.Second,
 	}
 	ctx = provider.WithActivityOptions(ctx, ao)
 
