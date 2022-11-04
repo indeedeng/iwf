@@ -17,7 +17,27 @@ Related projects:
 Contribution is welcome.   
 
 # Table of contents
-
+* [Why you would need iWF](#why-you-would-need-iwf)
+  * [If you are familar with <a href="https://github.com/uber/cadence">Cadence</a>/<a href="https://github.com/temporalio/temporal">Temporal</a>](#if-you-are-familar-with-cadencetemporal)
+  * [If you are not](#if-you-are-not)
+* [What is iWF](#what-is-iwf)
+  * [Advanced Concepts &amp; Usage](#advanced-concepts--usage)
+    * [WorkflowStartOption](#workflowstartoption)
+    * [WorkflowStateOption](#workflowstateoption)
+    * [Reset Workflow](#reset-workflow)
+* [How to run](#how-to-run)
+  * [Using docker image](#using-docker-image)
+  * [How to build &amp; run locally](#how-to-build--run-locally)
+  * [How to use in production](#how-to-use-in-production)
+    * [Option 1: use as library to customize your startup](#option-1-use-as-library-to-customize-your-startup)
+* [Development](#development)
+  * [How to update IDL and the generated code](#how-to-update-idl-and-the-generated-code)
+  * [Run with local Temporalite](#run-with-local-temporalite)
+  * [Run with local Cadence](#run-with-local-cadence)
+  * [Development Plan](#development-plan)
+    * [1.0](#10)
+    * [1.1](#11)
+    * [1.2](#12)
 
 # Why you would need iWF
 
