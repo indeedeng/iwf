@@ -9,14 +9,19 @@ It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 Back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter.
 
 Related projects:
-* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) and [Java SDK API review](https://docs.google.com/document/d/15CETNk9ewiP7M_6N9s7jo-Wm57WG977hch9kTVnaExA)
+* [API definition between SDKs and server](https://github.com/indeedeng/iwf-idl). Any languages can be supported as long as implementing it. 
+* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) 
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
 * [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk)
-* [API schema](https://github.com/indeedeng/iwf-idl)
 
-# What & Why
+Contribution is welcome.   
 
-### If you are familar with [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal)
+# Table of contents
+
+
+# Why you would need iWF
+
+## If you are familar with [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal)
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
 * See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
 
@@ -34,15 +39,76 @@ iWF is a application platform that provides you a comprehensive tooling:
 * ...
 * Basically with iWF, you mostly don't need any database, messageQueue or even ElasticSearch to build your applications
 
-## How to build & run
+# What is iWF
+
+iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/github/cadenceoss/iwf/core/Workflow.java).
+
+The key elements of a workflow are `WorkflowState`. A workflow can contain any number of WorkflowStates. 
+
+A WorkflowState is implemented with two APIs: `start` and `decide`. `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered.
+
+There are several types of commands:
+* `SignalCommand`: will be waiting for a signal from external to the workflow signal channel. 
+* `TimerCommand`: will be waiting for a durable timer to fire.
+* `InterStateChannelCommand`: will be waiting for a value being published from another state(internally in the same workflow)
+* `LongRunninngActivityCommand`: will schedule a Cadence/Temporal activity. This is only necessary for long-running activity like hours/days. 
+
+Note that `start` API can return multiple commands, and choose different DeciderTriggerType for triggering decide API:
+* `AllCommandCompleted`: this will wait for all command completed
+* `AnyCommandCompleted`: this will wait for any command completed
+
+iWF provides the below primitives when implementing the WorkflowState:
+* `StateLocals` is for 
+  * passing some data values from state API to decide API in the same WorkflowState execution
+  * recording some events that can be useful for debugging using Workflow history. Usually you may want to record the input/output of the dependency RPC calls.  
+* `QueryAttribute` is for 
+  * sharing some data values across the workflow
+  * can be retrieved by external application using GetQueryAttributes API
+  * can be viewed in Cadence/Temporal WebUI in QueryHandler tab
+* `SearchAttribute` is similarly:
+  * sharing some data values across the workflow
+  * can be retrieved by external application using GetSearchAttributes API
+  * search for workflows by external application using `SearchWorkflow` API
+  * search for workflows in Cadence/Temporal WebUI in Advanced tab
+  * search attribute type must be registered in Cadence/Temporal server before using for searching because it is backed up ElasticSearch
+  * the data types supported are limited as server has to understand the value for indexing
+
+## Advanced Concepts & Usage
+On top of the above basic concepts, you may want to deeply customize your workflow by using the below features.
+
+### WorkflowStartOption
+* IdReusePolicy
+* CronSchedule
+* RetryPolicy
+### WorkflowStateOption
+* AttributeLoadingPolicy
+* API timeout & retry
+### Reset Workflow
+
+
+
+# How to run
+
+##  Using docker image
+TODO
+
+## How to build & run locally
 * Run `make bins` to build the binary `iwf-server`
 * Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
 * Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below instructions for setting up local Cadence. 
 * Run `make integTests` to run all integration tests. This by default requires to have both local Cadence and Temporal to be set up.
 
-## Development
+## How to use in production
 
-### Update IDL and generated code
+### Option 1: use as library to customize your startup 
+
+Particularly, use the [api](https://github.com/indeedeng/iwf/tree/main/service/api) and [interpreter](https://github.com/indeedeng/iwf/tree/main/service/interpreter) that are exposed as the api service and workflow service.
+
+# Development
+
+Any contribution is welcome.
+
+### How to update IDL and the generated code
 1. Install openapi-generator using Homebrew if you haven't. See more [documentation](https://openapi-generator.tech/docs/installation) 
 2. Check out the idl submodule by running the command: `git submodule update --init --recursive`
 3. Run the command `git submodule update --remote --merge` to update IDL to the latest commit
@@ -66,8 +132,8 @@ tctl adm cl asa -n CustomIntField -t Int
 2. Register a new domain if not haven `cadence --do default domain register`
 3. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
-# Development Plan
-## 1.0
+## Development Plan
+### 1.0
 - [x] Start workflow API
 - [x] Executing `start`/`decide` APIs and completing workflow
 - [x] Parallel execution of multiple states 
@@ -81,7 +147,7 @@ tctl adm cl asa -n CustomIntField -t Int
 - [x] Get workflow API
 - [x] Search workflow API
 
-## 1.1
+### 1.1
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
@@ -89,7 +155,7 @@ tctl adm cl asa -n CustomIntField -t Int
 - [ ] StateOption: Start/Decide API timeout and retry
 - [ ] Reset workflow by stateId
 
-## 1.2
+### 1.2
 - [ ] Decider trigger type: AnyCommandClosed
 - [ ] WaitForMoreResults in StateDecision
 - [ ] Skip timer API for testing/operation
