@@ -47,6 +47,10 @@ func (t *temporalClient) SignalWorkflow(ctx context.Context, workflowID string, 
 	return t.tClient.SignalWorkflow(ctx, workflowID, runID, signalName, arg)
 }
 
+func (t *temporalClient) CancelWorkflow(ctx context.Context, workflowID string, runID string) error {
+	return t.tClient.CancelWorkflow(ctx, workflowID, runID)
+}
+
 func (t *temporalClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
 	listReq := &workflowservice.ListWorkflowExecutionsRequest{
 		PageSize: request.PageSize,

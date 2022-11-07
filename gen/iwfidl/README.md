@@ -78,6 +78,7 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**ApiV1WorkflowCancelPost**](docs/DefaultApi.md#apiv1workflowcancelpost) | **Post** /api/v1/workflow/cancel | cancel a workflow
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 *DefaultApi* | [**ApiV1WorkflowQueryattributesGetPost**](docs/DefaultApi.md#apiv1workflowqueryattributesgetpost) | **Post** /api/v1/workflow/queryattributes/get | get workflow query attributes
@@ -112,6 +113,7 @@ Class | Method | HTTP request | Description
  - [StateMovement](docs/StateMovement.md)
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
+ - [WorkflowCancelRequest](docs/WorkflowCancelRequest.md)
  - [WorkflowGetQueryAttributesRequest](docs/WorkflowGetQueryAttributesRequest.md)
  - [WorkflowGetQueryAttributesResponse](docs/WorkflowGetQueryAttributesResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)

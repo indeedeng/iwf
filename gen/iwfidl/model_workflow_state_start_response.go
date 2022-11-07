@@ -20,6 +20,7 @@ type WorkflowStateStartResponse struct {
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
 	CommandRequest *CommandRequest `json:"commandRequest,omitempty"`
 	UpsertStateLocalAttributes []KeyValue `json:"upsertStateLocalAttributes,omitempty"`
+	RecordEvents []KeyValue `json:"recordEvents,omitempty"`
 	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
 }
 
@@ -168,6 +169,38 @@ func (o *WorkflowStateStartResponse) SetUpsertStateLocalAttributes(v []KeyValue)
 	o.UpsertStateLocalAttributes = v
 }
 
+// GetRecordEvents returns the RecordEvents field value if set, zero value otherwise.
+func (o *WorkflowStateStartResponse) GetRecordEvents() []KeyValue {
+	if o == nil || o.RecordEvents == nil {
+		var ret []KeyValue
+		return ret
+	}
+	return o.RecordEvents
+}
+
+// GetRecordEventsOk returns a tuple with the RecordEvents field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateStartResponse) GetRecordEventsOk() ([]KeyValue, bool) {
+	if o == nil || o.RecordEvents == nil {
+		return nil, false
+	}
+	return o.RecordEvents, true
+}
+
+// HasRecordEvents returns a boolean if a field has been set.
+func (o *WorkflowStateStartResponse) HasRecordEvents() bool {
+	if o != nil && o.RecordEvents != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetRecordEvents gets a reference to the given []KeyValue and assigns it to the RecordEvents field.
+func (o *WorkflowStateStartResponse) SetRecordEvents(v []KeyValue) {
+	o.RecordEvents = v
+}
+
 // GetPublishToInterStateChannel returns the PublishToInterStateChannel field value if set, zero value otherwise.
 func (o *WorkflowStateStartResponse) GetPublishToInterStateChannel() []InterStateChannelPublishing {
 	if o == nil || o.PublishToInterStateChannel == nil {
@@ -213,6 +246,9 @@ func (o WorkflowStateStartResponse) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpsertStateLocalAttributes != nil {
 		toSerialize["upsertStateLocalAttributes"] = o.UpsertStateLocalAttributes
+	}
+	if o.RecordEvents != nil {
+		toSerialize["recordEvents"] = o.RecordEvents
 	}
 	if o.PublishToInterStateChannel != nil {
 		toSerialize["publishToInterStateChannel"] = o.PublishToInterStateChannel

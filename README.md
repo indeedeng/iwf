@@ -166,6 +166,7 @@ tctl adm cl asa -n CustomIntField -t Int
 - [x] Query workflow API
 - [x] Get workflow API
 - [x] Search workflow API
+- [x] Cancel workflow API
 
 ### 1.1
 - [x] Reset workflow API (Cadence only, TODO for Temporal)

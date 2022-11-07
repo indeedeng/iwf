@@ -19,6 +19,8 @@ type StateDecision struct {
 	NextStates []StateMovement `json:"nextStates,omitempty"`
 	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
 	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
+	RecordEvents []KeyValue `json:"recordEvents,omitempty"`
+	UpsertStateLocalAttributes []KeyValue `json:"upsertStateLocalAttributes,omitempty"`
 	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
 }
 
@@ -135,6 +137,70 @@ func (o *StateDecision) SetUpsertQueryAttributes(v []KeyValue) {
 	o.UpsertQueryAttributes = v
 }
 
+// GetRecordEvents returns the RecordEvents field value if set, zero value otherwise.
+func (o *StateDecision) GetRecordEvents() []KeyValue {
+	if o == nil || o.RecordEvents == nil {
+		var ret []KeyValue
+		return ret
+	}
+	return o.RecordEvents
+}
+
+// GetRecordEventsOk returns a tuple with the RecordEvents field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StateDecision) GetRecordEventsOk() ([]KeyValue, bool) {
+	if o == nil || o.RecordEvents == nil {
+		return nil, false
+	}
+	return o.RecordEvents, true
+}
+
+// HasRecordEvents returns a boolean if a field has been set.
+func (o *StateDecision) HasRecordEvents() bool {
+	if o != nil && o.RecordEvents != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetRecordEvents gets a reference to the given []KeyValue and assigns it to the RecordEvents field.
+func (o *StateDecision) SetRecordEvents(v []KeyValue) {
+	o.RecordEvents = v
+}
+
+// GetUpsertStateLocalAttributes returns the UpsertStateLocalAttributes field value if set, zero value otherwise.
+func (o *StateDecision) GetUpsertStateLocalAttributes() []KeyValue {
+	if o == nil || o.UpsertStateLocalAttributes == nil {
+		var ret []KeyValue
+		return ret
+	}
+	return o.UpsertStateLocalAttributes
+}
+
+// GetUpsertStateLocalAttributesOk returns a tuple with the UpsertStateLocalAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StateDecision) GetUpsertStateLocalAttributesOk() ([]KeyValue, bool) {
+	if o == nil || o.UpsertStateLocalAttributes == nil {
+		return nil, false
+	}
+	return o.UpsertStateLocalAttributes, true
+}
+
+// HasUpsertStateLocalAttributes returns a boolean if a field has been set.
+func (o *StateDecision) HasUpsertStateLocalAttributes() bool {
+	if o != nil && o.UpsertStateLocalAttributes != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUpsertStateLocalAttributes gets a reference to the given []KeyValue and assigns it to the UpsertStateLocalAttributes field.
+func (o *StateDecision) SetUpsertStateLocalAttributes(v []KeyValue) {
+	o.UpsertStateLocalAttributes = v
+}
+
 // GetPublishToInterStateChannel returns the PublishToInterStateChannel field value if set, zero value otherwise.
 func (o *StateDecision) GetPublishToInterStateChannel() []InterStateChannelPublishing {
 	if o == nil || o.PublishToInterStateChannel == nil {
@@ -177,6 +243,12 @@ func (o StateDecision) MarshalJSON() ([]byte, error) {
 	}
 	if o.UpsertQueryAttributes != nil {
 		toSerialize["upsertQueryAttributes"] = o.UpsertQueryAttributes
+	}
+	if o.RecordEvents != nil {
+		toSerialize["recordEvents"] = o.RecordEvents
+	}
+	if o.UpsertStateLocalAttributes != nil {
+		toSerialize["upsertStateLocalAttributes"] = o.UpsertStateLocalAttributes
 	}
 	if o.PublishToInterStateChannel != nil {
 		toSerialize["publishToInterStateChannel"] = o.PublishToInterStateChannel

@@ -60,6 +60,14 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(req iwfidl.WorkflowSignalRequest) 
 	return nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowCancelPost(req iwfidl.WorkflowCancelRequest) *ErrorAndStatus {
+	err := s.client.CancelWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+	if err != nil {
+		return s.handleError(err)
+	}
+	return nil
+}
+
 func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGetQueryAttributesRequest) (*iwfidl.WorkflowGetQueryAttributesResponse, *ErrorAndStatus) {
 	var queryResult1 service.QueryAttributeResponse
 	err := s.client.QueryWorkflow(context.Background(), &queryResult1,

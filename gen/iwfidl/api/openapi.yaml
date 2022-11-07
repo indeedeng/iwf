@@ -48,6 +48,24 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: signal a workflow
+  /api/v1/workflow/cancel:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowCancelRequest'
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: cancel a workflow
   /api/v1/workflow/queryattributes/get:
     post:
       requestBody:
@@ -401,6 +419,21 @@ components:
       - signalChannelName
       - workflowId
       type: object
+    WorkflowCancelRequest:
+      example:
+        reason: reason
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        reason:
+          type: string
+      required:
+      - workflowId
+      type: object
     WorkflowGetQueryAttributesRequest:
       example:
         attributeKeys:
@@ -701,6 +734,15 @@ components:
           valueType: KEYWORD
           integerValue: 0
           key: key
+        recordEvents:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
         upsertStateLocalAttributes:
         - value:
             data: data
@@ -757,6 +799,10 @@ components:
         commandRequest:
           $ref: '#/components/schemas/CommandRequest'
         upsertStateLocalAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        recordEvents:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
@@ -876,6 +922,24 @@ components:
             valueType: KEYWORD
             integerValue: 0
             key: key
+          recordEvents:
+          - value:
+              data: data
+              encoding: encoding
+            key: key
+          - value:
+              data: data
+              encoding: encoding
+            key: key
+          upsertStateLocalAttributes:
+          - value:
+              data: data
+              encoding: encoding
+            key: key
+          - value:
+              data: data
+              encoding: encoding
+            key: key
           nextStates:
           - nextStateInput:
               data: data
@@ -944,6 +1008,24 @@ components:
           valueType: KEYWORD
           integerValue: 0
           key: key
+        recordEvents:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        upsertStateLocalAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
         nextStates:
         - nextStateInput:
             data: data
@@ -1007,6 +1089,14 @@ components:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
         upsertQueryAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        recordEvents:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        upsertStateLocalAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
