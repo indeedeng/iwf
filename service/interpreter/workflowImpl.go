@@ -369,15 +369,15 @@ func executeState(
 	}
 
 	decision := decideResponse.GetStateDecision()
-	err = attrMgr.ProcessUpsertSearchAttribute(decision.GetUpsertSearchAttributes())
+	err = attrMgr.ProcessUpsertSearchAttribute(decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertQueryAttribute(decision.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertQueryAttribute(decideResponse.GetUpsertQueryAttributes())
 	if err != nil {
 		return nil, err
 	}
-	interStateChannel.ProcessPublishing(decision.GetPublishToInterStateChannel())
+	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
 	return &decision, nil
 }

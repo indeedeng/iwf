@@ -169,12 +169,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				// dead end
-				StateDecision: &iwfidl.StateDecision{
-					PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
-						{
-							ChannelName: channel2,
-							Value:       &TestVal2,
-						},
+				StateDecision: &iwfidl.StateDecision{},
+				PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+					{
+						ChannelName: channel2,
+						Value:       &TestVal2,
 					},
 				},
 			})
