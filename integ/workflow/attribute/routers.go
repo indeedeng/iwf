@@ -200,14 +200,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 							StateId: State2,
 						},
 					},
-					UpsertQueryAttributes: []iwfidl.KeyValue{
-						{
-							Key:   iwfidl.PtrString(TestQueryAttributeKey),
-							Value: &TestQueryVal2,
-						},
-					},
-					UpsertSearchAttributes: sa,
 				},
+				UpsertQueryAttributes: []iwfidl.KeyValue{
+					{
+						Key:   iwfidl.PtrString(TestQueryAttributeKey),
+						Value: &TestQueryVal2,
+					},
+				},
+				UpsertSearchAttributes: sa,
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {

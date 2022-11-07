@@ -912,34 +912,25 @@ components:
       type: object
     WorkflowStateDecideResponse:
       example:
+        upsertSearchAttributes:
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
+          key: key
+        - stringValue: stringValue
+          valueType: KEYWORD
+          integerValue: 0
+          key: key
+        recordEvents:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
         stateDecision:
-          upsertSearchAttributes:
-          - stringValue: stringValue
-            valueType: KEYWORD
-            integerValue: 0
-            key: key
-          - stringValue: stringValue
-            valueType: KEYWORD
-            integerValue: 0
-            key: key
-          recordEvents:
-          - value:
-              data: data
-              encoding: encoding
-            key: key
-          - value:
-              data: data
-              encoding: encoding
-            key: key
-          upsertStateLocalAttributes:
-          - value:
-              data: data
-              encoding: encoding
-            key: key
-          - value:
-              data: data
-              encoding: encoding
-            key: key
           nextStates:
           - nextStateInput:
               data: data
@@ -975,48 +966,6 @@ components:
                 attributeKeys:
                 - attributeKeys
                 - attributeKeys
-          publishToInterStateChannel:
-          - channelName: channelName
-            value:
-              data: data
-              encoding: encoding
-          - channelName: channelName
-            value:
-              data: data
-              encoding: encoding
-          upsertQueryAttributes:
-          - value:
-              data: data
-              encoding: encoding
-            key: key
-          - value:
-              data: data
-              encoding: encoding
-            key: key
-      properties:
-        stateDecision:
-          $ref: '#/components/schemas/StateDecision'
-      type: object
-    StateDecision:
-      example:
-        upsertSearchAttributes:
-        - stringValue: stringValue
-          valueType: KEYWORD
-          integerValue: 0
-          key: key
-        - stringValue: stringValue
-          valueType: KEYWORD
-          integerValue: 0
-          key: key
-        recordEvents:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
         upsertStateLocalAttributes:
         - value:
             data: data
@@ -1026,41 +975,6 @@ components:
             data: data
             encoding: encoding
           key: key
-        nextStates:
-        - nextStateInput:
-            data: data
-            encoding: encoding
-          stateId: stateId
-          nextStateOptions:
-            searchAttributesLoadingPolicy:
-              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-              attributeKeys:
-              - attributeKeys
-              - attributeKeys
-            commandCarryOverPolicy:
-              commandCarryOverType: NONE
-            queryAttributesLoadingPolicy:
-              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-              attributeKeys:
-              - attributeKeys
-              - attributeKeys
-        - nextStateInput:
-            data: data
-            encoding: encoding
-          stateId: stateId
-          nextStateOptions:
-            searchAttributesLoadingPolicy:
-              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-              attributeKeys:
-              - attributeKeys
-              - attributeKeys
-            commandCarryOverPolicy:
-              commandCarryOverType: NONE
-            queryAttributesLoadingPolicy:
-              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
-              attributeKeys:
-              - attributeKeys
-              - attributeKeys
         publishToInterStateChannel:
         - channelName: channelName
           value:
@@ -1080,10 +994,8 @@ components:
             encoding: encoding
           key: key
       properties:
-        nextStates:
-          items:
-            $ref: '#/components/schemas/StateMovement'
-          type: array
+        stateDecision:
+          $ref: '#/components/schemas/StateDecision'
         upsertSearchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
@@ -1103,6 +1015,49 @@ components:
         publishToInterStateChannel:
           items:
             $ref: '#/components/schemas/InterStateChannelPublishing'
+          type: array
+      type: object
+    StateDecision:
+      example:
+        nextStates:
+        - nextStateInput:
+            data: data
+            encoding: encoding
+          stateId: stateId
+          nextStateOptions:
+            searchAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+            commandCarryOverPolicy:
+              commandCarryOverType: NONE
+            queryAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+        - nextStateInput:
+            data: data
+            encoding: encoding
+          stateId: stateId
+          nextStateOptions:
+            searchAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+            commandCarryOverPolicy:
+              commandCarryOverType: NONE
+            queryAttributesLoadingPolicy:
+              attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              attributeKeys:
+              - attributeKeys
+              - attributeKeys
+      properties:
+        nextStates:
+          items:
+            $ref: '#/components/schemas/StateMovement'
           type: array
       type: object
     StateMovement:
