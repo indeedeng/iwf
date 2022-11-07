@@ -27,6 +27,7 @@ docs/StateDecision.md
 docs/StateMovement.md
 docs/TimerCommand.md
 docs/TimerResult.md
+docs/WorkflowCancelRequest.md
 docs/WorkflowGetQueryAttributesRequest.md
 docs/WorkflowGetQueryAttributesResponse.md
 docs/WorkflowGetRequest.md
@@ -69,6 +70,7 @@ model_state_decision.go
 model_state_movement.go
 model_timer_command.go
 model_timer_result.go
+model_workflow_cancel_request.go
 model_workflow_get_query_attributes_request.go
 model_workflow_get_query_attributes_response.go
 model_workflow_get_request.go

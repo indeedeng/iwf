@@ -7,6 +7,8 @@ Name | Type | Description | Notes
 **NextStates** | Pointer to [**[]StateMovement**](StateMovement.md) |  | [optional] 
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**RecordEvents** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**UpsertStateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **PublishToInterStateChannel** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
 
 ## Methods
@@ -102,6 +104,56 @@ SetUpsertQueryAttributes sets UpsertQueryAttributes field to given value.
 `func (o *StateDecision) HasUpsertQueryAttributes() bool`
 
 HasUpsertQueryAttributes returns a boolean if a field has been set.
+
+### GetRecordEvents
+
+`func (o *StateDecision) GetRecordEvents() []KeyValue`
+
+GetRecordEvents returns the RecordEvents field if non-nil, zero value otherwise.
+
+### GetRecordEventsOk
+
+`func (o *StateDecision) GetRecordEventsOk() (*[]KeyValue, bool)`
+
+GetRecordEventsOk returns a tuple with the RecordEvents field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRecordEvents
+
+`func (o *StateDecision) SetRecordEvents(v []KeyValue)`
+
+SetRecordEvents sets RecordEvents field to given value.
+
+### HasRecordEvents
+
+`func (o *StateDecision) HasRecordEvents() bool`
+
+HasRecordEvents returns a boolean if a field has been set.
+
+### GetUpsertStateLocalAttributes
+
+`func (o *StateDecision) GetUpsertStateLocalAttributes() []KeyValue`
+
+GetUpsertStateLocalAttributes returns the UpsertStateLocalAttributes field if non-nil, zero value otherwise.
+
+### GetUpsertStateLocalAttributesOk
+
+`func (o *StateDecision) GetUpsertStateLocalAttributesOk() (*[]KeyValue, bool)`
+
+GetUpsertStateLocalAttributesOk returns a tuple with the UpsertStateLocalAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpsertStateLocalAttributes
+
+`func (o *StateDecision) SetUpsertStateLocalAttributes(v []KeyValue)`
+
+SetUpsertStateLocalAttributes sets UpsertStateLocalAttributes field to given value.
+
+### HasUpsertStateLocalAttributes
+
+`func (o *StateDecision) HasUpsertStateLocalAttributes() bool`
+
+HasUpsertStateLocalAttributes returns a boolean if a field has been set.
 
 ### GetPublishToInterStateChannel
 

@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
 **UpsertStateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**RecordEvents** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **PublishToInterStateChannel** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
 
 ## Methods
@@ -128,6 +129,31 @@ SetUpsertStateLocalAttributes sets UpsertStateLocalAttributes field to given val
 `func (o *WorkflowStateStartResponse) HasUpsertStateLocalAttributes() bool`
 
 HasUpsertStateLocalAttributes returns a boolean if a field has been set.
+
+### GetRecordEvents
+
+`func (o *WorkflowStateStartResponse) GetRecordEvents() []KeyValue`
+
+GetRecordEvents returns the RecordEvents field if non-nil, zero value otherwise.
+
+### GetRecordEventsOk
+
+`func (o *WorkflowStateStartResponse) GetRecordEventsOk() (*[]KeyValue, bool)`
+
+GetRecordEventsOk returns a tuple with the RecordEvents field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRecordEvents
+
+`func (o *WorkflowStateStartResponse) SetRecordEvents(v []KeyValue)`
+
+SetRecordEvents sets RecordEvents field to given value.
+
+### HasRecordEvents
+
+`func (o *WorkflowStateStartResponse) HasRecordEvents() bool`
+
+HasRecordEvents returns a boolean if a field has been set.
 
 ### GetPublishToInterStateChannel
 

@@ -53,6 +53,10 @@ func (t *cadenceClient) SignalWorkflow(ctx context.Context, workflowID string, r
 	return t.cClient.SignalWorkflow(ctx, workflowID, runID, signalName, arg)
 }
 
+func (t *cadenceClient) CancelWorkflow(ctx context.Context, workflowID string, runID string) error {
+	return t.cClient.CancelWorkflow(ctx, workflowID, runID)
+}
+
 func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
 	listReq := &shared.ListWorkflowExecutionsRequest{
 		PageSize: &request.PageSize,
