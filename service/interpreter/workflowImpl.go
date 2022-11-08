@@ -8,6 +8,14 @@ import (
 )
 
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+	globalVersionProvider := newGlobalVersionProvider(provider)
+	if globalVersionProvider.isAfterVersionOfUsingGlobalVersioning(ctx) {
+		err := globalVersionProvider.upsertGlobalVersionSearchAttribute(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+	
 	execution := service.IwfWorkflowExecution{
 		IwfWorkerUrl:     input.IwfWorkerUrl,
 		WorkflowType:     input.IwfWorkflowType,
