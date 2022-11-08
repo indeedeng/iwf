@@ -11,23 +11,25 @@ import (
 )
 
 type serviceImpl struct {
-	client UnifiedClient
+	client    UnifiedClient
+	taskQueue string
 }
 
 func (s *serviceImpl) Close() {
 	s.client.Close()
 }
 
-func NewApiService(client UnifiedClient) (ApiService, error) {
+func NewApiService(client UnifiedClient, taskQueue string) (ApiService, error) {
 	return &serviceImpl{
-		client: client,
+		client:    client,
+		taskQueue: taskQueue,
 	}, nil
 }
 
 func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus) {
 	workflowOptions := StartWorkflowOptions{
 		ID:                 req.GetWorkflowId(),
-		TaskQueue:          service.TaskQueue,
+		TaskQueue:          s.taskQueue,
 		WorkflowRunTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
 	}
 
