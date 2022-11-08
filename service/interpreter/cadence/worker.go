@@ -1,7 +1,6 @@
 package cadence
 
 import (
-	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
@@ -13,12 +12,14 @@ type InterpreterWorker struct {
 	closeFunc func()
 	domain    string
 	worker    worker.Worker
+	tasklist  string
 }
 
-func NewInterpreterWorker(service workflowserviceclient.Interface, domain string, closeFunc func()) *InterpreterWorker {
+func NewInterpreterWorker(service workflowserviceclient.Interface, domain, tasklist string, closeFunc func()) *InterpreterWorker {
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,
+		tasklist:  tasklist,
 		closeFunc: closeFunc,
 	}
 }
@@ -29,7 +30,7 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	iw.worker = worker.New(iw.service, iw.domain, service.TaskQueue, worker.Options{})
+	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, worker.Options{})
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)

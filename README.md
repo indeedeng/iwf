@@ -21,10 +21,8 @@ Contribution is welcome.
   * [If you are familar with <a href="https://github.com/uber/cadence">Cadence</a>/<a href="https://github.com/temporalio/temporal">Temporal</a>](#if-you-are-familar-with-cadencetemporal)
   * [If you are not](#if-you-are-not)
 * [What is iWF](#what-is-iwf)
+  * [Basic Concepts &amp; Usage](#basic-concepts--usage) 
   * [Advanced Concepts &amp; Usage](#advanced-concepts--usage)
-    * [WorkflowStartOption](#workflowstartoption)
-    * [WorkflowStateOption](#workflowstateoption)
-    * [Reset Workflow](#reset-workflow)
 * [How to run](#how-to-run)
   * [Using docker image](#using-docker-image)
   * [How to build &amp; run locally](#how-to-build--run-locally)
@@ -61,17 +59,16 @@ iWF is a application platform that provides you a comprehensive tooling:
 
 # What is iWF
 
+## Basic Concepts & Usage
 iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/github/cadenceoss/iwf/core/Workflow.java).
 
 The key elements of a workflow are `WorkflowState`. A workflow can contain any number of WorkflowStates. 
 
 A WorkflowState is implemented with two APIs: `start` and `decide`. `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered.
 
-There are several types of commands:
-* `SignalCommand`: will be waiting for a signal from external to the workflow signal channel. 
-* `TimerCommand`: will be waiting for a durable timer to fire.
-* `InterStateChannelCommand`: will be waiting for a value being published from another state(internally in the same workflow)
-* `LongRunninngActivityCommand`: will schedule a Cadence/Temporal activity. This is only necessary for long-running activity like hours/days. 
+These are the two basic command types:
+* `SignalCommand`: will be waiting for a signal from external to the workflow signal channel. External application can use SignalWorkflow API to signal a workflow. 
+* `TimerCommand`: will be waiting for a **durable timer** to fire.   
 
 Note that `start` API can return multiple commands, and choose different DeciderTriggerType for triggering decide API:
 * `AllCommandCompleted`: this will wait for all command completed
@@ -92,9 +89,14 @@ iWF provides the below primitives when implementing the WorkflowState:
   * search for workflows in Cadence/Temporal WebUI in Advanced tab
   * search attribute type must be registered in Cadence/Temporal server before using for searching because it is backed up ElasticSearch
   * the data types supported are limited as server has to understand the value for indexing
+  * See [Temporal doc](https://docs.temporal.io/concepts/what-is-a-search-attribute) and [Cadence doc](https://cadenceworkflow.io/docs/concepts/search-workflows/) to understand more about SearchAttribute 
 
 ## Advanced Concepts & Usage
 On top of the above basic concepts, you may want to deeply customize your workflow by using the below features.
+
+### More advanced command types
+* `InterStateChannelCommand`: will be waiting for a value being published from another state(internally in the same workflow)
+* WIP `LongRunninngActivityCommand`: will schedule a Cadence/Temporal activity. This is only necessary for long-running activity like hours/days.
 
 ### WorkflowStartOption
 * IdReusePolicy
@@ -105,7 +107,20 @@ On top of the above basic concepts, you may want to deeply customize your workfl
 * API timeout & retry
 ### Reset Workflow
 
+## How to change workflow code
+Unlike Cadence/Temporal, there is no [Non-deterministic](https://docs.temporal.io/workflows#deterministic-constraints) errors anymore in iWF.  
+And there is no [versioning APIs](https://docs.temporal.io/go/versioning). You will never see the worker crashing & replay issues on iWF workers.
 
+However, changing workflow code could still have backward compatibility issues. Here are some tips:
+* Changing the behavior of a WorkflowState will always apply to any existing workflow executions. 
+  * Usually that's what you want. If it's not, then you should utilize QueryAttribute, SearchAttribute or StateLocalAttribute to record some data, and use it to decide the new behavior 
+* Removing an existing WorkflowState could cause existing workflow executions to stuck if there is any workflow executing on it. 
+  * If that happens, the worker will return errors to server, which will fail the server workflow activity and keep on backoff retry until it's fixed
+  * To safely delete a WorkflowState, you can utilize the `IwfExecutingStateIds` search attribute to check if the stateId is still being executed
+
+## How to write unit test
+Writing unit test for iWF workflow code should be super easy compared to Cadence/Temporal. There is no need to use any special testEnv.
+The standard unit test library should be sufficient.
 
 # How to run
 
@@ -148,8 +163,8 @@ NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporali
 3. Register system search attributes required by iWF server
 ```shell
 tctl adm cl asa -n IwfWorkflowType -t Keyword
-tctl adm cl asa -n GlobalWorkflowVersion -t Int
-tctl adm cl asa -n ExecutingStateIds -t Keyword
+tctl adm cl asa -n IwfGlobalWorkflowVersion -t Int
+tctl adm cl asa -n IwfExecutingStateIds -t Keyword
 
 ```
 4 For `attribute_test.go` integTests, you need to register search attributes:
@@ -166,8 +181,8 @@ docker-compose -f docker-compose-es-v7.yml up
 2. Register a new domain if not haven `cadence --do default domain register`
 3. Register system search attributes required by iWF server
 ```
-cadence adm cl asa --search_attr_key GlobalWorkflowVersion --search_attr_type 2
-cadence adm cl asa --search_attr_key ExecutingStateIds --search_attr_type 0
+cadence adm cl asa --search_attr_key IwfGlobalWorkflowVersion --search_attr_type 2
+cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 0
 cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 ```
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days

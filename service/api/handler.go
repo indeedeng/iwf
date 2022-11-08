@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 
@@ -14,7 +15,7 @@ type handler struct {
 }
 
 func newHandler(client UnifiedClient) *handler {
-	svc, err := NewApiService(client)
+	svc, err := NewApiService(client, service.TaskQueue)
 	if err != nil {
 		panic(err)
 	}

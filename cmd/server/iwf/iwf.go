@@ -23,6 +23,7 @@ package iwf
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/service"
+	isvc "github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
 	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
@@ -141,7 +142,7 @@ func launchTemporalService(svcName string, config *service.Config, unifiedClient
 		svc := api.NewService(unifiedClient)
 		log.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(temporalClient)
+		interpreter := temporal.NewInterpreterWorker(temporalClient, isvc.TaskQueue)
 		interpreter.Start()
 	default:
 		log.Printf("Invalid service: %v", svcName)
@@ -160,7 +161,7 @@ func launchCadenceService(
 		svc := api.NewService(unifiedClient)
 		log.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := cadence.NewInterpreterWorker(service, domain, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(service, domain, isvc.TaskQueue, closeFunc)
 		interpreter.Start()
 	default:
 		log.Printf("Invalid service: %v", svcName)

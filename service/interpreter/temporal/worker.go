@@ -1,7 +1,6 @@
 package temporal
 
 import (
-	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
@@ -11,11 +10,13 @@ import (
 type InterpreterWorker struct {
 	temporalClient client.Client
 	worker         worker.Worker
+	taskQueue      string
 }
 
-func NewInterpreterWorker(temporalClient client.Client) *InterpreterWorker {
+func NewInterpreterWorker(temporalClient client.Client, taskQueue string) *InterpreterWorker {
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
+		taskQueue:      taskQueue,
 	}
 }
 
@@ -25,7 +26,7 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	iw.worker = worker.New(iw.temporalClient, service.TaskQueue, worker.Options{})
+	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, worker.Options{})
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)

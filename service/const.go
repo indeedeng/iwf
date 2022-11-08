@@ -1,7 +1,7 @@
 package service
 
 const (
-	TaskQueue                         = "Interpreter"
+	TaskQueue                         = "Interpreter_DEFAULT"
 	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
 	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
 	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
@@ -38,8 +38,8 @@ const (
 	WorkflowStatusCanceled      = "CANCELED"
 	WorkflowStatusContinueAsNew = "CONTINUED_AS_NEW"
 
-	SearchAttributeGlobalVersion     = "GlobalWorkflowVersion"
-	SearchAttributeExecutingStateIds = "ExecutingStateIds"
+	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
+	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
 	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"
 )
 

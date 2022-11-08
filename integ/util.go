@@ -55,7 +55,7 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(temporalClient)
+		interpreter := temporal.NewInterpreterWorker(temporalClient, service.TaskQueue)
 		interpreter.Start()
 		return func() {
 			iwfServer.Close()
@@ -81,7 +81,7 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(serviceClient, iwf.DefaultCadenceDomain, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
 		interpreter.Start()
 		return func() {
 			iwfServer.Close()
