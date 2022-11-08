@@ -137,20 +137,40 @@ Any contribution is welcome.
 
 ### Run with local Temporalite
 1. Run a local Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start. 
-2. Go to http://localhost:8233/ for Temporal WebUI
+2. Register a default namespace
+```shell
+tctl --ns default n re
+```
+3. Go to http://localhost:8233/ for Temporal WebUI
 
 NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporalio/docker-compose) to run with docker
 
-3. For `attribute_test.go` integTests, you need to register search attributes:
-```bash
+3. Register system search attributes required by iWF server
+```shell
+tctl adm cl asa -n IWorklowType -t Keyword
+tctl adm cl asa -n GlobalWorkflowVersion -t Int
+tctl adm cl asa -n StateExecutionStatus -t Keyword
+
+```
+4 For `attribute_test.go` integTests, you need to register search attributes:
+```shell
 tctl adm cl asa -n CustomKeywordField -t Keyword
 tctl adm cl asa -n CustomIntField -t Int
 ```
 
 ### Run with local Cadence
 1. Run a local Cadence server following the [instructions](https://github.com/uber/cadence/tree/master/docker)
+```
+docker-compose -f docker-compose-es-v7.yml up
+```
 2. Register a new domain if not haven `cadence --do default domain register`
-3. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
+3. Register system search attributes required by iWF server
+```
+cadence adm cl asa --search_attr_key GlobalWorkflowVersion --search_attr_type 2
+cadence adm cl asa --search_attr_key StateExecutionStatus --search_attr_type 0
+cadence adm cl asa --search_attr_key IWorklowType --search_attr_type 0
+```
+4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
 ## Development Plan
 ### 1.0
