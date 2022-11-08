@@ -22,4 +22,7 @@ do
     echo "Waiting for ${HOST} to be ready..."
   fi
 done
+# TODO remove this hack by using tctl to make sure namespace is registered
+# then remove the hack in init.sh
+sleep 20
 "${SRC_ROOT}/iwf-server" --config "${CONFIG_TEMPLATE_PATH}" start "$@"

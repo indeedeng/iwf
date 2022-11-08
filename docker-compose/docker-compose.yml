@@ -61,6 +61,9 @@ services:
       - temporal-network
     stdin_open: true
     tty: true
+    volumes:
+     - ./init.sh:/etc/temporal/init.sh
+    entrypoint: sh -c "/etc/temporal/init.sh"
   temporal-ui:
     container_name: temporal-ui
     depends_on:
