@@ -22,4 +22,8 @@ do
     echo "Waiting for ${HOST} to be ready..."
   fi
 done
+# TODO remove this hack by using tctl to make sure namespace is registered
+# then remove the hack in init.sh
+echo "now waiting for 20s so that another script will register namespace/search attributes. TODO need to remove this hack..."
+sleep 20
 "${SRC_ROOT}/iwf-server" --config "${CONFIG_TEMPLATE_PATH}" start "$@"

@@ -124,8 +124,14 @@ The standard unit test library should be sufficient.
 
 # How to run
 
-##  Using docker image
-TODO
+##  Using docker image & docker-compose
+Checkout this repo, go to the docker-compose folder and run it:
+```shell
+cd docker-compose && docker-compose up
+```
+This by default will run Temporal server with it. 
+And it will also register a `default` namespace and required search attributes by iWF.
+Link to WebUI: http://localhost:8083/namespaces/default/workflows
 
 ## How to build & run locally
 * Run `make bins` to build the binary `iwf-server`
