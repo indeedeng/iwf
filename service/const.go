@@ -37,6 +37,10 @@ const (
 	WorkflowStatusTerminated    = "TERMINATED"
 	WorkflowStatusCanceled      = "CANCELED"
 	WorkflowStatusContinueAsNew = "CONTINUED_AS_NEW"
+
+	SearchAttributeGlobalVersion     = "GlobalWorkflowVersion"
+	SearchAttributeExecutingStateIds = "ExecutingStateIds"
+	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"
 )
 
 type BackendType string

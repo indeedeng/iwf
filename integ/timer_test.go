@@ -27,7 +27,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(service.BackendTypeTemporal)
+	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
 
 	// start a workflow
