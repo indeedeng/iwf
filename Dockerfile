@@ -18,8 +18,6 @@ RUN go mod download
 COPY . .
 RUN rm -fr .bin .build
 
-ENV CADENCE_NOTIFICATION_RELEASE_VERSION=$RELEASE_VERSION
-
 RUN CGO_ENABLED=0 make bins
 
 # Download dockerize
@@ -55,4 +53,5 @@ WORKDIR /etc/iwf-server
 
 ENV SERVICES="api,interpreter"
 RUN chmod +x /start.sh
+EXPOSE 8801
 CMD /start.sh
