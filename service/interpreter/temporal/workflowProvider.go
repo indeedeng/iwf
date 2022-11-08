@@ -130,6 +130,16 @@ func (w *workflowProvider) Sleep(ctx interpreter.UnifiedContext, d time.Duration
 	return workflow.Sleep(wfCtx, d)
 }
 
+func (w *workflowProvider) GetVersion(ctx interpreter.UnifiedContext, changeID string, minSupported, maxSupported int) int {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+
+	version := workflow.GetVersion(wfCtx, changeID, workflow.Version(minSupported), workflow.Version(maxSupported))
+	return int(version)
+}
+
 type temporalReceiveChannel struct {
 	channel workflow.ReceiveChannel
 }
