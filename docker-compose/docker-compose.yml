@@ -73,15 +73,15 @@ services:
       - temporal-network
     ports:
       - 8083:8080
-#  iwf-server:
-#    container_name: iwf-server
-#    image: iwf-server:latest
-#    networks:
-#      - temporal-network
-#    ports:
-#      - 8801:8801
-#    depends_on:
-#      - temporal
+  iwf-server:
+    container_name: iwf-server
+    image: prclqz/iwf-server:latest
+    networks:
+      - temporal-network
+    ports:
+      - 8801:8801
+    depends_on:
+      - temporal
 networks:
   temporal-network:
     driver: bridge
