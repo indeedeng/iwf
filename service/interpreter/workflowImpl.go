@@ -53,12 +53,16 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
-	inFlightExecutingStateCount := 0
+	stateExecutingMgr := newStateExecutingManager(ctx, provider)
+	//inFlightExecutingStateCount := 0
 
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
-		inFlightExecutingStateCount += len(currentStates)
 		statesToExecute := currentStates
+		err := stateExecutingMgr.startStates(currentStates)
+		if err != nil {
+			return nil, err
+		}
 		//reset to empty slice since each iteration will process all current states in the queue
 		currentStates = nil
 
@@ -67,10 +71,6 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
 			stateCtx := provider.ExtendContextWithValue(ctx, "state", stateToExecute)
 			provider.GoNamed(stateCtx, stateToExecute.GetStateId(), func(ctx UnifiedContext) {
-				defer func() {
-					inFlightExecutingStateCount--
-				}()
-
 				state, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = provider.NewApplicationError(
@@ -79,6 +79,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					)
 					return
 				}
+				defer func() {
+					err := stateExecutingMgr.completeStates(state)
+					if err != nil {
+						errToFailWf = err
+					}
+				}()
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
 				decision, err := executeState(ctx, provider, state, execution, stateExeId, attrMgr, interStateChannel)
@@ -109,7 +115,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 
 		awaitError := provider.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || inFlightExecutingStateCount == 0
+			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutingMgr.getTotalExecutingStates() == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
