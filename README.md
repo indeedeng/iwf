@@ -144,7 +144,10 @@ tctl --ns default n re
 3. Go to http://localhost:8233/ for Temporal WebUI
 
 NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporalio/docker-compose) to run with docker
-
+```shell
+docker-compose up
+```
+and use http://localhost:8080/ for webUI
 3. Register system search attributes required by iWF server
 ```shell
 tctl adm cl asa -n IwfWorkflowType -t Keyword
