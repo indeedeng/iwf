@@ -147,7 +147,7 @@ NOTE: alternatively, go to [Temporal-dockercompose](https://github.com/temporali
 
 3. Register system search attributes required by iWF server
 ```shell
-tctl adm cl asa -n IWorklowType -t Keyword
+tctl adm cl asa -n IwfWorkflowType -t Keyword
 tctl adm cl asa -n GlobalWorkflowVersion -t Int
 tctl adm cl asa -n StateExecutionStatus -t Keyword
 
@@ -168,7 +168,7 @@ docker-compose -f docker-compose-es-v7.yml up
 ```
 cadence adm cl asa --search_attr_key GlobalWorkflowVersion --search_attr_type 2
 cadence adm cl asa --search_attr_key StateExecutionStatus --search_attr_type 0
-cadence adm cl asa --search_attr_key IWorklowType --search_attr_type 0
+cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 ```
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 

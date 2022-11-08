@@ -40,7 +40,7 @@ const (
 
 	SearchAttributeGlobalVersion        = "GlobalWorkflowVersion"
 	SearchAttributeStateExecutionStatus = "StateExecutionStatus"
-	SearchAttributeIWorkflowType        = "IWorkflowType"
+	SearchAttributeIwfWorkflowType      = "IwfWorkflowType"
 )
 
 type BackendType string

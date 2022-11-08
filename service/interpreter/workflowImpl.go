@@ -15,7 +15,14 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			return nil, err
 		}
 	}
-	
+
+	err := provider.UpsertSearchAttributes(ctx, map[string]interface{}{
+		service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	execution := service.IwfWorkflowExecution{
 		IwfWorkerUrl:     input.IwfWorkerUrl,
 		WorkflowType:     input.IwfWorkflowType,
@@ -36,7 +43,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		return provider.UpsertSearchAttributes(ctx, attributes)
 	})
 
-	err := provider.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
+	err = provider.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
 		return attrMgr.GetQueryAttributesByKey(req), nil
 	})
 	if err != nil {
