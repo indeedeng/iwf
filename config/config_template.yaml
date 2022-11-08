@@ -1,0 +1,14 @@
+api:
+  port: 8801
+backend:
+#  {{- be := default .Env.BACKEND_TYPE "temporal" | lower -}}
+#    {{- if eq $be "temporal" }}
+    temporal:
+      hostPort: "temporal:7233"
+      namespace: "default"
+#    {{- end }}
+#    {{- if eq $be "temporal" }}
+#    cadence:
+#      hostPort: {{ default .Env.CADENCE_HOST_PORT "127.0.0.1:7833" }}
+#      domain: {{ default .Env.CADENCE_NAMESPACE "default" }}
+#    {{- end }}
