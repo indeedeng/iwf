@@ -276,21 +276,23 @@ func executeState(
 
 	// TODO process long running activity command
 
-	triggerType := commandReq.GetDeciderTriggerType()
-	if triggerType == service.DeciderTypeAllCommandCompleted {
-		err = provider.Await(ctx, func() bool {
-			return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
-				len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
-				len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
-		})
-	} else if triggerType == service.DeciderTypeAnyCommandCompleted {
-		err = provider.Await(ctx, func() bool {
-			return len(completedTimerCmds)+
-				len(completedSignalCmds)+
-				len(completedInterStateChannelCmds) > 0
-		})
-	} else {
-		return nil, provider.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
+	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
+		triggerType := commandReq.GetDeciderTriggerType()
+		if triggerType == service.DeciderTypeAllCommandCompleted {
+			err = provider.Await(ctx, func() bool {
+				return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
+					len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
+					len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
+			})
+		} else if triggerType == service.DeciderTypeAnyCommandCompleted {
+			err = provider.Await(ctx, func() bool {
+				return len(completedTimerCmds)+
+					len(completedSignalCmds)+
+					len(completedInterStateChannelCmds) > 0
+			})
+		} else {
+			return nil, provider.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
+		}
 	}
 
 	if err != nil {
