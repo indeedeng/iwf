@@ -115,7 +115,8 @@ However, changing workflow code could still have backward compatibility issues. 
 * Changing the behavior of a WorkflowState will always apply to any existing workflow executions. 
   * Usually that's what you want. If it's not, then you should utilize QueryAttribute, SearchAttribute or StateLocalAttribute to record some data, and use it to decide the new behavior 
 * Removing an existing WorkflowState could cause existing workflow executions to stuck if there is any workflow executing on it. 
-  * If that happens, the worker will return errors to server, which will fail the server workflow activity and keep on backoff retry until it's fixed
+  * If that happens, the worker will return errors to server, which will fail the server workflow activity and keep on backoff retry 
+  * Instead of fixing the code, you can also reset workflow to recover from bad state executions
   * To safely delete a WorkflowState, you can utilize the `IwfExecutingStateIds` search attribute to check if the stateId is still being executed
 
 ## How to write unit test
