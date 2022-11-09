@@ -75,7 +75,7 @@ services:
     networks:
       - temporal-network
     ports:
-      - 8083:8080
+      - 8233:8080
   iwf-server:
     container_name: iwf-server
     image: prclqz/iwf-server:latest
