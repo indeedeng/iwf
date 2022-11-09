@@ -75,7 +75,7 @@ Note that `start` API can return multiple commands, and choose different Decider
 * `AnyCommandCompleted`: this will wait for any command completed
 
 iWF provides the below primitives when implementing the WorkflowState:
-* `StateLocals` is for 
+  * `StateLocal` is for 
   * passing some data values from state API to decide API in the same WorkflowState execution
   * recording some events that can be useful for debugging using Workflow history. Usually you may want to record the input/output of the dependency RPC calls.  
 * `QueryAttribute` is for 
