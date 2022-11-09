@@ -7,17 +7,20 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 )
 
 func StateStart(ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateStartActivity", "input", input)
+	iwfWorkerBaseUrl := getIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
-				URL: input.IwfWorkerUrl,
+				URL: iwfWorkerBaseUrl,
 			},
 		},
 	})
@@ -35,10 +38,11 @@ func StateDecide(ctx context.Context, backendType service.BackendType, input ser
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)
 
+	iwfWorkerBaseUrl := getIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
-				URL: input.IwfWorkerUrl,
+				URL: iwfWorkerBaseUrl,
 			},
 		},
 	})
@@ -48,6 +52,15 @@ func StateDecide(ctx context.Context, backendType service.BackendType, input ser
 		return nil, composeError(provider, "state decide API failed", err, httpResp)
 	}
 	return resp, nil
+}
+
+func getIwfWorkerBaseUrlWithFix(url string) string {
+	autofix := os.Getenv("AUTO_FIX_WORKER_URL")
+	if autofix != "" {
+		url = strings.Replace(url, "localhost", autofix, 1)
+		url = strings.Replace(url, "127.0.0.1", autofix, 1)
+	}
+	return url
 }
 
 func checkError(err error, httpResp *http.Response) bool {

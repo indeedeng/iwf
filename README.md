@@ -132,7 +132,7 @@ cd docker-compose && docker-compose up
 ```
 This by default will run Temporal server with it. 
 And it will also register a `default` namespace and required search attributes by iWF.
-Link to WebUI: http://localhost:8083/namespaces/default/workflows
+Link to WebUI: http://localhost:8233/namespaces/default/workflows
 
 ## How to build & run locally
 * Run `make bins` to build the binary `iwf-server`
