@@ -1,8 +1,10 @@
 # iWF project - main & server repo 
 
-For most long running applications, iWF is a All-In-One solution to replace Database, MessageQueue and ElasticSearch. 
+For most long running business, iWF is a All-In-One framework to replace Database, MessageQueue and ElasticSearch. 
 
 **It will not make you a 10x developer...but you may feel like one!**
+
+We call _long running application_ **`Workflow`**. 
 
 It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 
