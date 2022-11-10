@@ -41,6 +41,11 @@ Contribution is welcome.
 
 # Why you would need iWF
 
+## TL;DR
+AWS published SWF in 2012 and then moved to Step Functions in 2016 because they found it’s too hard to support SWF. The creators later joined Uber and built Cadence and I was lucky enough to join Uber Cadence team. After leaving Cadence team, I have been supporting community and Indeed teams to use Cadence & Temporal. I realized that AWS is right that the programming of SWF/Cadence/Temporal is hard to adopt because of leaking too many internals. Inspired by Step Function, I created this iWF framework.
+
+<img width="916" alt="Screen Shot 2022-11-10 at 11 23 24 AM" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
+
 ## If you are familar with [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal)
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
 * See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
