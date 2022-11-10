@@ -136,6 +136,8 @@ This by default will run Temporal server with it.
 And it will also register a `default` namespace and required search attributes by iWF.
 Link to WebUI: http://localhost:8233/namespaces/default/workflows
 
+By default, iWF server is serving port **8801**.
+
 ## How to build & run locally
 * Run `make bins` to build the binary `iwf-server`
 * Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
