@@ -26,7 +26,7 @@ Contribution is welcome.
   * [Basic Concepts &amp; Usage](#basic-concepts--usage) 
   * [Advanced Concepts &amp; Usage](#advanced-concepts--usage)
 * [How to run](#how-to-run)
-  * [Using docker image](#using-docker-image)
+  * [Using docker image](#using-docker-image--docker-compose)
   * [How to build &amp; run locally](#how-to-build--run-locally)
   * [How to use in production](#how-to-use-in-production)
     * [Option 1: use as library to customize your startup](#option-1-use-as-library-to-customize-your-startup)
