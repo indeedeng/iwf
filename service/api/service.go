@@ -28,9 +28,11 @@ func NewApiService(client UnifiedClient, taskQueue string) (ApiService, error) {
 
 func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus) {
 	workflowOptions := StartWorkflowOptions{
-		ID:                 req.GetWorkflowId(),
-		TaskQueue:          s.taskQueue,
-		WorkflowRunTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
+		ID:                    req.GetWorkflowId(),
+		TaskQueue:             s.taskQueue,
+		WorkflowRunTimeout:    time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
+		WorkflowIDReusePolicy: *req.WorkflowStartOptions.WorkflowIDReusePolicy,
+		CronSchedule:          *req.WorkflowStartOptions.CronSchedule,
 	}
 
 	input := service.InterpreterWorkflowInput{

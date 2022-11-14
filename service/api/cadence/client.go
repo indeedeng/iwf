@@ -36,10 +36,16 @@ func (t *cadenceClient) Close() {
 }
 
 func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+	workflowIdReusePolicy, err := mapToTemporalWorkflowIdReusePolicy(options.WorkflowIDReusePolicy)
+	if err != nil {
+		return "", nil
+	}
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
 		ExecutionStartToCloseTimeout: options.WorkflowRunTimeout,
+		WorkflowIDReusePolicy:        workflowIdReusePolicy,
+		CronSchedule:                 options.CronSchedule,
 	}
 
 	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
@@ -141,6 +147,21 @@ func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[st
 	}
 
 	return result, nil
+}
+
+func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy string) (client.WorkflowIDReusePolicy, error) {
+	switch workflowIdReusePolicy {
+	case service.WorkflowIDReusePolicyAllowDuplicate:
+		return client.WorkflowIDReusePolicyAllowDuplicate, nil
+	case service.WorkflowIDReusePolicyAllowDuplicateFailedOnly:
+		return client.WorkflowIDReusePolicyAllowDuplicateFailedOnly, nil
+	case service.WorkflowIDReusePolicyRejectDuplicate:
+		return client.WorkflowIDReusePolicyRejectDuplicate, nil
+	case service.WorkflowIDReusePolicyTerminateIfRunning:
+		return client.WorkflowIDReusePolicyTerminateIfRunning, nil
+	default:
+		return client.WorkflowIDReusePolicyAllowDuplicate, fmt.Errorf("unsupported workflow id reuse policy %s", workflowIdReusePolicy)
+	}
 }
 
 func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (string, error) {
