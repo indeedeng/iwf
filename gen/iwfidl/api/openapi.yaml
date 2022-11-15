@@ -314,6 +314,21 @@ components:
         commandCarryOverPolicy:
           $ref: '#/components/schemas/CommandCarryOverPolicy'
       type: object
+    WorkflowStartOptions:
+      example:
+        workflowIDReusePolicy: ALLOW_DUPLICATE_FAILED_ONLY
+        cronSchedule: cronSchedule
+      properties:
+        workflowIDReusePolicy:
+          enum:
+          - ALLOW_DUPLICATE_FAILED_ONLY
+          - ALLOW_DUPLICATE
+          - REJECT_DUPLICATE
+          - TERMINATE_IF_RUNNING
+          type: string
+        cronSchedule:
+          type: string
+      type: object
     AttributesLoadingPolicy:
       example:
         attributeLoadingType: LOAD_ALL_WITHOUT_LOCKING
@@ -364,6 +379,9 @@ components:
             - attributeKeys
             - attributeKeys
         iwfWorkflowType: iwfWorkflowType
+        workflowStartOptions:
+          workflowIDReusePolicy: ALLOW_DUPLICATE_FAILED_ONLY
+          cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
         stateInput:
@@ -384,6 +402,8 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         stateOptions:
           $ref: '#/components/schemas/WorkflowStateOptions'
+        workflowStartOptions:
+          $ref: '#/components/schemas/WorkflowStartOptions'
       required:
       - iwfWorkerUrl
       - iwfWorkflowType

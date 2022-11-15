@@ -1,0 +1,82 @@
+# WorkflowStartOptions
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**WorkflowIDReusePolicy** | Pointer to **string** |  | [optional] 
+**CronSchedule** | Pointer to **string** |  | [optional] 
+
+## Methods
+
+### NewWorkflowStartOptions
+
+`func NewWorkflowStartOptions() *WorkflowStartOptions`
+
+NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
+
+### NewWorkflowStartOptionsWithDefaults
+
+`func NewWorkflowStartOptionsWithDefaults() *WorkflowStartOptions`
+
+NewWorkflowStartOptionsWithDefaults instantiates a new WorkflowStartOptions object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
+
+### GetWorkflowIDReusePolicy
+
+`func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() string`
+
+GetWorkflowIDReusePolicy returns the WorkflowIDReusePolicy field if non-nil, zero value otherwise.
+
+### GetWorkflowIDReusePolicyOk
+
+`func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*string, bool)`
+
+GetWorkflowIDReusePolicyOk returns a tuple with the WorkflowIDReusePolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWorkflowIDReusePolicy
+
+`func (o *WorkflowStartOptions) SetWorkflowIDReusePolicy(v string)`
+
+SetWorkflowIDReusePolicy sets WorkflowIDReusePolicy field to given value.
+
+### HasWorkflowIDReusePolicy
+
+`func (o *WorkflowStartOptions) HasWorkflowIDReusePolicy() bool`
+
+HasWorkflowIDReusePolicy returns a boolean if a field has been set.
+
+### GetCronSchedule
+
+`func (o *WorkflowStartOptions) GetCronSchedule() string`
+
+GetCronSchedule returns the CronSchedule field if non-nil, zero value otherwise.
+
+### GetCronScheduleOk
+
+`func (o *WorkflowStartOptions) GetCronScheduleOk() (*string, bool)`
+
+GetCronScheduleOk returns a tuple with the CronSchedule field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCronSchedule
+
+`func (o *WorkflowStartOptions) SetCronSchedule(v string)`
+
+SetCronSchedule sets CronSchedule field to given value.
+
+### HasCronSchedule
+
+`func (o *WorkflowStartOptions) HasCronSchedule() bool`
+
+HasCronSchedule returns a boolean if a field has been set.
+
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

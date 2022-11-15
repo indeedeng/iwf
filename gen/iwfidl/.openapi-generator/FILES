@@ -40,6 +40,7 @@ docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
 docs/WorkflowSignalRequest.md
+docs/WorkflowStartOptions.md
 docs/WorkflowStartRequest.md
 docs/WorkflowStartResponse.md
 docs/WorkflowStateDecideRequest.md
@@ -83,6 +84,7 @@ model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go
 model_workflow_signal_request.go
+model_workflow_start_options.go
 model_workflow_start_request.go
 model_workflow_start_response.go
 model_workflow_state_decide_request.go
