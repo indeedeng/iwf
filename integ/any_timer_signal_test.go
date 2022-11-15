@@ -15,11 +15,10 @@ func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
 	doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal)
 }
 
-// TODO after the Cadence SDK bug is fix, then enable this test
-// https://github.com/uber-go/cadence-client/issues/1198
-//func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
-//	doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence)
-//}
+// TODO this bug in Cadence SDK may cause the test to fail https://github.com/uber-go/cadence-client/issues/1198
+func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
+	doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence)
+}
 
 func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
