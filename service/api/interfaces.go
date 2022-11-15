@@ -38,11 +38,9 @@ type UnifiedClient interface {
 }
 
 type StartWorkflowOptions struct {
-	ID                    string
-	TaskQueue             string
-	WorkflowRunTimeout    time.Duration
-	WorkflowIDReusePolicy string
-	CronSchedule          string
+	ID                 string
+	TaskQueue          string
+	WorkflowRunTimeout time.Duration
 }
 
 type ListWorkflowExecutionsRequest struct {
