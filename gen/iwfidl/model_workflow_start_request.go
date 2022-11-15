@@ -23,6 +23,7 @@ type WorkflowStartRequest struct {
 	StartStateId string `json:"startStateId"`
 	StateInput *EncodedObject `json:"stateInput,omitempty"`
 	StateOptions *WorkflowStateOptions `json:"stateOptions,omitempty"`
+	WorkflowStartOptions *WorkflowStartOptions `json:"workflowStartOptions,omitempty"`
 }
 
 // NewWorkflowStartRequest instantiates a new WorkflowStartRequest object
@@ -231,6 +232,38 @@ func (o *WorkflowStartRequest) SetStateOptions(v WorkflowStateOptions) {
 	o.StateOptions = &v
 }
 
+// GetWorkflowStartOptions returns the WorkflowStartOptions field value if set, zero value otherwise.
+func (o *WorkflowStartRequest) GetWorkflowStartOptions() WorkflowStartOptions {
+	if o == nil || o.WorkflowStartOptions == nil {
+		var ret WorkflowStartOptions
+		return ret
+	}
+	return *o.WorkflowStartOptions
+}
+
+// GetWorkflowStartOptionsOk returns a tuple with the WorkflowStartOptions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartRequest) GetWorkflowStartOptionsOk() (*WorkflowStartOptions, bool) {
+	if o == nil || o.WorkflowStartOptions == nil {
+		return nil, false
+	}
+	return o.WorkflowStartOptions, true
+}
+
+// HasWorkflowStartOptions returns a boolean if a field has been set.
+func (o *WorkflowStartRequest) HasWorkflowStartOptions() bool {
+	if o != nil && o.WorkflowStartOptions != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetWorkflowStartOptions gets a reference to the given WorkflowStartOptions and assigns it to the WorkflowStartOptions field.
+func (o *WorkflowStartRequest) SetWorkflowStartOptions(v WorkflowStartOptions) {
+	o.WorkflowStartOptions = &v
+}
+
 func (o WorkflowStartRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -253,6 +286,9 @@ func (o WorkflowStartRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.StateOptions != nil {
 		toSerialize["stateOptions"] = o.StateOptions
+	}
+	if o.WorkflowStartOptions != nil {
+		toSerialize["workflowStartOptions"] = o.WorkflowStartOptions
 	}
 	return json.Marshal(toSerialize)
 }
