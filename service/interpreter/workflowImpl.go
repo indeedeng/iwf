@@ -10,13 +10,11 @@ import (
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
 	globalVersionProvider := newGlobalVersionProvider(provider)
 	if globalVersionProvider.isAfterVersionOfUsingGlobalVersioning(ctx) {
-		if provider.GetBackendType() != service.BackendTypeCadence {
-			// TODO after the Cadence SDK bug is fix, then use global versioning search attribute
-			// https://github.com/uber-go/cadence-client/issues/1198
-			err := globalVersionProvider.upsertGlobalVersionSearchAttribute(ctx)
-			if err != nil {
-				return nil, err
-			}
+		// TODO this bug in Cadence SDK may cause concurrent writes
+		// https://github.com/uber-go/cadence-client/issues/1198
+		err := globalVersionProvider.upsertGlobalVersionSearchAttribute(ctx)
+		if err != nil {
+			return nil, err
 		}
 	}
 
