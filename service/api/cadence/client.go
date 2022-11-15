@@ -149,7 +149,7 @@ func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[st
 	return result, nil
 }
 
-func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy string) (client.WorkflowIDReusePolicy, error) {
+func mapToCadenceWorkflowIdReusePolicy(workflowIdReusePolicy string) (client.WorkflowIDReusePolicy, error) {
 	switch workflowIdReusePolicy {
 	case service.WorkflowIDReusePolicyAllowDuplicate:
 		return client.WorkflowIDReusePolicyAllowDuplicate, nil
