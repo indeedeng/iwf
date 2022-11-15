@@ -41,11 +41,6 @@ const (
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
 	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"
-
-	WorkflowIDReusePolicyAllowDuplicateFailedOnly = "ALLOW_DUPLICATE_FAILED_ONLY"
-	WorkflowIDReusePolicyAllowDuplicate           = "ALLOW_DUPLICATE"
-	WorkflowIDReusePolicyRejectDuplicate          = "REJECT_DUPLICATE"
-	WorkflowIDReusePolicyTerminateIfRunning       = "TERMINATE_IF_RUNNING"
 )
 
 type BackendType string

@@ -126,7 +126,6 @@ Class | Method | HTTP request | Description
  - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
  - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
  - [WorkflowSignalRequest](docs/WorkflowSignalRequest.md)
- - [WorkflowStartOptions](docs/WorkflowStartOptions.md)
  - [WorkflowStartRequest](docs/WorkflowStartRequest.md)
  - [WorkflowStartResponse](docs/WorkflowStartResponse.md)
  - [WorkflowStateDecideRequest](docs/WorkflowStateDecideRequest.md)
