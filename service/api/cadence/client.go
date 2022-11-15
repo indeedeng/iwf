@@ -36,7 +36,7 @@ func (t *cadenceClient) Close() {
 }
 
 func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
-	workflowIdReusePolicy, err := mapToTemporalWorkflowIdReusePolicy(options.WorkflowIDReusePolicy)
+	workflowIdReusePolicy, err := mapToCadenceWorkflowIdReusePolicy(options.WorkflowIDReusePolicy)
 	if err != nil {
 		return "", nil
 	}
