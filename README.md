@@ -53,7 +53,7 @@ AWS published SWF in 2012 and then moved to Step Functions in 2016 because they 
 ## If you are not
 * Check out this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) to understand some history
 
-iWF is a application platform that provides you a comprehensive tooling:
+iWF is an application platform that provides you a comprehensive tooling:
 * WorkflowAsCode for highly flexibile/customizable business logic
 * Parallel execution of multiple threads of business
 * Intermidiate states stored as "QueryAttributes" and can be retrived by APIs
@@ -223,7 +223,7 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
-- [ ] More workflow start options: IdReusePolicy, initial earch attributes, cron schedule, retry, etc
+- [x] More workflow start options: IdReusePolicy, initial earch attributes, cron schedule, retry, etc
 - [ ] StateOption: Start/Decide API timeout and retry
 - [ ] Reset workflow by stateId
 

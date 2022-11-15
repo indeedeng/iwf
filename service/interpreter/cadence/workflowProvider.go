@@ -118,7 +118,7 @@ type futureImpl struct {
 }
 
 func (t *futureImpl) IsReady() bool {
-	return t.IsReady()
+	return t.future.IsReady()
 }
 
 func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) error {
