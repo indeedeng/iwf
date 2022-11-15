@@ -81,6 +81,7 @@ type WorkflowProvider interface {
 	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future Future)
 	Now(ctx UnifiedContext) time.Time
 	Sleep(ctx UnifiedContext, d time.Duration) (err error)
+	NewTimer(ctx UnifiedContext, d time.Duration) Future
 	GetSignalChannel(ctx UnifiedContext, signalName string) (receiveChannel ReceiveChannel)
 	GetContextValue(ctx UnifiedContext, key string) interface{}
 	GetVersion(ctx UnifiedContext, changeID string, minSupported, maxSupported int) int
@@ -89,8 +90,10 @@ type WorkflowProvider interface {
 
 type ReceiveChannel interface {
 	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool)
+	ReceiveAsync(valuePtr interface{}) (ok bool)
 }
 
 type Future interface {
 	Get(ctx UnifiedContext, valuePtr interface{}) error
+	IsReady() bool
 }

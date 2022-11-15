@@ -28,6 +28,17 @@ func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
 }
 
+func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Duration) interpreter.Future {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+	f := workflow.NewTimer(wfCtx, d)
+	return &futureImpl{
+		future: f,
+	}
+}
+
 func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) interpreter.WorkflowInfo {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
@@ -90,11 +101,15 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	return interpreter.NewUnifiedContext(wfCtx2)
 }
 
-type temporalFuture struct {
+type futureImpl struct {
 	future workflow.Future
 }
 
-func (t *temporalFuture) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) error {
+func (t *futureImpl) IsReady() bool {
+	return t.future.IsReady()
+}
+
+func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
@@ -109,7 +124,7 @@ func (w *workflowProvider) ExecuteActivity(ctx interpreter.UnifiedContext, activ
 		panic("cannot convert to temporal workflow context")
 	}
 	f := workflow.ExecuteActivity(wfCtx, activity, args...)
-	return &temporalFuture{
+	return &futureImpl{
 		future: f,
 	}
 }
@@ -142,6 +157,10 @@ func (w *workflowProvider) GetVersion(ctx interpreter.UnifiedContext, changeID s
 
 type temporalReceiveChannel struct {
 	channel workflow.ReceiveChannel
+}
+
+func (t *temporalReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
+	return t.channel.ReceiveAsync(valuePtr)
 }
 
 func (t *temporalReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr interface{}) (more bool) {
