@@ -10,6 +10,8 @@ import (
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
 	globalVersionProvider := newGlobalVersionProvider(provider)
 	if globalVersionProvider.isAfterVersionOfUsingGlobalVersioning(ctx) {
+		// TODO this bug in Cadence SDK may cause concurrent writes
+		// https://github.com/uber-go/cadence-client/issues/1198
 		err := globalVersionProvider.upsertGlobalVersionSearchAttribute(ctx)
 		if err != nil {
 			return nil, err
@@ -223,6 +225,7 @@ func executeState(
 	interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
 	commandReq := startResponse.GetCommandRequest()
+	commandReqDone := false
 
 	completedTimerCmds := map[int]bool{}
 	if len(commandReq.GetTimerCommands()) > 0 {
@@ -242,8 +245,13 @@ func executeState(
 				now := provider.Now(ctx).Unix()
 				fireAt := cmd.GetFiringUnixTimestampSeconds()
 				duration := time.Duration(fireAt-now) * time.Second
-				_ = provider.Sleep(ctx, duration)
-				completedTimerCmds[idx] = true
+				future := provider.NewTimer(ctx, duration)
+				_ = provider.Await(ctx, func() bool {
+					return future.IsReady() || commandReqDone
+				})
+				if future.IsReady() {
+					completedTimerCmds[idx] = true
+				}
 			})
 		}
 	}
@@ -264,8 +272,14 @@ func executeState(
 				}
 				ch := provider.GetSignalChannel(ctx, cmd.GetSignalChannelName())
 				value := iwfidl.EncodedObject{}
-				ch.Receive(ctx, &value)
-				completedSignalCmds[idx] = &value
+				received := false
+				_ = provider.Await(ctx, func() bool {
+					received = ch.ReceiveAsync(&value)
+					return received || commandReqDone
+				})
+				if received {
+					completedSignalCmds[idx] = &value
+				}
 			})
 		}
 	}
@@ -285,9 +299,10 @@ func executeState(
 					panic("critical code bug")
 				}
 
+				received := false
 				_ = provider.Await(ctx, func() bool {
-					res := interStateChannel.HasData(cmd.ChannelName)
-					return res
+					received = interStateChannel.HasData(cmd.ChannelName)
+					return received || commandReqDone
 				})
 
 				completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
@@ -315,6 +330,7 @@ func executeState(
 			return nil, provider.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
 		}
 	}
+	commandReqDone = true
 
 	if err != nil {
 		return nil, err

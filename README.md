@@ -42,7 +42,11 @@ Contribution is welcome.
 # Why you would need iWF
 
 ## TL;DR
-AWS published SWF in 2012 and then moved to Step Functions in 2016 because they found it’s too hard to support SWF. The creators later joined Uber and built Cadence and I was lucky enough to join Uber Cadence team. After leaving Cadence team, I have been supporting community and Indeed teams to use Cadence & Temporal. I realized that AWS is right that the programming of SWF/Cadence/Temporal is hard to adopt because of leaking too many internals. Inspired by Step Function, I created this iWF framework.
+AWS published SWF in 2012 and then moved to Step Functions in 2016 because they found it’s too hard to support SWF. 
+Cadence & Temporal continued the idea of SWF and became much more powerful.
+However, AWS is right that the programming of SWF/Cadence/Temporal is hard to adopt because of leaking too many internals. 
+Inspired by Step Function, iWF is created to provide equivalent power of Cadence/Temporal, but hiding all the internal details
+and provide clean and simple API to use.
 
 <img width="916" alt="Screen Shot 2022-11-10 at 11 23 24 AM" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
 
@@ -53,10 +57,10 @@ AWS published SWF in 2012 and then moved to Step Functions in 2016 because they 
 ## If you are not
 * Check out this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) to understand some history
 
-iWF is a application platform that provides you a comprehensive tooling:
+iWF is an application platform that provides you a comprehensive tooling:
 * WorkflowAsCode for highly flexibile/customizable business logic
 * Parallel execution of multiple threads of business
-* Intermidiate states stored as "QueryAttributes" and can be retrived by APIs
+* Intermidiate states stored as "QueryAttributes" and can be retrieved by APIs
 * Receiving data from external system by Signal
 * Searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch 
 * Durable timer, and cron job scheduling
@@ -103,7 +107,7 @@ On top of the above basic concepts, you may want to deeply customize your workfl
 
 ### More advanced command types
 * `InterStateChannelCommand`: will be waiting for a value being published from another state(internally in the same workflow)
-* WIP `LongRunninngActivityCommand`: will schedule a Cadence/Temporal activity. This is only necessary for long-running activity like hours/days.
+* [Future] `LongRunninngActivityCommand`: will schedule a Cadence/Temporal activity. This is only necessary for long-running activity like hours/days.
 
 ### WorkflowStartOption
 * IdReusePolicy
