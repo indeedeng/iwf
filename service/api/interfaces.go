@@ -41,8 +41,8 @@ type StartWorkflowOptions struct {
 	ID                    string
 	TaskQueue             string
 	WorkflowRunTimeout    time.Duration
-	WorkflowIDReusePolicy string
-	CronSchedule          string
+	WorkflowIDReusePolicy *string
+	CronSchedule          *string
 }
 
 type ListWorkflowExecutionsRequest struct {

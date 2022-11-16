@@ -36,16 +36,23 @@ func (t *cadenceClient) Close() {
 }
 
 func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
-	workflowIdReusePolicy, err := mapToCadenceWorkflowIdReusePolicy(options.WorkflowIDReusePolicy)
-	if err != nil {
-		return "", nil
-	}
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
 		ExecutionStartToCloseTimeout: options.WorkflowRunTimeout,
-		WorkflowIDReusePolicy:        *workflowIdReusePolicy,
-		CronSchedule:                 options.CronSchedule,
+	}
+
+	if options.WorkflowIDReusePolicy != nil {
+		workflowIdReusePolicy, err := mapToCadenceWorkflowIdReusePolicy(*options.WorkflowIDReusePolicy)
+		if err != nil {
+			return "", nil
+		}
+
+		workflowOptions.WorkflowIDReusePolicy = *workflowIdReusePolicy
+	}
+
+	if options.CronSchedule != nil {
+		workflowOptions.CronSchedule = *options.CronSchedule
 	}
 
 	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)

@@ -30,16 +30,23 @@ func (t *temporalClient) Close() {
 }
 
 func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
-	workflowIdReusePolicy, err := mapToTemporalWorkflowIdReusePolicy(options.WorkflowIDReusePolicy)
-	if err != nil {
-		return "", nil
-	}
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                    options.ID,
-		TaskQueue:             options.TaskQueue,
-		WorkflowRunTimeout:    options.WorkflowRunTimeout,
-		WorkflowIDReusePolicy: *workflowIdReusePolicy,
-		CronSchedule:          options.CronSchedule,
+		ID:                 options.ID,
+		TaskQueue:          options.TaskQueue,
+		WorkflowRunTimeout: options.WorkflowRunTimeout,
+	}
+
+	if options.WorkflowIDReusePolicy != nil {
+		workflowIdReusePolicy, err := mapToTemporalWorkflowIdReusePolicy(*options.WorkflowIDReusePolicy)
+		if err != nil {
+			return "", nil
+		}
+
+		workflowOptions.WorkflowIDReusePolicy = *workflowIdReusePolicy
+	}
+
+	if options.CronSchedule != nil {
+		workflowOptions.CronSchedule = *options.CronSchedule
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)

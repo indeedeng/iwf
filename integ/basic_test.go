@@ -2,15 +2,16 @@ package integ
 
 import (
 	"context"
-	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/basic"
-	"github.com/indeedeng/iwf/service"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/workflow/basic"
+	"github.com/indeedeng/iwf/service"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBasicWorkflowTemporal(t *testing.T) {
@@ -64,7 +65,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		WorkflowId: wfId,
 	}).Execute()
 	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
+		log.Fatalf("Fail to invoke get api %v", err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)
