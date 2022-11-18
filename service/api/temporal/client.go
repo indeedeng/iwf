@@ -36,6 +36,19 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 		WorkflowRunTimeout: options.WorkflowRunTimeout,
 	}
 
+	if options.WorkflowIDReusePolicy != nil {
+		workflowIdReusePolicy, err := mapToTemporalWorkflowIdReusePolicy(*options.WorkflowIDReusePolicy)
+		if err != nil {
+			return "", nil
+		}
+
+		workflowOptions.WorkflowIDReusePolicy = *workflowIdReusePolicy
+	}
+
+	if options.CronSchedule != nil {
+		workflowOptions.CronSchedule = *options.CronSchedule
+	}
+
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)
 	if err != nil {
 		return "", err
@@ -134,6 +147,26 @@ func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[st
 	}
 
 	return result, nil
+}
+
+func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy string) (*enums.WorkflowIdReusePolicy, error) {
+	var res enums.WorkflowIdReusePolicy
+	switch workflowIdReusePolicy {
+	case service.WorkflowIDReusePolicyAllowDuplicate:
+		res = enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE
+		return &res, nil
+	case service.WorkflowIDReusePolicyAllowDuplicateFailedOnly:
+		res = enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY
+		return &res, nil
+	case service.WorkflowIDReusePolicyRejectDuplicate:
+		res = enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE
+		return &res, nil
+	case service.WorkflowIDReusePolicyTerminateIfRunning:
+		res = enums.WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING
+		return &res, nil
+	default:
+		return nil, fmt.Errorf("unsupported workflow id reuse policy %s", workflowIdReusePolicy)
+	}
 }
 
 func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (string, error) {

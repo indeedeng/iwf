@@ -33,6 +33,14 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*
 		WorkflowRunTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
 	}
 
+	if req.WorkflowStartOptions != nil {
+		workflowOptions.WorkflowIDReusePolicy = req.WorkflowStartOptions.WorkflowIDReusePolicy
+	}
+
+	if req.WorkflowStartOptions != nil {
+		workflowOptions.CronSchedule = req.WorkflowStartOptions.CronSchedule
+	}
+
 	input := service.InterpreterWorkflowInput{
 		IwfWorkflowType: req.GetIwfWorkflowType(),
 		IwfWorkerUrl:    req.GetIwfWorkerUrl(),
