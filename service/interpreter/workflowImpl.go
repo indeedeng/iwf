@@ -305,7 +305,9 @@ func executeState(
 					return received || commandReqDone
 				})
 
-				completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
+				if received {
+					completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
+				}
 			})
 		}
 	}
