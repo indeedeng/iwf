@@ -23,7 +23,12 @@ func (p *globalVersioner) isAfterVersionOfUsingGlobalVersioning(ctx UnifiedConte
 }
 
 func (p *globalVersioner) upsertGlobalVersionSearchAttribute(ctx UnifiedContext) error {
-	return p.workflowProvider.UpsertSearchAttributes(ctx, map[string]interface{}{
-		service.SearchAttributeGlobalVersion: maxOfAllVersions,
-	})
+	// TODO this bug in Cadence SDK may cause concurrent writes
+	// https://github.com/uber-go/cadence-client/issues/1198
+	if p.workflowProvider.GetBackendType() != service.BackendTypeCadence {
+		return p.workflowProvider.UpsertSearchAttributes(ctx, map[string]interface{}{
+			service.SearchAttributeGlobalVersion: maxOfAllVersions,
+		})
+	}
+	return nil
 }
