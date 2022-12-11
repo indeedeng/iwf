@@ -21,7 +21,7 @@ type WorkflowStateStartRequest struct {
 	WorkflowStateId string `json:"workflowStateId"`
 	StateInput *EncodedObject `json:"stateInput,omitempty"`
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
-	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
+	DataObjects []KeyValue `json:"dataObjects,omitempty"`
 }
 
 // NewWorkflowStateStartRequest instantiates a new WorkflowStateStartRequest object
@@ -180,36 +180,36 @@ func (o *WorkflowStateStartRequest) SetSearchAttributes(v []SearchAttribute) {
 	o.SearchAttributes = v
 }
 
-// GetQueryAttributes returns the QueryAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartRequest) GetQueryAttributes() []KeyValue {
-	if o == nil || o.QueryAttributes == nil {
+// GetDataObjects returns the DataObjects field value if set, zero value otherwise.
+func (o *WorkflowStateStartRequest) GetDataObjects() []KeyValue {
+	if o == nil || o.DataObjects == nil {
 		var ret []KeyValue
 		return ret
 	}
-	return o.QueryAttributes
+	return o.DataObjects
 }
 
-// GetQueryAttributesOk returns a tuple with the QueryAttributes field value if set, nil otherwise
+// GetDataObjectsOk returns a tuple with the DataObjects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateStartRequest) GetQueryAttributesOk() ([]KeyValue, bool) {
-	if o == nil || o.QueryAttributes == nil {
+func (o *WorkflowStateStartRequest) GetDataObjectsOk() ([]KeyValue, bool) {
+	if o == nil || o.DataObjects == nil {
 		return nil, false
 	}
-	return o.QueryAttributes, true
+	return o.DataObjects, true
 }
 
-// HasQueryAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateStartRequest) HasQueryAttributes() bool {
-	if o != nil && o.QueryAttributes != nil {
+// HasDataObjects returns a boolean if a field has been set.
+func (o *WorkflowStateStartRequest) HasDataObjects() bool {
+	if o != nil && o.DataObjects != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetQueryAttributes gets a reference to the given []KeyValue and assigns it to the QueryAttributes field.
-func (o *WorkflowStateStartRequest) SetQueryAttributes(v []KeyValue) {
-	o.QueryAttributes = v
+// SetDataObjects gets a reference to the given []KeyValue and assigns it to the DataObjects field.
+func (o *WorkflowStateStartRequest) SetDataObjects(v []KeyValue) {
+	o.DataObjects = v
 }
 
 func (o WorkflowStateStartRequest) MarshalJSON() ([]byte, error) {
@@ -229,8 +229,8 @@ func (o WorkflowStateStartRequest) MarshalJSON() ([]byte, error) {
 	if o.SearchAttributes != nil {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
-	if o.QueryAttributes != nil {
-		toSerialize["queryAttributes"] = o.QueryAttributes
+	if o.DataObjects != nil {
+		toSerialize["dataObjects"] = o.DataObjects
 	}
 	return json.Marshal(toSerialize)
 }

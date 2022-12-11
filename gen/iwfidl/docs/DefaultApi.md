@@ -4,10 +4,9 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**ApiV1WorkflowCancelPost**](DefaultApi.md#ApiV1WorkflowCancelPost) | **Post** /api/v1/workflow/cancel | cancel a workflow
+[**ApiV1WorkflowDataobjectsGetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsGetPost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 [**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
-[**ApiV1WorkflowQueryattributesGetPost**](DefaultApi.md#ApiV1WorkflowQueryattributesGetPost) | **Post** /api/v1/workflow/queryattributes/get | get workflow query attributes
 [**ApiV1WorkflowResetPost**](DefaultApi.md#ApiV1WorkflowResetPost) | **Post** /api/v1/workflow/reset | reset a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 [**ApiV1WorkflowSearchattributesGetPost**](DefaultApi.md#ApiV1WorkflowSearchattributesGetPost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
@@ -15,14 +14,15 @@ Method | HTTP request | Description
 [**ApiV1WorkflowStartPost**](DefaultApi.md#ApiV1WorkflowStartPost) | **Post** /api/v1/workflow/start | start a workflow
 [**ApiV1WorkflowStateDecidePost**](DefaultApi.md#ApiV1WorkflowStateDecidePost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
 [**ApiV1WorkflowStateStartPost**](DefaultApi.md#ApiV1WorkflowStateStartPost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
+[**ApiV1WorkflowStopPost**](DefaultApi.md#ApiV1WorkflowStopPost) | **Post** /api/v1/workflow/stop | stop a workflow
 
 
 
-## ApiV1WorkflowCancelPost
+## ApiV1WorkflowDataobjectsGetPost
 
-> ApiV1WorkflowCancelPost(ctx).WorkflowCancelRequest(workflowCancelRequest).Execute()
+> WorkflowGetDataObjectsResponse ApiV1WorkflowDataobjectsGetPost(ctx).WorkflowGetDataObjectsRequest(workflowGetDataObjectsRequest).Execute()
 
-cancel a workflow
+get workflow data objects
 
 ### Example
 
@@ -37,15 +37,17 @@ import (
 )
 
 func main() {
-    workflowCancelRequest := *openapiclient.NewWorkflowCancelRequest("WorkflowId_example") // WorkflowCancelRequest |  (optional)
+    workflowGetDataObjectsRequest := *openapiclient.NewWorkflowGetDataObjectsRequest("WorkflowId_example") // WorkflowGetDataObjectsRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowCancelPost(context.Background()).WorkflowCancelRequest(workflowCancelRequest).Execute()
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background()).WorkflowGetDataObjectsRequest(workflowGetDataObjectsRequest).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowCancelPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowDataobjectsGetPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
+    // response from `ApiV1WorkflowDataobjectsGetPost`: WorkflowGetDataObjectsResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowDataobjectsGetPost`: %v\n", resp)
 }
 ```
 
@@ -55,16 +57,16 @@ func main() {
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiApiV1WorkflowCancelPostRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiApiV1WorkflowDataobjectsGetPostRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **workflowCancelRequest** | [**WorkflowCancelRequest**](WorkflowCancelRequest.md) |  | 
+ **workflowGetDataObjectsRequest** | [**WorkflowGetDataObjectsRequest**](WorkflowGetDataObjectsRequest.md) |  | 
 
 ### Return type
 
- (empty response body)
+[**WorkflowGetDataObjectsResponse**](WorkflowGetDataObjectsResponse.md)
 
 ### Authorization
 
@@ -193,70 +195,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowGetResponse**](WorkflowGetResponse.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## ApiV1WorkflowQueryattributesGetPost
-
-> WorkflowGetQueryAttributesResponse ApiV1WorkflowQueryattributesGetPost(ctx).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
-
-get workflow query attributes
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    workflowGetQueryAttributesRequest := *openapiclient.NewWorkflowGetQueryAttributesRequest("WorkflowId_example") // WorkflowGetQueryAttributesRequest |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowQueryattributesGetPost(context.Background()).WorkflowGetQueryAttributesRequest(workflowGetQueryAttributesRequest).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowQueryattributesGetPost``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `ApiV1WorkflowQueryattributesGetPost`: WorkflowGetQueryAttributesResponse
-    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowQueryattributesGetPost`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiApiV1WorkflowQueryattributesGetPostRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **workflowGetQueryAttributesRequest** | [**WorkflowGetQueryAttributesRequest**](WorkflowGetQueryAttributesRequest.md) |  | 
-
-### Return type
-
-[**WorkflowGetQueryAttributesResponse**](WorkflowGetQueryAttributesResponse.md)
 
 ### Authorization
 
@@ -703,6 +641,68 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowStateStartResponse**](WorkflowStateStartResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowStopPost
+
+> ApiV1WorkflowStopPost(ctx).WorkflowStopRequest(workflowStopRequest).Execute()
+
+stop a workflow
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    workflowStopRequest := *openapiclient.NewWorkflowStopRequest("WorkflowId_example") // WorkflowStopRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background()).WorkflowStopRequest(workflowStopRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowStopPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowStopPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowStopRequest** | [**WorkflowStopRequest**](WorkflowStopRequest.md) |  | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 

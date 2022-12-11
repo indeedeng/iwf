@@ -1,4 +1,4 @@
-# WorkflowGetSearchAttributesRequest
+# WorkflowGetDataObjectsRequest
 
 ## Properties
 
@@ -6,94 +6,94 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
-**Keys** | Pointer to [**[]SearchAttributeKeyAndType**](SearchAttributeKeyAndType.md) |  | [optional] 
+**Keys** | Pointer to **[]string** |  | [optional] 
 
 ## Methods
 
-### NewWorkflowGetSearchAttributesRequest
+### NewWorkflowGetDataObjectsRequest
 
-`func NewWorkflowGetSearchAttributesRequest(workflowId string, ) *WorkflowGetSearchAttributesRequest`
+`func NewWorkflowGetDataObjectsRequest(workflowId string, ) *WorkflowGetDataObjectsRequest`
 
-NewWorkflowGetSearchAttributesRequest instantiates a new WorkflowGetSearchAttributesRequest object
+NewWorkflowGetDataObjectsRequest instantiates a new WorkflowGetDataObjectsRequest object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewWorkflowGetSearchAttributesRequestWithDefaults
+### NewWorkflowGetDataObjectsRequestWithDefaults
 
-`func NewWorkflowGetSearchAttributesRequestWithDefaults() *WorkflowGetSearchAttributesRequest`
+`func NewWorkflowGetDataObjectsRequestWithDefaults() *WorkflowGetDataObjectsRequest`
 
-NewWorkflowGetSearchAttributesRequestWithDefaults instantiates a new WorkflowGetSearchAttributesRequest object
+NewWorkflowGetDataObjectsRequestWithDefaults instantiates a new WorkflowGetDataObjectsRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetWorkflowId
 
-`func (o *WorkflowGetSearchAttributesRequest) GetWorkflowId() string`
+`func (o *WorkflowGetDataObjectsRequest) GetWorkflowId() string`
 
 GetWorkflowId returns the WorkflowId field if non-nil, zero value otherwise.
 
 ### GetWorkflowIdOk
 
-`func (o *WorkflowGetSearchAttributesRequest) GetWorkflowIdOk() (*string, bool)`
+`func (o *WorkflowGetDataObjectsRequest) GetWorkflowIdOk() (*string, bool)`
 
 GetWorkflowIdOk returns a tuple with the WorkflowId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWorkflowId
 
-`func (o *WorkflowGetSearchAttributesRequest) SetWorkflowId(v string)`
+`func (o *WorkflowGetDataObjectsRequest) SetWorkflowId(v string)`
 
 SetWorkflowId sets WorkflowId field to given value.
 
 
 ### GetWorkflowRunId
 
-`func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string`
+`func (o *WorkflowGetDataObjectsRequest) GetWorkflowRunId() string`
 
 GetWorkflowRunId returns the WorkflowRunId field if non-nil, zero value otherwise.
 
 ### GetWorkflowRunIdOk
 
-`func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool)`
+`func (o *WorkflowGetDataObjectsRequest) GetWorkflowRunIdOk() (*string, bool)`
 
 GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWorkflowRunId
 
-`func (o *WorkflowGetSearchAttributesRequest) SetWorkflowRunId(v string)`
+`func (o *WorkflowGetDataObjectsRequest) SetWorkflowRunId(v string)`
 
 SetWorkflowRunId sets WorkflowRunId field to given value.
 
 ### HasWorkflowRunId
 
-`func (o *WorkflowGetSearchAttributesRequest) HasWorkflowRunId() bool`
+`func (o *WorkflowGetDataObjectsRequest) HasWorkflowRunId() bool`
 
 HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetKeys
 
-`func (o *WorkflowGetSearchAttributesRequest) GetKeys() []SearchAttributeKeyAndType`
+`func (o *WorkflowGetDataObjectsRequest) GetKeys() []string`
 
 GetKeys returns the Keys field if non-nil, zero value otherwise.
 
 ### GetKeysOk
 
-`func (o *WorkflowGetSearchAttributesRequest) GetKeysOk() (*[]SearchAttributeKeyAndType, bool)`
+`func (o *WorkflowGetDataObjectsRequest) GetKeysOk() (*[]string, bool)`
 
 GetKeysOk returns a tuple with the Keys field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetKeys
 
-`func (o *WorkflowGetSearchAttributesRequest) SetKeys(v []SearchAttributeKeyAndType)`
+`func (o *WorkflowGetDataObjectsRequest) SetKeys(v []string)`
 
 SetKeys sets Keys field to given value.
 
 ### HasKeys
 
-`func (o *WorkflowGetSearchAttributesRequest) HasKeys() bool`
+`func (o *WorkflowGetDataObjectsRequest) HasKeys() bool`
 
 HasKeys returns a boolean if a field has been set.
 

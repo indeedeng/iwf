@@ -9,9 +9,7 @@ Name | Type | Description | Notes
 **ResetType** | **string** |  | 
 **HistoryEventId** | Pointer to **int32** |  | [optional] 
 **Reason** | Pointer to **string** |  | [optional] 
-**DecisionOffset** | Pointer to **int32** |  | [optional] 
-**ResetBadBinaryChecksum** | Pointer to **string** |  | [optional] 
-**EarliestTime** | Pointer to **string** |  | [optional] 
+**HistoryEventTime** | Pointer to **string** |  | [optional] 
 **SkipSignalReapply** | Pointer to **bool** |  | [optional] 
 
 ## Methods
@@ -148,80 +146,30 @@ SetReason sets Reason field to given value.
 
 HasReason returns a boolean if a field has been set.
 
-### GetDecisionOffset
+### GetHistoryEventTime
 
-`func (o *WorkflowResetRequest) GetDecisionOffset() int32`
+`func (o *WorkflowResetRequest) GetHistoryEventTime() string`
 
-GetDecisionOffset returns the DecisionOffset field if non-nil, zero value otherwise.
+GetHistoryEventTime returns the HistoryEventTime field if non-nil, zero value otherwise.
 
-### GetDecisionOffsetOk
+### GetHistoryEventTimeOk
 
-`func (o *WorkflowResetRequest) GetDecisionOffsetOk() (*int32, bool)`
+`func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool)`
 
-GetDecisionOffsetOk returns a tuple with the DecisionOffset field if it's non-nil, zero value otherwise
+GetHistoryEventTimeOk returns a tuple with the HistoryEventTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetDecisionOffset
+### SetHistoryEventTime
 
-`func (o *WorkflowResetRequest) SetDecisionOffset(v int32)`
+`func (o *WorkflowResetRequest) SetHistoryEventTime(v string)`
 
-SetDecisionOffset sets DecisionOffset field to given value.
+SetHistoryEventTime sets HistoryEventTime field to given value.
 
-### HasDecisionOffset
+### HasHistoryEventTime
 
-`func (o *WorkflowResetRequest) HasDecisionOffset() bool`
+`func (o *WorkflowResetRequest) HasHistoryEventTime() bool`
 
-HasDecisionOffset returns a boolean if a field has been set.
-
-### GetResetBadBinaryChecksum
-
-`func (o *WorkflowResetRequest) GetResetBadBinaryChecksum() string`
-
-GetResetBadBinaryChecksum returns the ResetBadBinaryChecksum field if non-nil, zero value otherwise.
-
-### GetResetBadBinaryChecksumOk
-
-`func (o *WorkflowResetRequest) GetResetBadBinaryChecksumOk() (*string, bool)`
-
-GetResetBadBinaryChecksumOk returns a tuple with the ResetBadBinaryChecksum field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetResetBadBinaryChecksum
-
-`func (o *WorkflowResetRequest) SetResetBadBinaryChecksum(v string)`
-
-SetResetBadBinaryChecksum sets ResetBadBinaryChecksum field to given value.
-
-### HasResetBadBinaryChecksum
-
-`func (o *WorkflowResetRequest) HasResetBadBinaryChecksum() bool`
-
-HasResetBadBinaryChecksum returns a boolean if a field has been set.
-
-### GetEarliestTime
-
-`func (o *WorkflowResetRequest) GetEarliestTime() string`
-
-GetEarliestTime returns the EarliestTime field if non-nil, zero value otherwise.
-
-### GetEarliestTimeOk
-
-`func (o *WorkflowResetRequest) GetEarliestTimeOk() (*string, bool)`
-
-GetEarliestTimeOk returns a tuple with the EarliestTime field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetEarliestTime
-
-`func (o *WorkflowResetRequest) SetEarliestTime(v string)`
-
-SetEarliestTime sets EarliestTime field to given value.
-
-### HasEarliestTime
-
-`func (o *WorkflowResetRequest) HasEarliestTime() bool`
-
-HasEarliestTime returns a boolean if a field has been set.
+HasHistoryEventTime returns a boolean if a field has been set.
 
 ### GetSkipSignalReapply
 

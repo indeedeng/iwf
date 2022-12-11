@@ -9,21 +9,21 @@ import (
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/attribute"
+	"github.com/indeedeng/iwf/integ/workflow/persistence"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAttributeWorkflowTemporal(t *testing.T) {
-	doTestAttributeWorkflow(t, service.BackendTypeTemporal)
+func TestPersistenceWorkflowTemporal(t *testing.T) {
+	doTestPersistenceWorkflow(t, service.BackendTypeTemporal)
 }
 
-func TestAttributeWorkflowCadence(t *testing.T) {
-	doTestAttributeWorkflow(t, service.BackendTypeCadence)
+func TestPersistenceWorkflowCadence(t *testing.T) {
+	doTestPersistenceWorkflow(t, service.BackendTypeCadence)
 }
 
-func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
-	wfHandler := attribute.NewHandler()
+func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
+	wfHandler := persistence.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
@@ -38,14 +38,14 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := attribute.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	reqStart := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := reqStart.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        attribute.WorkflowType,
+		IwfWorkflowType:        persistence.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           attribute.State1,
+		StartStateId:           persistence.State1,
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
@@ -65,11 +65,11 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)
 	}
 
-	reqQry := apiClient.DefaultApi.ApiV1WorkflowQueryattributesGetPost(context.Background())
-	queryResult1, httpResp2, err := reqQry.WorkflowGetQueryAttributesRequest(iwfidl.WorkflowGetQueryAttributesRequest{
+	reqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
+	queryResult1, httpResp2, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
-		AttributeKeys: []string{
-			attribute.TestQueryAttributeKey,
+		Keys: []string{
+			persistence.TestDataObjectKey,
 		},
 	}).Execute()
 
@@ -77,7 +77,7 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Fail to invoke query workflow for sigle attr %v %v", err, httpResp2)
 	}
 
-	queryResult2, httpResp2, err := reqQry.WorkflowGetQueryAttributesRequest(iwfidl.WorkflowGetQueryAttributesRequest{
+	queryResult2, httpResp2, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 	}).Execute()
 
@@ -89,9 +89,9 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	searchResult1, httpSearchResponse1, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
 		WorkflowId:    wfId,
 		WorkflowRunId: &wfResponse.WorkflowRunId,
-		AttributeKeys: []iwfidl.SearchAttributeKeyAndType{
+		Keys: []iwfidl.SearchAttributeKeyAndType{
 			{
-				Key:       iwfidl.PtrString(attribute.TestSearchAttributeKeywordKey),
+				Key:       iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
 				ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
 			},
 		},
@@ -104,9 +104,9 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 	searchResult2, httpSearchResponse2, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
 		WorkflowId:    wfId,
 		WorkflowRunId: &wfResponse.WorkflowRunId,
-		AttributeKeys: []iwfidl.SearchAttributeKeyAndType{
+		Keys: []iwfidl.SearchAttributeKeyAndType{
 			{
-				Key:       iwfidl.PtrString(attribute.TestSearchAttributeIntKey),
+				Key:       iwfidl.PtrString(persistence.TestSearchAttributeIntKey),
 				ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
 			},
 		},
@@ -126,7 +126,7 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 		"S2_decide": 1,
 	}, history, "attribute test fail, %v", history)
 
-	if attribute.EnableTestingSearchAttribute {
+	if persistence.EnableTestingSearchAttribute {
 		assertions.Equal(map[string]interface{}{
 			"S1_decide_intSaFounds": 1,
 			"S1_decide_kwSaFounds":  1,
@@ -161,23 +161,23 @@ func doTestAttributeWorkflow(t *testing.T, backendType service.BackendType) {
 
 	expected := []iwfidl.KeyValue{
 		{
-			Key:   iwfidl.PtrString(attribute.TestQueryAttributeKey),
-			Value: &attribute.TestQueryVal2,
+			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
+			Value: &persistence.TestDataObjectVal2,
 		},
 	}
-	assertions.Equal(expected, queryResult2.GetQueryAttributes())
-	assertions.Equal(expected, queryResult1.GetQueryAttributes())
+	assertions.Equal(expected, queryResult2.GetObjects())
+	assertions.Equal(expected, queryResult1.GetObjects())
 
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
-		Key:          iwfidl.PtrString(attribute.TestSearchAttributeIntKey),
+		Key:          iwfidl.PtrString(persistence.TestSearchAttributeIntKey),
 		ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
-		IntegerValue: iwfidl.PtrInt64(attribute.TestSearchAttributeIntValue2),
+		IntegerValue: iwfidl.PtrInt64(persistence.TestSearchAttributeIntValue2),
 	}
 
 	expectedSearchAttributeKeyword := iwfidl.SearchAttribute{
-		Key:         iwfidl.PtrString(attribute.TestSearchAttributeKeywordKey),
+		Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
 		ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
-		StringValue: iwfidl.PtrString(attribute.TestSearchAttributeKeywordValue2),
+		StringValue: iwfidl.PtrString(persistence.TestSearchAttributeKeywordValue2),
 	}
 
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeKeyword}, searchResult1.GetSearchAttributes())

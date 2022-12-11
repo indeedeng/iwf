@@ -16,9 +16,11 @@ import (
 
 // WorkflowStateOptions struct for WorkflowStateOptions
 type WorkflowStateOptions struct {
-	SearchAttributesLoadingPolicy *AttributesLoadingPolicy `json:"searchAttributesLoadingPolicy,omitempty"`
-	QueryAttributesLoadingPolicy *AttributesLoadingPolicy `json:"queryAttributesLoadingPolicy,omitempty"`
+	SearchAttributesLoadingPolicy *PersistenceLoadingPolicy `json:"searchAttributesLoadingPolicy,omitempty"`
+	DataObjectsLoadingPolicy *PersistenceLoadingPolicy `json:"dataObjectsLoadingPolicy,omitempty"`
 	CommandCarryOverPolicy *CommandCarryOverPolicy `json:"commandCarryOverPolicy,omitempty"`
+	StartApiRetryPolicy *RetryPolicy `json:"startApiRetryPolicy,omitempty"`
+	DecideApiRetryPolicy *RetryPolicy `json:"decideApiRetryPolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -39,9 +41,9 @@ func NewWorkflowStateOptionsWithDefaults() *WorkflowStateOptions {
 }
 
 // GetSearchAttributesLoadingPolicy returns the SearchAttributesLoadingPolicy field value if set, zero value otherwise.
-func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() AttributesLoadingPolicy {
+func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() PersistenceLoadingPolicy {
 	if o == nil || o.SearchAttributesLoadingPolicy == nil {
-		var ret AttributesLoadingPolicy
+		var ret PersistenceLoadingPolicy
 		return ret
 	}
 	return *o.SearchAttributesLoadingPolicy
@@ -49,7 +51,7 @@ func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() AttributesLoad
 
 // GetSearchAttributesLoadingPolicyOk returns a tuple with the SearchAttributesLoadingPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicyOk() (*AttributesLoadingPolicy, bool) {
+func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
 	if o == nil || o.SearchAttributesLoadingPolicy == nil {
 		return nil, false
 	}
@@ -65,41 +67,41 @@ func (o *WorkflowStateOptions) HasSearchAttributesLoadingPolicy() bool {
 	return false
 }
 
-// SetSearchAttributesLoadingPolicy gets a reference to the given AttributesLoadingPolicy and assigns it to the SearchAttributesLoadingPolicy field.
-func (o *WorkflowStateOptions) SetSearchAttributesLoadingPolicy(v AttributesLoadingPolicy) {
+// SetSearchAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the SearchAttributesLoadingPolicy field.
+func (o *WorkflowStateOptions) SetSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
 	o.SearchAttributesLoadingPolicy = &v
 }
 
-// GetQueryAttributesLoadingPolicy returns the QueryAttributesLoadingPolicy field value if set, zero value otherwise.
-func (o *WorkflowStateOptions) GetQueryAttributesLoadingPolicy() AttributesLoadingPolicy {
-	if o == nil || o.QueryAttributesLoadingPolicy == nil {
-		var ret AttributesLoadingPolicy
+// GetDataObjectsLoadingPolicy returns the DataObjectsLoadingPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicy() PersistenceLoadingPolicy {
+	if o == nil || o.DataObjectsLoadingPolicy == nil {
+		var ret PersistenceLoadingPolicy
 		return ret
 	}
-	return *o.QueryAttributesLoadingPolicy
+	return *o.DataObjectsLoadingPolicy
 }
 
-// GetQueryAttributesLoadingPolicyOk returns a tuple with the QueryAttributesLoadingPolicy field value if set, nil otherwise
+// GetDataObjectsLoadingPolicyOk returns a tuple with the DataObjectsLoadingPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateOptions) GetQueryAttributesLoadingPolicyOk() (*AttributesLoadingPolicy, bool) {
-	if o == nil || o.QueryAttributesLoadingPolicy == nil {
+func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
+	if o == nil || o.DataObjectsLoadingPolicy == nil {
 		return nil, false
 	}
-	return o.QueryAttributesLoadingPolicy, true
+	return o.DataObjectsLoadingPolicy, true
 }
 
-// HasQueryAttributesLoadingPolicy returns a boolean if a field has been set.
-func (o *WorkflowStateOptions) HasQueryAttributesLoadingPolicy() bool {
-	if o != nil && o.QueryAttributesLoadingPolicy != nil {
+// HasDataObjectsLoadingPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool {
+	if o != nil && o.DataObjectsLoadingPolicy != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetQueryAttributesLoadingPolicy gets a reference to the given AttributesLoadingPolicy and assigns it to the QueryAttributesLoadingPolicy field.
-func (o *WorkflowStateOptions) SetQueryAttributesLoadingPolicy(v AttributesLoadingPolicy) {
-	o.QueryAttributesLoadingPolicy = &v
+// SetDataObjectsLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the DataObjectsLoadingPolicy field.
+func (o *WorkflowStateOptions) SetDataObjectsLoadingPolicy(v PersistenceLoadingPolicy) {
+	o.DataObjectsLoadingPolicy = &v
 }
 
 // GetCommandCarryOverPolicy returns the CommandCarryOverPolicy field value if set, zero value otherwise.
@@ -134,16 +136,86 @@ func (o *WorkflowStateOptions) SetCommandCarryOverPolicy(v CommandCarryOverPolic
 	o.CommandCarryOverPolicy = &v
 }
 
+// GetStartApiRetryPolicy returns the StartApiRetryPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetStartApiRetryPolicy() RetryPolicy {
+	if o == nil || o.StartApiRetryPolicy == nil {
+		var ret RetryPolicy
+		return ret
+	}
+	return *o.StartApiRetryPolicy
+}
+
+// GetStartApiRetryPolicyOk returns a tuple with the StartApiRetryPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetStartApiRetryPolicyOk() (*RetryPolicy, bool) {
+	if o == nil || o.StartApiRetryPolicy == nil {
+		return nil, false
+	}
+	return o.StartApiRetryPolicy, true
+}
+
+// HasStartApiRetryPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasStartApiRetryPolicy() bool {
+	if o != nil && o.StartApiRetryPolicy != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStartApiRetryPolicy gets a reference to the given RetryPolicy and assigns it to the StartApiRetryPolicy field.
+func (o *WorkflowStateOptions) SetStartApiRetryPolicy(v RetryPolicy) {
+	o.StartApiRetryPolicy = &v
+}
+
+// GetDecideApiRetryPolicy returns the DecideApiRetryPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetDecideApiRetryPolicy() RetryPolicy {
+	if o == nil || o.DecideApiRetryPolicy == nil {
+		var ret RetryPolicy
+		return ret
+	}
+	return *o.DecideApiRetryPolicy
+}
+
+// GetDecideApiRetryPolicyOk returns a tuple with the DecideApiRetryPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetDecideApiRetryPolicyOk() (*RetryPolicy, bool) {
+	if o == nil || o.DecideApiRetryPolicy == nil {
+		return nil, false
+	}
+	return o.DecideApiRetryPolicy, true
+}
+
+// HasDecideApiRetryPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasDecideApiRetryPolicy() bool {
+	if o != nil && o.DecideApiRetryPolicy != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDecideApiRetryPolicy gets a reference to the given RetryPolicy and assigns it to the DecideApiRetryPolicy field.
+func (o *WorkflowStateOptions) SetDecideApiRetryPolicy(v RetryPolicy) {
+	o.DecideApiRetryPolicy = &v
+}
+
 func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.SearchAttributesLoadingPolicy != nil {
 		toSerialize["searchAttributesLoadingPolicy"] = o.SearchAttributesLoadingPolicy
 	}
-	if o.QueryAttributesLoadingPolicy != nil {
-		toSerialize["queryAttributesLoadingPolicy"] = o.QueryAttributesLoadingPolicy
+	if o.DataObjectsLoadingPolicy != nil {
+		toSerialize["dataObjectsLoadingPolicy"] = o.DataObjectsLoadingPolicy
 	}
 	if o.CommandCarryOverPolicy != nil {
 		toSerialize["commandCarryOverPolicy"] = o.CommandCarryOverPolicy
+	}
+	if o.StartApiRetryPolicy != nil {
+		toSerialize["startApiRetryPolicy"] = o.StartApiRetryPolicy
+	}
+	if o.DecideApiRetryPolicy != nil {
+		toSerialize["decideApiRetryPolicy"] = o.DecideApiRetryPolicy
 	}
 	return json.Marshal(toSerialize)
 }

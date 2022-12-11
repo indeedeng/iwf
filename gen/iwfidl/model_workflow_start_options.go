@@ -18,6 +18,7 @@ import (
 type WorkflowStartOptions struct {
 	WorkflowIDReusePolicy *string `json:"workflowIDReusePolicy,omitempty"`
 	CronSchedule *string `json:"cronSchedule,omitempty"`
+	RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -101,6 +102,38 @@ func (o *WorkflowStartOptions) SetCronSchedule(v string) {
 	o.CronSchedule = &v
 }
 
+// GetRetryPolicy returns the RetryPolicy field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy {
+	if o == nil || o.RetryPolicy == nil {
+		var ret RetryPolicy
+		return ret
+	}
+	return *o.RetryPolicy
+}
+
+// GetRetryPolicyOk returns a tuple with the RetryPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartOptions) GetRetryPolicyOk() (*RetryPolicy, bool) {
+	if o == nil || o.RetryPolicy == nil {
+		return nil, false
+	}
+	return o.RetryPolicy, true
+}
+
+// HasRetryPolicy returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasRetryPolicy() bool {
+	if o != nil && o.RetryPolicy != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetRetryPolicy gets a reference to the given RetryPolicy and assigns it to the RetryPolicy field.
+func (o *WorkflowStartOptions) SetRetryPolicy(v RetryPolicy) {
+	o.RetryPolicy = &v
+}
+
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.WorkflowIDReusePolicy != nil {
@@ -108,6 +141,9 @@ func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	}
 	if o.CronSchedule != nil {
 		toSerialize["cronSchedule"] = o.CronSchedule
+	}
+	if o.RetryPolicy != nil {
+		toSerialize["retryPolicy"] = o.RetryPolicy
 	}
 	return json.Marshal(toSerialize)
 }

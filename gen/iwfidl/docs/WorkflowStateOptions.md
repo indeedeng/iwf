@@ -4,9 +4,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**SearchAttributesLoadingPolicy** | Pointer to [**AttributesLoadingPolicy**](AttributesLoadingPolicy.md) |  | [optional] 
-**QueryAttributesLoadingPolicy** | Pointer to [**AttributesLoadingPolicy**](AttributesLoadingPolicy.md) |  | [optional] 
+**SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**DataObjectsLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **CommandCarryOverPolicy** | Pointer to [**CommandCarryOverPolicy**](CommandCarryOverPolicy.md) |  | [optional] 
+**StartApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
+**DecideApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 
 ## Methods
 
@@ -29,20 +31,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetSearchAttributesLoadingPolicy
 
-`func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() AttributesLoadingPolicy`
+`func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() PersistenceLoadingPolicy`
 
 GetSearchAttributesLoadingPolicy returns the SearchAttributesLoadingPolicy field if non-nil, zero value otherwise.
 
 ### GetSearchAttributesLoadingPolicyOk
 
-`func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicyOk() (*AttributesLoadingPolicy, bool)`
+`func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
 
 GetSearchAttributesLoadingPolicyOk returns a tuple with the SearchAttributesLoadingPolicy field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSearchAttributesLoadingPolicy
 
-`func (o *WorkflowStateOptions) SetSearchAttributesLoadingPolicy(v AttributesLoadingPolicy)`
+`func (o *WorkflowStateOptions) SetSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
 
 SetSearchAttributesLoadingPolicy sets SearchAttributesLoadingPolicy field to given value.
 
@@ -52,30 +54,30 @@ SetSearchAttributesLoadingPolicy sets SearchAttributesLoadingPolicy field to giv
 
 HasSearchAttributesLoadingPolicy returns a boolean if a field has been set.
 
-### GetQueryAttributesLoadingPolicy
+### GetDataObjectsLoadingPolicy
 
-`func (o *WorkflowStateOptions) GetQueryAttributesLoadingPolicy() AttributesLoadingPolicy`
+`func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicy() PersistenceLoadingPolicy`
 
-GetQueryAttributesLoadingPolicy returns the QueryAttributesLoadingPolicy field if non-nil, zero value otherwise.
+GetDataObjectsLoadingPolicy returns the DataObjectsLoadingPolicy field if non-nil, zero value otherwise.
 
-### GetQueryAttributesLoadingPolicyOk
+### GetDataObjectsLoadingPolicyOk
 
-`func (o *WorkflowStateOptions) GetQueryAttributesLoadingPolicyOk() (*AttributesLoadingPolicy, bool)`
+`func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
 
-GetQueryAttributesLoadingPolicyOk returns a tuple with the QueryAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+GetDataObjectsLoadingPolicyOk returns a tuple with the DataObjectsLoadingPolicy field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetQueryAttributesLoadingPolicy
+### SetDataObjectsLoadingPolicy
 
-`func (o *WorkflowStateOptions) SetQueryAttributesLoadingPolicy(v AttributesLoadingPolicy)`
+`func (o *WorkflowStateOptions) SetDataObjectsLoadingPolicy(v PersistenceLoadingPolicy)`
 
-SetQueryAttributesLoadingPolicy sets QueryAttributesLoadingPolicy field to given value.
+SetDataObjectsLoadingPolicy sets DataObjectsLoadingPolicy field to given value.
 
-### HasQueryAttributesLoadingPolicy
+### HasDataObjectsLoadingPolicy
 
-`func (o *WorkflowStateOptions) HasQueryAttributesLoadingPolicy() bool`
+`func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool`
 
-HasQueryAttributesLoadingPolicy returns a boolean if a field has been set.
+HasDataObjectsLoadingPolicy returns a boolean if a field has been set.
 
 ### GetCommandCarryOverPolicy
 
@@ -101,6 +103,56 @@ SetCommandCarryOverPolicy sets CommandCarryOverPolicy field to given value.
 `func (o *WorkflowStateOptions) HasCommandCarryOverPolicy() bool`
 
 HasCommandCarryOverPolicy returns a boolean if a field has been set.
+
+### GetStartApiRetryPolicy
+
+`func (o *WorkflowStateOptions) GetStartApiRetryPolicy() RetryPolicy`
+
+GetStartApiRetryPolicy returns the StartApiRetryPolicy field if non-nil, zero value otherwise.
+
+### GetStartApiRetryPolicyOk
+
+`func (o *WorkflowStateOptions) GetStartApiRetryPolicyOk() (*RetryPolicy, bool)`
+
+GetStartApiRetryPolicyOk returns a tuple with the StartApiRetryPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStartApiRetryPolicy
+
+`func (o *WorkflowStateOptions) SetStartApiRetryPolicy(v RetryPolicy)`
+
+SetStartApiRetryPolicy sets StartApiRetryPolicy field to given value.
+
+### HasStartApiRetryPolicy
+
+`func (o *WorkflowStateOptions) HasStartApiRetryPolicy() bool`
+
+HasStartApiRetryPolicy returns a boolean if a field has been set.
+
+### GetDecideApiRetryPolicy
+
+`func (o *WorkflowStateOptions) GetDecideApiRetryPolicy() RetryPolicy`
+
+GetDecideApiRetryPolicy returns the DecideApiRetryPolicy field if non-nil, zero value otherwise.
+
+### GetDecideApiRetryPolicyOk
+
+`func (o *WorkflowStateOptions) GetDecideApiRetryPolicyOk() (*RetryPolicy, bool)`
+
+GetDecideApiRetryPolicyOk returns a tuple with the DecideApiRetryPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDecideApiRetryPolicy
+
+`func (o *WorkflowStateOptions) SetDecideApiRetryPolicy(v RetryPolicy)`
+
+SetDecideApiRetryPolicy sets DecideApiRetryPolicy field to given value.
+
+### HasDecideApiRetryPolicy
+
+`func (o *WorkflowStateOptions) HasDecideApiRetryPolicy() bool`
+
+HasDecideApiRetryPolicy returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

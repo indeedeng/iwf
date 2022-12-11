@@ -39,12 +39,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			NextStateInput:   &input.StateInput,
 		},
 	}
-	attrMgr := NewAttributeManager(func(attributes map[string]interface{}) error {
+	persistenceManager := NewPersistenceManager(func(attributes map[string]interface{}) error {
 		return provider.UpsertSearchAttributes(ctx, attributes)
 	})
 
-	err = provider.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
-		return attrMgr.GetQueryAttributesByKey(req), nil
+	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
+		return persistenceManager.GetDataObjectsByKey(req), nil
 	})
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}()
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, attrMgr, interStateChannel)
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -181,7 +181,7 @@ func executeState(
 	state iwfidl.StateMovement,
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
-	attrMgr *AttributeManager,
+	attrMgr *PersistenceManager,
 	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
 	ao := ActivityOptions{
@@ -204,8 +204,8 @@ func executeState(
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.NextStateInput,
-			SearchAttributes: attrMgr.GetAllSearchAttributes(),
-			QueryAttributes:  attrMgr.GetAllQueryAttributes(),
+			SearchAttributes: attrMgr.GetAllSearchAttributes(), // TODO support more loading policy
+			DataObjects:      attrMgr.GetAllDataObjects(),      // TODO support more loading policy
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
@@ -216,7 +216,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertQueryAttribute(startResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}
@@ -393,14 +393,14 @@ func executeState(
 	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
-			Context:              exeCtx,
-			WorkflowType:         execution.WorkflowType,
-			WorkflowStateId:      state.StateId,
-			CommandResults:       commandRes,
-			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),
-			SearchAttributes:     attrMgr.GetAllSearchAttributes(),
-			QueryAttributes:      attrMgr.GetAllQueryAttributes(),
-			StateInput:           state.NextStateInput,
+			Context:          exeCtx,
+			WorkflowType:     execution.WorkflowType,
+			WorkflowStateId:  state.StateId,
+			CommandResults:   commandRes,
+			StateLocals:      startResponse.GetUpsertStateLocals(),
+			SearchAttributes: attrMgr.GetAllSearchAttributes(), // TODO support more loading policy
+			DataObjects:      attrMgr.GetAllDataObjects(),      // TODO support more loading policy
+			StateInput:       state.NextStateInput,
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {
@@ -412,7 +412,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertQueryAttribute(decideResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}

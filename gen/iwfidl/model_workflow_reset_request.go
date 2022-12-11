@@ -21,10 +21,8 @@ type WorkflowResetRequest struct {
 	ResetType string `json:"resetType"`
 	HistoryEventId *int32 `json:"historyEventId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
-	DecisionOffset *int32 `json:"decision_offset,omitempty"`
-	ResetBadBinaryChecksum *string `json:"reset_bad_binary_checksum,omitempty"`
-	EarliestTime *string `json:"earliest_time,omitempty"`
-	SkipSignalReapply *bool `json:"skip_signal_reapply,omitempty"`
+	HistoryEventTime *string `json:"historyEventTime,omitempty"`
+	SkipSignalReapply *bool `json:"skipSignalReapply,omitempty"`
 }
 
 // NewWorkflowResetRequest instantiates a new WorkflowResetRequest object
@@ -190,100 +188,36 @@ func (o *WorkflowResetRequest) SetReason(v string) {
 	o.Reason = &v
 }
 
-// GetDecisionOffset returns the DecisionOffset field value if set, zero value otherwise.
-func (o *WorkflowResetRequest) GetDecisionOffset() int32 {
-	if o == nil || o.DecisionOffset == nil {
-		var ret int32
-		return ret
-	}
-	return *o.DecisionOffset
-}
-
-// GetDecisionOffsetOk returns a tuple with the DecisionOffset field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowResetRequest) GetDecisionOffsetOk() (*int32, bool) {
-	if o == nil || o.DecisionOffset == nil {
-		return nil, false
-	}
-	return o.DecisionOffset, true
-}
-
-// HasDecisionOffset returns a boolean if a field has been set.
-func (o *WorkflowResetRequest) HasDecisionOffset() bool {
-	if o != nil && o.DecisionOffset != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetDecisionOffset gets a reference to the given int32 and assigns it to the DecisionOffset field.
-func (o *WorkflowResetRequest) SetDecisionOffset(v int32) {
-	o.DecisionOffset = &v
-}
-
-// GetResetBadBinaryChecksum returns the ResetBadBinaryChecksum field value if set, zero value otherwise.
-func (o *WorkflowResetRequest) GetResetBadBinaryChecksum() string {
-	if o == nil || o.ResetBadBinaryChecksum == nil {
+// GetHistoryEventTime returns the HistoryEventTime field value if set, zero value otherwise.
+func (o *WorkflowResetRequest) GetHistoryEventTime() string {
+	if o == nil || o.HistoryEventTime == nil {
 		var ret string
 		return ret
 	}
-	return *o.ResetBadBinaryChecksum
+	return *o.HistoryEventTime
 }
 
-// GetResetBadBinaryChecksumOk returns a tuple with the ResetBadBinaryChecksum field value if set, nil otherwise
+// GetHistoryEventTimeOk returns a tuple with the HistoryEventTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowResetRequest) GetResetBadBinaryChecksumOk() (*string, bool) {
-	if o == nil || o.ResetBadBinaryChecksum == nil {
+func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool) {
+	if o == nil || o.HistoryEventTime == nil {
 		return nil, false
 	}
-	return o.ResetBadBinaryChecksum, true
+	return o.HistoryEventTime, true
 }
 
-// HasResetBadBinaryChecksum returns a boolean if a field has been set.
-func (o *WorkflowResetRequest) HasResetBadBinaryChecksum() bool {
-	if o != nil && o.ResetBadBinaryChecksum != nil {
+// HasHistoryEventTime returns a boolean if a field has been set.
+func (o *WorkflowResetRequest) HasHistoryEventTime() bool {
+	if o != nil && o.HistoryEventTime != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetResetBadBinaryChecksum gets a reference to the given string and assigns it to the ResetBadBinaryChecksum field.
-func (o *WorkflowResetRequest) SetResetBadBinaryChecksum(v string) {
-	o.ResetBadBinaryChecksum = &v
-}
-
-// GetEarliestTime returns the EarliestTime field value if set, zero value otherwise.
-func (o *WorkflowResetRequest) GetEarliestTime() string {
-	if o == nil || o.EarliestTime == nil {
-		var ret string
-		return ret
-	}
-	return *o.EarliestTime
-}
-
-// GetEarliestTimeOk returns a tuple with the EarliestTime field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowResetRequest) GetEarliestTimeOk() (*string, bool) {
-	if o == nil || o.EarliestTime == nil {
-		return nil, false
-	}
-	return o.EarliestTime, true
-}
-
-// HasEarliestTime returns a boolean if a field has been set.
-func (o *WorkflowResetRequest) HasEarliestTime() bool {
-	if o != nil && o.EarliestTime != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetEarliestTime gets a reference to the given string and assigns it to the EarliestTime field.
-func (o *WorkflowResetRequest) SetEarliestTime(v string) {
-	o.EarliestTime = &v
+// SetHistoryEventTime gets a reference to the given string and assigns it to the HistoryEventTime field.
+func (o *WorkflowResetRequest) SetHistoryEventTime(v string) {
+	o.HistoryEventTime = &v
 }
 
 // GetSkipSignalReapply returns the SkipSignalReapply field value if set, zero value otherwise.
@@ -335,17 +269,11 @@ func (o WorkflowResetRequest) MarshalJSON() ([]byte, error) {
 	if o.Reason != nil {
 		toSerialize["reason"] = o.Reason
 	}
-	if o.DecisionOffset != nil {
-		toSerialize["decision_offset"] = o.DecisionOffset
-	}
-	if o.ResetBadBinaryChecksum != nil {
-		toSerialize["reset_bad_binary_checksum"] = o.ResetBadBinaryChecksum
-	}
-	if o.EarliestTime != nil {
-		toSerialize["earliest_time"] = o.EarliestTime
+	if o.HistoryEventTime != nil {
+		toSerialize["historyEventTime"] = o.HistoryEventTime
 	}
 	if o.SkipSignalReapply != nil {
-		toSerialize["skip_signal_reapply"] = o.SkipSignalReapply
+		toSerialize["skipSignalReapply"] = o.SkipSignalReapply
 	}
 	return json.Marshal(toSerialize)
 }

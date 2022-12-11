@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **WorkflowStateId** | **string** |  | 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
-**QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**DataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 
 ## Methods
 
@@ -140,30 +140,30 @@ SetSearchAttributes sets SearchAttributes field to given value.
 
 HasSearchAttributes returns a boolean if a field has been set.
 
-### GetQueryAttributes
+### GetDataObjects
 
-`func (o *WorkflowStateStartRequest) GetQueryAttributes() []KeyValue`
+`func (o *WorkflowStateStartRequest) GetDataObjects() []KeyValue`
 
-GetQueryAttributes returns the QueryAttributes field if non-nil, zero value otherwise.
+GetDataObjects returns the DataObjects field if non-nil, zero value otherwise.
 
-### GetQueryAttributesOk
+### GetDataObjectsOk
 
-`func (o *WorkflowStateStartRequest) GetQueryAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateStartRequest) GetDataObjectsOk() (*[]KeyValue, bool)`
 
-GetQueryAttributesOk returns a tuple with the QueryAttributes field if it's non-nil, zero value otherwise
+GetDataObjectsOk returns a tuple with the DataObjects field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetQueryAttributes
+### SetDataObjects
 
-`func (o *WorkflowStateStartRequest) SetQueryAttributes(v []KeyValue)`
+`func (o *WorkflowStateStartRequest) SetDataObjects(v []KeyValue)`
 
-SetQueryAttributes sets QueryAttributes field to given value.
+SetDataObjects sets DataObjects field to given value.
 
-### HasQueryAttributes
+### HasDataObjects
 
-`func (o *WorkflowStateStartRequest) HasQueryAttributes() bool`
+`func (o *WorkflowStateStartRequest) HasDataObjects() bool`
 
-HasQueryAttributes returns a boolean if a field has been set.
+HasDataObjects returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

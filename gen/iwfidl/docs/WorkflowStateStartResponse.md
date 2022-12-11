@@ -5,9 +5,9 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
-**UpsertQueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**UpsertDataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
-**UpsertStateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**UpsertStateLocals** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **RecordEvents** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **PublishToInterStateChannel** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
 
@@ -55,30 +55,30 @@ SetUpsertSearchAttributes sets UpsertSearchAttributes field to given value.
 
 HasUpsertSearchAttributes returns a boolean if a field has been set.
 
-### GetUpsertQueryAttributes
+### GetUpsertDataObjects
 
-`func (o *WorkflowStateStartResponse) GetUpsertQueryAttributes() []KeyValue`
+`func (o *WorkflowStateStartResponse) GetUpsertDataObjects() []KeyValue`
 
-GetUpsertQueryAttributes returns the UpsertQueryAttributes field if non-nil, zero value otherwise.
+GetUpsertDataObjects returns the UpsertDataObjects field if non-nil, zero value otherwise.
 
-### GetUpsertQueryAttributesOk
+### GetUpsertDataObjectsOk
 
-`func (o *WorkflowStateStartResponse) GetUpsertQueryAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateStartResponse) GetUpsertDataObjectsOk() (*[]KeyValue, bool)`
 
-GetUpsertQueryAttributesOk returns a tuple with the UpsertQueryAttributes field if it's non-nil, zero value otherwise
+GetUpsertDataObjectsOk returns a tuple with the UpsertDataObjects field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetUpsertQueryAttributes
+### SetUpsertDataObjects
 
-`func (o *WorkflowStateStartResponse) SetUpsertQueryAttributes(v []KeyValue)`
+`func (o *WorkflowStateStartResponse) SetUpsertDataObjects(v []KeyValue)`
 
-SetUpsertQueryAttributes sets UpsertQueryAttributes field to given value.
+SetUpsertDataObjects sets UpsertDataObjects field to given value.
 
-### HasUpsertQueryAttributes
+### HasUpsertDataObjects
 
-`func (o *WorkflowStateStartResponse) HasUpsertQueryAttributes() bool`
+`func (o *WorkflowStateStartResponse) HasUpsertDataObjects() bool`
 
-HasUpsertQueryAttributes returns a boolean if a field has been set.
+HasUpsertDataObjects returns a boolean if a field has been set.
 
 ### GetCommandRequest
 
@@ -105,30 +105,30 @@ SetCommandRequest sets CommandRequest field to given value.
 
 HasCommandRequest returns a boolean if a field has been set.
 
-### GetUpsertStateLocalAttributes
+### GetUpsertStateLocals
 
-`func (o *WorkflowStateStartResponse) GetUpsertStateLocalAttributes() []KeyValue`
+`func (o *WorkflowStateStartResponse) GetUpsertStateLocals() []KeyValue`
 
-GetUpsertStateLocalAttributes returns the UpsertStateLocalAttributes field if non-nil, zero value otherwise.
+GetUpsertStateLocals returns the UpsertStateLocals field if non-nil, zero value otherwise.
 
-### GetUpsertStateLocalAttributesOk
+### GetUpsertStateLocalsOk
 
-`func (o *WorkflowStateStartResponse) GetUpsertStateLocalAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateStartResponse) GetUpsertStateLocalsOk() (*[]KeyValue, bool)`
 
-GetUpsertStateLocalAttributesOk returns a tuple with the UpsertStateLocalAttributes field if it's non-nil, zero value otherwise
+GetUpsertStateLocalsOk returns a tuple with the UpsertStateLocals field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetUpsertStateLocalAttributes
+### SetUpsertStateLocals
 
-`func (o *WorkflowStateStartResponse) SetUpsertStateLocalAttributes(v []KeyValue)`
+`func (o *WorkflowStateStartResponse) SetUpsertStateLocals(v []KeyValue)`
 
-SetUpsertStateLocalAttributes sets UpsertStateLocalAttributes field to given value.
+SetUpsertStateLocals sets UpsertStateLocals field to given value.
 
-### HasUpsertStateLocalAttributes
+### HasUpsertStateLocals
 
-`func (o *WorkflowStateStartResponse) HasUpsertStateLocalAttributes() bool`
+`func (o *WorkflowStateStartResponse) HasUpsertStateLocals() bool`
 
-HasUpsertStateLocalAttributes returns a boolean if a field has been set.
+HasUpsertStateLocals returns a boolean if a field has been set.
 
 ### GetRecordEvents
 

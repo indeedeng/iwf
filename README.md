@@ -1,6 +1,6 @@
 # iWF project - main & server repo 
 
-For most long running business, iWF is a All-In-One framework to replace Database, MessageQueue and ElasticSearch. 
+iWF is a platform providing an all-in-one tooling for building long-running business application. It provides an abstraction for persistence(database, elasticSearch) and more! It aims to provide clean, simple and easy to use interface, like an iPhone. 
 
 **It will not make you a 10x developer...but you may feel like one!**
 
@@ -8,49 +8,34 @@ We call _long running application_ **`Workflow`**.
 
 It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 
-Back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter.
+The server is back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter.
 
 Related projects:
 * [API definition between SDKs and server](https://github.com/indeedeng/iwf-idl). Any languages can be supported as long as implementing it. 
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) 
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
-* [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk)
-
-Contribution is welcome.   
+* [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk), WIP, Contribution is welcome.
+* More SDKs? Contribution is welcome.
 
 # Table of contents
-* [Why you would need iWF](#why-you-would-need-iwf)
-  * [If you are familar with <a href="https://github.com/uber/cadence">Cadence</a>/<a href="https://github.com/temporalio/temporal">Temporal</a>](#if-you-are-familar-with-cadencetemporal)
-  * [If you are not](#if-you-are-not)
-* [What is iWF](#what-is-iwf)
-  * [Basic Concepts &amp; Usage](#basic-concepts--usage) 
-  * [Advanced Concepts &amp; Usage](#advanced-concepts--usage)
-* [How to run](#how-to-run)
-  * [Using docker image](#using-docker-image--docker-compose)
-  * [How to build &amp; run locally](#how-to-build--run-locally)
-  * [How to use in production](#how-to-use-in-production)
-    * [Option 1: use as library to customize your startup](#option-1-use-as-library-to-customize-your-startup)
-* [Development](#development)
-  * [How to update IDL and the generated code](#how-to-update-idl-and-the-generated-code)
-  * [Run with local Temporalite](#run-with-local-temporalite)
-  * [Run with local Cadence](#run-with-local-cadence)
-  * [Development Plan](#development-plan)
-    * [1.0](#10)
-    * [1.1](#11)
-    * [1.2](#12)
+
+- [Why you would need iWF](#why-you-would-need-iwf)
+  - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
+  - [If you are not](#if-you-are-not)
+- [What is iWF](#what-is-iwf)
+  - [Basic Concepts & Usage](#basic-concepts--usage)
+  - [Advanced Concepts & Usage](#advanced-concepts--usage)
+- [How to run this server](#how-to-run-this-server)
+  - [Using docker image & docker-compose](#using-docker-image--docker-compose)
+  - [How to build & run locally](#how-to-build--run-locally)
+  - [How to use in production](#how-to-use-in-production)
+- [Development](#development)
+  - [Development Plan](#development-plan)
+- [Some history](#some-history)
 
 # Why you would need iWF
 
-## TL;DR
-AWS published SWF in 2012 and then moved to Step Functions in 2016 because they found it’s too hard to support SWF. 
-Cadence & Temporal continued the idea of SWF and became much more powerful.
-However, AWS is right that the programming of SWF/Cadence/Temporal is hard to adopt because of leaking too many internals. 
-Inspired by Step Function, iWF is created to provide equivalent power of Cadence/Temporal, but hiding all the internal details
-and provide clean and simple API to use.
-
-<img width="916" alt="Screen Shot 2022-11-10 at 11 23 24 AM" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
-
-## If you are familar with [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal)
+## If you are familar with Cadence/Temporal
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
 * See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
 
@@ -60,13 +45,13 @@ and provide clean and simple API to use.
 iWF is an application platform that provides you a comprehensive tooling:
 * WorkflowAsCode for highly flexibile/customizable business logic
 * Parallel execution of multiple threads of business
-* Intermidiate states stored as "QueryAttributes" and can be retrieved by APIs
+* Persistence storage for intermediate states stored as "dataObjects"
+* Persistence searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch
 * Receiving data from external system by Signal
-* Searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch 
 * Durable timer, and cron job scheduling
 * Reset workflow to let you recover the workflows from bad states easily 
+* Highly testable and easy to maintain
 * ...
-* Basically with iWF, you mostly don't need any database, messageQueue or even ElasticSearch to build your applications
 
 # What is iWF
 
@@ -85,13 +70,10 @@ Note that `start` API can return multiple commands, and choose different Decider
 * `AllCommandCompleted`: this will wait for all command completed
 * `AnyCommandCompleted`: this will wait for any command completed
 
-iWF provides the below primitives when implementing the WorkflowState:
-  * `StateLocal` is for 
-  * passing some data values from state API to decide API in the same WorkflowState execution
-  * recording some events that can be useful for debugging using Workflow history. Usually you may want to record the input/output of the dependency RPC calls.  
-* `QueryAttribute` is for 
+iWF provides the below persistence APIs when implementing the WorkflowState:
+* `DataObject` is for 
   * sharing some data values across the workflow
-  * can be retrieved by external application using GetQueryAttributes API
+  * can be retrieved by external application using GetDataObjects API
   * can be viewed in Cadence/Temporal WebUI in QueryHandler tab
 * `SearchAttribute` is similarly:
   * sharing some data values across the workflow
@@ -101,40 +83,18 @@ iWF provides the below primitives when implementing the WorkflowState:
   * search attribute type must be registered in Cadence/Temporal server before using for searching because it is backed up ElasticSearch
   * the data types supported are limited as server has to understand the value for indexing
   * See [Temporal doc](https://docs.temporal.io/concepts/what-is-a-search-attribute) and [Cadence doc](https://cadenceworkflow.io/docs/concepts/search-workflows/) to understand more about SearchAttribute 
-
+* `StateLocal` is for
+  * passing some data values from state API to decide API in the same WorkflowState execution
+  * recording some events that can be useful for debugging using Workflow history. Usually you may want to record the input/output of the dependency RPC calls.
+  
 ## Advanced Concepts & Usage
 On top of the above basic concepts, you may want to deeply customize your workflow by using the below features.
 
 ### More advanced command types
 * `InterStateChannelCommand`: will be waiting for a value being published from another state(internally in the same workflow)
-* [Future] `LongRunninngActivityCommand`: will schedule a Cadence/Temporal activity. This is only necessary for long-running activity like hours/days.
+* [Future] `LongRunninngActivityCommand`: will schedule a long-running activity like hours/days with capability to recover from previous states
 
-### WorkflowStartOption
-* IdReusePolicy
-* CronSchedule
-* RetryPolicy
-### WorkflowStateOption
-* AttributeLoadingPolicy
-* API timeout & retry
-### Reset Workflow
-
-## How to change workflow code
-Unlike Cadence/Temporal, there is no [Non-deterministic](https://docs.temporal.io/workflows#deterministic-constraints) errors anymore in iWF.  
-And there is no [versioning APIs](https://docs.temporal.io/go/versioning). You will never see the worker crashing & replay issues on iWF workers.
-
-However, changing workflow code could still have backward compatibility issues. Here are some tips:
-* Changing the behavior of a WorkflowState will always apply to any existing workflow executions. 
-  * Usually that's what you want. If it's not, then you should utilize QueryAttribute, SearchAttribute or StateLocalAttribute to record some data, and use it to decide the new behavior 
-* Removing an existing WorkflowState could cause existing workflow executions to stuck if there is any workflow executing on it. 
-  * If that happens, the worker will return errors to server, which will fail the server workflow activity and keep on backoff retry 
-  * Instead of fixing the code, you can also reset workflow to recover from bad state executions
-  * To safely delete a WorkflowState, you can utilize the `IwfExecutingStateIds` search attribute to check if the stateId is still being executed
-
-## How to write unit test
-Writing unit test for iWF workflow code should be super easy compared to Cadence/Temporal. There is no need to use any special testEnv.
-The standard unit test library should be sufficient.
-
-# How to run
+# How to run this server
 
 ##  Using docker image & docker-compose
 Checkout this repo, go to the docker-compose folder and run it:
@@ -215,8 +175,8 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] Timer command
 - [x] Signal command
 - [x] SearchAttributeRW
-- [x] QueryAttributeRW
-- [x] StateLocalAttribute
+- [x] DataObjectRW
+- [x] StateLocal
 - [x] Signal workflow API
 - [x] Query workflow API
 - [x] Get workflow API
@@ -227,7 +187,7 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
-- [ ] More workflow start options: IdReusePolicy, initial earch attributes, cron schedule, retry, etc
+- [ ] More workflow start options: IdReusePolicy, initial search attributes/memo, cron schedule, retry, etc
 - [ ] StateOption: Start/Decide API timeout and retry
 - [ ] Reset workflow by stateId
 
@@ -238,5 +198,14 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [ ] LongRunningActivityCommand
 - [ ] Failing workflow details
 - [ ] Auto ContinueAsNew 
-- [ ] StateOption: more AttributeLoadingPolicy
+- [ ] StateOption: more PersistenceLoadingPolicy
 - [ ] StateOption: more CommandCarryOverPolicy
+
+# Some history
+AWS published SWF in 2012 and then moved to Step Functions in 2016 because they found it’s too hard to support SWF.
+Cadence & Temporal continued the idea of SWF and became much more powerful.
+However, AWS is right that the programming of SWF/Cadence/Temporal is hard to adopt because of leaking too many internals.
+Inspired by Step Function, iWF is created to provide equivalent power of Cadence/Temporal, but hiding all the internal details
+and provide clean and simple API to use.
+
+<img width="916" alt="Screen Shot 2022-11-10 at 11 23 24 AM" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">

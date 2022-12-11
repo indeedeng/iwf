@@ -6,21 +6,21 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
-type AttributeManager struct {
-	queryAttributes         map[string]iwfidl.KeyValue
+type PersistenceManager struct {
+	dataObjects             map[string]iwfidl.KeyValue
 	searchAttributes        map[string]iwfidl.SearchAttribute
 	searchAttributeUpserter func(attributes map[string]interface{}) error
 }
 
-func NewAttributeManager(searchAttributeUpserter func(attributes map[string]interface{}) error) *AttributeManager {
-	return &AttributeManager{
-		queryAttributes:         make(map[string]iwfidl.KeyValue),
+func NewPersistenceManager(searchAttributeUpserter func(attributes map[string]interface{}) error) *PersistenceManager {
+	return &PersistenceManager{
+		dataObjects:             make(map[string]iwfidl.KeyValue),
 		searchAttributes:        make(map[string]iwfidl.SearchAttribute),
 		searchAttributeUpserter: searchAttributeUpserter,
 	}
 }
 
-func (am *AttributeManager) GetQueryAttributesByKey(request service.QueryAttributeRequest) service.QueryAttributeResponse {
+func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjectsQueryRequest) service.GetDataObjectsQueryResponse {
 	all := false
 	if len(request.Keys) == 0 {
 		all = true
@@ -30,17 +30,17 @@ func (am *AttributeManager) GetQueryAttributesByKey(request service.QueryAttribu
 	for _, k := range request.Keys {
 		keyMap[k] = true
 	}
-	for key, value := range am.queryAttributes {
+	for key, value := range am.dataObjects {
 		if keyMap[key] || all {
 			res = append(res, value)
 		}
 	}
-	return service.QueryAttributeResponse{
-		AttributeValues: res,
+	return service.GetDataObjectsQueryResponse{
+		DataObjects: res,
 	}
 }
 
-func (am *AttributeManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
+func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
 	var res []iwfidl.SearchAttribute
 	for _, value := range am.searchAttributes {
 		res = append(res, value)
@@ -48,15 +48,15 @@ func (am *AttributeManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
 	return res
 }
 
-func (am *AttributeManager) GetAllQueryAttributes() []iwfidl.KeyValue {
+func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 	var res []iwfidl.KeyValue
-	for _, value := range am.queryAttributes {
+	for _, value := range am.dataObjects {
 		res = append(res, value)
 	}
 	return res
 }
 
-func (am *AttributeManager) ProcessUpsertSearchAttribute(attributes []iwfidl.SearchAttribute) error {
+func (am *PersistenceManager) ProcessUpsertSearchAttribute(attributes []iwfidl.SearchAttribute) error {
 	if len(attributes) == 0 {
 		return nil
 	}
@@ -76,9 +76,9 @@ func (am *AttributeManager) ProcessUpsertSearchAttribute(attributes []iwfidl.Sea
 	return am.searchAttributeUpserter(attrsToUpsert)
 }
 
-func (am *AttributeManager) ProcessUpsertQueryAttribute(attributes []iwfidl.KeyValue) error {
+func (am *PersistenceManager) ProcessUpsertDataObject(attributes []iwfidl.KeyValue) error {
 	for _, attr := range attributes {
-		am.queryAttributes[attr.GetKey()] = attr
+		am.dataObjects[attr.GetKey()] = attr
 	}
 	return nil
 }
