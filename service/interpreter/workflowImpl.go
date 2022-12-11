@@ -39,12 +39,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			NextStateInput:   &input.StateInput,
 		},
 	}
-	attrMgr := NewPersistenceManager(func(attributes map[string]interface{}) error {
+	persistenceManager := NewPersistenceManager(func(attributes map[string]interface{}) error {
 		return provider.UpsertSearchAttributes(ctx, attributes)
 	})
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
-		return attrMgr.GetDataObjectsByKey(req), nil
+		return persistenceManager.GetDataObjectsByKey(req), nil
 	})
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}()
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, attrMgr, interStateChannel)
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel)
 				if err != nil {
 					errToFailWf = err
 				}
