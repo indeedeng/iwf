@@ -21,7 +21,7 @@ type WorkflowResetRequest struct {
 	ResetType string `json:"resetType"`
 	HistoryEventId *int32 `json:"historyEventId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
-	EventTime *string `json:"eventTime,omitempty"`
+	HistoryEventTime *string `json:"historyEventTime,omitempty"`
 	SkipSignalReapply *bool `json:"skipSignalReapply,omitempty"`
 }
 
@@ -188,36 +188,36 @@ func (o *WorkflowResetRequest) SetReason(v string) {
 	o.Reason = &v
 }
 
-// GetEventTime returns the EventTime field value if set, zero value otherwise.
-func (o *WorkflowResetRequest) GetEventTime() string {
-	if o == nil || o.EventTime == nil {
+// GetHistoryEventTime returns the HistoryEventTime field value if set, zero value otherwise.
+func (o *WorkflowResetRequest) GetHistoryEventTime() string {
+	if o == nil || o.HistoryEventTime == nil {
 		var ret string
 		return ret
 	}
-	return *o.EventTime
+	return *o.HistoryEventTime
 }
 
-// GetEventTimeOk returns a tuple with the EventTime field value if set, nil otherwise
+// GetHistoryEventTimeOk returns a tuple with the HistoryEventTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowResetRequest) GetEventTimeOk() (*string, bool) {
-	if o == nil || o.EventTime == nil {
+func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool) {
+	if o == nil || o.HistoryEventTime == nil {
 		return nil, false
 	}
-	return o.EventTime, true
+	return o.HistoryEventTime, true
 }
 
-// HasEventTime returns a boolean if a field has been set.
-func (o *WorkflowResetRequest) HasEventTime() bool {
-	if o != nil && o.EventTime != nil {
+// HasHistoryEventTime returns a boolean if a field has been set.
+func (o *WorkflowResetRequest) HasHistoryEventTime() bool {
+	if o != nil && o.HistoryEventTime != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetEventTime gets a reference to the given string and assigns it to the EventTime field.
-func (o *WorkflowResetRequest) SetEventTime(v string) {
-	o.EventTime = &v
+// SetHistoryEventTime gets a reference to the given string and assigns it to the HistoryEventTime field.
+func (o *WorkflowResetRequest) SetHistoryEventTime(v string) {
+	o.HistoryEventTime = &v
 }
 
 // GetSkipSignalReapply returns the SkipSignalReapply field value if set, zero value otherwise.
@@ -269,8 +269,8 @@ func (o WorkflowResetRequest) MarshalJSON() ([]byte, error) {
 	if o.Reason != nil {
 		toSerialize["reason"] = o.Reason
 	}
-	if o.EventTime != nil {
-		toSerialize["eventTime"] = o.EventTime
+	if o.HistoryEventTime != nil {
+		toSerialize["historyEventTime"] = o.HistoryEventTime
 	}
 	if o.SkipSignalReapply != nil {
 		toSerialize["skipSignalReapply"] = o.SkipSignalReapply

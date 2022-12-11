@@ -39,11 +39,11 @@ type (
 		StartedTimestamp int64
 	}
 
-	QueryAttributeRequest struct {
+	GetDataObjectsQueryRequest struct {
 		Keys []string
 	}
 
-	QueryAttributeResponse struct {
+	GetDataObjectsQueryResponse struct {
 		AttributeValues []iwfidl.KeyValue
 	}
 )

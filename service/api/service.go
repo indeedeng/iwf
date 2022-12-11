@@ -79,10 +79,10 @@ func (s *serviceImpl) ApiV1WorkflowCancelPost(req iwfidl.WorkflowCancelRequest) 
 }
 
 func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGetQueryAttributesRequest) (*iwfidl.WorkflowGetQueryAttributesResponse, *ErrorAndStatus) {
-	var queryResult1 service.QueryAttributeResponse
+	var queryResult1 service.GetDataObjectsQueryResponse
 	err := s.client.QueryWorkflow(context.Background(), &queryResult1,
-		req.GetWorkflowId(), req.GetWorkflowRunId(), service.AttributeQueryType,
-		service.QueryAttributeRequest{
+		req.GetWorkflowId(), req.GetWorkflowRunId(), service.GetDataObjectsWorkflowQueryType,
+		service.GetDataObjectsQueryRequest{
 			Keys: req.AttributeKeys,
 		})
 

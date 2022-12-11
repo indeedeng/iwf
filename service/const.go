@@ -24,7 +24,7 @@ const (
 	SearchAttributeValueTypeKeyword = "KEYWORD"
 	SearchAttributeValueTypeInt     = "INT"
 
-	AttributeQueryType = "GetQueryAttributes"
+	GetDataObjectsWorkflowQueryType = "GetDataObjects"
 
 	WorkflowErrorTypeUserWorkflowDecision = "UserWorkflowDecision"
 	WorkflowErrorTypeUserWorkflowError    = "UserWorkflowError"
@@ -56,10 +56,5 @@ const BackendTypeTemporal BackendType = "temporal"
 type ResetType string
 
 const ResetTypeHistoryEventId ResetType = "HISTORY_EVENT_ID"
-const ResetTypeFirstDecisionCompleted ResetType = "FIRST_DECISION_COMPLETED"
-const ResetTypeLastDecisionCompleted ResetType = "LAST_DECISION_COMPLETED"
-const ResetTypeLastContinuedAsNew ResetType = "LAST_CONTINUED_AS_NEW"
-const ResetTypeBadBinary ResetType = "BAD_BINARY"
-const ResetTypeDecisionCompletedTime ResetType = "DECISION_COMPLETED_TIME"
-const ResetTypeFirstDecisionScheduled ResetType = "FIRST_DECISION_SCHEDULED"
-const ResetTypeLastDecisionScheduled ResetType = "LAST_DECISION_SCHEDULED"
+const ResetTypeBeginning ResetType = "BEGINNING"
+const ResetTypeHistoryEventTime ResetType = "HISTORY_EVENT_TIME"

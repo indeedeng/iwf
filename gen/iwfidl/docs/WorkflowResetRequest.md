@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **ResetType** | **string** |  | 
 **HistoryEventId** | Pointer to **int32** |  | [optional] 
 **Reason** | Pointer to **string** |  | [optional] 
-**EventTime** | Pointer to **string** |  | [optional] 
+**HistoryEventTime** | Pointer to **string** |  | [optional] 
 **SkipSignalReapply** | Pointer to **bool** |  | [optional] 
 
 ## Methods
@@ -146,30 +146,30 @@ SetReason sets Reason field to given value.
 
 HasReason returns a boolean if a field has been set.
 
-### GetEventTime
+### GetHistoryEventTime
 
-`func (o *WorkflowResetRequest) GetEventTime() string`
+`func (o *WorkflowResetRequest) GetHistoryEventTime() string`
 
-GetEventTime returns the EventTime field if non-nil, zero value otherwise.
+GetHistoryEventTime returns the HistoryEventTime field if non-nil, zero value otherwise.
 
-### GetEventTimeOk
+### GetHistoryEventTimeOk
 
-`func (o *WorkflowResetRequest) GetEventTimeOk() (*string, bool)`
+`func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool)`
 
-GetEventTimeOk returns a tuple with the EventTime field if it's non-nil, zero value otherwise
+GetHistoryEventTimeOk returns a tuple with the HistoryEventTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEventTime
+### SetHistoryEventTime
 
-`func (o *WorkflowResetRequest) SetEventTime(v string)`
+`func (o *WorkflowResetRequest) SetHistoryEventTime(v string)`
 
-SetEventTime sets EventTime field to given value.
+SetHistoryEventTime sets HistoryEventTime field to given value.
 
-### HasEventTime
+### HasHistoryEventTime
 
-`func (o *WorkflowResetRequest) HasEventTime() bool`
+`func (o *WorkflowResetRequest) HasHistoryEventTime() bool`
 
-HasEventTime returns a boolean if a field has been set.
+HasHistoryEventTime returns a boolean if a field has been set.
 
 ### GetSkipSignalReapply
 

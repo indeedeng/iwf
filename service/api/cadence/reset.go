@@ -39,7 +39,7 @@ func getResetIDsByType(
 		if err != nil {
 			return
 		}
-	case service.ResetTypeFirstDecisionCompleted:
+	case service.ResetTypeBeginning:
 		decisionFinishID, err = getFirstDecisionTaskByType(ctx, domain, wid, rid, frontendClient, shared.EventTypeDecisionTaskCompleted)
 		if err != nil {
 			return

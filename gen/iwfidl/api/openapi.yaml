@@ -508,7 +508,6 @@ components:
           enum:
           - CANCEL
           - TERMINATE
-          - FAIL
           type: string
       required:
       - workflowId
@@ -702,7 +701,7 @@ components:
       example:
         reason: reason
         historyEventId: 0
-        eventTime: eventTime
+        historyEventTime: historyEventTime
         resetType: HISTORY_EVENT_ID
         skipSignalReapply: true
         workflowRunId: workflowRunId
@@ -716,13 +715,13 @@ components:
           enum:
           - HISTORY_EVENT_ID
           - BEGINNING
-          - EVENT_TIME
+          - HISTORY_EVENT_TIME
           type: string
         historyEventId:
           type: integer
         reason:
           type: string
-        eventTime:
+        historyEventTime:
           type: string
         skipSignalReapply:
           type: boolean

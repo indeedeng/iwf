@@ -39,12 +39,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			NextStateInput:   &input.StateInput,
 		},
 	}
-	attrMgr := NewAttributeManager(func(attributes map[string]interface{}) error {
+	attrMgr := NewPersistenceManager(func(attributes map[string]interface{}) error {
 		return provider.UpsertSearchAttributes(ctx, attributes)
 	})
 
-	err = provider.SetQueryHandler(ctx, service.AttributeQueryType, func(req service.QueryAttributeRequest) (service.QueryAttributeResponse, error) {
-		return attrMgr.GetQueryAttributesByKey(req), nil
+	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
+		return attrMgr.GetDataObjectsByKey(req), nil
 	})
 	if err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ func executeState(
 	state iwfidl.StateMovement,
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
-	attrMgr *AttributeManager,
+	attrMgr *PersistenceManager,
 	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
 	ao := ActivityOptions{
@@ -205,7 +205,7 @@ func executeState(
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.NextStateInput,
 			SearchAttributes: attrMgr.GetAllSearchAttributes(),
-			QueryAttributes:  attrMgr.GetAllQueryAttributes(),
+			QueryAttributes:  attrMgr.GetAllDataObjects(),
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
@@ -216,7 +216,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertQueryAttribute(startResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertDataObject(startResponse.GetUpsertQueryAttributes())
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +399,7 @@ func executeState(
 			CommandResults:       commandRes,
 			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),
 			SearchAttributes:     attrMgr.GetAllSearchAttributes(),
-			QueryAttributes:      attrMgr.GetAllQueryAttributes(),
+			QueryAttributes:      attrMgr.GetAllDataObjects(),
 			StateInput:           state.NextStateInput,
 		},
 	}).Get(ctx, &decideResponse)
@@ -412,7 +412,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertQueryAttribute(decideResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertDataObject(decideResponse.GetUpsertQueryAttributes())
 	if err != nil {
 		return nil, err
 	}
