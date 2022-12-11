@@ -16,7 +16,7 @@ import (
 
 // WorkflowGetDataObjectsResponse struct for WorkflowGetDataObjectsResponse
 type WorkflowGetDataObjectsResponse struct {
-	Keys []KeyValue `json:"keys,omitempty"`
+	Objects []KeyValue `json:"objects,omitempty"`
 }
 
 // NewWorkflowGetDataObjectsResponse instantiates a new WorkflowGetDataObjectsResponse object
@@ -36,42 +36,42 @@ func NewWorkflowGetDataObjectsResponseWithDefaults() *WorkflowGetDataObjectsResp
 	return &this
 }
 
-// GetKeys returns the Keys field value if set, zero value otherwise.
-func (o *WorkflowGetDataObjectsResponse) GetKeys() []KeyValue {
-	if o == nil || o.Keys == nil {
+// GetObjects returns the Objects field value if set, zero value otherwise.
+func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue {
+	if o == nil || o.Objects == nil {
 		var ret []KeyValue
 		return ret
 	}
-	return o.Keys
+	return o.Objects
 }
 
-// GetKeysOk returns a tuple with the Keys field value if set, nil otherwise
+// GetObjectsOk returns a tuple with the Objects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowGetDataObjectsResponse) GetKeysOk() ([]KeyValue, bool) {
-	if o == nil || o.Keys == nil {
+func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() ([]KeyValue, bool) {
+	if o == nil || o.Objects == nil {
 		return nil, false
 	}
-	return o.Keys, true
+	return o.Objects, true
 }
 
-// HasKeys returns a boolean if a field has been set.
-func (o *WorkflowGetDataObjectsResponse) HasKeys() bool {
-	if o != nil && o.Keys != nil {
+// HasObjects returns a boolean if a field has been set.
+func (o *WorkflowGetDataObjectsResponse) HasObjects() bool {
+	if o != nil && o.Objects != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetKeys gets a reference to the given []KeyValue and assigns it to the Keys field.
-func (o *WorkflowGetDataObjectsResponse) SetKeys(v []KeyValue) {
-	o.Keys = v
+// SetObjects gets a reference to the given []KeyValue and assigns it to the Objects field.
+func (o *WorkflowGetDataObjectsResponse) SetObjects(v []KeyValue) {
+	o.Objects = v
 }
 
 func (o WorkflowGetDataObjectsResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Keys != nil {
-		toSerialize["keys"] = o.Keys
+	if o.Objects != nil {
+		toSerialize["objects"] = o.Objects
 	}
 	return json.Marshal(toSerialize)
 }

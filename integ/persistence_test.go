@@ -69,7 +69,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	queryResult1, httpResp2, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			persistence.TestQueryAttributeKey,
+			persistence.TestDataObjectKey,
 		},
 	}).Execute()
 
@@ -161,12 +161,12 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 
 	expected := []iwfidl.KeyValue{
 		{
-			Key:   iwfidl.PtrString(persistence.TestQueryAttributeKey),
-			Value: &persistence.TestQueryVal2,
+			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
+			Value: &persistence.TestDataObjectVal2,
 		},
 	}
-	assertions.Equal(expected, queryResult2.GetDataObjects())
-	assertions.Equal(expected, queryResult1.GetDataObjects())
+	assertions.Equal(expected, queryResult2.GetObjects())
+	assertions.Equal(expected, queryResult1.GetObjects())
 
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
 		Key:          iwfidl.PtrString(persistence.TestSearchAttributeIntKey),

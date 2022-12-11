@@ -171,7 +171,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
-      summary: search for workflows by a search persistence query
+      summary: search for workflows by a search attribute query
   /api/v1/workflow/reset:
     post:
       requestBody:
@@ -532,7 +532,7 @@ components:
       type: object
     WorkflowGetDataObjectsResponse:
       example:
-        keys:
+        objects:
         - value:
             data: data
             encoding: encoding
@@ -542,7 +542,7 @@ components:
             encoding: encoding
           key: key
       properties:
-        keys:
+        objects:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array

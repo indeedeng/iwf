@@ -12,11 +12,11 @@ import (
 const (
 	EnableTestingSearchAttribute = true
 
-	WorkflowType               = "attribute"
-	State1                     = "S1"
-	State2                     = "S2"
-	TestQueryAttributeKey      = "test-query-attribute"
-	TestStateLocalAttributeKey = "test-state-local-attribute"
+	WorkflowType      = "persistence"
+	State1            = "S1"
+	State2            = "S2"
+	TestDataObjectKey = "test-data-object"
+	TestStateLocalKey = "test-state-local"
 
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
@@ -26,17 +26,17 @@ const (
 	TestSearchAttributeIntValue2     = 2
 )
 
-var TestQueryVal1 = iwfidl.EncodedObject{
+var TestDataObjectVal1 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-query-value1"),
+	Data:     iwfidl.PtrString("test-data-object-value1"),
 }
 
-var TestQueryVal2 = iwfidl.EncodedObject{
+var TestDataObjectVal2 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-query-value2"),
+	Data:     iwfidl.PtrString("test-data-object-value2"),
 }
 
-var testStateLocalAttributeVal = iwfidl.EncodedObject{
+var testStateLocalVal = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
 	Data:     iwfidl.PtrString("test-state-local-value"),
 }
@@ -85,17 +85,17 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
 				},
-				UpsertQueryAttributes: []iwfidl.KeyValue{
+				UpsertDataObjects: []iwfidl.KeyValue{
 					{
-						Key:   iwfidl.PtrString(TestQueryAttributeKey),
-						Value: &TestQueryVal1,
+						Key:   iwfidl.PtrString(TestDataObjectKey),
+						Value: &TestDataObjectVal1,
 					},
 				},
 				UpsertSearchAttributes: sa,
-				UpsertStateLocalAttributes: []iwfidl.KeyValue{
+				UpsertStateLocals: []iwfidl.KeyValue{
 					{
-						Key:   iwfidl.PtrString(TestStateLocalAttributeKey),
-						Value: &testStateLocalAttributeVal,
+						Key:   iwfidl.PtrString(TestStateLocalKey),
+						Value: &testStateLocalVal,
 					},
 				},
 			})
@@ -117,9 +117,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			h.invokeData["S2_start_intSaFounds"] = intSaFounds
 
 			queryAttFound := false
-			queryAtt := req.GetQueryAttributes()[0]
+			queryAtt := req.GetDataObjects()[0]
 			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal2.GetData() && value.GetEncoding() == TestQueryVal2.GetEncoding() {
+			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
 				queryAttFound = true
 			}
 			h.invokeData["S2_start_queryAttFound"] = queryAttFound
@@ -162,17 +162,17 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["S1_decide_intSaFounds"] = intSaFounds
 
 			queryAttFound := false
-			queryAtt := req.GetQueryAttributes()[0]
+			queryAtt := req.GetDataObjects()[0]
 			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal1.GetData() && value.GetEncoding() == TestQueryVal1.GetEncoding() {
+			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
 				queryAttFound = true
 			}
 			h.invokeData["S1_decide_queryAttFound"] = queryAttFound
 
 			localAttFound := false
-			localAtt := req.GetStateLocalAttributes()[0]
+			localAtt := req.GetStateLocals()[0]
 			value = localAtt.GetValue()
-			if localAtt.GetKey() == TestStateLocalAttributeKey && value.GetData() == testStateLocalAttributeVal.GetData() && value.GetEncoding() == testStateLocalAttributeVal.GetEncoding() {
+			if localAtt.GetKey() == TestStateLocalKey && value.GetData() == testStateLocalVal.GetData() && value.GetEncoding() == testStateLocalVal.GetEncoding() {
 				localAttFound = true
 			}
 			h.invokeData["S1_decide_localAttFound"] = localAttFound
@@ -201,10 +201,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 						},
 					},
 				},
-				UpsertQueryAttributes: []iwfidl.KeyValue{
+				UpsertDataObjects: []iwfidl.KeyValue{
 					{
-						Key:   iwfidl.PtrString(TestQueryAttributeKey),
-						Value: &TestQueryVal2,
+						Key:   iwfidl.PtrString(TestDataObjectKey),
+						Value: &TestDataObjectVal2,
 					},
 				},
 				UpsertSearchAttributes: sa,
@@ -226,9 +226,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["S2_decide_intSaFounds"] = intSaFounds
 
 			queryAttFound := false
-			queryAtt := req.GetQueryAttributes()[0]
+			queryAtt := req.GetDataObjects()[0]
 			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestQueryAttributeKey && value.GetData() == TestQueryVal2.GetData() && value.GetEncoding() == TestQueryVal2.GetEncoding() {
+			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
 				queryAttFound = true
 			}
 			h.invokeData["S2_decide_queryAttFound"] = queryAttFound

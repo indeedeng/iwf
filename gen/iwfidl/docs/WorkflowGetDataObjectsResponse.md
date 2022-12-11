@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Keys** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**Objects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 
 ## Methods
 
@@ -25,30 +25,30 @@ NewWorkflowGetDataObjectsResponseWithDefaults instantiates a new WorkflowGetData
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetKeys
+### GetObjects
 
-`func (o *WorkflowGetDataObjectsResponse) GetKeys() []KeyValue`
+`func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue`
 
-GetKeys returns the Keys field if non-nil, zero value otherwise.
+GetObjects returns the Objects field if non-nil, zero value otherwise.
 
-### GetKeysOk
+### GetObjectsOk
 
-`func (o *WorkflowGetDataObjectsResponse) GetKeysOk() (*[]KeyValue, bool)`
+`func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() (*[]KeyValue, bool)`
 
-GetKeysOk returns a tuple with the Keys field if it's non-nil, zero value otherwise
+GetObjectsOk returns a tuple with the Objects field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetKeys
+### SetObjects
 
-`func (o *WorkflowGetDataObjectsResponse) SetKeys(v []KeyValue)`
+`func (o *WorkflowGetDataObjectsResponse) SetObjects(v []KeyValue)`
 
-SetKeys sets Keys field to given value.
+SetObjects sets Objects field to given value.
 
-### HasKeys
+### HasObjects
 
-`func (o *WorkflowGetDataObjectsResponse) HasKeys() bool`
+`func (o *WorkflowGetDataObjectsResponse) HasObjects() bool`
 
-HasKeys returns a boolean if a field has been set.
+HasObjects returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
