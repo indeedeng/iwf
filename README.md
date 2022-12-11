@@ -17,6 +17,15 @@ Related projects:
 * [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk), WIP, Contribution is welcome.
 * More SDKs? Contribution is welcome.
 
+## Community & Help
+* [Github Discussion](https://github.com/indeedeng/iwf/discussions)
+  * Best for Q&A, support/help, general discusion, and annoucement 
+* [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
+  * Best for Q&A and general discusion
+* [Github Issues](https://github.com/indeedeng/iwf/issues)
+  * Best for reporting bugs and feature requests
+* For any questions & consultant email to: qlong.seattle@gmail.com
+  
 # Table of contents
 
 - [Why you would need iWF](#why-you-would-need-iwf)
