@@ -204,8 +204,8 @@ func executeState(
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.NextStateInput,
-			SearchAttributes: attrMgr.GetAllSearchAttributes(),
-			QueryAttributes:  attrMgr.GetAllDataObjects(),
+			SearchAttributes: attrMgr.GetAllSearchAttributes(), // TODO support more loading policy
+			DataObjects:      attrMgr.GetAllDataObjects(),      // TODO support more loading policy
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
@@ -216,7 +216,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertDataObject(startResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}
@@ -393,14 +393,14 @@ func executeState(
 	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
-			Context:              exeCtx,
-			WorkflowType:         execution.WorkflowType,
-			WorkflowStateId:      state.StateId,
-			CommandResults:       commandRes,
-			StateLocalAttributes: startResponse.GetUpsertStateLocalAttributes(),
-			SearchAttributes:     attrMgr.GetAllSearchAttributes(),
-			QueryAttributes:      attrMgr.GetAllDataObjects(),
-			StateInput:           state.NextStateInput,
+			Context:          exeCtx,
+			WorkflowType:     execution.WorkflowType,
+			WorkflowStateId:  state.StateId,
+			CommandResults:   commandRes,
+			StateLocals:      startResponse.GetUpsertStateLocals(),
+			SearchAttributes: attrMgr.GetAllSearchAttributes(), // TODO support more loading policy
+			DataObjects:      attrMgr.GetAllDataObjects(),      // TODO support more loading policy
+			StateInput:       state.NextStateInput,
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {
@@ -412,7 +412,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertDataObject(decideResponse.GetUpsertQueryAttributes())
+	err = attrMgr.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}

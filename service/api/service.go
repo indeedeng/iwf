@@ -91,7 +91,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGet
 	}
 
 	return &iwfidl.WorkflowGetQueryAttributesResponse{
-		QueryAttributes: queryResult1.AttributeValues,
+		QueryAttributes: queryResult1.DataObjects,
 	}, nil
 }
 

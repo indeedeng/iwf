@@ -44,6 +44,6 @@ type (
 	}
 
 	GetDataObjectsQueryResponse struct {
-		AttributeValues []iwfidl.KeyValue
+		DataObjects []iwfidl.KeyValue
 	}
 )

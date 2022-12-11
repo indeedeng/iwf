@@ -36,7 +36,7 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 		}
 	}
 	return service.GetDataObjectsQueryResponse{
-		AttributeValues: res,
+		DataObjects: res,
 	}
 }
 
