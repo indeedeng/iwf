@@ -7,7 +7,6 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
-	"math"
 	"regexp"
 	"strconv"
 	"time"
@@ -18,8 +17,7 @@ func getResetIDsByType(
 	resetType service.ResetType,
 	domain, wid, rid string,
 	frontendClient workflowserviceclient.Interface,
-	binCheckSum, earliestTimeStr string,
-	historyEventId, decisionOffset int32,
+	historyEventId int32, earliestHistoryTimeStr string,
 ) (resetBaseRunID string, decisionFinishID int64, err error) {
 	// default to the same runID
 	resetBaseRunID = rid
@@ -28,30 +26,14 @@ func getResetIDsByType(
 	case service.ResetTypeHistoryEventId:
 		decisionFinishID = int64(historyEventId)
 		return
-	case service.ResetTypeLastDecisionCompleted:
-		decisionFinishID, err = getLastDecisionTaskByType(ctx, domain, wid, rid, frontendClient, shared.EventTypeDecisionTaskCompleted, int(decisionOffset))
-		if err != nil {
-			return
-		}
-	case service.ResetTypeLastContinuedAsNew:
-		// this reset type may change the base runID
-		resetBaseRunID, decisionFinishID, err = getLastContinueAsNewID(ctx, domain, wid, rid, frontendClient)
-		if err != nil {
-			return
-		}
 	case service.ResetTypeBeginning:
 		decisionFinishID, err = getFirstDecisionTaskByType(ctx, domain, wid, rid, frontendClient, shared.EventTypeDecisionTaskCompleted)
 		if err != nil {
 			return
 		}
-	case service.ResetTypeBadBinary:
-		decisionFinishID, err = getBadDecisionCompletedID(ctx, domain, wid, rid, binCheckSum, frontendClient)
-		if err != nil {
-			return
-		}
-	case service.ResetTypeDecisionCompletedTime:
+	case service.ResetTypeHistoryEventTime:
 		var earliestTime int64
-		earliestTime, err = parseTime(earliestTimeStr)
+		earliestTime, err = parseTime(earliestHistoryTimeStr)
 		if err != nil {
 			return
 		}
@@ -59,20 +41,6 @@ func getResetIDsByType(
 		if err != nil {
 			return
 		}
-	case service.ResetTypeFirstDecisionScheduled:
-		decisionFinishID, err = getFirstDecisionTaskByType(ctx, domain, wid, rid, frontendClient, shared.EventTypeDecisionTaskScheduled)
-		if err != nil {
-			return
-		}
-		// decisionFinishID is exclusive in reset API
-		decisionFinishID++
-	case service.ResetTypeLastDecisionScheduled:
-		decisionFinishID, err = getLastDecisionTaskByType(ctx, domain, wid, rid, frontendClient, shared.EventTypeDecisionTaskScheduled, int(decisionOffset))
-		if err != nil {
-			return
-		}
-		// decisionFinishID is exclusive in reset API
-		decisionFinishID++
 	default:
 		err = fmt.Errorf("not supported resetType")
 	}
@@ -119,150 +87,6 @@ func getFirstDecisionTaskByType(
 	}
 	if decisionFinishID == 0 {
 		return 0, composeErrorWithMessage("Get DecisionFinishID failed", fmt.Errorf("no DecisionFinishID"))
-	}
-	return
-}
-
-func getCurrentRunID(ctx context.Context, domain, wid string, frontendClient workflowserviceclient.Interface) (string, error) {
-	resp, err := frontendClient.DescribeWorkflowExecution(ctx, &shared.DescribeWorkflowExecutionRequest{
-		Domain: &domain,
-		Execution: &shared.WorkflowExecution{
-			WorkflowId: &wid,
-		},
-	})
-	if err != nil {
-		return "", err
-	}
-	return resp.WorkflowExecutionInfo.Execution.GetRunId(), nil
-}
-
-func getBadDecisionCompletedID(ctx context.Context, domain, wid, rid, binChecksum string, frontendClient workflowserviceclient.Interface) (decisionFinishID int64, err error) {
-	resp, err := frontendClient.DescribeWorkflowExecution(ctx, &shared.DescribeWorkflowExecutionRequest{
-		Domain: &domain,
-		Execution: &shared.WorkflowExecution{
-			WorkflowId: &wid,
-			RunId:      &rid,
-		},
-	})
-	if err != nil {
-		return 0, composeErrorWithMessage("DescribeWorkflowExecution failed", err)
-	}
-
-	_, p := findAutoResetPoint(&shared.BadBinaries{
-		Binaries: map[string]*shared.BadBinaryInfo{
-			binChecksum: {},
-		},
-	}, resp.WorkflowExecutionInfo.AutoResetPoints)
-	if p != nil {
-		decisionFinishID = p.GetFirstDecisionCompletedId()
-	}
-
-	if decisionFinishID == 0 {
-		return 0, composeErrorWithMessage("Get DecisionFinishID failed", &shared.BadRequestError{Message: "no DecisionFinishID"})
-	}
-	return
-}
-
-func getLastDecisionTaskByType(
-	ctx context.Context,
-	domain string,
-	workflowID string,
-	runID string,
-	frontendClient workflowserviceclient.Interface,
-	decisionType shared.EventType,
-	decisionOffset int,
-) (int64, error) {
-
-	// this fixedSizeQueue is for remembering the offset decision eventID
-	fixedSizeQueue := make([]int64, 0)
-	size := int(math.Abs(float64(decisionOffset))) + 1
-
-	req := &shared.GetWorkflowExecutionHistoryRequest{
-		Domain: &domain,
-		Execution: &shared.WorkflowExecution{
-			WorkflowId: &workflowID,
-			RunId:      &runID,
-		},
-		MaximumPageSize: iwfidl.PtrInt32(1000),
-		NextPageToken:   nil,
-	}
-
-	for {
-		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
-		if err != nil {
-			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
-		}
-
-		for _, e := range resp.GetHistory().GetEvents() {
-			if e.GetEventType() == decisionType {
-				decisionEventID := e.GetEventId()
-				fixedSizeQueue = append(fixedSizeQueue, decisionEventID)
-				if len(fixedSizeQueue) > size {
-					fixedSizeQueue = fixedSizeQueue[1:]
-				}
-			}
-		}
-
-		if len(resp.NextPageToken) != 0 {
-			req.NextPageToken = resp.NextPageToken
-		} else {
-			break
-		}
-	}
-	if len(fixedSizeQueue) == 0 {
-		return 0, composeErrorWithMessage("Get DecisionFinishID failed", fmt.Errorf("no DecisionFinishID"))
-	}
-	return fixedSizeQueue[0], nil
-}
-
-func getLastContinueAsNewID(ctx context.Context, domain, wid, rid string, frontendClient workflowserviceclient.Interface) (resetBaseRunID string, decisionFinishID int64, err error) {
-	// get first event
-	req := &shared.GetWorkflowExecutionHistoryRequest{
-		Domain: &domain,
-		Execution: &shared.WorkflowExecution{
-			WorkflowId: &wid,
-			RunId:      &rid,
-		},
-		MaximumPageSize: iwfidl.PtrInt32(1),
-		NextPageToken:   nil,
-	}
-	resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
-	if err != nil {
-		return "", 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
-	}
-	firstEvent := resp.History.Events[0]
-	resetBaseRunID = firstEvent.GetWorkflowExecutionStartedEventAttributes().GetContinuedExecutionRunId()
-	if resetBaseRunID == "" {
-		return "", 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", fmt.Errorf("cannot get resetBaseRunID"))
-	}
-
-	req = &shared.GetWorkflowExecutionHistoryRequest{
-		Domain: &domain,
-		Execution: &shared.WorkflowExecution{
-			WorkflowId: &wid,
-			RunId:      &resetBaseRunID,
-		},
-		MaximumPageSize: iwfidl.PtrInt32(1000),
-		NextPageToken:   nil,
-	}
-	for {
-		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
-		if err != nil {
-			return "", 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
-		}
-		for _, e := range resp.GetHistory().GetEvents() {
-			if e.GetEventType() == shared.EventTypeDecisionTaskCompleted {
-				decisionFinishID = e.GetEventId()
-			}
-		}
-		if len(resp.NextPageToken) != 0 {
-			req.NextPageToken = resp.NextPageToken
-		} else {
-			break
-		}
-	}
-	if decisionFinishID == 0 {
-		return "", 0, composeErrorWithMessage("Get DecisionFinishID failed", fmt.Errorf("no DecisionFinishID"))
 	}
 	return
 }
@@ -443,25 +267,4 @@ func parseTimeDuration(duration string) (dur time.Duration, err error) {
 func composeErrorWithMessage(msg string, err error) error {
 	err = fmt.Errorf("%v, %v", msg, err)
 	return err
-}
-
-func findAutoResetPoint(
-	badBinaries *shared.BadBinaries,
-	autoResetPoints *shared.ResetPoints,
-) (string, *shared.ResetPointInfo) {
-	if badBinaries == nil || badBinaries.Binaries == nil || autoResetPoints == nil || autoResetPoints.Points == nil {
-		return "", nil
-	}
-	nowNano := time.Now().UnixNano()
-	for _, p := range autoResetPoints.Points {
-		bin, ok := badBinaries.Binaries[p.GetBinaryChecksum()]
-		if ok && p.GetResettable() {
-			if p.GetExpiringTimeNano() > 0 && nowNano > p.GetExpiringTimeNano() {
-				// reset point has expired and we may already deleted the history
-				continue
-			}
-			return bin.GetReason(), p
-		}
-	}
-	return "", nil
 }

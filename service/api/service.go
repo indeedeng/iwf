@@ -70,7 +70,7 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(req iwfidl.WorkflowSignalRequest) 
 	return nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowCancelPost(req iwfidl.WorkflowCancelRequest) *ErrorAndStatus {
+func (s *serviceImpl) ApiV1WorkflowStopPost(req iwfidl.WorkflowStopRequest) *ErrorAndStatus {
 	err := s.client.CancelWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
 	if err != nil {
 		return s.handleError(err)
@@ -78,20 +78,20 @@ func (s *serviceImpl) ApiV1WorkflowCancelPost(req iwfidl.WorkflowCancelRequest) 
 	return nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGetQueryAttributesRequest) (*iwfidl.WorkflowGetQueryAttributesResponse, *ErrorAndStatus) {
+func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *ErrorAndStatus) {
 	var queryResult1 service.GetDataObjectsQueryResponse
 	err := s.client.QueryWorkflow(context.Background(), &queryResult1,
 		req.GetWorkflowId(), req.GetWorkflowRunId(), service.GetDataObjectsWorkflowQueryType,
 		service.GetDataObjectsQueryRequest{
-			Keys: req.AttributeKeys,
+			Keys: req.Keys,
 		})
 
 	if err != nil {
 		return nil, s.handleError(err)
 	}
 
-	return &iwfidl.WorkflowGetQueryAttributesResponse{
-		QueryAttributes: queryResult1.DataObjects,
+	return &iwfidl.WorkflowGetDataObjectsResponse{
+		Keys: queryResult1.DataObjects,
 	}, nil
 }
 
@@ -102,7 +102,7 @@ func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(req iwfidl.WorkflowGe
 	}
 
 	searchAttributes := []iwfidl.SearchAttribute{}
-	for _, v := range req.AttributeKeys {
+	for _, v := range req.Keys {
 		searchAttribute, exist := response.SearchAttributes[*v.Key]
 		if exist {
 			searchAttributes = append(searchAttributes, searchAttribute)

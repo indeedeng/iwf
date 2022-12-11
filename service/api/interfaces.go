@@ -10,8 +10,8 @@ import (
 type ApiService interface {
 	ApiV1WorkflowStartPost(request iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus)
 	ApiV1WorkflowSignalPost(request iwfidl.WorkflowSignalRequest) *ErrorAndStatus
-	ApiV1WorkflowCancelPost(request iwfidl.WorkflowCancelRequest) *ErrorAndStatus
-	ApiV1WorkflowGetQueryAttributesPost(request iwfidl.WorkflowGetQueryAttributesRequest) (*iwfidl.WorkflowGetQueryAttributesResponse, *ErrorAndStatus)
+	ApiV1WorkflowStopPost(request iwfidl.WorkflowStopRequest) *ErrorAndStatus
+	ApiV1WorkflowGetQueryAttributesPost(request iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *ErrorAndStatus)
 	ApiV1WorkflowGetSearchAttributesPost(request iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus)
 	ApiV1WorkflowGetPost(request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
 	ApiV1WorkflowGetWithWaitPost(request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)

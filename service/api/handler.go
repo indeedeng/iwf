@@ -68,15 +68,15 @@ func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 	return
 }
 
-func (h *handler) apiV1WorkflowCancel(c *gin.Context) {
-	var req iwfidl.WorkflowCancelRequest
+func (h *handler) apiV1WorkflowStop(c *gin.Context) {
+	var req iwfidl.WorkflowStopRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	log.Println("received API request", req)
 
-	errResp := h.svc.ApiV1WorkflowCancelPost(req)
+	errResp := h.svc.ApiV1WorkflowStopPost(req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -102,8 +102,8 @@ func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	return
 }
 
-func (h *handler) apiV1WorkflowGetQueryAttributes(c *gin.Context) {
-	var req iwfidl.WorkflowGetQueryAttributesRequest
+func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
+	var req iwfidl.WorkflowGetDataObjectsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
