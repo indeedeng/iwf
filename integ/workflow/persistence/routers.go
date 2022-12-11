@@ -1,4 +1,4 @@
-package attribute
+package persistence
 
 import (
 	"github.com/gin-gonic/gin"

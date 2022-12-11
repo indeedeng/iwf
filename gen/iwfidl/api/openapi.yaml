@@ -171,7 +171,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
-      summary: search for workflows by a search attribute query
+      summary: search for workflows by a search persistence query
   /api/v1/workflow/reset:
     post:
       requestBody:
