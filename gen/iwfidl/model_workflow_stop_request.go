@@ -14,33 +14,34 @@ import (
 	"encoding/json"
 )
 
-// WorkflowCancelRequest struct for WorkflowCancelRequest
-type WorkflowCancelRequest struct {
+// WorkflowStopRequest struct for WorkflowStopRequest
+type WorkflowStopRequest struct {
 	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
+	StopType *string `json:"stopType,omitempty"`
 }
 
-// NewWorkflowCancelRequest instantiates a new WorkflowCancelRequest object
+// NewWorkflowStopRequest instantiates a new WorkflowStopRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowCancelRequest(workflowId string) *WorkflowCancelRequest {
-	this := WorkflowCancelRequest{}
+func NewWorkflowStopRequest(workflowId string) *WorkflowStopRequest {
+	this := WorkflowStopRequest{}
 	this.WorkflowId = workflowId
 	return &this
 }
 
-// NewWorkflowCancelRequestWithDefaults instantiates a new WorkflowCancelRequest object
+// NewWorkflowStopRequestWithDefaults instantiates a new WorkflowStopRequest object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewWorkflowCancelRequestWithDefaults() *WorkflowCancelRequest {
-	this := WorkflowCancelRequest{}
+func NewWorkflowStopRequestWithDefaults() *WorkflowStopRequest {
+	this := WorkflowStopRequest{}
 	return &this
 }
 
 // GetWorkflowId returns the WorkflowId field value
-func (o *WorkflowCancelRequest) GetWorkflowId() string {
+func (o *WorkflowStopRequest) GetWorkflowId() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -51,7 +52,7 @@ func (o *WorkflowCancelRequest) GetWorkflowId() string {
 
 // GetWorkflowIdOk returns a tuple with the WorkflowId field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowCancelRequest) GetWorkflowIdOk() (*string, bool) {
+func (o *WorkflowStopRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -59,12 +60,12 @@ func (o *WorkflowCancelRequest) GetWorkflowIdOk() (*string, bool) {
 }
 
 // SetWorkflowId sets field value
-func (o *WorkflowCancelRequest) SetWorkflowId(v string) {
+func (o *WorkflowStopRequest) SetWorkflowId(v string) {
 	o.WorkflowId = v
 }
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
-func (o *WorkflowCancelRequest) GetWorkflowRunId() string {
+func (o *WorkflowStopRequest) GetWorkflowRunId() string {
 	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
@@ -74,7 +75,7 @@ func (o *WorkflowCancelRequest) GetWorkflowRunId() string {
 
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowCancelRequest) GetWorkflowRunIdOk() (*string, bool) {
+func (o *WorkflowStopRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
@@ -82,7 +83,7 @@ func (o *WorkflowCancelRequest) GetWorkflowRunIdOk() (*string, bool) {
 }
 
 // HasWorkflowRunId returns a boolean if a field has been set.
-func (o *WorkflowCancelRequest) HasWorkflowRunId() bool {
+func (o *WorkflowStopRequest) HasWorkflowRunId() bool {
 	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
@@ -91,12 +92,12 @@ func (o *WorkflowCancelRequest) HasWorkflowRunId() bool {
 }
 
 // SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
-func (o *WorkflowCancelRequest) SetWorkflowRunId(v string) {
+func (o *WorkflowStopRequest) SetWorkflowRunId(v string) {
 	o.WorkflowRunId = &v
 }
 
 // GetReason returns the Reason field value if set, zero value otherwise.
-func (o *WorkflowCancelRequest) GetReason() string {
+func (o *WorkflowStopRequest) GetReason() string {
 	if o == nil || o.Reason == nil {
 		var ret string
 		return ret
@@ -106,7 +107,7 @@ func (o *WorkflowCancelRequest) GetReason() string {
 
 // GetReasonOk returns a tuple with the Reason field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowCancelRequest) GetReasonOk() (*string, bool) {
+func (o *WorkflowStopRequest) GetReasonOk() (*string, bool) {
 	if o == nil || o.Reason == nil {
 		return nil, false
 	}
@@ -114,7 +115,7 @@ func (o *WorkflowCancelRequest) GetReasonOk() (*string, bool) {
 }
 
 // HasReason returns a boolean if a field has been set.
-func (o *WorkflowCancelRequest) HasReason() bool {
+func (o *WorkflowStopRequest) HasReason() bool {
 	if o != nil && o.Reason != nil {
 		return true
 	}
@@ -123,11 +124,43 @@ func (o *WorkflowCancelRequest) HasReason() bool {
 }
 
 // SetReason gets a reference to the given string and assigns it to the Reason field.
-func (o *WorkflowCancelRequest) SetReason(v string) {
+func (o *WorkflowStopRequest) SetReason(v string) {
 	o.Reason = &v
 }
 
-func (o WorkflowCancelRequest) MarshalJSON() ([]byte, error) {
+// GetStopType returns the StopType field value if set, zero value otherwise.
+func (o *WorkflowStopRequest) GetStopType() string {
+	if o == nil || o.StopType == nil {
+		var ret string
+		return ret
+	}
+	return *o.StopType
+}
+
+// GetStopTypeOk returns a tuple with the StopType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStopRequest) GetStopTypeOk() (*string, bool) {
+	if o == nil || o.StopType == nil {
+		return nil, false
+	}
+	return o.StopType, true
+}
+
+// HasStopType returns a boolean if a field has been set.
+func (o *WorkflowStopRequest) HasStopType() bool {
+	if o != nil && o.StopType != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStopType gets a reference to the given string and assigns it to the StopType field.
+func (o *WorkflowStopRequest) SetStopType(v string) {
+	o.StopType = &v
+}
+
+func (o WorkflowStopRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
@@ -138,41 +171,44 @@ func (o WorkflowCancelRequest) MarshalJSON() ([]byte, error) {
 	if o.Reason != nil {
 		toSerialize["reason"] = o.Reason
 	}
+	if o.StopType != nil {
+		toSerialize["stopType"] = o.StopType
+	}
 	return json.Marshal(toSerialize)
 }
 
-type NullableWorkflowCancelRequest struct {
-	value *WorkflowCancelRequest
+type NullableWorkflowStopRequest struct {
+	value *WorkflowStopRequest
 	isSet bool
 }
 
-func (v NullableWorkflowCancelRequest) Get() *WorkflowCancelRequest {
+func (v NullableWorkflowStopRequest) Get() *WorkflowStopRequest {
 	return v.value
 }
 
-func (v *NullableWorkflowCancelRequest) Set(val *WorkflowCancelRequest) {
+func (v *NullableWorkflowStopRequest) Set(val *WorkflowStopRequest) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableWorkflowCancelRequest) IsSet() bool {
+func (v NullableWorkflowStopRequest) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableWorkflowCancelRequest) Unset() {
+func (v *NullableWorkflowStopRequest) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableWorkflowCancelRequest(val *WorkflowCancelRequest) *NullableWorkflowCancelRequest {
-	return &NullableWorkflowCancelRequest{value: val, isSet: true}
+func NewNullableWorkflowStopRequest(val *WorkflowStopRequest) *NullableWorkflowStopRequest {
+	return &NullableWorkflowStopRequest{value: val, isSet: true}
 }
 
-func (v NullableWorkflowCancelRequest) MarshalJSON() ([]byte, error) {
+func (v NullableWorkflowStopRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableWorkflowCancelRequest) UnmarshalJSON(src []byte) error {
+func (v *NullableWorkflowStopRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

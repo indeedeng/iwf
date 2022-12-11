@@ -17,9 +17,9 @@ import (
 // WorkflowStateStartResponse struct for WorkflowStateStartResponse
 type WorkflowStateStartResponse struct {
 	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
-	UpsertQueryAttributes []KeyValue `json:"upsertQueryAttributes,omitempty"`
+	UpsertDataObjects []KeyValue `json:"upsertDataObjects,omitempty"`
 	CommandRequest *CommandRequest `json:"commandRequest,omitempty"`
-	UpsertStateLocalAttributes []KeyValue `json:"upsertStateLocalAttributes,omitempty"`
+	UpsertStateLocals []KeyValue `json:"upsertStateLocals,omitempty"`
 	RecordEvents []KeyValue `json:"recordEvents,omitempty"`
 	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
 }
@@ -73,36 +73,36 @@ func (o *WorkflowStateStartResponse) SetUpsertSearchAttributes(v []SearchAttribu
 	o.UpsertSearchAttributes = v
 }
 
-// GetUpsertQueryAttributes returns the UpsertQueryAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartResponse) GetUpsertQueryAttributes() []KeyValue {
-	if o == nil || o.UpsertQueryAttributes == nil {
+// GetUpsertDataObjects returns the UpsertDataObjects field value if set, zero value otherwise.
+func (o *WorkflowStateStartResponse) GetUpsertDataObjects() []KeyValue {
+	if o == nil || o.UpsertDataObjects == nil {
 		var ret []KeyValue
 		return ret
 	}
-	return o.UpsertQueryAttributes
+	return o.UpsertDataObjects
 }
 
-// GetUpsertQueryAttributesOk returns a tuple with the UpsertQueryAttributes field value if set, nil otherwise
+// GetUpsertDataObjectsOk returns a tuple with the UpsertDataObjects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateStartResponse) GetUpsertQueryAttributesOk() ([]KeyValue, bool) {
-	if o == nil || o.UpsertQueryAttributes == nil {
+func (o *WorkflowStateStartResponse) GetUpsertDataObjectsOk() ([]KeyValue, bool) {
+	if o == nil || o.UpsertDataObjects == nil {
 		return nil, false
 	}
-	return o.UpsertQueryAttributes, true
+	return o.UpsertDataObjects, true
 }
 
-// HasUpsertQueryAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateStartResponse) HasUpsertQueryAttributes() bool {
-	if o != nil && o.UpsertQueryAttributes != nil {
+// HasUpsertDataObjects returns a boolean if a field has been set.
+func (o *WorkflowStateStartResponse) HasUpsertDataObjects() bool {
+	if o != nil && o.UpsertDataObjects != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetUpsertQueryAttributes gets a reference to the given []KeyValue and assigns it to the UpsertQueryAttributes field.
-func (o *WorkflowStateStartResponse) SetUpsertQueryAttributes(v []KeyValue) {
-	o.UpsertQueryAttributes = v
+// SetUpsertDataObjects gets a reference to the given []KeyValue and assigns it to the UpsertDataObjects field.
+func (o *WorkflowStateStartResponse) SetUpsertDataObjects(v []KeyValue) {
+	o.UpsertDataObjects = v
 }
 
 // GetCommandRequest returns the CommandRequest field value if set, zero value otherwise.
@@ -137,36 +137,36 @@ func (o *WorkflowStateStartResponse) SetCommandRequest(v CommandRequest) {
 	o.CommandRequest = &v
 }
 
-// GetUpsertStateLocalAttributes returns the UpsertStateLocalAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartResponse) GetUpsertStateLocalAttributes() []KeyValue {
-	if o == nil || o.UpsertStateLocalAttributes == nil {
+// GetUpsertStateLocals returns the UpsertStateLocals field value if set, zero value otherwise.
+func (o *WorkflowStateStartResponse) GetUpsertStateLocals() []KeyValue {
+	if o == nil || o.UpsertStateLocals == nil {
 		var ret []KeyValue
 		return ret
 	}
-	return o.UpsertStateLocalAttributes
+	return o.UpsertStateLocals
 }
 
-// GetUpsertStateLocalAttributesOk returns a tuple with the UpsertStateLocalAttributes field value if set, nil otherwise
+// GetUpsertStateLocalsOk returns a tuple with the UpsertStateLocals field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateStartResponse) GetUpsertStateLocalAttributesOk() ([]KeyValue, bool) {
-	if o == nil || o.UpsertStateLocalAttributes == nil {
+func (o *WorkflowStateStartResponse) GetUpsertStateLocalsOk() ([]KeyValue, bool) {
+	if o == nil || o.UpsertStateLocals == nil {
 		return nil, false
 	}
-	return o.UpsertStateLocalAttributes, true
+	return o.UpsertStateLocals, true
 }
 
-// HasUpsertStateLocalAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateStartResponse) HasUpsertStateLocalAttributes() bool {
-	if o != nil && o.UpsertStateLocalAttributes != nil {
+// HasUpsertStateLocals returns a boolean if a field has been set.
+func (o *WorkflowStateStartResponse) HasUpsertStateLocals() bool {
+	if o != nil && o.UpsertStateLocals != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetUpsertStateLocalAttributes gets a reference to the given []KeyValue and assigns it to the UpsertStateLocalAttributes field.
-func (o *WorkflowStateStartResponse) SetUpsertStateLocalAttributes(v []KeyValue) {
-	o.UpsertStateLocalAttributes = v
+// SetUpsertStateLocals gets a reference to the given []KeyValue and assigns it to the UpsertStateLocals field.
+func (o *WorkflowStateStartResponse) SetUpsertStateLocals(v []KeyValue) {
+	o.UpsertStateLocals = v
 }
 
 // GetRecordEvents returns the RecordEvents field value if set, zero value otherwise.
@@ -238,14 +238,14 @@ func (o WorkflowStateStartResponse) MarshalJSON() ([]byte, error) {
 	if o.UpsertSearchAttributes != nil {
 		toSerialize["upsertSearchAttributes"] = o.UpsertSearchAttributes
 	}
-	if o.UpsertQueryAttributes != nil {
-		toSerialize["upsertQueryAttributes"] = o.UpsertQueryAttributes
+	if o.UpsertDataObjects != nil {
+		toSerialize["upsertDataObjects"] = o.UpsertDataObjects
 	}
 	if o.CommandRequest != nil {
 		toSerialize["commandRequest"] = o.CommandRequest
 	}
-	if o.UpsertStateLocalAttributes != nil {
-		toSerialize["upsertStateLocalAttributes"] = o.UpsertStateLocalAttributes
+	if o.UpsertStateLocals != nil {
+		toSerialize["upsertStateLocals"] = o.UpsertStateLocals
 	}
 	if o.RecordEvents != nil {
 		toSerialize["recordEvents"] = o.RecordEvents

@@ -9,8 +9,8 @@ Name | Type | Description | Notes
 **WorkflowStateId** | **string** |  | 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
-**QueryAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
-**StateLocalAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**DataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**StateLocals** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandResults** | Pointer to [**CommandResults**](CommandResults.md) |  | [optional] 
 
 ## Methods
@@ -142,55 +142,55 @@ SetSearchAttributes sets SearchAttributes field to given value.
 
 HasSearchAttributes returns a boolean if a field has been set.
 
-### GetQueryAttributes
+### GetDataObjects
 
-`func (o *WorkflowStateDecideRequest) GetQueryAttributes() []KeyValue`
+`func (o *WorkflowStateDecideRequest) GetDataObjects() []KeyValue`
 
-GetQueryAttributes returns the QueryAttributes field if non-nil, zero value otherwise.
+GetDataObjects returns the DataObjects field if non-nil, zero value otherwise.
 
-### GetQueryAttributesOk
+### GetDataObjectsOk
 
-`func (o *WorkflowStateDecideRequest) GetQueryAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateDecideRequest) GetDataObjectsOk() (*[]KeyValue, bool)`
 
-GetQueryAttributesOk returns a tuple with the QueryAttributes field if it's non-nil, zero value otherwise
+GetDataObjectsOk returns a tuple with the DataObjects field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetQueryAttributes
+### SetDataObjects
 
-`func (o *WorkflowStateDecideRequest) SetQueryAttributes(v []KeyValue)`
+`func (o *WorkflowStateDecideRequest) SetDataObjects(v []KeyValue)`
 
-SetQueryAttributes sets QueryAttributes field to given value.
+SetDataObjects sets DataObjects field to given value.
 
-### HasQueryAttributes
+### HasDataObjects
 
-`func (o *WorkflowStateDecideRequest) HasQueryAttributes() bool`
+`func (o *WorkflowStateDecideRequest) HasDataObjects() bool`
 
-HasQueryAttributes returns a boolean if a field has been set.
+HasDataObjects returns a boolean if a field has been set.
 
-### GetStateLocalAttributes
+### GetStateLocals
 
-`func (o *WorkflowStateDecideRequest) GetStateLocalAttributes() []KeyValue`
+`func (o *WorkflowStateDecideRequest) GetStateLocals() []KeyValue`
 
-GetStateLocalAttributes returns the StateLocalAttributes field if non-nil, zero value otherwise.
+GetStateLocals returns the StateLocals field if non-nil, zero value otherwise.
 
-### GetStateLocalAttributesOk
+### GetStateLocalsOk
 
-`func (o *WorkflowStateDecideRequest) GetStateLocalAttributesOk() (*[]KeyValue, bool)`
+`func (o *WorkflowStateDecideRequest) GetStateLocalsOk() (*[]KeyValue, bool)`
 
-GetStateLocalAttributesOk returns a tuple with the StateLocalAttributes field if it's non-nil, zero value otherwise
+GetStateLocalsOk returns a tuple with the StateLocals field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetStateLocalAttributes
+### SetStateLocals
 
-`func (o *WorkflowStateDecideRequest) SetStateLocalAttributes(v []KeyValue)`
+`func (o *WorkflowStateDecideRequest) SetStateLocals(v []KeyValue)`
 
-SetStateLocalAttributes sets StateLocalAttributes field to given value.
+SetStateLocals sets StateLocals field to given value.
 
-### HasStateLocalAttributes
+### HasStateLocals
 
-`func (o *WorkflowStateDecideRequest) HasStateLocalAttributes() bool`
+`func (o *WorkflowStateDecideRequest) HasStateLocals() bool`
 
-HasStateLocalAttributes returns a boolean if a field has been set.
+HasStateLocals returns a boolean if a field has been set.
 
 ### GetCommandResults
 

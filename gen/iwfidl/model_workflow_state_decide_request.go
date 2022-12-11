@@ -21,8 +21,8 @@ type WorkflowStateDecideRequest struct {
 	WorkflowStateId string `json:"workflowStateId"`
 	StateInput *EncodedObject `json:"stateInput,omitempty"`
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
-	QueryAttributes []KeyValue `json:"queryAttributes,omitempty"`
-	StateLocalAttributes []KeyValue `json:"stateLocalAttributes,omitempty"`
+	DataObjects []KeyValue `json:"DataObjects,omitempty"`
+	StateLocals []KeyValue `json:"stateLocals,omitempty"`
 	CommandResults *CommandResults `json:"commandResults,omitempty"`
 }
 
@@ -182,68 +182,68 @@ func (o *WorkflowStateDecideRequest) SetSearchAttributes(v []SearchAttribute) {
 	o.SearchAttributes = v
 }
 
-// GetQueryAttributes returns the QueryAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateDecideRequest) GetQueryAttributes() []KeyValue {
-	if o == nil || o.QueryAttributes == nil {
+// GetDataObjects returns the DataObjects field value if set, zero value otherwise.
+func (o *WorkflowStateDecideRequest) GetDataObjects() []KeyValue {
+	if o == nil || o.DataObjects == nil {
 		var ret []KeyValue
 		return ret
 	}
-	return o.QueryAttributes
+	return o.DataObjects
 }
 
-// GetQueryAttributesOk returns a tuple with the QueryAttributes field value if set, nil otherwise
+// GetDataObjectsOk returns a tuple with the DataObjects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateDecideRequest) GetQueryAttributesOk() ([]KeyValue, bool) {
-	if o == nil || o.QueryAttributes == nil {
+func (o *WorkflowStateDecideRequest) GetDataObjectsOk() ([]KeyValue, bool) {
+	if o == nil || o.DataObjects == nil {
 		return nil, false
 	}
-	return o.QueryAttributes, true
+	return o.DataObjects, true
 }
 
-// HasQueryAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateDecideRequest) HasQueryAttributes() bool {
-	if o != nil && o.QueryAttributes != nil {
+// HasDataObjects returns a boolean if a field has been set.
+func (o *WorkflowStateDecideRequest) HasDataObjects() bool {
+	if o != nil && o.DataObjects != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetQueryAttributes gets a reference to the given []KeyValue and assigns it to the QueryAttributes field.
-func (o *WorkflowStateDecideRequest) SetQueryAttributes(v []KeyValue) {
-	o.QueryAttributes = v
+// SetDataObjects gets a reference to the given []KeyValue and assigns it to the DataObjects field.
+func (o *WorkflowStateDecideRequest) SetDataObjects(v []KeyValue) {
+	o.DataObjects = v
 }
 
-// GetStateLocalAttributes returns the StateLocalAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateDecideRequest) GetStateLocalAttributes() []KeyValue {
-	if o == nil || o.StateLocalAttributes == nil {
+// GetStateLocals returns the StateLocals field value if set, zero value otherwise.
+func (o *WorkflowStateDecideRequest) GetStateLocals() []KeyValue {
+	if o == nil || o.StateLocals == nil {
 		var ret []KeyValue
 		return ret
 	}
-	return o.StateLocalAttributes
+	return o.StateLocals
 }
 
-// GetStateLocalAttributesOk returns a tuple with the StateLocalAttributes field value if set, nil otherwise
+// GetStateLocalsOk returns a tuple with the StateLocals field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStateDecideRequest) GetStateLocalAttributesOk() ([]KeyValue, bool) {
-	if o == nil || o.StateLocalAttributes == nil {
+func (o *WorkflowStateDecideRequest) GetStateLocalsOk() ([]KeyValue, bool) {
+	if o == nil || o.StateLocals == nil {
 		return nil, false
 	}
-	return o.StateLocalAttributes, true
+	return o.StateLocals, true
 }
 
-// HasStateLocalAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateDecideRequest) HasStateLocalAttributes() bool {
-	if o != nil && o.StateLocalAttributes != nil {
+// HasStateLocals returns a boolean if a field has been set.
+func (o *WorkflowStateDecideRequest) HasStateLocals() bool {
+	if o != nil && o.StateLocals != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetStateLocalAttributes gets a reference to the given []KeyValue and assigns it to the StateLocalAttributes field.
-func (o *WorkflowStateDecideRequest) SetStateLocalAttributes(v []KeyValue) {
-	o.StateLocalAttributes = v
+// SetStateLocals gets a reference to the given []KeyValue and assigns it to the StateLocals field.
+func (o *WorkflowStateDecideRequest) SetStateLocals(v []KeyValue) {
+	o.StateLocals = v
 }
 
 // GetCommandResults returns the CommandResults field value if set, zero value otherwise.
@@ -295,11 +295,11 @@ func (o WorkflowStateDecideRequest) MarshalJSON() ([]byte, error) {
 	if o.SearchAttributes != nil {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
-	if o.QueryAttributes != nil {
-		toSerialize["queryAttributes"] = o.QueryAttributes
+	if o.DataObjects != nil {
+		toSerialize["DataObjects"] = o.DataObjects
 	}
-	if o.StateLocalAttributes != nil {
-		toSerialize["stateLocalAttributes"] = o.StateLocalAttributes
+	if o.StateLocals != nil {
+		toSerialize["stateLocals"] = o.StateLocals
 	}
 	if o.CommandResults != nil {
 		toSerialize["commandResults"] = o.CommandResults

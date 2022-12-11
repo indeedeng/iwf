@@ -78,10 +78,9 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**ApiV1WorkflowCancelPost**](docs/DefaultApi.md#apiv1workflowcancelpost) | **Post** /api/v1/workflow/cancel | cancel a workflow
+*DefaultApi* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultApi.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
-*DefaultApi* | [**ApiV1WorkflowQueryattributesGetPost**](docs/DefaultApi.md#apiv1workflowqueryattributesgetpost) | **Post** /api/v1/workflow/queryattributes/get | get workflow query attributes
 *DefaultApi* | [**ApiV1WorkflowResetPost**](docs/DefaultApi.md#apiv1workflowresetpost) | **Post** /api/v1/workflow/reset | reset a workflow
 *DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 *DefaultApi* | [**ApiV1WorkflowSearchattributesGetPost**](docs/DefaultApi.md#apiv1workflowsearchattributesgetpost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
@@ -89,11 +88,11 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowStartPost**](docs/DefaultApi.md#apiv1workflowstartpost) | **Post** /api/v1/workflow/start | start a workflow
 *DefaultApi* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultApi.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
 *DefaultApi* | [**ApiV1WorkflowStateStartPost**](docs/DefaultApi.md#apiv1workflowstatestartpost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
+*DefaultApi* | [**ApiV1WorkflowStopPost**](docs/DefaultApi.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
 
 
 ## Documentation For Models
 
- - [AttributesLoadingPolicy](docs/AttributesLoadingPolicy.md)
  - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
  - [CommandRequest](docs/CommandRequest.md)
  - [CommandResults](docs/CommandResults.md)
@@ -104,6 +103,8 @@ Class | Method | HTTP request | Description
  - [InterStateChannelPublishing](docs/InterStateChannelPublishing.md)
  - [InterStateChannelResult](docs/InterStateChannelResult.md)
  - [KeyValue](docs/KeyValue.md)
+ - [PersistenceLoadingPolicy](docs/PersistenceLoadingPolicy.md)
+ - [RetryPolicy](docs/RetryPolicy.md)
  - [SearchAttribute](docs/SearchAttribute.md)
  - [SearchAttributeKeyAndType](docs/SearchAttributeKeyAndType.md)
  - [SignalCommand](docs/SignalCommand.md)
@@ -113,9 +114,8 @@ Class | Method | HTTP request | Description
  - [StateMovement](docs/StateMovement.md)
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
- - [WorkflowCancelRequest](docs/WorkflowCancelRequest.md)
- - [WorkflowGetQueryAttributesRequest](docs/WorkflowGetQueryAttributesRequest.md)
- - [WorkflowGetQueryAttributesResponse](docs/WorkflowGetQueryAttributesResponse.md)
+ - [WorkflowGetDataObjectsRequest](docs/WorkflowGetDataObjectsRequest.md)
+ - [WorkflowGetDataObjectsResponse](docs/WorkflowGetDataObjectsResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)
  - [WorkflowGetResponse](docs/WorkflowGetResponse.md)
  - [WorkflowGetSearchAttributesRequest](docs/WorkflowGetSearchAttributesRequest.md)
@@ -134,6 +134,7 @@ Class | Method | HTTP request | Description
  - [WorkflowStateOptions](docs/WorkflowStateOptions.md)
  - [WorkflowStateStartRequest](docs/WorkflowStateStartRequest.md)
  - [WorkflowStateStartResponse](docs/WorkflowStateStartResponse.md)
+ - [WorkflowStopRequest](docs/WorkflowStopRequest.md)
 
 
 ## Documentation For Authorization
