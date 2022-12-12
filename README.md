@@ -82,7 +82,7 @@ A WorkflowState is implemented with two APIs: `start` and `decide`.
 * `decide` API will decide next states to execute. Next states be multiple, and can be re-executed as different `stateExecutions`. 
 
 ### Commands
-These are the two basic command types:
+These are the three command types:
 * `SignalCommand`: will be waiting for a signal from external to the workflow signal channel. External application can use SignalWorkflow API to signal a workflow. 
 * `TimerCommand`: will be waiting for a **durable timer** to fire.
 * `InterStateChannelCommand`: will be waiting for a value being published from another state execution(internally in the same workflow execution)
