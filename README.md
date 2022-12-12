@@ -65,21 +65,28 @@ iWF is an application platform that provides you a comprehensive tooling:
 # What is iWF
 
 ## Basic Concepts & Usage
+
+### Workflow and WorkflowState
 iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/github/cadenceoss/iwf/core/Workflow.java).
 
 The key elements of a workflow are `WorkflowState` e.g. [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/github/cadenceoss/iwf/core/WorkflowState.java). A workflow can contain any number of WorkflowStates. 
 
-A WorkflowState is implemented with two APIs: `start` and `decide`. `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered.
+A WorkflowState is implemented with two APIs: `start` and `decide`. 
+* `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered. 
+* `decide` API will decide next states to execute. Next states be multiple, and can be re-executed as different `stateExecutions`. 
 
+### Commands
 These are the two basic command types:
 * `SignalCommand`: will be waiting for a signal from external to the workflow signal channel. External application can use SignalWorkflow API to signal a workflow. 
-* `TimerCommand`: will be waiting for a **durable timer** to fire.   
+* `TimerCommand`: will be waiting for a **durable timer** to fire.
+* `InterStateChannelCommand`: will be waiting for a value being published from another state execution(internally in the same workflow execution)
 
 Note that `start` API can return multiple commands, and choose different DeciderTriggerType for triggering decide API:
 * `AllCommandCompleted`: this will wait for all command completed
 * `AnyCommandCompleted`: this will wait for any command completed
 
-iWF provides the below persistence APIs when implementing the WorkflowState:
+### Persistence
+iWF provides the below persistence storage
 * `DataObject` is for 
   * sharing some data values across the workflow
   * can be retrieved by external application using GetDataObjects API
@@ -94,14 +101,29 @@ iWF provides the below persistence APIs when implementing the WorkflowState:
   * See [Temporal doc](https://docs.temporal.io/concepts/what-is-a-search-attribute) and [Cadence doc](https://cadenceworkflow.io/docs/concepts/search-workflows/) to understand more about SearchAttribute 
 * `StateLocal` is for
   * passing some data values from state API to decide API in the same WorkflowState execution
-  * recording some events that can be useful for debugging using Workflow history. Usually you may want to record the input/output of the dependency RPC calls.
-  
-## Advanced Concepts & Usage
-On top of the above basic concepts, you may want to deeply customize your workflow by using the below features.
+* `RecordEvent` is for
+  * recording some events within the state execution. They are useful for debugging using Workflow history. Usually you may want to record the input/output of the dependency RPC calls.
 
-### More advanced command types
-* `InterStateChannelCommand`: will be waiting for a value being published from another state(internally in the same workflow)
-* [Future] `LongRunninngActivityCommand`: will schedule a long-running activity like hours/days with capability to recover from previous states
+Logically, each workflow type will have a persistence schema like below:
+```text
++-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
+| workflowId  | runId | dataObject key1 | dataObject key2 | searchAttribute key1 | searchAttribute key2 | ... |
++-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
+| your-wf-id1 | uuid1 | valu1           | value2          | keyword-value1       | 123(integer)         | ... |
++-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
+| your-wf-id1 | uuid2 | value3          | value4          | keyword-value2       | 456(integer)         | ... |
++-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
+| your-wf-id2 | uuid3 | value5          | value5          | keyword-value3       | 789(integer)         | ... |
++-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
+| ...         | ...   | ...             | ...             | ...                  | ...                  | ... |
++-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
+```
+  
+### Communication
+There are two major communication mechanism in iWF:
+* `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalChannelCommand`.
+* `InterStateChannel`: for interaction between state executions. It's used with `InterStateChannelCommand`.
+
 
 # How to run this server
 
