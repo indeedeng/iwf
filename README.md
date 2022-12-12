@@ -33,12 +33,18 @@ Related projects:
   - [If you are not](#if-you-are-not)
 - [What is iWF](#what-is-iwf)
   - [Basic Concepts & Usage](#basic-concepts--usage)
-  - [Advanced Concepts & Usage](#advanced-concepts--usage)
+    - [Workflow and WorkflowState](#workflow-and-workflowstate)
+    - [Commands](#commands)
+    - [Persistence](#persistence)
+    - [Communication](#communication)
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
   - [How to build & run locally](#how-to-build--run-locally)
   - [How to use in production](#how-to-use-in-production)
 - [Development](#development)
+  - [How to update IDL and the generated code](#how-to-update-idl-and-the-generated-code)
+  - [Run with local Temporalite](#run-with-local-temporalite)
+  - [Run with local Cadence](#run-with-local-cadence)
   - [Development Plan](#development-plan)
 - [Some history](#some-history)
 
@@ -146,9 +152,9 @@ By default, iWF server is serving port **8801**, server URL is http://localhost:
 
 ## How to use in production
 
-### Option 1: use as library to customize your startup 
+You can customize the docker image, or just use the [api](https://github.com/indeedeng/iwf/tree/main/service/api) and [interpreter](https://github.com/indeedeng/iwf/tree/main/service/interpreter) that are exposed as the api service and workflow service.
 
-Particularly, use the [api](https://github.com/indeedeng/iwf/tree/main/service/api) and [interpreter](https://github.com/indeedeng/iwf/tree/main/service/interpreter) that are exposed as the api service and workflow service.
+For more info, contact qlong.seattle@gmail.com
 
 # Development
 
