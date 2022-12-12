@@ -67,7 +67,7 @@ iWF is an application platform that provides you a comprehensive tooling:
 ## Basic Concepts & Usage
 iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/github/cadenceoss/iwf/core/Workflow.java).
 
-The key elements of a workflow are `WorkflowState`. A workflow can contain any number of WorkflowStates. 
+The key elements of a workflow are `WorkflowState` e.g. [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/github/cadenceoss/iwf/core/WorkflowState.java). A workflow can contain any number of WorkflowStates. 
 
 A WorkflowState is implemented with two APIs: `start` and `decide`. `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered.
 
