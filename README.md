@@ -282,6 +282,8 @@ AWS published SWF in 2012 and then moved to Step Functions in 2016 because they 
 Cadence & Temporal continued the idea of SWF and became much more powerful.
 However, AWS is right that the programming of SWF/Cadence/Temporal is hard to adopt because of leaking too many internals.
 Inspired by Step Function, iWF is created to provide equivalent power of Cadence/Temporal, but hiding all the internal details
-and provide clean and simple API to use.
+and provide clean and simple API to use. 
+
+Read this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) for more.
 
 <img width="916" alt="history diagram" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
