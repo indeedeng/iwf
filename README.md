@@ -254,8 +254,8 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] DataObjectRW
 - [x] StateLocal
 - [x] Signal workflow API
-- [x] Query workflow API
-- [x] Get workflow API
+- [x] Get DataObjects/SearchAttributes API
+- [x] Get workflow info API
 - [x] Search workflow API
 - [x] Stop workflow API
 
