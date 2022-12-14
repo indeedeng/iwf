@@ -17,26 +17,21 @@ Related projects:
 * [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk), WIP, Contribution is welcome.
 * More SDKs? Contribution is welcome.
 
-## Community & Help
-* [Github Discussion](https://github.com/indeedeng/iwf/discussions)
-  * Best for Q&A, support/help, general discusion, and annoucement 
-* [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
-  * Best for Q&A and general discusion
-* [Github Issues](https://github.com/indeedeng/iwf/issues)
-  * Best for reporting bugs and feature requests
-* For any questions & consultant email to: qlong.seattle@gmail.com
-  
 # Table of contents
 
-- [Why you would need iWF](#why-you-would-need-iwf)
+- [Community & Help](#community--help)
+- [Why iWF](#why-iwf)
   - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
   - [If you are not](#if-you-are-not)
 - [What is iWF](#what-is-iwf)
-  - [Basic Concepts & Usage](#basic-concepts--usage)
-    - [Workflow and WorkflowState](#workflow-and-workflowstate)
+  - [Basic Concepts](#basic-concepts)
+    - [Workflow and WorkflowState definition](#workflow-and-workflowstate-definition)
+    - [Workflow execution and WorkflowState execution](#workflow-execution-and-workflowstate-execution)
     - [Commands](#commands)
     - [Persistence](#persistence)
     - [Communication](#communication)
+  - [Client APIs](#client-apis)
+  - [Architecture](#architecture)
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
   - [How to build & run locally](#how-to-build--run-locally)
@@ -48,7 +43,16 @@ Related projects:
   - [Development Plan](#development-plan)
 - [Some history](#some-history)
 
-# Why you would need iWF
+# Community & Help
+* [Github Discussion](https://github.com/indeedeng/iwf/discussions)
+  * Best for Q&A, support/help, general discusion, and annoucement 
+* [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
+  * Best for Q&A and general discusion
+* [Github Issues](https://github.com/indeedeng/iwf/issues)
+  * Best for reporting bugs and feature requests
+* For any questions & consultant email to: qlong.seattle@gmail.com
+
+# Why iWF
 
 ## If you are familar with Cadence/Temporal
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
@@ -70,16 +74,28 @@ iWF is an application platform that provides you a comprehensive tooling:
 
 # What is iWF
 
-## Basic Concepts & Usage
+## Basic Concepts
 
-### Workflow and WorkflowState
+### Workflow and WorkflowState definition
 iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java).
+An instance of the interface is a `WorkflowDefinition`. Am application uses `iwfWorkflowType` to differentiate WorkflowDefinitions.    
 
-The key elements of a workflow are `WorkflowState` e.g. [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java). A workflow can contain any number of WorkflowStates. 
-
+A WorkflowDefinition contains several `WorkflowState` e.g. [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java). 
 A WorkflowState is implemented with two APIs: `start` and `decide`. 
 * `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered. 
 * `decide` API will decide next states to execute. Next states be multiple, and can be re-executed as different `stateExecutions`. 
+
+### Workflow execution and WorkflowState execution
+Application can start a workflow instance with a `workflowId` for any workflow definition. A workflow instance is called `WorkflowExecution`. 
+iWF server returns `runId` of UUID as the identifier of the WorkflowExecution. The runId is globally unique.  
+
+WorkflowId uniqueness: At anytime, there must be at most one WorkflowExecution running with the same workflowId. However, after a previous WorkflowExecution finished running (in any closed status), 
+application may start a new WorkflowExecutions with the same workflowId using appropriate `IdReusePolicy`. 
+
+There must be at least one WorkflowState being executed for a running WorkflowExecution. The instance of WorkflowState is called `StateExecution`.     
+
+:warning: Note:
+> Depends on the context, the only word `workflow` may mean WorkflowExecution(most commonly), WorkflowDefinition or both.  
 
 ### Commands
 These are the three command types:
@@ -130,6 +146,29 @@ There are two major communication mechanism in iWF:
 * `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalChannelCommand`.
 * `InterStateChannel`: for interaction between state executions. It's used with `InterStateChannelCommand`.
 
+## Client APIs
+Client APIs are hosted by iWF server for user workflow application to interact with their workflow executions. 
+* Start workflow: start a new workflow execution
+* Stop workflow: stop a workflow execution
+* Signal workflow: send a signal to a workflow execution via iWF serv
+* Search workflow: search for workflows using a query language like SQL with search attributes
+* Get workflow: get basic information about a workflow like status
+* Get workflow data objects: get the dataObjects of a workflow execution
+* Get workflow search attributes: get the search attributes of a workflow execution
+* Reset workflow: reset a workflow to previous states
+* Get workflow results: get the workflow completion results (with or without waiting for completion)
+
+## Architecture 
+A iWF application will host a set of iWF workflow workers. The workers host two REST APIs of WorkflowState `start` and `decide` using iWF SDKs.
+The application will call iWF server to interact with workflow executions -- start, stop, signal, get results, etc, using iWF SDKs.
+
+iWF server hosts those APIs(also REST) as a iWF API service. The API service will call Cadence/Temporal service as the backend. 
+
+iWF server also hosts Cadence/Temporal workers which hosts [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go). 
+Any iWF workflows are interpreted into this Cadence/Temporal workflow. The interpreter workflow will invoke the two iWF APIs of 
+the application workflow workers. Internally, the two APIs are executed by Cadence/Temporal activity.  
+
+![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
 
 # How to run this server
 
@@ -215,10 +254,10 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] DataObjectRW
 - [x] StateLocal
 - [x] Signal workflow API
-- [x] Query workflow API
-- [x] Get workflow API
+- [x] Get DataObjects/SearchAttributes API
+- [x] Get workflow info API
 - [x] Search workflow API
-- [x] Cancel workflow API
+- [x] Stop workflow API
 
 ### 1.1
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
@@ -245,4 +284,4 @@ However, AWS is right that the programming of SWF/Cadence/Temporal is hard to ad
 Inspired by Step Function, iWF is created to provide equivalent power of Cadence/Temporal, but hiding all the internal details
 and provide clean and simple API to use.
 
-<img width="916" alt="Screen Shot 2022-11-10 at 11 23 24 AM" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
+<img width="916" alt="history diagram" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
