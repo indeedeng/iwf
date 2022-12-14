@@ -17,26 +17,21 @@ Related projects:
 * [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk), WIP, Contribution is welcome.
 * More SDKs? Contribution is welcome.
 
-## Community & Help
-* [Github Discussion](https://github.com/indeedeng/iwf/discussions)
-  * Best for Q&A, support/help, general discusion, and annoucement 
-* [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
-  * Best for Q&A and general discusion
-* [Github Issues](https://github.com/indeedeng/iwf/issues)
-  * Best for reporting bugs and feature requests
-* For any questions & consultant email to: qlong.seattle@gmail.com
-  
 # Table of contents
 
-- [Why you would need iWF](#why-you-would-need-iwf)
+- [Community & Help](#community--help)
+- [Why iWF](#why-iwf)
   - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
   - [If you are not](#if-you-are-not)
 - [What is iWF](#what-is-iwf)
-  - [Basic Concepts & Usage](#basic-concepts--usage)
-    - [Workflow and WorkflowState](#workflow-and-workflowstate)
+  - [Basic Concepts](#basic-concepts)
+    - [Workflow and WorkflowState definition](#workflow-and-workflowstate-definition)
+    - [Workflow execution and WorkflowState execution](#workflow-execution-and-workflowstate-execution)
     - [Commands](#commands)
     - [Persistence](#persistence)
     - [Communication](#communication)
+  - [Client APIs](#client-apis)
+  - [Architecture](#architecture)
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
   - [How to build & run locally](#how-to-build--run-locally)
@@ -48,7 +43,16 @@ Related projects:
   - [Development Plan](#development-plan)
 - [Some history](#some-history)
 
-# Why you would need iWF
+# Community & Help
+* [Github Discussion](https://github.com/indeedeng/iwf/discussions)
+  * Best for Q&A, support/help, general discusion, and annoucement 
+* [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
+  * Best for Q&A and general discusion
+* [Github Issues](https://github.com/indeedeng/iwf/issues)
+  * Best for reporting bugs and feature requests
+* For any questions & consultant email to: qlong.seattle@gmail.com
+
+# Why iWF
 
 ## If you are familar with Cadence/Temporal
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
