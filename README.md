@@ -164,6 +164,8 @@ iWF server also hosts Cadence/Temporal workers which hosts [an interpreter workf
 Any iWF workflows are interpreted into this Cadence/Temporal workflow. The interpreter workflow will invoke the two iWF APIs of 
 the application workflow workers. Internally, the two APIs are executed by Cadence/Temporal activity.  
 
+![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
+
 # How to run this server
 
 ##  Using docker image & docker-compose
@@ -278,4 +280,4 @@ However, AWS is right that the programming of SWF/Cadence/Temporal is hard to ad
 Inspired by Step Function, iWF is created to provide equivalent power of Cadence/Temporal, but hiding all the internal details
 and provide clean and simple API to use.
 
-<img width="916" alt="Screen Shot 2022-11-10 at 11 23 24 AM" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
+<img width="916" alt="history diagram" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
