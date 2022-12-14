@@ -24,6 +24,7 @@ Related projects:
   - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
   - [If you are not](#if-you-are-not)
 - [What is iWF](#what-is-iwf)
+  - [Architecture](#architecture)
   - [Basic Concepts](#basic-concepts)
     - [Workflow and WorkflowState definition](#workflow-and-workflowstate-definition)
     - [Workflow execution and WorkflowState execution](#workflow-execution-and-workflowstate-execution)
@@ -31,7 +32,6 @@ Related projects:
     - [Persistence](#persistence)
     - [Communication](#communication)
   - [Client APIs](#client-apis)
-  - [Architecture](#architecture)
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
   - [How to build & run locally](#how-to-build--run-locally)
@@ -74,6 +74,18 @@ iWF is an application platform that provides you a comprehensive tooling:
 
 # What is iWF
 
+## Architecture
+A iWF application will host a set of iWF workflow workers. The workers host two REST APIs of WorkflowState `start` and `decide` using iWF SDKs.
+The application will call iWF server to interact with workflow executions -- start, stop, signal, get results, etc, using iWF SDKs.
+
+iWF server hosts those APIs(also REST) as a iWF API service. The API service will call Cadence/Temporal service as the backend.
+
+iWF server also hosts Cadence/Temporal workers which hosts [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
+Any iWF workflows are interpreted into this Cadence/Temporal workflow. The interpreter workflow will invoke the two iWF APIs of
+the application workflow workers. Internally, the two APIs are executed by Cadence/Temporal activity.
+
+![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
+
 ## Basic Concepts
 
 ### Workflow and WorkflowState definition
@@ -108,8 +120,8 @@ Note that `start` API can return multiple commands, and choose different Decider
 * `AnyCommandCompleted`: this will wait for any command completed
 
 ### Persistence
-iWF provides the below persistence storage
-* `DataObject` is for 
+iWF provides super simple persistence abstraction for workflow to use. Developers don't need to touch any database system to register/maintain the schemas. The only schema is defined in the workflow code.
+* `DataObject` is  
   * sharing some data values across the workflow
   * can be retrieved by external application using GetDataObjects API
   * can be viewed in Cadence/Temporal WebUI in QueryHandler tab
@@ -157,18 +169,6 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 * Get workflow search attributes: get the search attributes of a workflow execution
 * Reset workflow: reset a workflow to previous states
 * Get workflow results: get the workflow completion results (with or without waiting for completion)
-
-## Architecture 
-A iWF application will host a set of iWF workflow workers. The workers host two REST APIs of WorkflowState `start` and `decide` using iWF SDKs.
-The application will call iWF server to interact with workflow executions -- start, stop, signal, get results, etc, using iWF SDKs.
-
-iWF server hosts those APIs(also REST) as a iWF API service. The API service will call Cadence/Temporal service as the backend. 
-
-iWF server also hosts Cadence/Temporal workers which hosts [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go). 
-Any iWF workflows are interpreted into this Cadence/Temporal workflow. The interpreter workflow will invoke the two iWF APIs of 
-the application workflow workers. Internally, the two APIs are executed by Cadence/Temporal activity.  
-
-![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
 
 # How to run this server
 
