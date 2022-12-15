@@ -7,6 +7,8 @@ Name | Type | Description | Notes
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataObjectsLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **CommandCarryOverPolicy** | Pointer to [**CommandCarryOverPolicy**](CommandCarryOverPolicy.md) |  | [optional] 
+**StartApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
+**DecideApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **StartApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 **DecideApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 
@@ -103,6 +105,56 @@ SetCommandCarryOverPolicy sets CommandCarryOverPolicy field to given value.
 `func (o *WorkflowStateOptions) HasCommandCarryOverPolicy() bool`
 
 HasCommandCarryOverPolicy returns a boolean if a field has been set.
+
+### GetStartApiTimeoutSeconds
+
+`func (o *WorkflowStateOptions) GetStartApiTimeoutSeconds() int32`
+
+GetStartApiTimeoutSeconds returns the StartApiTimeoutSeconds field if non-nil, zero value otherwise.
+
+### GetStartApiTimeoutSecondsOk
+
+`func (o *WorkflowStateOptions) GetStartApiTimeoutSecondsOk() (*int32, bool)`
+
+GetStartApiTimeoutSecondsOk returns a tuple with the StartApiTimeoutSeconds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStartApiTimeoutSeconds
+
+`func (o *WorkflowStateOptions) SetStartApiTimeoutSeconds(v int32)`
+
+SetStartApiTimeoutSeconds sets StartApiTimeoutSeconds field to given value.
+
+### HasStartApiTimeoutSeconds
+
+`func (o *WorkflowStateOptions) HasStartApiTimeoutSeconds() bool`
+
+HasStartApiTimeoutSeconds returns a boolean if a field has been set.
+
+### GetDecideApiTimeoutSeconds
+
+`func (o *WorkflowStateOptions) GetDecideApiTimeoutSeconds() int32`
+
+GetDecideApiTimeoutSeconds returns the DecideApiTimeoutSeconds field if non-nil, zero value otherwise.
+
+### GetDecideApiTimeoutSecondsOk
+
+`func (o *WorkflowStateOptions) GetDecideApiTimeoutSecondsOk() (*int32, bool)`
+
+GetDecideApiTimeoutSecondsOk returns a tuple with the DecideApiTimeoutSeconds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDecideApiTimeoutSeconds
+
+`func (o *WorkflowStateOptions) SetDecideApiTimeoutSeconds(v int32)`
+
+SetDecideApiTimeoutSeconds sets DecideApiTimeoutSeconds field to given value.
+
+### HasDecideApiTimeoutSeconds
+
+`func (o *WorkflowStateOptions) HasDecideApiTimeoutSeconds() bool`
+
+HasDecideApiTimeoutSeconds returns a boolean if a field has been set.
 
 ### GetStartApiRetryPolicy
 
