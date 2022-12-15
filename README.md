@@ -30,7 +30,7 @@ Related projects:
     - [Communication](#communication)
   - [Client APIs](#client-apis)
 - [Why iWF](#why-iwf)
-  - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
+  - [If you are familiar with Cadence/Temporal](#if-you-are-familiar-with-cadencetemporal)
   - [If you are not](#if-you-are-not)  
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
@@ -152,7 +152,7 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 
 # Why iWF
 
-## If you are familar with Cadence/Temporal
+## If you are familiar with Cadence/Temporal
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
 * See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
 
