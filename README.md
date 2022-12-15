@@ -135,14 +135,14 @@ Logically, each workflow type will have a persistence schema like below:
   
 ### Communication
 There are two major communication mechanism in iWF:
-* `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalChannelCommand`.
+* `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalCommand`.
 * `InterStateChannel`: for interaction between state executions. It's used with `InterStateChannelCommand`.
 
 ## Client APIs
 Client APIs are hosted by iWF server for user workflow application to interact with their workflow executions. 
 * Start workflow: start a new workflow execution
 * Stop workflow: stop a workflow execution
-* Signal workflow: send a signal to a workflow execution via iWF serv
+* Signal workflow: send a signal to a workflow execution 
 * Search workflow: search for workflows using a query language like SQL with search attributes
 * Get workflow: get basic information about a workflow like status
 * Get workflow data objects: get the dataObjects of a workflow execution
