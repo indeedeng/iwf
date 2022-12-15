@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/cadence/workflow"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -53,6 +55,15 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 
 	if options.CronSchedule != nil {
 		workflowOptions.CronSchedule = *options.CronSchedule
+	}
+
+	if options.RetryPolicy != nil {
+		workflowOptions.RetryPolicy = &workflow.RetryPolicy{
+			InitialInterval:    time.Second * time.Duration(options.RetryPolicy.GetInitialIntervalSeconds()),
+			MaximumInterval:    time.Second * time.Duration(options.RetryPolicy.GetMaximumIntervalSeconds()),
+			MaximumAttempts:    options.RetryPolicy.GetMaximumAttempts(),
+			BackoffCoefficient: float64(options.RetryPolicy.GetBackoffCoefficient()),
+		}
 	}
 
 	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
