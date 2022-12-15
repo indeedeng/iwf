@@ -43,6 +43,7 @@ type StartWorkflowOptions struct {
 	WorkflowRunTimeout    time.Duration
 	WorkflowIDReusePolicy *string
 	CronSchedule          *string
+	RetryPolicy           *iwfidl.RetryPolicy
 }
 
 type ListWorkflowExecutionsRequest struct {

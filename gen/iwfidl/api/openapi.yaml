@@ -295,16 +295,16 @@ components:
     RetryPolicy:
       example:
         maximumAttempts: 7
-        initialInterval: 5.962133916683182
-        maximumInterval: 2.3021358869347655
+        initialIntervalSeconds: 5
+        maximumIntervalSeconds: 2
         backoffCoefficient: 5.637376656633329
       properties:
-        initialInterval:
-          type: number
+        initialIntervalSeconds:
+          type: integer
         backoffCoefficient:
           type: number
-        maximumInterval:
-          type: number
+        maximumIntervalSeconds:
+          type: integer
         maximumAttempts:
           type: integer
       type: object
@@ -319,15 +319,15 @@ components:
           commandCarryOverType: NONE
         decideApiRetryPolicy:
           maximumAttempts: 7
-          initialInterval: 5.962133916683182
-          maximumInterval: 2.3021358869347655
+          initialIntervalSeconds: 5
+          maximumIntervalSeconds: 2
           backoffCoefficient: 5.637376656633329
         decideApiTimeoutSeconds: 1
         startApiTimeoutSeconds: 6
         startApiRetryPolicy:
           maximumAttempts: 7
-          initialInterval: 5.962133916683182
-          maximumInterval: 2.3021358869347655
+          initialIntervalSeconds: 5
+          maximumIntervalSeconds: 2
           backoffCoefficient: 5.637376656633329
         dataObjectsLoadingPolicy:
           partialLoadingKeys:
@@ -354,8 +354,8 @@ components:
       example:
         retryPolicy:
           maximumAttempts: 7
-          initialInterval: 5.962133916683182
-          maximumInterval: 2.3021358869347655
+          initialIntervalSeconds: 5
+          maximumIntervalSeconds: 2
           backoffCoefficient: 5.637376656633329
         workflowIDReusePolicy: ALLOW_DUPLICATE_FAILED_ONLY
         cronSchedule: cronSchedule
@@ -418,15 +418,15 @@ components:
             commandCarryOverType: NONE
           decideApiRetryPolicy:
             maximumAttempts: 7
-            initialInterval: 5.962133916683182
-            maximumInterval: 2.3021358869347655
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
           startApiRetryPolicy:
             maximumAttempts: 7
-            initialInterval: 5.962133916683182
-            maximumInterval: 2.3021358869347655
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
           dataObjectsLoadingPolicy:
             partialLoadingKeys:
@@ -437,8 +437,8 @@ components:
         workflowStartOptions:
           retryPolicy:
             maximumAttempts: 7
-            initialInterval: 5.962133916683182
-            maximumInterval: 2.3021358869347655
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
           workflowIDReusePolicy: ALLOW_DUPLICATE_FAILED_ONLY
           cronSchedule: cronSchedule
@@ -1020,15 +1020,15 @@ components:
                 commandCarryOverType: NONE
               decideApiRetryPolicy:
                 maximumAttempts: 7
-                initialInterval: 5.962133916683182
-                maximumInterval: 2.3021358869347655
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637376656633329
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
               startApiRetryPolicy:
                 maximumAttempts: 7
-                initialInterval: 5.962133916683182
-                maximumInterval: 2.3021358869347655
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637376656633329
               dataObjectsLoadingPolicy:
                 partialLoadingKeys:
@@ -1049,15 +1049,15 @@ components:
                 commandCarryOverType: NONE
               decideApiRetryPolicy:
                 maximumAttempts: 7
-                initialInterval: 5.962133916683182
-                maximumInterval: 2.3021358869347655
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637376656633329
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
               startApiRetryPolicy:
                 maximumAttempts: 7
-                initialInterval: 5.962133916683182
-                maximumInterval: 2.3021358869347655
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637376656633329
               dataObjectsLoadingPolicy:
                 partialLoadingKeys:
@@ -1132,15 +1132,15 @@ components:
               commandCarryOverType: NONE
             decideApiRetryPolicy:
               maximumAttempts: 7
-              initialInterval: 5.962133916683182
-              maximumInterval: 2.3021358869347655
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
               backoffCoefficient: 5.637376656633329
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
             startApiRetryPolicy:
               maximumAttempts: 7
-              initialInterval: 5.962133916683182
-              maximumInterval: 2.3021358869347655
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
               backoffCoefficient: 5.637376656633329
             dataObjectsLoadingPolicy:
               partialLoadingKeys:
@@ -1161,15 +1161,15 @@ components:
               commandCarryOverType: NONE
             decideApiRetryPolicy:
               maximumAttempts: 7
-              initialInterval: 5.962133916683182
-              maximumInterval: 2.3021358869347655
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
               backoffCoefficient: 5.637376656633329
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
             startApiRetryPolicy:
               maximumAttempts: 7
-              initialInterval: 5.962133916683182
-              maximumInterval: 2.3021358869347655
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
               backoffCoefficient: 5.637376656633329
             dataObjectsLoadingPolicy:
               partialLoadingKeys:
@@ -1198,15 +1198,15 @@ components:
             commandCarryOverType: NONE
           decideApiRetryPolicy:
             maximumAttempts: 7
-            initialInterval: 5.962133916683182
-            maximumInterval: 2.3021358869347655
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
           startApiRetryPolicy:
             maximumAttempts: 7
-            initialInterval: 5.962133916683182
-            maximumInterval: 2.3021358869347655
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
           dataObjectsLoadingPolicy:
             partialLoadingKeys:
