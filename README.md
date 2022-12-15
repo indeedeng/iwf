@@ -20,9 +20,6 @@ Related projects:
 # Table of contents
 
 - [Community & Help](#community--help)
-- [Why iWF](#why-iwf)
-  - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
-  - [If you are not](#if-you-are-not)
 - [What is iWF](#what-is-iwf)
   - [Architecture](#architecture)
   - [Basic Concepts](#basic-concepts)
@@ -32,6 +29,9 @@ Related projects:
     - [Persistence](#persistence)
     - [Communication](#communication)
   - [Client APIs](#client-apis)
+- [Why iWF](#why-iwf)
+  - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
+  - [If you are not](#if-you-are-not)  
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
   - [How to build & run locally](#how-to-build--run-locally)
@@ -52,26 +52,6 @@ Related projects:
   * Best for reporting bugs and feature requests
 * For any questions & consultant email to: qlong.seattle@gmail.com
 
-# Why iWF
-
-## If you are familar with Cadence/Temporal
-* See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
-* See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
-
-## If you are not
-* Check out this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) to understand some history
-
-iWF is an application platform that provides you a comprehensive tooling:
-* WorkflowAsCode for highly flexibile/customizable business logic
-* Parallel execution of multiple threads of business
-* Persistence storage for intermediate states stored as "dataObjects"
-* Persistence searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch
-* Receiving data from external system by Signal
-* Durable timer, and cron job scheduling
-* Reset workflow to let you recover the workflows from bad states easily 
-* Highly testable and easy to maintain
-* ...
-
 # What is iWF
 
 ## Architecture
@@ -82,7 +62,7 @@ iWF server hosts those APIs(also REST) as a iWF API service. The API service wil
 
 iWF server also hosts Cadence/Temporal workers which hosts [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
 Any iWF workflows are interpreted into this Cadence/Temporal workflow. The interpreter workflow will invoke the two iWF APIs of
-the application workflow workers. Internally, the two APIs are executed by Cadence/Temporal activity.
+the application workflow workers. Internally, the two APIs are executed by Cadence/Temporal activity. Therefore, all the REST API request/response with the worker are stored in history events which are useful for debugging/troubleshooting. 
 
 ![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
 
@@ -90,7 +70,7 @@ the application workflow workers. Internally, the two APIs are executed by Caden
 
 ### Workflow and WorkflowState definition
 iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java).
-An instance of the interface is a `WorkflowDefinition`. Am application uses `iwfWorkflowType` to differentiate WorkflowDefinitions.    
+An instance of the interface is a `WorkflowDefinition`. User applications use `iwfWorkflowType` to differentiate WorkflowDefinitions.    
 
 A WorkflowDefinition contains several `WorkflowState` e.g. [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java). 
 A WorkflowState is implemented with two APIs: `start` and `decide`. 
@@ -169,6 +149,26 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 * Get workflow search attributes: get the search attributes of a workflow execution
 * Reset workflow: reset a workflow to previous states
 * Get workflow results: get the workflow completion results (with or without waiting for completion)
+
+# Why iWF
+
+## If you are familar with Cadence/Temporal
+* See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
+* See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
+
+## If you are not
+* Check out this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) to understand some history
+
+iWF is an application platform that provides you a comprehensive tooling:
+* WorkflowAsCode for highly flexibile/customizable business logic
+* Parallel execution of multiple threads of business
+* Persistence storage for intermediate states stored as "dataObjects"
+* Persistence searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch
+* Receiving data from external system by Signal
+* Durable timer, and cron job scheduling
+* Reset workflow to let you recover the workflows from bad states easily 
+* Highly testable and easy to maintain
+* ...
 
 # How to run this server
 
