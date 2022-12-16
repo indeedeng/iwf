@@ -99,7 +99,7 @@ func start(c *cli.Context) {
 		if err != nil {
 			log.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient)
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Backend.Temporal.Namespace)
 
 		for _, svcName := range services {
 			go launchTemporalService(svcName, config, unifiedClient, temporalClient)

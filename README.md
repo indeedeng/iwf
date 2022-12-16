@@ -144,11 +144,10 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 * Stop workflow: stop a workflow execution
 * Signal workflow: send a signal to a workflow execution 
 * Search workflow: search for workflows using a query language like SQL with search attributes
-* Get workflow: get basic information about a workflow like status
+* Get workflow: get basic information about a workflow like status and results(if completed or waiting for completed)
 * Get workflow data objects: get the dataObjects of a workflow execution
 * Get workflow search attributes: get the search attributes of a workflow execution
 * Reset workflow: reset a workflow to previous states
-* Get workflow results: get the workflow completion results (with or without waiting for completion)
 
 # Why iWF
 
@@ -260,7 +259,7 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] Stop workflow API
 
 ### 1.1
-- [x] Reset workflow API (Cadence only, TODO for Temporal)
+- [x] Reset workflow API 
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
 - [x] More workflow start options: IdReusePolicy, cron schedule, retry
