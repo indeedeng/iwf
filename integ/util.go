@@ -15,8 +15,12 @@ import (
 	"net/http"
 )
 
+const testNamespace = "default"
+
 func createTemporalClient() client.Client {
-	temporalClient, err := client.Dial(client.Options{})
+	temporalClient, err := client.Dial(client.Options{
+		Namespace: testNamespace,
+	})
 	if err != nil {
 		log.Fatalf("unable to connect to Temporal %v", err)
 	}
@@ -43,7 +47,7 @@ func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
 	if backendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
-		iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient))
+		iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient, testNamespace))
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
