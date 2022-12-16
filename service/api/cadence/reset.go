@@ -84,7 +84,7 @@ func getFirstDecisionTaskByType(
 		}
 	}
 	if decisionFinishID == 0 {
-		return 0, composeErrorWithMessage("Get DecisionFinishID failed", fmt.Errorf("no DecisionFinishID"))
+		return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
 	}
 	return
 }
@@ -126,7 +126,7 @@ OuterLoop:
 		}
 	}
 	if decisionFinishID == 0 {
-		return 0, composeErrorWithMessage("Get DecisionFinishID failed", fmt.Errorf("no DecisionFinishID"))
+		return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
 	}
 	return
 }

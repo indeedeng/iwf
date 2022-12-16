@@ -37,6 +37,11 @@ func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
 		if err != nil {
 			return
 		}
+	case service.ResetTypeStateId:
+		workflowTaskFinishID, err = getDecisionEventIDByStateOrStateExecutionId(ctx, namespace, wid, rid, "", "", frontendClient)
+		if err != nil {
+			return
+		}
 	default:
 		panic("not supported resetType")
 	}
@@ -83,6 +88,7 @@ func getFirstWorkflowTaskEventID(ctx context.Context, namespace, wid, rid string
 	}
 	return
 }
+
 func getEarliestDecisionEventID(
 	ctx context.Context,
 	namespace string, wid string,
@@ -120,7 +126,50 @@ OuterLoop:
 		}
 	}
 	if decisionFinishID == 0 {
-		return 0, composeErrorWithMessage("Get DecisionFinishID failed", fmt.Errorf("no DecisionFinishID"))
+		return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
+	}
+	return
+}
+
+func getDecisionEventIDByStateOrStateExecutionId(
+	ctx context.Context,
+	namespace string, wid string,
+	rid string, stateId, stateExecutionId string,
+	frontendClient workflowservice.WorkflowServiceClient,
+) (decisionFinishID int64, err error) {
+	req := &workflowservice.GetWorkflowExecutionHistoryRequest{
+		Namespace: namespace,
+		Execution: &common.WorkflowExecution{
+			WorkflowId: wid,
+			RunId:      rid,
+		},
+		MaximumPageSize: 1000,
+		NextPageToken:   nil,
+	}
+
+	found := false
+	for {
+		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
+		if err != nil {
+			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
+		}
+		for _, e := range resp.GetHistory().GetEvents() {
+			if e.GetEventType() == enums.EVENT_TYPE_WORKFLOW_TASK_COMPLETED {
+				decisionFinishID = e.GetEventId()
+			}
+			if e.GetEventType() == enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED {
+				// TODO see decodeArgsToRawValues in go-sdk (encode_args.go)
+
+			}
+		}
+		if len(resp.NextPageToken) != 0 {
+			req.NextPageToken = resp.NextPageToken
+		} else {
+			break
+		}
+	}
+	if !found {
+		return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
 	}
 	return
 }

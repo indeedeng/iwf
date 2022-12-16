@@ -58,3 +58,5 @@ type ResetType string
 const ResetTypeHistoryEventId ResetType = "HISTORY_EVENT_ID"
 const ResetTypeBeginning ResetType = "BEGINNING"
 const ResetTypeHistoryEventTime ResetType = "HISTORY_EVENT_TIME"
+const ResetTypeStateId ResetType = "STATE_ID"
+const ResetTypeStateExecutionId ResetType = "STATE_EXECUTION_ID"
