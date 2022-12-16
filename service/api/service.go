@@ -36,22 +36,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*
 	if req.WorkflowStartOptions != nil {
 		workflowOptions.WorkflowIDReusePolicy = req.WorkflowStartOptions.WorkflowIDReusePolicy
 		workflowOptions.CronSchedule = req.WorkflowStartOptions.CronSchedule
-		retryPolicy := req.WorkflowStartOptions.RetryPolicy
-		if retryPolicy != nil {
-			if retryPolicy.InitialIntervalSeconds == nil {
-				retryPolicy.InitialIntervalSeconds = iwfidl.PtrInt32(1)
-			}
-			if retryPolicy.BackoffCoefficient == nil {
-				retryPolicy.BackoffCoefficient = iwfidl.PtrFloat32(2)
-			}
-			if retryPolicy.MaximumIntervalSeconds == nil {
-				retryPolicy.MaximumAttempts = iwfidl.PtrInt32(100)
-			}
-			if retryPolicy.MaximumAttempts == nil {
-				retryPolicy.MaximumAttempts = iwfidl.PtrInt32(0)
-			}
-		}
-		workflowOptions.RetryPolicy = retryPolicy
+		workflowOptions.RetryPolicy = req.WorkflowStartOptions.RetryPolicy
 	}
 
 	input := service.InterpreterWorkflowInput{

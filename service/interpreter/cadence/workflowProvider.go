@@ -3,6 +3,7 @@ package cadence
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.uber.org/cadence/workflow"
 	"time"
@@ -102,13 +103,7 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
 		StartToCloseTimeout:    options.StartToCloseTimeout,
 		ScheduleToStartTimeout: unlimited,
-		RetryPolicy: &workflow.RetryPolicy{
-			InitialInterval:    time.Second,
-			BackoffCoefficient: 2,
-			MaximumInterval:    time.Second * 100,
-			MaximumAttempts:    0,
-			ExpirationInterval: unlimited,
-		},
+		RetryPolicy:            retry.ConvertCadenceRetryPolicy(options.RetryPolicy),
 	})
 	return interpreter.NewUnifiedContext(wfCtx2)
 }

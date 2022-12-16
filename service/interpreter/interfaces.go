@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"time"
 )
@@ -49,6 +50,7 @@ type WorkflowInfo struct {
 
 type ActivityOptions struct {
 	StartToCloseTimeout time.Duration
+	RetryPolicy         *iwfidl.RetryPolicy
 }
 
 type UnifiedContext interface {

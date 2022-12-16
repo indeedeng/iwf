@@ -3,18 +3,16 @@ package temporal
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
-	temporalsdk "go.temporal.io/sdk/temporal"
 )
 
 type temporalClient struct {
@@ -52,12 +50,7 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 	}
 
 	if options.RetryPolicy != nil {
-		workflowOptions.RetryPolicy = &temporalsdk.RetryPolicy{
-			InitialInterval:    time.Second * time.Duration(options.RetryPolicy.GetInitialIntervalSeconds()),
-			MaximumInterval:    time.Second * time.Duration(options.RetryPolicy.GetMaximumIntervalSeconds()),
-			MaximumAttempts:    options.RetryPolicy.GetMaximumAttempts(),
-			BackoffCoefficient: float64(options.RetryPolicy.GetBackoffCoefficient()),
-		}
+		workflowOptions.RetryPolicy = retry.ConvertTemporalRetryPolicy(options.RetryPolicy)
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)

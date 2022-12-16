@@ -184,10 +184,17 @@ func executeState(
 	attrMgr *PersistenceManager,
 	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
-	ao := ActivityOptions{
+	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
 	}
-	ctx = provider.WithActivityOptions(ctx, ao)
+	if state.NextStateOptions != nil {
+		if state.NextStateOptions.GetStartApiTimeoutSeconds() > 0 {
+			activityOptions.StartToCloseTimeout = time.Duration(state.NextStateOptions.GetStartApiTimeoutSeconds()) * time.Second
+		}
+		activityOptions.RetryPolicy = state.NextStateOptions.StartApiRetryPolicy
+	}
+
+	ctx = provider.WithActivityOptions(ctx, activityOptions)
 
 	exeCtx := iwfidl.Context{
 		WorkflowId:               execution.WorkflowId,
@@ -389,6 +396,14 @@ func executeState(
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
+	if state.NextStateOptions != nil {
+		if state.NextStateOptions.GetDecideApiTimeoutSeconds() > 0 {
+			activityOptions.StartToCloseTimeout = time.Duration(state.NextStateOptions.GetDecideApiTimeoutSeconds()) * time.Second
+		}
+		activityOptions.RetryPolicy = state.NextStateOptions.DecideApiRetryPolicy
+	}
+
+	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
 	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
