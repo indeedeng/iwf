@@ -22,6 +22,8 @@ type WorkflowResetRequest struct {
 	HistoryEventId *int32 `json:"historyEventId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
 	HistoryEventTime *string `json:"historyEventTime,omitempty"`
+	StateId *string `json:"stateId,omitempty"`
+	StateExecutionId *string `json:"stateExecutionId,omitempty"`
 	SkipSignalReapply *bool `json:"skipSignalReapply,omitempty"`
 }
 
@@ -220,6 +222,70 @@ func (o *WorkflowResetRequest) SetHistoryEventTime(v string) {
 	o.HistoryEventTime = &v
 }
 
+// GetStateId returns the StateId field value if set, zero value otherwise.
+func (o *WorkflowResetRequest) GetStateId() string {
+	if o == nil || o.StateId == nil {
+		var ret string
+		return ret
+	}
+	return *o.StateId
+}
+
+// GetStateIdOk returns a tuple with the StateId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowResetRequest) GetStateIdOk() (*string, bool) {
+	if o == nil || o.StateId == nil {
+		return nil, false
+	}
+	return o.StateId, true
+}
+
+// HasStateId returns a boolean if a field has been set.
+func (o *WorkflowResetRequest) HasStateId() bool {
+	if o != nil && o.StateId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStateId gets a reference to the given string and assigns it to the StateId field.
+func (o *WorkflowResetRequest) SetStateId(v string) {
+	o.StateId = &v
+}
+
+// GetStateExecutionId returns the StateExecutionId field value if set, zero value otherwise.
+func (o *WorkflowResetRequest) GetStateExecutionId() string {
+	if o == nil || o.StateExecutionId == nil {
+		var ret string
+		return ret
+	}
+	return *o.StateExecutionId
+}
+
+// GetStateExecutionIdOk returns a tuple with the StateExecutionId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowResetRequest) GetStateExecutionIdOk() (*string, bool) {
+	if o == nil || o.StateExecutionId == nil {
+		return nil, false
+	}
+	return o.StateExecutionId, true
+}
+
+// HasStateExecutionId returns a boolean if a field has been set.
+func (o *WorkflowResetRequest) HasStateExecutionId() bool {
+	if o != nil && o.StateExecutionId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStateExecutionId gets a reference to the given string and assigns it to the StateExecutionId field.
+func (o *WorkflowResetRequest) SetStateExecutionId(v string) {
+	o.StateExecutionId = &v
+}
+
 // GetSkipSignalReapply returns the SkipSignalReapply field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetSkipSignalReapply() bool {
 	if o == nil || o.SkipSignalReapply == nil {
@@ -271,6 +337,12 @@ func (o WorkflowResetRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.HistoryEventTime != nil {
 		toSerialize["historyEventTime"] = o.HistoryEventTime
+	}
+	if o.StateId != nil {
+		toSerialize["stateId"] = o.StateId
+	}
+	if o.StateExecutionId != nil {
+		toSerialize["stateExecutionId"] = o.StateExecutionId
 	}
 	if o.SkipSignalReapply != nil {
 		toSerialize["skipSignalReapply"] = o.SkipSignalReapply

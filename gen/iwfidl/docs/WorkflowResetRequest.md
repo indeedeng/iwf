@@ -10,6 +10,8 @@ Name | Type | Description | Notes
 **HistoryEventId** | Pointer to **int32** |  | [optional] 
 **Reason** | Pointer to **string** |  | [optional] 
 **HistoryEventTime** | Pointer to **string** |  | [optional] 
+**StateId** | Pointer to **string** |  | [optional] 
+**StateExecutionId** | Pointer to **string** |  | [optional] 
 **SkipSignalReapply** | Pointer to **bool** |  | [optional] 
 
 ## Methods
@@ -170,6 +172,56 @@ SetHistoryEventTime sets HistoryEventTime field to given value.
 `func (o *WorkflowResetRequest) HasHistoryEventTime() bool`
 
 HasHistoryEventTime returns a boolean if a field has been set.
+
+### GetStateId
+
+`func (o *WorkflowResetRequest) GetStateId() string`
+
+GetStateId returns the StateId field if non-nil, zero value otherwise.
+
+### GetStateIdOk
+
+`func (o *WorkflowResetRequest) GetStateIdOk() (*string, bool)`
+
+GetStateIdOk returns a tuple with the StateId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStateId
+
+`func (o *WorkflowResetRequest) SetStateId(v string)`
+
+SetStateId sets StateId field to given value.
+
+### HasStateId
+
+`func (o *WorkflowResetRequest) HasStateId() bool`
+
+HasStateId returns a boolean if a field has been set.
+
+### GetStateExecutionId
+
+`func (o *WorkflowResetRequest) GetStateExecutionId() string`
+
+GetStateExecutionId returns the StateExecutionId field if non-nil, zero value otherwise.
+
+### GetStateExecutionIdOk
+
+`func (o *WorkflowResetRequest) GetStateExecutionIdOk() (*string, bool)`
+
+GetStateExecutionIdOk returns a tuple with the StateExecutionId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStateExecutionId
+
+`func (o *WorkflowResetRequest) SetStateExecutionId(v string)`
+
+SetStateExecutionId sets StateExecutionId field to given value.
+
+### HasStateExecutionId
+
+`func (o *WorkflowResetRequest) HasStateExecutionId() bool`
+
+HasStateExecutionId returns a boolean if a field has been set.
 
 ### GetSkipSignalReapply
 
