@@ -36,6 +36,7 @@ import (
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	cclient "go.uber.org/cadence/client"
 	"go.uber.org/cadence/compatibility"
+	"go.uber.org/cadence/encoded"
 	"go.uber.org/yarpc"
 	"go.uber.org/yarpc/transport/grpc"
 	"log"
@@ -122,7 +123,7 @@ func start(c *cli.Context) {
 		if err != nil {
 			log.Fatalf("Unable to connect to Cadence because of error %v", err)
 		}
-		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, closeFunc)
+		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
 
 		for _, svcName := range services {
 			go launchCadenceService(svcName, config, unifiedClient, serviceClient, domain, closeFunc)

@@ -8,14 +8,15 @@ import (
 	"github.com/indeedeng/iwf/service/common/timeparser"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
+	"go.uber.org/cadence/encoded"
 )
 
 func getResetIDsByType(
 	ctx context.Context,
 	resetType service.ResetType,
 	domain, wid, rid string,
-	frontendClient workflowserviceclient.Interface,
-	historyEventId int32, earliestHistoryTimeStr string,
+	frontendClient workflowserviceclient.Interface, converter encoded.DataConverter,
+	historyEventId int32, earliestHistoryTimeStr string, stateId, stateExecutionId string,
 ) (resetBaseRunID string, decisionFinishID int64, err error) {
 	// default to the same runID
 	resetBaseRunID = rid
@@ -36,6 +37,11 @@ func getResetIDsByType(
 			return
 		}
 		decisionFinishID, err = getEarliestDecisionID(ctx, domain, wid, rid, earliestTimeUnixNano, frontendClient)
+		if err != nil {
+			return
+		}
+	case service.ResetTypeStateId, service.ResetTypeStateExecutionId:
+		decisionFinishID, err = getDecisionEventIDByStateOrStateExecutionId(ctx, domain, wid, rid, stateId, stateExecutionId, frontendClient, converter)
 		if err != nil {
 			return
 		}
@@ -65,7 +71,8 @@ func getFirstDecisionTaskByType(
 	}
 
 	for {
-		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
+		var resp *shared.GetWorkflowExecutionHistoryResponse
+		resp, err = frontendClient.GetWorkflowExecutionHistory(ctx, req)
 		if err != nil {
 			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
 		}
@@ -107,7 +114,8 @@ func getEarliestDecisionID(
 
 OuterLoop:
 	for {
-		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
+		var resp *shared.GetWorkflowExecutionHistoryResponse
+		resp, err = frontendClient.GetWorkflowExecutionHistory(ctx, req)
 		if err != nil {
 			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
 		}
@@ -129,6 +137,59 @@ OuterLoop:
 		return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
 	}
 	return
+}
+
+func getDecisionEventIDByStateOrStateExecutionId(
+	ctx context.Context,
+	domain string, wid string,
+	rid string, stateId, stateExecutionId string,
+	frontendClient workflowserviceclient.Interface,
+	converter encoded.DataConverter,
+) (decisionFinishID int64, err error) {
+	req := &shared.GetWorkflowExecutionHistoryRequest{
+		Domain: &domain,
+		Execution: &shared.WorkflowExecution{
+			WorkflowId: &wid,
+			RunId:      &rid,
+		},
+		MaximumPageSize: iwfidl.PtrInt32(1000),
+		NextPageToken:   nil,
+	}
+
+	for {
+		var resp *shared.GetWorkflowExecutionHistoryResponse
+		resp, err = frontendClient.GetWorkflowExecutionHistory(ctx, req)
+		if err != nil {
+			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
+		}
+		for _, e := range resp.GetHistory().GetEvents() {
+			if e.GetEventType() == shared.EventTypeDecisionTaskCompleted {
+				decisionFinishID = e.GetEventId()
+			}
+			if e.GetEventType() == shared.EventTypeActivityTaskScheduled {
+				if e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName() == "StateStart" {
+					var backendType service.BackendType
+					var input service.StateStartActivityInput
+					err = converter.FromData(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)
+					if err != nil {
+						return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
+					}
+					if input.Request.WorkflowStateId == stateId || input.Request.Context.StateExecutionId == stateExecutionId {
+						if decisionFinishID == 0 {
+							return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", fmt.Errorf("invalid history or something goes very wrong"))
+						}
+						return
+					}
+				}
+			}
+		}
+		if len(resp.NextPageToken) != 0 {
+			req.NextPageToken = resp.NextPageToken
+		} else {
+			break
+		}
+	}
+	return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
 }
 
 func composeErrorWithMessage(msg string, err error) error {

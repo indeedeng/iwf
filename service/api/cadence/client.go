@@ -13,6 +13,7 @@ import (
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
+	"go.uber.org/cadence/encoded"
 )
 
 type cadenceClient struct {
@@ -20,14 +21,16 @@ type cadenceClient struct {
 	cClient       client.Client
 	closeFunc     func()
 	serviceClient workflowserviceclient.Interface
+	converter     encoded.DataConverter
 }
 
-func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, closeFunc func()) api.UnifiedClient {
+func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, converter encoded.DataConverter, closeFunc func()) api.UnifiedClient {
 	return &cadenceClient{
 		domain:        domain,
 		cClient:       cClient,
 		closeFunc:     closeFunc,
 		serviceClient: serviceClient,
+		converter:     converter,
 	}
 }
 
@@ -222,7 +225,7 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 
 	resetType := service.ResetType(request.GetResetType())
 	resetBaseRunID, decisionFinishID, err := getResetIDsByType(ctx, resetType, t.domain, request.GetWorkflowId(),
-		reqRunId, t.serviceClient, request.GetHistoryEventId(), request.GetHistoryEventTime())
+		reqRunId, t.serviceClient, t.converter, request.GetHistoryEventId(), request.GetHistoryEventTime(), request.GetStateId(), request.GetStateExecutionId())
 
 	if err != nil {
 		return "", err
