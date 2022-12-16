@@ -263,8 +263,9 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
-- [ ] More workflow start options: IdReusePolicy, initial search attributes/memo, cron schedule, retry, etc
-- [ ] StateOption: Start/Decide API timeout and retry
+- [x] More workflow start options: IdReusePolicy, cron schedule, retry
+- [x] StateOption: Start/Decide API timeout and retry policy
+- [ ] More workflow start options: initial search attributes/memo
 - [ ] Reset workflow by stateId
 
 ### 1.2
