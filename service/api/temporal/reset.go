@@ -8,12 +8,13 @@ import (
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/workflowservice/v1"
+	"go.temporal.io/sdk/converter"
 )
 
 func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
 	namespace, wid, rid string,
-	frontendClient workflowservice.WorkflowServiceClient,
-	historyEventId int32, earliestHistoryTimeStr string,
+	frontendClient workflowservice.WorkflowServiceClient, converter converter.DataConverter,
+	historyEventId int32, earliestHistoryTimeStr string, stateId, stateExecutionId string,
 ) (resetBaseRunID string, workflowTaskFinishID int64, err error) {
 	// default to the same runID
 	resetBaseRunID = rid
@@ -37,8 +38,8 @@ func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
 		if err != nil {
 			return
 		}
-	case service.ResetTypeStateId:
-		workflowTaskFinishID, err = getDecisionEventIDByStateOrStateExecutionId(ctx, namespace, wid, rid, "", "", frontendClient)
+	case service.ResetTypeStateId, service.ResetTypeStateExecutionId:
+		workflowTaskFinishID, err = getDecisionEventIDByStateOrStateExecutionId(ctx, namespace, wid, rid, stateId, stateExecutionId, frontendClient, converter)
 		if err != nil {
 			return
 		}
@@ -107,7 +108,8 @@ func getEarliestDecisionEventID(
 
 OuterLoop:
 	for {
-		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
+		var resp *workflowservice.GetWorkflowExecutionHistoryResponse
+		resp, err = frontendClient.GetWorkflowExecutionHistory(ctx, req)
 		if err != nil {
 			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
 		}
@@ -135,7 +137,7 @@ func getDecisionEventIDByStateOrStateExecutionId(
 	ctx context.Context,
 	namespace string, wid string,
 	rid string, stateId, stateExecutionId string,
-	frontendClient workflowservice.WorkflowServiceClient,
+	frontendClient workflowservice.WorkflowServiceClient, converter converter.DataConverter,
 ) (decisionFinishID int64, err error) {
 	req := &workflowservice.GetWorkflowExecutionHistoryRequest{
 		Namespace: namespace,
@@ -147,9 +149,9 @@ func getDecisionEventIDByStateOrStateExecutionId(
 		NextPageToken:   nil,
 	}
 
-	found := false
 	for {
-		resp, err := frontendClient.GetWorkflowExecutionHistory(ctx, req)
+		var resp *workflowservice.GetWorkflowExecutionHistoryResponse
+		resp, err = frontendClient.GetWorkflowExecutionHistory(ctx, req)
 		if err != nil {
 			return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
 		}
@@ -158,8 +160,20 @@ func getDecisionEventIDByStateOrStateExecutionId(
 				decisionFinishID = e.GetEventId()
 			}
 			if e.GetEventType() == enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED {
-				// TODO see decodeArgsToRawValues in go-sdk (encode_args.go)
-
+				if e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName() == "StateStart" {
+					var backendType service.BackendType
+					var input service.StateStartActivityInput
+					err = converter.FromPayloads(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)
+					if err != nil {
+						return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
+					}
+					if input.Request.WorkflowStateId == stateId || input.Request.Context.StateExecutionId == stateExecutionId {
+						if decisionFinishID == 0 {
+							return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", fmt.Errorf("invalid history or something goes very wrong"))
+						}
+						return
+					}
+				}
 			}
 		}
 		if len(resp.NextPageToken) != 0 {
@@ -168,10 +182,7 @@ func getDecisionEventIDByStateOrStateExecutionId(
 			break
 		}
 	}
-	if !found {
-		return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
-	}
-	return
+	return 0, composeErrorWithMessage("Get historyEventId failed", fmt.Errorf("no historyEventId"))
 }
 
 func composeErrorWithMessage(msg string, err error) error {

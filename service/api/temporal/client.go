@@ -17,14 +17,16 @@ import (
 )
 
 type temporalClient struct {
-	tClient   client.Client
-	namespace string
+	tClient       client.Client
+	namespace     string
+	dataConverter converter.DataConverter
 }
 
-func NewTemporalClient(tClient client.Client, namespace string) api.UnifiedClient {
+func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter) api.UnifiedClient {
 	return &temporalClient{
-		tClient:   tClient,
-		namespace: namespace,
+		tClient:       tClient,
+		namespace:     namespace,
+		dataConverter: dataConverter,
 	}
 }
 
@@ -216,7 +218,8 @@ func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.Workf
 	resetType := service.ResetType(request.GetResetType())
 	resetBaseRunID, resetEventId, err := getResetEventIDByType(ctx, resetType,
 		t.namespace, request.GetWorkflowId(), reqRunId,
-		t.tClient.WorkflowService(), request.GetHistoryEventId(), request.GetHistoryEventTime())
+		t.tClient.WorkflowService(), t.dataConverter,
+		request.GetHistoryEventId(), request.GetHistoryEventTime(), request.GetStateId(), request.GetStateExecutionId())
 
 	if err != nil {
 		return "", err

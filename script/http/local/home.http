@@ -22,8 +22,9 @@ Content-Type: application/json
 {
   "workflowId": "timer1671219152",
   "workflowRunId": "fae51e69-7e41-4658-89aa-663463951dc7",
-  "resetType": "STATE_ID",
+  "resetType": "STATE_EXECUTION_ID",
   "historyEventId":15,
   "historyEventTime": "150m",
-  "stateId": "S1"
+  "stateId": "S2",
+  "stateExecutionId": "S2-1"
 }
