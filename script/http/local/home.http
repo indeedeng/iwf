@@ -15,11 +15,14 @@ Content-Type: application/json
   "stateOptions": {}
 }
 
-### test reset API
+### test reset API NOTE: try different resetType: BEGINNING, HISTORY_EVENT_ID, HISTORY_EVENT_TIME
 POST http://localhost:8801/api/v1/workflow/reset
 Content-Type: application/json
 
 {
   "workflowId": "timer1671219152",
-  "resetType": "BEGINNING"
+  "workflowRunId": "fae51e69-7e41-4658-89aa-663463951dc7",
+  "resetType": "HISTORY_EVENT_TIME",
+  "historyEventId":15,
+  "historyEventTime": "150m"
 }

@@ -30,12 +30,12 @@ func getResetIDsByType(
 			return
 		}
 	case service.ResetTypeHistoryEventTime:
-		var earliestTime int64
-		earliestTime, err = timeparser.ParseTime(earliestHistoryTimeStr)
+		var earliestTimeUnixNano int64
+		earliestTimeUnixNano, err = timeparser.ParseTime(earliestHistoryTimeStr)
 		if err != nil {
 			return
 		}
-		decisionFinishID, err = getEarliestDecisionID(ctx, domain, wid, rid, earliestTime, frontendClient)
+		decisionFinishID, err = getEarliestDecisionID(ctx, domain, wid, rid, earliestTimeUnixNano, frontendClient)
 		if err != nil {
 			return
 		}

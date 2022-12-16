@@ -23,12 +23,12 @@ func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
 		workflowTaskFinishID = int64(historyEventId)
 		return
 	case service.ResetTypeHistoryEventTime:
-		var earliestTime int64
-		earliestTime, err = timeparser.ParseTime(earliestHistoryTimeStr)
+		var earliestTimeUnixNano int64
+		earliestTimeUnixNano, err = timeparser.ParseTime(earliestHistoryTimeStr)
 		if err != nil {
 			return
 		}
-		workflowTaskFinishID, err = getEarliestDecisionEventID(ctx, namespace, wid, rid, earliestTime, frontendClient)
+		workflowTaskFinishID, err = getEarliestDecisionEventID(ctx, namespace, wid, rid, earliestTimeUnixNano, frontendClient)
 		if err != nil {
 			return
 		}
@@ -107,7 +107,7 @@ OuterLoop:
 		}
 		for _, e := range resp.GetHistory().GetEvents() {
 			if e.GetEventType() == enums.EVENT_TYPE_WORKFLOW_TASK_COMPLETED {
-				if e.GetEventTime().Unix() >= earliestTime {
+				if e.GetEventTime().UnixNano() >= earliestTime {
 					decisionFinishID = e.GetEventId()
 					break OuterLoop
 				}
