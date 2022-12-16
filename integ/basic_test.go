@@ -48,10 +48,36 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        basic.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 100,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           basic.State1,
 		StateInput:             wfInput,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			WorkflowIDReusePolicy: iwfidl.PtrString(service.WorkflowIDReusePolicyRejectDuplicate),
+			// CronSchedule:          iwfidl.PtrString("* * * * *"),
+			RetryPolicy: &iwfidl.RetryPolicy{
+				InitialIntervalSeconds: iwfidl.PtrInt32(11),
+				BackoffCoefficient:     iwfidl.PtrFloat32(11),
+				MaximumAttempts:        iwfidl.PtrInt32(11),
+				MaximumIntervalSeconds: iwfidl.PtrInt32(11),
+			},
+		},
+		StateOptions: &iwfidl.WorkflowStateOptions{
+			StartApiTimeoutSeconds:  iwfidl.PtrInt32(12),
+			DecideApiTimeoutSeconds: iwfidl.PtrInt32(13),
+			StartApiRetryPolicy: &iwfidl.RetryPolicy{
+				InitialIntervalSeconds: iwfidl.PtrInt32(12),
+				BackoffCoefficient:     iwfidl.PtrFloat32(12),
+				MaximumAttempts:        iwfidl.PtrInt32(12),
+				MaximumIntervalSeconds: iwfidl.PtrInt32(12),
+			},
+			DecideApiRetryPolicy: &iwfidl.RetryPolicy{
+				InitialIntervalSeconds: iwfidl.PtrInt32(13),
+				BackoffCoefficient:     iwfidl.PtrFloat32(13),
+				MaximumAttempts:        iwfidl.PtrInt32(13),
+				MaximumIntervalSeconds: iwfidl.PtrInt32(13),
+			},
+		},
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)

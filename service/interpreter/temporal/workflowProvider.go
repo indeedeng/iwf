@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
@@ -97,6 +98,7 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	}
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
 		StartToCloseTimeout: options.StartToCloseTimeout,
+		RetryPolicy:         retry.ConvertTemporalRetryPolicy(options.RetryPolicy),
 	})
 	return interpreter.NewUnifiedContext(wfCtx2)
 }

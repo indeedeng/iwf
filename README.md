@@ -30,7 +30,7 @@ Related projects:
     - [Communication](#communication)
   - [Client APIs](#client-apis)
 - [Why iWF](#why-iwf)
-  - [If you are familar with Cadence/Temporal](#if-you-are-familar-with-cadencetemporal)
+  - [If you are familiar with Cadence/Temporal](#if-you-are-familiar-with-cadencetemporal)
   - [If you are not](#if-you-are-not)  
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
@@ -135,14 +135,14 @@ Logically, each workflow type will have a persistence schema like below:
   
 ### Communication
 There are two major communication mechanism in iWF:
-* `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalChannelCommand`.
+* `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalCommand`.
 * `InterStateChannel`: for interaction between state executions. It's used with `InterStateChannelCommand`.
 
 ## Client APIs
 Client APIs are hosted by iWF server for user workflow application to interact with their workflow executions. 
 * Start workflow: start a new workflow execution
 * Stop workflow: stop a workflow execution
-* Signal workflow: send a signal to a workflow execution via iWF serv
+* Signal workflow: send a signal to a workflow execution 
 * Search workflow: search for workflows using a query language like SQL with search attributes
 * Get workflow: get basic information about a workflow like status
 * Get workflow data objects: get the dataObjects of a workflow execution
@@ -152,7 +152,7 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 
 # Why iWF
 
-## If you are familar with Cadence/Temporal
+## If you are familiar with Cadence/Temporal
 * See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
 * See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
 
@@ -263,8 +263,9 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] Reset workflow API (Cadence only, TODO for Temporal)
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
-- [ ] More workflow start options: IdReusePolicy, initial search attributes/memo, cron schedule, retry, etc
-- [ ] StateOption: Start/Decide API timeout and retry
+- [x] More workflow start options: IdReusePolicy, cron schedule, retry
+- [x] StateOption: Start/Decide API timeout and retry policy
+- [ ] More workflow start options: initial search attributes/memo
 - [ ] Reset workflow by stateId
 
 ### 1.2

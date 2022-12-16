@@ -3,10 +3,10 @@ package temporal
 import (
 	"context"
 	"fmt"
-
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
@@ -31,9 +31,9 @@ func (t *temporalClient) Close() {
 
 func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                 options.ID,
-		TaskQueue:          options.TaskQueue,
-		WorkflowRunTimeout: options.WorkflowRunTimeout,
+		ID:                       options.ID,
+		TaskQueue:                options.TaskQueue,
+		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {
@@ -47,6 +47,10 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 
 	if options.CronSchedule != nil {
 		workflowOptions.CronSchedule = *options.CronSchedule
+	}
+
+	if options.RetryPolicy != nil {
+		workflowOptions.RetryPolicy = retry.ConvertTemporalRetryPolicy(options.RetryPolicy)
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)

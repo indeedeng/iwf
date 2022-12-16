@@ -16,9 +16,9 @@ import (
 
 // RetryPolicy struct for RetryPolicy
 type RetryPolicy struct {
-	InitialInterval *float32 `json:"initialInterval,omitempty"`
+	InitialIntervalSeconds *int32 `json:"initialIntervalSeconds,omitempty"`
 	BackoffCoefficient *float32 `json:"backoffCoefficient,omitempty"`
-	MaximumInterval *float32 `json:"maximumInterval,omitempty"`
+	MaximumIntervalSeconds *int32 `json:"maximumIntervalSeconds,omitempty"`
 	MaximumAttempts *int32 `json:"maximumAttempts,omitempty"`
 }
 
@@ -39,36 +39,36 @@ func NewRetryPolicyWithDefaults() *RetryPolicy {
 	return &this
 }
 
-// GetInitialInterval returns the InitialInterval field value if set, zero value otherwise.
-func (o *RetryPolicy) GetInitialInterval() float32 {
-	if o == nil || o.InitialInterval == nil {
-		var ret float32
+// GetInitialIntervalSeconds returns the InitialIntervalSeconds field value if set, zero value otherwise.
+func (o *RetryPolicy) GetInitialIntervalSeconds() int32 {
+	if o == nil || o.InitialIntervalSeconds == nil {
+		var ret int32
 		return ret
 	}
-	return *o.InitialInterval
+	return *o.InitialIntervalSeconds
 }
 
-// GetInitialIntervalOk returns a tuple with the InitialInterval field value if set, nil otherwise
+// GetInitialIntervalSecondsOk returns a tuple with the InitialIntervalSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetInitialIntervalOk() (*float32, bool) {
-	if o == nil || o.InitialInterval == nil {
+func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool) {
+	if o == nil || o.InitialIntervalSeconds == nil {
 		return nil, false
 	}
-	return o.InitialInterval, true
+	return o.InitialIntervalSeconds, true
 }
 
-// HasInitialInterval returns a boolean if a field has been set.
-func (o *RetryPolicy) HasInitialInterval() bool {
-	if o != nil && o.InitialInterval != nil {
+// HasInitialIntervalSeconds returns a boolean if a field has been set.
+func (o *RetryPolicy) HasInitialIntervalSeconds() bool {
+	if o != nil && o.InitialIntervalSeconds != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetInitialInterval gets a reference to the given float32 and assigns it to the InitialInterval field.
-func (o *RetryPolicy) SetInitialInterval(v float32) {
-	o.InitialInterval = &v
+// SetInitialIntervalSeconds gets a reference to the given int32 and assigns it to the InitialIntervalSeconds field.
+func (o *RetryPolicy) SetInitialIntervalSeconds(v int32) {
+	o.InitialIntervalSeconds = &v
 }
 
 // GetBackoffCoefficient returns the BackoffCoefficient field value if set, zero value otherwise.
@@ -103,36 +103,36 @@ func (o *RetryPolicy) SetBackoffCoefficient(v float32) {
 	o.BackoffCoefficient = &v
 }
 
-// GetMaximumInterval returns the MaximumInterval field value if set, zero value otherwise.
-func (o *RetryPolicy) GetMaximumInterval() float32 {
-	if o == nil || o.MaximumInterval == nil {
-		var ret float32
+// GetMaximumIntervalSeconds returns the MaximumIntervalSeconds field value if set, zero value otherwise.
+func (o *RetryPolicy) GetMaximumIntervalSeconds() int32 {
+	if o == nil || o.MaximumIntervalSeconds == nil {
+		var ret int32
 		return ret
 	}
-	return *o.MaximumInterval
+	return *o.MaximumIntervalSeconds
 }
 
-// GetMaximumIntervalOk returns a tuple with the MaximumInterval field value if set, nil otherwise
+// GetMaximumIntervalSecondsOk returns a tuple with the MaximumIntervalSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetMaximumIntervalOk() (*float32, bool) {
-	if o == nil || o.MaximumInterval == nil {
+func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool) {
+	if o == nil || o.MaximumIntervalSeconds == nil {
 		return nil, false
 	}
-	return o.MaximumInterval, true
+	return o.MaximumIntervalSeconds, true
 }
 
-// HasMaximumInterval returns a boolean if a field has been set.
-func (o *RetryPolicy) HasMaximumInterval() bool {
-	if o != nil && o.MaximumInterval != nil {
+// HasMaximumIntervalSeconds returns a boolean if a field has been set.
+func (o *RetryPolicy) HasMaximumIntervalSeconds() bool {
+	if o != nil && o.MaximumIntervalSeconds != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetMaximumInterval gets a reference to the given float32 and assigns it to the MaximumInterval field.
-func (o *RetryPolicy) SetMaximumInterval(v float32) {
-	o.MaximumInterval = &v
+// SetMaximumIntervalSeconds gets a reference to the given int32 and assigns it to the MaximumIntervalSeconds field.
+func (o *RetryPolicy) SetMaximumIntervalSeconds(v int32) {
+	o.MaximumIntervalSeconds = &v
 }
 
 // GetMaximumAttempts returns the MaximumAttempts field value if set, zero value otherwise.
@@ -169,14 +169,14 @@ func (o *RetryPolicy) SetMaximumAttempts(v int32) {
 
 func (o RetryPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.InitialInterval != nil {
-		toSerialize["initialInterval"] = o.InitialInterval
+	if o.InitialIntervalSeconds != nil {
+		toSerialize["initialIntervalSeconds"] = o.InitialIntervalSeconds
 	}
 	if o.BackoffCoefficient != nil {
 		toSerialize["backoffCoefficient"] = o.BackoffCoefficient
 	}
-	if o.MaximumInterval != nil {
-		toSerialize["maximumInterval"] = o.MaximumInterval
+	if o.MaximumIntervalSeconds != nil {
+		toSerialize["maximumIntervalSeconds"] = o.MaximumIntervalSeconds
 	}
 	if o.MaximumAttempts != nil {
 		toSerialize["maximumAttempts"] = o.MaximumAttempts

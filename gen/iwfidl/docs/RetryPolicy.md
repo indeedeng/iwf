@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**InitialInterval** | Pointer to **float32** |  | [optional] 
+**InitialIntervalSeconds** | Pointer to **int32** |  | [optional] 
 **BackoffCoefficient** | Pointer to **float32** |  | [optional] 
-**MaximumInterval** | Pointer to **float32** |  | [optional] 
+**MaximumIntervalSeconds** | Pointer to **int32** |  | [optional] 
 **MaximumAttempts** | Pointer to **int32** |  | [optional] 
 
 ## Methods
@@ -28,30 +28,30 @@ NewRetryPolicyWithDefaults instantiates a new RetryPolicy object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetInitialInterval
+### GetInitialIntervalSeconds
 
-`func (o *RetryPolicy) GetInitialInterval() float32`
+`func (o *RetryPolicy) GetInitialIntervalSeconds() int32`
 
-GetInitialInterval returns the InitialInterval field if non-nil, zero value otherwise.
+GetInitialIntervalSeconds returns the InitialIntervalSeconds field if non-nil, zero value otherwise.
 
-### GetInitialIntervalOk
+### GetInitialIntervalSecondsOk
 
-`func (o *RetryPolicy) GetInitialIntervalOk() (*float32, bool)`
+`func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool)`
 
-GetInitialIntervalOk returns a tuple with the InitialInterval field if it's non-nil, zero value otherwise
+GetInitialIntervalSecondsOk returns a tuple with the InitialIntervalSeconds field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetInitialInterval
+### SetInitialIntervalSeconds
 
-`func (o *RetryPolicy) SetInitialInterval(v float32)`
+`func (o *RetryPolicy) SetInitialIntervalSeconds(v int32)`
 
-SetInitialInterval sets InitialInterval field to given value.
+SetInitialIntervalSeconds sets InitialIntervalSeconds field to given value.
 
-### HasInitialInterval
+### HasInitialIntervalSeconds
 
-`func (o *RetryPolicy) HasInitialInterval() bool`
+`func (o *RetryPolicy) HasInitialIntervalSeconds() bool`
 
-HasInitialInterval returns a boolean if a field has been set.
+HasInitialIntervalSeconds returns a boolean if a field has been set.
 
 ### GetBackoffCoefficient
 
@@ -78,30 +78,30 @@ SetBackoffCoefficient sets BackoffCoefficient field to given value.
 
 HasBackoffCoefficient returns a boolean if a field has been set.
 
-### GetMaximumInterval
+### GetMaximumIntervalSeconds
 
-`func (o *RetryPolicy) GetMaximumInterval() float32`
+`func (o *RetryPolicy) GetMaximumIntervalSeconds() int32`
 
-GetMaximumInterval returns the MaximumInterval field if non-nil, zero value otherwise.
+GetMaximumIntervalSeconds returns the MaximumIntervalSeconds field if non-nil, zero value otherwise.
 
-### GetMaximumIntervalOk
+### GetMaximumIntervalSecondsOk
 
-`func (o *RetryPolicy) GetMaximumIntervalOk() (*float32, bool)`
+`func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool)`
 
-GetMaximumIntervalOk returns a tuple with the MaximumInterval field if it's non-nil, zero value otherwise
+GetMaximumIntervalSecondsOk returns a tuple with the MaximumIntervalSeconds field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetMaximumInterval
+### SetMaximumIntervalSeconds
 
-`func (o *RetryPolicy) SetMaximumInterval(v float32)`
+`func (o *RetryPolicy) SetMaximumIntervalSeconds(v int32)`
 
-SetMaximumInterval sets MaximumInterval field to given value.
+SetMaximumIntervalSeconds sets MaximumIntervalSeconds field to given value.
 
-### HasMaximumInterval
+### HasMaximumIntervalSeconds
 
-`func (o *RetryPolicy) HasMaximumInterval() bool`
+`func (o *RetryPolicy) HasMaximumIntervalSeconds() bool`
 
-HasMaximumInterval returns a boolean if a field has been set.
+HasMaximumIntervalSeconds returns a boolean if a field has been set.
 
 ### GetMaximumAttempts
 

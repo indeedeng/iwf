@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
@@ -39,7 +39,7 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
-		ExecutionStartToCloseTimeout: options.WorkflowRunTimeout,
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {
@@ -53,6 +53,10 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 
 	if options.CronSchedule != nil {
 		workflowOptions.CronSchedule = *options.CronSchedule
+	}
+
+	if options.RetryPolicy != nil {
+		workflowOptions.RetryPolicy = retry.ConvertCadenceRetryPolicy(options.RetryPolicy)
 	}
 
 	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
