@@ -3,6 +3,7 @@ package temporal
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
@@ -200,5 +201,44 @@ func (t *temporalClient) GetWorkflowResult(ctx context.Context, valuePtr interfa
 }
 
 func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error) {
-	return "", fmt.Errorf("not supported")
+	reqRunId := request.GetWorkflowRunId()
+	if reqRunId == "" {
+		// set default runId to current
+		resp, err := t.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
+		if err != nil {
+			return "", err
+		}
+		reqRunId = resp.RunId
+	}
+
+	resetType := service.ResetType(request.GetResetType())
+	resetBaseRunID, resetEventId, err := getResetEventIDByType(ctx, resetType,
+		"", request.GetWorkflowId(), reqRunId,
+		t.tClient.WorkflowService(), request.GetHistoryEventId(), request.GetHistoryEventTime())
+
+	if err != nil {
+		return "", err
+	}
+
+	requestId := uuid.New().String()
+	resetReapplyType := enums.RESET_REAPPLY_TYPE_SIGNAL
+	if request.GetSkipSignalReapply() {
+		resetReapplyType = enums.RESET_REAPPLY_TYPE_NONE
+	}
+
+	resp, err := t.tClient.ResetWorkflowExecution(ctx, &workflowservice.ResetWorkflowExecutionRequest{
+		WorkflowExecution: &common.WorkflowExecution{
+			WorkflowId: request.WorkflowId,
+			RunId:      resetBaseRunID,
+		},
+		Reason:                    request.GetReason(),
+		WorkflowTaskFinishEventId: resetEventId,
+		RequestId:                 requestId,
+		ResetReapplyType:          resetReapplyType,
+	})
+
+	if err != nil {
+		return "", err
+	}
+	return resp.GetRunId(), nil
 }
