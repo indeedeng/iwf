@@ -8,6 +8,9 @@ import (
 )
 
 func ConvertCadenceRetryPolicy(policy *iwfidl.RetryPolicy) *workflow.RetryPolicy {
+	if policy == nil {
+		return nil
+	}
 	fillRetryPolicyDefault(policy)
 
 	return &workflow.RetryPolicy{
@@ -19,6 +22,9 @@ func ConvertCadenceRetryPolicy(policy *iwfidl.RetryPolicy) *workflow.RetryPolicy
 }
 
 func ConvertTemporalRetryPolicy(policy *iwfidl.RetryPolicy) *temporal.RetryPolicy {
+	if policy == nil {
+		return nil
+	}
 	fillRetryPolicyDefault(policy)
 
 	return &temporal.RetryPolicy{
