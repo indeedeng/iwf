@@ -31,9 +31,9 @@ func (t *temporalClient) Close() {
 
 func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                 options.ID,
-		TaskQueue:          options.TaskQueue,
-		WorkflowRunTimeout: options.WorkflowRunTimeout,
+		ID:                       options.ID,
+		TaskQueue:                options.TaskQueue,
+		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {

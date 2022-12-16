@@ -39,7 +39,7 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
-		ExecutionStartToCloseTimeout: options.WorkflowRunTimeout,
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {

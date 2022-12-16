@@ -38,12 +38,12 @@ type UnifiedClient interface {
 }
 
 type StartWorkflowOptions struct {
-	ID                    string
-	TaskQueue             string
-	WorkflowRunTimeout    time.Duration
-	WorkflowIDReusePolicy *string
-	CronSchedule          *string
-	RetryPolicy           *iwfidl.RetryPolicy
+	ID                       string
+	TaskQueue                string
+	WorkflowExecutionTimeout time.Duration
+	WorkflowIDReusePolicy    *string
+	CronSchedule             *string
+	RetryPolicy              *iwfidl.RetryPolicy
 }
 
 type ListWorkflowExecutionsRequest struct {

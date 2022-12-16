@@ -52,6 +52,16 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           basic.State1,
 		StateInput:             wfInput,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			WorkflowIDReusePolicy: iwfidl.PtrString(service.WorkflowIDReusePolicyRejectDuplicate),
+			CronSchedule:          iwfidl.PtrString("* * * * *"),
+			RetryPolicy: &iwfidl.RetryPolicy{
+				InitialIntervalSeconds: iwfidl.PtrInt32(10),
+				BackoffCoefficient:     iwfidl.PtrFloat32(10),
+				MaximumAttempts:        iwfidl.PtrInt32(10),
+				MaximumIntervalSeconds: iwfidl.PtrInt32(10),
+			},
+		},
 	}).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
