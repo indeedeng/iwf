@@ -32,9 +32,11 @@ import (
 	apiv1 "github.com/uber/cadence-idl/go/proto/api/v1"
 	"github.com/urfave/cli"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	cclient "go.uber.org/cadence/client"
 	"go.uber.org/cadence/compatibility"
+	"go.uber.org/cadence/encoded"
 	"go.uber.org/yarpc"
 	"go.uber.org/yarpc/transport/grpc"
 	"log"
@@ -99,7 +101,7 @@ func start(c *cli.Context) {
 		if err != nil {
 			log.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Backend.Temporal.Namespace)
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Backend.Temporal.Namespace, converter.GetDefaultDataConverter())
 
 		for _, svcName := range services {
 			go launchTemporalService(svcName, config, unifiedClient, temporalClient)
@@ -121,7 +123,7 @@ func start(c *cli.Context) {
 		if err != nil {
 			log.Fatalf("Unable to connect to Cadence because of error %v", err)
 		}
-		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, closeFunc)
+		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
 
 		for _, svcName := range services {
 			go launchCadenceService(svcName, config, unifiedClient, serviceClient, domain, closeFunc)

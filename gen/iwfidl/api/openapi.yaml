@@ -709,10 +709,12 @@ components:
         reason: reason
         historyEventId: 0
         historyEventTime: historyEventTime
+        stateId: stateId
         resetType: HISTORY_EVENT_ID
         skipSignalReapply: true
         workflowRunId: workflowRunId
         workflowId: workflowId
+        stateExecutionId: stateExecutionId
       properties:
         workflowId:
           type: string
@@ -723,12 +725,18 @@ components:
           - HISTORY_EVENT_ID
           - BEGINNING
           - HISTORY_EVENT_TIME
+          - STATE_ID
+          - STATE_EXECUTION_ID
           type: string
         historyEventId:
           type: integer
         reason:
           type: string
         historyEventTime:
+          type: string
+        stateId:
+          type: string
+        stateExecutionId:
           type: string
         skipSignalReapply:
           type: boolean

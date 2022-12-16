@@ -264,8 +264,8 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] AnyCommandCompleted Decider trigger type
 - [x] More workflow start options: IdReusePolicy, cron schedule, retry
 - [x] StateOption: Start/Decide API timeout and retry policy
+- [x] Reset workflow by stateId or stateExecutionId 
 - [ ] More workflow start options: initial search attributes/memo
-- [ ] Reset workflow by stateId
 
 ### 1.2
 - [ ] Decider trigger type: AnyCommandClosed

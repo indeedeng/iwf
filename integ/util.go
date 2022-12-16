@@ -11,6 +11,8 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
+	"go.uber.org/cadence/encoded"
 	"log"
 	"net/http"
 )
@@ -47,7 +49,7 @@ func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
 	if backendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
-		iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient, testNamespace))
+		iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter()))
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -73,7 +75,7 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 
 		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, iwf.DefaultCadenceDomain)
 
-		iwfService := api.NewService(cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, closeFunc))
+		iwfService := api.NewService(cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc))
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
