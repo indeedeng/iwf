@@ -78,7 +78,7 @@ services:
       - 8233:8080
   iwf-server:
     container_name: iwf-server
-    image: prclqz/iwf-server:latest
+    image: iworkflowio/iwf-server:latest #NOTE: you can change to version tag like v1.0.0-RC6
     environment:
       - AUTO_FIX_WORKER_URL=host.docker.internal # this will let iwf-server automatically replace all iwfWorkerUrls of "localhost" or "127.0.0.1" with "host.docker.internal"
     networks:

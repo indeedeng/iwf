@@ -182,6 +182,10 @@ Link to WebUI: http://localhost:8233/namespaces/default/workflows
 
 By default, iWF server is serving port **8801**, server URL is http://localhost:8801/ )
 
+NOTE:
+
+Use `docker pull iworkflowio/iwf-server:latest` to update the latest image.Or update the docker-compose file to specify the version tag.
+
 ## How to build & run locally
 * Run `make bins` to build the binary `iwf-server`
 * Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
