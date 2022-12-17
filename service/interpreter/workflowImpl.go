@@ -396,6 +396,9 @@ func executeState(
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
+	activityOptions = ActivityOptions{
+		StartToCloseTimeout: 30 * time.Second,
+	}
 	if state.NextStateOptions != nil {
 		if state.NextStateOptions.GetDecideApiTimeoutSeconds() > 0 {
 			activityOptions.StartToCloseTimeout = time.Duration(state.NextStateOptions.GetDecideApiTimeoutSeconds()) * time.Second
