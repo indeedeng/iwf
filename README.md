@@ -106,7 +106,7 @@ There must be at least one WorkflowState being executed for a running WorkflowEx
 These are the three command types:
 * `SignalCommand`: will be waiting for a signal from external to the workflow signal channel. External application can use SignalWorkflow API to signal a workflow. 
 * `TimerCommand`: will be waiting for a **durable timer** to fire.
-* `InterStateChannelCommand`: will be waiting for a value being published from another state execution(internally in the same workflow execution)
+* `InterStateChannelCommand`: will be waiting for a value being published from another state in the same workflow execution
 
 Note that `start` API can return multiple commands, and choose different DeciderTriggerType for triggering decide API:
 * `AllCommandCompleted`: this will wait for all command completed
