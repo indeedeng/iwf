@@ -34,9 +34,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	interStateChannel := NewInterStateChannel()
 	currentStates := []iwfidl.StateMovement{
 		{
-			StateId:          input.StartStateId,
-			NextStateOptions: &input.StateOptions,
-			NextStateInput:   &input.StateInput,
+			StateId:      input.StartStateId,
+			StateOptions: &input.StateOptions,
+			StateInput:   &input.StateInput,
 		},
 	}
 	persistenceManager := NewPersistenceManager(func(attributes map[string]interface{}) error {
@@ -147,7 +147,7 @@ func checkClosingWorkflow(
 			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
-				CompletedStateOutput:      movement.NextStateInput,
+				CompletedStateOutput:      movement.StateInput,
 			}
 		}
 		if stateId == service.ForceCompletingWorkflowStateId {
@@ -156,7 +156,7 @@ func checkClosingWorkflow(
 			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
-				CompletedStateOutput:      movement.NextStateInput,
+				CompletedStateOutput:      movement.StateInput,
 			}
 		}
 		if stateId == service.ForceFailingWorkflowStateId {
@@ -187,11 +187,11 @@ func executeState(
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
 	}
-	if state.NextStateOptions != nil {
-		if state.NextStateOptions.GetStartApiTimeoutSeconds() > 0 {
-			activityOptions.StartToCloseTimeout = time.Duration(state.NextStateOptions.GetStartApiTimeoutSeconds()) * time.Second
+	if state.StateOptions != nil {
+		if state.StateOptions.GetStartApiTimeoutSeconds() > 0 {
+			activityOptions.StartToCloseTimeout = time.Duration(state.StateOptions.GetStartApiTimeoutSeconds()) * time.Second
 		}
-		activityOptions.RetryPolicy = state.NextStateOptions.StartApiRetryPolicy
+		activityOptions.RetryPolicy = state.StateOptions.StartApiRetryPolicy
 	}
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
@@ -210,9 +210,9 @@ func executeState(
 			Context:          exeCtx,
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
-			StateInput:       state.NextStateInput,
-			SearchAttributes: attrMgr.LoadSearchAttributes(state.NextStateOptions),
-			DataObjects:      attrMgr.LoadDataObjects(state.NextStateOptions),
+			StateInput:       state.StateInput,
+			SearchAttributes: attrMgr.LoadSearchAttributes(state.StateOptions),
+			DataObjects:      attrMgr.LoadDataObjects(state.StateOptions),
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
@@ -399,11 +399,11 @@ func executeState(
 	activityOptions = ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
 	}
-	if state.NextStateOptions != nil {
-		if state.NextStateOptions.GetDecideApiTimeoutSeconds() > 0 {
-			activityOptions.StartToCloseTimeout = time.Duration(state.NextStateOptions.GetDecideApiTimeoutSeconds()) * time.Second
+	if state.StateOptions != nil {
+		if state.StateOptions.GetDecideApiTimeoutSeconds() > 0 {
+			activityOptions.StartToCloseTimeout = time.Duration(state.StateOptions.GetDecideApiTimeoutSeconds()) * time.Second
 		}
-		activityOptions.RetryPolicy = state.NextStateOptions.DecideApiRetryPolicy
+		activityOptions.RetryPolicy = state.StateOptions.DecideApiRetryPolicy
 	}
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
@@ -416,9 +416,9 @@ func executeState(
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      startResponse.GetUpsertStateLocals(),
-			SearchAttributes: attrMgr.LoadSearchAttributes(state.NextStateOptions),
-			DataObjects:      attrMgr.LoadDataObjects(state.NextStateOptions),
-			StateInput:       state.NextStateInput,
+			SearchAttributes: attrMgr.LoadSearchAttributes(state.StateOptions),
+			DataObjects:      attrMgr.LoadDataObjects(state.StateOptions),
+			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {
