@@ -17,8 +17,8 @@ import (
 // StateMovement struct for StateMovement
 type StateMovement struct {
 	StateId string `json:"stateId"`
-	NextStateInput *EncodedObject `json:"nextStateInput,omitempty"`
-	NextStateOptions *WorkflowStateOptions `json:"nextStateOptions,omitempty"`
+	StateInput *EncodedObject `json:"stateInput,omitempty"`
+	StateOptions *WorkflowStateOptions `json:"stateOptions,omitempty"`
 }
 
 // NewStateMovement instantiates a new StateMovement object
@@ -63,68 +63,68 @@ func (o *StateMovement) SetStateId(v string) {
 	o.StateId = v
 }
 
-// GetNextStateInput returns the NextStateInput field value if set, zero value otherwise.
-func (o *StateMovement) GetNextStateInput() EncodedObject {
-	if o == nil || o.NextStateInput == nil {
+// GetStateInput returns the StateInput field value if set, zero value otherwise.
+func (o *StateMovement) GetStateInput() EncodedObject {
+	if o == nil || o.StateInput == nil {
 		var ret EncodedObject
 		return ret
 	}
-	return *o.NextStateInput
+	return *o.StateInput
 }
 
-// GetNextStateInputOk returns a tuple with the NextStateInput field value if set, nil otherwise
+// GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *StateMovement) GetNextStateInputOk() (*EncodedObject, bool) {
-	if o == nil || o.NextStateInput == nil {
+func (o *StateMovement) GetStateInputOk() (*EncodedObject, bool) {
+	if o == nil || o.StateInput == nil {
 		return nil, false
 	}
-	return o.NextStateInput, true
+	return o.StateInput, true
 }
 
-// HasNextStateInput returns a boolean if a field has been set.
-func (o *StateMovement) HasNextStateInput() bool {
-	if o != nil && o.NextStateInput != nil {
+// HasStateInput returns a boolean if a field has been set.
+func (o *StateMovement) HasStateInput() bool {
+	if o != nil && o.StateInput != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetNextStateInput gets a reference to the given EncodedObject and assigns it to the NextStateInput field.
-func (o *StateMovement) SetNextStateInput(v EncodedObject) {
-	o.NextStateInput = &v
+// SetStateInput gets a reference to the given EncodedObject and assigns it to the StateInput field.
+func (o *StateMovement) SetStateInput(v EncodedObject) {
+	o.StateInput = &v
 }
 
-// GetNextStateOptions returns the NextStateOptions field value if set, zero value otherwise.
-func (o *StateMovement) GetNextStateOptions() WorkflowStateOptions {
-	if o == nil || o.NextStateOptions == nil {
+// GetStateOptions returns the StateOptions field value if set, zero value otherwise.
+func (o *StateMovement) GetStateOptions() WorkflowStateOptions {
+	if o == nil || o.StateOptions == nil {
 		var ret WorkflowStateOptions
 		return ret
 	}
-	return *o.NextStateOptions
+	return *o.StateOptions
 }
 
-// GetNextStateOptionsOk returns a tuple with the NextStateOptions field value if set, nil otherwise
+// GetStateOptionsOk returns a tuple with the StateOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *StateMovement) GetNextStateOptionsOk() (*WorkflowStateOptions, bool) {
-	if o == nil || o.NextStateOptions == nil {
+func (o *StateMovement) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
+	if o == nil || o.StateOptions == nil {
 		return nil, false
 	}
-	return o.NextStateOptions, true
+	return o.StateOptions, true
 }
 
-// HasNextStateOptions returns a boolean if a field has been set.
-func (o *StateMovement) HasNextStateOptions() bool {
-	if o != nil && o.NextStateOptions != nil {
+// HasStateOptions returns a boolean if a field has been set.
+func (o *StateMovement) HasStateOptions() bool {
+	if o != nil && o.StateOptions != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetNextStateOptions gets a reference to the given WorkflowStateOptions and assigns it to the NextStateOptions field.
-func (o *StateMovement) SetNextStateOptions(v WorkflowStateOptions) {
-	o.NextStateOptions = &v
+// SetStateOptions gets a reference to the given WorkflowStateOptions and assigns it to the StateOptions field.
+func (o *StateMovement) SetStateOptions(v WorkflowStateOptions) {
+	o.StateOptions = &v
 }
 
 func (o StateMovement) MarshalJSON() ([]byte, error) {
@@ -132,11 +132,11 @@ func (o StateMovement) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["stateId"] = o.StateId
 	}
-	if o.NextStateInput != nil {
-		toSerialize["nextStateInput"] = o.NextStateInput
+	if o.StateInput != nil {
+		toSerialize["stateInput"] = o.StateInput
 	}
-	if o.NextStateOptions != nil {
-		toSerialize["nextStateOptions"] = o.NextStateOptions
+	if o.StateOptions != nil {
+		toSerialize["stateOptions"] = o.StateOptions
 	}
 	return json.Marshal(toSerialize)
 }

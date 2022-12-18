@@ -5,8 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **StateId** | **string** |  | 
-**NextStateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
-**NextStateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
+**StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
+**StateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 
 ## Methods
 
@@ -47,55 +47,55 @@ and a boolean to check if the value has been set.
 SetStateId sets StateId field to given value.
 
 
-### GetNextStateInput
+### GetStateInput
 
-`func (o *StateMovement) GetNextStateInput() EncodedObject`
+`func (o *StateMovement) GetStateInput() EncodedObject`
 
-GetNextStateInput returns the NextStateInput field if non-nil, zero value otherwise.
+GetStateInput returns the StateInput field if non-nil, zero value otherwise.
 
-### GetNextStateInputOk
+### GetStateInputOk
 
-`func (o *StateMovement) GetNextStateInputOk() (*EncodedObject, bool)`
+`func (o *StateMovement) GetStateInputOk() (*EncodedObject, bool)`
 
-GetNextStateInputOk returns a tuple with the NextStateInput field if it's non-nil, zero value otherwise
+GetStateInputOk returns a tuple with the StateInput field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetNextStateInput
+### SetStateInput
 
-`func (o *StateMovement) SetNextStateInput(v EncodedObject)`
+`func (o *StateMovement) SetStateInput(v EncodedObject)`
 
-SetNextStateInput sets NextStateInput field to given value.
+SetStateInput sets StateInput field to given value.
 
-### HasNextStateInput
+### HasStateInput
 
-`func (o *StateMovement) HasNextStateInput() bool`
+`func (o *StateMovement) HasStateInput() bool`
 
-HasNextStateInput returns a boolean if a field has been set.
+HasStateInput returns a boolean if a field has been set.
 
-### GetNextStateOptions
+### GetStateOptions
 
-`func (o *StateMovement) GetNextStateOptions() WorkflowStateOptions`
+`func (o *StateMovement) GetStateOptions() WorkflowStateOptions`
 
-GetNextStateOptions returns the NextStateOptions field if non-nil, zero value otherwise.
+GetStateOptions returns the StateOptions field if non-nil, zero value otherwise.
 
-### GetNextStateOptionsOk
+### GetStateOptionsOk
 
-`func (o *StateMovement) GetNextStateOptionsOk() (*WorkflowStateOptions, bool)`
+`func (o *StateMovement) GetStateOptionsOk() (*WorkflowStateOptions, bool)`
 
-GetNextStateOptionsOk returns a tuple with the NextStateOptions field if it's non-nil, zero value otherwise
+GetStateOptionsOk returns a tuple with the StateOptions field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetNextStateOptions
+### SetStateOptions
 
-`func (o *StateMovement) SetNextStateOptions(v WorkflowStateOptions)`
+`func (o *StateMovement) SetStateOptions(v WorkflowStateOptions)`
 
-SetNextStateOptions sets NextStateOptions field to given value.
+SetStateOptions sets StateOptions field to given value.
 
-### HasNextStateOptions
+### HasStateOptions
 
-`func (o *StateMovement) HasNextStateOptions() bool`
+`func (o *StateMovement) HasStateOptions() bool`
 
-HasNextStateOptions returns a boolean if a field has been set.
+HasStateOptions returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

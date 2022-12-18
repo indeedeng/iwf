@@ -43,7 +43,7 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.SearchAttribute {
 	var loadingType string
 	var partialLoadingKeys []string
-	if stateOptions != nil || stateOptions.SearchAttributesLoadingPolicy != nil {
+	if stateOptions != nil && stateOptions.SearchAttributesLoadingPolicy != nil {
 		policy := stateOptions.GetSearchAttributesLoadingPolicy()
 		loadingType = policy.GetPersistenceLoadingType()
 	}
@@ -69,7 +69,7 @@ func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.Workflow
 func (am *PersistenceManager) LoadDataObjects(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.KeyValue {
 	var loadingType string
 	var partialLoadingKeys []string
-	if stateOptions != nil || stateOptions.DataObjectsLoadingPolicy != nil {
+	if stateOptions != nil && stateOptions.DataObjectsLoadingPolicy != nil {
 		policy := stateOptions.GetDataObjectsLoadingPolicy()
 		loadingType = policy.GetPersistenceLoadingType()
 	}
