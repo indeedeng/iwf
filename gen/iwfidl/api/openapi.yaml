@@ -382,6 +382,7 @@ components:
         persistenceLoadingType:
           enum:
           - LOAD_ALL_WITHOUT_LOCKING
+          - LOAD_PARTIAL_WITHOUT_LOCKING
           type: string
         partialLoadingKeys:
           items:
