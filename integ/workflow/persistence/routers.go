@@ -12,11 +12,12 @@ import (
 const (
 	EnableTestingSearchAttribute = true
 
-	WorkflowType      = "persistence"
-	State1            = "S1"
-	State2            = "S2"
-	TestDataObjectKey = "test-data-object"
-	TestStateLocalKey = "test-state-local"
+	WorkflowType       = "persistence"
+	State1             = "S1"
+	State2             = "S2"
+	TestDataObjectKey  = "test-data-object"
+	TestDataObjectKey2 = "test-data-object-2"
+	TestStateLocalKey  = "test-state-local"
 
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
@@ -90,6 +91,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 						Key:   iwfidl.PtrString(TestDataObjectKey),
 						Value: &TestDataObjectVal1,
 					},
+					{
+						Key:   iwfidl.PtrString(TestDataObjectKey2),
+						Value: &TestDataObjectVal1,
+					},
 				},
 				UpsertSearchAttributes: sa,
 				UpsertStateLocals: []iwfidl.KeyValue{
@@ -121,6 +126,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			value := queryAtt.GetValue()
 			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
 				queryAttFound = true
+			}
+			if queryAtt.GetKey() == TestDataObjectKey2 {
+				panic("should not load key that is not included in partial loading")
 			}
 			h.invokeData["S2_start_queryAttFound"] = queryAttFound
 
@@ -198,6 +206,21 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					NextStates: []iwfidl.StateMovement{
 						{
 							StateId: State2,
+							StateOptions: &iwfidl.WorkflowStateOptions{
+								SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PartialLoadingKeys: []string{
+										TestDataObjectKey,
+									},
+								},
+								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PartialLoadingKeys: []string{
+										TestSearchAttributeIntKey,
+										TestSearchAttributeKeywordKey,
+									},
+								},
+							},
 						},
 					},
 				},
