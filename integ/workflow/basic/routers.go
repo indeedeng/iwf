@@ -65,9 +65,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId:        State2,
-							NextStateInput: req.StateInput,
-							NextStateOptions: &iwfidl.WorkflowStateOptions{
+							StateId:    State2,
+							StateInput: req.StateInput,
+							StateOptions: &iwfidl.WorkflowStateOptions{
 								StartApiTimeoutSeconds:  iwfidl.PtrInt32(14),
 								DecideApiTimeoutSeconds: iwfidl.PtrInt32(15),
 								StartApiRetryPolicy: &iwfidl.RetryPolicy{
@@ -94,8 +94,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId:        service.GracefulCompletingWorkflowStateId,
-							NextStateInput: req.StateInput,
+							StateId:    service.GracefulCompletingWorkflowStateId,
+							StateInput: req.StateInput,
 						},
 					},
 				},

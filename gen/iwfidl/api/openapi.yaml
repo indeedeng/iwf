@@ -382,6 +382,7 @@ components:
         persistenceLoadingType:
           enum:
           - LOAD_ALL_WITHOUT_LOCKING
+          - LOAD_PARTIAL_WITHOUT_LOCKING
           type: string
         partialLoadingKeys:
           items:
@@ -1014,11 +1015,8 @@ components:
           key: key
         stateDecision:
           nextStates:
-          - nextStateInput:
-              data: data
-              encoding: encoding
-            stateId: stateId
-            nextStateOptions:
+          - stateId: stateId
+            stateOptions:
               searchAttributesLoadingPolicy:
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1043,11 +1041,11 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
-          - nextStateInput:
+            stateInput:
               data: data
               encoding: encoding
-            stateId: stateId
-            nextStateOptions:
+          - stateId: stateId
+            stateOptions:
               searchAttributesLoadingPolicy:
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1072,6 +1070,9 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            stateInput:
+              data: data
+              encoding: encoding
         publishToInterStateChannel:
         - channelName: channelName
           value:
@@ -1126,11 +1127,8 @@ components:
     StateDecision:
       example:
         nextStates:
-        - nextStateInput:
-            data: data
-            encoding: encoding
-          stateId: stateId
-          nextStateOptions:
+        - stateId: stateId
+          stateOptions:
             searchAttributesLoadingPolicy:
               partialLoadingKeys:
               - partialLoadingKeys
@@ -1155,11 +1153,11 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
-        - nextStateInput:
+          stateInput:
             data: data
             encoding: encoding
-          stateId: stateId
-          nextStateOptions:
+        - stateId: stateId
+          stateOptions:
             searchAttributesLoadingPolicy:
               partialLoadingKeys:
               - partialLoadingKeys
@@ -1184,6 +1182,9 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          stateInput:
+            data: data
+            encoding: encoding
       properties:
         nextStates:
           items:
@@ -1192,11 +1193,8 @@ components:
       type: object
     StateMovement:
       example:
-        nextStateInput:
-          data: data
-          encoding: encoding
         stateId: stateId
-        nextStateOptions:
+        stateOptions:
           searchAttributesLoadingPolicy:
             partialLoadingKeys:
             - partialLoadingKeys
@@ -1221,12 +1219,15 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+        stateInput:
+          data: data
+          encoding: encoding
       properties:
         stateId:
           type: string
-        nextStateInput:
+        stateInput:
           $ref: '#/components/schemas/EncodedObject'
-        nextStateOptions:
+        stateOptions:
           $ref: '#/components/schemas/WorkflowStateOptions'
       required:
       - stateId

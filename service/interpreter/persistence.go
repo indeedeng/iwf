@@ -40,6 +40,54 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 	}
 }
 
+func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.SearchAttribute {
+	var loadingType string
+	var partialLoadingKeys []string
+	if stateOptions != nil && stateOptions.SearchAttributesLoadingPolicy != nil {
+		policy := stateOptions.GetSearchAttributesLoadingPolicy()
+		loadingType = policy.GetPersistenceLoadingType()
+		partialLoadingKeys = policy.PartialLoadingKeys
+	}
+	if loadingType == "" || loadingType == service.LoadingTypeLoadAllWithoutLocking {
+		return am.GetAllSearchAttributes()
+	} else if loadingType == service.LoadingTypeLoadPartialWithoutLocking {
+		var res []iwfidl.SearchAttribute
+		keyMap := map[string]bool{}
+		for _, k := range partialLoadingKeys {
+			keyMap[k] = true
+		}
+		for key, value := range am.searchAttributes {
+			if keyMap[key] {
+				res = append(res, value)
+			}
+		}
+		return res
+	} else {
+		panic("not supported loading type " + loadingType)
+	}
+}
+
+func (am *PersistenceManager) LoadDataObjects(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.KeyValue {
+	var loadingType string
+	var partialLoadingKeys []string
+	if stateOptions != nil && stateOptions.DataObjectsLoadingPolicy != nil {
+		policy := stateOptions.GetDataObjectsLoadingPolicy()
+		loadingType = policy.GetPersistenceLoadingType()
+		partialLoadingKeys = policy.PartialLoadingKeys
+	}
+
+	if loadingType == "" || loadingType == service.LoadingTypeLoadAllWithoutLocking {
+		return am.GetAllDataObjects()
+	} else if loadingType == service.LoadingTypeLoadPartialWithoutLocking {
+		res := am.GetDataObjectsByKey(service.GetDataObjectsQueryRequest{
+			Keys: partialLoadingKeys,
+		})
+		return res.DataObjects
+	} else {
+		panic("not supported loading type " + loadingType)
+	}
+}
+
 func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
 	var res []iwfidl.SearchAttribute
 	for _, value := range am.searchAttributes {

@@ -104,7 +104,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: service.GracefulCompletingWorkflowStateId,
-					NextStateInput: &iwfidl.EncodedObject{
+					StateInput: &iwfidl.EncodedObject{
 						Encoding: iwfidl.PtrString("json"),
 						Data:     iwfidl.PtrString("from " + req.GetWorkflowStateId()),
 					},
