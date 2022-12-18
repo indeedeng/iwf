@@ -269,6 +269,7 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [x] More workflow start options: IdReusePolicy, cron schedule, retry
 - [x] StateOption: Start/Decide API timeout and retry policy
 - [x] Reset workflow by stateId or stateExecutionId 
+- [x] StateOption.PersistenceLoadingPolicy: LOAD_PARTIAL_WITHOUT_LOCKING
 - [ ] More workflow start options: initial search attributes/memo
 
 ### 1.2
@@ -278,8 +279,7 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 - [ ] LongRunningActivityCommand
 - [ ] Failing workflow details
 - [ ] Auto ContinueAsNew 
-- [ ] StateOption: more PersistenceLoadingPolicy
-- [ ] StateOption: more CommandCarryOverPolicy
+- [ ] StateOption.PersistenceLoadingPolicy: LOAD_ALL_WITH_EXCLUSIVE_LOCK and LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
 
 # Some history
 AWS published SWF in 2012 and then moved to Step Functions in 2016 because they found it’s too hard to support SWF.
