@@ -202,6 +202,32 @@ For more info, contact qlong.seattle@gmail.com
 
 Any contribution is welcome.
 
+Here is the repository layout if you are interested to learn about it:
+
+* `cmd/` the code to bootstrap the server -- loading config and connect to Cadence/Temporal service, and start iWF API and interpreter service
+* `config` the config to start the server, and also config template to start the Docker image
+* `docker-compose` the docker compose file to start a full iWF server with Temporal dependency
+* `gen` the generated code from iwf-idl (Open API definition/Swagger)
+* `integ` the end to end integration tests. 
+  * `workflow` the iWF workflows that are written without SDK(just implemented the REST APIs)
+  * `*.go` the tests
+* `iwf-idl` the idl submodule
+* `script` some scripts
+  * `http` some example HTTP scripts to call server, like REST API
+  * `start-server.sh` the script to start iWF server in Docker image 
+* `service` iWF implementation
+  * `api` API service implementation
+    * `cadence` the Cadence abstraction of `UnifiedClient`
+    * `temporal` the Temporal abstraction of `UnifiedClient`
+    * `*.go` the implementation of API service using `UnifiedClient` so that it works for both Cadence and Temporal
+  * `interpreter` interpreter worker service implementation
+    * `cadence` the Cadence abstraction of `ActivityProvider` and `WorkflowProvider`
+    * `temporal` the Temporal abstraction of `ActivityProvider` and `WorkflowProvider`
+    * `*.go` the implementation of interpreter workflow service using `ActivityProvider` and `WorkflowProvider` so that it works for both Cadence and Temporal
+      * `workflowImpl.go` the core workflow implementation
+  * `common` some common libraries between `api` and `interpreter`
+  * `*.go` some common definitions between `api` and `interpreter`
+
 ### How to update IDL and the generated code
 1. Install openapi-generator using Homebrew if you haven't. See more [documentation](https://openapi-generator.tech/docs/installation) 
 2. Check out the idl submodule by running the command: `git submodule update --init --recursive`
