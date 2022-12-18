@@ -246,6 +246,71 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 ```
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
+# How to migrate from Cadence/Temporal
+Migrating from Cadence/Temporal is simple and easy. However, it's only possible to migrate new workflows. The existing running workflows in Cadence/Temporal will require you to keep the Cadence/Temporal workers until they are finished.
+
+## Activity
+Wait, what? **There is no activity at all in iWF?**
+Yes, iWF workflows are essentially a REST service and all the activity code in Cadence/Temporal can just move in iWF workflow code -- start or decide API of WorkflowState.
+
+## Signal
+Depends on different SDKs of Cadence/Temporal, there are different APIs like SignalMethod/SignalChannel/SignalHandler etc.
+In iWF, just use SignalCommand as equivalent. 
+
+## Query
+Depends on different SDKs of Cadence/Temporal, there are different APIs like QueryHandler/QueryMethod/etc. 
+In iWF, use DataObjects as equivalent. Unlike Cadence/Temporal, DataObjects should be explicitly defined in WorkflowDefinition.
+
+## Search Attribute
+iWF has the same concepts of Search Attribute.
+Unlike Cadence/Temporal, SearchAttribute should be explicitly defined in WorkflowDefinition.
+
+## Any timer APIs
+There are different timer APIs in Cadence/Temporal depends on which SDK:
+* workflow.Sleep(duration)
+* workflow.Await(duration, condition)
+* workflow.NewTimer(duration)
+* ...
+
+In iWF, just use TimerCommand as equivalent. 
+
+## Versioning and change compatibility
+There is no versioning anymore in iWF! As there is no non-deterministic errors in iWF applications.
+
+However, making workflow code change will still have backward-compatibility issue like all other microservice applications. 
+You just need to apply all the standard ways to address the issues:
+
+1) Workflow code change will always apply to existing and new workflow executions, as long as they are running
+2) If you don't want old workflows to execute the new code, the standard way is to use a flag in new executions to branch out.
+3) As a special case of 2), 
+
+
+## Non-workflow code
+
+# Monitoring and Operations
+## iWF server 
+There are two components for iWF server: API service and interpreter worker service.
+
+For API service, you need to set up monitors/dashboards:
+* API availability
+* API latency
+
+The interpreter worker service is just a standard Cadence/Temporal workflow application. Follow the developer guides:
+* For [Cadence to set up monitor/dashboards ](https://cadenceworkflow.io/docs/operation-guide/monitor/#cadence-application-monitoring)
+* For [Temporal to set up monitor/dashboards](https://github.com/temporalio/dashboards) and [metrics definition](https://docs.temporal.io/references/sdk-metrics)
+
+## iWF application
+As you may realize, iWF application is just a standard REST microservice. Therefore, you just need to use the standard way of set up monitor. 
+
+Usually, you need to set up monitors/dashboards:
+* API availability 
+* API latency
+
+When something goes wrong in your applications, here are the tips for troubleshooting:
+* Let your worker service return error stacktrace as the response body to iWF server. E.g. like [this example of Spring Boot using ExceptionHandler](https://github.com/indeedeng/iwf-java-samples/blob/2d500093e2aaecf2d728f78366fee776a73efd29/src/main/java/io/iworkflow/controller/IwfWorkerApiController.java#L51). 
+* Use Cadence/Temporal WebUI to debug your application. If you return the full stacktrace in response body, the pending activity view will show it to you!
+* All the input/output to your workflow are stored in the activity input/output of history event. The input is in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having errors.
+
 ## Development Plan
 ### 1.0
 - [x] Start workflow API
