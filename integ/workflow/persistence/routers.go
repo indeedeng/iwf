@@ -15,6 +15,7 @@ const (
 	WorkflowType       = "persistence"
 	State1             = "S1"
 	State2             = "S2"
+	State3             = "S3"
 	TestDataObjectKey  = "test-data-object"
 	TestDataObjectKey2 = "test-data-object-2"
 	TestStateLocalKey  = "test-state-local"
@@ -122,15 +123,53 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			h.invokeData["S2_start_intSaFounds"] = intSaFounds
 
 			queryAttFound := false
-			queryAtt := req.GetDataObjects()[0]
-			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
-				queryAttFound = true
-			}
-			if queryAtt.GetKey() == TestDataObjectKey2 {
-				panic("should not load key that is not included in partial loading")
+			queryAtts := req.GetDataObjects()
+			for _, queryAtt := range queryAtts {
+				value := queryAtt.GetValue()
+				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
+					queryAttFound = true
+				}
+				if queryAtt.GetKey() == TestDataObjectKey2 {
+					panic("should not load key that is not included in partial loading")
+				}
 			}
 			h.invokeData["S2_start_queryAttFound"] = queryAttFound
+
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+				},
+			})
+			return
+		}
+		if req.GetWorkflowStateId() == State3 {
+			sas := req.GetSearchAttributes()
+			found := false
+			for _, sa := range sas {
+				if sa.GetKey() == TestSearchAttributeKeywordKey {
+					panic("should not load key that is not included in partial loading")
+				}
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+					found = true
+				}
+			}
+			if !found {
+				panic("should see the requested partial loading key")
+			}
+
+			queryAttFound := 0
+			queryAtts := req.GetDataObjects()
+			for _, queryAtt := range queryAtts {
+				if queryAtt.GetKey() == TestDataObjectKey {
+					queryAttFound++
+				}
+				if queryAtt.GetKey() == TestDataObjectKey2 {
+					queryAttFound++
+				}
+			}
+			if queryAttFound != 2 {
+				panic("missing query attribute requested by partial loading keys")
+			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -210,14 +249,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 								SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
 									PartialLoadingKeys: []string{
-										TestDataObjectKey,
+										TestSearchAttributeIntKey,
+										TestSearchAttributeKeywordKey,
 									},
 								},
 								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
 									PartialLoadingKeys: []string{
-										TestSearchAttributeIntKey,
-										TestSearchAttributeKeywordKey,
+										TestDataObjectKey,
 									},
 								},
 							},
@@ -249,14 +288,73 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["S2_decide_intSaFounds"] = intSaFounds
 
 			queryAttFound := false
-			queryAtt := req.GetDataObjects()[0]
-			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
-				queryAttFound = true
+			queryAtts := req.GetDataObjects()
+			for _, queryAtt := range queryAtts {
+				value := queryAtt.GetValue()
+				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
+					queryAttFound = true
+				}
+				if queryAtt.GetKey() == TestDataObjectKey2 {
+					panic("should not load key that is not included in partial loading")
+				}
 			}
+
 			h.invokeData["S2_decide_queryAttFound"] = queryAttFound
 
-			// go to complete
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: State3,
+							StateOptions: &iwfidl.WorkflowStateOptions{
+								SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PartialLoadingKeys: []string{
+										TestSearchAttributeIntKey,
+									},
+								},
+								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PartialLoadingKeys: []string{
+										TestDataObjectKey,
+										TestDataObjectKey2,
+									},
+								},
+							},
+						},
+					},
+				},
+			})
+			return
+		} else if req.GetWorkflowStateId() == State3 {
+			sas := req.GetSearchAttributes()
+			found := false
+			for _, sa := range sas {
+				if sa.GetKey() == TestSearchAttributeKeywordKey {
+					panic("should not load key that is not included in partial loading")
+				}
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+					found = true
+				}
+			}
+			if !found {
+				panic("should see the requested partial loading key")
+			}
+
+			queryAttFound := 0
+			queryAtts := req.GetDataObjects()
+			for _, queryAtt := range queryAtts {
+				if queryAtt.GetKey() == TestDataObjectKey {
+					queryAttFound++
+				}
+				if queryAtt.GetKey() == TestDataObjectKey2 {
+					queryAttFound++
+				}
+			}
+			if queryAttFound != 2 {
+				panic("missing query attribute requested by partial loading keys")
+			}
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -268,6 +366,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		}
+
 	}
 
 	c.JSON(http.StatusBadRequest, struct{}{})

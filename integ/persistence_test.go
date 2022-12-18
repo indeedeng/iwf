@@ -132,6 +132,8 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		"S1_decide": 1,
 		"S2_start":  1,
 		"S2_decide": 1,
+		"S3_start":  1,
+		"S3_decide": 1,
 	}, history, "attribute test fail, %v", history)
 
 	if persistence.EnableTestingSearchAttribute {
@@ -167,14 +169,24 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		}, data)
 	}
 
-	expected := []iwfidl.KeyValue{
+	expected1 := []iwfidl.KeyValue{
 		{
 			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
 			Value: &persistence.TestDataObjectVal2,
 		},
 	}
-	assertions.Equal(expected, queryResult2.GetObjects())
-	assertions.Equal(expected, queryResult1.GetObjects())
+	expected2 := []iwfidl.KeyValue{
+		{
+			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
+			Value: &persistence.TestDataObjectVal2,
+		},
+		{
+			Key:   iwfidl.PtrString(persistence.TestDataObjectKey2),
+			Value: &persistence.TestDataObjectVal1,
+		},
+	}
+	assertions.Equal(expected1, queryResult1.GetObjects())
+	assertions.Equal(expected2, queryResult2.GetObjects())
 
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
 		Key:          iwfidl.PtrString(persistence.TestSearchAttributeIntKey),
