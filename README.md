@@ -286,14 +286,15 @@ cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
 # How to migrate from Cadence/Temporal
-Migrating from Cadence/Temporal is simple and easy. However, it's only possible to migrate new workflows. The existing running workflows in Cadence/Temporal will require you to keep the Cadence/Temporal workers until they are finished.
+Migrating from Cadence/Temporal is simple and easy. It's only possible to migrate new workflow executions. Let your applications to only start new workflows in iWF. For the existing running workflows in Cadence/Temporal, keep the Cadence/Temporal workers until they are finished.
 
 ## Activity
 Wait, what? **There is no activity at all in iWF?**
+
 Yes, iWF workflows are essentially a REST service and all the activity code in Cadence/Temporal can just move in iWF workflow code -- start or decide API of WorkflowState.
 
-One main reason that many people use Cadence/Temporal is to take advantage of the history showing input/output in WebUI. This is handy for debugging/troubleshooting.
-iWF provides a `RecordEvent` API to mimic. You can call with any arbitrary data, and they will be recorded into history just for your debugging/troubleshooting.  
+A main reason that many people use Cadence/Temporal activity is to take advantage of the history showing input/output in WebUI. This is handy for debugging/troubleshooting.
+iWF provides a `RecordEvent` API to mimic. It can be called with any arbitrary data, and they will be recorded into history just for debugging/troubleshooting.  
 
 ## Signal
 Depends on different SDKs of Cadence/Temporal, there are different APIs like SignalMethod/SignalChannel/SignalHandler etc.
@@ -314,42 +315,46 @@ Again in some use cases, you may combine signal/timer commands and use `AnyComma
 
 ## Query
 Depends on different SDKs of Cadence/Temporal, there are different APIs like QueryHandler/QueryMethod/etc. 
+
 In iWF, use DataObjects as equivalent. Unlike Cadence/Temporal, DataObjects should be explicitly defined in WorkflowDefinition.
 
 Note that by default all the DataObjects and SearchAttributes will be loaded into any WorkflowState as `LOAD_ALL_WITHOUT_LOCKING` persistence loading policy. 
-This could be a performance issue if there are too many big items. You should consider using different loading policy like `LOAD_PARTIAL_WITHOUT_LOCKING` to improve by changing the WorkflowStateOptions.
+This could be a performance issue if there are too many big items. Consider using different loading policy like `LOAD_PARTIAL_WITHOUT_LOCKING` to improve by customizing the WorkflowStateOptions.
 
-Also note that DataObjects are not just for returning data to API, but also for sharing data across different StateExecutions. But if it's just to share data from start API to decide API, using StateLocal is preferred for efficiency reason.
+Also note that DataObjects are not just for returning data to API, but also for sharing data across different StateExecutions. But if it's just to share data from start API to decide API in the same StateExecution, using `StateLocal` is preferred for efficiency reason.
 
 ## Search Attribute
 iWF has the same concepts of Search Attribute.
 Unlike Cadence/Temporal, SearchAttribute should be explicitly defined in WorkflowDefinition.
 
 ## Versioning and change compatibility
-There is no versioning anymore in iWF! As there is no non-deterministic errors in iWF applications. Because there is no replay at all for iWF workflows. All workflow state executions are stored in Cadence/Temporal activities.
+There is no versioning API at all in iWF! 
 
-Workflow code change will always apply to any running existing and new workflow executions. This gives superpower and flexibility to maintain long-running business applications.
+As there is no replay at all for iWF workflow applications, there is no non-deterministic errors or versioning API. All workflow state executions are stored in Cadence/Temporal activities of the interpreter workflow activities.
+
+Workflow code change will always apply to any running existing and new workflow executions once deployed. This gives superpower and flexibility to maintain long-running business applications.
 
 However, making workflow code change will still have backward-compatibility issue like all other microservice applications. 
-You just need to apply all the standard ways to address the issues:
+Below are the standard ways to address the issues:
 
-1) It's rare but if you don't want old workflows to execute the new code, the standard way is to use a flag in new executions to branch out. For example, if you want to change StateA->StateB to StateA->StateC only for new workflows, then set a new flag in the new workflow so that StateA decide API implementation can know if it should go to StateB or StateC. 
-2) Removing state code could cause errors if there is any state execution still running.  For example, if you have changed StateA->StateB to StateA->StateC, you may want to delete StateB. However, there could be a StateExecution stays at StateB(most commonly waiting for commands to complete). Deleting StateB will cause a not found error when StateB is executed.
-   1) If you want to delete StateB as early as possible, use `IwfWorkflowType` and `IwfExecutingStateIds` search attributes to confirm if there is any workflows still running at the state. These are built-in search attributes from iWF server. 
-   2) The error will be gone if you add the StateB back. Because by default, all State APIs will be backoff retried forever. 
+1) It's rare but if you don't want old workflows to execute the new code, use a flag in new executions to branch out. For example, if changing flow `StateA->StateB` to `StateA->StateC` only for new workflows, then set a new flag in the new workflow so that StateA can decide go to StateB or StateC. 
+2) Removing state code could cause errors(state not found) if there is any state execution still running.  For example, after changed `StateA->StateB` to `StateA->StateC`, you may want to delete StateB. If a StateExecution stays at StateB(most commonly waiting for commands to complete), deleting StateB will cause a not found error when StateB is executed.
+   1) The error will be gone if you add the StateB back. Because by default, all State APIs will be backoff retried forever.
+   2) If you want to delete StateB as early as possible, use `IwfWorkflowType` and `IwfExecutingStateIds` search attributes to confirm if there is any workflows still running at the state. These are built-in search attributes from iWF server.  
 
 ## Parallel execution with synchronization
-In Cadence/Temporal, multi-threading is useful for complicated applications. But the APIs are hard to understand to use, and debug. Each language/SDK has its own APIs without much consistency.
+In Cadence/Temporal, multi-threading is powerful for complicated applications. But the APIs are hard to understand, to use, and to debug. Especially each language/SDK has its own set of APIs without much consistency.
 
 In iWF, there are just a few concepts that are very straightforward:
-1) The `decide` API can go to multiple next states. The next states will be executed in parallel
-2) It can go back to any previous StateId to form a loop. The StateExecutionId is the unique identifier. 
+1) The `decide` API can go to multiple next states. All next states will be executed in parallel
+2) `decide` API can also go back to any previous StateId, or the same StateId, to form a loop. The StateExecutionId is the unique identifier. 
 3) Use `InterStateChannel` for synchronization communication. It's just like a signal channel that works internally.
 
-Notes:
+Some notes:
 
 1) Any state can decide to complete or fail the workflow, or just go to a dead end(no next state).
-2) Because of above, there could be more than one completing with data as workflow results. The client API provides a special way to retrieve this kind of results.
+2) Because of above, there could be zero, or more than one state completing with data as workflow results. 
+3) To get multiple state results from a workflow execution, use the special API `getComplexWorkflowResult` of client API.
 
 ## Non-workflow code
 Check [Client APIs](#client-apis) for all the APIs that are equivalent to Cadence/Temporal client APIs.
@@ -360,24 +365,25 @@ What's more, there are features that are impossible in Cadence/Temporal are prov
 Because WorkflowState are explicitly defined, resetting API is a lot more friendly to use. 
 
 ## Anything else
-Is that all? For now yes. We believe these are all you really need to migrate to iWF from Cadence/Temporal.
-One philosophy of iWF is providing simple and easy to understand APIs to users(as minimist). As apposed to the complicated and also huge number APIs in Cadence/Temporal. 
+Is that all? For now yes. We believe these are all you need to migrate to iWF from Cadence/Temporal.
 
-So what about something else:
-* Timeout and backoff retry: State start/decide APIs have default timeout and infinite backoff retry. You can use StateOptions to customize.  
-* ChildWorkflow can be replaced with regular workflow+signal. See this [StackOverflow](https://stackoverflow.com/questions/74494134/should-i-use-child-workflow-or-use-activity-to-start-new-workflow) for why.
-* SignalWithStart: Use start+signal API will be the same except for more exception handling work. We may consider provide it in the future because we have seen a lot of people don't know how to use it correctly in Cadence/Temporal.
-* ContinueAsNew: this is missing in iWF for now. But as the philosophy of hiding internal details, we will implement it in a way that user workflow code doesn't have to know. Internally the workflow execution can do a continueAsNew without letting user workflow to know.
-* Long-running activity with stateful recovery(heartbeat details): this is indeed a good one that we want to add. But we don't see it very commonly used. Please leave your message if you are in a need.
+The main philosophy of iWF is providing simple and easy to understand APIs to users(as minimist), as apposed to the complicated and also huge number APIs in Cadence/Temporal. 
 
-But we may be wrong. If you believe there is something else you really need, open a [ticket](https://github.com/indeedeng/iwf/issues) or join us in the [discussion](https://github.com/indeedeng/iwf/discussions).
+So what about something else like:
+* Timeout and backoff retry: State start/decide APIs have default timeout and infinite backoff retry. You can customize in StateOptions.  
+* ChildWorkflow can be replaced with regular workflow + signal. See this [StackOverflow](https://stackoverflow.com/questions/74494134/should-i-use-child-workflow-or-use-activity-to-start-new-workflow) for why.
+* SignalWithStart: Use start + signal API will be the same except for more exception handling work. We have seen a lot of people don't know how to use it correctly in Cadence/Temporal. We will consider provide it in a better way in the future.
+* ContinueAsNew: this is missing in iWF for now. But as the philosophy of hiding internal details, we will implement it in a way that is transparent to user workflows. Internally the interpreter workflow can continueAsNew without letting iWF user workflow to know.
+* Long-running activity with stateful recovery(heartbeat details): this is indeed a good one that we want to add. But we don't see Cadence/Temporal activity is very commonly used yet. Please leave your message if you are in a need.
+
+If you believe there is something else you really need, open a [ticket](https://github.com/indeedeng/iwf/issues) or join us in the [discussion](https://github.com/indeedeng/iwf/discussions).
 
 
 # Monitoring and Operations
 ## iWF server 
 There are two components for iWF server: API service and interpreter worker service.
 
-For API service, you need to set up monitors/dashboards:
+For API service, set up monitors/dashboards:
 * API availability
 * API latency
 
@@ -386,15 +392,15 @@ The interpreter worker service is just a standard Cadence/Temporal workflow appl
 * For [Temporal to set up monitor/dashboards](https://github.com/temporalio/dashboards) and [metrics definition](https://docs.temporal.io/references/sdk-metrics)
 
 ## iWF application
-As you may realize, iWF application is just a standard REST microservice. Therefore, you just need to use the standard way of set up monitor. 
+As you may realize, iWF application is a typical REST microservice. You just need the standard ways to operate it. 
 
 Usually, you need to set up monitors/dashboards:
 * API availability 
 * API latency
 
-When something goes wrong in your applications, here are the tips for troubleshooting:
+When something goes wrong in your applications, here are the tips:
 * Let your worker service return error stacktrace as the response body to iWF server. E.g. like [this example of Spring Boot using ExceptionHandler](https://github.com/indeedeng/iwf-java-samples/blob/2d500093e2aaecf2d728f78366fee776a73efd29/src/main/java/io/iworkflow/controller/IwfWorkerApiController.java#L51). 
-* Use Cadence/Temporal WebUI to debug your application. If you return the full stacktrace in response body, the pending activity view will show it to you!
+* If you return the full stacktrace in response body, the pending activity view will show it to you! Then use Cadence/Temporal WebUI to debug your application.
 * All the input/output to your workflow are stored in the activity input/output of history event. The input is in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having errors.
 
 ## Development Plan
