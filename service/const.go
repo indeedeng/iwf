@@ -46,6 +46,9 @@ const (
 	WorkflowIDReusePolicyAllowDuplicate           = "ALLOW_DUPLICATE"
 	WorkflowIDReusePolicyRejectDuplicate          = "REJECT_DUPLICATE"
 	WorkflowIDReusePolicyTerminateIfRunning       = "TERMINATE_IF_RUNNING"
+
+	LoadingTypeLoadPartialWithoutLocking = "LOAD_PARTIAL_WITHOUT_LOCKING"
+	LoadingTypeLoadAllWithoutLocking     = "LOAD_ALL_WITHOUT_LOCKING"
 )
 
 type BackendType string

@@ -211,8 +211,8 @@ func executeState(
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.NextStateInput,
-			SearchAttributes: attrMgr.GetAllSearchAttributes(), // TODO support more loading policy
-			DataObjects:      attrMgr.GetAllDataObjects(),      // TODO support more loading policy
+			SearchAttributes: attrMgr.LoadSearchAttributes(state.NextStateOptions),
+			DataObjects:      attrMgr.LoadDataObjects(state.NextStateOptions),
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
@@ -416,8 +416,8 @@ func executeState(
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      startResponse.GetUpsertStateLocals(),
-			SearchAttributes: attrMgr.GetAllSearchAttributes(), // TODO support more loading policy
-			DataObjects:      attrMgr.GetAllDataObjects(),      // TODO support more loading policy
+			SearchAttributes: attrMgr.LoadSearchAttributes(state.NextStateOptions),
+			DataObjects:      attrMgr.LoadDataObjects(state.NextStateOptions),
 			StateInput:       state.NextStateInput,
 		},
 	}).Get(ctx, &decideResponse)
