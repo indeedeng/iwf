@@ -53,7 +53,7 @@ Related projects:
 - [Monitoring and Operations](#monitoring-and-operations)
   - [iWF server](#iwf-server)
   - [iWF application](#iwf-application)
-  - [Development Plan](#development-plan)
+- [Development Plan](#development-plan)
 - [Some history](#some-history)
 
 # Community & Help
@@ -403,7 +403,7 @@ When something goes wrong in your applications, here are the tips:
 * If you return the full stacktrace in response body, the pending activity view will show it to you! Then use Cadence/Temporal WebUI to debug your application.
 * All the input/output to your workflow are stored in the activity input/output of history event. The input is in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having errors.
 
-## Development Plan
+# Development Plan
 ### 1.0
 - [x] Start workflow API
 - [x] Executing `start`/`decide` APIs and completing workflow
