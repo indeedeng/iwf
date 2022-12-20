@@ -78,7 +78,7 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 		"S31_decide": 1,
 	}, history, "interstate test fail, %v", history)
 
-	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
 	assertions.Equal(0, len(resp2.GetResults()))
 	assertions.Equal(map[string]interface{}{
 		interstate.State21 + "received": interstate.TestVal1,

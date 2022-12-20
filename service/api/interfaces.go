@@ -41,7 +41,7 @@ type StartWorkflowOptions struct {
 	ID                       string
 	TaskQueue                string
 	WorkflowExecutionTimeout time.Duration
-	WorkflowIDReusePolicy    *string
+	WorkflowIDReusePolicy    *iwfidl.WorkflowIDReusePolicy
 	CronSchedule             *string
 	RetryPolicy              *iwfidl.RetryPolicy
 }
@@ -56,7 +56,7 @@ type ListWorkflowExecutionsResponse struct {
 }
 
 type DescribeWorkflowExecutionResponse struct {
-	Status           string
+	Status           iwfidl.WorkflowStatus
 	RunId            string
 	SearchAttributes map[string]iwfidl.SearchAttribute
 }

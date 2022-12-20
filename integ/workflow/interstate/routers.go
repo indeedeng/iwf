@@ -3,7 +3,6 @@ package interstate
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 	"time"
@@ -57,7 +56,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 			})
 			return
@@ -65,7 +64,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State21 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
 							CommandId:   "cmd-1",
@@ -79,7 +78,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State31 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
 							CommandId:   "cmd-2",
@@ -95,7 +94,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 
 				PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{

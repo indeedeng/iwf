@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 )
@@ -73,19 +74,19 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					{
 						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
 						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue1),
-						ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+						ValueType:   ptr.Any(iwfidl.KEYWORD),
 					},
 					{
 						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
 						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
-						ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+						ValueType:    ptr.Any(iwfidl.INT),
 					},
 				}
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
@@ -112,10 +113,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue2 &&
+					sa.GetValueType() == iwfidl.KEYWORD {
 					kwSaFounds++
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
+					sa.GetValueType() == iwfidl.INT {
 					intSaFounds++
 				}
 			}
@@ -137,7 +140,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 			})
 			return
@@ -149,7 +152,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
 					panic("should not load key that is not included in partial loading")
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
+					sa.GetValueType() == iwfidl.INT {
 					found = true
 				}
 			}
@@ -173,7 +177,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 			})
 			return
@@ -198,10 +202,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue1 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue1 &&
+					sa.GetValueType() == iwfidl.KEYWORD {
 					kwSaFounds++
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue1 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue1 &&
+					sa.GetValueType() == iwfidl.INT {
 					intSaFounds++
 				}
 			}
@@ -230,12 +236,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					{
 						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
 						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue2),
-						ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+						ValueType:   ptr.Any(iwfidl.KEYWORD),
 					},
 					{
 						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
 						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue2),
-						ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+						ValueType:    ptr.Any(iwfidl.INT),
 					},
 				}
 			}
@@ -247,14 +253,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 							StateId: State2,
 							StateOptions: &iwfidl.WorkflowStateOptions{
 								SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
 										TestSearchAttributeIntKey,
 										TestSearchAttributeKeywordKey,
 									},
 								},
 								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
 										TestDataObjectKey,
 									},
@@ -277,10 +283,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
-				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue2 && sa.GetValueType() == service.SearchAttributeValueTypeKeyword {
+				if sa.GetKey() == TestSearchAttributeKeywordKey && sa.GetStringValue() == TestSearchAttributeKeywordValue2 &&
+					sa.GetValueType() == iwfidl.KEYWORD {
 					kwSaFounds++
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
+					sa.GetValueType() == iwfidl.INT {
 					intSaFounds++
 				}
 			}
@@ -308,13 +316,13 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 							StateId: State3,
 							StateOptions: &iwfidl.WorkflowStateOptions{
 								SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
 										TestSearchAttributeIntKey,
 									},
 								},
 								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-									PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadPartialWithoutLocking),
+									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
 										TestDataObjectKey,
 										TestDataObjectKey2,
@@ -333,7 +341,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
 					panic("should not load key that is not included in partial loading")
 				}
-				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 && sa.GetValueType() == service.SearchAttributeValueTypeInt {
+				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
+					sa.GetValueType() == iwfidl.INT {
 					found = true
 				}
 			}

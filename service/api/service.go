@@ -128,7 +128,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(req iwfidl.WorkflowGetRequest, wait
 
 	var output service.InterpreterWorkflowOutput
 	if req.GetNeedsResults() || waitIfStillRunning {
-		if resp.Status == service.WorkflowStatusCompleted || waitIfStillRunning {
+		if resp.Status == iwfidl.COMPLETED || waitIfStillRunning {
 			err := s.client.GetWorkflowResult(context.Background(), &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 			if err != nil {
 				return nil, s.handleError(err)
@@ -139,7 +139,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(req iwfidl.WorkflowGetRequest, wait
 	status := resp.Status
 	if waitIfStillRunning {
 		// override because when GetWorkflowResult, the workflow is completed
-		status = service.WorkflowStatusCompleted
+		status = iwfidl.COMPLETED
 	}
 
 	if err != nil {

@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"strconv"
@@ -53,7 +54,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		StartStateId:           basic.State1,
 		StateInput:             wfInput,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			WorkflowIDReusePolicy: iwfidl.PtrString(service.WorkflowIDReusePolicyRejectDuplicate),
+			WorkflowIDReusePolicy: ptr.Any(iwfidl.REJECT_DUPLICATE),
 			// CronSchedule:          iwfidl.PtrString("* * * * *"),
 			RetryPolicy: &iwfidl.RetryPolicy{
 				InitialIntervalSeconds: iwfidl.PtrInt32(11),
@@ -106,7 +107,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		"S2_decide": 1,
 	}, history, "basic test fail, %v", history)
 
-	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
 	assertions.Equal(1, len(resp2.GetResults()))
 	assertions.Equal(iwfidl.StateCompletionOutput{
 		CompletedStateId:          "S2",

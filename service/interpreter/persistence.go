@@ -41,16 +41,16 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 }
 
 func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.SearchAttribute {
-	var loadingType string
+	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
 	if stateOptions != nil && stateOptions.SearchAttributesLoadingPolicy != nil {
 		policy := stateOptions.GetSearchAttributesLoadingPolicy()
 		loadingType = policy.GetPersistenceLoadingType()
 		partialLoadingKeys = policy.PartialLoadingKeys
 	}
-	if loadingType == "" || loadingType == service.LoadingTypeLoadAllWithoutLocking {
+	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllSearchAttributes()
-	} else if loadingType == service.LoadingTypeLoadPartialWithoutLocking {
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING {
 		var res []iwfidl.SearchAttribute
 		keyMap := map[string]bool{}
 		for _, k := range partialLoadingKeys {
@@ -68,7 +68,7 @@ func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.Workflow
 }
 
 func (am *PersistenceManager) LoadDataObjects(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.KeyValue {
-	var loadingType string
+	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
 	if stateOptions != nil && stateOptions.DataObjectsLoadingPolicy != nil {
 		policy := stateOptions.GetDataObjectsLoadingPolicy()
@@ -76,9 +76,9 @@ func (am *PersistenceManager) LoadDataObjects(stateOptions *iwfidl.WorkflowState
 		partialLoadingKeys = policy.PartialLoadingKeys
 	}
 
-	if loadingType == "" || loadingType == service.LoadingTypeLoadAllWithoutLocking {
+	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllDataObjects()
-	} else if loadingType == service.LoadingTypeLoadPartialWithoutLocking {
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING {
 		res := am.GetDataObjectsByKey(service.GetDataObjectsQueryRequest{
 			Keys: partialLoadingKeys,
 		})
@@ -112,9 +112,9 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(attributes []iwfidl.S
 	for _, attr := range attributes {
 		am.searchAttributes[attr.GetKey()] = attr
 		switch attr.GetValueType() {
-		case service.SearchAttributeValueTypeKeyword:
+		case iwfidl.KEYWORD:
 			attrsToUpsert[attr.GetKey()] = attr.GetStringValue()
-		case service.SearchAttributeValueTypeInt:
+		case iwfidl.INT:
 			num := attr.GetIntegerValue()
 			attrsToUpsert[attr.GetKey()] = num
 		default:

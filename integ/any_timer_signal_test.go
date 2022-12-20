@@ -82,10 +82,10 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType)
 
 	assertions.Equal(anytimersignal.SignalName, data["signalChannelName1"])
 	assertions.Equal("signal-cmd-id", data["signalCommandId1"])
-	assertions.Equal(service.SignalStatusWaiting, data["signalStatus1"])
+	assertions.Equal(iwfidl.WAITING, data["signalStatus1"])
 
 	assertions.Equal(anytimersignal.SignalName, data["signalChannelName2"])
 	assertions.Equal("signal-cmd-id", data["signalCommandId2"])
-	assertions.Equal(service.SignalStatusReceived, data["signalStatus2"])
+	assertions.Equal(iwfidl.RECEIVED, data["signalStatus2"])
 	assertions.Equal(signalValue, data["signalValue2"])
 }

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
@@ -145,16 +145,20 @@ func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[st
 			result[key] = iwfidl.SearchAttribute{
 				Key:         iwfidl.PtrString(key),
 				StringValue: iwfidl.PtrString(str),
-				ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+				ValueType:   ptr.Any(iwfidl.KEYWORD),
 			}
 		} else {
 			number, ok := object.(json.Number)
 			if ok {
-				integer, _ := number.Int64()
+				integer, err := number.Int64()
+				if err != nil {
+					// TODO: we will process float here. In case of float, this will return error
+					return nil, err
+				}
 				result[key] = iwfidl.SearchAttribute{
 					Key:          iwfidl.PtrString(key),
 					IntegerValue: iwfidl.PtrInt64(integer),
-					ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+					ValueType:    ptr.Any(iwfidl.INT),
 				}
 			}
 		}
@@ -163,19 +167,19 @@ func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[st
 	return result, nil
 }
 
-func mapToCadenceWorkflowIdReusePolicy(workflowIdReusePolicy string) (*client.WorkflowIDReusePolicy, error) {
+func mapToCadenceWorkflowIdReusePolicy(workflowIdReusePolicy iwfidl.WorkflowIDReusePolicy) (*client.WorkflowIDReusePolicy, error) {
 	var res client.WorkflowIDReusePolicy
 	switch workflowIdReusePolicy {
-	case service.WorkflowIDReusePolicyAllowDuplicate:
+	case iwfidl.ALLOW_DUPLICATE:
 		res = client.WorkflowIDReusePolicyAllowDuplicate
 		return &res, nil
-	case service.WorkflowIDReusePolicyAllowDuplicateFailedOnly:
+	case iwfidl.ALLOW_DUPLICATE_FAILED_ONLY:
 		res = client.WorkflowIDReusePolicyAllowDuplicateFailedOnly
 		return &res, nil
-	case service.WorkflowIDReusePolicyRejectDuplicate:
+	case iwfidl.REJECT_DUPLICATE:
 		res = client.WorkflowIDReusePolicyRejectDuplicate
 		return &res, nil
-	case service.WorkflowIDReusePolicyTerminateIfRunning:
+	case iwfidl.TERMINATE_IF_RUNNING:
 		res = client.WorkflowIDReusePolicyTerminateIfRunning
 		return &res, nil
 	default:
@@ -183,24 +187,24 @@ func mapToCadenceWorkflowIdReusePolicy(workflowIdReusePolicy string) (*client.Wo
 	}
 }
 
-func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (string, error) {
+func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (iwfidl.WorkflowStatus, error) {
 	if status == nil {
-		return service.WorkflowStatusRunning, nil
+		return iwfidl.RUNNING, nil
 	}
 
 	switch *status {
 	case shared.WorkflowExecutionCloseStatusCanceled:
-		return service.WorkflowStatusCanceled, nil
+		return iwfidl.CANCELED, nil
 	case shared.WorkflowExecutionCloseStatusContinuedAsNew:
-		return service.WorkflowStatusContinueAsNew, nil
+		return iwfidl.CONTINUED_AS_NEW, nil
 	case shared.WorkflowExecutionCloseStatusFailed:
-		return service.WorkflowStatusFailed, nil
+		return iwfidl.FAILED, nil
 	case shared.WorkflowExecutionCloseStatusTimedOut:
-		return service.WorkflowStatusTimeout, nil
+		return iwfidl.TIMEOUT, nil
 	case shared.WorkflowExecutionCloseStatusTerminated:
-		return service.WorkflowStatusTerminated, nil
+		return iwfidl.TERMINATED, nil
 	case shared.WorkflowExecutionCloseStatusCompleted:
-		return service.WorkflowStatusCompleted, nil
+		return iwfidl.COMPLETED, nil
 	default:
 		return "", fmt.Errorf("not supported status %s", status)
 	}
@@ -223,7 +227,7 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 		reqRunId = resp.RunId
 	}
 
-	resetType := service.ResetType(request.GetResetType())
+	resetType := request.GetResetType()
 	resetBaseRunID, decisionFinishID, err := getResetIDsByType(ctx, resetType, t.domain, request.GetWorkflowId(),
 		reqRunId, t.serviceClient, t.converter, request.GetHistoryEventId(), request.GetHistoryEventTime(), request.GetStateId(), request.GetStateExecutionId())
 

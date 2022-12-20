@@ -90,7 +90,7 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 		"S122_decide": 1,
 	}, history, "parallel test fail, %v", history)
 
-	assertions.Equal(service.WorkflowStatusCompleted, resp2.GetWorkflowStatus())
+	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
 	assertions.Equal(4, len(resp2.GetResults()))
 	//assertions.Equal([]iwfidl.StateCompletionOutput{
 	//	{
