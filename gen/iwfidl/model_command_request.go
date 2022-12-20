@@ -16,7 +16,7 @@ import (
 
 // CommandRequest struct for CommandRequest
 type CommandRequest struct {
-	DeciderTriggerType string `json:"deciderTriggerType"`
+	DeciderTriggerType DeciderTriggerType `json:"deciderTriggerType"`
 	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
 	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
 	InterStateChannelCommands []InterStateChannelCommand `json:"interStateChannelCommands,omitempty"`
@@ -26,7 +26,7 @@ type CommandRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCommandRequest(deciderTriggerType string) *CommandRequest {
+func NewCommandRequest(deciderTriggerType DeciderTriggerType) *CommandRequest {
 	this := CommandRequest{}
 	this.DeciderTriggerType = deciderTriggerType
 	return &this
@@ -41,9 +41,9 @@ func NewCommandRequestWithDefaults() *CommandRequest {
 }
 
 // GetDeciderTriggerType returns the DeciderTriggerType field value
-func (o *CommandRequest) GetDeciderTriggerType() string {
+func (o *CommandRequest) GetDeciderTriggerType() DeciderTriggerType {
 	if o == nil {
-		var ret string
+		var ret DeciderTriggerType
 		return ret
 	}
 
@@ -52,7 +52,7 @@ func (o *CommandRequest) GetDeciderTriggerType() string {
 
 // GetDeciderTriggerTypeOk returns a tuple with the DeciderTriggerType field value
 // and a boolean to check if the value has been set.
-func (o *CommandRequest) GetDeciderTriggerTypeOk() (*string, bool) {
+func (o *CommandRequest) GetDeciderTriggerTypeOk() (*DeciderTriggerType, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -60,7 +60,7 @@ func (o *CommandRequest) GetDeciderTriggerTypeOk() (*string, bool) {
 }
 
 // SetDeciderTriggerType sets field value
-func (o *CommandRequest) SetDeciderTriggerType(v string) {
+func (o *CommandRequest) SetDeciderTriggerType(v DeciderTriggerType) {
 	o.DeciderTriggerType = v
 }
 

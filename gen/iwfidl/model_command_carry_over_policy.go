@@ -16,7 +16,7 @@ import (
 
 // CommandCarryOverPolicy struct for CommandCarryOverPolicy
 type CommandCarryOverPolicy struct {
-	CommandCarryOverType *string `json:"commandCarryOverType,omitempty"`
+	CommandCarryOverType *CommandCarryOverType `json:"commandCarryOverType,omitempty"`
 }
 
 // NewCommandCarryOverPolicy instantiates a new CommandCarryOverPolicy object
@@ -37,9 +37,9 @@ func NewCommandCarryOverPolicyWithDefaults() *CommandCarryOverPolicy {
 }
 
 // GetCommandCarryOverType returns the CommandCarryOverType field value if set, zero value otherwise.
-func (o *CommandCarryOverPolicy) GetCommandCarryOverType() string {
+func (o *CommandCarryOverPolicy) GetCommandCarryOverType() CommandCarryOverType {
 	if o == nil || o.CommandCarryOverType == nil {
-		var ret string
+		var ret CommandCarryOverType
 		return ret
 	}
 	return *o.CommandCarryOverType
@@ -47,7 +47,7 @@ func (o *CommandCarryOverPolicy) GetCommandCarryOverType() string {
 
 // GetCommandCarryOverTypeOk returns a tuple with the CommandCarryOverType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *CommandCarryOverPolicy) GetCommandCarryOverTypeOk() (*string, bool) {
+func (o *CommandCarryOverPolicy) GetCommandCarryOverTypeOk() (*CommandCarryOverType, bool) {
 	if o == nil || o.CommandCarryOverType == nil {
 		return nil, false
 	}
@@ -63,8 +63,8 @@ func (o *CommandCarryOverPolicy) HasCommandCarryOverType() bool {
 	return false
 }
 
-// SetCommandCarryOverType gets a reference to the given string and assigns it to the CommandCarryOverType field.
-func (o *CommandCarryOverPolicy) SetCommandCarryOverType(v string) {
+// SetCommandCarryOverType gets a reference to the given CommandCarryOverType and assigns it to the CommandCarryOverType field.
+func (o *CommandCarryOverPolicy) SetCommandCarryOverType(v CommandCarryOverType) {
 	o.CommandCarryOverType = &v
 }
 

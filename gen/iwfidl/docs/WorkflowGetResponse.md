@@ -5,14 +5,14 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowRunId** | **string** |  | 
-**WorkflowStatus** | **string** |  | 
+**WorkflowStatus** | [**WorkflowStatus**](WorkflowStatus.md) |  | 
 **Results** | Pointer to [**[]StateCompletionOutput**](StateCompletionOutput.md) |  | [optional] 
 
 ## Methods
 
 ### NewWorkflowGetResponse
 
-`func NewWorkflowGetResponse(workflowRunId string, workflowStatus string, ) *WorkflowGetResponse`
+`func NewWorkflowGetResponse(workflowRunId string, workflowStatus WorkflowStatus, ) *WorkflowGetResponse`
 
 NewWorkflowGetResponse instantiates a new WorkflowGetResponse object
 This constructor will assign default values to properties that have it defined,
@@ -49,20 +49,20 @@ SetWorkflowRunId sets WorkflowRunId field to given value.
 
 ### GetWorkflowStatus
 
-`func (o *WorkflowGetResponse) GetWorkflowStatus() string`
+`func (o *WorkflowGetResponse) GetWorkflowStatus() WorkflowStatus`
 
 GetWorkflowStatus returns the WorkflowStatus field if non-nil, zero value otherwise.
 
 ### GetWorkflowStatusOk
 
-`func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*string, bool)`
+`func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*WorkflowStatus, bool)`
 
 GetWorkflowStatusOk returns a tuple with the WorkflowStatus field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWorkflowStatus
 
-`func (o *WorkflowGetResponse) SetWorkflowStatus(v string)`
+`func (o *WorkflowGetResponse) SetWorkflowStatus(v WorkflowStatus)`
 
 SetWorkflowStatus sets WorkflowStatus field to given value.
 

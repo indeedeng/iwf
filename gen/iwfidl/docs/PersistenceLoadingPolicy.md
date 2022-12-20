@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**PersistenceLoadingType** | Pointer to **string** |  | [optional] 
+**PersistenceLoadingType** | Pointer to [**PersistenceLoadingType**](PersistenceLoadingType.md) |  | [optional] 
 **PartialLoadingKeys** | Pointer to **[]string** |  | [optional] 
 
 ## Methods
@@ -28,20 +28,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetPersistenceLoadingType
 
-`func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() string`
+`func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() PersistenceLoadingType`
 
 GetPersistenceLoadingType returns the PersistenceLoadingType field if non-nil, zero value otherwise.
 
 ### GetPersistenceLoadingTypeOk
 
-`func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*string, bool)`
+`func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*PersistenceLoadingType, bool)`
 
 GetPersistenceLoadingTypeOk returns a tuple with the PersistenceLoadingType field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetPersistenceLoadingType
 
-`func (o *PersistenceLoadingPolicy) SetPersistenceLoadingType(v string)`
+`func (o *PersistenceLoadingPolicy) SetPersistenceLoadingType(v PersistenceLoadingType)`
 
 SetPersistenceLoadingType sets PersistenceLoadingType field to given value.
 

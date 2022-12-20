@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandCarryOverType** | Pointer to **string** |  | [optional] 
+**CommandCarryOverType** | Pointer to [**CommandCarryOverType**](CommandCarryOverType.md) |  | [optional] 
 
 ## Methods
 
@@ -27,20 +27,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetCommandCarryOverType
 
-`func (o *CommandCarryOverPolicy) GetCommandCarryOverType() string`
+`func (o *CommandCarryOverPolicy) GetCommandCarryOverType() CommandCarryOverType`
 
 GetCommandCarryOverType returns the CommandCarryOverType field if non-nil, zero value otherwise.
 
 ### GetCommandCarryOverTypeOk
 
-`func (o *CommandCarryOverPolicy) GetCommandCarryOverTypeOk() (*string, bool)`
+`func (o *CommandCarryOverPolicy) GetCommandCarryOverTypeOk() (*CommandCarryOverType, bool)`
 
 GetCommandCarryOverTypeOk returns a tuple with the CommandCarryOverType field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCommandCarryOverType
 
-`func (o *CommandCarryOverPolicy) SetCommandCarryOverType(v string)`
+`func (o *CommandCarryOverPolicy) SetCommandCarryOverType(v CommandCarryOverType)`
 
 SetCommandCarryOverType sets CommandCarryOverType field to given value.
 

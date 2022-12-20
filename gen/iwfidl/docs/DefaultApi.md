@@ -229,7 +229,7 @@ import (
 )
 
 func main() {
-    workflowResetRequest := *openapiclient.NewWorkflowResetRequest("WorkflowId_example", "ResetType_example") // WorkflowResetRequest |  (optional)
+    workflowResetRequest := *openapiclient.NewWorkflowResetRequest("WorkflowId_example", openapiclient.WorkflowResetType("HISTORY_EVENT_ID")) // WorkflowResetRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

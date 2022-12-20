@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorkflowIDReusePolicy** | Pointer to **string** |  | [optional] 
+**WorkflowIDReusePolicy** | Pointer to [**WorkflowIDReusePolicy**](WorkflowIDReusePolicy.md) |  | [optional] 
 **CronSchedule** | Pointer to **string** |  | [optional] 
 **RetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 
@@ -29,20 +29,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetWorkflowIDReusePolicy
 
-`func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() string`
+`func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() WorkflowIDReusePolicy`
 
 GetWorkflowIDReusePolicy returns the WorkflowIDReusePolicy field if non-nil, zero value otherwise.
 
 ### GetWorkflowIDReusePolicyOk
 
-`func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*string, bool)`
+`func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*WorkflowIDReusePolicy, bool)`
 
 GetWorkflowIDReusePolicyOk returns a tuple with the WorkflowIDReusePolicy field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetWorkflowIDReusePolicy
 
-`func (o *WorkflowStartOptions) SetWorkflowIDReusePolicy(v string)`
+`func (o *WorkflowStartOptions) SetWorkflowIDReusePolicy(v WorkflowIDReusePolicy)`
 
 SetWorkflowIDReusePolicy sets WorkflowIDReusePolicy field to given value.
 

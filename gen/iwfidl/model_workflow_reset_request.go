@@ -18,7 +18,7 @@ import (
 type WorkflowResetRequest struct {
 	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	ResetType string `json:"resetType"`
+	ResetType WorkflowResetType `json:"resetType"`
 	HistoryEventId *int32 `json:"historyEventId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
 	HistoryEventTime *string `json:"historyEventTime,omitempty"`
@@ -31,7 +31,7 @@ type WorkflowResetRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowResetRequest(workflowId string, resetType string) *WorkflowResetRequest {
+func NewWorkflowResetRequest(workflowId string, resetType WorkflowResetType) *WorkflowResetRequest {
 	this := WorkflowResetRequest{}
 	this.WorkflowId = workflowId
 	this.ResetType = resetType
@@ -103,9 +103,9 @@ func (o *WorkflowResetRequest) SetWorkflowRunId(v string) {
 }
 
 // GetResetType returns the ResetType field value
-func (o *WorkflowResetRequest) GetResetType() string {
+func (o *WorkflowResetRequest) GetResetType() WorkflowResetType {
 	if o == nil {
-		var ret string
+		var ret WorkflowResetType
 		return ret
 	}
 
@@ -114,7 +114,7 @@ func (o *WorkflowResetRequest) GetResetType() string {
 
 // GetResetTypeOk returns a tuple with the ResetType field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowResetRequest) GetResetTypeOk() (*string, bool) {
+func (o *WorkflowResetRequest) GetResetTypeOk() (*WorkflowResetType, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -122,7 +122,7 @@ func (o *WorkflowResetRequest) GetResetTypeOk() (*string, bool) {
 }
 
 // SetResetType sets field value
-func (o *WorkflowResetRequest) SetResetType(v string) {
+func (o *WorkflowResetRequest) SetResetType(v WorkflowResetType) {
 	o.ResetType = v
 }
 

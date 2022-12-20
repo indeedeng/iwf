@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **Reason** | Pointer to **string** |  | [optional] 
-**StopType** | Pointer to **string** |  | [optional] 
+**StopType** | Pointer to [**WorkflowStopType**](WorkflowStopType.md) |  | [optional] 
 
 ## Methods
 
@@ -100,20 +100,20 @@ HasReason returns a boolean if a field has been set.
 
 ### GetStopType
 
-`func (o *WorkflowStopRequest) GetStopType() string`
+`func (o *WorkflowStopRequest) GetStopType() WorkflowStopType`
 
 GetStopType returns the StopType field if non-nil, zero value otherwise.
 
 ### GetStopTypeOk
 
-`func (o *WorkflowStopRequest) GetStopTypeOk() (*string, bool)`
+`func (o *WorkflowStopRequest) GetStopTypeOk() (*WorkflowStopType, bool)`
 
 GetStopTypeOk returns a tuple with the StopType field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetStopType
 
-`func (o *WorkflowStopRequest) SetStopType(v string)`
+`func (o *WorkflowStopRequest) SetStopType(v WorkflowStopType)`
 
 SetStopType sets StopType field to given value.
 

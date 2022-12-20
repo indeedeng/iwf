@@ -5,13 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | **string** |  | 
-**TimerStatus** | **string** |  | 
+**TimerStatus** | [**TimerStatus**](TimerStatus.md) |  | 
 
 ## Methods
 
 ### NewTimerResult
 
-`func NewTimerResult(commandId string, timerStatus string, ) *TimerResult`
+`func NewTimerResult(commandId string, timerStatus TimerStatus, ) *TimerResult`
 
 NewTimerResult instantiates a new TimerResult object
 This constructor will assign default values to properties that have it defined,
@@ -48,20 +48,20 @@ SetCommandId sets CommandId field to given value.
 
 ### GetTimerStatus
 
-`func (o *TimerResult) GetTimerStatus() string`
+`func (o *TimerResult) GetTimerStatus() TimerStatus`
 
 GetTimerStatus returns the TimerStatus field if non-nil, zero value otherwise.
 
 ### GetTimerStatusOk
 
-`func (o *TimerResult) GetTimerStatusOk() (*string, bool)`
+`func (o *TimerResult) GetTimerStatusOk() (*TimerStatus, bool)`
 
 GetTimerStatusOk returns a tuple with the TimerStatus field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetTimerStatus
 
-`func (o *TimerResult) SetTimerStatus(v string)`
+`func (o *TimerResult) SetTimerStatus(v TimerStatus)`
 
 SetTimerStatus sets TimerStatus field to given value.
 
