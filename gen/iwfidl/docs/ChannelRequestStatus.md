@@ -1,4 +1,4 @@
-# InterStateChannelRequestStatus
+# ChannelRequestStatus
 
 ## Enum
 

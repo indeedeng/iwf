@@ -93,6 +93,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ChannelRequestStatus](docs/ChannelRequestStatus.md)
  - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
  - [CommandCarryOverType](docs/CommandCarryOverType.md)
  - [CommandRequest](docs/CommandRequest.md)
@@ -103,7 +104,6 @@ Class | Method | HTTP request | Description
  - [ErrorResponse](docs/ErrorResponse.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)
  - [InterStateChannelPublishing](docs/InterStateChannelPublishing.md)
- - [InterStateChannelRequestStatus](docs/InterStateChannelRequestStatus.md)
  - [InterStateChannelResult](docs/InterStateChannelResult.md)
  - [KeyValue](docs/KeyValue.md)
  - [PersistenceLoadingPolicy](docs/PersistenceLoadingPolicy.md)
@@ -113,7 +113,6 @@ Class | Method | HTTP request | Description
  - [SearchAttributeKeyAndType](docs/SearchAttributeKeyAndType.md)
  - [SearchAttributeValueType](docs/SearchAttributeValueType.md)
  - [SignalCommand](docs/SignalCommand.md)
- - [SignalRequestStatus](docs/SignalRequestStatus.md)
  - [SignalResult](docs/SignalResult.md)
  - [StateCompletionOutput](docs/StateCompletionOutput.md)
  - [StateDecision](docs/StateDecision.md)
