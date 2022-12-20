@@ -17,7 +17,7 @@ import (
 // WorkflowGetResponse struct for WorkflowGetResponse
 type WorkflowGetResponse struct {
 	WorkflowRunId string `json:"workflowRunId"`
-	WorkflowStatus string `json:"workflowStatus"`
+	WorkflowStatus WorkflowStatus `json:"workflowStatus"`
 	Results []StateCompletionOutput `json:"results,omitempty"`
 }
 
@@ -25,7 +25,7 @@ type WorkflowGetResponse struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowGetResponse(workflowRunId string, workflowStatus string) *WorkflowGetResponse {
+func NewWorkflowGetResponse(workflowRunId string, workflowStatus WorkflowStatus) *WorkflowGetResponse {
 	this := WorkflowGetResponse{}
 	this.WorkflowRunId = workflowRunId
 	this.WorkflowStatus = workflowStatus
@@ -65,9 +65,9 @@ func (o *WorkflowGetResponse) SetWorkflowRunId(v string) {
 }
 
 // GetWorkflowStatus returns the WorkflowStatus field value
-func (o *WorkflowGetResponse) GetWorkflowStatus() string {
+func (o *WorkflowGetResponse) GetWorkflowStatus() WorkflowStatus {
 	if o == nil {
-		var ret string
+		var ret WorkflowStatus
 		return ret
 	}
 
@@ -76,7 +76,7 @@ func (o *WorkflowGetResponse) GetWorkflowStatus() string {
 
 // GetWorkflowStatusOk returns a tuple with the WorkflowStatus field value
 // and a boolean to check if the value has been set.
-func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*string, bool) {
+func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*WorkflowStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -84,7 +84,7 @@ func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*string, bool) {
 }
 
 // SetWorkflowStatus sets field value
-func (o *WorkflowGetResponse) SetWorkflowStatus(v string) {
+func (o *WorkflowGetResponse) SetWorkflowStatus(v WorkflowStatus) {
 	o.WorkflowStatus = v
 }
 

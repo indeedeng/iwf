@@ -93,10 +93,13 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ChannelRequestStatus](docs/ChannelRequestStatus.md)
  - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
+ - [CommandCarryOverType](docs/CommandCarryOverType.md)
  - [CommandRequest](docs/CommandRequest.md)
  - [CommandResults](docs/CommandResults.md)
  - [Context](docs/Context.md)
+ - [DeciderTriggerType](docs/DeciderTriggerType.md)
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)
@@ -104,9 +107,11 @@ Class | Method | HTTP request | Description
  - [InterStateChannelResult](docs/InterStateChannelResult.md)
  - [KeyValue](docs/KeyValue.md)
  - [PersistenceLoadingPolicy](docs/PersistenceLoadingPolicy.md)
+ - [PersistenceLoadingType](docs/PersistenceLoadingType.md)
  - [RetryPolicy](docs/RetryPolicy.md)
  - [SearchAttribute](docs/SearchAttribute.md)
  - [SearchAttributeKeyAndType](docs/SearchAttributeKeyAndType.md)
+ - [SearchAttributeValueType](docs/SearchAttributeValueType.md)
  - [SignalCommand](docs/SignalCommand.md)
  - [SignalResult](docs/SignalResult.md)
  - [StateCompletionOutput](docs/StateCompletionOutput.md)
@@ -114,14 +119,17 @@ Class | Method | HTTP request | Description
  - [StateMovement](docs/StateMovement.md)
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
+ - [TimerStatus](docs/TimerStatus.md)
  - [WorkflowGetDataObjectsRequest](docs/WorkflowGetDataObjectsRequest.md)
  - [WorkflowGetDataObjectsResponse](docs/WorkflowGetDataObjectsResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)
  - [WorkflowGetResponse](docs/WorkflowGetResponse.md)
  - [WorkflowGetSearchAttributesRequest](docs/WorkflowGetSearchAttributesRequest.md)
  - [WorkflowGetSearchAttributesResponse](docs/WorkflowGetSearchAttributesResponse.md)
+ - [WorkflowIDReusePolicy](docs/WorkflowIDReusePolicy.md)
  - [WorkflowResetRequest](docs/WorkflowResetRequest.md)
  - [WorkflowResetResponse](docs/WorkflowResetResponse.md)
+ - [WorkflowResetType](docs/WorkflowResetType.md)
  - [WorkflowSearchRequest](docs/WorkflowSearchRequest.md)
  - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
  - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
@@ -134,7 +142,9 @@ Class | Method | HTTP request | Description
  - [WorkflowStateOptions](docs/WorkflowStateOptions.md)
  - [WorkflowStateStartRequest](docs/WorkflowStateStartRequest.md)
  - [WorkflowStateStartResponse](docs/WorkflowStateStartResponse.md)
+ - [WorkflowStatus](docs/WorkflowStatus.md)
  - [WorkflowStopRequest](docs/WorkflowStopRequest.md)
+ - [WorkflowStopType](docs/WorkflowStopType.md)
 
 
 ## Documentation For Authorization

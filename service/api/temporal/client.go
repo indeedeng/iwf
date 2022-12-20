@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
@@ -142,7 +142,7 @@ func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[st
 			result[key] = iwfidl.SearchAttribute{
 				Key:         iwfidl.PtrString(key),
 				StringValue: iwfidl.PtrString(str),
-				ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+				ValueType:   ptr.Any(iwfidl.KEYWORD),
 			}
 		}
 		number, isInt := object.(float64)
@@ -150,7 +150,7 @@ func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[st
 			result[key] = iwfidl.SearchAttribute{
 				Key:          iwfidl.PtrString(key),
 				IntegerValue: iwfidl.PtrInt64(int64(number)),
-				ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+				ValueType:    ptr.Any(iwfidl.INT),
 			}
 		}
 	}
@@ -158,19 +158,19 @@ func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[st
 	return result, nil
 }
 
-func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy string) (*enums.WorkflowIdReusePolicy, error) {
+func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy iwfidl.WorkflowIDReusePolicy) (*enums.WorkflowIdReusePolicy, error) {
 	var res enums.WorkflowIdReusePolicy
 	switch workflowIdReusePolicy {
-	case service.WorkflowIDReusePolicyAllowDuplicate:
+	case iwfidl.ALLOW_DUPLICATE:
 		res = enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE
 		return &res, nil
-	case service.WorkflowIDReusePolicyAllowDuplicateFailedOnly:
+	case iwfidl.ALLOW_DUPLICATE_FAILED_ONLY:
 		res = enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY
 		return &res, nil
-	case service.WorkflowIDReusePolicyRejectDuplicate:
+	case iwfidl.REJECT_DUPLICATE:
 		res = enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE
 		return &res, nil
-	case service.WorkflowIDReusePolicyTerminateIfRunning:
+	case iwfidl.TERMINATE_IF_RUNNING:
 		res = enums.WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING
 		return &res, nil
 	default:
@@ -178,22 +178,22 @@ func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy string) (*enums.Wo
 	}
 }
 
-func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (string, error) {
+func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (iwfidl.WorkflowStatus, error) {
 	switch status {
 	case enums.WORKFLOW_EXECUTION_STATUS_CANCELED:
-		return service.WorkflowStatusCanceled, nil
+		return iwfidl.CANCELED, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_COMPLETED:
-		return service.WorkflowStatusCompleted, nil
+		return iwfidl.COMPLETED, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW:
-		return service.WorkflowStatusContinueAsNew, nil
+		return iwfidl.CONTINUED_AS_NEW, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_FAILED:
-		return service.WorkflowStatusFailed, nil
+		return iwfidl.FAILED, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_RUNNING:
-		return service.WorkflowStatusRunning, nil
+		return iwfidl.RUNNING, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_TIMED_OUT:
-		return service.WorkflowStatusTimeout, nil
+		return iwfidl.TIMEOUT, nil
 	case enums.WORKFLOW_EXECUTION_STATUS_TERMINATED:
-		return service.WorkflowStatusTerminated, nil
+		return iwfidl.TERMINATED, nil
 	default:
 		return "", fmt.Errorf("not supported status %s", status)
 	}
@@ -215,7 +215,7 @@ func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.Workf
 		reqRunId = resp.RunId
 	}
 
-	resetType := service.ResetType(request.GetResetType())
+	resetType := request.GetResetType()
 	resetBaseRunID, resetEventId, err := getResetEventIDByType(ctx, resetType,
 		t.namespace, request.GetWorkflowId(), reqRunId,
 		t.tClient.WorkflowService(), t.dataConverter,

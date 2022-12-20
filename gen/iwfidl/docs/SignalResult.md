@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | **string** |  | 
-**SignalRequestStatus** | **string** |  | 
+**SignalRequestStatus** | [**ChannelRequestStatus**](ChannelRequestStatus.md) |  | 
 **SignalChannelName** | **string** |  | 
 **SignalValue** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewSignalResult
 
-`func NewSignalResult(commandId string, signalRequestStatus string, signalChannelName string, ) *SignalResult`
+`func NewSignalResult(commandId string, signalRequestStatus ChannelRequestStatus, signalChannelName string, ) *SignalResult`
 
 NewSignalResult instantiates a new SignalResult object
 This constructor will assign default values to properties that have it defined,
@@ -50,20 +50,20 @@ SetCommandId sets CommandId field to given value.
 
 ### GetSignalRequestStatus
 
-`func (o *SignalResult) GetSignalRequestStatus() string`
+`func (o *SignalResult) GetSignalRequestStatus() ChannelRequestStatus`
 
 GetSignalRequestStatus returns the SignalRequestStatus field if non-nil, zero value otherwise.
 
 ### GetSignalRequestStatusOk
 
-`func (o *SignalResult) GetSignalRequestStatusOk() (*string, bool)`
+`func (o *SignalResult) GetSignalRequestStatusOk() (*ChannelRequestStatus, bool)`
 
 GetSignalRequestStatusOk returns a tuple with the SignalRequestStatus field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSignalRequestStatus
 
-`func (o *SignalResult) SetSignalRequestStatus(v string)`
+`func (o *SignalResult) SetSignalRequestStatus(v ChannelRequestStatus)`
 
 SetSignalRequestStatus sets SignalRequestStatus field to given value.
 

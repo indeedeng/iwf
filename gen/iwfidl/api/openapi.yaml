@@ -261,21 +261,23 @@ components:
       type: object
     SearchAttributeKeyAndType:
       example:
-        valueType: KEYWORD
+        valueType: null
         key: key
       properties:
         key:
           type: string
         valueType:
-          enum:
-          - KEYWORD
-          - INT
-          type: string
+          $ref: '#/components/schemas/SearchAttributeValueType'
       type: object
+    SearchAttributeValueType:
+      enum:
+      - KEYWORD
+      - INT
+      type: string
     SearchAttribute:
       example:
         stringValue: stringValue
-        valueType: KEYWORD
+        valueType: null
         integerValue: 0
         key: key
       properties:
@@ -287,10 +289,7 @@ components:
           format: int64
           type: integer
         valueType:
-          enum:
-          - KEYWORD
-          - INT
-          type: string
+          $ref: '#/components/schemas/SearchAttributeValueType'
       type: object
     RetryPolicy:
       example:
@@ -314,9 +313,9 @@ components:
           partialLoadingKeys:
           - partialLoadingKeys
           - partialLoadingKeys
-          persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          persistenceLoadingType: null
         commandCarryOverPolicy:
-          commandCarryOverType: NONE
+          commandCarryOverType: null
         decideApiRetryPolicy:
           maximumAttempts: 7
           initialIntervalSeconds: 5
@@ -333,7 +332,7 @@ components:
           partialLoadingKeys:
           - partialLoadingKeys
           - partialLoadingKeys
-          persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+          persistenceLoadingType: null
       properties:
         searchAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
@@ -357,47 +356,53 @@ components:
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
           backoffCoefficient: 5.637376656633329
-        workflowIDReusePolicy: ALLOW_DUPLICATE_FAILED_ONLY
+        workflowIDReusePolicy: null
         cronSchedule: cronSchedule
       properties:
         workflowIDReusePolicy:
-          enum:
-          - ALLOW_DUPLICATE_FAILED_ONLY
-          - ALLOW_DUPLICATE
-          - REJECT_DUPLICATE
-          - TERMINATE_IF_RUNNING
-          type: string
+          $ref: '#/components/schemas/WorkflowIDReusePolicy'
         cronSchedule:
           type: string
         retryPolicy:
           $ref: '#/components/schemas/RetryPolicy'
       type: object
+    WorkflowIDReusePolicy:
+      enum:
+      - ALLOW_DUPLICATE_FAILED_ONLY
+      - ALLOW_DUPLICATE
+      - REJECT_DUPLICATE
+      - TERMINATE_IF_RUNNING
+      type: string
     PersistenceLoadingPolicy:
       example:
         partialLoadingKeys:
         - partialLoadingKeys
         - partialLoadingKeys
-        persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+        persistenceLoadingType: null
       properties:
         persistenceLoadingType:
-          enum:
-          - LOAD_ALL_WITHOUT_LOCKING
-          - LOAD_PARTIAL_WITHOUT_LOCKING
-          type: string
+          $ref: '#/components/schemas/PersistenceLoadingType'
         partialLoadingKeys:
           items:
             type: string
           type: array
       type: object
+    PersistenceLoadingType:
+      enum:
+      - LOAD_ALL_WITHOUT_LOCKING
+      - LOAD_PARTIAL_WITHOUT_LOCKING
+      type: string
     CommandCarryOverPolicy:
       example:
-        commandCarryOverType: NONE
+        commandCarryOverType: null
       properties:
         commandCarryOverType:
-          enum:
-          - NONE
-          type: string
+          $ref: '#/components/schemas/CommandCarryOverType'
       type: object
+    CommandCarryOverType:
+      enum:
+      - NONE
+      type: string
     ErrorResponse:
       properties:
         detail:
@@ -414,9 +419,9 @@ components:
             partialLoadingKeys:
             - partialLoadingKeys
             - partialLoadingKeys
-            persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            persistenceLoadingType: null
           commandCarryOverPolicy:
-            commandCarryOverType: NONE
+            commandCarryOverType: null
           decideApiRetryPolicy:
             maximumAttempts: 7
             initialIntervalSeconds: 5
@@ -433,7 +438,7 @@ components:
             partialLoadingKeys:
             - partialLoadingKeys
             - partialLoadingKeys
-            persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            persistenceLoadingType: null
         iwfWorkflowType: iwfWorkflowType
         workflowStartOptions:
           retryPolicy:
@@ -441,7 +446,7 @@ components:
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
-          workflowIDReusePolicy: ALLOW_DUPLICATE_FAILED_ONLY
+          workflowIDReusePolicy: null
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
@@ -503,7 +508,7 @@ components:
     WorkflowStopRequest:
       example:
         reason: reason
-        stopType: CANCEL
+        stopType: null
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -514,12 +519,14 @@ components:
         reason:
           type: string
         stopType:
-          enum:
-          - CANCEL
-          type: string
+          $ref: '#/components/schemas/WorkflowStopType'
       required:
       - workflowId
       type: object
+    WorkflowStopType:
+      enum:
+      - CANCEL
+      type: string
     WorkflowGetDataObjectsRequest:
       example:
         keys:
@@ -559,9 +566,9 @@ components:
     WorkflowGetSearchAttributesRequest:
       example:
         keys:
-        - valueType: KEYWORD
+        - valueType: null
           key: key
-        - valueType: KEYWORD
+        - valueType: null
           key: key
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -581,11 +588,11 @@ components:
       example:
         searchAttributes:
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
       properties:
@@ -614,7 +621,7 @@ components:
       type: object
     WorkflowGetResponse:
       example:
-        workflowStatus: RUNNING
+        workflowStatus: null
         workflowRunId: workflowRunId
         results:
         - completedStateOutput:
@@ -631,15 +638,7 @@ components:
         workflowRunId:
           type: string
         workflowStatus:
-          enum:
-          - RUNNING
-          - COMPLETED
-          - FAILED
-          - TIMEOUT
-          - TERMINATED
-          - CANCELED
-          - CONTINUED_AS_NEW
-          type: string
+          $ref: '#/components/schemas/WorkflowStatus'
         results:
           items:
             $ref: '#/components/schemas/StateCompletionOutput'
@@ -648,6 +647,16 @@ components:
       - workflowRunId
       - workflowStatus
       type: object
+    WorkflowStatus:
+      enum:
+      - RUNNING
+      - COMPLETED
+      - FAILED
+      - TIMEOUT
+      - TERMINATED
+      - CANCELED
+      - CONTINUED_AS_NEW
+      type: string
     StateCompletionOutput:
       example:
         completedStateOutput:
@@ -711,7 +720,7 @@ components:
         historyEventId: 0
         historyEventTime: historyEventTime
         stateId: stateId
-        resetType: HISTORY_EVENT_ID
+        resetType: null
         skipSignalReapply: true
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -722,13 +731,7 @@ components:
         workflowRunId:
           type: string
         resetType:
-          enum:
-          - HISTORY_EVENT_ID
-          - BEGINNING
-          - HISTORY_EVENT_TIME
-          - STATE_ID
-          - STATE_EXECUTION_ID
-          type: string
+          $ref: '#/components/schemas/WorkflowResetType'
         historyEventId:
           type: integer
         reason:
@@ -745,6 +748,14 @@ components:
       - resetType
       - workflowId
       type: object
+    WorkflowResetType:
+      enum:
+      - HISTORY_EVENT_ID
+      - BEGINNING
+      - HISTORY_EVENT_TIME
+      - STATE_ID
+      - STATE_EXECUTION_ID
+      type: string
     WorkflowResetResponse:
       example:
         workflowRunId: workflowRunId
@@ -774,11 +785,11 @@ components:
         workflowType: workflowType
         searchAttributes:
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         stateInput:
@@ -810,11 +821,11 @@ components:
       example:
         upsertSearchAttributes:
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         recordEvents:
@@ -837,7 +848,7 @@ components:
             commandId: commandId
           - firingUnixTimestampSeconds: 0
             commandId: commandId
-          deciderTriggerType: ALL_COMMAND_COMPLETED
+          deciderTriggerType: null
           interStateChannelCommands:
           - channelName: channelName
             commandId: commandId
@@ -908,13 +919,13 @@ components:
         workflowStateId: workflowStateId
         commandResults:
           signalResults:
-          - signalRequestStatus: WAITING
+          - signalRequestStatus: null
             signalChannelName: signalChannelName
             commandId: commandId
             signalValue:
               data: data
               encoding: encoding
-          - signalRequestStatus: WAITING
+          - signalRequestStatus: null
             signalChannelName: signalChannelName
             commandId: commandId
             signalValue:
@@ -926,17 +937,17 @@ components:
             value:
               data: data
               encoding: encoding
-            requestStatus: WAITING
+            requestStatus: null
           - channelName: channelName
             commandId: commandId
             value:
               data: data
               encoding: encoding
-            requestStatus: WAITING
+            requestStatus: null
           timerResults:
-          - timerStatus: SCHEDULED
+          - timerStatus: null
             commandId: commandId
-          - timerStatus: SCHEDULED
+          - timerStatus: null
             commandId: commandId
         context:
           workflowStartedTimestamp: 0
@@ -946,11 +957,11 @@ components:
         workflowType: workflowType
         searchAttributes:
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         DataObjects:
@@ -997,11 +1008,11 @@ components:
       example:
         upsertSearchAttributes:
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         - stringValue: stringValue
-          valueType: KEYWORD
+          valueType: null
           integerValue: 0
           key: key
         recordEvents:
@@ -1021,9 +1032,9 @@ components:
                 partialLoadingKeys:
                 - partialLoadingKeys
                 - partialLoadingKeys
-                persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                persistenceLoadingType: null
               commandCarryOverPolicy:
-                commandCarryOverType: NONE
+                commandCarryOverType: null
               decideApiRetryPolicy:
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
@@ -1040,7 +1051,7 @@ components:
                 partialLoadingKeys:
                 - partialLoadingKeys
                 - partialLoadingKeys
-                persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                persistenceLoadingType: null
             stateInput:
               data: data
               encoding: encoding
@@ -1050,9 +1061,9 @@ components:
                 partialLoadingKeys:
                 - partialLoadingKeys
                 - partialLoadingKeys
-                persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                persistenceLoadingType: null
               commandCarryOverPolicy:
-                commandCarryOverType: NONE
+                commandCarryOverType: null
               decideApiRetryPolicy:
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
@@ -1069,7 +1080,7 @@ components:
                 partialLoadingKeys:
                 - partialLoadingKeys
                 - partialLoadingKeys
-                persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+                persistenceLoadingType: null
             stateInput:
               data: data
               encoding: encoding
@@ -1133,9 +1144,9 @@ components:
               partialLoadingKeys:
               - partialLoadingKeys
               - partialLoadingKeys
-              persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              persistenceLoadingType: null
             commandCarryOverPolicy:
-              commandCarryOverType: NONE
+              commandCarryOverType: null
             decideApiRetryPolicy:
               maximumAttempts: 7
               initialIntervalSeconds: 5
@@ -1152,7 +1163,7 @@ components:
               partialLoadingKeys:
               - partialLoadingKeys
               - partialLoadingKeys
-              persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              persistenceLoadingType: null
           stateInput:
             data: data
             encoding: encoding
@@ -1162,9 +1173,9 @@ components:
               partialLoadingKeys:
               - partialLoadingKeys
               - partialLoadingKeys
-              persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              persistenceLoadingType: null
             commandCarryOverPolicy:
-              commandCarryOverType: NONE
+              commandCarryOverType: null
             decideApiRetryPolicy:
               maximumAttempts: 7
               initialIntervalSeconds: 5
@@ -1181,7 +1192,7 @@ components:
               partialLoadingKeys:
               - partialLoadingKeys
               - partialLoadingKeys
-              persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+              persistenceLoadingType: null
           stateInput:
             data: data
             encoding: encoding
@@ -1199,9 +1210,9 @@ components:
             partialLoadingKeys:
             - partialLoadingKeys
             - partialLoadingKeys
-            persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            persistenceLoadingType: null
           commandCarryOverPolicy:
-            commandCarryOverType: NONE
+            commandCarryOverType: null
           decideApiRetryPolicy:
             maximumAttempts: 7
             initialIntervalSeconds: 5
@@ -1218,7 +1229,7 @@ components:
             partialLoadingKeys:
             - partialLoadingKeys
             - partialLoadingKeys
-            persistenceLoadingType: LOAD_ALL_WITHOUT_LOCKING
+            persistenceLoadingType: null
         stateInput:
           data: data
           encoding: encoding
@@ -1244,7 +1255,7 @@ components:
           commandId: commandId
         - firingUnixTimestampSeconds: 0
           commandId: commandId
-        deciderTriggerType: ALL_COMMAND_COMPLETED
+        deciderTriggerType: null
         interStateChannelCommands:
         - channelName: channelName
           commandId: commandId
@@ -1252,10 +1263,7 @@ components:
           commandId: commandId
       properties:
         deciderTriggerType:
-          enum:
-          - ALL_COMMAND_COMPLETED
-          - ANY_COMMAND_COMPLETED
-          type: string
+          $ref: '#/components/schemas/DeciderTriggerType'
         timerCommands:
           items:
             $ref: '#/components/schemas/TimerCommand'
@@ -1271,16 +1279,21 @@ components:
       required:
       - deciderTriggerType
       type: object
+    DeciderTriggerType:
+      enum:
+      - ALL_COMMAND_COMPLETED
+      - ANY_COMMAND_COMPLETED
+      type: string
     CommandResults:
       example:
         signalResults:
-        - signalRequestStatus: WAITING
+        - signalRequestStatus: null
           signalChannelName: signalChannelName
           commandId: commandId
           signalValue:
             data: data
             encoding: encoding
-        - signalRequestStatus: WAITING
+        - signalRequestStatus: null
           signalChannelName: signalChannelName
           commandId: commandId
           signalValue:
@@ -1292,17 +1305,17 @@ components:
           value:
             data: data
             encoding: encoding
-          requestStatus: WAITING
+          requestStatus: null
         - channelName: channelName
           commandId: commandId
           value:
             data: data
             encoding: encoding
-          requestStatus: WAITING
+          requestStatus: null
         timerResults:
-        - timerStatus: SCHEDULED
+        - timerStatus: null
           commandId: commandId
-        - timerStatus: SCHEDULED
+        - timerStatus: null
           commandId: commandId
       properties:
         signalResults:
@@ -1360,23 +1373,25 @@ components:
       type: object
     TimerResult:
       example:
-        timerStatus: SCHEDULED
+        timerStatus: null
         commandId: commandId
       properties:
         commandId:
           type: string
         timerStatus:
-          enum:
-          - SCHEDULED
-          - FIRED
-          type: string
+          $ref: '#/components/schemas/TimerStatus'
       required:
       - commandId
       - timerStatus
       type: object
+    TimerStatus:
+      enum:
+      - SCHEDULED
+      - FIRED
+      type: string
     SignalResult:
       example:
-        signalRequestStatus: WAITING
+        signalRequestStatus: null
         signalChannelName: signalChannelName
         commandId: commandId
         signalValue:
@@ -1386,10 +1401,7 @@ components:
         commandId:
           type: string
         signalRequestStatus:
-          enum:
-          - WAITING
-          - RECEIVED
-          type: string
+          $ref: '#/components/schemas/ChannelRequestStatus'
         signalChannelName:
           type: string
         signalValue:
@@ -1406,15 +1418,12 @@ components:
         value:
           data: data
           encoding: encoding
-        requestStatus: WAITING
+        requestStatus: null
       properties:
         commandId:
           type: string
         requestStatus:
-          enum:
-          - WAITING
-          - RECEIVED
-          type: string
+          $ref: '#/components/schemas/ChannelRequestStatus'
         channelName:
           type: string
         value:
@@ -1424,6 +1433,11 @@ components:
       - commandId
       - requestStatus
       type: object
+    ChannelRequestStatus:
+      enum:
+      - WAITING
+      - RECEIVED
+      type: string
     InterStateChannelPublishing:
       example:
         channelName: channelName

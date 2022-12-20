@@ -19,7 +19,7 @@ type WorkflowStopRequest struct {
 	WorkflowId string `json:"workflowId"`
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
 	Reason *string `json:"reason,omitempty"`
-	StopType *string `json:"stopType,omitempty"`
+	StopType *WorkflowStopType `json:"stopType,omitempty"`
 }
 
 // NewWorkflowStopRequest instantiates a new WorkflowStopRequest object
@@ -129,9 +129,9 @@ func (o *WorkflowStopRequest) SetReason(v string) {
 }
 
 // GetStopType returns the StopType field value if set, zero value otherwise.
-func (o *WorkflowStopRequest) GetStopType() string {
+func (o *WorkflowStopRequest) GetStopType() WorkflowStopType {
 	if o == nil || o.StopType == nil {
-		var ret string
+		var ret WorkflowStopType
 		return ret
 	}
 	return *o.StopType
@@ -139,7 +139,7 @@ func (o *WorkflowStopRequest) GetStopType() string {
 
 // GetStopTypeOk returns a tuple with the StopType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStopRequest) GetStopTypeOk() (*string, bool) {
+func (o *WorkflowStopRequest) GetStopTypeOk() (*WorkflowStopType, bool) {
 	if o == nil || o.StopType == nil {
 		return nil, false
 	}
@@ -155,8 +155,8 @@ func (o *WorkflowStopRequest) HasStopType() bool {
 	return false
 }
 
-// SetStopType gets a reference to the given string and assigns it to the StopType field.
-func (o *WorkflowStopRequest) SetStopType(v string) {
+// SetStopType gets a reference to the given WorkflowStopType and assigns it to the StopType field.
+func (o *WorkflowStopRequest) SetStopType(v WorkflowStopType) {
 	o.StopType = &v
 }
 

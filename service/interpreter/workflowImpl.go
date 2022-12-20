@@ -321,13 +321,13 @@ func executeState(
 
 	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
 		triggerType := commandReq.GetDeciderTriggerType()
-		if triggerType == service.DeciderTypeAllCommandCompleted {
+		if triggerType == iwfidl.ALL_COMMAND_COMPLETED {
 			err = provider.Await(ctx, func() bool {
 				return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
 					len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
 					len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
 			})
-		} else if triggerType == service.DeciderTypeAnyCommandCompleted {
+		} else if triggerType == iwfidl.ANY_COMMAND_COMPLETED {
 			err = provider.Await(ctx, func() bool {
 				return len(completedTimerCmds)+
 					len(completedSignalCmds)+
@@ -346,9 +346,9 @@ func executeState(
 	if len(commandReq.GetTimerCommands()) > 0 {
 		var timerResults []iwfidl.TimerResult
 		for idx, cmd := range commandReq.GetTimerCommands() {
-			status := service.TimerStatusFired
+			status := iwfidl.FIRED
 			if !completedTimerCmds[idx] {
-				status = service.TimerStatusScheduled
+				status = iwfidl.SCHEDULED
 			}
 			timerResults = append(timerResults, iwfidl.TimerResult{
 				CommandId:   cmd.GetCommandId(),
@@ -361,10 +361,10 @@ func executeState(
 	if len(commandReq.GetSignalCommands()) > 0 {
 		var signalResults []iwfidl.SignalResult
 		for idx, cmd := range commandReq.GetSignalCommands() {
-			status := service.SignalStatusReceived
+			status := iwfidl.RECEIVED
 			result, completed := completedSignalCmds[idx]
 			if !completed {
-				status = service.SignalStatusWaiting
+				status = iwfidl.WAITING
 			}
 
 			signalResults = append(signalResults, iwfidl.SignalResult{
@@ -380,10 +380,10 @@ func executeState(
 	if len(commandReq.GetInterStateChannelCommands()) > 0 {
 		var interStateChannelResults []iwfidl.InterStateChannelResult
 		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
-			status := service.InternStateChannelCommandReceived
+			status := iwfidl.RECEIVED
 			result, completed := completedInterStateChannelCmds[idx]
 			if !completed {
-				status = service.InternStateChannelCommandStatusWaiting
+				status = iwfidl.WAITING
 			}
 
 			interStateChannelResults = append(interStateChannelResults, iwfidl.InterStateChannelResult{

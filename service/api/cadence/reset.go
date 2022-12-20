@@ -13,7 +13,7 @@ import (
 
 func getResetIDsByType(
 	ctx context.Context,
-	resetType service.ResetType,
+	resetType iwfidl.WorkflowResetType,
 	domain, wid, rid string,
 	frontendClient workflowserviceclient.Interface, converter encoded.DataConverter,
 	historyEventId int32, earliestHistoryTimeStr string, stateId, stateExecutionId string,
@@ -22,15 +22,15 @@ func getResetIDsByType(
 	resetBaseRunID = rid
 
 	switch resetType {
-	case service.ResetTypeHistoryEventId:
+	case iwfidl.HISTORY_EVENT_ID:
 		decisionFinishID = int64(historyEventId)
 		return
-	case service.ResetTypeBeginning:
+	case iwfidl.BEGINNING:
 		decisionFinishID, err = getFirstDecisionTaskByType(ctx, domain, wid, rid, frontendClient, shared.EventTypeDecisionTaskCompleted)
 		if err != nil {
 			return
 		}
-	case service.ResetTypeHistoryEventTime:
+	case iwfidl.HISTORY_EVENT_TIME:
 		var earliestTimeUnixNano int64
 		earliestTimeUnixNano, err = timeparser.ParseTime(earliestHistoryTimeStr)
 		if err != nil {
@@ -40,7 +40,7 @@ func getResetIDsByType(
 		if err != nil {
 			return
 		}
-	case service.ResetTypeStateId, service.ResetTypeStateExecutionId:
+	case iwfidl.STATE_ID, iwfidl.STATE_EXECUTION_ID:
 		decisionFinishID, err = getDecisionEventIDByStateOrStateExecutionId(ctx, domain, wid, rid, stateId, stateExecutionId, frontendClient, converter)
 		if err != nil {
 			return

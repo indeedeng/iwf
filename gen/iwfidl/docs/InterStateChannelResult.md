@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | **string** |  | 
-**RequestStatus** | **string** |  | 
+**RequestStatus** | [**ChannelRequestStatus**](ChannelRequestStatus.md) |  | 
 **ChannelName** | **string** |  | 
 **Value** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewInterStateChannelResult
 
-`func NewInterStateChannelResult(commandId string, requestStatus string, channelName string, ) *InterStateChannelResult`
+`func NewInterStateChannelResult(commandId string, requestStatus ChannelRequestStatus, channelName string, ) *InterStateChannelResult`
 
 NewInterStateChannelResult instantiates a new InterStateChannelResult object
 This constructor will assign default values to properties that have it defined,
@@ -50,20 +50,20 @@ SetCommandId sets CommandId field to given value.
 
 ### GetRequestStatus
 
-`func (o *InterStateChannelResult) GetRequestStatus() string`
+`func (o *InterStateChannelResult) GetRequestStatus() ChannelRequestStatus`
 
 GetRequestStatus returns the RequestStatus field if non-nil, zero value otherwise.
 
 ### GetRequestStatusOk
 
-`func (o *InterStateChannelResult) GetRequestStatusOk() (*string, bool)`
+`func (o *InterStateChannelResult) GetRequestStatusOk() (*ChannelRequestStatus, bool)`
 
 GetRequestStatusOk returns a tuple with the RequestStatus field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetRequestStatus
 
-`func (o *InterStateChannelResult) SetRequestStatus(v string)`
+`func (o *InterStateChannelResult) SetRequestStatus(v ChannelRequestStatus)`
 
 SetRequestStatus sets RequestStatus field to given value.
 

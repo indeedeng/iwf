@@ -17,7 +17,7 @@ import (
 // InterStateChannelResult struct for InterStateChannelResult
 type InterStateChannelResult struct {
 	CommandId string `json:"commandId"`
-	RequestStatus string `json:"requestStatus"`
+	RequestStatus ChannelRequestStatus `json:"requestStatus"`
 	ChannelName string `json:"channelName"`
 	Value *EncodedObject `json:"value,omitempty"`
 }
@@ -26,7 +26,7 @@ type InterStateChannelResult struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInterStateChannelResult(commandId string, requestStatus string, channelName string) *InterStateChannelResult {
+func NewInterStateChannelResult(commandId string, requestStatus ChannelRequestStatus, channelName string) *InterStateChannelResult {
 	this := InterStateChannelResult{}
 	this.CommandId = commandId
 	this.RequestStatus = requestStatus
@@ -67,9 +67,9 @@ func (o *InterStateChannelResult) SetCommandId(v string) {
 }
 
 // GetRequestStatus returns the RequestStatus field value
-func (o *InterStateChannelResult) GetRequestStatus() string {
+func (o *InterStateChannelResult) GetRequestStatus() ChannelRequestStatus {
 	if o == nil {
-		var ret string
+		var ret ChannelRequestStatus
 		return ret
 	}
 
@@ -78,7 +78,7 @@ func (o *InterStateChannelResult) GetRequestStatus() string {
 
 // GetRequestStatusOk returns a tuple with the RequestStatus field value
 // and a boolean to check if the value has been set.
-func (o *InterStateChannelResult) GetRequestStatusOk() (*string, bool) {
+func (o *InterStateChannelResult) GetRequestStatusOk() (*ChannelRequestStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -86,7 +86,7 @@ func (o *InterStateChannelResult) GetRequestStatusOk() (*string, bool) {
 }
 
 // SetRequestStatus sets field value
-func (o *InterStateChannelResult) SetRequestStatus(v string) {
+func (o *InterStateChannelResult) SetRequestStatus(v ChannelRequestStatus) {
 	o.RequestStatus = v
 }
 

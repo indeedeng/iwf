@@ -16,7 +16,7 @@ import (
 
 // WorkflowStartOptions struct for WorkflowStartOptions
 type WorkflowStartOptions struct {
-	WorkflowIDReusePolicy *string `json:"workflowIDReusePolicy,omitempty"`
+	WorkflowIDReusePolicy *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
 	CronSchedule *string `json:"cronSchedule,omitempty"`
 	RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty"`
 }
@@ -39,9 +39,9 @@ func NewWorkflowStartOptionsWithDefaults() *WorkflowStartOptions {
 }
 
 // GetWorkflowIDReusePolicy returns the WorkflowIDReusePolicy field value if set, zero value otherwise.
-func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() string {
+func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() WorkflowIDReusePolicy {
 	if o == nil || o.WorkflowIDReusePolicy == nil {
-		var ret string
+		var ret WorkflowIDReusePolicy
 		return ret
 	}
 	return *o.WorkflowIDReusePolicy
@@ -49,7 +49,7 @@ func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() string {
 
 // GetWorkflowIDReusePolicyOk returns a tuple with the WorkflowIDReusePolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*string, bool) {
+func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*WorkflowIDReusePolicy, bool) {
 	if o == nil || o.WorkflowIDReusePolicy == nil {
 		return nil, false
 	}
@@ -65,8 +65,8 @@ func (o *WorkflowStartOptions) HasWorkflowIDReusePolicy() bool {
 	return false
 }
 
-// SetWorkflowIDReusePolicy gets a reference to the given string and assigns it to the WorkflowIDReusePolicy field.
-func (o *WorkflowStartOptions) SetWorkflowIDReusePolicy(v string) {
+// SetWorkflowIDReusePolicy gets a reference to the given WorkflowIDReusePolicy and assigns it to the WorkflowIDReusePolicy field.
+func (o *WorkflowStartOptions) SetWorkflowIDReusePolicy(v WorkflowIDReusePolicy) {
 	o.WorkflowIDReusePolicy = &v
 }
 

@@ -17,7 +17,7 @@ import (
 // SignalResult struct for SignalResult
 type SignalResult struct {
 	CommandId string `json:"commandId"`
-	SignalRequestStatus string `json:"signalRequestStatus"`
+	SignalRequestStatus ChannelRequestStatus `json:"signalRequestStatus"`
 	SignalChannelName string `json:"signalChannelName"`
 	SignalValue *EncodedObject `json:"signalValue,omitempty"`
 }
@@ -26,7 +26,7 @@ type SignalResult struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSignalResult(commandId string, signalRequestStatus string, signalChannelName string) *SignalResult {
+func NewSignalResult(commandId string, signalRequestStatus ChannelRequestStatus, signalChannelName string) *SignalResult {
 	this := SignalResult{}
 	this.CommandId = commandId
 	this.SignalRequestStatus = signalRequestStatus
@@ -67,9 +67,9 @@ func (o *SignalResult) SetCommandId(v string) {
 }
 
 // GetSignalRequestStatus returns the SignalRequestStatus field value
-func (o *SignalResult) GetSignalRequestStatus() string {
+func (o *SignalResult) GetSignalRequestStatus() ChannelRequestStatus {
 	if o == nil {
-		var ret string
+		var ret ChannelRequestStatus
 		return ret
 	}
 
@@ -78,7 +78,7 @@ func (o *SignalResult) GetSignalRequestStatus() string {
 
 // GetSignalRequestStatusOk returns a tuple with the SignalRequestStatus field value
 // and a boolean to check if the value has been set.
-func (o *SignalResult) GetSignalRequestStatusOk() (*string, bool) {
+func (o *SignalResult) GetSignalRequestStatusOk() (*ChannelRequestStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -86,7 +86,7 @@ func (o *SignalResult) GetSignalRequestStatusOk() (*string, bool) {
 }
 
 // SetSignalRequestStatus sets field value
-func (o *SignalResult) SetSignalRequestStatus(v string) {
+func (o *SignalResult) SetSignalRequestStatus(v ChannelRequestStatus) {
 	o.SignalRequestStatus = v
 }
 

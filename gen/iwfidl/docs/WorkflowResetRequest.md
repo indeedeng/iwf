@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
-**ResetType** | **string** |  | 
+**ResetType** | [**WorkflowResetType**](WorkflowResetType.md) |  | 
 **HistoryEventId** | Pointer to **int32** |  | [optional] 
 **Reason** | Pointer to **string** |  | [optional] 
 **HistoryEventTime** | Pointer to **string** |  | [optional] 
@@ -18,7 +18,7 @@ Name | Type | Description | Notes
 
 ### NewWorkflowResetRequest
 
-`func NewWorkflowResetRequest(workflowId string, resetType string, ) *WorkflowResetRequest`
+`func NewWorkflowResetRequest(workflowId string, resetType WorkflowResetType, ) *WorkflowResetRequest`
 
 NewWorkflowResetRequest instantiates a new WorkflowResetRequest object
 This constructor will assign default values to properties that have it defined,
@@ -80,20 +80,20 @@ HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetResetType
 
-`func (o *WorkflowResetRequest) GetResetType() string`
+`func (o *WorkflowResetRequest) GetResetType() WorkflowResetType`
 
 GetResetType returns the ResetType field if non-nil, zero value otherwise.
 
 ### GetResetTypeOk
 
-`func (o *WorkflowResetRequest) GetResetTypeOk() (*string, bool)`
+`func (o *WorkflowResetRequest) GetResetTypeOk() (*WorkflowResetType, bool)`
 
 GetResetTypeOk returns a tuple with the ResetType field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetResetType
 
-`func (o *WorkflowResetRequest) SetResetType(v string)`
+`func (o *WorkflowResetRequest) SetResetType(v WorkflowResetType)`
 
 SetResetType sets ResetType field to given value.
 

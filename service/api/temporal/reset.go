@@ -3,6 +3,7 @@ package temporal
 import (
 	"context"
 	"fmt"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/timeparser"
 	"go.temporal.io/api/common/v1"
@@ -11,7 +12,7 @@ import (
 	"go.temporal.io/sdk/converter"
 )
 
-func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
+func getResetEventIDByType(ctx context.Context, resetType iwfidl.WorkflowResetType,
 	namespace, wid, rid string,
 	frontendClient workflowservice.WorkflowServiceClient, converter converter.DataConverter,
 	historyEventId int32, earliestHistoryTimeStr string, stateId, stateExecutionId string,
@@ -20,10 +21,10 @@ func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
 	resetBaseRunID = rid
 
 	switch resetType {
-	case service.ResetTypeHistoryEventId:
+	case iwfidl.HISTORY_EVENT_ID:
 		workflowTaskFinishID = int64(historyEventId)
 		return
-	case service.ResetTypeHistoryEventTime:
+	case iwfidl.HISTORY_EVENT_TIME:
 		var earliestTimeUnixNano int64
 		earliestTimeUnixNano, err = timeparser.ParseTime(earliestHistoryTimeStr)
 		if err != nil {
@@ -33,12 +34,12 @@ func getResetEventIDByType(ctx context.Context, resetType service.ResetType,
 		if err != nil {
 			return
 		}
-	case service.ResetTypeBeginning:
+	case iwfidl.BEGINNING:
 		resetBaseRunID, workflowTaskFinishID, err = getFirstWorkflowTaskEventID(ctx, namespace, wid, rid, frontendClient)
 		if err != nil {
 			return
 		}
-	case service.ResetTypeStateId, service.ResetTypeStateExecutionId:
+	case iwfidl.STATE_ID, iwfidl.STATE_EXECUTION_ID:
 		workflowTaskFinishID, err = getDecisionEventIDByStateOrStateExecutionId(ctx, namespace, wid, rid, stateId, stateExecutionId, frontendClient, converter)
 		if err != nil {
 			return

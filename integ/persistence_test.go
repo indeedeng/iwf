@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"strconv"
@@ -48,10 +49,10 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		StartStateId:           persistence.State1,
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadAllWithoutLocking),
+				PersistenceLoadingType: ptr.Any(iwfidl.ALL_WITHOUT_LOCKING),
 			},
 			DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PtrString(service.LoadingTypeLoadAllWithoutLocking),
+				PersistenceLoadingType: ptr.Any(iwfidl.ALL_WITHOUT_LOCKING),
 			},
 		},
 	}).Execute()
@@ -100,7 +101,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		Keys: []iwfidl.SearchAttributeKeyAndType{
 			{
 				Key:       iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
-				ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+				ValueType: ptr.Any(iwfidl.KEYWORD),
 			},
 		},
 	}).Execute()
@@ -115,7 +116,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		Keys: []iwfidl.SearchAttributeKeyAndType{
 			{
 				Key:       iwfidl.PtrString(persistence.TestSearchAttributeIntKey),
-				ValueType: iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+				ValueType: ptr.Any(iwfidl.INT),
 			},
 		},
 	}).Execute()
@@ -190,13 +191,13 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
 		Key:          iwfidl.PtrString(persistence.TestSearchAttributeIntKey),
-		ValueType:    iwfidl.PtrString(service.SearchAttributeValueTypeInt),
+		ValueType:    ptr.Any(iwfidl.INT),
 		IntegerValue: iwfidl.PtrInt64(persistence.TestSearchAttributeIntValue2),
 	}
 
 	expectedSearchAttributeKeyword := iwfidl.SearchAttribute{
 		Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
-		ValueType:   iwfidl.PtrString(service.SearchAttributeValueTypeKeyword),
+		ValueType:   ptr.Any(iwfidl.KEYWORD),
 		StringValue: iwfidl.PtrString(persistence.TestSearchAttributeKeywordValue2),
 	}
 

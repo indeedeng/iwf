@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **Key** | Pointer to **string** |  | [optional] 
 **StringValue** | Pointer to **string** |  | [optional] 
 **IntegerValue** | Pointer to **int64** |  | [optional] 
-**ValueType** | Pointer to **string** |  | [optional] 
+**ValueType** | Pointer to [**SearchAttributeValueType**](SearchAttributeValueType.md) |  | [optional] 
 
 ## Methods
 
@@ -105,20 +105,20 @@ HasIntegerValue returns a boolean if a field has been set.
 
 ### GetValueType
 
-`func (o *SearchAttribute) GetValueType() string`
+`func (o *SearchAttribute) GetValueType() SearchAttributeValueType`
 
 GetValueType returns the ValueType field if non-nil, zero value otherwise.
 
 ### GetValueTypeOk
 
-`func (o *SearchAttribute) GetValueTypeOk() (*string, bool)`
+`func (o *SearchAttribute) GetValueTypeOk() (*SearchAttributeValueType, bool)`
 
 GetValueTypeOk returns a tuple with the ValueType field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetValueType
 
-`func (o *SearchAttribute) SetValueType(v string)`
+`func (o *SearchAttribute) SetValueType(v SearchAttributeValueType)`
 
 SetValueType sets ValueType field to given value.
 

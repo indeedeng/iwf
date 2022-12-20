@@ -50,7 +50,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 							FiringUnixTimestampSeconds: now + 10, // fire after 10s
 						},
 					},
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 			})
 			return
@@ -58,7 +58,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State2 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: service.DeciderTypeAllCommandCompleted,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
 				},
 			})
 			return

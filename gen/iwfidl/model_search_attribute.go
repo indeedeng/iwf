@@ -19,7 +19,7 @@ type SearchAttribute struct {
 	Key *string `json:"key,omitempty"`
 	StringValue *string `json:"stringValue,omitempty"`
 	IntegerValue *int64 `json:"integerValue,omitempty"`
-	ValueType *string `json:"valueType,omitempty"`
+	ValueType *SearchAttributeValueType `json:"valueType,omitempty"`
 }
 
 // NewSearchAttribute instantiates a new SearchAttribute object
@@ -136,9 +136,9 @@ func (o *SearchAttribute) SetIntegerValue(v int64) {
 }
 
 // GetValueType returns the ValueType field value if set, zero value otherwise.
-func (o *SearchAttribute) GetValueType() string {
+func (o *SearchAttribute) GetValueType() SearchAttributeValueType {
 	if o == nil || o.ValueType == nil {
-		var ret string
+		var ret SearchAttributeValueType
 		return ret
 	}
 	return *o.ValueType
@@ -146,7 +146,7 @@ func (o *SearchAttribute) GetValueType() string {
 
 // GetValueTypeOk returns a tuple with the ValueType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *SearchAttribute) GetValueTypeOk() (*string, bool) {
+func (o *SearchAttribute) GetValueTypeOk() (*SearchAttributeValueType, bool) {
 	if o == nil || o.ValueType == nil {
 		return nil, false
 	}
@@ -162,8 +162,8 @@ func (o *SearchAttribute) HasValueType() bool {
 	return false
 }
 
-// SetValueType gets a reference to the given string and assigns it to the ValueType field.
-func (o *SearchAttribute) SetValueType(v string) {
+// SetValueType gets a reference to the given SearchAttributeValueType and assigns it to the ValueType field.
+func (o *SearchAttribute) SetValueType(v SearchAttributeValueType) {
 	o.ValueType = &v
 }
 

@@ -16,7 +16,7 @@ import (
 
 // PersistenceLoadingPolicy struct for PersistenceLoadingPolicy
 type PersistenceLoadingPolicy struct {
-	PersistenceLoadingType *string `json:"persistenceLoadingType,omitempty"`
+	PersistenceLoadingType *PersistenceLoadingType `json:"persistenceLoadingType,omitempty"`
 	PartialLoadingKeys []string `json:"partialLoadingKeys,omitempty"`
 }
 
@@ -38,9 +38,9 @@ func NewPersistenceLoadingPolicyWithDefaults() *PersistenceLoadingPolicy {
 }
 
 // GetPersistenceLoadingType returns the PersistenceLoadingType field value if set, zero value otherwise.
-func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() string {
+func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() PersistenceLoadingType {
 	if o == nil || o.PersistenceLoadingType == nil {
-		var ret string
+		var ret PersistenceLoadingType
 		return ret
 	}
 	return *o.PersistenceLoadingType
@@ -48,7 +48,7 @@ func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() string {
 
 // GetPersistenceLoadingTypeOk returns a tuple with the PersistenceLoadingType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*string, bool) {
+func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*PersistenceLoadingType, bool) {
 	if o == nil || o.PersistenceLoadingType == nil {
 		return nil, false
 	}
@@ -64,8 +64,8 @@ func (o *PersistenceLoadingPolicy) HasPersistenceLoadingType() bool {
 	return false
 }
 
-// SetPersistenceLoadingType gets a reference to the given string and assigns it to the PersistenceLoadingType field.
-func (o *PersistenceLoadingPolicy) SetPersistenceLoadingType(v string) {
+// SetPersistenceLoadingType gets a reference to the given PersistenceLoadingType and assigns it to the PersistenceLoadingType field.
+func (o *PersistenceLoadingPolicy) SetPersistenceLoadingType(v PersistenceLoadingType) {
 	o.PersistenceLoadingType = &v
 }
 

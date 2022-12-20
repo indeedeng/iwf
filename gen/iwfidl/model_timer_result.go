@@ -17,14 +17,14 @@ import (
 // TimerResult struct for TimerResult
 type TimerResult struct {
 	CommandId string `json:"commandId"`
-	TimerStatus string `json:"timerStatus"`
+	TimerStatus TimerStatus `json:"timerStatus"`
 }
 
 // NewTimerResult instantiates a new TimerResult object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTimerResult(commandId string, timerStatus string) *TimerResult {
+func NewTimerResult(commandId string, timerStatus TimerStatus) *TimerResult {
 	this := TimerResult{}
 	this.CommandId = commandId
 	this.TimerStatus = timerStatus
@@ -64,9 +64,9 @@ func (o *TimerResult) SetCommandId(v string) {
 }
 
 // GetTimerStatus returns the TimerStatus field value
-func (o *TimerResult) GetTimerStatus() string {
+func (o *TimerResult) GetTimerStatus() TimerStatus {
 	if o == nil {
-		var ret string
+		var ret TimerStatus
 		return ret
 	}
 
@@ -75,7 +75,7 @@ func (o *TimerResult) GetTimerStatus() string {
 
 // GetTimerStatusOk returns a tuple with the TimerStatus field value
 // and a boolean to check if the value has been set.
-func (o *TimerResult) GetTimerStatusOk() (*string, bool) {
+func (o *TimerResult) GetTimerStatusOk() (*TimerStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -83,7 +83,7 @@ func (o *TimerResult) GetTimerStatusOk() (*string, bool) {
 }
 
 // SetTimerStatus sets field value
-func (o *TimerResult) SetTimerStatus(v string) {
+func (o *TimerResult) SetTimerStatus(v TimerStatus) {
 	o.TimerStatus = v
 }
 
