@@ -24,7 +24,7 @@ func StateStart(ctx context.Context, backendType service.BackendType, input serv
 			},
 		},
 	})
-	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(context.Background())
+	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(ctx)
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	if checkError(err, httpResp) {
 		return nil, composeError(provider, "state start API failed", err, httpResp)
@@ -46,7 +46,7 @@ func StateDecide(ctx context.Context, backendType service.BackendType, input ser
 			},
 		},
 	})
-	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(context.Background())
+	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
 	if checkError(err, httpResp) {
 		return nil, composeError(provider, "state decide API failed", err, httpResp)
