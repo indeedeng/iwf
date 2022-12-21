@@ -418,8 +418,6 @@ When something goes wrong in your applications, here are the tips:
 - [x] Get workflow info API
 - [x] Search workflow API
 - [x] Stop workflow API
-
-### 1.1
 - [x] Reset workflow API 
 - [x] Command type(s) for inter-state communications (e.g. internal channel)
 - [x] AnyCommandCompleted Decider trigger type
@@ -427,15 +425,15 @@ When something goes wrong in your applications, here are the tips:
 - [x] StateOption: Start/Decide API timeout and retry policy
 - [x] Reset workflow by stateId or stateExecutionId 
 - [x] StateOption.PersistenceLoadingPolicy: LOAD_PARTIAL_WITHOUT_LOCKING
-- [ ] More workflow start options: initial search attributes/memo
 
-### 1.2
-- [ ] Decider trigger type: AnyCommandClosed
+### 1.1
+- [ ] Auto ContinueAsNew 
+- [ ] More workflow start options: initial search attributes/memo
 - [ ] WaitForMoreResults in StateDecision
 - [ ] Skip timer API for testing/operation
 - [ ] LongRunningActivityCommand
+- [ ] Decider trigger type: AnyCommandClosed
 - [ ] Failing workflow details
-- [ ] Auto ContinueAsNew 
 - [ ] StateOption.PersistenceLoadingPolicy: LOAD_ALL_WITH_EXCLUSIVE_LOCK and LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
 
 # Some history
