@@ -161,10 +161,13 @@ deps-all: ## Check for all dependency updates
 		| sort -n
 
 integTests:
-	$Q go test -v ./integ -repeat=10
+	$Q go test -v ./integ
+
+integTestsWithStress:
+	$Q go test -v ./integ -repeat=10 interval=10
 
 integTestsCadence:
-	$Q go test -v ./integ -repeat=10 -temporal=false
+	$Q go test -v ./integ -repeat=10 -temporal=false interval=100
 
 integTestsTemporal:
 	$Q go test -v ./integ -repeat=10 -cadence=false

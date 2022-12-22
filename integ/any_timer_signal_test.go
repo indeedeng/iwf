@@ -17,7 +17,7 @@ func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Second * time.Duration(*repeatInterval))
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
@@ -28,7 +28,7 @@ func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Second * time.Duration(*repeatInterval))
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
