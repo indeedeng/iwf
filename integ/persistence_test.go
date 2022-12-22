@@ -16,13 +16,23 @@ import (
 )
 
 func TestPersistenceWorkflowTemporal(t *testing.T) {
-	for i := 0; i < 10; i++ {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
 		doTestPersistenceWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
 	}
 }
 
 func TestPersistenceWorkflowCadence(t *testing.T) {
-	doTestPersistenceWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {

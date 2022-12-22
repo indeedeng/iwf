@@ -14,11 +14,23 @@ import (
 )
 
 func TestInterStateWorkflowTemporal(t *testing.T) {
-	doTestInterStateWorkflow(t, service.BackendTypeTemporal)
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestInterStateWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func TestInterStateWorkflowCadence(t *testing.T) {
-	doTestInterStateWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestInterStateWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {

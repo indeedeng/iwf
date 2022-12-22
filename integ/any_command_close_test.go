@@ -12,11 +12,23 @@ import (
 )
 
 func TestAnyCommandCloseWorkflowTemporal(t *testing.T) {
-	doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal)
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func TestAnyCommandCloseWorkflowCadence(t *testing.T) {
-	doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType) {

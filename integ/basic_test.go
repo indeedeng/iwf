@@ -16,11 +16,23 @@ import (
 )
 
 func TestBasicWorkflowTemporal(t *testing.T) {
-	doTestBasicWorkflow(t, service.BackendTypeTemporal)
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestBasicWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func TestBasicWorkflowCadence(t *testing.T) {
-	doTestBasicWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestBasicWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Second * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
