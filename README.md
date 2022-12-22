@@ -52,7 +52,7 @@ Related projects:
 - [Development Plan](#development-plan)
 - [Some history](#some-history)
 - [Contribution](CONTRIBUTING.md)
-- 
+
 # Community & Help
 * [Slack Channels](https://iworkflow-slack.work/)
 * [Github Discussion](https://github.com/indeedeng/iwf/discussions)
