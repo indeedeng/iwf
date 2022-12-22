@@ -21,7 +21,12 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestBasicWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		// NOTE: basic wf is too fast so we have to make sure to have enough interval
+		du := time.Millisecond * time.Duration(*repeatInterval)
+		if *repeatIntegTest > 1 && du < time.Second {
+			du = time.Second
+		}
+		time.Sleep(du)
 	}
 }
 
@@ -31,7 +36,12 @@ func TestBasicWorkflowCadence(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestBasicWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		// NOTE: basic wf is too fast so we have to make sure to have enough interval
+		du := time.Millisecond * time.Duration(*repeatInterval)
+		if *repeatIntegTest > 1 && du < time.Second {
+			du = time.Second
+		}
+		time.Sleep(du)
 	}
 }
 
