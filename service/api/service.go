@@ -26,7 +26,7 @@ func NewApiService(client UnifiedClient, taskQueue string) (ApiService, error) {
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus) {
+func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus) {
 	workflowOptions := StartWorkflowOptions{
 		ID:                       req.GetWorkflowId(),
 		TaskQueue:                s.taskQueue,
@@ -46,7 +46,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*
 		StateInput:      req.GetStateInput(),
 		StateOptions:    req.GetStateOptions(),
 	}
-	runId, err := s.client.StartInterpreterWorkflow(context.Background(), workflowOptions, input)
+	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
 		return nil, s.handleError(err)
 
@@ -59,8 +59,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(req iwfidl.WorkflowStartRequest) (*
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowSignalPost(req iwfidl.WorkflowSignalRequest) *ErrorAndStatus {
-	err := s.client.SignalWorkflow(context.Background(),
+func (s *serviceImpl) ApiV1WorkflowSignalPost(ctx context.Context, req iwfidl.WorkflowSignalRequest) *ErrorAndStatus {
+	err := s.client.SignalWorkflow(ctx,
 		req.GetWorkflowId(), req.GetWorkflowRunId(), req.GetSignalChannelName(), req.GetSignalValue())
 	if err != nil {
 		return s.handleError(err)
@@ -68,17 +68,17 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(req iwfidl.WorkflowSignalRequest) 
 	return nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowStopPost(req iwfidl.WorkflowStopRequest) *ErrorAndStatus {
-	err := s.client.CancelWorkflow(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+func (s *serviceImpl) ApiV1WorkflowStopPost(ctx context.Context, req iwfidl.WorkflowStopRequest) *ErrorAndStatus {
+	err := s.client.CancelWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
 	if err != nil {
 		return s.handleError(err)
 	}
 	return nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *ErrorAndStatus) {
+func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, req iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *ErrorAndStatus) {
 	var queryResult1 service.GetDataObjectsQueryResponse
-	err := s.client.QueryWorkflow(context.Background(), &queryResult1,
+	err := s.client.QueryWorkflow(ctx, &queryResult1,
 		req.GetWorkflowId(), req.GetWorkflowRunId(), service.GetDataObjectsWorkflowQueryType,
 		service.GetDataObjectsQueryRequest{
 			Keys: req.Keys,
@@ -93,8 +93,8 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(req iwfidl.WorkflowGet
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(req iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus) {
-	response, err := s.client.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(ctx context.Context, req iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus) {
+	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
 	if err != nil {
 		return nil, s.handleError(err)
 	}
@@ -112,16 +112,16 @@ func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(req iwfidl.WorkflowGe
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowGetPost(req iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
-	return s.doApiV1WorkflowGetPost(req, false)
+func (s *serviceImpl) ApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
+	return s.doApiV1WorkflowGetPost(ctx, req, false)
 }
 
-func (s *serviceImpl) ApiV1WorkflowGetWithWaitPost(req iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
-	return s.doApiV1WorkflowGetPost(req, true)
+func (s *serviceImpl) ApiV1WorkflowGetWithWaitPost(ctx context.Context, req iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
+	return s.doApiV1WorkflowGetPost(ctx, req, true)
 }
 
-func (s *serviceImpl) doApiV1WorkflowGetPost(req iwfidl.WorkflowGetRequest, waitIfStillRunning bool) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
-	resp, err := s.client.DescribeWorkflowExecution(context.Background(), req.GetWorkflowId(), req.GetWorkflowRunId())
+func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest, waitIfStillRunning bool) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
+	resp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
 	if err != nil {
 		return nil, s.handleError(err)
 	}
@@ -129,7 +129,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(req iwfidl.WorkflowGetRequest, wait
 	var output service.InterpreterWorkflowOutput
 	if req.GetNeedsResults() || waitIfStillRunning {
 		if resp.Status == iwfidl.COMPLETED || waitIfStillRunning {
-			err := s.client.GetWorkflowResult(context.Background(), &output, req.GetWorkflowId(), req.GetWorkflowRunId())
+			err := s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 			if err != nil {
 				return nil, s.handleError(err)
 			}
@@ -153,12 +153,12 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(req iwfidl.WorkflowGetRequest, wait
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowSearchPost(req iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *ErrorAndStatus) {
+func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *ErrorAndStatus) {
 	pageSize := int32(1000)
 	if req.GetPageSize() > 0 {
 		pageSize = req.GetPageSize()
 	}
-	resp, err := s.client.ListWorkflow(context.Background(), &ListWorkflowExecutionsRequest{
+	resp, err := s.client.ListWorkflow(ctx, &ListWorkflowExecutionsRequest{
 		PageSize: pageSize,
 		Query:    req.GetQuery(),
 	})
@@ -170,11 +170,7 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(req iwfidl.WorkflowSearchRequest) 
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowResetPost(req iwfidl.WorkflowResetRequest) (*iwfidl.WorkflowResetResponse, *ErrorAndStatus) {
-	// TODO https://github.com/indeedeng/iwf/issues/52
-	// this is required otherwise Cadence won't accept a reset request
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
-	defer cancel()
+func (s *serviceImpl) ApiV1WorkflowResetPost(ctx context.Context, req iwfidl.WorkflowResetRequest) (*iwfidl.WorkflowResetResponse, *ErrorAndStatus) {
 	runId, err := s.client.ResetWorkflow(ctx, req)
 	if err != nil {
 		return nil, s.handleError(err)

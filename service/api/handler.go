@@ -42,7 +42,7 @@ func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	resp, errResp := h.svc.ApiV1WorkflowStartPost(req)
+	resp, errResp := h.svc.ApiV1WorkflowStartPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -59,7 +59,7 @@ func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	errResp := h.svc.ApiV1WorkflowSignalPost(req)
+	errResp := h.svc.ApiV1WorkflowSignalPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -76,7 +76,7 @@ func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	errResp := h.svc.ApiV1WorkflowStopPost(req)
+	errResp := h.svc.ApiV1WorkflowStopPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -93,7 +93,7 @@ func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	resp, errResp := h.svc.ApiV1WorkflowSearchPost(req)
+	resp, errResp := h.svc.ApiV1WorkflowSearchPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -110,7 +110,7 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	resp, errResp := h.svc.ApiV1WorkflowGetQueryAttributesPost(req)
+	resp, errResp := h.svc.ApiV1WorkflowGetQueryAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -127,7 +127,7 @@ func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	resp, errResp := h.svc.ApiV1WorkflowGetSearchAttributesPost(req)
+	resp, errResp := h.svc.ApiV1WorkflowGetSearchAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
@@ -155,9 +155,9 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 	var resp *iwfidl.WorkflowGetResponse
 	var errResp *ErrorAndStatus
 	if waitIfStillRunning {
-		resp, errResp = h.svc.ApiV1WorkflowGetWithWaitPost(req)
+		resp, errResp = h.svc.ApiV1WorkflowGetWithWaitPost(c.Request.Context(), req)
 	} else {
-		resp, errResp = h.svc.ApiV1WorkflowGetPost(req)
+		resp, errResp = h.svc.ApiV1WorkflowGetPost(c.Request.Context(), req)
 	}
 
 	if errResp != nil {
@@ -176,7 +176,7 @@ func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 	}
 	log.Println("received API request", req)
 
-	resp, errResp := h.svc.ApiV1WorkflowResetPost(req)
+	resp, errResp := h.svc.ApiV1WorkflowResetPost(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return
