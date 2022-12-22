@@ -8,15 +8,15 @@ import (
 )
 
 type ApiService interface {
-	ApiV1WorkflowStartPost(request iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus)
-	ApiV1WorkflowSignalPost(request iwfidl.WorkflowSignalRequest) *ErrorAndStatus
-	ApiV1WorkflowStopPost(request iwfidl.WorkflowStopRequest) *ErrorAndStatus
-	ApiV1WorkflowGetQueryAttributesPost(request iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *ErrorAndStatus)
-	ApiV1WorkflowGetSearchAttributesPost(request iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus)
-	ApiV1WorkflowGetPost(request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
-	ApiV1WorkflowGetWithWaitPost(request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
-	ApiV1WorkflowSearchPost(request iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *ErrorAndStatus)
-	ApiV1WorkflowResetPost(request iwfidl.WorkflowResetRequest) (*iwfidl.WorkflowResetResponse, *ErrorAndStatus)
+	ApiV1WorkflowStartPost(ctx context.Context, request iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *ErrorAndStatus)
+	ApiV1WorkflowSignalPost(ctx context.Context, request iwfidl.WorkflowSignalRequest) *ErrorAndStatus
+	ApiV1WorkflowStopPost(ctx context.Context, request iwfidl.WorkflowStopRequest) *ErrorAndStatus
+	ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, request iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *ErrorAndStatus)
+	ApiV1WorkflowGetSearchAttributesPost(ctx context.Context, request iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus)
+	ApiV1WorkflowGetPost(ctx context.Context, request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
+	ApiV1WorkflowGetWithWaitPost(ctx context.Context, request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus)
+	ApiV1WorkflowSearchPost(ctx context.Context, request iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *ErrorAndStatus)
+	ApiV1WorkflowResetPost(ctx context.Context, request iwfidl.WorkflowResetRequest) (*iwfidl.WorkflowResetResponse, *ErrorAndStatus)
 	Close()
 }
 
