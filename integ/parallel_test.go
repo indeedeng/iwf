@@ -14,11 +14,23 @@ import (
 )
 
 func TestParallelWorkflowTemporal(t *testing.T) {
-	doTestParallelWorkflow(t, service.BackendTypeTemporal)
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestParallelWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+	}
 }
 
 func TestParallelWorkflowCadence(t *testing.T) {
-	doTestParallelWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestParallelWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {

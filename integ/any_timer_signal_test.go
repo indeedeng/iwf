@@ -12,12 +12,24 @@ import (
 )
 
 func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
-	doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal)
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+	}
 }
 
 // TODO this bug in Cadence SDK may cause the test to fail https://github.com/uber-go/cadence-client/issues/1198
 func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
-	doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType) {

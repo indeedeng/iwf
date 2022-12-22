@@ -16,11 +16,23 @@ import (
 )
 
 func TestPersistenceWorkflowTemporal(t *testing.T) {
-	doTestPersistenceWorkflow(t, service.BackendTypeTemporal)
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal)
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+	}
 }
 
 func TestPersistenceWorkflowCadence(t *testing.T) {
-	doTestPersistenceWorkflow(t, service.BackendTypeCadence)
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence)
+		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+	}
 }
 
 func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
@@ -147,7 +159,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			"S2_start_kwSaFounds":   1,
 
 			"S1_decide_localAttFound": true,
-			"S1_decide_queryAttFound": true,
+			"S1_decide_queryAttFound": 2,
 			"S2_decide_queryAttFound": true,
 			"S2_start_queryAttFound":  true,
 		}, data)
@@ -164,7 +176,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			"S2_start_kwSaFounds":   0,
 
 			"S1_decide_localAttFound": true,
-			"S1_decide_queryAttFound": true,
+			"S1_decide_queryAttFound": 2,
 			"S2_decide_queryAttFound": true,
 			"S2_start_queryAttFound":  true,
 		}, data)
@@ -186,8 +198,8 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			Value: &persistence.TestDataObjectVal1,
 		},
 	}
-	assertions.Equal(expected1, queryResult1.GetObjects())
-	assertions.Equal(expected2, queryResult2.GetObjects())
+	assertions.ElementsMatch(expected1, queryResult1.GetObjects())
+	assertions.ElementsMatch(expected2, queryResult2.GetObjects())
 
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
 		Key:          iwfidl.PtrString(persistence.TestSearchAttributeIntKey),

@@ -214,17 +214,23 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["S1_decide_kwSaFounds"] = kwSaFounds
 			h.invokeData["S1_decide_intSaFounds"] = intSaFounds
 
-			queryAttFound := false
-			queryAtt := req.GetDataObjects()[0]
-			value := queryAtt.GetValue()
-			if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
-				queryAttFound = true
+			queryAttFound := 0
+			queryAtts := req.GetDataObjects()
+
+			for _, queryAtt := range queryAtts {
+				value := queryAtt.GetValue()
+				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
+					queryAttFound++
+				}
+				if queryAtt.GetKey() == TestDataObjectKey2 && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
+					queryAttFound++
+				}
 			}
 			h.invokeData["S1_decide_queryAttFound"] = queryAttFound
 
 			localAttFound := false
 			localAtt := req.GetStateLocals()[0]
-			value = localAtt.GetValue()
+			value := localAtt.GetValue()
 			if localAtt.GetKey() == TestStateLocalKey && value.GetData() == testStateLocalVal.GetData() && value.GetEncoding() == testStateLocalVal.GetEncoding() {
 				localAttFound = true
 			}
