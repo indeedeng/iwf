@@ -32,7 +32,7 @@ type UnifiedClient interface {
 	CancelWorkflow(ctx context.Context, workflowID string, runID string) error
 	ListWorkflow(ctx context.Context, request *ListWorkflowExecutionsRequest) (*ListWorkflowExecutionsResponse, error)
 	QueryWorkflow(ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{}) error
-	DescribeWorkflowExecution(ctx context.Context, workflowID, runID string) (*DescribeWorkflowExecutionResponse, error)
+	DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*DescribeWorkflowExecutionResponse, error)
 	GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error
 	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
 }
@@ -44,15 +44,18 @@ type StartWorkflowOptions struct {
 	WorkflowIDReusePolicy    *iwfidl.WorkflowIDReusePolicy
 	CronSchedule             *string
 	RetryPolicy              *iwfidl.RetryPolicy
+	SearchAttributes         map[string]interface{}
 }
 
 type ListWorkflowExecutionsRequest struct {
-	PageSize int32
-	Query    string
+	PageSize      int32
+	Query         string
+	NextPageToken []byte
 }
 
 type ListWorkflowExecutionsResponse struct {
-	Executions []iwfidl.WorkflowSearchResponseEntry
+	Executions    []iwfidl.WorkflowSearchResponseEntry
+	NextPageToken []byte
 }
 
 type DescribeWorkflowExecutionResponse struct {

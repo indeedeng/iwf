@@ -163,14 +163,17 @@ deps-all: ## Check for all dependency updates
 integTests:
 	$Q go test -v ./integ
 
+integTestsNoSearch:
+	$Q go test -v ./integ -search=false -searchWaitMs=100
+
 integTestsWithStress:
-	$Q go test -v ./integ -repeat=10 interval=100
+	$Q go test -v ./integ -repeat=10 intervalMs=100 -search=false -searchWaitMs=100
 
 integTestsCadence:
-	$Q go test -v ./integ -repeat=10 -temporal=false interval=100
+	$Q go test -v ./integ -repeat=10 -temporal=false intervalMs=100 -search=false -searchWaitMs=100
 
 integTestsTemporal:
-	$Q go test -v ./integ -repeat=10 -cadence=false interval=100
+	$Q go test -v ./integ -repeat=10 -cadence=false intervalMs=100 -search=false -searchWaitMs=100
 
 help:
 	@# print help first, so it's visible

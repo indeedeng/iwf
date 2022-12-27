@@ -347,8 +347,11 @@ When something goes wrong in your applications, here are the tips:
 - [x] StateOption.PersistenceLoadingPolicy: LOAD_PARTIAL_WITHOUT_LOCKING
 
 ### 1.1
-- [ ] Auto ContinueAsNew 
-- [ ] More workflow start options: initial search attributes/memo
+- [x] More Search attribute types: Datetime, double, bool, keyword array, text
+- [x] More workflow start options: initial search attributes
+
+### Future
+- [ ] Auto ContinueAsNew
 - [ ] WaitForMoreResults in StateDecision
 - [ ] Skip timer API for testing/operation
 - [ ] LongRunningActivityCommand

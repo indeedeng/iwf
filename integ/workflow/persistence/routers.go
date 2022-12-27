@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	EnableTestingSearchAttribute = true
-
 	WorkflowType       = "persistence"
 	State1             = "S1"
 	State2             = "S2"
@@ -24,9 +22,14 @@ const (
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
 	TestSearchAttributeKeywordValue2 = "keyword-value2"
-	TestSearchAttributeIntKey        = "CustomIntField"
-	TestSearchAttributeIntValue1     = 1
-	TestSearchAttributeIntValue2     = 2
+
+	TestSearchAttributeIntKey      = "CustomIntField"
+	TestSearchAttributeBoolKey     = "CustomBoolField"
+	TestSearchAttributeDoubleKey   = "CustomDoubleField"
+	TestSearchAttributeDatetimeKey = "CustomDatetimeField"
+	TestSearchAttributeTextKey     = "CustomStringField"
+	TestSearchAttributeIntValue1   = 1
+	TestSearchAttributeIntValue2   = 2
 )
 
 var TestDataObjectVal1 = iwfidl.EncodedObject{
@@ -69,19 +72,22 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
 			var sa []iwfidl.SearchAttribute
-			if EnableTestingSearchAttribute {
-				sa = []iwfidl.SearchAttribute{
-					{
-						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
-						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue1),
-						ValueType:   ptr.Any(iwfidl.KEYWORD),
-					},
-					{
-						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
-						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
-						ValueType:    ptr.Any(iwfidl.INT),
-					},
-				}
+			sa = []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+					StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue1),
+					ValueType:   ptr.Any(iwfidl.KEYWORD),
+				},
+				{
+					Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+					IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
+					ValueType:    ptr.Any(iwfidl.INT),
+				},
+				{
+					Key:       iwfidl.PtrString(TestSearchAttributeBoolKey),
+					ValueType: ptr.Any(iwfidl.BOOL),
+					BoolValue: iwfidl.PtrBool(false),
+				},
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -237,19 +243,17 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["S1_decide_localAttFound"] = localAttFound
 
 			var sa []iwfidl.SearchAttribute
-			if EnableTestingSearchAttribute {
-				sa = []iwfidl.SearchAttribute{
-					{
-						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
-						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue2),
-						ValueType:   ptr.Any(iwfidl.KEYWORD),
-					},
-					{
-						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
-						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue2),
-						ValueType:    ptr.Any(iwfidl.INT),
-					},
-				}
+			sa = []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+					StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue2),
+					ValueType:   ptr.Any(iwfidl.KEYWORD),
+				},
+				{
+					Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+					IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue2),
+					ValueType:    ptr.Any(iwfidl.INT),
+				},
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{

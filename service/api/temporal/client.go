@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/api"
-	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
@@ -39,6 +39,7 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 		ID:                       options.ID,
 		TaskQueue:                options.TaskQueue,
 		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
+		SearchAttributes:         options.SearchAttributes,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {
@@ -75,8 +76,9 @@ func (t *temporalClient) CancelWorkflow(ctx context.Context, workflowID string, 
 
 func (t *temporalClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
 	listReq := &workflowservice.ListWorkflowExecutionsRequest{
-		PageSize: request.PageSize,
-		Query:    request.Query,
+		PageSize:      request.PageSize,
+		Query:         request.Query,
+		NextPageToken: request.NextPageToken,
 	}
 	resp, err := t.tClient.ListWorkflow(ctx, listReq)
 	if err != nil {
@@ -90,7 +92,8 @@ func (t *temporalClient) ListWorkflow(ctx context.Context, request *api.ListWork
 		})
 	}
 	return &api.ListWorkflowExecutionsResponse{
-		Executions: executions,
+		Executions:    executions,
+		NextPageToken: resp.NextPageToken,
 	}, nil
 }
 
@@ -102,7 +105,7 @@ func (t *temporalClient) QueryWorkflow(ctx context.Context, valuePtr interface{}
 	return qres.Get(valuePtr)
 }
 
-func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string) (*api.DescribeWorkflowExecutionResponse, error) {
+func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*api.DescribeWorkflowExecutionResponse, error) {
 	resp, err := t.tClient.DescribeWorkflowExecution(ctx, workflowID, runID)
 	if err != nil {
 		return nil, err
@@ -112,7 +115,7 @@ func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflow
 		return nil, err
 	}
 
-	searchAttributes, err := mapToIwfSearchAttributes(resp.GetWorkflowExecutionInfo().GetSearchAttributes())
+	searchAttributes, err := mapper.MapTemporalToIwfSearchAttributes(resp.GetWorkflowExecutionInfo().GetSearchAttributes(), requestedSearchAttributes)
 	if err != nil {
 		return nil, err
 	}
@@ -122,40 +125,6 @@ func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflow
 		Status:           status,
 		SearchAttributes: searchAttributes,
 	}, nil
-}
-
-func mapToIwfSearchAttributes(searchAttributes *common.SearchAttributes) (map[string]iwfidl.SearchAttribute, error) {
-	result := make(map[string]iwfidl.SearchAttribute)
-	if searchAttributes == nil {
-		return result, nil
-	}
-
-	for key, value := range searchAttributes.IndexedFields {
-		var object interface{}
-		err := converter.GetDefaultDataConverter().FromPayload(value, &object)
-		if err != nil {
-			return make(map[string]iwfidl.SearchAttribute), nil
-		}
-
-		str, isString := object.(string)
-		if isString {
-			result[key] = iwfidl.SearchAttribute{
-				Key:         iwfidl.PtrString(key),
-				StringValue: iwfidl.PtrString(str),
-				ValueType:   ptr.Any(iwfidl.KEYWORD),
-			}
-		}
-		number, isInt := object.(float64)
-		if isInt {
-			result[key] = iwfidl.SearchAttribute{
-				Key:          iwfidl.PtrString(key),
-				IntegerValue: iwfidl.PtrInt64(int64(number)),
-				ValueType:    ptr.Any(iwfidl.INT),
-			}
-		}
-	}
-
-	return result, nil
 }
 
 func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy iwfidl.WorkflowIDReusePolicy) (*enums.WorkflowIdReusePolicy, error) {
@@ -208,11 +177,11 @@ func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.Workf
 	reqRunId := request.GetWorkflowRunId()
 	if reqRunId == "" {
 		// set default runId to current
-		resp, err := t.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
+		resp, err := t.tClient.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
 		if err != nil {
 			return "", err
 		}
-		reqRunId = resp.RunId
+		reqRunId = resp.GetWorkflowExecutionInfo().GetExecution().GetRunId()
 	}
 
 	resetType := request.GetResetType()

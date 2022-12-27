@@ -19,6 +19,9 @@ type SearchAttribute struct {
 	Key *string `json:"key,omitempty"`
 	StringValue *string `json:"stringValue,omitempty"`
 	IntegerValue *int64 `json:"integerValue,omitempty"`
+	DoubleValue *float64 `json:"doubleValue,omitempty"`
+	BoolValue *bool `json:"boolValue,omitempty"`
+	StringArrayValue []string `json:"stringArrayValue,omitempty"`
 	ValueType *SearchAttributeValueType `json:"valueType,omitempty"`
 }
 
@@ -135,6 +138,102 @@ func (o *SearchAttribute) SetIntegerValue(v int64) {
 	o.IntegerValue = &v
 }
 
+// GetDoubleValue returns the DoubleValue field value if set, zero value otherwise.
+func (o *SearchAttribute) GetDoubleValue() float64 {
+	if o == nil || o.DoubleValue == nil {
+		var ret float64
+		return ret
+	}
+	return *o.DoubleValue
+}
+
+// GetDoubleValueOk returns a tuple with the DoubleValue field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SearchAttribute) GetDoubleValueOk() (*float64, bool) {
+	if o == nil || o.DoubleValue == nil {
+		return nil, false
+	}
+	return o.DoubleValue, true
+}
+
+// HasDoubleValue returns a boolean if a field has been set.
+func (o *SearchAttribute) HasDoubleValue() bool {
+	if o != nil && o.DoubleValue != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDoubleValue gets a reference to the given float64 and assigns it to the DoubleValue field.
+func (o *SearchAttribute) SetDoubleValue(v float64) {
+	o.DoubleValue = &v
+}
+
+// GetBoolValue returns the BoolValue field value if set, zero value otherwise.
+func (o *SearchAttribute) GetBoolValue() bool {
+	if o == nil || o.BoolValue == nil {
+		var ret bool
+		return ret
+	}
+	return *o.BoolValue
+}
+
+// GetBoolValueOk returns a tuple with the BoolValue field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SearchAttribute) GetBoolValueOk() (*bool, bool) {
+	if o == nil || o.BoolValue == nil {
+		return nil, false
+	}
+	return o.BoolValue, true
+}
+
+// HasBoolValue returns a boolean if a field has been set.
+func (o *SearchAttribute) HasBoolValue() bool {
+	if o != nil && o.BoolValue != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetBoolValue gets a reference to the given bool and assigns it to the BoolValue field.
+func (o *SearchAttribute) SetBoolValue(v bool) {
+	o.BoolValue = &v
+}
+
+// GetStringArrayValue returns the StringArrayValue field value if set, zero value otherwise.
+func (o *SearchAttribute) GetStringArrayValue() []string {
+	if o == nil || o.StringArrayValue == nil {
+		var ret []string
+		return ret
+	}
+	return o.StringArrayValue
+}
+
+// GetStringArrayValueOk returns a tuple with the StringArrayValue field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SearchAttribute) GetStringArrayValueOk() ([]string, bool) {
+	if o == nil || o.StringArrayValue == nil {
+		return nil, false
+	}
+	return o.StringArrayValue, true
+}
+
+// HasStringArrayValue returns a boolean if a field has been set.
+func (o *SearchAttribute) HasStringArrayValue() bool {
+	if o != nil && o.StringArrayValue != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStringArrayValue gets a reference to the given []string and assigns it to the StringArrayValue field.
+func (o *SearchAttribute) SetStringArrayValue(v []string) {
+	o.StringArrayValue = v
+}
+
 // GetValueType returns the ValueType field value if set, zero value otherwise.
 func (o *SearchAttribute) GetValueType() SearchAttributeValueType {
 	if o == nil || o.ValueType == nil {
@@ -177,6 +276,15 @@ func (o SearchAttribute) MarshalJSON() ([]byte, error) {
 	}
 	if o.IntegerValue != nil {
 		toSerialize["integerValue"] = o.IntegerValue
+	}
+	if o.DoubleValue != nil {
+		toSerialize["doubleValue"] = o.DoubleValue
+	}
+	if o.BoolValue != nil {
+		toSerialize["boolValue"] = o.BoolValue
+	}
+	if o.StringArrayValue != nil {
+		toSerialize["stringArrayValue"] = o.StringArrayValue
 	}
 	if o.ValueType != nil {
 		toSerialize["valueType"] = o.ValueType

@@ -19,6 +19,7 @@ type WorkflowStartOptions struct {
 	WorkflowIDReusePolicy *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
 	CronSchedule *string `json:"cronSchedule,omitempty"`
 	RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty"`
+	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -134,6 +135,38 @@ func (o *WorkflowStartOptions) SetRetryPolicy(v RetryPolicy) {
 	o.RetryPolicy = &v
 }
 
+// GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetSearchAttributes() []SearchAttribute {
+	if o == nil || o.SearchAttributes == nil {
+		var ret []SearchAttribute
+		return ret
+	}
+	return o.SearchAttributes
+}
+
+// GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartOptions) GetSearchAttributesOk() ([]SearchAttribute, bool) {
+	if o == nil || o.SearchAttributes == nil {
+		return nil, false
+	}
+	return o.SearchAttributes, true
+}
+
+// HasSearchAttributes returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasSearchAttributes() bool {
+	if o != nil && o.SearchAttributes != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSearchAttributes gets a reference to the given []SearchAttribute and assigns it to the SearchAttributes field.
+func (o *WorkflowStartOptions) SetSearchAttributes(v []SearchAttribute) {
+	o.SearchAttributes = v
+}
+
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.WorkflowIDReusePolicy != nil {
@@ -144,6 +177,9 @@ func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	}
 	if o.RetryPolicy != nil {
 		toSerialize["retryPolicy"] = o.RetryPolicy
+	}
+	if o.SearchAttributes != nil {
+		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
 	return json.Marshal(toSerialize)
 }
