@@ -283,9 +283,9 @@ components:
       example:
         stringValue: stringValue
         valueType: null
-        integerValue: 0
+        integerValue: 9
         boolValue: true
-        doubleValue: 6.027456183070403
+        doubleValue: 3.616076749251911
         stringArrayValue:
         - stringArrayValue
         - stringArrayValue
@@ -375,6 +375,25 @@ components:
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
           backoffCoefficient: 5.637376656633329
+        searchAttributes:
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 9
+          boolValue: true
+          doubleValue: 3.616076749251911
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 9
+          boolValue: true
+          doubleValue: 3.616076749251911
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
         workflowIDReusePolicy: null
         cronSchedule: cronSchedule
       properties:
@@ -384,6 +403,10 @@ components:
           type: string
         retryPolicy:
           $ref: '#/components/schemas/RetryPolicy'
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
       type: object
     WorkflowIDReusePolicy:
       enum:
@@ -465,6 +488,25 @@ components:
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637376656633329
+          searchAttributes:
+          - stringValue: stringValue
+            valueType: null
+            integerValue: 9
+            boolValue: true
+            doubleValue: 3.616076749251911
+            stringArrayValue:
+            - stringArrayValue
+            - stringArrayValue
+            key: key
+          - stringValue: stringValue
+            valueType: null
+            integerValue: 9
+            boolValue: true
+            doubleValue: 3.616076749251911
+            stringArrayValue:
+            - stringArrayValue
+            - stringArrayValue
+            key: key
           workflowIDReusePolicy: null
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
@@ -608,18 +650,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -821,18 +863,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -867,18 +909,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1013,18 +1055,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1074,18 +1116,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 0
+          integerValue: 9
           boolValue: true
-          doubleValue: 6.027456183070403
+          doubleValue: 3.616076749251911
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue

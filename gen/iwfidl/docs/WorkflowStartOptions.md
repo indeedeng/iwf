@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **WorkflowIDReusePolicy** | Pointer to [**WorkflowIDReusePolicy**](WorkflowIDReusePolicy.md) |  | [optional] 
 **CronSchedule** | Pointer to **string** |  | [optional] 
 **RetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
+**SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 
 ## Methods
 
@@ -101,6 +102,31 @@ SetRetryPolicy sets RetryPolicy field to given value.
 `func (o *WorkflowStartOptions) HasRetryPolicy() bool`
 
 HasRetryPolicy returns a boolean if a field has been set.
+
+### GetSearchAttributes
+
+`func (o *WorkflowStartOptions) GetSearchAttributes() []SearchAttribute`
+
+GetSearchAttributes returns the SearchAttributes field if non-nil, zero value otherwise.
+
+### GetSearchAttributesOk
+
+`func (o *WorkflowStartOptions) GetSearchAttributesOk() (*[]SearchAttribute, bool)`
+
+GetSearchAttributesOk returns a tuple with the SearchAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSearchAttributes
+
+`func (o *WorkflowStartOptions) SetSearchAttributes(v []SearchAttribute)`
+
+SetSearchAttributes sets SearchAttributes field to given value.
+
+### HasSearchAttributes
+
+`func (o *WorkflowStartOptions) HasSearchAttributes() bool`
+
+HasSearchAttributes returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

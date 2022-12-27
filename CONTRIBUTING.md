@@ -52,10 +52,14 @@ tctl adm cl asa -n IwfGlobalWorkflowVersion -t Int
 tctl adm cl asa -n IwfExecutingStateIds -t Keyword
 
 ```
-4 For `attribute_test.go` integTests, you need to register search attributes:
+4 For `persistence_test.go` integTests, you need to register search attributes into Temporalite. Unlike Temporal docker, those Search Attributes are not provided by default:
 ```shell
 tctl adm cl asa -n CustomKeywordField -t Keyword
 tctl adm cl asa -n CustomIntField -t Int
+tctl adm cl asa -n CustomBoolField -t Bool
+tctl adm cl asa -n CustomDoubleField -t Double
+tctl adm cl asa -n CustomDatetimeField -t Datetime
+tctl adm cl asa -n CustomStringField -t text
 ```
 
 ### Run with local Cadence
@@ -71,3 +75,8 @@ cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 0
 cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
 ```
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
+
+If you run into any issues with Search Attributes registration, use the below command to check the existing Search attributes:
+
+* Cadence: `cadence cl get-search-attr`
+* Temporal: `tctl adm cl get-search-attributes`

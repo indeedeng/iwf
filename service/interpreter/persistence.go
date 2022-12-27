@@ -1,9 +1,9 @@
 package interpreter
 
 import (
-	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/mapper"
 )
 
 type PersistenceManager struct {
@@ -108,18 +108,13 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(attributes []iwfidl.S
 	if len(attributes) == 0 {
 		return nil
 	}
-	attrsToUpsert := map[string]interface{}{}
+
 	for _, attr := range attributes {
 		am.searchAttributes[attr.GetKey()] = attr
-		switch attr.GetValueType() {
-		case iwfidl.KEYWORD:
-			attrsToUpsert[attr.GetKey()] = attr.GetStringValue()
-		case iwfidl.INT:
-			num := attr.GetIntegerValue()
-			attrsToUpsert[attr.GetKey()] = num
-		default:
-			return fmt.Errorf("unsupported search attribute value type %v", attr.GetValueType())
-		}
+	}
+	attrsToUpsert, err := mapper.MapToInternalSearchAttributes(attributes)
+	if err != nil {
+		return err
 	}
 	return am.searchAttributeUpserter(attrsToUpsert)
 }

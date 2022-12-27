@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	EnableTestingSearchAttribute = true
-
 	WorkflowType       = "persistence"
 	State1             = "S1"
 	State2             = "S2"
@@ -69,19 +67,17 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
 			var sa []iwfidl.SearchAttribute
-			if EnableTestingSearchAttribute {
-				sa = []iwfidl.SearchAttribute{
-					{
-						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
-						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue1),
-						ValueType:   ptr.Any(iwfidl.KEYWORD),
-					},
-					{
-						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
-						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
-						ValueType:    ptr.Any(iwfidl.INT),
-					},
-				}
+			sa = []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+					StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue1),
+					ValueType:   ptr.Any(iwfidl.KEYWORD),
+				},
+				{
+					Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+					IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
+					ValueType:    ptr.Any(iwfidl.INT),
+				},
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -237,19 +233,17 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["S1_decide_localAttFound"] = localAttFound
 
 			var sa []iwfidl.SearchAttribute
-			if EnableTestingSearchAttribute {
-				sa = []iwfidl.SearchAttribute{
-					{
-						Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
-						StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue2),
-						ValueType:   ptr.Any(iwfidl.KEYWORD),
-					},
-					{
-						Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
-						IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue2),
-						ValueType:    ptr.Any(iwfidl.INT),
-					},
-				}
+			sa = []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+					StringValue: iwfidl.PtrString(TestSearchAttributeKeywordValue2),
+					ValueType:   ptr.Any(iwfidl.KEYWORD),
+				},
+				{
+					Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+					IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue2),
+					ValueType:    ptr.Any(iwfidl.INT),
+				},
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{

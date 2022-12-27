@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/mapper"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"time"
@@ -37,6 +39,11 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		workflowOptions.WorkflowIDReusePolicy = req.WorkflowStartOptions.WorkflowIDReusePolicy
 		workflowOptions.CronSchedule = req.WorkflowStartOptions.CronSchedule
 		workflowOptions.RetryPolicy = req.WorkflowStartOptions.RetryPolicy
+		var err error
+		workflowOptions.SearchAttributes, err = mapper.MapToInternalSearchAttributes(req.WorkflowStartOptions.SearchAttributes)
+		if err != nil {
+			return nil, s.handleError(err)
+		}
 	}
 
 	input := service.InterpreterWorkflowInput{
@@ -49,7 +56,6 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
 		return nil, s.handleError(err)
-
 	}
 
 	log.Println("Started workflow", "WorkflowID", req.WorkflowId, "RunID", runId)
@@ -94,12 +100,12 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, r
 }
 
 func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(ctx context.Context, req iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *ErrorAndStatus) {
-	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), req.Keys)
 	if err != nil {
 		return nil, s.handleError(err)
 	}
 
-	searchAttributes := []iwfidl.SearchAttribute{}
+	var searchAttributes []iwfidl.SearchAttribute
 	for _, v := range req.Keys {
 		searchAttribute, exist := response.SearchAttributes[*v.Key]
 		if exist {
@@ -121,7 +127,7 @@ func (s *serviceImpl) ApiV1WorkflowGetWithWaitPost(ctx context.Context, req iwfi
 }
 
 func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest, waitIfStillRunning bool) (*iwfidl.WorkflowGetResponse, *ErrorAndStatus) {
-	resp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+	resp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
 	if err != nil {
 		return nil, s.handleError(err)
 	}
@@ -159,14 +165,16 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 		pageSize = req.GetPageSize()
 	}
 	resp, err := s.client.ListWorkflow(ctx, &ListWorkflowExecutionsRequest{
-		PageSize: pageSize,
-		Query:    req.GetQuery(),
+		PageSize:      pageSize,
+		Query:         req.GetQuery(),
+		NextPageToken: []byte(req.GetNextPageToken()),
 	})
 	if err != nil {
 		return nil, s.handleError(err)
 	}
 	return &iwfidl.WorkflowSearchResponse{
 		WorkflowExecutions: resp.Executions,
+		NextPageToken:      ptr.Any(string(resp.NextPageToken)),
 	}, nil
 }
 

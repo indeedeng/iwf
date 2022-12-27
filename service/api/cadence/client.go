@@ -2,12 +2,11 @@ package cadence
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/api"
-	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
@@ -43,6 +42,7 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
 		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
+		SearchAttributes:             options.SearchAttributes,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {
@@ -79,8 +79,9 @@ func (t *cadenceClient) CancelWorkflow(ctx context.Context, workflowID string, r
 
 func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
 	listReq := &shared.ListWorkflowExecutionsRequest{
-		PageSize: &request.PageSize,
-		Query:    &request.Query,
+		PageSize:      &request.PageSize,
+		Query:         &request.Query,
+		NextPageToken: request.NextPageToken,
 	}
 	resp, err := t.cClient.ListWorkflow(ctx, listReq)
 	if err != nil {
@@ -94,7 +95,8 @@ func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkf
 		})
 	}
 	return &api.ListWorkflowExecutionsResponse{
-		Executions: executions,
+		Executions:    executions,
+		NextPageToken: resp.NextPageToken,
 	}, nil
 }
 
@@ -106,7 +108,7 @@ func (t *cadenceClient) QueryWorkflow(ctx context.Context, valuePtr interface{},
 	return qres.Get(valuePtr)
 }
 
-func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string) (*api.DescribeWorkflowExecutionResponse, error) {
+func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*api.DescribeWorkflowExecutionResponse, error) {
 	resp, err := t.cClient.DescribeWorkflowExecution(ctx, workflowID, runID)
 	if err != nil {
 		return nil, err
@@ -115,7 +117,7 @@ func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowI
 	if err != nil {
 		return nil, err
 	}
-	searchAttributes, err := mapToIwfSearchAttributes(resp.GetWorkflowExecutionInfo().GetSearchAttributes())
+	searchAttributes, err := mapper.MapCadenceToIwfSearchAttributes(resp.GetWorkflowExecutionInfo().GetSearchAttributes(), requestedSearchAttributes)
 	if err != nil {
 		return nil, err
 	}
@@ -125,46 +127,6 @@ func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowI
 		Status:           status,
 		SearchAttributes: searchAttributes,
 	}, nil
-}
-
-func mapToIwfSearchAttributes(searchAttributes *shared.SearchAttributes) (map[string]iwfidl.SearchAttribute, error) {
-	result := make(map[string]iwfidl.SearchAttribute)
-	if searchAttributes == nil {
-		return result, nil
-	}
-
-	for key, value := range searchAttributes.IndexedFields {
-		var object interface{}
-		err := client.NewValue(value).Get(&object)
-		if err != nil {
-			return make(map[string]iwfidl.SearchAttribute), nil
-		}
-
-		str, ok := object.(string)
-		if ok {
-			result[key] = iwfidl.SearchAttribute{
-				Key:         iwfidl.PtrString(key),
-				StringValue: iwfidl.PtrString(str),
-				ValueType:   ptr.Any(iwfidl.KEYWORD),
-			}
-		} else {
-			number, ok := object.(json.Number)
-			if ok {
-				integer, err := number.Int64()
-				if err != nil {
-					// TODO: we will process float here. In case of float, this will return error
-					return nil, err
-				}
-				result[key] = iwfidl.SearchAttribute{
-					Key:          iwfidl.PtrString(key),
-					IntegerValue: iwfidl.PtrInt64(integer),
-					ValueType:    ptr.Any(iwfidl.INT),
-				}
-			}
-		}
-	}
-
-	return result, nil
 }
 
 func mapToCadenceWorkflowIdReusePolicy(workflowIdReusePolicy iwfidl.WorkflowIDReusePolicy) (*client.WorkflowIDReusePolicy, error) {
@@ -220,11 +182,11 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 	reqRunId := request.GetWorkflowRunId()
 	if reqRunId == "" {
 		// set default runId to current
-		resp, err := t.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
+		resp, err := t.cClient.DescribeWorkflowExecution(ctx, request.GetWorkflowId(), "")
 		if err != nil {
 			return "", err
 		}
-		reqRunId = resp.RunId
+		reqRunId = resp.GetWorkflowExecutionInfo().GetExecution().GetRunId()
 	}
 
 	resetType := request.GetResetType()
