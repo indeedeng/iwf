@@ -9,6 +9,7 @@ import (
 	"go.temporal.io/sdk/converter"
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
+	"time"
 )
 
 func MapToInternalSearchAttributes(attributes []iwfidl.SearchAttribute) (map[string]interface{}, error) {
@@ -31,7 +32,7 @@ func MapToInternalSearchAttributes(attributes []iwfidl.SearchAttribute) (map[str
 			if err != nil {
 				return nil, err
 			}
-			res[attr.GetKey()] = t
+			res[attr.GetKey()] = time.Unix(0, t)
 		case iwfidl.KEYWORD_ARRAY:
 			res[attr.GetKey()] = attr.GetStringArrayValue()
 		default:
@@ -117,7 +118,10 @@ func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueTy
 		strVal, ok = object.(string)
 		rv.StringValue = &strVal
 	case iwfidl.INT:
-		intVal, ok = object.(int64)
+		// TODO we should call UseNumber here for JSON decoder
+		// see https://github.com/temporalio/sdk-go/issues/942
+		floatVal, ok = object.(float64)
+		intVal = int64(floatVal)
 		rv.IntegerValue = &intVal
 	case iwfidl.BOOL:
 		boolVal, ok = object.(bool)

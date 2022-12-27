@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"fmt"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
@@ -34,6 +35,7 @@ func TestPersistenceWorkflowCadence(t *testing.T) {
 }
 
 func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
+	assertions := assert.New(t)
 	wfHandler := persistence.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
@@ -50,6 +52,11 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		},
 	})
 	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	nowTime := time.Now()
+	nowTimeUtc := nowTime.UTC()
+	nowTimeStr := nowTimeUtc.Format("2006-01-02T15:04:05Z")
+	nowTimeStrForSearch := nowTime.Format("2006-01-02T15:04:05-07:00")
+
 	reqStart := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	wfReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
@@ -63,6 +70,15 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 			DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 				PersistenceLoadingType: ptr.Any(iwfidl.ALL_WITHOUT_LOCKING),
+			},
+		},
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			SearchAttributes: []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString("CustomDatetimeField"),
+					ValueType:   ptr.Any(iwfidl.DATETIME),
+					StringValue: iwfidl.PtrString(nowTimeStr),
+				},
 			},
 		},
 	}
@@ -116,7 +132,6 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 
 	// assertion
 	history, data := wfHandler.GetTestResult()
-	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,
@@ -178,55 +193,44 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		// start more WFs in order to test pagination
 		firstWfId := wfReq.WorkflowId
 		wfReq.WorkflowId = firstWfId + "-1"
-		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
-			SearchAttributes: []iwfidl.SearchAttribute{
-				{
-					Key:       iwfidl.PtrString("CustomBoolField"),
-					ValueType: ptr.Any(iwfidl.BOOL),
-					BoolValue: ptr.Any(true),
-				},
-			},
+		newSa := iwfidl.SearchAttribute{
+			Key:       iwfidl.PtrString("CustomBoolField"),
+			ValueType: ptr.Any(iwfidl.BOOL),
+			BoolValue: ptr.Any(true),
 		}
+		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
+
 		_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
 
 		wfReq.WorkflowId = firstWfId + "-2"
-		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
-			SearchAttributes: []iwfidl.SearchAttribute{
-				{
-					Key:         iwfidl.PtrString("CustomDoubleField"),
-					ValueType:   ptr.Any(iwfidl.DOUBLE),
-					DoubleValue: ptr.Any(0.01),
-				},
-			},
+		newSa = iwfidl.SearchAttribute{
+			Key:         iwfidl.PtrString("CustomDoubleField"),
+			ValueType:   ptr.Any(iwfidl.DOUBLE),
+			DoubleValue: ptr.Any(0.01),
 		}
+		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
+
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
 
-		timeStr := "2018-02-15T16:16:36-08:00"
 		wfReq.WorkflowId = firstWfId + "-3"
-		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
-			SearchAttributes: []iwfidl.SearchAttribute{
-				{
-					Key:         iwfidl.PtrString("CustomDatetimeField"),
-					ValueType:   ptr.Any(iwfidl.DATETIME),
-					StringValue: iwfidl.PtrString(timeStr),
-				},
-			},
+		newSa = iwfidl.SearchAttribute{
+			Key:              iwfidl.PtrString("CustomKeywordField"),
+			ValueType:        ptr.Any(iwfidl.KEYWORD_ARRAY),
+			StringArrayValue: []string{"keyword1", "keyword2"},
 		}
+		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
 
 		wfReq.WorkflowId = firstWfId + "-4"
-		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
-			SearchAttributes: []iwfidl.SearchAttribute{
-				{
-					Key:         iwfidl.PtrString("CustomStringField"),
-					ValueType:   ptr.Any(iwfidl.TEXT),
-					StringValue: iwfidl.PtrString("My name is Quanzheng Long"),
-				},
-			},
+		newSa = iwfidl.SearchAttribute{
+			Key:         iwfidl.PtrString("CustomStringField"),
+			ValueType:   ptr.Any(iwfidl.TEXT),
+			StringValue: iwfidl.PtrString("My name is Quanzheng Long"),
 		}
+		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
 
@@ -251,8 +255,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		// wait for the search attribute index to be ready in ElasticSearch
 		time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
-		assertSearch("", 5, apiClient, assertions)
-		assertSearch("CustomIntField=2", 5, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStrForSearch), 5, apiClient, assertions)
 	}
 }
 
@@ -261,7 +264,8 @@ func assertSearch(query string, expected int, apiClient *iwfidl.APIClient, asser
 	search := apiClient.DefaultApi.ApiV1WorkflowSearchPost(context.Background())
 
 	var nextPageToken string
-	for current := 0; current < expected; {
+	current := 0
+	for current < expected {
 		searchResp, httpResp, err := search.WorkflowSearchRequest(iwfidl.WorkflowSearchRequest{
 			Query:         query,
 			PageSize:      iwfidl.PtrInt32(2),
