@@ -24,6 +24,6 @@ do
 done
 # TODO remove this hack by using tctl to make sure namespace is registered
 # then remove the hack in init.sh
-echo "now waiting for 20s so that another script will register namespace/search attributes. TODO need to remove this hack..."
+echo "now waiting 20s for server to be ready, so that another script will register namespace/search attributes. TODO need to remove this hack... see https://github.com/indeedeng/iwf/issues/74"
 sleep 20
 "${SRC_ROOT}/iwf-server" --config "${CONFIG_TEMPLATE_PATH}" start "$@"

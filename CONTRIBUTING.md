@@ -2,6 +2,8 @@
 
 Any contribution is welcome. Even just a fix for typo in a code comment, or README/wiki.
 
+See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works.
+
 Here is the repository layout if you are interested to learn about it:
 
 * `cmd/` the code to bootstrap the server -- loading config and connect to Cadence/Temporal service, and start iWF API and interpreter service
