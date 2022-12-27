@@ -175,17 +175,62 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
 
 	if *testSearchIntegTest {
-		// start more WFs in order to test pagination, and wait for all completed
+		// start more WFs in order to test pagination
 		firstWfId := wfReq.WorkflowId
 		wfReq.WorkflowId = firstWfId + "-1"
+		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
+			SearchAttributes: []iwfidl.SearchAttribute{
+				{
+					Key:       iwfidl.PtrString("CustomBoolField"),
+					ValueType: ptr.Any(iwfidl.BOOL),
+					BoolValue: ptr.Any(true),
+				},
+			},
+		}
 		_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
+
 		wfReq.WorkflowId = firstWfId + "-2"
+		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
+			SearchAttributes: []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString("CustomDoubleField"),
+					ValueType:   ptr.Any(iwfidl.DOUBLE),
+					DoubleValue: ptr.Any(0.01),
+				},
+			},
+		}
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
+
+		timeStr := "2018-02-15T16:16:36-08:00"
 		wfReq.WorkflowId = firstWfId + "-3"
+		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
+			SearchAttributes: []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString("CustomDatetimeField"),
+					ValueType:   ptr.Any(iwfidl.DATETIME),
+					StringValue: iwfidl.PtrString(timeStr),
+				},
+			},
+		}
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
+
+		wfReq.WorkflowId = firstWfId + "-4"
+		wfReq.WorkflowStartOptions = &iwfidl.WorkflowStartOptions{
+			SearchAttributes: []iwfidl.SearchAttribute{
+				{
+					Key:         iwfidl.PtrString("CustomStringField"),
+					ValueType:   ptr.Any(iwfidl.TEXT),
+					StringValue: iwfidl.PtrString("My name is Quanzheng Long"),
+				},
+			},
+		}
+		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
+		panicAtHttpError(err, httpResp)
+
+		// wait for all completed
 		_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: firstWfId + "-1",
 		}).Execute()
@@ -198,20 +243,42 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			WorkflowId: firstWfId + "-3",
 		}).Execute()
 		panicAtHttpError(err, httpResp)
+		_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+			WorkflowId: firstWfId + "-4",
+		}).Execute()
+		panicAtHttpError(err, httpResp)
 
 		// wait for the search attribute index to be ready in ElasticSearch
 		time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
-		assertSearch("", 2)
-		// search through all wfs using search API with pagination
-		search := apiClient.DefaultApi.ApiV1WorkflowSearchPost(context.Background())
+		assertSearch("", 5, apiClient, assertions)
+		assertSearch("CustomIntField=2", 5, apiClient, assertions)
+	}
+}
+
+func assertSearch(query string, expected int, apiClient *iwfidl.APIClient, assertions *assert.Assertions) {
+	// search through all wfs using search API with pagination
+	search := apiClient.DefaultApi.ApiV1WorkflowSearchPost(context.Background())
+
+	var nextPageToken string
+	for current := 0; current < expected; {
 		searchResp, httpResp, err := search.WorkflowSearchRequest(iwfidl.WorkflowSearchRequest{
-			Query:    "", // empty query
-			PageSize: iwfidl.PtrInt32(2),
+			Query:         query,
+			PageSize:      iwfidl.PtrInt32(2),
+			NextPageToken: &nextPageToken,
 		}).Execute()
 		panicAtHttpError(err, httpResp)
-		println(searchResp.GetWorkflowExecutions())
-		assertions.Equal(2, len(searchResp.WorkflowExecutions))
-		assertions.True(len(searchResp.GetNextPageToken()) > 0)
+
+		current += len(searchResp.WorkflowExecutions)
+		if current < expected {
+			assertions.Equal(2, len(searchResp.WorkflowExecutions))
+			assertions.True(len(searchResp.GetNextPageToken()) > 0)
+			nextPageToken = *searchResp.NextPageToken
+		} else if current == expected {
+			assertions.True(len(searchResp.GetNextPageToken()) == 0)
+		} else {
+			assertions.Fail("cannot happen")
+		}
 	}
+
 }

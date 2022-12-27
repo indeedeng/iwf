@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/common/timeparser"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/sdk/converter"
 	"go.uber.org/cadence/.gen/go/shared"
@@ -17,7 +18,7 @@ func MapToInternalSearchAttributes(attributes []iwfidl.SearchAttribute) (map[str
 	res := map[string]interface{}{}
 	for _, attr := range attributes {
 		switch attr.GetValueType() {
-		case iwfidl.KEYWORD, iwfidl.DATETIME, iwfidl.TEXT:
+		case iwfidl.KEYWORD, iwfidl.TEXT:
 			res[attr.GetKey()] = attr.GetStringValue()
 		case iwfidl.INT:
 			res[attr.GetKey()] = attr.GetIntegerValue()
@@ -25,6 +26,12 @@ func MapToInternalSearchAttributes(attributes []iwfidl.SearchAttribute) (map[str
 			res[attr.GetKey()] = attr.GetBoolValue()
 		case iwfidl.DOUBLE:
 			res[attr.GetKey()] = attr.GetDoubleValue()
+		case iwfidl.DATETIME:
+			t, err := timeparser.ParseTime(attr.GetStringValue())
+			if err != nil {
+				return nil, err
+			}
+			res[attr.GetKey()] = t
 		case iwfidl.KEYWORD_ARRAY:
 			res[attr.GetKey()] = attr.GetStringArrayValue()
 		default:
@@ -106,7 +113,7 @@ func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueTy
 	var ok bool
 	var err error
 	switch valueType {
-	case iwfidl.KEYWORD, iwfidl.DATETIME, iwfidl.TEXT:
+	case iwfidl.KEYWORD, iwfidl.DATETIME, iwfidl.TEXT: // for DATETIME it will be like 2022-12-27T20:00:24.338155843Z
 		strVal, ok = object.(string)
 		rv.StringValue = &strVal
 	case iwfidl.INT:
