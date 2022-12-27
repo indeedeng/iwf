@@ -272,13 +272,23 @@ components:
     SearchAttributeValueType:
       enum:
       - KEYWORD
+      - TEXT
+      - DATETIME
       - INT
+      - DOUBLE
+      - BOOL
+      - KEYWORD_ARRAY
       type: string
     SearchAttribute:
       example:
         stringValue: stringValue
         valueType: null
         integerValue: 0
+        boolValue: true
+        doubleValue: 6.027456183070403
+        stringArrayValue:
+        - stringArrayValue
+        - stringArrayValue
         key: key
       properties:
         key:
@@ -288,6 +298,15 @@ components:
         integerValue:
           format: int64
           type: integer
+        doubleValue:
+          format: double
+          type: number
+        boolValue:
+          type: boolean
+        stringArrayValue:
+          items:
+            type: string
+          type: array
         valueType:
           $ref: '#/components/schemas/SearchAttributeValueType'
       type: object
@@ -590,10 +609,20 @@ components:
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
       properties:
         searchAttributes:
@@ -677,6 +706,7 @@ components:
       type: object
     WorkflowSearchRequest:
       example:
+        nextPageToken: nextPageToken
         query: query
         pageSize: 0
       properties:
@@ -685,11 +715,14 @@ components:
         pageSize:
           format: int32
           type: integer
+        nextPageToken:
+          type: string
       required:
       - query
       type: object
     WorkflowSearchResponse:
       example:
+        nextPageToken: nextPageToken
         workflowExecutions:
         - workflowRunId: workflowRunId
           workflowId: workflowId
@@ -700,6 +733,8 @@ components:
           items:
             $ref: '#/components/schemas/WorkflowSearchResponseEntry'
           type: array
+        nextPageToken:
+          type: string
       type: object
     WorkflowSearchResponseEntry:
       example:
@@ -787,10 +822,20 @@ components:
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         stateInput:
           data: data
@@ -823,10 +868,20 @@ components:
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         recordEvents:
         - value:
@@ -959,10 +1014,20 @@ components:
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         DataObjects:
         - value:
@@ -1010,10 +1075,20 @@ components:
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
           integerValue: 0
+          boolValue: true
+          doubleValue: 6.027456183070403
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
           key: key
         recordEvents:
         - value:

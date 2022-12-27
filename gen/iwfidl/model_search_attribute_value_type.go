@@ -21,13 +21,23 @@ type SearchAttributeValueType string
 // List of SearchAttributeValueType
 const (
 	KEYWORD SearchAttributeValueType = "KEYWORD"
+	TEXT SearchAttributeValueType = "TEXT"
+	DATETIME SearchAttributeValueType = "DATETIME"
 	INT SearchAttributeValueType = "INT"
+	DOUBLE SearchAttributeValueType = "DOUBLE"
+	BOOL SearchAttributeValueType = "BOOL"
+	KEYWORD_ARRAY SearchAttributeValueType = "KEYWORD_ARRAY"
 )
 
 // All allowed values of SearchAttributeValueType enum
 var AllowedSearchAttributeValueTypeEnumValues = []SearchAttributeValueType{
 	"KEYWORD",
+	"TEXT",
+	"DATETIME",
 	"INT",
+	"DOUBLE",
+	"BOOL",
+	"KEYWORD_ARRAY",
 }
 
 func (v *SearchAttributeValueType) UnmarshalJSON(src []byte) error {
