@@ -256,6 +256,12 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
 		assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStrForSearch), 5, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStrForSearch, "Quanzheng"), 1, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStrForSearch, "0.01"), 3, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStrForSearch, "true"), 4, apiClient, assertions)
+
+		// TODO?? research how to use text
+		//assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomKeywordField='%v'", nowTimeStrForSearch, "keyword-value1"), 5, apiClient, assertions) // this got changed during WF execution
 	}
 }
 
@@ -279,7 +285,18 @@ func assertSearch(query string, expected int, apiClient *iwfidl.APIClient, asser
 			assertions.True(len(searchResp.GetNextPageToken()) > 0)
 			nextPageToken = *searchResp.NextPageToken
 		} else if current == expected {
-			assertions.True(len(searchResp.GetNextPageToken()) == 0)
+			if len(searchResp.GetNextPageToken()) > 0 {
+				nextPageToken = *searchResp.NextPageToken
+				// the next page must be empty
+				searchResp, httpResp, err := search.WorkflowSearchRequest(iwfidl.WorkflowSearchRequest{
+					Query:         query,
+					PageSize:      iwfidl.PtrInt32(2),
+					NextPageToken: &nextPageToken,
+				}).Execute()
+				panicAtHttpError(err, httpResp)
+				assertions.Equal(0, len(searchResp.WorkflowExecutions))
+				assertions.True(len(searchResp.GetNextPageToken()) == 0)
+			}
 		} else {
 			assertions.Fail("cannot happen")
 		}

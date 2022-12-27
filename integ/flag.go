@@ -14,4 +14,4 @@ var temporalIntegTest = flag.Bool("temporal", true, "run integ test against temp
 
 var testSearchIntegTest = flag.Bool("search", true, "run search integ test against temporal/Cadence")
 
-var searchWaitTimeIntegTest = flag.Int("searchWaitMs", 1000, "the amount of time to wait for ElasticSearch being able to search in milliseconds")
+var searchWaitTimeIntegTest = flag.Int("searchWaitMs", 2000, "the amount of time to wait for ElasticSearch being able to search in milliseconds")
