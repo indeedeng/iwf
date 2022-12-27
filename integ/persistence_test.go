@@ -258,10 +258,10 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStrForSearch), 5, apiClient, assertions)
 		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStrForSearch, "Quanzheng"), 1, apiClient, assertions)
 		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStrForSearch, "0.01"), 3, apiClient, assertions)
-		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStrForSearch, "true"), 4, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStrForSearch, "true"), 0, apiClient, assertions) // this got changed during WF execution
 
 		// TODO?? research how to use text
-		//assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomKeywordField='%v'", nowTimeStrForSearch, "keyword-value1"), 5, apiClient, assertions) // this got changed during WF execution
+		//assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomKeywordField='%v'", nowTimeStrForSearch, "keyword-value1"), 5, apiClient, assertions)
 	}
 }
 

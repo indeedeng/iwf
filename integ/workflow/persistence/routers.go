@@ -22,9 +22,14 @@ const (
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
 	TestSearchAttributeKeywordValue2 = "keyword-value2"
-	TestSearchAttributeIntKey        = "CustomIntField"
-	TestSearchAttributeIntValue1     = 1
-	TestSearchAttributeIntValue2     = 2
+
+	TestSearchAttributeIntKey      = "CustomIntField"
+	TestSearchAttributeBoolKey     = "CustomBoolField"
+	TestSearchAttributeDoubleKey   = "CustomDoubleField"
+	TestSearchAttributeDatetimeKey = "CustomDatetimeField"
+	TestSearchAttributeTextKey     = "CustomStringField"
+	TestSearchAttributeIntValue1   = 1
+	TestSearchAttributeIntValue2   = 2
 )
 
 var TestDataObjectVal1 = iwfidl.EncodedObject{
@@ -77,6 +82,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
 					IntegerValue: iwfidl.PtrInt64(TestSearchAttributeIntValue1),
 					ValueType:    ptr.Any(iwfidl.INT),
+				},
+				{
+					Key:       iwfidl.PtrString(TestSearchAttributeBoolKey),
+					ValueType: ptr.Any(iwfidl.BOOL),
+					BoolValue: iwfidl.PtrBool(false),
 				},
 			}
 
