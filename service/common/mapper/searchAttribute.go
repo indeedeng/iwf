@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -61,7 +62,7 @@ func MapCadenceToIwfSearchAttributes(searchAttributes *shared.SearchAttributes, 
 		if err != nil {
 			return nil, err
 		}
-		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object)
+		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, true)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +92,9 @@ func MapTemporalToIwfSearchAttributes(searchAttributes *common.SearchAttributes,
 		if err != nil {
 			return nil, err
 		}
-		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object)
+		// TODO we should also call UseNumber here for JSON decoder for Temporal
+		// see https://github.com/temporalio/sdk-go/issues/942
+		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, false)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +104,7 @@ func MapTemporalToIwfSearchAttributes(searchAttributes *common.SearchAttributes,
 	return result, nil
 }
 
-func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueType, object interface{}) (*iwfidl.SearchAttribute, error) {
+func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueType, object interface{}, useNumber bool) (*iwfidl.SearchAttribute, error) {
 	var strVal string
 	var intVal int64
 	var floatVal float64
@@ -118,11 +121,21 @@ func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueTy
 		strVal, ok = object.(string)
 		rv.StringValue = &strVal
 	case iwfidl.INT:
-		// TODO we should call UseNumber here for JSON decoder
-		// see https://github.com/temporalio/sdk-go/issues/942
-		floatVal, ok = object.(float64)
-		intVal = int64(floatVal)
-		rv.IntegerValue = &intVal
+		if useNumber {
+			var number json.Number
+			number, ok = object.(json.Number)
+			if ok {
+				intVal, err := number.Int64()
+				if err != nil {
+					return nil, err
+				}
+				rv.IntegerValue = &intVal
+			}
+		} else {
+			floatVal, ok = object.(float64)
+			intVal = int64(floatVal)
+			rv.IntegerValue = &intVal
+		}
 	case iwfidl.BOOL:
 		boolVal, ok = object.(bool)
 		rv.BoolValue = &boolVal

@@ -54,7 +54,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	nowTime := time.Now()
 	nowTimeUtc := nowTime.UTC()
-	nowTimeStr := nowTimeUtc.Format("2006-01-02T15:04:05Z")
+	nowTimeStr := nowTimeUtc.Format("2006-01-02T15:04:05Z") // TODO support non-UTC value in timeparser library
 	nowTimeStrForSearch := nowTime.Format("2006-01-02T15:04:05-07:00")
 
 	reqStart := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
