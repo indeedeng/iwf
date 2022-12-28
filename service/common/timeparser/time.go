@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultDateTimeFormat = time.RFC3339 // used for converting UnixNano to string like 2018-02-15T16:16:36-08:00
+	DateTimeFormat = "2006-01-02T15:04:05-07:00" // used for converting UnixNano to string like 2018-02-15T16:16:36-08:00
 	// regex expression for parsing time durations, shorter, longer notations and numeric value respectively
 	defaultDateTimeRangeShortRE = "^[1-9][0-9]*[smhdwMy]$"                                // eg. 1s, 20m, 300h etc.
 	defaultDateTimeRangeLongRE  = "^[1-9][0-9]*(second|minute|hour|day|week|month|year)$" // eg. 1second, 20minute, 300hour etc.
@@ -22,7 +22,7 @@ func ParseTime(timeStr string) (int64, error) {
 	}
 
 	// try to parse
-	parsedTime, err := time.Parse(defaultDateTimeFormat, timeStr)
+	parsedTime, err := time.Parse(DateTimeFormat, timeStr)
 	if err == nil {
 		return parsedTime.UnixNano(), nil
 	}
@@ -36,8 +36,8 @@ func ParseTime(timeStr string) (int64, error) {
 	// treat as time range format
 	parsedTime, err = parseTimeRange(timeStr)
 	if err != nil {
-		return 0, fmt.Errorf("cannot parse time '%s', use UTC format '2006-01-02T15:04:05Z', "+
-			"time range or raw UnixNano directly. See help for more details: %v", timeStr, err)
+		return 0, fmt.Errorf("cannot parse time '%s', use UTC format %v, "+
+			"time range or raw UnixNano directly. See help for more details: %v", DateTimeFormat, timeStr, err)
 	}
 	return parsedTime.UnixNano(), nil
 }
