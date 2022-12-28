@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/common/timeparser"
 	"strconv"
 	"testing"
 	"time"
@@ -53,9 +54,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	})
 	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	nowTime := time.Now()
-	nowTimeUtc := nowTime.UTC()
-	nowTimeStr := nowTimeUtc.Format("2006-01-02T15:04:05Z") // TODO support non-UTC value in timeparser library
-	nowTimeStrForSearch := nowTime.Format("2006-01-02T15:04:05-07:00")
+	nowTimeStr := nowTime.Format(timeparser.DateTimeFormat)
 
 	reqStart := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	wfReq := iwfidl.WorkflowStartRequest{
@@ -255,10 +254,10 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		// wait for the search attribute index to be ready in ElasticSearch
 		time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
-		assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStrForSearch), 5, apiClient, assertions)
-		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStrForSearch, "Quanzheng"), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStrForSearch, "0.01"), 3, apiClient, assertions)
-		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStrForSearch, "true"), 0, apiClient, assertions) // this got changed during WF execution
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStr), 5, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStr, "Quanzheng"), 1, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStr, "0.01"), 3, apiClient, assertions)
+		assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStr, "true"), 0, apiClient, assertions) // this got changed during WF execution
 
 		// TODO?? research how to use text
 		//assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomKeywordField='%v'", nowTimeStrForSearch, "keyword-value1"), 5, apiClient, assertions)
