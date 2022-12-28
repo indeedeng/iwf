@@ -54,6 +54,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	})
 	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
 	nowTime := time.Now()
+	notTimeNanoStr := fmt.Sprintf("%v", nowTime.UnixNano())
 	nowTimeStr := nowTime.Format(timeparser.DateTimeFormat)
 
 	reqStart := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
@@ -197,7 +198,16 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			ValueType: ptr.Any(iwfidl.BOOL),
 			BoolValue: ptr.Any(true),
 		}
-		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
+
+		wfReq.WorkflowStartOptions.SearchAttributes = []iwfidl.SearchAttribute{
+			newSa,
+			// try using nano string
+			{
+				Key:         iwfidl.PtrString("CustomDatetimeField"),
+				ValueType:   ptr.Any(iwfidl.DATETIME),
+				StringValue: iwfidl.PtrString(notTimeNanoStr),
+			},
+		}
 
 		_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 		panicAtHttpError(err, httpResp)
