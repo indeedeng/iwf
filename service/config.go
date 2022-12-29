@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/uber-go/tally/v4/prometheus"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
@@ -31,6 +32,8 @@ type (
 		HostPort string `yaml:"hostPort"`
 		// Namespace to connect to, default to default
 		Namespace string `yaml:"namespace"`
+		// Prometheus is configuring the metric exposer
+		Prometheus *prometheus.Configuration `yaml:"prometheus"`
 	}
 
 	CadenceConfig struct {
