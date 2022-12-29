@@ -4,7 +4,7 @@ iWF is a platform providing an all-in-one tooling for building long-running busi
 
 **It will not make you a 10x developer...but you may feel like one!**
 
-We call _long running application_ **`Workflow`**. 
+We call _long running process_ **`Workflow`**. 
 
 It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 
