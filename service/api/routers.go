@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/indeedeng/iwf/service/common/log"
 )
 
 const WorkflowStartApiPath = "/api/v1/workflow/start"
@@ -15,10 +16,10 @@ const WorkflowResetApiPath = "/api/v1/workflow/reset"
 const WorkflowStopApiPath = "/api/v1/workflow/stop"
 
 // NewService returns a new router.
-func NewService(client UnifiedClient) *gin.Engine {
+func NewService(client UnifiedClient, logger log.Logger) *gin.Engine {
 	router := gin.Default()
 
-	handler := newHandler(client)
+	handler := newHandler(client, logger)
 
 	router.GET("/", handler.index)
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStart)

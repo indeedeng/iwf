@@ -1,8 +1,11 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/indeedeng/iwf/service"
-	"log"
+	"github.com/indeedeng/iwf/service/common/errors"
+	"github.com/indeedeng/iwf/service/common/log"
+	"github.com/indeedeng/iwf/service/common/log/tag"
 	"net/http"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -11,16 +14,18 @@ import (
 )
 
 type handler struct {
-	svc ApiService
+	svc    ApiService
+	logger log.Logger
 }
 
-func newHandler(client UnifiedClient) *handler {
-	svc, err := NewApiService(client, service.TaskQueue)
+func newHandler(client UnifiedClient, logger log.Logger) *handler {
+	svc, err := NewApiService(client, service.TaskQueue, logger)
 	if err != nil {
 		panic(err)
 	}
 	return &handler{
-		svc: svc,
+		svc:    svc,
+		logger: logger,
 	}
 }
 
@@ -40,7 +45,7 @@ func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowStartPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -57,7 +62,7 @@ func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	errResp := h.svc.ApiV1WorkflowSignalPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -74,7 +79,7 @@ func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	errResp := h.svc.ApiV1WorkflowStopPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -91,7 +96,7 @@ func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowSearchPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -108,7 +113,7 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowGetQueryAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -125,7 +130,7 @@ func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowGetSearchAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -150,10 +155,10 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	var resp *iwfidl.WorkflowGetResponse
-	var errResp *ErrorAndStatus
+	var errResp *errors.ErrorAndStatus
 	if waitIfStillRunning {
 		resp, errResp = h.svc.ApiV1WorkflowGetWithWaitPost(c.Request.Context(), req)
 	} else {
@@ -174,7 +179,7 @@ func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Println("received API request", req)
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowResetPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -185,6 +190,15 @@ func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 	return
 }
 
-func (h *handler) processError(c *gin.Context, resp *ErrorAndStatus) {
+func (h *handler) processError(c *gin.Context, resp *errors.ErrorAndStatus) {
 	c.JSON(resp.StatusCode, resp.Error)
+}
+
+func (h *handler) toJson(req any) string {
+	str, err := json.Marshal(req)
+	if err != nil {
+		h.logger.Error("error when serializing request", tag.Error(err), tag.DefaultValue(req))
+		return ""
+	}
+	return string(str)
 }

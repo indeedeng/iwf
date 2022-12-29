@@ -1,4 +1,7 @@
-
+log:
+  stdout: true
+  level: info
+  levelKey: "level"
 api:
   port: 8801
 backend:
