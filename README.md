@@ -11,11 +11,12 @@ It's a simple and powerful WorkflowAsCode general purpose workflow engine.
 The server is back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter.
 
 Related projects:
-* [API definition between SDKs and server](https://github.com/indeedeng/iwf-idl). Any languages can be supported as long as implementing it. 
+* [API definition between SDKs and server](https://github.com/indeedeng/iwf-idl). 
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) 
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
-* [iWF Golang SDK](https://github.com/cadence-oss/iwf-golang-sdk), WIP, Contribution is welcome.
-* More SDKs? Contribution is welcome.
+* [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk)
+* [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples) 
+* More SDKs? Contribution is welcome. Any languages can be supported as long as implementing the [IDL](https://github.com/indeedeng/iwf-idl).
 
 # Table of contents
 
@@ -76,10 +77,14 @@ the application workflow workers. Internally, the two APIs are executed by Caden
 ## Basic Concepts
 
 ### Workflow and WorkflowState definition
-iWF lets you build long-running applications by implementing the workflow interface, e.g. [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java).
+iWF lets you build long-running applications by implementing the workflow interface, e.g. 
+[Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java) 
+or [Golang Workflow interface](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow.go).
 An instance of the interface is a `WorkflowDefinition`. User applications use `iwfWorkflowType` to differentiate WorkflowDefinitions.    
 
-A WorkflowDefinition contains several `WorkflowState` e.g. [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java). 
+A WorkflowDefinition contains several `WorkflowState` e.g. 
+[Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java) 
+or [Golang WorkflowState interface](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow_state.go). 
 A WorkflowState is implemented with two APIs: `start` and `decide`. 
 * `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the requested `Commands` are completed, `decide` API will be triggered. 
 * `decide` API will decide next states to execute. Next states be multiple, and can be re-executed as different `stateExecutions`. 
