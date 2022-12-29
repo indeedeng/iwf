@@ -20,11 +20,11 @@ POST http://localhost:8801/api/v1/workflow/reset
 Content-Type: application/json
 
 {
-  "workflowId": "timer1671219152",
-  "workflowRunId": "fae51e69-7e41-4658-89aa-663463951dc7",
-  "resetType": "STATE_EXECUTION_ID",
+  "workflowId": "timer1672340240",
+  "workflowRunId": "",
+  "resetType": "STATE_ID",
   "historyEventId":15,
   "historyEventTime": "150m",
-  "stateId": "S2",
+  "stateId": "S1",
   "stateExecutionId": "S2-1"
 }

@@ -10,6 +10,7 @@ import (
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/sdk/converter"
+	"strings"
 )
 
 func getResetEventIDByType(ctx context.Context, resetType iwfidl.WorkflowResetType,
@@ -161,7 +162,8 @@ func getDecisionEventIDByStateOrStateExecutionId(
 				decisionFinishID = e.GetEventId()
 			}
 			if e.GetEventType() == enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED {
-				if e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName() == "StateStart" {
+				typeName := e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName()
+				if strings.Contains(typeName, "StateStart") {
 					var backendType service.BackendType
 					var input service.StateStartActivityInput
 					err = converter.FromPayloads(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)
