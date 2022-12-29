@@ -79,12 +79,16 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					)
 					return
 				}
-				defer func() {
+				manualDeferFn := func() {
+					// using defer will cause https://github.com/uber-go/cadence-client/issues/1198 in Cadence
+					// so we use manual defer here...
+					// NOTE: must execute this in every place when return...
+					// TODO be extremely careful in this piece of code, and remove this hack when the bug is fixed in Cadence client
 					err := stateExecutingMgr.completeStates(state)
 					if err != nil {
 						errToFailWf = err
 					}
-				}()
+				}
 
 				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
 				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel)
@@ -111,6 +115,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				if !shouldClose && decision.HasNextStates() {
 					currentStates = append(currentStates, decision.GetNextStates()...)
 				}
+				manualDeferFn()
 			})
 		}
 
