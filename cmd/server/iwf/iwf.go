@@ -29,9 +29,13 @@ import (
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
+	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/uber-go/tally/v4"
+	"github.com/uber-go/tally/v4/prometheus"
 	apiv1 "github.com/uber/cadence-idl/go/proto/api/v1"
 	"github.com/urfave/cli"
 	"go.temporal.io/sdk/client"
+	sdktally "go.temporal.io/sdk/contrib/tally"
 	"go.temporal.io/sdk/converter"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	cclient "go.uber.org/cadence/client"
@@ -42,6 +46,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 )
 
 const serviceAPI = "api"
@@ -94,9 +99,15 @@ func start(c *cli.Context) {
 	// The client is a heavyweight object that should be created once per process.
 	var unifiedClient api.UnifiedClient
 	if config.Backend.Temporal != nil {
+		pscope := newPrometheusScope(prometheus.Configuration{
+			ListenAddress: "0.0.0.0:9090",
+			TimerType:     "histogram",
+		})
+
 		temporalClient, err := client.Dial(client.Options{
-			HostPort:  config.Backend.Temporal.HostPort,
-			Namespace: config.Backend.Temporal.Namespace,
+			HostPort:       config.Backend.Temporal.HostPort,
+			Namespace:      config.Backend.Temporal.Namespace,
+			MetricsHandler: sdktally.NewMetricsHandler(pscope),
 		})
 		if err != nil {
 			log.Fatalf("Unable to connect to Temporal because of error %v", err)
@@ -229,4 +240,52 @@ func BuildCadenceServiceClient(hostPort string) (workflowserviceclient.Interface
 		), func() {
 			dispatcher.Stop()
 		}, nil
+}
+
+// tally sanitizer options that satisfy Prometheus restrictions.
+// This will rename metrics at the tally emission level, so metrics name we
+// use maybe different from what gets emitted. In the current implementation
+// it will replace - and . with _
+var (
+	safeCharacters = []rune{'_'}
+
+	sanitizeOptions = tally.SanitizeOptions{
+		NameCharacters: tally.ValidCharacters{
+			Ranges:     tally.AlphanumericRange,
+			Characters: safeCharacters,
+		},
+		KeyCharacters: tally.ValidCharacters{
+			Ranges:     tally.AlphanumericRange,
+			Characters: safeCharacters,
+		},
+		ValueCharacters: tally.ValidCharacters{
+			Ranges:     tally.AlphanumericRange,
+			Characters: safeCharacters,
+		},
+		ReplacementCharacter: tally.DefaultReplacementCharacter,
+	}
+)
+
+func newPrometheusScope(c prometheus.Configuration) tally.Scope {
+	reporter, err := c.NewReporter(
+		prometheus.ConfigurationOptions{
+			Registry: prom.NewRegistry(),
+			OnError: func(err error) {
+				log.Println("error in prometheus reporter", err)
+			},
+		},
+	)
+	if err != nil {
+		log.Fatalln("error creating prometheus reporter", err)
+	}
+	scopeOpts := tally.ScopeOptions{
+		CachedReporter:  reporter,
+		Separator:       prometheus.DefaultSeparator,
+		SanitizeOptions: &sanitizeOptions,
+		Prefix:          "temporal_samples",
+	}
+	scope, _ := tally.NewRootScope(scopeOpts, time.Second)
+
+	log.Println("prometheus metrics scope created")
+	return scope
 }
