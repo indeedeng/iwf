@@ -73,8 +73,8 @@ docker-compose -f docker-compose-es-v7.yml up
 3. Register system search attributes required by iWF server
 ```
 cadence adm cl asa --search_attr_key IwfGlobalWorkflowVersion --search_attr_type 2
-cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 0
-cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 0
+cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
+cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
 ```
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
