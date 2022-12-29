@@ -9,6 +9,7 @@ import (
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/encoded"
+	"strings"
 )
 
 func getResetIDsByType(
@@ -167,7 +168,8 @@ func getDecisionEventIDByStateOrStateExecutionId(
 				decisionFinishID = e.GetEventId()
 			}
 			if e.GetEventType() == shared.EventTypeActivityTaskScheduled {
-				if e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName() == "StateStart" {
+				typeName := e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName()
+				if strings.Contains(typeName, "StateStart") {
 					var backendType service.BackendType
 					var input service.StateStartActivityInput
 					err = converter.FromData(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)

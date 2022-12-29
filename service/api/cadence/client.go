@@ -13,6 +13,7 @@ import (
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
 	"go.uber.org/cadence/encoded"
+	"time"
 )
 
 type cadenceClient struct {
@@ -189,6 +190,10 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 		reqRunId = resp.GetWorkflowExecutionInfo().GetExecution().GetRunId()
 	}
 
+	// TODO not sure why Cadence reset API requires this for GetWorkflowExecutionHistory API....
+	ctx, cancelFn := context.WithTimeout(ctx, time.Second*120)
+	defer cancelFn()
+
 	resetType := request.GetResetType()
 	resetBaseRunID, decisionFinishID, err := getResetIDsByType(ctx, resetType, t.domain, request.GetWorkflowId(),
 		reqRunId, t.serviceClient, t.converter, request.GetHistoryEventId(), request.GetHistoryEventTime(), request.GetStateId(), request.GetStateExecutionId())
@@ -209,6 +214,7 @@ func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.Workfl
 		RequestId:             &requestId,
 		SkipSignalReapply:     iwfidl.PtrBool(request.GetSkipSignalReapply()),
 	}
+
 	resp, err := t.serviceClient.ResetWorkflowExecution(ctx, resetReq)
 	if err != nil {
 		return "", err
