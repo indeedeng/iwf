@@ -8,7 +8,7 @@ Content-Type: application/json
 {
   "workflowId": "test-wf",
   "iwfWorkflowType": "test-wf-type",
-  "workflowTimeoutSeconds": 3600,
+  "workflowTimeoutSeconds": 10,
   "iwfWorkerUrl": "http://localhost:8080",
   "startStateId": "test_state_1",
   "stateInput": {},

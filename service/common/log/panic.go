@@ -23,7 +23,7 @@ package log
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log/tag"
 	"net/http"
 	"runtime/debug"
@@ -36,7 +36,7 @@ import (
 // errPanic MUST be the result from calling recover, which MUST be done in a single level deep
 // deferred function. The usual way of calling this is:
 // - defer func() { log.CapturePanic(recover(), logger, &err) }()
-func CapturePanic(errPanic interface{}, logger Logger, retError **api.ErrorAndStatus) {
+func CapturePanic(errPanic interface{}, logger Logger, retError **errors.ErrorAndStatus) {
 	if errPanic != nil {
 		err, ok := errPanic.(error)
 		if !ok {
@@ -48,7 +48,7 @@ func CapturePanic(errPanic interface{}, logger Logger, retError **api.ErrorAndSt
 		logger.Error("Panic is captured", tag.SysStackTrace(st), tag.Error(err))
 
 		if retError != nil {
-			*retError = &api.ErrorAndStatus{
+			*retError = &errors.ErrorAndStatus{
 				StatusCode: http.StatusInternalServerError,
 				Error: iwfidl.ErrorResponse{
 					Detail: iwfidl.PtrString(err.Error()),

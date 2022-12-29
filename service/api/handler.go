@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
 	"net/http"
@@ -157,7 +158,7 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	var resp *iwfidl.WorkflowGetResponse
-	var errResp *ErrorAndStatus
+	var errResp *errors.ErrorAndStatus
 	if waitIfStillRunning {
 		resp, errResp = h.svc.ApiV1WorkflowGetWithWaitPost(c.Request.Context(), req)
 	} else {
@@ -189,7 +190,7 @@ func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 	return
 }
 
-func (h *handler) processError(c *gin.Context, resp *ErrorAndStatus) {
+func (h *handler) processError(c *gin.Context, resp *errors.ErrorAndStatus) {
 	c.JSON(resp.StatusCode, resp.Error)
 }
 
