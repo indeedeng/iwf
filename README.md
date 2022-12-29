@@ -80,7 +80,7 @@ the application workflow workers. Internally, the two APIs are executed by Caden
 iWF lets you build long-running applications by implementing the workflow interface, e.g. 
 [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java) 
 or [Golang Workflow interface](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow.go).
-An instance of the interface is a `WorkflowDefinition`. User applications use `iwfWorkflowType` to differentiate WorkflowDefinitions.    
+An instance of the interface is a `WorkflowDefinition`. User applications use `IwfWorkflowType` to differentiate WorkflowDefinitions.    
 
 A WorkflowDefinition contains several `WorkflowState` e.g. 
 [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java) 
