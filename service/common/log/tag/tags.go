@@ -182,3 +182,8 @@ func NextNumber(n int64) Tag {
 func Bool(b bool) Tag {
 	return newBoolTag("bool", b)
 }
+
+// SysStackTrace returns tag for SysStackTrace
+func SysStackTrace(stackTrace string) Tag {
+	return newStringTag("sys-stack-trace", stackTrace)
+}
