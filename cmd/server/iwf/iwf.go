@@ -99,15 +99,16 @@ func start(c *cli.Context) {
 	// The client is a heavyweight object that should be created once per process.
 	var unifiedClient api.UnifiedClient
 	if config.Backend.Temporal != nil {
-		pscope := newPrometheusScope(prometheus.Configuration{
-			ListenAddress: "0.0.0.0:9090",
-			TimerType:     "histogram",
-		})
+		var metricHandler client.MetricsHandler
+		if config.Backend.Temporal.Prometheus != nil {
+			pscope := newPrometheusScope(*config.Backend.Temporal.Prometheus)
+			metricHandler = sdktally.NewMetricsHandler(pscope)
+		}
 
 		temporalClient, err := client.Dial(client.Options{
 			HostPort:       config.Backend.Temporal.HostPort,
 			Namespace:      config.Backend.Temporal.Namespace,
-			MetricsHandler: sdktally.NewMetricsHandler(pscope),
+			MetricsHandler: metricHandler,
 		})
 		if err != nil {
 			log.Fatalf("Unable to connect to Temporal because of error %v", err)
