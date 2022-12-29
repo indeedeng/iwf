@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   elasticsearch:
-    container_name: temporal-elasticsearch
+    container_name: temporal-elasticsearch-iwf
     environment:
       - cluster.routing.allocation.disk.threshold_enabled=true
       - cluster.routing.allocation.disk.watermark.low=512mb
@@ -17,7 +17,7 @@ services:
     expose:
       - 9200
   postgresql:
-    container_name: temporal-postgresql
+    container_name: temporal-postgresql-iwf
     environment:
       POSTGRES_PASSWORD: temporal
       POSTGRES_USER: temporal
@@ -27,7 +27,7 @@ services:
     expose:
       - 5432
   temporal:
-    container_name: temporal
+    container_name: temporal-iwf
     depends_on:
       - postgresql
       - elasticsearch
@@ -51,7 +51,7 @@ services:
     volumes:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
   temporal-admin-tools:
-    container_name: temporal-admin-tools
+    container_name: temporal-admin-tools-iwf
     depends_on:
       - temporal
     environment:
@@ -65,7 +65,7 @@ services:
      - ./init.sh:/etc/temporal/init.sh
     entrypoint: sh -c "/etc/temporal/init.sh"
   temporal-ui:
-    container_name: temporal-ui
+    container_name: temporal-ui-iwf
     depends_on:
       - temporal
     environment:
