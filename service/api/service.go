@@ -2,9 +2,10 @@ package api
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/log"
+	"github.com/indeedeng/iwf/service/common/log/tag"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/ptr"
-	"log"
 	"net/http"
 	"time"
 
@@ -15,16 +16,18 @@ import (
 type serviceImpl struct {
 	client    UnifiedClient
 	taskQueue string
+	logger    log.Logger
 }
 
 func (s *serviceImpl) Close() {
 	s.client.Close()
 }
 
-func NewApiService(client UnifiedClient, taskQueue string) (ApiService, error) {
+func NewApiService(client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
 	return &serviceImpl{
 		client:    client,
 		taskQueue: taskQueue,
+		logger:    logger,
 	}, nil
 }
 
@@ -58,7 +61,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		return nil, s.handleError(err)
 	}
 
-	log.Println("Started workflow", "WorkflowID", req.WorkflowId, "RunID", runId)
+	s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
 
 	return &iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
@@ -190,7 +193,7 @@ func (s *serviceImpl) ApiV1WorkflowResetPost(ctx context.Context, req iwfidl.Wor
 
 func (s *serviceImpl) handleError(err error) *ErrorAndStatus {
 	// TODO differentiate different error for different codes
-	log.Println("encounter error for API", err)
+	s.logger.Error("encounter error for API", tag.Error(err))
 	return &ErrorAndStatus{
 		StatusCode: http.StatusInternalServerError,
 		Error: iwfidl.ErrorResponse{

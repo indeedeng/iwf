@@ -56,6 +56,11 @@ func workflowAction(action string) Tag {
 
 // general
 
+// Service returns tag for Service
+func Service(sv string) Tag {
+	return newStringTag("service", sv)
+}
+
 // WorkflowError returns tag for WorkflowError
 func WorkflowError(error error) Tag {
 	return newErrorTag("wf-error", error)
