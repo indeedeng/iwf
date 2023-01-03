@@ -281,6 +281,18 @@ Some notes:
 2) Because of above, there could be zero, or more than one state completing with data as workflow results. 
 3) To get multiple state results from a workflow execution, use the special API `getComplexWorkflowResult` of client API.
 
+## ContinueAsNew
+There is on ContinueAsNew API exposed to user workflow!
+ContinueAsNew of Cadence/Temporal is a purely leaked technical details. It's due to the replay model conflicting with the underlying storage limit/performance.
+As iWF is built on Cadence/Temporal, it will be implemented in a way that is transparent to user workflows. 
+
+Internally the interpreter workflow can continueAsNew without letting iWF user workflow to know. This is called "auto continueAsNew"
+
+Note: the initial version of "auto continueAsNew" is implemented with a limit(because it's easier to build). 
+After exceeding the history threshold(defined by numOfStateExecutionCompleted) auto continueAsNew will only be trigger if there is a point that 
+there is no pending states(started by not complete). 
+This means autoContinueAsNew doesn't need to carry over the pending states. Only the internal states like DataObjects, interStateChannels, searchAttributes are carried over.
+
 ## Non-workflow code
 Check [Client APIs](#client-apis) for all the APIs that are equivalent to Cadence/Temporal client APIs.
 
@@ -298,7 +310,6 @@ So what about something else like:
 * Timeout and backoff retry: State start/decide APIs have default timeout and infinite backoff retry. You can customize in StateOptions.  
 * ChildWorkflow can be replaced with regular workflow + signal. See this [StackOverflow](https://stackoverflow.com/questions/74494134/should-i-use-child-workflow-or-use-activity-to-start-new-workflow) for why.
 * SignalWithStart: Use start + signal API will be the same except for more exception handling work. We have seen a lot of people don't know how to use it correctly in Cadence/Temporal. We will consider provide it in a better way in the future.
-* ContinueAsNew: this is missing in iWF for now. But as the philosophy of hiding internal details, we will implement it in a way that is transparent to user workflows. Internally the interpreter workflow can continueAsNew without letting iWF user workflow to know.
 * Long-running activity with stateful recovery(heartbeat details): this is indeed a good one that we want to add. But we don't see Cadence/Temporal activity is very commonly used yet. Please leave your message if you are in a need.
 
 If you believe there is something else you really need, open a [ticket](https://github.com/indeedeng/iwf/issues) or join us in the [discussion](https://github.com/indeedeng/iwf/discussions).
@@ -355,12 +366,16 @@ When something goes wrong in your applications, here are the tips:
 - [x] More Search attribute types: Datetime, double, bool, keyword array, text
 - [x] More workflow start options: initial search attributes
 
-### Future
-- [ ] Auto ContinueAsNew
-- [ ] WaitForMoreResults in StateDecision
+### 1.2
+- [x] Limited auto continueAsNew 
 - [ ] Skip timer API for testing/operation
+- [ ] Decider trigger type: any command combination 
+
+### Future
+- [ ] Auto ContinueAsNew without limit
+- [ ] WaitForMoreResults in StateDecision
 - [ ] LongRunningActivityCommand
-- [ ] Decider trigger type: AnyCommandClosed
+- [ ] More Decider trigger type
 - [ ] Failing workflow details
 - [ ] StateOption.PersistenceLoadingPolicy: LOAD_ALL_WITH_EXCLUSIVE_LOCK and LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
 
