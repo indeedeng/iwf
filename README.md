@@ -45,6 +45,7 @@ Related projects:
   - [Search Attribute](#search-attribute)
   - [Versioning and change compatibility](#versioning-and-change-compatibility)
   - [Parallel execution with synchronization](#parallel-execution-with-synchronization)
+  - [ContinueAsNew](#continueasnew)
   - [Non-workflow code](#non-workflow-code)
   - [Anything else](#anything-else)
 - [Monitoring and Operations](#monitoring-and-operations)
@@ -286,12 +287,10 @@ There is on ContinueAsNew API exposed to user workflow!
 ContinueAsNew of Cadence/Temporal is a purely leaked technical details. It's due to the replay model conflicting with the underlying storage limit/performance.
 As iWF is built on Cadence/Temporal, it will be implemented in a way that is transparent to user workflows. 
 
-Internally the interpreter workflow can continueAsNew without letting iWF user workflow to know. This is called "auto continueAsNew"
-
-Note: the initial version of "auto continueAsNew" is implemented with a limit(because it's easier to build). 
-After exceeding the history threshold(defined by numOfStateExecutionCompleted) auto continueAsNew will only be trigger if there is a point that 
-there is no pending states(started by not complete). 
-This means autoContinueAsNew doesn't need to carry over the pending states. Only the internal states like DataObjects, interStateChannels, searchAttributes are carried over.
+Internally the interpreter workflow can continueAsNew without letting iWF user workflow to know. This is called "auto continueAsNew" --
+ 
+After exceeding the history threshold(defined by numOfStateExecutionCompleted) auto continueAsNew,
+AutoContinueAsNew will carry over the pending states, along with all the internal states like DataObjects, interStateChannels, searchAttributes.
 
 ## Non-workflow code
 Check [Client APIs](#client-apis) for all the APIs that are equivalent to Cadence/Temporal client APIs.
@@ -367,12 +366,11 @@ When something goes wrong in your applications, here are the tips:
 - [x] More workflow start options: initial search attributes
 
 ### 1.2
-- [x] Limited auto continueAsNew 
+- [x] Auto continueAsNew 
 - [ ] Skip timer API for testing/operation
 - [ ] Decider trigger type: any command combination 
 
 ### Future
-- [ ] Auto ContinueAsNew without limit
 - [ ] WaitForMoreResults in StateDecision
 - [ ] LongRunningActivityCommand
 - [ ] More Decider trigger type
