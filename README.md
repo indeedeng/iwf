@@ -283,6 +283,8 @@ Some notes:
 3) To get multiple state results from a workflow execution, use the special API `getComplexWorkflowResult` of client API.
 
 ## ContinueAsNew
+_This feature is WIP._
+
 There is on ContinueAsNew API exposed to user workflow!
 ContinueAsNew of Cadence/Temporal is a purely leaked technical details. It's due to the replay model conflicting with the underlying storage limit/performance.
 As iWF is built on Cadence/Temporal, it will be implemented in a way that is transparent to user workflows. 
@@ -366,7 +368,7 @@ When something goes wrong in your applications, here are the tips:
 - [x] More workflow start options: initial search attributes
 
 ### 1.2
-- [x] Auto continueAsNew 
+- [ ] Auto continueAsNew(WIP) 
 - [ ] Skip timer API for testing/operation
 - [ ] Decider trigger type: any command combination 
 
