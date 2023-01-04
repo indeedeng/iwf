@@ -30,7 +30,6 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		RunId:            provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 		StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
 	}
-	stateExeIdMgr := NewStateExecutionIdManager()
 	interStateChannel := NewInterStateChannel()
 	currentStates := []iwfidl.StateMovement{
 		{
@@ -53,13 +52,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
-	stateExecutingMgr := newStateExecutingManager(ctx, provider)
+	stateExecutionMgr := newStateExecutionManager(ctx, provider)
 	//inFlightExecutingStateCount := 0
 
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
 		statesToExecute := currentStates
-		err := stateExecutingMgr.startStates(currentStates)
+		err := stateExecutionMgr.markStatesPending(currentStates)
 		if err != nil {
 			return nil, err
 		}
@@ -84,13 +83,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					// so we use manual defer here...
 					// NOTE: must execute this in every place when return...
 					// TODO be extremely careful in this piece of code, and remove this hack when the bug is fixed in Cadence client
-					err := stateExecutingMgr.completeStates(state)
+					err := stateExecutionMgr.markStateCompleted(state)
 					if err != nil {
 						errToFailWf = err
 					}
 				}
 
-				stateExeId := stateExeIdMgr.IncAndGetNextExecutionId(state.GetStateId())
+				stateExeId := stateExecutionMgr.createNextExecutionId(state.GetStateId())
 				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel)
 				if err != nil {
 					errToFailWf = err
@@ -120,7 +119,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 
 		awaitError := provider.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutingMgr.getTotalExecutingStates() == 0
+			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionMgr.getTotalPendingStates() == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{

@@ -13,6 +13,12 @@ func NewInterStateChannel() *InterStateChannel {
 	}
 }
 
+func RebuildInterStateChannel(refill map[string][]*iwfidl.EncodedObject) *InterStateChannel {
+	return &InterStateChannel{
+		receivedData: refill,
+	}
+}
+
 func (i *InterStateChannel) HasData(channelName string) bool {
 	l := i.receivedData[channelName]
 	return len(l) > 0

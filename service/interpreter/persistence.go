@@ -20,6 +20,24 @@ func NewPersistenceManager(searchAttributeUpserter func(attributes map[string]in
 	}
 }
 
+func RebuildPersistenceManager(searchAttributeUpserter func(attributes map[string]interface{}) error,
+	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
+) *PersistenceManager {
+	dataObjects := make(map[string]iwfidl.KeyValue)
+	searchAttributes := make(map[string]iwfidl.SearchAttribute)
+	for _, do := range dolist {
+		dataObjects[do.GetKey()] = do
+	}
+	for _, sa := range salist {
+		searchAttributes[sa.GetKey()] = sa
+	}
+	return &PersistenceManager{
+		dataObjects:             dataObjects,
+		searchAttributes:        searchAttributes,
+		searchAttributeUpserter: searchAttributeUpserter,
+	}
+}
+
 func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjectsQueryRequest) service.GetDataObjectsQueryResponse {
 	all := false
 	if len(request.Keys) == 0 {
