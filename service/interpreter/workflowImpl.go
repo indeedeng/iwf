@@ -58,7 +58,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
 		statesToExecute := currentStates
-		err := stateExecutionMgr.startStates(currentStates)
+		err := stateExecutionMgr.markStatesPending(currentStates)
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +83,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					// so we use manual defer here...
 					// NOTE: must execute this in every place when return...
 					// TODO be extremely careful in this piece of code, and remove this hack when the bug is fixed in Cadence client
-					err := stateExecutionMgr.completeStates(state)
+					err := stateExecutionMgr.markStateCompleted(state)
 					if err != nil {
 						errToFailWf = err
 					}

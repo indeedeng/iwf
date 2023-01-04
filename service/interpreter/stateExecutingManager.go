@@ -47,7 +47,7 @@ func (e *stateExecutingManager) createNextExecutionId(stateId string) string {
 	return fmt.Sprintf("%v-%v", stateId, id)
 }
 
-func (e *stateExecutingManager) startStates(states []iwfidl.StateMovement) error {
+func (e *stateExecutingManager) markStatesPending(states []iwfidl.StateMovement) error {
 	needsUpdate := false
 	for _, s := range states {
 		e.pendingStateIdCount[s.StateId]++
@@ -63,7 +63,7 @@ func (e *stateExecutingManager) startStates(states []iwfidl.StateMovement) error
 	return nil
 }
 
-func (e *stateExecutingManager) completeStates(state iwfidl.StateMovement) error {
+func (e *stateExecutingManager) markStateCompleted(state iwfidl.StateMovement) error {
 	e.pendingStateIdCount[state.StateId]--
 	e.totalPendingCount -= 1
 	if e.pendingStateIdCount[state.StateId] == 0 {
