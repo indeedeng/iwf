@@ -19,10 +19,26 @@ func newStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider) *st
 	return &stateExecutingManager{
 		ctx:                 ctx,
 		provider:            provider,
-		pendingStateIdCount: map[string]int{},
+		pendingStateIdCount: make(map[string]int),
 		stateIdCountMap:     make(map[string]int),
 		totalPendingCount:   0,
 	}
+}
+
+func rebuildStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider,
+	stateIdCountMap map[string]int, pendingStateIdCount map[string]int, totalPendingCount int,
+) *stateExecutingManager {
+	return &stateExecutingManager{
+		ctx:                 ctx,
+		provider:            provider,
+		pendingStateIdCount: pendingStateIdCount,
+		stateIdCountMap:     stateIdCountMap,
+		totalPendingCount:   totalPendingCount,
+	}
+}
+
+func (e *stateExecutingManager) getCarryOverData() (stateIdCountMap map[string]int, pendingStateIdCount map[string]int, totalPendingCount int) {
+	return e.stateIdCountMap, e.pendingStateIdCount, e.totalPendingCount
 }
 
 func (e *stateExecutingManager) createNextExecutionId(stateId string) string {
