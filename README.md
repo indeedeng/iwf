@@ -57,7 +57,7 @@ Related projects:
 - [Posts & Articles](#posts--articles)
 
 # Community & Help
-* [Slack Channels](https://iworkflow-slack.work/)
+* [Slack Channels](https://join.slack.com/t/iwfglobal/shared_invite/zt-1mgi9q6gw-aog6KBuTHFu1KolBerBaLA)
 * [Github Discussion](https://github.com/indeedeng/iwf/discussions)
 * [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
 * [Github Issues](https://github.com/indeedeng/iwf/issues)
@@ -286,7 +286,7 @@ Some notes:
 
 ## ContinueAsNew
 
-There is on ContinueAsNew API exposed to user workflow!
+There is NO ContinueAsNew API exposed to user workflow!
 ContinueAsNew of Cadence/Temporal is a purely leaked technical details. It's due to the replay model conflicting with the underlying storage limit/performance.
 As iWF is built on Cadence/Temporal, it will be implemented in a way that is transparent to user workflows. 
 
