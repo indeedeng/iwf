@@ -54,6 +54,7 @@ Related projects:
 - [Development Plan](#development-plan)
 - [Some history](#some-history)
 - [Contribution](CONTRIBUTING.md)
+- [Posts & Articles](#posts--articles)
 
 # Community & Help
 * [Slack Channels](https://iworkflow-slack.work/)
@@ -75,6 +76,8 @@ the application workflow workers. Internally, the two APIs are executed by Caden
 
 ![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
 
+* See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for more details. 
+ 
 ## Basic Concepts
 
 ### Workflow and WorkflowState definition
@@ -165,8 +168,7 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 # Why iWF
 
 ## If you are familiar with Cadence/Temporal
-* See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for what problems it is solving
-* See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for how it works  
+* See [Slide deck](https://docs.google.com/presentation/d/1CpsroSf6NeVce_XyUhFTkd9bLHN8UHRtM9NavPCMhj8/edit#slide=id.gfe2f455492_0_56) for comparison with Cadence/Temporal.
 
 ## If you are not
 * Check out this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) to understand some history
@@ -283,7 +285,6 @@ Some notes:
 3) To get multiple state results from a workflow execution, use the special API `getComplexWorkflowResult` of client API.
 
 ## ContinueAsNew
-_This feature is WIP._
 
 There is on ContinueAsNew API exposed to user workflow!
 ContinueAsNew of Cadence/Temporal is a purely leaked technical details. It's due to the replay model conflicting with the underlying storage limit/performance.
@@ -293,6 +294,15 @@ Internally the interpreter workflow can continueAsNew without letting iWF user w
  
 After exceeding the history threshold(defined by numOfStateExecutionCompleted) auto continueAsNew,
 AutoContinueAsNew will carry over the pending states, along with all the internal states like DataObjects, interStateChannels, searchAttributes.
+
+_This feature is WIP._ See [this issue](https://github.com/indeedeng/iwf/issues/107) for progress.
+
+For now, the recommended workaround is to do a manual "continueAsNew" by using "TerminateIfRunning" IdReusePolicy to start a new 
+workflow execution with the same workflowId. This is almost same as Cadence/Temporal's ContinueAsNew API(an atomic operation), except for some minor difference:
+* It won't carry over Search Attributes automatically. You have to carry over them using initial search attributes by WorkflowOptions
+* The old execution will be terminated, rather than in "ContinuedAsNew" status
+
+Same as using Cadence/Temporal's ContinueAsNew API, user must ensure all the signals are drained otherwise signals could be lost.
 
 ## Non-workflow code
 Check [Client APIs](#client-apis) for all the APIs that are equivalent to Cadence/Temporal client APIs.
@@ -389,3 +399,9 @@ and provide clean and simple API to use.
 Read this [doc](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE) for more.
 
 <img width="916" alt="history diagram" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
+
+# Posts & Articles  
+* [A Letter to Cadence/Temporal, and Workflow Tech Community](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
+* [iWF vs Cadence/Temporal](https://medium.com/@qlong/iwf-vs-cadence-temporal-1e11b35960fe)
+* [iWF vs other general purposed workflow Engines](https://medium.com/@qlong/iwf-vs-other-general-purposed-workflow-engines-f8f3e3d8993d)
+* [Cadence® iWF](https://www.instaclustr.com/blog/cadence-iwf/?utm_content=1669999382&utm_medium=linkedin&utm_source=organicsocial)
