@@ -19,6 +19,17 @@ func RebuildInterStateChannel(refill map[string][]*iwfidl.EncodedObject) *InterS
 	}
 }
 
+func (i *InterStateChannel) ReadData(channelNames []string) map[string][]*iwfidl.EncodedObject {
+	if len(channelNames) == 0 {
+		return i.receivedData
+	}
+	data := make(map[string][]*iwfidl.EncodedObject)
+	for _, n := range channelNames {
+		data[n] = i.receivedData[n]
+	}
+	return data
+}
+
 func (i *InterStateChannel) HasData(channelName string) bool {
 	l := i.receivedData[channelName]
 	return len(l) > 0

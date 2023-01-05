@@ -13,7 +13,8 @@ const (
 	StateStartApi  = "/api/v1/workflowState/start"
 	StateDecideApi = "/api/v1/workflowState/decide"
 
-	GetDataObjectsWorkflowQueryType = "GetDataObjects"
+	GetDataObjectsWorkflowQueryType   = "GetDataObjects"
+	GetInterStateChannelDataQueryType = "GetInterStateChannelData"
 
 	WorkflowErrorTypeUserWorkflowDecision = "UserWorkflowDecision"
 	WorkflowErrorTypeUserWorkflowError    = "UserWorkflowError"

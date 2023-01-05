@@ -48,12 +48,15 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	if err != nil {
 		return nil, err
 	}
+	err = setQueryHandlersForContinueAsNew(ctx, provider, interStateChannel)
+	if err != nil {
+		return nil, err
+	}
 
-	var errToFailWf error // TODO Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
+	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
 	stateExecutionMgr := newStateExecutionManager(ctx, provider)
-	//inFlightExecutingStateCount := 0
 
 	for len(currentStates) > 0 {
 		// copy the whole slice(pointer)
