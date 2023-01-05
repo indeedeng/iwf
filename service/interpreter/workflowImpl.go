@@ -31,7 +31,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
 	}
 	interStateChannel := NewInterStateChannel()
-	currentStates := []iwfidl.StateMovement{
+	statesToExecuteQueue := []iwfidl.StateMovement{
 		{
 			StateId:      input.StartStateId,
 			StateOptions: &input.StateOptions,
@@ -58,15 +58,15 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 	stateExecutionMgr := newStateExecutionManager(ctx, provider)
 
-	for len(currentStates) > 0 {
+	for len(statesToExecuteQueue) > 0 {
 		// copy the whole slice(pointer)
-		statesToExecute := currentStates
-		err := stateExecutionMgr.markStatesPending(currentStates)
+		statesToExecute := statesToExecuteQueue
+		err := stateExecutionMgr.markStatesPending(statesToExecuteQueue)
 		if err != nil {
 			return nil, err
 		}
 		//reset to empty slice since each iteration will process all current states in the queue
-		currentStates = nil
+		statesToExecuteQueue = nil
 
 		for _, stateToExecute := range statesToExecute {
 			// execute in another thread for parallelism
@@ -80,16 +80,6 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						service.WorkflowErrorTypeUserInternalError,
 					)
 					return
-				}
-				manualDeferFn := func() {
-					// using defer will cause https://github.com/uber-go/cadence-client/issues/1198 in Cadence
-					// so we use manual defer here...
-					// NOTE: must execute this in every place when return...
-					// TODO be extremely careful in this piece of code, and remove this hack when the bug is fixed in Cadence client
-					err := stateExecutionMgr.markStateCompleted(state)
-					if err != nil {
-						errToFailWf = err
-					}
 				}
 
 				stateExeId := stateExecutionMgr.createNextExecutionId(state.GetStateId())
@@ -115,14 +105,26 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					)
 				}
 				if !shouldClose && decision.HasNextStates() {
-					currentStates = append(currentStates, decision.GetNextStates()...)
+					statesToExecuteQueue = append(statesToExecuteQueue, decision.GetNextStates()...)
 				}
-				manualDeferFn()
+
+				// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
+				err = stateExecutionMgr.markStateCompleted(state)
+				if err != nil {
+					errToFailWf = err
+				}
 			})
 		}
 
+		// The conditions here are quite tricky:
+		// For len(statesToExecuteQueue) > 0: First of all, we need some condition to wait here because all the stateToExecute are running in different thread.
+		//    Right after the stateToExecute are pop from queue, the len(...) becomes zero. So when the len(...) >0, it means there are new states to execute pushed into the queue,
+		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, using totalPendingCount == 0 will work, but not as efficient as this one --
+		//    it will wait for all current pending to complete will take much longer time
+		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
+		// For stateExecutionMgr.getTotalPendingStates() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
 		awaitError := provider.Await(ctx, func() bool {
-			return len(currentStates) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionMgr.getTotalPendingStates() == 0
+			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionMgr.getTotalPendingStates() == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
