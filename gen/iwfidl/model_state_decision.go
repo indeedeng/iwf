@@ -38,7 +38,7 @@ func NewStateDecisionWithDefaults() *StateDecision {
 
 // GetNextStates returns the NextStates field value if set, zero value otherwise.
 func (o *StateDecision) GetNextStates() []StateMovement {
-	if o == nil || o.NextStates == nil {
+	if o == nil || isNil(o.NextStates) {
 		var ret []StateMovement
 		return ret
 	}
@@ -48,15 +48,15 @@ func (o *StateDecision) GetNextStates() []StateMovement {
 // GetNextStatesOk returns a tuple with the NextStates field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateDecision) GetNextStatesOk() ([]StateMovement, bool) {
-	if o == nil || o.NextStates == nil {
-		return nil, false
+	if o == nil || isNil(o.NextStates) {
+    return nil, false
 	}
 	return o.NextStates, true
 }
 
 // HasNextStates returns a boolean if a field has been set.
 func (o *StateDecision) HasNextStates() bool {
-	if o != nil && o.NextStates != nil {
+	if o != nil && !isNil(o.NextStates) {
 		return true
 	}
 
@@ -70,7 +70,7 @@ func (o *StateDecision) SetNextStates(v []StateMovement) {
 
 func (o StateDecision) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.NextStates != nil {
+	if !isNil(o.NextStates) {
 		toSerialize["nextStates"] = o.NextStates
 	}
 	return json.Marshal(toSerialize)

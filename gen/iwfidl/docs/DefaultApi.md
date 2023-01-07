@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowStateDecidePost**](DefaultApi.md#ApiV1WorkflowStateDecidePost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
 [**ApiV1WorkflowStateStartPost**](DefaultApi.md#ApiV1WorkflowStateStartPost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
 [**ApiV1WorkflowStopPost**](DefaultApi.md#ApiV1WorkflowStopPost) | **Post** /api/v1/workflow/stop | stop a workflow
+[**ApiV1WorkflowTimerSkipPost**](DefaultApi.md#ApiV1WorkflowTimerSkipPost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
 
 
 
@@ -699,6 +700,68 @@ Other parameters are passed through a pointer to a apiApiV1WorkflowStopPostReque
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **workflowStopRequest** | [**WorkflowStopRequest**](WorkflowStopRequest.md) |  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowTimerSkipPost
+
+> ApiV1WorkflowTimerSkipPost(ctx).WorkflowSkipTimerRequest(workflowSkipTimerRequest).Execute()
+
+skip the timer of a workflow
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    workflowSkipTimerRequest := *openapiclient.NewWorkflowSkipTimerRequest("WorkflowId_example", "WorkflowStateExecutionId_example") // WorkflowSkipTimerRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background()).WorkflowSkipTimerRequest(workflowSkipTimerRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowTimerSkipPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowTimerSkipPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowSkipTimerRequest** | [**WorkflowSkipTimerRequest**](WorkflowSkipTimerRequest.md) |  | 
 
 ### Return type
 

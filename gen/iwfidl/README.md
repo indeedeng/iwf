@@ -61,7 +61,7 @@ Each operation can use different server URL defined using `OperationServers` map
 An operation is uniquely identified by `"{classname}Service.{nickname}"` string.
 Similar rules for overriding default operation server index and variables applies by using `sw.ContextOperationServerIndices` and `sw.ContextOperationServerVariables` context maps.
 
-```
+```golang
 ctx := context.WithValue(context.Background(), iwfidl.ContextOperationServerIndices, map[string]int{
 	"{classname}Service.{nickname}": 2,
 })
@@ -89,6 +89,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultApi.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
 *DefaultApi* | [**ApiV1WorkflowStateStartPost**](docs/DefaultApi.md#apiv1workflowstatestartpost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
 *DefaultApi* | [**ApiV1WorkflowStopPost**](docs/DefaultApi.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
+*DefaultApi* | [**ApiV1WorkflowTimerSkipPost**](docs/DefaultApi.md#apiv1workflowtimerskippost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
 
 
 ## Documentation For Models
@@ -96,6 +97,7 @@ Class | Method | HTTP request | Description
  - [ChannelRequestStatus](docs/ChannelRequestStatus.md)
  - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
  - [CommandCarryOverType](docs/CommandCarryOverType.md)
+ - [CommandCombination](docs/CommandCombination.md)
  - [CommandRequest](docs/CommandRequest.md)
  - [CommandResults](docs/CommandResults.md)
  - [Context](docs/Context.md)
@@ -134,6 +136,7 @@ Class | Method | HTTP request | Description
  - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
  - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
  - [WorkflowSignalRequest](docs/WorkflowSignalRequest.md)
+ - [WorkflowSkipTimerRequest](docs/WorkflowSkipTimerRequest.md)
  - [WorkflowStartOptions](docs/WorkflowStartOptions.md)
  - [WorkflowStartRequest](docs/WorkflowStartRequest.md)
  - [WorkflowStartResponse](docs/WorkflowStartResponse.md)

@@ -56,7 +56,7 @@ func (o *InterStateChannelResult) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -80,7 +80,7 @@ func (o *InterStateChannelResult) GetRequestStatus() ChannelRequestStatus {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetRequestStatusOk() (*ChannelRequestStatus, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.RequestStatus, true
 }
@@ -104,7 +104,7 @@ func (o *InterStateChannelResult) GetChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetChannelNameOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.ChannelName, true
 }
@@ -116,7 +116,7 @@ func (o *InterStateChannelResult) SetChannelName(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *InterStateChannelResult) GetValue() EncodedObject {
-	if o == nil || o.Value == nil {
+	if o == nil || isNil(o.Value) {
 		var ret EncodedObject
 		return ret
 	}
@@ -126,15 +126,15 @@ func (o *InterStateChannelResult) GetValue() EncodedObject {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetValueOk() (*EncodedObject, bool) {
-	if o == nil || o.Value == nil {
-		return nil, false
+	if o == nil || isNil(o.Value) {
+    return nil, false
 	}
 	return o.Value, true
 }
 
 // HasValue returns a boolean if a field has been set.
 func (o *InterStateChannelResult) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !isNil(o.Value) {
 		return true
 	}
 
@@ -157,7 +157,7 @@ func (o InterStateChannelResult) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["channelName"] = o.ChannelName
 	}
-	if o.Value != nil {
+	if !isNil(o.Value) {
 		toSerialize["value"] = o.Value
 	}
 	return json.Marshal(toSerialize)

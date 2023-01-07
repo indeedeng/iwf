@@ -39,7 +39,7 @@ func NewWorkflowSearchResponseWithDefaults() *WorkflowSearchResponse {
 
 // GetWorkflowExecutions returns the WorkflowExecutions field value if set, zero value otherwise.
 func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchResponseEntry {
-	if o == nil || o.WorkflowExecutions == nil {
+	if o == nil || isNil(o.WorkflowExecutions) {
 		var ret []WorkflowSearchResponseEntry
 		return ret
 	}
@@ -49,15 +49,15 @@ func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchRespons
 // GetWorkflowExecutionsOk returns a tuple with the WorkflowExecutions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponse) GetWorkflowExecutionsOk() ([]WorkflowSearchResponseEntry, bool) {
-	if o == nil || o.WorkflowExecutions == nil {
-		return nil, false
+	if o == nil || isNil(o.WorkflowExecutions) {
+    return nil, false
 	}
 	return o.WorkflowExecutions, true
 }
 
 // HasWorkflowExecutions returns a boolean if a field has been set.
 func (o *WorkflowSearchResponse) HasWorkflowExecutions() bool {
-	if o != nil && o.WorkflowExecutions != nil {
+	if o != nil && !isNil(o.WorkflowExecutions) {
 		return true
 	}
 
@@ -71,7 +71,7 @@ func (o *WorkflowSearchResponse) SetWorkflowExecutions(v []WorkflowSearchRespons
 
 // GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
 func (o *WorkflowSearchResponse) GetNextPageToken() string {
-	if o == nil || o.NextPageToken == nil {
+	if o == nil || isNil(o.NextPageToken) {
 		var ret string
 		return ret
 	}
@@ -81,15 +81,15 @@ func (o *WorkflowSearchResponse) GetNextPageToken() string {
 // GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponse) GetNextPageTokenOk() (*string, bool) {
-	if o == nil || o.NextPageToken == nil {
-		return nil, false
+	if o == nil || isNil(o.NextPageToken) {
+    return nil, false
 	}
 	return o.NextPageToken, true
 }
 
 // HasNextPageToken returns a boolean if a field has been set.
 func (o *WorkflowSearchResponse) HasNextPageToken() bool {
-	if o != nil && o.NextPageToken != nil {
+	if o != nil && !isNil(o.NextPageToken) {
 		return true
 	}
 
@@ -103,10 +103,10 @@ func (o *WorkflowSearchResponse) SetNextPageToken(v string) {
 
 func (o WorkflowSearchResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowExecutions != nil {
+	if !isNil(o.WorkflowExecutions) {
 		toSerialize["workflowExecutions"] = o.WorkflowExecutions
 	}
-	if o.NextPageToken != nil {
+	if !isNil(o.NextPageToken) {
 		toSerialize["nextPageToken"] = o.NextPageToken
 	}
 	return json.Marshal(toSerialize)

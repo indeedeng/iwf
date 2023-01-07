@@ -193,6 +193,24 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: reset a workflow
+  /api/v1/workflow/timer/skip:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSkipTimerRequest'
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: skip the timer of a workflow
   /api/v1/workflowState/start:
     post:
       requestBody:
@@ -904,6 +922,25 @@ components:
       - workflowStateId
       - workflowType
       type: object
+    WorkflowSkipTimerRequest:
+      example:
+        timerCommandIndex: 0
+        workflowStateExecutionId: workflowStateExecutionId
+        timerCommandId: timerCommandId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowStateExecutionId:
+          type: string
+        timerCommandId:
+          type: string
+        timerCommandIndex:
+          type: integer
+      required:
+      - workflowId
+      - workflowStateExecutionId
+      type: object
     WorkflowStateStartResponse:
       example:
         upsertSearchAttributes:
@@ -946,6 +983,13 @@ components:
           - firingUnixTimestampSeconds: 0
             commandId: commandId
           deciderTriggerType: null
+          commandCombinations:
+          - commandIds:
+            - commandIds
+            - commandIds
+          - commandIds:
+            - commandIds
+            - commandIds
           interStateChannelCommands:
           - channelName: channelName
             commandId: commandId
@@ -1373,6 +1417,13 @@ components:
         - firingUnixTimestampSeconds: 0
           commandId: commandId
         deciderTriggerType: null
+        commandCombinations:
+        - commandIds:
+          - commandIds
+          - commandIds
+        - commandIds:
+          - commandIds
+          - commandIds
         interStateChannelCommands:
         - channelName: channelName
           commandId: commandId
@@ -1393,6 +1444,10 @@ components:
           items:
             $ref: '#/components/schemas/InterStateChannelCommand'
           type: array
+        commandCombinations:
+          items:
+            $ref: '#/components/schemas/CommandCombination'
+          type: array
       required:
       - deciderTriggerType
       type: object
@@ -1400,7 +1455,19 @@ components:
       enum:
       - ALL_COMMAND_COMPLETED
       - ANY_COMMAND_COMPLETED
+      - ANY_COMMAND_COMBINATION_COMPLETED
       type: string
+    CommandCombination:
+      example:
+        commandIds:
+        - commandIds
+        - commandIds
+      properties:
+        commandIds:
+          items:
+            type: string
+          type: array
+      type: object
     CommandResults:
       example:
         signalResults:

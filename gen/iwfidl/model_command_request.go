@@ -20,6 +20,7 @@ type CommandRequest struct {
 	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
 	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
 	InterStateChannelCommands []InterStateChannelCommand `json:"interStateChannelCommands,omitempty"`
+	CommandCombinations []CommandCombination `json:"commandCombinations,omitempty"`
 }
 
 // NewCommandRequest instantiates a new CommandRequest object
@@ -54,7 +55,7 @@ func (o *CommandRequest) GetDeciderTriggerType() DeciderTriggerType {
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetDeciderTriggerTypeOk() (*DeciderTriggerType, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.DeciderTriggerType, true
 }
@@ -66,7 +67,7 @@ func (o *CommandRequest) SetDeciderTriggerType(v DeciderTriggerType) {
 
 // GetTimerCommands returns the TimerCommands field value if set, zero value otherwise.
 func (o *CommandRequest) GetTimerCommands() []TimerCommand {
-	if o == nil || o.TimerCommands == nil {
+	if o == nil || isNil(o.TimerCommands) {
 		var ret []TimerCommand
 		return ret
 	}
@@ -76,15 +77,15 @@ func (o *CommandRequest) GetTimerCommands() []TimerCommand {
 // GetTimerCommandsOk returns a tuple with the TimerCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetTimerCommandsOk() ([]TimerCommand, bool) {
-	if o == nil || o.TimerCommands == nil {
-		return nil, false
+	if o == nil || isNil(o.TimerCommands) {
+    return nil, false
 	}
 	return o.TimerCommands, true
 }
 
 // HasTimerCommands returns a boolean if a field has been set.
 func (o *CommandRequest) HasTimerCommands() bool {
-	if o != nil && o.TimerCommands != nil {
+	if o != nil && !isNil(o.TimerCommands) {
 		return true
 	}
 
@@ -98,7 +99,7 @@ func (o *CommandRequest) SetTimerCommands(v []TimerCommand) {
 
 // GetSignalCommands returns the SignalCommands field value if set, zero value otherwise.
 func (o *CommandRequest) GetSignalCommands() []SignalCommand {
-	if o == nil || o.SignalCommands == nil {
+	if o == nil || isNil(o.SignalCommands) {
 		var ret []SignalCommand
 		return ret
 	}
@@ -108,15 +109,15 @@ func (o *CommandRequest) GetSignalCommands() []SignalCommand {
 // GetSignalCommandsOk returns a tuple with the SignalCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetSignalCommandsOk() ([]SignalCommand, bool) {
-	if o == nil || o.SignalCommands == nil {
-		return nil, false
+	if o == nil || isNil(o.SignalCommands) {
+    return nil, false
 	}
 	return o.SignalCommands, true
 }
 
 // HasSignalCommands returns a boolean if a field has been set.
 func (o *CommandRequest) HasSignalCommands() bool {
-	if o != nil && o.SignalCommands != nil {
+	if o != nil && !isNil(o.SignalCommands) {
 		return true
 	}
 
@@ -130,7 +131,7 @@ func (o *CommandRequest) SetSignalCommands(v []SignalCommand) {
 
 // GetInterStateChannelCommands returns the InterStateChannelCommands field value if set, zero value otherwise.
 func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelCommand {
-	if o == nil || o.InterStateChannelCommands == nil {
+	if o == nil || isNil(o.InterStateChannelCommands) {
 		var ret []InterStateChannelCommand
 		return ret
 	}
@@ -140,15 +141,15 @@ func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelComma
 // GetInterStateChannelCommandsOk returns a tuple with the InterStateChannelCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetInterStateChannelCommandsOk() ([]InterStateChannelCommand, bool) {
-	if o == nil || o.InterStateChannelCommands == nil {
-		return nil, false
+	if o == nil || isNil(o.InterStateChannelCommands) {
+    return nil, false
 	}
 	return o.InterStateChannelCommands, true
 }
 
 // HasInterStateChannelCommands returns a boolean if a field has been set.
 func (o *CommandRequest) HasInterStateChannelCommands() bool {
-	if o != nil && o.InterStateChannelCommands != nil {
+	if o != nil && !isNil(o.InterStateChannelCommands) {
 		return true
 	}
 
@@ -160,19 +161,54 @@ func (o *CommandRequest) SetInterStateChannelCommands(v []InterStateChannelComma
 	o.InterStateChannelCommands = v
 }
 
+// GetCommandCombinations returns the CommandCombinations field value if set, zero value otherwise.
+func (o *CommandRequest) GetCommandCombinations() []CommandCombination {
+	if o == nil || isNil(o.CommandCombinations) {
+		var ret []CommandCombination
+		return ret
+	}
+	return o.CommandCombinations
+}
+
+// GetCommandCombinationsOk returns a tuple with the CommandCombinations field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandRequest) GetCommandCombinationsOk() ([]CommandCombination, bool) {
+	if o == nil || isNil(o.CommandCombinations) {
+    return nil, false
+	}
+	return o.CommandCombinations, true
+}
+
+// HasCommandCombinations returns a boolean if a field has been set.
+func (o *CommandRequest) HasCommandCombinations() bool {
+	if o != nil && !isNil(o.CommandCombinations) {
+		return true
+	}
+
+	return false
+}
+
+// SetCommandCombinations gets a reference to the given []CommandCombination and assigns it to the CommandCombinations field.
+func (o *CommandRequest) SetCommandCombinations(v []CommandCombination) {
+	o.CommandCombinations = v
+}
+
 func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["deciderTriggerType"] = o.DeciderTriggerType
 	}
-	if o.TimerCommands != nil {
+	if !isNil(o.TimerCommands) {
 		toSerialize["timerCommands"] = o.TimerCommands
 	}
-	if o.SignalCommands != nil {
+	if !isNil(o.SignalCommands) {
 		toSerialize["signalCommands"] = o.SignalCommands
 	}
-	if o.InterStateChannelCommands != nil {
+	if !isNil(o.InterStateChannelCommands) {
 		toSerialize["interStateChannelCommands"] = o.InterStateChannelCommands
+	}
+	if !isNil(o.CommandCombinations) {
+		toSerialize["commandCombinations"] = o.CommandCombinations
 	}
 	return json.Marshal(toSerialize)
 }

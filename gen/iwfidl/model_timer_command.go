@@ -53,7 +53,7 @@ func (o *TimerCommand) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *TimerCommand) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -77,7 +77,7 @@ func (o *TimerCommand) GetFiringUnixTimestampSeconds() int64 {
 // and a boolean to check if the value has been set.
 func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int64, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.FiringUnixTimestampSeconds, true
 }

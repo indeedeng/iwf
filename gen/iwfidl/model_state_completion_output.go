@@ -54,7 +54,7 @@ func (o *StateCompletionOutput) GetCompletedStateId() string {
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.CompletedStateId, true
 }
@@ -78,7 +78,7 @@ func (o *StateCompletionOutput) GetCompletedStateExecutionId() string {
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateExecutionIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.CompletedStateExecutionId, true
 }
@@ -90,7 +90,7 @@ func (o *StateCompletionOutput) SetCompletedStateExecutionId(v string) {
 
 // GetCompletedStateOutput returns the CompletedStateOutput field value if set, zero value otherwise.
 func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
-	if o == nil || o.CompletedStateOutput == nil {
+	if o == nil || isNil(o.CompletedStateOutput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -100,15 +100,15 @@ func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
 // GetCompletedStateOutputOk returns a tuple with the CompletedStateOutput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, bool) {
-	if o == nil || o.CompletedStateOutput == nil {
-		return nil, false
+	if o == nil || isNil(o.CompletedStateOutput) {
+    return nil, false
 	}
 	return o.CompletedStateOutput, true
 }
 
 // HasCompletedStateOutput returns a boolean if a field has been set.
 func (o *StateCompletionOutput) HasCompletedStateOutput() bool {
-	if o != nil && o.CompletedStateOutput != nil {
+	if o != nil && !isNil(o.CompletedStateOutput) {
 		return true
 	}
 
@@ -128,7 +128,7 @@ func (o StateCompletionOutput) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["completedStateExecutionId"] = o.CompletedStateExecutionId
 	}
-	if o.CompletedStateOutput != nil {
+	if !isNil(o.CompletedStateOutput) {
 		toSerialize["completedStateOutput"] = o.CompletedStateOutput
 	}
 	return json.Marshal(toSerialize)

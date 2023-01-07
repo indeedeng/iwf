@@ -39,7 +39,7 @@ func NewSearchAttributeKeyAndTypeWithDefaults() *SearchAttributeKeyAndType {
 
 // GetKey returns the Key field value if set, zero value otherwise.
 func (o *SearchAttributeKeyAndType) GetKey() string {
-	if o == nil || o.Key == nil {
+	if o == nil || isNil(o.Key) {
 		var ret string
 		return ret
 	}
@@ -49,15 +49,15 @@ func (o *SearchAttributeKeyAndType) GetKey() string {
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttributeKeyAndType) GetKeyOk() (*string, bool) {
-	if o == nil || o.Key == nil {
-		return nil, false
+	if o == nil || isNil(o.Key) {
+    return nil, false
 	}
 	return o.Key, true
 }
 
 // HasKey returns a boolean if a field has been set.
 func (o *SearchAttributeKeyAndType) HasKey() bool {
-	if o != nil && o.Key != nil {
+	if o != nil && !isNil(o.Key) {
 		return true
 	}
 
@@ -71,7 +71,7 @@ func (o *SearchAttributeKeyAndType) SetKey(v string) {
 
 // GetValueType returns the ValueType field value if set, zero value otherwise.
 func (o *SearchAttributeKeyAndType) GetValueType() SearchAttributeValueType {
-	if o == nil || o.ValueType == nil {
+	if o == nil || isNil(o.ValueType) {
 		var ret SearchAttributeValueType
 		return ret
 	}
@@ -81,15 +81,15 @@ func (o *SearchAttributeKeyAndType) GetValueType() SearchAttributeValueType {
 // GetValueTypeOk returns a tuple with the ValueType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttributeKeyAndType) GetValueTypeOk() (*SearchAttributeValueType, bool) {
-	if o == nil || o.ValueType == nil {
-		return nil, false
+	if o == nil || isNil(o.ValueType) {
+    return nil, false
 	}
 	return o.ValueType, true
 }
 
 // HasValueType returns a boolean if a field has been set.
 func (o *SearchAttributeKeyAndType) HasValueType() bool {
-	if o != nil && o.ValueType != nil {
+	if o != nil && !isNil(o.ValueType) {
 		return true
 	}
 
@@ -103,10 +103,10 @@ func (o *SearchAttributeKeyAndType) SetValueType(v SearchAttributeValueType) {
 
 func (o SearchAttributeKeyAndType) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Key != nil {
+	if !isNil(o.Key) {
 		toSerialize["key"] = o.Key
 	}
-	if o.ValueType != nil {
+	if !isNil(o.ValueType) {
 		toSerialize["valueType"] = o.ValueType
 	}
 	return json.Marshal(toSerialize)

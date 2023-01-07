@@ -44,7 +44,7 @@ func NewWorkflowStateOptionsWithDefaults() *WorkflowStateOptions {
 
 // GetSearchAttributesLoadingPolicy returns the SearchAttributesLoadingPolicy field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() PersistenceLoadingPolicy {
-	if o == nil || o.SearchAttributesLoadingPolicy == nil {
+	if o == nil || isNil(o.SearchAttributesLoadingPolicy) {
 		var ret PersistenceLoadingPolicy
 		return ret
 	}
@@ -54,15 +54,15 @@ func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() PersistenceLoa
 // GetSearchAttributesLoadingPolicyOk returns a tuple with the SearchAttributesLoadingPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
-	if o == nil || o.SearchAttributesLoadingPolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.SearchAttributesLoadingPolicy) {
+    return nil, false
 	}
 	return o.SearchAttributesLoadingPolicy, true
 }
 
 // HasSearchAttributesLoadingPolicy returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasSearchAttributesLoadingPolicy() bool {
-	if o != nil && o.SearchAttributesLoadingPolicy != nil {
+	if o != nil && !isNil(o.SearchAttributesLoadingPolicy) {
 		return true
 	}
 
@@ -76,7 +76,7 @@ func (o *WorkflowStateOptions) SetSearchAttributesLoadingPolicy(v PersistenceLoa
 
 // GetDataObjectsLoadingPolicy returns the DataObjectsLoadingPolicy field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicy() PersistenceLoadingPolicy {
-	if o == nil || o.DataObjectsLoadingPolicy == nil {
+	if o == nil || isNil(o.DataObjectsLoadingPolicy) {
 		var ret PersistenceLoadingPolicy
 		return ret
 	}
@@ -86,15 +86,15 @@ func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicy() PersistenceLoadingP
 // GetDataObjectsLoadingPolicyOk returns a tuple with the DataObjectsLoadingPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
-	if o == nil || o.DataObjectsLoadingPolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.DataObjectsLoadingPolicy) {
+    return nil, false
 	}
 	return o.DataObjectsLoadingPolicy, true
 }
 
 // HasDataObjectsLoadingPolicy returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool {
-	if o != nil && o.DataObjectsLoadingPolicy != nil {
+	if o != nil && !isNil(o.DataObjectsLoadingPolicy) {
 		return true
 	}
 
@@ -108,7 +108,7 @@ func (o *WorkflowStateOptions) SetDataObjectsLoadingPolicy(v PersistenceLoadingP
 
 // GetCommandCarryOverPolicy returns the CommandCarryOverPolicy field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetCommandCarryOverPolicy() CommandCarryOverPolicy {
-	if o == nil || o.CommandCarryOverPolicy == nil {
+	if o == nil || isNil(o.CommandCarryOverPolicy) {
 		var ret CommandCarryOverPolicy
 		return ret
 	}
@@ -118,15 +118,15 @@ func (o *WorkflowStateOptions) GetCommandCarryOverPolicy() CommandCarryOverPolic
 // GetCommandCarryOverPolicyOk returns a tuple with the CommandCarryOverPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetCommandCarryOverPolicyOk() (*CommandCarryOverPolicy, bool) {
-	if o == nil || o.CommandCarryOverPolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.CommandCarryOverPolicy) {
+    return nil, false
 	}
 	return o.CommandCarryOverPolicy, true
 }
 
 // HasCommandCarryOverPolicy returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasCommandCarryOverPolicy() bool {
-	if o != nil && o.CommandCarryOverPolicy != nil {
+	if o != nil && !isNil(o.CommandCarryOverPolicy) {
 		return true
 	}
 
@@ -140,7 +140,7 @@ func (o *WorkflowStateOptions) SetCommandCarryOverPolicy(v CommandCarryOverPolic
 
 // GetStartApiTimeoutSeconds returns the StartApiTimeoutSeconds field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetStartApiTimeoutSeconds() int32 {
-	if o == nil || o.StartApiTimeoutSeconds == nil {
+	if o == nil || isNil(o.StartApiTimeoutSeconds) {
 		var ret int32
 		return ret
 	}
@@ -150,15 +150,15 @@ func (o *WorkflowStateOptions) GetStartApiTimeoutSeconds() int32 {
 // GetStartApiTimeoutSecondsOk returns a tuple with the StartApiTimeoutSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetStartApiTimeoutSecondsOk() (*int32, bool) {
-	if o == nil || o.StartApiTimeoutSeconds == nil {
-		return nil, false
+	if o == nil || isNil(o.StartApiTimeoutSeconds) {
+    return nil, false
 	}
 	return o.StartApiTimeoutSeconds, true
 }
 
 // HasStartApiTimeoutSeconds returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasStartApiTimeoutSeconds() bool {
-	if o != nil && o.StartApiTimeoutSeconds != nil {
+	if o != nil && !isNil(o.StartApiTimeoutSeconds) {
 		return true
 	}
 
@@ -172,7 +172,7 @@ func (o *WorkflowStateOptions) SetStartApiTimeoutSeconds(v int32) {
 
 // GetDecideApiTimeoutSeconds returns the DecideApiTimeoutSeconds field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetDecideApiTimeoutSeconds() int32 {
-	if o == nil || o.DecideApiTimeoutSeconds == nil {
+	if o == nil || isNil(o.DecideApiTimeoutSeconds) {
 		var ret int32
 		return ret
 	}
@@ -182,15 +182,15 @@ func (o *WorkflowStateOptions) GetDecideApiTimeoutSeconds() int32 {
 // GetDecideApiTimeoutSecondsOk returns a tuple with the DecideApiTimeoutSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetDecideApiTimeoutSecondsOk() (*int32, bool) {
-	if o == nil || o.DecideApiTimeoutSeconds == nil {
-		return nil, false
+	if o == nil || isNil(o.DecideApiTimeoutSeconds) {
+    return nil, false
 	}
 	return o.DecideApiTimeoutSeconds, true
 }
 
 // HasDecideApiTimeoutSeconds returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasDecideApiTimeoutSeconds() bool {
-	if o != nil && o.DecideApiTimeoutSeconds != nil {
+	if o != nil && !isNil(o.DecideApiTimeoutSeconds) {
 		return true
 	}
 
@@ -204,7 +204,7 @@ func (o *WorkflowStateOptions) SetDecideApiTimeoutSeconds(v int32) {
 
 // GetStartApiRetryPolicy returns the StartApiRetryPolicy field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetStartApiRetryPolicy() RetryPolicy {
-	if o == nil || o.StartApiRetryPolicy == nil {
+	if o == nil || isNil(o.StartApiRetryPolicy) {
 		var ret RetryPolicy
 		return ret
 	}
@@ -214,15 +214,15 @@ func (o *WorkflowStateOptions) GetStartApiRetryPolicy() RetryPolicy {
 // GetStartApiRetryPolicyOk returns a tuple with the StartApiRetryPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetStartApiRetryPolicyOk() (*RetryPolicy, bool) {
-	if o == nil || o.StartApiRetryPolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.StartApiRetryPolicy) {
+    return nil, false
 	}
 	return o.StartApiRetryPolicy, true
 }
 
 // HasStartApiRetryPolicy returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasStartApiRetryPolicy() bool {
-	if o != nil && o.StartApiRetryPolicy != nil {
+	if o != nil && !isNil(o.StartApiRetryPolicy) {
 		return true
 	}
 
@@ -236,7 +236,7 @@ func (o *WorkflowStateOptions) SetStartApiRetryPolicy(v RetryPolicy) {
 
 // GetDecideApiRetryPolicy returns the DecideApiRetryPolicy field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetDecideApiRetryPolicy() RetryPolicy {
-	if o == nil || o.DecideApiRetryPolicy == nil {
+	if o == nil || isNil(o.DecideApiRetryPolicy) {
 		var ret RetryPolicy
 		return ret
 	}
@@ -246,15 +246,15 @@ func (o *WorkflowStateOptions) GetDecideApiRetryPolicy() RetryPolicy {
 // GetDecideApiRetryPolicyOk returns a tuple with the DecideApiRetryPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetDecideApiRetryPolicyOk() (*RetryPolicy, bool) {
-	if o == nil || o.DecideApiRetryPolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.DecideApiRetryPolicy) {
+    return nil, false
 	}
 	return o.DecideApiRetryPolicy, true
 }
 
 // HasDecideApiRetryPolicy returns a boolean if a field has been set.
 func (o *WorkflowStateOptions) HasDecideApiRetryPolicy() bool {
-	if o != nil && o.DecideApiRetryPolicy != nil {
+	if o != nil && !isNil(o.DecideApiRetryPolicy) {
 		return true
 	}
 
@@ -268,25 +268,25 @@ func (o *WorkflowStateOptions) SetDecideApiRetryPolicy(v RetryPolicy) {
 
 func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.SearchAttributesLoadingPolicy != nil {
+	if !isNil(o.SearchAttributesLoadingPolicy) {
 		toSerialize["searchAttributesLoadingPolicy"] = o.SearchAttributesLoadingPolicy
 	}
-	if o.DataObjectsLoadingPolicy != nil {
+	if !isNil(o.DataObjectsLoadingPolicy) {
 		toSerialize["dataObjectsLoadingPolicy"] = o.DataObjectsLoadingPolicy
 	}
-	if o.CommandCarryOverPolicy != nil {
+	if !isNil(o.CommandCarryOverPolicy) {
 		toSerialize["commandCarryOverPolicy"] = o.CommandCarryOverPolicy
 	}
-	if o.StartApiTimeoutSeconds != nil {
+	if !isNil(o.StartApiTimeoutSeconds) {
 		toSerialize["startApiTimeoutSeconds"] = o.StartApiTimeoutSeconds
 	}
-	if o.DecideApiTimeoutSeconds != nil {
+	if !isNil(o.DecideApiTimeoutSeconds) {
 		toSerialize["decideApiTimeoutSeconds"] = o.DecideApiTimeoutSeconds
 	}
-	if o.StartApiRetryPolicy != nil {
+	if !isNil(o.StartApiRetryPolicy) {
 		toSerialize["startApiRetryPolicy"] = o.StartApiRetryPolicy
 	}
-	if o.DecideApiRetryPolicy != nil {
+	if !isNil(o.DecideApiRetryPolicy) {
 		toSerialize["decideApiRetryPolicy"] = o.DecideApiRetryPolicy
 	}
 	return json.Marshal(toSerialize)

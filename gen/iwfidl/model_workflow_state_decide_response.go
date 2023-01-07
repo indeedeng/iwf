@@ -43,7 +43,7 @@ func NewWorkflowStateDecideResponseWithDefaults() *WorkflowStateDecideResponse {
 
 // GetStateDecision returns the StateDecision field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetStateDecision() StateDecision {
-	if o == nil || o.StateDecision == nil {
+	if o == nil || isNil(o.StateDecision) {
 		var ret StateDecision
 		return ret
 	}
@@ -53,15 +53,15 @@ func (o *WorkflowStateDecideResponse) GetStateDecision() StateDecision {
 // GetStateDecisionOk returns a tuple with the StateDecision field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideResponse) GetStateDecisionOk() (*StateDecision, bool) {
-	if o == nil || o.StateDecision == nil {
-		return nil, false
+	if o == nil || isNil(o.StateDecision) {
+    return nil, false
 	}
 	return o.StateDecision, true
 }
 
 // HasStateDecision returns a boolean if a field has been set.
 func (o *WorkflowStateDecideResponse) HasStateDecision() bool {
-	if o != nil && o.StateDecision != nil {
+	if o != nil && !isNil(o.StateDecision) {
 		return true
 	}
 
@@ -75,7 +75,7 @@ func (o *WorkflowStateDecideResponse) SetStateDecision(v StateDecision) {
 
 // GetUpsertSearchAttributes returns the UpsertSearchAttributes field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetUpsertSearchAttributes() []SearchAttribute {
-	if o == nil || o.UpsertSearchAttributes == nil {
+	if o == nil || isNil(o.UpsertSearchAttributes) {
 		var ret []SearchAttribute
 		return ret
 	}
@@ -85,15 +85,15 @@ func (o *WorkflowStateDecideResponse) GetUpsertSearchAttributes() []SearchAttrib
 // GetUpsertSearchAttributesOk returns a tuple with the UpsertSearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideResponse) GetUpsertSearchAttributesOk() ([]SearchAttribute, bool) {
-	if o == nil || o.UpsertSearchAttributes == nil {
-		return nil, false
+	if o == nil || isNil(o.UpsertSearchAttributes) {
+    return nil, false
 	}
 	return o.UpsertSearchAttributes, true
 }
 
 // HasUpsertSearchAttributes returns a boolean if a field has been set.
 func (o *WorkflowStateDecideResponse) HasUpsertSearchAttributes() bool {
-	if o != nil && o.UpsertSearchAttributes != nil {
+	if o != nil && !isNil(o.UpsertSearchAttributes) {
 		return true
 	}
 
@@ -107,7 +107,7 @@ func (o *WorkflowStateDecideResponse) SetUpsertSearchAttributes(v []SearchAttrib
 
 // GetUpsertDataObjects returns the UpsertDataObjects field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetUpsertDataObjects() []KeyValue {
-	if o == nil || o.UpsertDataObjects == nil {
+	if o == nil || isNil(o.UpsertDataObjects) {
 		var ret []KeyValue
 		return ret
 	}
@@ -117,15 +117,15 @@ func (o *WorkflowStateDecideResponse) GetUpsertDataObjects() []KeyValue {
 // GetUpsertDataObjectsOk returns a tuple with the UpsertDataObjects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideResponse) GetUpsertDataObjectsOk() ([]KeyValue, bool) {
-	if o == nil || o.UpsertDataObjects == nil {
-		return nil, false
+	if o == nil || isNil(o.UpsertDataObjects) {
+    return nil, false
 	}
 	return o.UpsertDataObjects, true
 }
 
 // HasUpsertDataObjects returns a boolean if a field has been set.
 func (o *WorkflowStateDecideResponse) HasUpsertDataObjects() bool {
-	if o != nil && o.UpsertDataObjects != nil {
+	if o != nil && !isNil(o.UpsertDataObjects) {
 		return true
 	}
 
@@ -139,7 +139,7 @@ func (o *WorkflowStateDecideResponse) SetUpsertDataObjects(v []KeyValue) {
 
 // GetRecordEvents returns the RecordEvents field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetRecordEvents() []KeyValue {
-	if o == nil || o.RecordEvents == nil {
+	if o == nil || isNil(o.RecordEvents) {
 		var ret []KeyValue
 		return ret
 	}
@@ -149,15 +149,15 @@ func (o *WorkflowStateDecideResponse) GetRecordEvents() []KeyValue {
 // GetRecordEventsOk returns a tuple with the RecordEvents field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideResponse) GetRecordEventsOk() ([]KeyValue, bool) {
-	if o == nil || o.RecordEvents == nil {
-		return nil, false
+	if o == nil || isNil(o.RecordEvents) {
+    return nil, false
 	}
 	return o.RecordEvents, true
 }
 
 // HasRecordEvents returns a boolean if a field has been set.
 func (o *WorkflowStateDecideResponse) HasRecordEvents() bool {
-	if o != nil && o.RecordEvents != nil {
+	if o != nil && !isNil(o.RecordEvents) {
 		return true
 	}
 
@@ -171,7 +171,7 @@ func (o *WorkflowStateDecideResponse) SetRecordEvents(v []KeyValue) {
 
 // GetUpsertStateLocals returns the UpsertStateLocals field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetUpsertStateLocals() []KeyValue {
-	if o == nil || o.UpsertStateLocals == nil {
+	if o == nil || isNil(o.UpsertStateLocals) {
 		var ret []KeyValue
 		return ret
 	}
@@ -181,15 +181,15 @@ func (o *WorkflowStateDecideResponse) GetUpsertStateLocals() []KeyValue {
 // GetUpsertStateLocalsOk returns a tuple with the UpsertStateLocals field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideResponse) GetUpsertStateLocalsOk() ([]KeyValue, bool) {
-	if o == nil || o.UpsertStateLocals == nil {
-		return nil, false
+	if o == nil || isNil(o.UpsertStateLocals) {
+    return nil, false
 	}
 	return o.UpsertStateLocals, true
 }
 
 // HasUpsertStateLocals returns a boolean if a field has been set.
 func (o *WorkflowStateDecideResponse) HasUpsertStateLocals() bool {
-	if o != nil && o.UpsertStateLocals != nil {
+	if o != nil && !isNil(o.UpsertStateLocals) {
 		return true
 	}
 
@@ -203,7 +203,7 @@ func (o *WorkflowStateDecideResponse) SetUpsertStateLocals(v []KeyValue) {
 
 // GetPublishToInterStateChannel returns the PublishToInterStateChannel field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetPublishToInterStateChannel() []InterStateChannelPublishing {
-	if o == nil || o.PublishToInterStateChannel == nil {
+	if o == nil || isNil(o.PublishToInterStateChannel) {
 		var ret []InterStateChannelPublishing
 		return ret
 	}
@@ -213,15 +213,15 @@ func (o *WorkflowStateDecideResponse) GetPublishToInterStateChannel() []InterSta
 // GetPublishToInterStateChannelOk returns a tuple with the PublishToInterStateChannel field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideResponse) GetPublishToInterStateChannelOk() ([]InterStateChannelPublishing, bool) {
-	if o == nil || o.PublishToInterStateChannel == nil {
-		return nil, false
+	if o == nil || isNil(o.PublishToInterStateChannel) {
+    return nil, false
 	}
 	return o.PublishToInterStateChannel, true
 }
 
 // HasPublishToInterStateChannel returns a boolean if a field has been set.
 func (o *WorkflowStateDecideResponse) HasPublishToInterStateChannel() bool {
-	if o != nil && o.PublishToInterStateChannel != nil {
+	if o != nil && !isNil(o.PublishToInterStateChannel) {
 		return true
 	}
 
@@ -235,22 +235,22 @@ func (o *WorkflowStateDecideResponse) SetPublishToInterStateChannel(v []InterSta
 
 func (o WorkflowStateDecideResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.StateDecision != nil {
+	if !isNil(o.StateDecision) {
 		toSerialize["stateDecision"] = o.StateDecision
 	}
-	if o.UpsertSearchAttributes != nil {
+	if !isNil(o.UpsertSearchAttributes) {
 		toSerialize["upsertSearchAttributes"] = o.UpsertSearchAttributes
 	}
-	if o.UpsertDataObjects != nil {
+	if !isNil(o.UpsertDataObjects) {
 		toSerialize["upsertDataObjects"] = o.UpsertDataObjects
 	}
-	if o.RecordEvents != nil {
+	if !isNil(o.RecordEvents) {
 		toSerialize["recordEvents"] = o.RecordEvents
 	}
-	if o.UpsertStateLocals != nil {
+	if !isNil(o.UpsertStateLocals) {
 		toSerialize["upsertStateLocals"] = o.UpsertStateLocals
 	}
-	if o.PublishToInterStateChannel != nil {
+	if !isNil(o.PublishToInterStateChannel) {
 		toSerialize["publishToInterStateChannel"] = o.PublishToInterStateChannel
 	}
 	return json.Marshal(toSerialize)

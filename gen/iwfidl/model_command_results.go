@@ -40,7 +40,7 @@ func NewCommandResultsWithDefaults() *CommandResults {
 
 // GetSignalResults returns the SignalResults field value if set, zero value otherwise.
 func (o *CommandResults) GetSignalResults() []SignalResult {
-	if o == nil || o.SignalResults == nil {
+	if o == nil || isNil(o.SignalResults) {
 		var ret []SignalResult
 		return ret
 	}
@@ -50,15 +50,15 @@ func (o *CommandResults) GetSignalResults() []SignalResult {
 // GetSignalResultsOk returns a tuple with the SignalResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetSignalResultsOk() ([]SignalResult, bool) {
-	if o == nil || o.SignalResults == nil {
-		return nil, false
+	if o == nil || isNil(o.SignalResults) {
+    return nil, false
 	}
 	return o.SignalResults, true
 }
 
 // HasSignalResults returns a boolean if a field has been set.
 func (o *CommandResults) HasSignalResults() bool {
-	if o != nil && o.SignalResults != nil {
+	if o != nil && !isNil(o.SignalResults) {
 		return true
 	}
 
@@ -72,7 +72,7 @@ func (o *CommandResults) SetSignalResults(v []SignalResult) {
 
 // GetInterStateChannelResults returns the InterStateChannelResults field value if set, zero value otherwise.
 func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult {
-	if o == nil || o.InterStateChannelResults == nil {
+	if o == nil || isNil(o.InterStateChannelResults) {
 		var ret []InterStateChannelResult
 		return ret
 	}
@@ -82,15 +82,15 @@ func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult
 // GetInterStateChannelResultsOk returns a tuple with the InterStateChannelResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetInterStateChannelResultsOk() ([]InterStateChannelResult, bool) {
-	if o == nil || o.InterStateChannelResults == nil {
-		return nil, false
+	if o == nil || isNil(o.InterStateChannelResults) {
+    return nil, false
 	}
 	return o.InterStateChannelResults, true
 }
 
 // HasInterStateChannelResults returns a boolean if a field has been set.
 func (o *CommandResults) HasInterStateChannelResults() bool {
-	if o != nil && o.InterStateChannelResults != nil {
+	if o != nil && !isNil(o.InterStateChannelResults) {
 		return true
 	}
 
@@ -104,7 +104,7 @@ func (o *CommandResults) SetInterStateChannelResults(v []InterStateChannelResult
 
 // GetTimerResults returns the TimerResults field value if set, zero value otherwise.
 func (o *CommandResults) GetTimerResults() []TimerResult {
-	if o == nil || o.TimerResults == nil {
+	if o == nil || isNil(o.TimerResults) {
 		var ret []TimerResult
 		return ret
 	}
@@ -114,15 +114,15 @@ func (o *CommandResults) GetTimerResults() []TimerResult {
 // GetTimerResultsOk returns a tuple with the TimerResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetTimerResultsOk() ([]TimerResult, bool) {
-	if o == nil || o.TimerResults == nil {
-		return nil, false
+	if o == nil || isNil(o.TimerResults) {
+    return nil, false
 	}
 	return o.TimerResults, true
 }
 
 // HasTimerResults returns a boolean if a field has been set.
 func (o *CommandResults) HasTimerResults() bool {
-	if o != nil && o.TimerResults != nil {
+	if o != nil && !isNil(o.TimerResults) {
 		return true
 	}
 
@@ -136,13 +136,13 @@ func (o *CommandResults) SetTimerResults(v []TimerResult) {
 
 func (o CommandResults) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.SignalResults != nil {
+	if !isNil(o.SignalResults) {
 		toSerialize["signalResults"] = o.SignalResults
 	}
-	if o.InterStateChannelResults != nil {
+	if !isNil(o.InterStateChannelResults) {
 		toSerialize["interStateChannelResults"] = o.InterStateChannelResults
 	}
-	if o.TimerResults != nil {
+	if !isNil(o.TimerResults) {
 		toSerialize["timerResults"] = o.TimerResults
 	}
 	return json.Marshal(toSerialize)
