@@ -97,7 +97,7 @@ A WorkflowDefinition contains several `WorkflowState` e.g.
 or [Golang WorkflowState interface](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow_state.go). 
 A WorkflowState is implemented with two APIs: `start` and `decide`. 
 * `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the 
-* requested `Commands` are completed, `decide` API will be triggered. 
+requested `Commands` are completed, `decide` API will be triggered. 
 * `decide` API will decide next states to execute. Next states can be zero, one or multiple, and can be re-executed as different `stateExecutions`. 
 
 ### Workflow execution and WorkflowState execution
