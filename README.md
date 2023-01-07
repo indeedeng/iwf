@@ -122,8 +122,7 @@ These are the three command types:
 Note that `start` API can return multiple commands, and choose different DeciderTriggerType for triggering decide API:
 * `AllCommandCompleted`: this will wait for all command completed
 * `AnyCommandCompleted`: this will wait for any command completed
-* `AnyCommandCombinationCompleted`: (WIP) this will wait for a list of command combinations(by commandIds) and triggers 
-when any combination is completed
+* `AnyCommandCombinationCompleted`: (WIP) this will wait for a list of command combinations on any combination completed
 
 ### Persistence
 iWF provides super simple persistence abstraction. Developers don't need to touch any database system to register/maintain the schemas. 
