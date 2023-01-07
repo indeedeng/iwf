@@ -328,8 +328,8 @@ Because WorkflowState are explicitly defined, resetting API is a lot more friend
 For unit testing, user code should be mocking all the dependencies in `WorkflowState` implementation, including the input/output of the 
 `start` and `decide` API. Users should be able to use any standard testing frameworks/libraries. 
 
-For integration test, iWF provides a SKip Timer API to fire any timer immediately. Although users can always implement this themselves,
-the API provides a standard way and save the effort of re-inventing the wheels.
+For integration test, iWF provides a SkipTimer API to fire any timer immediately. Although users can always implement this themselves,
+the API provides a standard way and saves the effort of re-inventing the wheels.
 
 ## Anything else
 Is that all? For now yes. We believe these are all you need to migrate to iWF from Cadence/Temporal.
@@ -401,7 +401,7 @@ When something goes wrong in your applications, here are the tips:
 - [ ] Decider trigger type: any command combination 
 
 ### Future
-- [ ] Auto continueAsNew(WIP)
+- [ ] Auto continueAsNew([WIP](https://github.com/indeedeng/iwf/issues/107))
 - [ ] WaitForMoreResults in StateDecision
 - [ ] LongRunningActivityCommand
 - [ ] More Decider trigger type
