@@ -39,6 +39,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		},
 	}
 	persistenceManager := NewPersistenceManager(provider)
+	timerProcessor := NewTimerProcessor(provider)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil
@@ -81,7 +82,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExecutionMgr.createNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel)
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, timerProcessor)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -190,6 +191,7 @@ func executeState(
 	stateExeId string,
 	persistenceManager *PersistenceManager,
 	interStateChannel *InterStateChannel,
+	timerProcessor *TimerProcessor,
 ) (*iwfidl.StateDecision, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
@@ -241,27 +243,17 @@ func executeState(
 
 	completedTimerCmds := map[int]bool{}
 	if len(commandReq.GetTimerCommands()) > 0 {
+		timerProcessor.StartProcessing(stateExeId, commandReq.GetTimerCommands())
 		for idx, cmd := range commandReq.GetTimerCommands() {
-			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
-			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
+			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
-				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.TimerCommand)
-				if !ok {
-					panic("critical code bug")
-				}
 				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
 					panic("critical code bug")
 				}
 
-				now := provider.Now(ctx).Unix()
-				fireAt := cmd.GetFiringUnixTimestampSeconds()
-				duration := time.Duration(fireAt-now) * time.Second
-				future := provider.NewTimer(ctx, duration)
-				_ = provider.Await(ctx, func() bool {
-					return future.IsReady() || commandReqDone
-				})
-				if future.IsReady() {
+				completed := timerProcessor.WaitForTimerCompleted(ctx, stateExeId, idx, &commandReqDone)
+				if completed {
 					completedTimerCmds[idx] = true
 				}
 			})
@@ -351,6 +343,8 @@ func executeState(
 	}
 	commandRes := &iwfidl.CommandResults{}
 	if len(commandReq.GetTimerCommands()) > 0 {
+		timerProcessor.FinishProcessing(stateExeId)
+
 		var timerResults []iwfidl.TimerResult
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			status := iwfidl.FIRED

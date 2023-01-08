@@ -1,28 +1,29 @@
 package interpreter
 
 import (
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"time"
 )
 
-type timerProcessor struct {
+type TimerProcessor struct {
 	stateExecutionCurrentTimerInfos map[string][]*service.TimerInfo
 	provider                        WorkflowProvider
 	logger                          UnifiedLogger
 }
 
-func NewTimerProcessor(provider WorkflowProvider) *timerProcessor {
-	return &timerProcessor{
+func NewTimerProcessor(provider WorkflowProvider) *TimerProcessor {
+	return &TimerProcessor{
 		provider:                        provider,
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
 	}
 }
 
-func (t *timerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
+func (t *TimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
 	return t.stateExecutionCurrentTimerInfos
 }
 
-func (t *timerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
+func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
 	timer, valid := service.ValidateTimerSkipRequest(t.stateExecutionCurrentTimerInfos, stateExeId, timerId, timerIdx)
 	if !valid {
 		// since we have checked it before sending signals, this should only happen in some vary rare cases for racing condition
@@ -33,7 +34,7 @@ func (t *timerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
 }
 
 // WaitForTimerCompleted waits for timer completed(fired or skipped), return false if the waiting is canceled by cancelWaiting bool pointer
-func (t *timerProcessor) WaitForTimerCompleted(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
+func (t *TimerProcessor) WaitForTimerCompleted(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
 	timer := t.stateExecutionCurrentTimerInfos[stateExeId][timerIdx]
 	now := t.provider.Now(ctx).Unix()
 	fireAt := timer.FiringUnixTimestampSeconds
@@ -46,4 +47,21 @@ func (t *timerProcessor) WaitForTimerCompleted(ctx UnifiedContext, stateExeId st
 		return false
 	}
 	return true
+}
+
+func (t *TimerProcessor) FinishProcessing(stateExeId string) {
+	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
+}
+
+func (t *TimerProcessor) StartProcessing(stateExeId string, commands []iwfidl.TimerCommand) {
+	timers := make([]*service.TimerInfo, len(commands))
+	for idx, cmd := range commands {
+		timer := service.TimerInfo{
+			CommandId:                  cmd.CommandId,
+			FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
+			Status:                     service.TimerPending,
+		}
+		timers[idx] = &timer
+	}
+	t.stateExecutionCurrentTimerInfos[stateExeId] = timers
 }
