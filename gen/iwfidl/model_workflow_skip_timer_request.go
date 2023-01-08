@@ -17,6 +17,7 @@ import (
 // WorkflowSkipTimerRequest struct for WorkflowSkipTimerRequest
 type WorkflowSkipTimerRequest struct {
 	WorkflowId string `json:"workflowId"`
+	WorkflowRunId *string `json:"workflowRunId,omitempty"`
 	WorkflowStateExecutionId string `json:"workflowStateExecutionId"`
 	TimerCommandId *string `json:"timerCommandId,omitempty"`
 	TimerCommandIndex *int32 `json:"timerCommandIndex,omitempty"`
@@ -63,6 +64,38 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowIdOk() (*string, bool) {
 // SetWorkflowId sets field value
 func (o *WorkflowSkipTimerRequest) SetWorkflowId(v string) {
 	o.WorkflowId = v
+}
+
+// GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
+func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string {
+	if o == nil || isNil(o.WorkflowRunId) {
+		var ret string
+		return ret
+	}
+	return *o.WorkflowRunId
+}
+
+// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool) {
+	if o == nil || isNil(o.WorkflowRunId) {
+    return nil, false
+	}
+	return o.WorkflowRunId, true
+}
+
+// HasWorkflowRunId returns a boolean if a field has been set.
+func (o *WorkflowSkipTimerRequest) HasWorkflowRunId() bool {
+	if o != nil && !isNil(o.WorkflowRunId) {
+		return true
+	}
+
+	return false
+}
+
+// SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
+func (o *WorkflowSkipTimerRequest) SetWorkflowRunId(v string) {
+	o.WorkflowRunId = &v
 }
 
 // GetWorkflowStateExecutionId returns the WorkflowStateExecutionId field value
@@ -157,6 +190,9 @@ func (o WorkflowSkipTimerRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
+	}
+	if !isNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	if true {
 		toSerialize["workflowStateExecutionId"] = o.WorkflowStateExecutionId

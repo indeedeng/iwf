@@ -925,11 +925,14 @@ components:
     WorkflowSkipTimerRequest:
       example:
         timerCommandIndex: 0
+        workflowRunId: workflowRunId
         workflowStateExecutionId: workflowStateExecutionId
         timerCommandId: timerCommandId
         workflowId: workflowId
       properties:
         workflowId:
+          type: string
+        workflowRunId:
           type: string
         workflowStateExecutionId:
           type: string

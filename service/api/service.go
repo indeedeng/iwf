@@ -210,6 +210,34 @@ func (s *serviceImpl) ApiV1WorkflowResetPost(ctx context.Context, req iwfidl.Wor
 	}, nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iwfidl.WorkflowSkipTimerRequest) (retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+	timerInfos := service.GetCurrentTimerInfosQueryResponse{}
+	err := s.client.QueryWorkflow(ctx, &timerInfos, request.GetWorkflowId(), request.GetWorkflowRunId(), service.GetCurrentTimerInfosQueryType)
+	if err != nil {
+		return s.handleError(err)
+	}
+	_, valid := service.ValidateTimerSkipRequest(timerInfos.StateExecutionCurrentTimerInfos, request.GetWorkflowStateExecutionId(), request.GetTimerCommandId(), int(request.GetTimerCommandIndex()))
+	if !valid {
+		return &errors.ErrorAndStatus{
+			StatusCode: http.StatusBadRequest,
+			Error: iwfidl.ErrorResponse{
+				Detail: iwfidl.PtrString("invalid skip timer request"),
+			},
+		}
+	}
+	signal := service.SkipTimerSignalRequest{
+		StateExecutionId: request.GetWorkflowStateExecutionId(),
+		CommandId:        request.GetTimerCommandId(),
+		CommandIndex:     int(request.GetTimerCommandIndex()),
+	}
+	err = s.client.SignalWorkflow(ctx, request.GetWorkflowId(), request.GetWorkflowRunId(), service.SkipTimerSignalChannelName, signal)
+	if err != nil {
+		return s.handleError(err)
+	}
+	return nil
+}
+
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {
 	// TODO differentiate different error for different codes
 	s.logger.Error("encounter error for API", tag.Error(err))

@@ -13,6 +13,7 @@ const WorkflowGetApiPath = "/api/v1/workflow/get"
 const WorkflowGetWithWaitApiPath = "/api/v1/workflow/getWithWait"
 const WorkflowSearchApiPath = "/api/v1/workflow/search"
 const WorkflowResetApiPath = "/api/v1/workflow/reset"
+const WorkflowSkipTimerApiPath = "/api/v1/workflow/timer/skip"
 const WorkflowStopApiPath = "/api/v1/workflow/stop"
 
 // NewService returns a new router.
@@ -31,6 +32,7 @@ func NewService(client UnifiedClient, logger log.Logger) *gin.Engine {
 	router.POST(WorkflowSearchApiPath, handler.apiV1WorkflowSearch)
 	router.POST(WorkflowResetApiPath, handler.apiV1WorkflowReset)
 	router.POST(WorkflowStopApiPath, handler.apiV1WorkflowStop)
+	router.POST(WorkflowSkipTimerApiPath, handler.apiV1WorkflowSkipTimer)
 
 	return router
 }

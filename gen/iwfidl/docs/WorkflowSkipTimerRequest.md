@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | **string** |  | 
+**WorkflowRunId** | Pointer to **string** |  | [optional] 
 **WorkflowStateExecutionId** | **string** |  | 
 **TimerCommandId** | Pointer to **string** |  | [optional] 
 **TimerCommandIndex** | Pointer to **int32** |  | [optional] 
@@ -47,6 +48,31 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
+
+### GetWorkflowRunId
+
+`func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string`
+
+GetWorkflowRunId returns the WorkflowRunId field if non-nil, zero value otherwise.
+
+### GetWorkflowRunIdOk
+
+`func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool)`
+
+GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWorkflowRunId
+
+`func (o *WorkflowSkipTimerRequest) SetWorkflowRunId(v string)`
+
+SetWorkflowRunId sets WorkflowRunId field to given value.
+
+### HasWorkflowRunId
+
+`func (o *WorkflowSkipTimerRequest) HasWorkflowRunId() bool`
+
+HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetWorkflowStateExecutionId
 
