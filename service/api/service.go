@@ -212,6 +212,11 @@ func (s *serviceImpl) ApiV1WorkflowResetPost(ctx context.Context, req iwfidl.Wor
 
 func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iwfidl.WorkflowSkipTimerRequest) (retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	if request.GetTimerCommandId() == "" && request.TimerCommandIndex == nil {
+		return makeInvalidRequestError("must provide either a timerCommandId or index")
+	}
+
 	timerInfos := service.GetCurrentTimerInfosQueryResponse{}
 	err := s.client.QueryWorkflow(ctx, &timerInfos, request.GetWorkflowId(), request.GetWorkflowRunId(), service.GetCurrentTimerInfosQueryType)
 	if err != nil {
@@ -219,12 +224,7 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 	}
 	_, valid := service.ValidateTimerSkipRequest(timerInfos.StateExecutionCurrentTimerInfos, request.GetWorkflowStateExecutionId(), request.GetTimerCommandId(), int(request.GetTimerCommandIndex()))
 	if !valid {
-		return &errors.ErrorAndStatus{
-			StatusCode: http.StatusBadRequest,
-			Error: iwfidl.ErrorResponse{
-				Detail: iwfidl.PtrString("invalid skip timer request"),
-			},
-		}
+		return makeInvalidRequestError("requested timer command doesn't exist")
 	}
 	signal := service.SkipTimerSignalRequest{
 		StateExecutionId: request.GetWorkflowStateExecutionId(),
@@ -236,6 +236,15 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 		return s.handleError(err)
 	}
 	return nil
+}
+
+func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
+	return &errors.ErrorAndStatus{
+		StatusCode: http.StatusBadRequest,
+		Error: iwfidl.ErrorResponse{
+			Detail: iwfidl.PtrString("invalid request - " + msg),
+		},
+	}
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {
