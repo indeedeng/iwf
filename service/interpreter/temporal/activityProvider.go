@@ -14,7 +14,7 @@ func init() {
 	interpreter.RegisterActivityProvider(service.BackendTypeTemporal, &activityProvider{})
 }
 
-func (a *activityProvider) GetLogger(ctx context.Context) interpreter.ActivityLogger {
+func (a *activityProvider) GetLogger(ctx context.Context) interpreter.UnifiedLogger {
 	return activity.GetLogger(ctx)
 }
 

@@ -14,6 +14,7 @@ const (
 	StateDecideApi = "/api/v1/workflowState/decide"
 
 	GetDataObjectsWorkflowQueryType   = "GetDataObjects"
+	GetCurrentTimerInfosQueryType     = "GetCurrentTimerInfos"
 	GetInterStateChannelDataQueryType = "GetInterStateChannelData"
 
 	WorkflowErrorTypeUserWorkflowDecision = "UserWorkflowDecision"
