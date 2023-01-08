@@ -191,3 +191,11 @@ func (w *workflowProvider) GetContextValue(ctx interpreter.UnifiedContext, key s
 	}
 	return wfCtx.Value(key)
 }
+
+func (w *workflowProvider) GetLogger(ctx interpreter.UnifiedContext) interpreter.UnifiedLogger {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+	return workflow.GetLogger(wfCtx)
+}

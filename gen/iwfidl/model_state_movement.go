@@ -53,7 +53,7 @@ func (o *StateMovement) GetStateId() string {
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.StateId, true
 }
@@ -65,7 +65,7 @@ func (o *StateMovement) SetStateId(v string) {
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *StateMovement) GetStateInput() EncodedObject {
-	if o == nil || o.StateInput == nil {
+	if o == nil || isNil(o.StateInput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -75,15 +75,15 @@ func (o *StateMovement) GetStateInput() EncodedObject {
 // GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateInputOk() (*EncodedObject, bool) {
-	if o == nil || o.StateInput == nil {
-		return nil, false
+	if o == nil || isNil(o.StateInput) {
+    return nil, false
 	}
 	return o.StateInput, true
 }
 
 // HasStateInput returns a boolean if a field has been set.
 func (o *StateMovement) HasStateInput() bool {
-	if o != nil && o.StateInput != nil {
+	if o != nil && !isNil(o.StateInput) {
 		return true
 	}
 
@@ -97,7 +97,7 @@ func (o *StateMovement) SetStateInput(v EncodedObject) {
 
 // GetStateOptions returns the StateOptions field value if set, zero value otherwise.
 func (o *StateMovement) GetStateOptions() WorkflowStateOptions {
-	if o == nil || o.StateOptions == nil {
+	if o == nil || isNil(o.StateOptions) {
 		var ret WorkflowStateOptions
 		return ret
 	}
@@ -107,15 +107,15 @@ func (o *StateMovement) GetStateOptions() WorkflowStateOptions {
 // GetStateOptionsOk returns a tuple with the StateOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
-	if o == nil || o.StateOptions == nil {
-		return nil, false
+	if o == nil || isNil(o.StateOptions) {
+    return nil, false
 	}
 	return o.StateOptions, true
 }
 
 // HasStateOptions returns a boolean if a field has been set.
 func (o *StateMovement) HasStateOptions() bool {
-	if o != nil && o.StateOptions != nil {
+	if o != nil && !isNil(o.StateOptions) {
 		return true
 	}
 
@@ -132,10 +132,10 @@ func (o StateMovement) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["stateId"] = o.StateId
 	}
-	if o.StateInput != nil {
+	if !isNil(o.StateInput) {
 		toSerialize["stateInput"] = o.StateInput
 	}
-	if o.StateOptions != nil {
+	if !isNil(o.StateOptions) {
 		toSerialize["stateOptions"] = o.StateOptions
 	}
 	return json.Marshal(toSerialize)

@@ -51,7 +51,7 @@ func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) inter
 			ID:    info.WorkflowExecution.ID,
 			RunID: info.WorkflowExecution.RunID,
 		},
-		WorkflowStartTime: time.UnixMilli(0), // TODO need to file a ticket to support this in Cadence
+		WorkflowStartTime: time.UnixMilli(0), // TODO need support from Cadence client: https://github.com/uber-go/cadence-client/issues/1204
 	}
 }
 
@@ -195,4 +195,16 @@ func (w *workflowProvider) GetContextValue(ctx interpreter.UnifiedContext, key s
 		panic("cannot convert to temporal workflow context")
 	}
 	return wfCtx.Value(key)
+}
+
+func (w *workflowProvider) GetLogger(ctx interpreter.UnifiedContext) interpreter.UnifiedLogger {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to cadence workflow context")
+	}
+
+	zLogger := workflow.GetLogger(wfCtx)
+	return &loggerImpl{
+		zlogger: zLogger,
+	}
 }

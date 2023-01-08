@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -40,7 +41,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
-			now := time.Now().Unix()
+			nowInt, err := strconv.Atoi(req.StateInput.GetData())
+			if err != nil {
+				panic(err)
+			}
+			now := int64(nowInt)
 			h.invokeData["scheduled_at"] = now
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -48,6 +53,14 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 						{
 							CommandId:                  "timer-cmd-id",
 							FiringUnixTimestampSeconds: now + 10, // fire after 10s
+						},
+						{
+							CommandId:                  "timer-cmd-id-2",
+							FiringUnixTimestampSeconds: now + 86400, // fire after one day
+						},
+						{
+							CommandId:                  "timer-cmd-id-3",
+							FiringUnixTimestampSeconds: now + 86400*365, // fire after one year
 						},
 					},
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,

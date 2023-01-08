@@ -38,9 +38,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			StateInput:   &input.StateInput,
 		},
 	}
-	persistenceManager := NewPersistenceManager(func(attributes map[string]interface{}) error {
-		return provider.UpsertSearchAttributes(ctx, attributes)
-	})
+	persistenceManager := NewPersistenceManager(provider)
+	timerProcessor := NewTimerProcessor(ctx, provider)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil
@@ -83,7 +82,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExecutionMgr.createNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel)
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, timerProcessor)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -190,8 +189,9 @@ func executeState(
 	state iwfidl.StateMovement,
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
-	attrMgr *PersistenceManager,
+	persistenceManager *PersistenceManager,
 	interStateChannel *InterStateChannel,
+	timerProcessor *TimerProcessor,
 ) (*iwfidl.StateDecision, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
@@ -220,19 +220,19 @@ func executeState(
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.StateInput,
-			SearchAttributes: attrMgr.LoadSearchAttributes(state.StateOptions),
-			DataObjects:      attrMgr.LoadDataObjects(state.StateOptions),
+			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
+			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	err = attrMgr.ProcessUpsertSearchAttribute(startResponse.GetUpsertSearchAttributes())
+	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}
@@ -243,27 +243,17 @@ func executeState(
 
 	completedTimerCmds := map[int]bool{}
 	if len(commandReq.GetTimerCommands()) > 0 {
+		timerProcessor.StartProcessing(stateExeId, commandReq.GetTimerCommands())
 		for idx, cmd := range commandReq.GetTimerCommands() {
-			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
-			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
+			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
-				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.TimerCommand)
-				if !ok {
-					panic("critical code bug")
-				}
 				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
 					panic("critical code bug")
 				}
 
-				now := provider.Now(ctx).Unix()
-				fireAt := cmd.GetFiringUnixTimestampSeconds()
-				duration := time.Duration(fireAt-now) * time.Second
-				future := provider.NewTimer(ctx, duration)
-				_ = provider.Await(ctx, func() bool {
-					return future.IsReady() || commandReqDone
-				})
-				if future.IsReady() {
+				completed := timerProcessor.WaitForTimerCompleted(ctx, stateExeId, idx, &commandReqDone)
+				if completed {
 					completedTimerCmds[idx] = true
 				}
 			})
@@ -353,6 +343,8 @@ func executeState(
 	}
 	commandRes := &iwfidl.CommandResults{}
 	if len(commandReq.GetTimerCommands()) > 0 {
+		timerProcessor.FinishProcessing(stateExeId)
+
 		var timerResults []iwfidl.TimerResult
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			status := iwfidl.FIRED
@@ -425,8 +417,8 @@ func executeState(
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      startResponse.GetUpsertStateLocals(),
-			SearchAttributes: attrMgr.LoadSearchAttributes(state.StateOptions),
-			DataObjects:      attrMgr.LoadDataObjects(state.StateOptions),
+			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
+			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)
@@ -435,11 +427,11 @@ func executeState(
 	}
 
 	decision := decideResponse.GetStateDecision()
-	err = attrMgr.ProcessUpsertSearchAttribute(decideResponse.GetUpsertSearchAttributes())
+	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}

@@ -58,7 +58,7 @@ func (o *WorkflowStateStartRequest) GetContext() Context {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetContextOk() (*Context, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.Context, true
 }
@@ -82,7 +82,7 @@ func (o *WorkflowStateStartRequest) GetWorkflowType() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetWorkflowTypeOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowType, true
 }
@@ -106,7 +106,7 @@ func (o *WorkflowStateStartRequest) GetWorkflowStateId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetWorkflowStateIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowStateId, true
 }
@@ -118,7 +118,7 @@ func (o *WorkflowStateStartRequest) SetWorkflowStateId(v string) {
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *WorkflowStateStartRequest) GetStateInput() EncodedObject {
-	if o == nil || o.StateInput == nil {
+	if o == nil || isNil(o.StateInput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -128,15 +128,15 @@ func (o *WorkflowStateStartRequest) GetStateInput() EncodedObject {
 // GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetStateInputOk() (*EncodedObject, bool) {
-	if o == nil || o.StateInput == nil {
-		return nil, false
+	if o == nil || isNil(o.StateInput) {
+    return nil, false
 	}
 	return o.StateInput, true
 }
 
 // HasStateInput returns a boolean if a field has been set.
 func (o *WorkflowStateStartRequest) HasStateInput() bool {
-	if o != nil && o.StateInput != nil {
+	if o != nil && !isNil(o.StateInput) {
 		return true
 	}
 
@@ -150,7 +150,7 @@ func (o *WorkflowStateStartRequest) SetStateInput(v EncodedObject) {
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
 func (o *WorkflowStateStartRequest) GetSearchAttributes() []SearchAttribute {
-	if o == nil || o.SearchAttributes == nil {
+	if o == nil || isNil(o.SearchAttributes) {
 		var ret []SearchAttribute
 		return ret
 	}
@@ -160,15 +160,15 @@ func (o *WorkflowStateStartRequest) GetSearchAttributes() []SearchAttribute {
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetSearchAttributesOk() ([]SearchAttribute, bool) {
-	if o == nil || o.SearchAttributes == nil {
-		return nil, false
+	if o == nil || isNil(o.SearchAttributes) {
+    return nil, false
 	}
 	return o.SearchAttributes, true
 }
 
 // HasSearchAttributes returns a boolean if a field has been set.
 func (o *WorkflowStateStartRequest) HasSearchAttributes() bool {
-	if o != nil && o.SearchAttributes != nil {
+	if o != nil && !isNil(o.SearchAttributes) {
 		return true
 	}
 
@@ -182,7 +182,7 @@ func (o *WorkflowStateStartRequest) SetSearchAttributes(v []SearchAttribute) {
 
 // GetDataObjects returns the DataObjects field value if set, zero value otherwise.
 func (o *WorkflowStateStartRequest) GetDataObjects() []KeyValue {
-	if o == nil || o.DataObjects == nil {
+	if o == nil || isNil(o.DataObjects) {
 		var ret []KeyValue
 		return ret
 	}
@@ -192,15 +192,15 @@ func (o *WorkflowStateStartRequest) GetDataObjects() []KeyValue {
 // GetDataObjectsOk returns a tuple with the DataObjects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetDataObjectsOk() ([]KeyValue, bool) {
-	if o == nil || o.DataObjects == nil {
-		return nil, false
+	if o == nil || isNil(o.DataObjects) {
+    return nil, false
 	}
 	return o.DataObjects, true
 }
 
 // HasDataObjects returns a boolean if a field has been set.
 func (o *WorkflowStateStartRequest) HasDataObjects() bool {
-	if o != nil && o.DataObjects != nil {
+	if o != nil && !isNil(o.DataObjects) {
 		return true
 	}
 
@@ -223,13 +223,13 @@ func (o WorkflowStateStartRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowStateId"] = o.WorkflowStateId
 	}
-	if o.StateInput != nil {
+	if !isNil(o.StateInput) {
 		toSerialize["stateInput"] = o.StateInput
 	}
-	if o.SearchAttributes != nil {
+	if !isNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
-	if o.DataObjects != nil {
+	if !isNil(o.DataObjects) {
 		toSerialize["dataObjects"] = o.DataObjects
 	}
 	return json.Marshal(toSerialize)

@@ -7,20 +7,20 @@ import (
 )
 
 type PersistenceManager struct {
-	dataObjects             map[string]iwfidl.KeyValue
-	searchAttributes        map[string]iwfidl.SearchAttribute
-	searchAttributeUpserter func(attributes map[string]interface{}) error
+	dataObjects      map[string]iwfidl.KeyValue
+	searchAttributes map[string]iwfidl.SearchAttribute
+	provider         WorkflowProvider
 }
 
-func NewPersistenceManager(searchAttributeUpserter func(attributes map[string]interface{}) error) *PersistenceManager {
+func NewPersistenceManager(provider WorkflowProvider) *PersistenceManager {
 	return &PersistenceManager{
-		dataObjects:             make(map[string]iwfidl.KeyValue),
-		searchAttributes:        make(map[string]iwfidl.SearchAttribute),
-		searchAttributeUpserter: searchAttributeUpserter,
+		dataObjects:      make(map[string]iwfidl.KeyValue),
+		searchAttributes: make(map[string]iwfidl.SearchAttribute),
+		provider:         provider,
 	}
 }
 
-func RebuildPersistenceManager(searchAttributeUpserter func(attributes map[string]interface{}) error,
+func RebuildPersistenceManager(provider WorkflowProvider,
 	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
 ) *PersistenceManager {
 	dataObjects := make(map[string]iwfidl.KeyValue)
@@ -32,9 +32,9 @@ func RebuildPersistenceManager(searchAttributeUpserter func(attributes map[strin
 		searchAttributes[sa.GetKey()] = sa
 	}
 	return &PersistenceManager{
-		dataObjects:             dataObjects,
-		searchAttributes:        searchAttributes,
-		searchAttributeUpserter: searchAttributeUpserter,
+		dataObjects:      dataObjects,
+		searchAttributes: searchAttributes,
+		provider:         provider,
 	}
 }
 
@@ -122,7 +122,7 @@ func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 	return res
 }
 
-func (am *PersistenceManager) ProcessUpsertSearchAttribute(attributes []iwfidl.SearchAttribute) error {
+func (am *PersistenceManager) ProcessUpsertSearchAttribute(ctx UnifiedContext, attributes []iwfidl.SearchAttribute) error {
 	if len(attributes) == 0 {
 		return nil
 	}
@@ -134,7 +134,7 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(attributes []iwfidl.S
 	if err != nil {
 		return err
 	}
-	return am.searchAttributeUpserter(attrsToUpsert)
+	return am.provider.UpsertSearchAttributes(ctx, attrsToUpsert)
 }
 
 func (am *PersistenceManager) ProcessUpsertDataObject(attributes []iwfidl.KeyValue) error {

@@ -9,6 +9,7 @@ configuration.go
 docs/ChannelRequestStatus.md
 docs/CommandCarryOverPolicy.md
 docs/CommandCarryOverType.md
+docs/CommandCombination.md
 docs/CommandRequest.md
 docs/CommandResults.md
 docs/Context.md
@@ -48,6 +49,7 @@ docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
 docs/WorkflowSignalRequest.md
+docs/WorkflowSkipTimerRequest.md
 docs/WorkflowStartOptions.md
 docs/WorkflowStartRequest.md
 docs/WorkflowStartResponse.md
@@ -65,6 +67,7 @@ go.sum
 model_channel_request_status.go
 model_command_carry_over_policy.go
 model_command_carry_over_type.go
+model_command_combination.go
 model_command_request.go
 model_command_results.go
 model_context.go
@@ -103,6 +106,7 @@ model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go
 model_workflow_signal_request.go
+model_workflow_skip_timer_request.go
 model_workflow_start_options.go
 model_workflow_start_request.go
 model_workflow_start_response.go
@@ -115,4 +119,5 @@ model_workflow_status.go
 model_workflow_stop_request.go
 model_workflow_stop_type.go
 response.go
+test/api_default_test.go
 utils.go

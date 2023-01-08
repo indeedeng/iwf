@@ -62,7 +62,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := basic.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := basic.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	wfInput := &iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
 		Data:     iwfidl.PtrString("test data"),

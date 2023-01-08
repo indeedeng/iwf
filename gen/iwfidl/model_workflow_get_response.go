@@ -54,7 +54,7 @@ func (o *WorkflowGetResponse) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowRunId, true
 }
@@ -78,7 +78,7 @@ func (o *WorkflowGetResponse) GetWorkflowStatus() WorkflowStatus {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*WorkflowStatus, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowStatus, true
 }
@@ -90,7 +90,7 @@ func (o *WorkflowGetResponse) SetWorkflowStatus(v WorkflowStatus) {
 
 // GetResults returns the Results field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
-	if o == nil || o.Results == nil {
+	if o == nil || isNil(o.Results) {
 		var ret []StateCompletionOutput
 		return ret
 	}
@@ -100,15 +100,15 @@ func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
 // GetResultsOk returns a tuple with the Results field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetResultsOk() ([]StateCompletionOutput, bool) {
-	if o == nil || o.Results == nil {
-		return nil, false
+	if o == nil || isNil(o.Results) {
+    return nil, false
 	}
 	return o.Results, true
 }
 
 // HasResults returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasResults() bool {
-	if o != nil && o.Results != nil {
+	if o != nil && !isNil(o.Results) {
 		return true
 	}
 
@@ -128,7 +128,7 @@ func (o WorkflowGetResponse) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowStatus"] = o.WorkflowStatus
 	}
-	if o.Results != nil {
+	if !isNil(o.Results) {
 		toSerialize["results"] = o.Results
 	}
 	return json.Marshal(toSerialize)

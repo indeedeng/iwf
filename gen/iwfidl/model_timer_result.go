@@ -53,7 +53,7 @@ func (o *TimerResult) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *TimerResult) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -77,7 +77,7 @@ func (o *TimerResult) GetTimerStatus() TimerStatus {
 // and a boolean to check if the value has been set.
 func (o *TimerResult) GetTimerStatusOk() (*TimerStatus, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.TimerStatus, true
 }

@@ -38,7 +38,7 @@ func NewCommandCarryOverPolicyWithDefaults() *CommandCarryOverPolicy {
 
 // GetCommandCarryOverType returns the CommandCarryOverType field value if set, zero value otherwise.
 func (o *CommandCarryOverPolicy) GetCommandCarryOverType() CommandCarryOverType {
-	if o == nil || o.CommandCarryOverType == nil {
+	if o == nil || isNil(o.CommandCarryOverType) {
 		var ret CommandCarryOverType
 		return ret
 	}
@@ -48,15 +48,15 @@ func (o *CommandCarryOverPolicy) GetCommandCarryOverType() CommandCarryOverType 
 // GetCommandCarryOverTypeOk returns a tuple with the CommandCarryOverType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandCarryOverPolicy) GetCommandCarryOverTypeOk() (*CommandCarryOverType, bool) {
-	if o == nil || o.CommandCarryOverType == nil {
-		return nil, false
+	if o == nil || isNil(o.CommandCarryOverType) {
+    return nil, false
 	}
 	return o.CommandCarryOverType, true
 }
 
 // HasCommandCarryOverType returns a boolean if a field has been set.
 func (o *CommandCarryOverPolicy) HasCommandCarryOverType() bool {
-	if o != nil && o.CommandCarryOverType != nil {
+	if o != nil && !isNil(o.CommandCarryOverType) {
 		return true
 	}
 
@@ -70,7 +70,7 @@ func (o *CommandCarryOverPolicy) SetCommandCarryOverType(v CommandCarryOverType)
 
 func (o CommandCarryOverPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.CommandCarryOverType != nil {
+	if !isNil(o.CommandCarryOverType) {
 		toSerialize["commandCarryOverType"] = o.CommandCarryOverType
 	}
 	return json.Marshal(toSerialize)

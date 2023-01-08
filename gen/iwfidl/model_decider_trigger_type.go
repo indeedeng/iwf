@@ -22,12 +22,14 @@ type DeciderTriggerType string
 const (
 	ALL_COMMAND_COMPLETED DeciderTriggerType = "ALL_COMMAND_COMPLETED"
 	ANY_COMMAND_COMPLETED DeciderTriggerType = "ANY_COMMAND_COMPLETED"
+	ANY_COMMAND_COMBINATION_COMPLETED DeciderTriggerType = "ANY_COMMAND_COMBINATION_COMPLETED"
 )
 
 // All allowed values of DeciderTriggerType enum
 var AllowedDeciderTriggerTypeEnumValues = []DeciderTriggerType{
 	"ALL_COMMAND_COMPLETED",
 	"ANY_COMMAND_COMPLETED",
+	"ANY_COMMAND_COMBINATION_COMPLETED",
 }
 
 func (v *DeciderTriggerType) UnmarshalJSON(src []byte) error {

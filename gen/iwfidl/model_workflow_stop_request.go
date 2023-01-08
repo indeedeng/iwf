@@ -54,7 +54,7 @@ func (o *WorkflowStopRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -66,7 +66,7 @@ func (o *WorkflowStopRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowStopRequest) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || isNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -76,15 +76,15 @@ func (o *WorkflowStopRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
-		return nil, false
+	if o == nil || isNil(o.WorkflowRunId) {
+    return nil, false
 	}
 	return o.WorkflowRunId, true
 }
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowStopRequest) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
+	if o != nil && !isNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -98,7 +98,7 @@ func (o *WorkflowStopRequest) SetWorkflowRunId(v string) {
 
 // GetReason returns the Reason field value if set, zero value otherwise.
 func (o *WorkflowStopRequest) GetReason() string {
-	if o == nil || o.Reason == nil {
+	if o == nil || isNil(o.Reason) {
 		var ret string
 		return ret
 	}
@@ -108,15 +108,15 @@ func (o *WorkflowStopRequest) GetReason() string {
 // GetReasonOk returns a tuple with the Reason field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetReasonOk() (*string, bool) {
-	if o == nil || o.Reason == nil {
-		return nil, false
+	if o == nil || isNil(o.Reason) {
+    return nil, false
 	}
 	return o.Reason, true
 }
 
 // HasReason returns a boolean if a field has been set.
 func (o *WorkflowStopRequest) HasReason() bool {
-	if o != nil && o.Reason != nil {
+	if o != nil && !isNil(o.Reason) {
 		return true
 	}
 
@@ -130,7 +130,7 @@ func (o *WorkflowStopRequest) SetReason(v string) {
 
 // GetStopType returns the StopType field value if set, zero value otherwise.
 func (o *WorkflowStopRequest) GetStopType() WorkflowStopType {
-	if o == nil || o.StopType == nil {
+	if o == nil || isNil(o.StopType) {
 		var ret WorkflowStopType
 		return ret
 	}
@@ -140,15 +140,15 @@ func (o *WorkflowStopRequest) GetStopType() WorkflowStopType {
 // GetStopTypeOk returns a tuple with the StopType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetStopTypeOk() (*WorkflowStopType, bool) {
-	if o == nil || o.StopType == nil {
-		return nil, false
+	if o == nil || isNil(o.StopType) {
+    return nil, false
 	}
 	return o.StopType, true
 }
 
 // HasStopType returns a boolean if a field has been set.
 func (o *WorkflowStopRequest) HasStopType() bool {
-	if o != nil && o.StopType != nil {
+	if o != nil && !isNil(o.StopType) {
 		return true
 	}
 
@@ -165,13 +165,13 @@ func (o WorkflowStopRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if o.WorkflowRunId != nil {
+	if !isNil(o.WorkflowRunId) {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
-	if o.Reason != nil {
+	if !isNil(o.Reason) {
 		toSerialize["reason"] = o.Reason
 	}
-	if o.StopType != nil {
+	if !isNil(o.StopType) {
 		toSerialize["stopType"] = o.StopType
 	}
 	return json.Marshal(toSerialize)

@@ -57,7 +57,7 @@ func (o *Context) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -81,7 +81,7 @@ func (o *Context) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowRunId, true
 }
@@ -105,7 +105,7 @@ func (o *Context) GetWorkflowStartedTimestamp() int64 {
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowStartedTimestampOk() (*int64, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowStartedTimestamp, true
 }
@@ -129,7 +129,7 @@ func (o *Context) GetStateExecutionId() string {
 // and a boolean to check if the value has been set.
 func (o *Context) GetStateExecutionIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.StateExecutionId, true
 }

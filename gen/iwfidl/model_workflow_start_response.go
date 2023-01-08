@@ -38,7 +38,7 @@ func NewWorkflowStartResponseWithDefaults() *WorkflowStartResponse {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowStartResponse) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || isNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -48,15 +48,15 @@ func (o *WorkflowStartResponse) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartResponse) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
-		return nil, false
+	if o == nil || isNil(o.WorkflowRunId) {
+    return nil, false
 	}
 	return o.WorkflowRunId, true
 }
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowStartResponse) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
+	if o != nil && !isNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -70,7 +70,7 @@ func (o *WorkflowStartResponse) SetWorkflowRunId(v string) {
 
 func (o WorkflowStartResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowRunId != nil {
+	if !isNil(o.WorkflowRunId) {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	return json.Marshal(toSerialize)

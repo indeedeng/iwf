@@ -50,7 +50,7 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := parallel.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := parallel.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,

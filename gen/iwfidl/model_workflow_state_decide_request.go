@@ -60,7 +60,7 @@ func (o *WorkflowStateDecideRequest) GetContext() Context {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetContextOk() (*Context, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.Context, true
 }
@@ -84,7 +84,7 @@ func (o *WorkflowStateDecideRequest) GetWorkflowType() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetWorkflowTypeOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowType, true
 }
@@ -108,7 +108,7 @@ func (o *WorkflowStateDecideRequest) GetWorkflowStateId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetWorkflowStateIdOk() (*string, bool) {
 	if o == nil {
-		return nil, false
+    return nil, false
 	}
 	return &o.WorkflowStateId, true
 }
@@ -120,7 +120,7 @@ func (o *WorkflowStateDecideRequest) SetWorkflowStateId(v string) {
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *WorkflowStateDecideRequest) GetStateInput() EncodedObject {
-	if o == nil || o.StateInput == nil {
+	if o == nil || isNil(o.StateInput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -130,15 +130,15 @@ func (o *WorkflowStateDecideRequest) GetStateInput() EncodedObject {
 // GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetStateInputOk() (*EncodedObject, bool) {
-	if o == nil || o.StateInput == nil {
-		return nil, false
+	if o == nil || isNil(o.StateInput) {
+    return nil, false
 	}
 	return o.StateInput, true
 }
 
 // HasStateInput returns a boolean if a field has been set.
 func (o *WorkflowStateDecideRequest) HasStateInput() bool {
-	if o != nil && o.StateInput != nil {
+	if o != nil && !isNil(o.StateInput) {
 		return true
 	}
 
@@ -152,7 +152,7 @@ func (o *WorkflowStateDecideRequest) SetStateInput(v EncodedObject) {
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
 func (o *WorkflowStateDecideRequest) GetSearchAttributes() []SearchAttribute {
-	if o == nil || o.SearchAttributes == nil {
+	if o == nil || isNil(o.SearchAttributes) {
 		var ret []SearchAttribute
 		return ret
 	}
@@ -162,15 +162,15 @@ func (o *WorkflowStateDecideRequest) GetSearchAttributes() []SearchAttribute {
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetSearchAttributesOk() ([]SearchAttribute, bool) {
-	if o == nil || o.SearchAttributes == nil {
-		return nil, false
+	if o == nil || isNil(o.SearchAttributes) {
+    return nil, false
 	}
 	return o.SearchAttributes, true
 }
 
 // HasSearchAttributes returns a boolean if a field has been set.
 func (o *WorkflowStateDecideRequest) HasSearchAttributes() bool {
-	if o != nil && o.SearchAttributes != nil {
+	if o != nil && !isNil(o.SearchAttributes) {
 		return true
 	}
 
@@ -184,7 +184,7 @@ func (o *WorkflowStateDecideRequest) SetSearchAttributes(v []SearchAttribute) {
 
 // GetDataObjects returns the DataObjects field value if set, zero value otherwise.
 func (o *WorkflowStateDecideRequest) GetDataObjects() []KeyValue {
-	if o == nil || o.DataObjects == nil {
+	if o == nil || isNil(o.DataObjects) {
 		var ret []KeyValue
 		return ret
 	}
@@ -194,15 +194,15 @@ func (o *WorkflowStateDecideRequest) GetDataObjects() []KeyValue {
 // GetDataObjectsOk returns a tuple with the DataObjects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetDataObjectsOk() ([]KeyValue, bool) {
-	if o == nil || o.DataObjects == nil {
-		return nil, false
+	if o == nil || isNil(o.DataObjects) {
+    return nil, false
 	}
 	return o.DataObjects, true
 }
 
 // HasDataObjects returns a boolean if a field has been set.
 func (o *WorkflowStateDecideRequest) HasDataObjects() bool {
-	if o != nil && o.DataObjects != nil {
+	if o != nil && !isNil(o.DataObjects) {
 		return true
 	}
 
@@ -216,7 +216,7 @@ func (o *WorkflowStateDecideRequest) SetDataObjects(v []KeyValue) {
 
 // GetStateLocals returns the StateLocals field value if set, zero value otherwise.
 func (o *WorkflowStateDecideRequest) GetStateLocals() []KeyValue {
-	if o == nil || o.StateLocals == nil {
+	if o == nil || isNil(o.StateLocals) {
 		var ret []KeyValue
 		return ret
 	}
@@ -226,15 +226,15 @@ func (o *WorkflowStateDecideRequest) GetStateLocals() []KeyValue {
 // GetStateLocalsOk returns a tuple with the StateLocals field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetStateLocalsOk() ([]KeyValue, bool) {
-	if o == nil || o.StateLocals == nil {
-		return nil, false
+	if o == nil || isNil(o.StateLocals) {
+    return nil, false
 	}
 	return o.StateLocals, true
 }
 
 // HasStateLocals returns a boolean if a field has been set.
 func (o *WorkflowStateDecideRequest) HasStateLocals() bool {
-	if o != nil && o.StateLocals != nil {
+	if o != nil && !isNil(o.StateLocals) {
 		return true
 	}
 
@@ -248,7 +248,7 @@ func (o *WorkflowStateDecideRequest) SetStateLocals(v []KeyValue) {
 
 // GetCommandResults returns the CommandResults field value if set, zero value otherwise.
 func (o *WorkflowStateDecideRequest) GetCommandResults() CommandResults {
-	if o == nil || o.CommandResults == nil {
+	if o == nil || isNil(o.CommandResults) {
 		var ret CommandResults
 		return ret
 	}
@@ -258,15 +258,15 @@ func (o *WorkflowStateDecideRequest) GetCommandResults() CommandResults {
 // GetCommandResultsOk returns a tuple with the CommandResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateDecideRequest) GetCommandResultsOk() (*CommandResults, bool) {
-	if o == nil || o.CommandResults == nil {
-		return nil, false
+	if o == nil || isNil(o.CommandResults) {
+    return nil, false
 	}
 	return o.CommandResults, true
 }
 
 // HasCommandResults returns a boolean if a field has been set.
 func (o *WorkflowStateDecideRequest) HasCommandResults() bool {
-	if o != nil && o.CommandResults != nil {
+	if o != nil && !isNil(o.CommandResults) {
 		return true
 	}
 
@@ -289,19 +289,19 @@ func (o WorkflowStateDecideRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowStateId"] = o.WorkflowStateId
 	}
-	if o.StateInput != nil {
+	if !isNil(o.StateInput) {
 		toSerialize["stateInput"] = o.StateInput
 	}
-	if o.SearchAttributes != nil {
+	if !isNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
-	if o.DataObjects != nil {
+	if !isNil(o.DataObjects) {
 		toSerialize["DataObjects"] = o.DataObjects
 	}
-	if o.StateLocals != nil {
+	if !isNil(o.StateLocals) {
 		toSerialize["stateLocals"] = o.StateLocals
 	}
-	if o.CommandResults != nil {
+	if !isNil(o.CommandResults) {
 		toSerialize["commandResults"] = o.CommandResults
 	}
 	return json.Marshal(toSerialize)

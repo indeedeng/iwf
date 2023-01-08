@@ -38,7 +38,7 @@ func NewWorkflowGetSearchAttributesResponseWithDefaults() *WorkflowGetSearchAttr
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
 func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributes() []SearchAttribute {
-	if o == nil || o.SearchAttributes == nil {
+	if o == nil || isNil(o.SearchAttributes) {
 		var ret []SearchAttribute
 		return ret
 	}
@@ -48,15 +48,15 @@ func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributes() []SearchAttr
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributesOk() ([]SearchAttribute, bool) {
-	if o == nil || o.SearchAttributes == nil {
-		return nil, false
+	if o == nil || isNil(o.SearchAttributes) {
+    return nil, false
 	}
 	return o.SearchAttributes, true
 }
 
 // HasSearchAttributes returns a boolean if a field has been set.
 func (o *WorkflowGetSearchAttributesResponse) HasSearchAttributes() bool {
-	if o != nil && o.SearchAttributes != nil {
+	if o != nil && !isNil(o.SearchAttributes) {
 		return true
 	}
 
@@ -70,7 +70,7 @@ func (o *WorkflowGetSearchAttributesResponse) SetSearchAttributes(v []SearchAttr
 
 func (o WorkflowGetSearchAttributesResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.SearchAttributes != nil {
+	if !isNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
 	return json.Marshal(toSerialize)

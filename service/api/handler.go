@@ -42,7 +42,7 @@ func (h *handler) index(c *gin.Context) {
 func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 	var req iwfidl.WorkflowStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -59,7 +59,7 @@ func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 	var req iwfidl.WorkflowSignalRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -76,7 +76,7 @@ func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 	var req iwfidl.WorkflowStopRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -93,7 +93,7 @@ func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	var req iwfidl.WorkflowSearchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -110,7 +110,7 @@ func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	var req iwfidl.WorkflowGetDataObjectsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -127,7 +127,7 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 	var req iwfidl.WorkflowGetSearchAttributesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -152,7 +152,7 @@ func (h *handler) apiV1WorkflowGetWithWait(c *gin.Context) {
 func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool) {
 	var req iwfidl.WorkflowGetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -176,7 +176,7 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 	var req iwfidl.WorkflowResetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		invalidRequestSchema(c)
 		return
 	}
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
@@ -188,6 +188,27 @@ func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, resp)
 	return
+}
+
+func (h *handler) apiV1WorkflowSkipTimer(c *gin.Context) {
+	var req iwfidl.WorkflowSkipTimerRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	errResp := h.svc.ApiV1WorkflowSkipTimerPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, struct{}{})
+	return
+}
+
+func invalidRequestSchema(c *gin.Context) {
+	c.JSON(http.StatusBadRequest, iwfidl.ErrorResponse{
+		Detail: iwfidl.PtrString("invalid request schema"),
+	})
 }
 
 func (h *handler) processError(c *gin.Context, resp *errors.ErrorAndStatus) {

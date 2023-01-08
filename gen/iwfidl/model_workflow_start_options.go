@@ -41,7 +41,7 @@ func NewWorkflowStartOptionsWithDefaults() *WorkflowStartOptions {
 
 // GetWorkflowIDReusePolicy returns the WorkflowIDReusePolicy field value if set, zero value otherwise.
 func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() WorkflowIDReusePolicy {
-	if o == nil || o.WorkflowIDReusePolicy == nil {
+	if o == nil || isNil(o.WorkflowIDReusePolicy) {
 		var ret WorkflowIDReusePolicy
 		return ret
 	}
@@ -51,15 +51,15 @@ func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() WorkflowIDReusePolicy 
 // GetWorkflowIDReusePolicyOk returns a tuple with the WorkflowIDReusePolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*WorkflowIDReusePolicy, bool) {
-	if o == nil || o.WorkflowIDReusePolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.WorkflowIDReusePolicy) {
+    return nil, false
 	}
 	return o.WorkflowIDReusePolicy, true
 }
 
 // HasWorkflowIDReusePolicy returns a boolean if a field has been set.
 func (o *WorkflowStartOptions) HasWorkflowIDReusePolicy() bool {
-	if o != nil && o.WorkflowIDReusePolicy != nil {
+	if o != nil && !isNil(o.WorkflowIDReusePolicy) {
 		return true
 	}
 
@@ -73,7 +73,7 @@ func (o *WorkflowStartOptions) SetWorkflowIDReusePolicy(v WorkflowIDReusePolicy)
 
 // GetCronSchedule returns the CronSchedule field value if set, zero value otherwise.
 func (o *WorkflowStartOptions) GetCronSchedule() string {
-	if o == nil || o.CronSchedule == nil {
+	if o == nil || isNil(o.CronSchedule) {
 		var ret string
 		return ret
 	}
@@ -83,15 +83,15 @@ func (o *WorkflowStartOptions) GetCronSchedule() string {
 // GetCronScheduleOk returns a tuple with the CronSchedule field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetCronScheduleOk() (*string, bool) {
-	if o == nil || o.CronSchedule == nil {
-		return nil, false
+	if o == nil || isNil(o.CronSchedule) {
+    return nil, false
 	}
 	return o.CronSchedule, true
 }
 
 // HasCronSchedule returns a boolean if a field has been set.
 func (o *WorkflowStartOptions) HasCronSchedule() bool {
-	if o != nil && o.CronSchedule != nil {
+	if o != nil && !isNil(o.CronSchedule) {
 		return true
 	}
 
@@ -105,7 +105,7 @@ func (o *WorkflowStartOptions) SetCronSchedule(v string) {
 
 // GetRetryPolicy returns the RetryPolicy field value if set, zero value otherwise.
 func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy {
-	if o == nil || o.RetryPolicy == nil {
+	if o == nil || isNil(o.RetryPolicy) {
 		var ret RetryPolicy
 		return ret
 	}
@@ -115,15 +115,15 @@ func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy {
 // GetRetryPolicyOk returns a tuple with the RetryPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetRetryPolicyOk() (*RetryPolicy, bool) {
-	if o == nil || o.RetryPolicy == nil {
-		return nil, false
+	if o == nil || isNil(o.RetryPolicy) {
+    return nil, false
 	}
 	return o.RetryPolicy, true
 }
 
 // HasRetryPolicy returns a boolean if a field has been set.
 func (o *WorkflowStartOptions) HasRetryPolicy() bool {
-	if o != nil && o.RetryPolicy != nil {
+	if o != nil && !isNil(o.RetryPolicy) {
 		return true
 	}
 
@@ -137,7 +137,7 @@ func (o *WorkflowStartOptions) SetRetryPolicy(v RetryPolicy) {
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
 func (o *WorkflowStartOptions) GetSearchAttributes() []SearchAttribute {
-	if o == nil || o.SearchAttributes == nil {
+	if o == nil || isNil(o.SearchAttributes) {
 		var ret []SearchAttribute
 		return ret
 	}
@@ -147,15 +147,15 @@ func (o *WorkflowStartOptions) GetSearchAttributes() []SearchAttribute {
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetSearchAttributesOk() ([]SearchAttribute, bool) {
-	if o == nil || o.SearchAttributes == nil {
-		return nil, false
+	if o == nil || isNil(o.SearchAttributes) {
+    return nil, false
 	}
 	return o.SearchAttributes, true
 }
 
 // HasSearchAttributes returns a boolean if a field has been set.
 func (o *WorkflowStartOptions) HasSearchAttributes() bool {
-	if o != nil && o.SearchAttributes != nil {
+	if o != nil && !isNil(o.SearchAttributes) {
 		return true
 	}
 
@@ -169,16 +169,16 @@ func (o *WorkflowStartOptions) SetSearchAttributes(v []SearchAttribute) {
 
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.WorkflowIDReusePolicy != nil {
+	if !isNil(o.WorkflowIDReusePolicy) {
 		toSerialize["workflowIDReusePolicy"] = o.WorkflowIDReusePolicy
 	}
-	if o.CronSchedule != nil {
+	if !isNil(o.CronSchedule) {
 		toSerialize["cronSchedule"] = o.CronSchedule
 	}
-	if o.RetryPolicy != nil {
+	if !isNil(o.RetryPolicy) {
 		toSerialize["retryPolicy"] = o.RetryPolicy
 	}
-	if o.SearchAttributes != nil {
+	if !isNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
 	return json.Marshal(toSerialize)

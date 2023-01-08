@@ -46,4 +46,53 @@ type (
 	GetDataObjectsQueryResponse struct {
 		DataObjects []iwfidl.KeyValue
 	}
+
+	GetCurrentTimerInfosQueryResponse struct {
+		StateExecutionCurrentTimerInfos map[string][]*TimerInfo // key is stateExecutionId
+	}
+
+	TimerInfo struct {
+		CommandId                  string
+		FiringUnixTimestampSeconds int64
+		Status                     InternalTimerStatus
+	}
+
+	SkipTimerSignalRequest struct {
+		StateExecutionId string
+		CommandId        string
+		CommandIndex     int
+	}
+
+	InternalTimerStatus string
 )
+
+const (
+	TimerPending InternalTimerStatus = "Pending"
+	TimerFired   InternalTimerStatus = "Fired"
+	TimerSkipped InternalTimerStatus = "Skipped"
+)
+
+// ValidateTimerSkipRequest validates if the skip timer request is valid
+// return true if it's valid, along with the timer pointer
+// use timerIdx if timerId is not empty
+func ValidateTimerSkipRequest(stateExeTimerInfos map[string][]*TimerInfo, stateExeId, timerId string, timerIdx int) (*TimerInfo, bool) {
+	timerInfos := stateExeTimerInfos[stateExeId]
+	if len(timerInfos) == 0 {
+		return nil, false
+	}
+	if timerId != "" {
+		for _, t := range timerInfos {
+			if t.CommandId == timerId {
+				return t, true
+			}
+		}
+		return nil, false
+	}
+	if timerIdx >= 0 && timerIdx < len(timerInfos) {
+		t := timerInfos[timerIdx]
+		if t.Status == TimerPending {
+			return t, true
+		}
+	}
+	return nil, false
+}

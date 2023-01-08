@@ -150,6 +150,17 @@ type DefaultApi interface {
 
 	// ApiV1WorkflowStopPostExecute executes the request
 	ApiV1WorkflowStopPostExecute(r ApiApiV1WorkflowStopPostRequest) (*http.Response, error)
+
+	/*
+	ApiV1WorkflowTimerSkipPost skip the timer of a workflow
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowTimerSkipPostRequest
+	*/
+	ApiV1WorkflowTimerSkipPost(ctx context.Context) ApiApiV1WorkflowTimerSkipPostRequest
+
+	// ApiV1WorkflowTimerSkipPostExecute executes the request
+	ApiV1WorkflowTimerSkipPostExecute(r ApiApiV1WorkflowTimerSkipPostRequest) (*http.Response, error)
 }
 
 // DefaultApiService DefaultApi service
@@ -252,7 +263,8 @@ func (a *DefaultApiService) ApiV1WorkflowDataobjectsGetPostExecute(r ApiApiV1Wor
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -366,7 +378,8 @@ func (a *DefaultApiService) ApiV1WorkflowGetPostExecute(r ApiApiV1WorkflowGetPos
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -480,7 +493,8 @@ func (a *DefaultApiService) ApiV1WorkflowGetWithWaitPostExecute(r ApiApiV1Workfl
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -594,7 +608,8 @@ func (a *DefaultApiService) ApiV1WorkflowResetPostExecute(r ApiApiV1WorkflowRese
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -708,7 +723,8 @@ func (a *DefaultApiService) ApiV1WorkflowSearchPostExecute(r ApiApiV1WorkflowSea
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -822,7 +838,8 @@ func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApi
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -934,7 +951,8 @@ func (a *DefaultApiService) ApiV1WorkflowSignalPostExecute(r ApiApiV1WorkflowSig
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}
@@ -1039,7 +1057,8 @@ func (a *DefaultApiService) ApiV1WorkflowStartPostExecute(r ApiApiV1WorkflowStar
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1153,7 +1172,8 @@ func (a *DefaultApiService) ApiV1WorkflowStateDecidePostExecute(r ApiApiV1Workfl
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1267,7 +1287,8 @@ func (a *DefaultApiService) ApiV1WorkflowStateStartPostExecute(r ApiApiV1Workflo
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1379,7 +1400,112 @@ func (a *DefaultApiService) ApiV1WorkflowStopPostExecute(r ApiApiV1WorkflowStopP
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.model = v
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiApiV1WorkflowTimerSkipPostRequest struct {
+	ctx context.Context
+	ApiService DefaultApi
+	workflowSkipTimerRequest *WorkflowSkipTimerRequest
+}
+
+func (r ApiApiV1WorkflowTimerSkipPostRequest) WorkflowSkipTimerRequest(workflowSkipTimerRequest WorkflowSkipTimerRequest) ApiApiV1WorkflowTimerSkipPostRequest {
+	r.workflowSkipTimerRequest = &workflowSkipTimerRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowTimerSkipPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.ApiV1WorkflowTimerSkipPostExecute(r)
+}
+
+/*
+ApiV1WorkflowTimerSkipPost skip the timer of a workflow
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowTimerSkipPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowTimerSkipPost(ctx context.Context) ApiApiV1WorkflowTimerSkipPostRequest {
+	return ApiApiV1WorkflowTimerSkipPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultApiService) ApiV1WorkflowTimerSkipPostExecute(r ApiApiV1WorkflowTimerSkipPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowTimerSkipPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/timer/skip"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowSkipTimerRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+            		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+            		newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}

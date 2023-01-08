@@ -41,7 +41,7 @@ func NewRetryPolicyWithDefaults() *RetryPolicy {
 
 // GetInitialIntervalSeconds returns the InitialIntervalSeconds field value if set, zero value otherwise.
 func (o *RetryPolicy) GetInitialIntervalSeconds() int32 {
-	if o == nil || o.InitialIntervalSeconds == nil {
+	if o == nil || isNil(o.InitialIntervalSeconds) {
 		var ret int32
 		return ret
 	}
@@ -51,15 +51,15 @@ func (o *RetryPolicy) GetInitialIntervalSeconds() int32 {
 // GetInitialIntervalSecondsOk returns a tuple with the InitialIntervalSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool) {
-	if o == nil || o.InitialIntervalSeconds == nil {
-		return nil, false
+	if o == nil || isNil(o.InitialIntervalSeconds) {
+    return nil, false
 	}
 	return o.InitialIntervalSeconds, true
 }
 
 // HasInitialIntervalSeconds returns a boolean if a field has been set.
 func (o *RetryPolicy) HasInitialIntervalSeconds() bool {
-	if o != nil && o.InitialIntervalSeconds != nil {
+	if o != nil && !isNil(o.InitialIntervalSeconds) {
 		return true
 	}
 
@@ -73,7 +73,7 @@ func (o *RetryPolicy) SetInitialIntervalSeconds(v int32) {
 
 // GetBackoffCoefficient returns the BackoffCoefficient field value if set, zero value otherwise.
 func (o *RetryPolicy) GetBackoffCoefficient() float32 {
-	if o == nil || o.BackoffCoefficient == nil {
+	if o == nil || isNil(o.BackoffCoefficient) {
 		var ret float32
 		return ret
 	}
@@ -83,15 +83,15 @@ func (o *RetryPolicy) GetBackoffCoefficient() float32 {
 // GetBackoffCoefficientOk returns a tuple with the BackoffCoefficient field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetBackoffCoefficientOk() (*float32, bool) {
-	if o == nil || o.BackoffCoefficient == nil {
-		return nil, false
+	if o == nil || isNil(o.BackoffCoefficient) {
+    return nil, false
 	}
 	return o.BackoffCoefficient, true
 }
 
 // HasBackoffCoefficient returns a boolean if a field has been set.
 func (o *RetryPolicy) HasBackoffCoefficient() bool {
-	if o != nil && o.BackoffCoefficient != nil {
+	if o != nil && !isNil(o.BackoffCoefficient) {
 		return true
 	}
 
@@ -105,7 +105,7 @@ func (o *RetryPolicy) SetBackoffCoefficient(v float32) {
 
 // GetMaximumIntervalSeconds returns the MaximumIntervalSeconds field value if set, zero value otherwise.
 func (o *RetryPolicy) GetMaximumIntervalSeconds() int32 {
-	if o == nil || o.MaximumIntervalSeconds == nil {
+	if o == nil || isNil(o.MaximumIntervalSeconds) {
 		var ret int32
 		return ret
 	}
@@ -115,15 +115,15 @@ func (o *RetryPolicy) GetMaximumIntervalSeconds() int32 {
 // GetMaximumIntervalSecondsOk returns a tuple with the MaximumIntervalSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool) {
-	if o == nil || o.MaximumIntervalSeconds == nil {
-		return nil, false
+	if o == nil || isNil(o.MaximumIntervalSeconds) {
+    return nil, false
 	}
 	return o.MaximumIntervalSeconds, true
 }
 
 // HasMaximumIntervalSeconds returns a boolean if a field has been set.
 func (o *RetryPolicy) HasMaximumIntervalSeconds() bool {
-	if o != nil && o.MaximumIntervalSeconds != nil {
+	if o != nil && !isNil(o.MaximumIntervalSeconds) {
 		return true
 	}
 
@@ -137,7 +137,7 @@ func (o *RetryPolicy) SetMaximumIntervalSeconds(v int32) {
 
 // GetMaximumAttempts returns the MaximumAttempts field value if set, zero value otherwise.
 func (o *RetryPolicy) GetMaximumAttempts() int32 {
-	if o == nil || o.MaximumAttempts == nil {
+	if o == nil || isNil(o.MaximumAttempts) {
 		var ret int32
 		return ret
 	}
@@ -147,15 +147,15 @@ func (o *RetryPolicy) GetMaximumAttempts() int32 {
 // GetMaximumAttemptsOk returns a tuple with the MaximumAttempts field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetMaximumAttemptsOk() (*int32, bool) {
-	if o == nil || o.MaximumAttempts == nil {
-		return nil, false
+	if o == nil || isNil(o.MaximumAttempts) {
+    return nil, false
 	}
 	return o.MaximumAttempts, true
 }
 
 // HasMaximumAttempts returns a boolean if a field has been set.
 func (o *RetryPolicy) HasMaximumAttempts() bool {
-	if o != nil && o.MaximumAttempts != nil {
+	if o != nil && !isNil(o.MaximumAttempts) {
 		return true
 	}
 
@@ -169,16 +169,16 @@ func (o *RetryPolicy) SetMaximumAttempts(v int32) {
 
 func (o RetryPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.InitialIntervalSeconds != nil {
+	if !isNil(o.InitialIntervalSeconds) {
 		toSerialize["initialIntervalSeconds"] = o.InitialIntervalSeconds
 	}
-	if o.BackoffCoefficient != nil {
+	if !isNil(o.BackoffCoefficient) {
 		toSerialize["backoffCoefficient"] = o.BackoffCoefficient
 	}
-	if o.MaximumIntervalSeconds != nil {
+	if !isNil(o.MaximumIntervalSeconds) {
 		toSerialize["maximumIntervalSeconds"] = o.MaximumIntervalSeconds
 	}
-	if o.MaximumAttempts != nil {
+	if !isNil(o.MaximumAttempts) {
 		toSerialize["maximumAttempts"] = o.MaximumAttempts
 	}
 	return json.Marshal(toSerialize)

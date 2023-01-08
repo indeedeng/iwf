@@ -8,7 +8,7 @@ import (
 )
 
 type ActivityProvider interface {
-	GetLogger(ctx context.Context) ActivityLogger
+	GetLogger(ctx context.Context) UnifiedLogger
 	NewApplicationError(message, errType string, details ...interface{}) error
 }
 
@@ -29,7 +29,7 @@ func getActivityProviderByType(backendType service.BackendType) ActivityProvider
 	return provider
 }
 
-type ActivityLogger interface {
+type UnifiedLogger interface {
 	Debug(msg string, keyvals ...interface{})
 	Info(msg string, keyvals ...interface{})
 	Warn(msg string, keyvals ...interface{})
@@ -88,6 +88,7 @@ type WorkflowProvider interface {
 	GetContextValue(ctx UnifiedContext, key string) interface{}
 	GetVersion(ctx UnifiedContext, changeID string, minSupported, maxSupported int) int
 	GetBackendType() service.BackendType
+	GetLogger(ctx UnifiedContext) UnifiedLogger
 }
 
 type ReceiveChannel interface {
