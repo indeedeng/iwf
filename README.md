@@ -18,7 +18,7 @@ Related projects:
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
 * [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk)
 * [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples) 
-* More SDKs? Contribution is welcome. Any languages can be supported as long as implementing the [OpenAPI IDL](https://github.com/indeedeng/iwf-idl).
+* More SDKs? Contribution is welcome. Any languages can be supported as long as implementing the [OpenAPI IDL](https://github.com/indeedeng/iwf-idl/blob/main/iwf.yaml).
 
 # Table of contents
 
