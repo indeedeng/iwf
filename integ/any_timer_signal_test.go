@@ -51,7 +51,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType)
 	})
 
 	// start a workflow
-	wfId := anytimersignal.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := anytimersignal.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,

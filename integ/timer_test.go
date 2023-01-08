@@ -50,7 +50,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := timer.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := timer.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,

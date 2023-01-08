@@ -164,16 +164,19 @@ integTests:
 	$Q go test -v ./integ
 
 integTestsNoSearch:
-	$Q go test -v ./integ -search=false -searchWaitMs=100
+	$Q go test -v ./integ -search=false
 
-integTestsWithStress:
-	$Q go test -v ./integ -repeat=10 intervalMs=100 -search=false -searchWaitMs=100
+stressTestsWithSearch:
+	$Q go test -v ./integ -repeat=10 intervalMs=100 -searchWaitMs=100
 
-integTestsCadence:
-	$Q go test -v ./integ -repeat=10 -temporal=false intervalMs=100 -search=false -searchWaitMs=1000
+stressTestsNoSearch:
+	$Q go test -v ./integ -repeat=10 intervalMs=100 -search=false
 
-integTestsTemporal:
-	$Q go test -v ./integ -repeat=10 -cadence=false intervalMs=100 -search=false -searchWaitMs=1000
+stressTestsCadenceNoSearch:
+	$Q go test -v ./integ -repeat=10 -temporal=false intervalMs=100 -search=false
+
+stressTestsTemporalNoSearch:
+	$Q go test -v ./integ -repeat=10 -cadence=false intervalMs=100 -search=false
 
 help:
 	@# print help first, so it's visible

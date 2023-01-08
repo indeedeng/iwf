@@ -48,7 +48,7 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 			},
 		},
 	})
-	wfId := anycommandclose.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := anycommandclose.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,

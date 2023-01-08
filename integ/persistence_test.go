@@ -52,7 +52,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().Unix()))
+	wfId := persistence.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	nowTime := time.Now()
 	notTimeNanoStr := fmt.Sprintf("%v", nowTime.UnixNano())
 	nowTimeStr := nowTime.Format(timeparser.DateTimeFormat)
