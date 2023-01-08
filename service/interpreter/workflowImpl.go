@@ -38,9 +38,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			StateInput:   &input.StateInput,
 		},
 	}
-	persistenceManager := NewPersistenceManager(func(attributes map[string]interface{}) error {
-		return provider.UpsertSearchAttributes(ctx, attributes)
-	})
+	persistenceManager := NewPersistenceManager(provider)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil
@@ -190,7 +188,7 @@ func executeState(
 	state iwfidl.StateMovement,
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
-	attrMgr *PersistenceManager,
+	persistenceManager *PersistenceManager,
 	interStateChannel *InterStateChannel,
 ) (*iwfidl.StateDecision, error) {
 	activityOptions := ActivityOptions{
@@ -220,19 +218,19 @@ func executeState(
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			StateInput:       state.StateInput,
-			SearchAttributes: attrMgr.LoadSearchAttributes(state.StateOptions),
-			DataObjects:      attrMgr.LoadDataObjects(state.StateOptions),
+			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
+			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	err = attrMgr.ProcessUpsertSearchAttribute(startResponse.GetUpsertSearchAttributes())
+	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}
@@ -425,8 +423,8 @@ func executeState(
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      startResponse.GetUpsertStateLocals(),
-			SearchAttributes: attrMgr.LoadSearchAttributes(state.StateOptions),
-			DataObjects:      attrMgr.LoadDataObjects(state.StateOptions),
+			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
+			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)
@@ -435,11 +433,11 @@ func executeState(
 	}
 
 	decision := decideResponse.GetStateDecision()
-	err = attrMgr.ProcessUpsertSearchAttribute(decideResponse.GetUpsertSearchAttributes())
+	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
 	}
-	err = attrMgr.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, err
 	}
