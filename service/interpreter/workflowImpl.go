@@ -39,7 +39,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		},
 	}
 	persistenceManager := NewPersistenceManager(provider)
-	timerProcessor := NewTimerProcessor(provider)
+	timerProcessor := NewTimerProcessor(ctx, provider)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil

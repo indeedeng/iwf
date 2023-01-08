@@ -17,6 +17,8 @@ const (
 	GetCurrentTimerInfosQueryType     = "GetCurrentTimerInfos"
 	GetInterStateChannelDataQueryType = "GetInterStateChannelData"
 
+	SkipTimerSignalChannelName = "IwfSystemSkipTimerChannel"
+
 	WorkflowErrorTypeUserWorkflowDecision = "UserWorkflowDecision"
 	WorkflowErrorTypeUserWorkflowError    = "UserWorkflowError"
 	WorkflowErrorTypeUserInternalError    = "InternalError"

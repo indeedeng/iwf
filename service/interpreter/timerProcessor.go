@@ -12,11 +12,20 @@ type TimerProcessor struct {
 	logger                          UnifiedLogger
 }
 
-func NewTimerProcessor(provider WorkflowProvider) *TimerProcessor {
-	return &TimerProcessor{
+func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProcessor {
+	tp := &TimerProcessor{
 		provider:                        provider,
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
 	}
+	provider.GoNamed(ctx, "skip-timer-signal-handler", func(ctx UnifiedContext) {
+		for {
+			ch := provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
+			val := service.SkipTimerSignalRequest{}
+			ch.Receive(ctx, &val)
+			tp.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
+		}
+	})
+	return tp
 }
 
 func (t *TimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {

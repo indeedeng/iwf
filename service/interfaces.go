@@ -57,6 +57,12 @@ type (
 		Status                     InternalTimerStatus
 	}
 
+	SkipTimerSignalRequest struct {
+		StateExecutionId string
+		CommandId        string
+		CommandIndex     int
+	}
+
 	InternalTimerStatus string
 )
 

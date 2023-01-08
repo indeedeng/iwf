@@ -170,10 +170,10 @@ integTestsWithStress:
 	$Q go test -v ./integ -repeat=10 intervalMs=100 -search=false -searchWaitMs=100
 
 integTestsCadence:
-	$Q go test -v ./integ -repeat=10 -temporal=false intervalMs=100 -search=false -searchWaitMs=100
+	$Q go test -v ./integ -repeat=10 -temporal=false intervalMs=100 -search=false -searchWaitMs=1000
 
 integTestsTemporal:
-	$Q go test -v ./integ -repeat=10 -cadence=false intervalMs=100 -search=false -searchWaitMs=100
+	$Q go test -v ./integ -repeat=10 -cadence=false intervalMs=100 -search=false -searchWaitMs=1000
 
 help:
 	@# print help first, so it's visible
