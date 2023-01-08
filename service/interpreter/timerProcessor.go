@@ -25,6 +25,14 @@ func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProc
 			tp.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
 		}
 	})
+	err := provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
+		return service.GetCurrentTimerInfosQueryResponse{
+			StateExecutionCurrentTimerInfos: tp.stateExecutionCurrentTimerInfos,
+		}, nil
+	})
+	if err != nil {
+		panic("cannot set query handler")
+	}
 	return tp
 }
 
