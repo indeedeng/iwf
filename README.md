@@ -104,14 +104,19 @@ requested `Commands` are completed, `decide` API will be triggered. The number o
 Application can start a workflow instance with a `workflowId` for any workflow definition. A workflow instance is called `WorkflowExecution`. 
 iWF server returns `runId` of UUID as the identifier of the WorkflowExecution. The runId is globally unique.  
 
-WorkflowId uniqueness: At anytime, there must be at most one WorkflowExecution running with the same workflowId. However, 
-after a previous WorkflowExecution finished running (in any closed status), 
-application may start a new WorkflowExecutions with the same workflowId using appropriate `IdReusePolicy`. 
-
-There must be at least one WorkflowState being executed for a running WorkflowExecution. The instance of WorkflowState is called `StateExecution`.     
-
 :warning: Note:
-> Depends on the context, the only word `workflow` may mean WorkflowExecution(most commonly), WorkflowDefinition or both.  
+> Depends on the context, the only word `workflow` may mean WorkflowExecution(most commonly), WorkflowDefinition or both.
+
+For a running WorkflowExecution, there must be at least one `WorkflowState` being executed, otherwise the workflow execution will complete. 
+An execution instance of WorkflowState is called `StateExecution`, which by identified `StateExecutionId`. A `StateExecutionId` is formatted
+as `<StateId>-<Number>`. `StateId` is defined by workflow state definition, while `Number` is how many times this `StateId` has been executed.
+StateExecutionId is only unique within the workflow execution.
+
+
+WorkflowId uniqueness and reuse: For the same workflowId, there must be at most one WorkflowExecution running at anytime. However,
+after a previous WorkflowExecution finished running (in any closed status),
+application may start a new WorkflowExecution with the same workflowId using appropriate `IdReusePolicy`.
+
 
 ### Commands
 These are the three command types:
@@ -122,7 +127,7 @@ These are the three command types:
 Note that `start` API can return multiple commands, and choose different DeciderTriggerType for triggering decide API:
 * `AllCommandCompleted`: this will wait for all command completed
 * `AnyCommandCompleted`: this will wait for any command completed
-* `AnyCommandCombinationCompleted`: (WIP) this will wait for a list of command combinations on any combination completed
+* `AnyCommandCombinationCompleted`: this will wait for a list of command combinations on any combination completed
 
 ### Persistence
 iWF provides super simple persistence abstraction. Developers don't need to touch any database system to register/maintain the schemas. 
@@ -398,7 +403,7 @@ When something goes wrong in your applications, here are the tips:
 
 ### 1.2 
 - [x] Skip timer API for testing/operation
-- [ ] Decider trigger type: any command combination 
+- [x] Decider trigger type: any command combination 
 
 ### Future
 - [ ] Auto continueAsNew([WIP](https://github.com/indeedeng/iwf/issues/107))
