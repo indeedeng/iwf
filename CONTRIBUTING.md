@@ -76,8 +76,9 @@ cadence adm cl asa --search_attr_key IwfGlobalWorkflowVersion --search_attr_type
 cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
 cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
 ```
-After registering, it may take [up 60s](https://github.com/uber/cadence/blob/d618e32ac5ea05c411cca08c3e4859e800daa1e0/docker/config_template.yaml#L286) for Cadence to load the new search attributes. If you run the test too early, you may see error:
- like `"IwfWorkflowType is not a valid search attribute key"`
+After registering, it may take [up 60s](https://github.com/uber/cadence/blob/d618e32ac5ea05c411cca08c3e4859e800daa1e0/docker/config_template.yaml#L286) 
+for Cadence to load the new search attributes. If you run the test too early, you may see error:  `"IwfWorkflowType is not a valid search attribute key"`
+
 4. Go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
 If you run into any issues with Search Attributes registration, use the below command to check the existing Search attributes:
