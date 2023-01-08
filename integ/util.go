@@ -48,13 +48,19 @@ func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {
 }
 
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
+	_, cf := doStartIwfServiceWithClient(backendType)
+	return cf
+}
+
+func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
 	if backendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
 		logger, err := loggerimpl.NewDevelopment()
 		if err != nil {
 			panic(err)
 		}
-		iwfService := api.NewService(temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter()), logger)
+		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter())
+		iwfService := api.NewService(uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -68,7 +74,7 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 		// start iwf interpreter worker
 		interpreter := temporal.NewInterpreterWorker(temporalClient, service.TaskQueue)
 		interpreter.Start()
-		return func() {
+		return uclient, func() {
 			iwfServer.Close()
 			interpreter.Close()
 		}
@@ -84,7 +90,8 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 		if err != nil {
 			panic(err)
 		}
-		iwfService := api.NewService(cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc), logger)
+		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
+		iwfService := api.NewService(uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -98,7 +105,7 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 		// start iwf interpreter worker
 		interpreter := cadence.NewInterpreterWorker(serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
 		interpreter.Start()
-		return func() {
+		return uclient, func() {
 			iwfServer.Close()
 			interpreter.Close()
 		}

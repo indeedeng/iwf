@@ -39,7 +39,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(backendType)
+	uclient, closeFunc2 := doStartIwfServiceWithClient(backendType)
 	defer closeFunc2()
 
 	// start a workflow
@@ -52,19 +52,81 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	})
 	wfId := timer.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
+	nowTimestamp := time.Now().Unix()
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        timer.WorkflowType,
 		WorkflowTimeoutSeconds: 30,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           timer.State1,
+		StateInput: &iwfidl.EncodedObject{
+			Data: iwfidl.PtrString(strconv.Itoa(int(nowTimestamp))),
+		},
 	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second * 3)
+	timerInfos := service.GetCurrentTimerInfosQueryResponse{}
+	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
 	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
+		log.Fatalf("Fail to invoke query %v", err)
 	}
-	if httpResp.StatusCode != http.StatusOK {
-		log.Fatalf("Status not success" + httpResp.Status)
+	assertions := assert.New(t)
+	timer2 := &service.TimerInfo{
+		CommandId:                  "timer-cmd-id-2",
+		FiringUnixTimestampSeconds: nowTimestamp + 86400,
+		Status:                     service.TimerPending,
 	}
+	timer3 := &service.TimerInfo{
+		CommandId:                  "timer-cmd-id-3",
+		FiringUnixTimestampSeconds: nowTimestamp + 86400*365,
+		Status:                     service.TimerPending,
+	}
+	expectedTimerInfos := service.GetCurrentTimerInfosQueryResponse{
+		StateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{
+			"S1-1": {
+				{
+					CommandId:                  "timer-cmd-id",
+					FiringUnixTimestampSeconds: nowTimestamp + 10,
+					Status:                     service.TimerPending,
+				},
+				timer2,
+				timer3,
+			},
+		},
+	}
+	assertions.Equal(expectedTimerInfos, timerInfos)
+
+	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
+	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
+		WorkflowId:               wfId,
+		WorkflowStateExecutionId: "S1-1",
+		TimerCommandId:           iwfidl.PtrString("timer-cmd-id-2"),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
+	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
+	if err != nil {
+		log.Fatalf("Fail to invoke query %v", err)
+	}
+	timer2.Status = service.TimerSkipped
+	assertions.Equal(expectedTimerInfos, timerInfos)
+
+	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
+		WorkflowId:               wfId,
+		WorkflowStateExecutionId: "S1-1",
+		TimerCommandIndex:        iwfidl.PtrInt32(2),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
+	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
+	if err != nil {
+		log.Fatalf("Fail to invoke query %v", err)
+	}
+	timer3.Status = service.TimerSkipped
+	assertions.Equal(expectedTimerInfos, timerInfos)
 
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
@@ -79,7 +141,6 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	}
 
 	history, data := wfHandler.GetTestResult()
-	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,
@@ -88,5 +149,5 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	}, history, "timer test fail, %v", history)
 	duration := (data["fired_at"]).(int64) - (data["scheduled_at"]).(int64)
 	assertions.Equal("timer-cmd-id", data["timer_id"])
-	assertions.True(duration >= 9 && duration <= 11)
+	assertions.True(duration >= 9 && duration <= 11, duration)
 }
