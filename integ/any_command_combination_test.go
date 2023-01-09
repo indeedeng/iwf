@@ -3,7 +3,6 @@ package integ
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	anycommandconbination "github.com/indeedeng/iwf/integ/workflow/any_command_combination"
 	"github.com/indeedeng/iwf/service"
@@ -34,6 +33,7 @@ func TestAnyCommandCombinationWorkflowCadence(t *testing.T) {
 }
 
 func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType) {
+	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := anycommandconbination.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -76,7 +76,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	panicAtHttpError(err, httpResp)
 
 	// skip the timer
-	time.Sleep(time.Second) // wait for a second so that timer is ready to be skipped
+	time.Sleep(time.Second * 2) // wait for a second so that timer is ready to be skipped
 	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
@@ -85,20 +85,13 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(time.Second)
 	// now it should be running at S2
-	// TODO maybe we check it is already done S2??
+	// Future: we can check it is already done S1
 
-	// send two signals for s2
+	// send first signal for s2
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
-		SignalValue:       &signalValue,
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
-		WorkflowId:        wfId,
-		SignalChannelName: anycommandconbination.SignalNameAndId2,
 		SignalValue:       &signalValue,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
@@ -106,27 +99,26 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	// wait and check the workflow, it should be still running
 	time.Sleep(time.Second)
 	reqDesc := apiClient.DefaultApi.ApiV1WorkflowGetPost(context.Background())
-	_, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
-		WorkflowId: wfId,
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-
-	// skip the other timer
-	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
-		WorkflowId:               wfId,
-		WorkflowStateExecutionId: "S2-1",
-		TimerCommandId:           iwfidl.PtrString(anycommandconbination.TimerId1),
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-
-	// workflow should be completed now
 	descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
+	assertions.Equal(iwfidl.RUNNING, descResp.GetWorkflowStatus())
 
-	assertions := assert.New(t)
+	// send 2nd signal for s2
+	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+		WorkflowId:        wfId,
+		SignalChannelName: anycommandconbination.SignalNameAndId2,
+		SignalValue:       &signalValue,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
 
+	// workflow should be completed now
+	time.Sleep(time.Second)
+	descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: wfId,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
 	assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
 
 	history, data := wfHandler.GetTestResult()
@@ -138,6 +130,21 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"S2_decide": 1,
 	}, history, "anycommandconbination test fail, %v", history)
 
-	dataStr, _ := json.Marshal(data)
-	fmt.Println(string(dataStr))
+	var s1CommandResults iwfidl.CommandResults
+	var s2CommandResults iwfidl.CommandResults
+	s1ResultJsonStr := "{\"signalResults\":[{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, {\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"WAITING\"}],\"timerResults\":[{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}]}"
+	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
+	if err != nil {
+		panic(err)
+	}
+	s2ResultsJsonStr := "{\"signalResults\":[{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, {\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}],\"timerResults\":[{\"commandId\":\"test-timer-1\",\"timerStatus\":\"SCHEDULED\"}]}"
+	err = json.Unmarshal([]byte(s2ResultsJsonStr), &s2CommandResults)
+	if err != nil {
+		panic(err)
+	}
+	expectedData := map[string]interface{}{
+		"s1_commandResults": s1CommandResults,
+		"s2_commandResults": s2CommandResults,
+	}
+	assertions.Equal(expectedData, data)
 }
