@@ -316,26 +316,7 @@ func executeState(
 		}
 	}
 
-	// TODO process long running activity command
-
-	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
-		triggerType := commandReq.GetDeciderTriggerType()
-		if triggerType == iwfidl.ALL_COMMAND_COMPLETED {
-			err = provider.Await(ctx, func() bool {
-				return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
-					len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
-					len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
-			})
-		} else if triggerType == iwfidl.ANY_COMMAND_COMPLETED {
-			err = provider.Await(ctx, func() bool {
-				return len(completedTimerCmds)+
-					len(completedSignalCmds)+
-					len(completedInterStateChannelCmds) > 0
-			})
-		} else {
-			return nil, provider.NewApplicationError("unsupported decider trigger type", "unsupported", triggerType)
-		}
-	}
+	WaitForDeciderTriggerType(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds)
 	commandReqDone = true
 
 	if err != nil {
