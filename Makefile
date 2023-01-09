@@ -167,16 +167,16 @@ integTestsNoSearch:
 	$Q go test -v ./integ -search=false
 
 stressTestsWithSearch:
-	$Q go test -v ./integ -repeat=10 intervalMs=100 -searchWaitMs=100
+	$Q go test -v ./integ -repeat=10 -intervalMs=100 -searchWaitMs=100 | tee test.log # TODO https://github.com/indeedeng/iwf/issues/134
 
 stressTestsNoSearch:
-	$Q go test -v ./integ -repeat=10 intervalMs=100 -search=false
+	$Q go test -v ./integ -repeat=10 -search=false | tee test.log
 
 stressTestsCadenceNoSearch:
-	$Q go test -v ./integ -repeat=10 -temporal=false intervalMs=100 -search=false
+	$Q go test -v ./integ -repeat=10 -temporal=false -search=false | tee test.log
 
 stressTestsTemporalNoSearch:
-	$Q go test -v ./integ -repeat=10 -cadence=false intervalMs=100 -search=false
+	$Q go test -v ./integ -repeat=10 -cadence=false -search=false | tee test.log
 
 help:
 	@# print help first, so it's visible
