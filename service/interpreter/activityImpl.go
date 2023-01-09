@@ -104,7 +104,10 @@ func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
 		}
 		if dtt == iwfidl.ANY_COMMAND_COMBINATION_COMPLETED {
 			// every command must have an id for this type
-			err := fmt.Errorf("ANY_COMMAND_COMBINATION_COMPLETED can only be used when every command has an commandId")
+			err := fmt.Errorf("ANY_COMMAND_COMBINATION_COMPLETED can only be used when every command has an commandId, and the combination list cannot be empty")
+			if len(commandReq.GetCommandCombinations()) == 0 {
+				return err
+			}
 			for _, cmd := range commandReq.GetTimerCommands() {
 				if cmd.GetCommandId() == "" {
 					return err
