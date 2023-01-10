@@ -6,10 +6,10 @@ HOST=''
 TEMPORAL_SERVICE_NAME="${TEMPORAL_SERVICE_NAME:-temporal}"
 CADENCE_SERVICE_NAME="${CADENCE_SERVICE_NAME:-cadence}"
 
-if [[ -n "${BACKEND_DEPENDENCY}" && "${BACKEND_DEPENDENCY,,}" = "cadence" ]]; then
+if [[ -n "${BACKEND_DEPENDENCY}" && "${BACKEND_DEPENDENCY}" = "cadence" ]]; then
   HOST=$(echo ${CADENCE_HOST_PORT:-"${CADENCE_SERVICE_NAME}:7833"} | sed 's/:/ /')
 else
-    HOST=$(echo ${TEMPORAL_HOST_PORT:-"${TEMPORAL_SERVICE_NAME}:7233"} | sed 's/:/ /')
+  HOST=$(echo ${TEMPORAL_HOST_PORT:-"${TEMPORAL_SERVICE_NAME}:7233"} | sed 's/:/ /')
 fi
 
 RESULT=1
@@ -27,7 +27,7 @@ echo "now waiting 20s for server to be ready, so that another script will regist
 
 for run in {1..60}; do
   sleep 1
-  if nc -zv temporal 7233; then
+  if nc -zv ${HOST}; then
     break
   fi
 done
