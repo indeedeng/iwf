@@ -68,7 +68,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		Data:     iwfidl.PtrString("test data"),
 	}
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
-	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	startReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        basic.WorkflowType,
 		WorkflowTimeoutSeconds: 100,
@@ -101,13 +101,27 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 				MaximumIntervalSeconds: iwfidl.PtrInt32(13),
 			},
 		},
-	}).Execute()
+	}
+	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	if err != nil {
 		log.Fatalf("Fail to invoke start api %v", err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
 		log.Fatalf("Status not success" + httpResp.Status)
 	}
+
+	// start it again should return already started error
+	_, _, err = req.WorkflowStartRequest(startReq).Execute()
+	apiErr, ok := err.(*iwfidl.GenericOpenAPIError)
+	if !ok {
+		log.Fatalf("Should fail to invoke start api %v", err)
+	}
+	errResp, ok := apiErr.Model().(iwfidl.ErrorResponse)
+	if !ok {
+		log.Fatalf("should be error response")
+	}
+	assertions := assert.New(t)
+	assertions.Equal(errResp.GetSubStatus(), iwfidl.WORKFLOW_ALREADY_STARTED_SUB_STATUS)
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -120,8 +134,21 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("Fail to get workflow" + httpResp.Status)
 	}
 
+	// use a wrong workflowId to test the error case
+	_, _, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: "a wrong workflowId",
+	}).Execute()
+	apiErr, ok = err.(*iwfidl.GenericOpenAPIError)
+	if !ok {
+		log.Fatalf("Should fail to invoke get api %v", err)
+	}
+	errResp, ok = apiErr.Model().(iwfidl.ErrorResponse)
+	if !ok {
+		log.Fatalf("should be error response")
+	}
+	assertions.Equal(errResp.GetSubStatus(), iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS)
+
 	history, _ := wfHandler.GetTestResult()
-	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,

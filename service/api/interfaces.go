@@ -24,6 +24,7 @@ type ApiService interface {
 
 type UnifiedClient interface {
 	Close()
+	errorChecker
 	StartInterpreterWorkflow(ctx context.Context, options StartWorkflowOptions, args ...interface{}) (runId string, err error)
 	SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error
 	CancelWorkflow(ctx context.Context, workflowID string, runID string) error
@@ -32,6 +33,11 @@ type UnifiedClient interface {
 	DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*DescribeWorkflowExecutionResponse, error)
 	GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error
 	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
+}
+
+type errorChecker interface {
+	IsWorkflowAlreadyStartedError(error) bool
+	IsNotFoundError(error) bool
 }
 
 type StartWorkflowOptions struct {

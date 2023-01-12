@@ -24,6 +24,16 @@ type cadenceClient struct {
 	converter     encoded.DataConverter
 }
 
+func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
+	_, ok := err.(*shared.WorkflowExecutionAlreadyStartedError)
+	return ok
+}
+
+func (t *cadenceClient) IsNotFoundError(err error) bool {
+	_, ok := err.(*shared.EntityNotExistsError)
+	return ok
+}
+
 func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, converter encoded.DataConverter, closeFunc func()) api.UnifiedClient {
 	return &cadenceClient{
 		domain:        domain,
@@ -63,11 +73,11 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 		workflowOptions.RetryPolicy = retry.ConvertCadenceRetryPolicy(options.RetryPolicy)
 	}
 
-	run, err := t.cClient.ExecuteWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
+	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
 	if err != nil {
 		return "", err
 	}
-	return run.GetRunID(), nil
+	return run.RunID, nil
 }
 
 func (t *cadenceClient) SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error {

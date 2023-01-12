@@ -239,21 +239,26 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 }
 
 func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
-	return &errors.ErrorAndStatus{
-		StatusCode: http.StatusBadRequest,
-		Error: iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString("invalid request - " + msg),
-		},
-	}
+	return errors.NewErrorAndStatus(http.StatusBadRequest,
+		iwfidl.UNCATEGORIZED_SUB_STATUS,
+		"invalid request - "+msg)
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {
-	// TODO differentiate different error for different codes
 	s.logger.Error("encounter error for API", tag.Error(err))
-	return &errors.ErrorAndStatus{
-		StatusCode: http.StatusInternalServerError,
-		Error: iwfidl.ErrorResponse{
-			Detail: iwfidl.PtrString(err.Error()),
-		},
+	status := http.StatusInternalServerError
+	subStatus := iwfidl.UNCATEGORIZED_SUB_STATUS
+	if s.client.IsNotFoundError(err) {
+		status = http.StatusBadRequest
+		subStatus = iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS
 	}
+	if s.client.IsWorkflowAlreadyStartedError(err) {
+		status = http.StatusBadRequest
+		subStatus = iwfidl.WORKFLOW_ALREADY_STARTED_SUB_STATUS
+	}
+	return errors.NewErrorAndStatus(
+		status,
+		subStatus,
+		err.Error(),
+	)
 }

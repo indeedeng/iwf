@@ -104,6 +104,7 @@ Class | Method | HTTP request | Description
  - [DeciderTriggerType](docs/DeciderTriggerType.md)
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
+ - [ErrorSubStatus](docs/ErrorSubStatus.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)
  - [InterStateChannelPublishing](docs/InterStateChannelPublishing.md)
  - [InterStateChannelResult](docs/InterStateChannelResult.md)
