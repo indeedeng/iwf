@@ -468,8 +468,14 @@ components:
         detail:
           type: string
         subStatus:
-          type: string
+          $ref: '#/components/schemas/ErrorSubStatus'
       type: object
+    ErrorSubStatus:
+      enum:
+      - ERR_UNCATEGORIZED
+      - ERR_WORKFLOW_ALREADY_STARTED
+      - ERR_WORKFLOW_NOT_EXISTS
+      type: string
     WorkflowStartRequest:
       example:
         startStateId: startStateId

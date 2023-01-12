@@ -17,7 +17,7 @@ import (
 // ErrorResponse struct for ErrorResponse
 type ErrorResponse struct {
 	Detail *string `json:"detail,omitempty"`
-	SubStatus *string `json:"subStatus,omitempty"`
+	SubStatus *ErrorSubStatus `json:"subStatus,omitempty"`
 }
 
 // NewErrorResponse instantiates a new ErrorResponse object
@@ -70,9 +70,9 @@ func (o *ErrorResponse) SetDetail(v string) {
 }
 
 // GetSubStatus returns the SubStatus field value if set, zero value otherwise.
-func (o *ErrorResponse) GetSubStatus() string {
+func (o *ErrorResponse) GetSubStatus() ErrorSubStatus {
 	if o == nil || isNil(o.SubStatus) {
-		var ret string
+		var ret ErrorSubStatus
 		return ret
 	}
 	return *o.SubStatus
@@ -80,7 +80,7 @@ func (o *ErrorResponse) GetSubStatus() string {
 
 // GetSubStatusOk returns a tuple with the SubStatus field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ErrorResponse) GetSubStatusOk() (*string, bool) {
+func (o *ErrorResponse) GetSubStatusOk() (*ErrorSubStatus, bool) {
 	if o == nil || isNil(o.SubStatus) {
     return nil, false
 	}
@@ -96,8 +96,8 @@ func (o *ErrorResponse) HasSubStatus() bool {
 	return false
 }
 
-// SetSubStatus gets a reference to the given string and assigns it to the SubStatus field.
-func (o *ErrorResponse) SetSubStatus(v string) {
+// SetSubStatus gets a reference to the given ErrorSubStatus and assigns it to the SubStatus field.
+func (o *ErrorResponse) SetSubStatus(v ErrorSubStatus) {
 	o.SubStatus = &v
 }
 

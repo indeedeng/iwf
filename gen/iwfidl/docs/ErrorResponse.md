@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Detail** | Pointer to **string** |  | [optional] 
-**SubStatus** | Pointer to **string** |  | [optional] 
+**SubStatus** | Pointer to [**ErrorSubStatus**](ErrorSubStatus.md) |  | [optional] 
 
 ## Methods
 
@@ -53,20 +53,20 @@ HasDetail returns a boolean if a field has been set.
 
 ### GetSubStatus
 
-`func (o *ErrorResponse) GetSubStatus() string`
+`func (o *ErrorResponse) GetSubStatus() ErrorSubStatus`
 
 GetSubStatus returns the SubStatus field if non-nil, zero value otherwise.
 
 ### GetSubStatusOk
 
-`func (o *ErrorResponse) GetSubStatusOk() (*string, bool)`
+`func (o *ErrorResponse) GetSubStatusOk() (*ErrorSubStatus, bool)`
 
 GetSubStatusOk returns a tuple with the SubStatus field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetSubStatus
 
-`func (o *ErrorResponse) SetSubStatus(v string)`
+`func (o *ErrorResponse) SetSubStatus(v ErrorSubStatus)`
 
 SetSubStatus sets SubStatus field to given value.
 
