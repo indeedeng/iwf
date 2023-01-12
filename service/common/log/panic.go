@@ -48,12 +48,7 @@ func CapturePanic(errPanic interface{}, logger Logger, retError **errors.ErrorAn
 		logger.Error("Panic is captured", tag.SysStackTrace(st), tag.Error(err))
 
 		if retError != nil {
-			*retError = &errors.ErrorAndStatus{
-				StatusCode: http.StatusInternalServerError,
-				Error: iwfidl.ErrorResponse{
-					Detail: iwfidl.PtrString(err.Error()),
-				},
-			}
+			*retError = errors.NewErrorAndStatus(http.StatusInternalServerError, iwfidl.UNCATEGORIZED_SUB_STATUS, err.Error())
 		}
 	}
 }

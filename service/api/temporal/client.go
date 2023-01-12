@@ -11,15 +11,26 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
+	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/workflowservice/v1"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
+	realtemporal "go.temporal.io/sdk/temporal"
 )
 
 type temporalClient struct {
 	tClient       client.Client
 	namespace     string
 	dataConverter converter.DataConverter
+}
+
+func (t *temporalClient) IsWorkflowAlreadyStartedError(err error) bool {
+	return realtemporal.IsWorkflowExecutionAlreadyStartedError(err)
+}
+
+func (t *temporalClient) IsNotFoundError(err error) bool {
+	_, ok := err.(*serviceerror.NotFound)
+	return ok
 }
 
 func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter) api.UnifiedClient {
@@ -36,10 +47,11 @@ func (t *temporalClient) Close() {
 
 func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                       options.ID,
-		TaskQueue:                options.TaskQueue,
-		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
-		SearchAttributes:         options.SearchAttributes,
+		ID:                                       options.ID,
+		TaskQueue:                                options.TaskQueue,
+		WorkflowExecutionTimeout:                 options.WorkflowExecutionTimeout,
+		SearchAttributes:                         options.SearchAttributes,
+		WorkflowExecutionErrorWhenAlreadyStarted: true,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {

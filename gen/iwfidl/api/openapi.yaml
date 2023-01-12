@@ -472,9 +472,9 @@ components:
       type: object
     ErrorSubStatus:
       enum:
-      - ERR_UNCATEGORIZED
-      - ERR_WORKFLOW_ALREADY_STARTED
-      - ERR_WORKFLOW_NOT_EXISTS
+      - UNCATEGORIZED_SUB_STATUS
+      - WORKFLOW_ALREADY_STARTED_SUB_STATUS
+      - WORKFLOW_NOT_EXISTS_SUB_STATUS
       type: string
     WorkflowStartRequest:
       example:
