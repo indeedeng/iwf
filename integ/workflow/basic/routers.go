@@ -33,6 +33,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	}
 	log.Println("received state start request, ", req)
 
+	context := req.GetContext()
+	if context.GetAttempt() <= 0 || context.GetFirstAttemptTimestamp() <= 0 {
+		panic("attempt and firstAttemptTimestamp should be greater than zero")
+	}
+
 	if req.GetWorkflowType() == WorkflowType {
 		// basic workflow go straight to decide methods without any commands
 		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State2 {
@@ -56,6 +61,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		return
 	}
 	log.Println("received state decide request, ", req)
+	context := req.GetContext()
+	if context.GetAttempt() <= 0 || context.GetFirstAttemptTimestamp() <= 0 {
+		panic("attempt and firstAttemptTimestamp should be greater than zero")
+	}
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
