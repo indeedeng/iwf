@@ -879,8 +879,10 @@ components:
           key: key
         workflowStateId: workflowStateId
         context:
+          firstAttemptTimestamp: 6
           workflowStartedTimestamp: 0
           workflowRunId: workflowRunId
+          attempt: 1
           workflowId: workflowId
           stateExecutionId: stateExecutionId
         workflowType: workflowType
@@ -1100,8 +1102,10 @@ components:
           - timerStatus: null
             commandId: commandId
         context:
+          firstAttemptTimestamp: 6
           workflowStartedTimestamp: 0
           workflowRunId: workflowRunId
+          attempt: 1
           workflowId: workflowId
           stateExecutionId: stateExecutionId
         workflowType: workflowType
@@ -1647,8 +1651,10 @@ components:
       type: object
     Context:
       example:
+        firstAttemptTimestamp: 6
         workflowStartedTimestamp: 0
         workflowRunId: workflowRunId
+        attempt: 1
         workflowId: workflowId
         stateExecutionId: stateExecutionId
       properties:
@@ -1661,6 +1667,11 @@ components:
           type: integer
         stateExecutionId:
           type: string
+        firstAttemptTimestamp:
+          format: int64
+          type: integer
+        attempt:
+          type: integer
       required:
       - commandId
       - stateExecutionId
