@@ -24,3 +24,11 @@ func (a *activityProvider) GetLogger(ctx context.Context) interpreter.UnifiedLog
 		zlogger: zLogger,
 	}
 }
+
+func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.ActivityInfo {
+	info := activity.GetInfo(ctx)
+	return interpreter.ActivityInfo{
+		ScheduledTime: info.ScheduledTimestamp,
+		Attempt:       info.Attempt + 1, // NOTE increase by one to match Temporal
+	}
+}

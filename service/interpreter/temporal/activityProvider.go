@@ -21,3 +21,11 @@ func (a *activityProvider) GetLogger(ctx context.Context) interpreter.UnifiedLog
 func (a *activityProvider) NewApplicationError(message, errType string, details ...interface{}) error {
 	return temporal.NewApplicationError(message, errType, details...)
 }
+
+func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.ActivityInfo {
+	info := activity.GetInfo(ctx)
+	return interpreter.ActivityInfo{
+		ScheduledTime: info.ScheduledTime,
+		Attempt:       info.Attempt,
+	}
+}

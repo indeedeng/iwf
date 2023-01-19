@@ -27,6 +27,10 @@ func StateStart(ctx context.Context, backendType service.BackendType, input serv
 			},
 		},
 	})
+	attempt := provider.GetActivityInfo(ctx).Attempt
+	scheduledTs := provider.GetActivityInfo(ctx).ScheduledTime.Unix()
+	input.Request.Context.Attempt = &attempt
+	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
 	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(ctx)
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	if checkHttpError(err, httpResp) {

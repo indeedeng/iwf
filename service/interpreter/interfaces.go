@@ -10,6 +10,12 @@ import (
 type ActivityProvider interface {
 	GetLogger(ctx context.Context) UnifiedLogger
 	NewApplicationError(message, errType string, details ...interface{}) error
+	GetActivityInfo(ctx context.Context) ActivityInfo
+}
+
+type ActivityInfo struct {
+	ScheduledTime time.Time // Time of activity scheduled by a workflow
+	Attempt       int32     // Attempt starts from 1, and increased by 1 for every retry if retry policy is specified.
 }
 
 var activityProviderRegistry = make(map[service.BackendType]ActivityProvider)
