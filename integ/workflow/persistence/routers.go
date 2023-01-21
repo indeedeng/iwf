@@ -68,6 +68,18 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	}
 	log.Println("received state start request, ", req)
 
+	initSas := req.GetSearchAttributes()
+	if len(initSas) < 1 {
+		panic("should have at least one init search attribute")
+	}
+	for _, sa := range initSas {
+		if sa.GetKey() == "CustomDatetimeField" {
+			if sa.GetValueType() != iwfidl.DATETIME {
+				panic("key and value type not match")
+			}
+		}
+	}
+
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {

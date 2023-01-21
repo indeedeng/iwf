@@ -12,10 +12,14 @@ type PersistenceManager struct {
 	provider         WorkflowProvider
 }
 
-func NewPersistenceManager(provider WorkflowProvider) *PersistenceManager {
+func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute) *PersistenceManager {
+	searchAttributes := make(map[string]iwfidl.SearchAttribute)
+	for _, sa := range initSearchAttributes {
+		searchAttributes[sa.GetKey()] = sa
+	}
 	return &PersistenceManager{
 		dataObjects:      make(map[string]iwfidl.KeyValue),
-		searchAttributes: make(map[string]iwfidl.SearchAttribute),
+		searchAttributes: searchAttributes,
 		provider:         provider,
 	}
 }

@@ -15,6 +15,8 @@ type (
 		StateInput iwfidl.EncodedObject `json:"stateInput,omitempty"`
 
 		StateOptions iwfidl.WorkflowStateOptions `json:"stateOptions,omitempty"`
+
+		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 	}
 
 	InterpreterWorkflowOutput struct {
