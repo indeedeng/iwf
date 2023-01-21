@@ -41,6 +41,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		WorkflowExecutionTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
 	}
 
+	var initSAs []iwfidl.SearchAttribute
 	if req.WorkflowStartOptions != nil {
 		workflowOptions.WorkflowIDReusePolicy = req.WorkflowStartOptions.WorkflowIDReusePolicy
 		workflowOptions.CronSchedule = req.WorkflowStartOptions.CronSchedule
@@ -50,14 +51,16 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		if err != nil {
 			return nil, s.handleError(err)
 		}
+		initSAs = req.WorkflowStartOptions.SearchAttributes
 	}
 
 	input := service.InterpreterWorkflowInput{
-		IwfWorkflowType: req.GetIwfWorkflowType(),
-		IwfWorkerUrl:    req.GetIwfWorkerUrl(),
-		StartStateId:    req.GetStartStateId(),
-		StateInput:      req.GetStateInput(),
-		StateOptions:    req.GetStateOptions(),
+		IwfWorkflowType:      req.GetIwfWorkflowType(),
+		IwfWorkerUrl:         req.GetIwfWorkerUrl(),
+		StartStateId:         req.GetStartStateId(),
+		StateInput:           req.GetStateInput(),
+		StateOptions:         req.GetStateOptions(),
+		InitSearchAttributes: initSAs,
 	}
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
