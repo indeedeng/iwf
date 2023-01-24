@@ -17,6 +17,7 @@ const (
 	TimerId1         = "test-timer-1"
 	SignalNameAndId1 = "test-signal-name1"
 	SignalNameAndId2 = "test-signal-name2"
+	SignalNameAndId3 = "test-signal-name3"
 )
 
 type handler struct {
@@ -75,6 +76,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		{
 			CommandId:         SignalNameAndId2,
 			SignalChannelName: SignalNameAndId2,
+		},
+		{
+			CommandId:         SignalNameAndId3,
+			SignalChannelName: SignalNameAndId3,
 		},
 	}
 

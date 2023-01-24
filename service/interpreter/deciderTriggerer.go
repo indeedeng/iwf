@@ -3,8 +3,6 @@ package interpreter
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"reflect"
-	"sort"
 )
 
 func WaitForDeciderTriggerType(
@@ -46,8 +44,15 @@ func WaitForDeciderTriggerType(
 				}
 
 				for _, acceptedComb := range commandReq.GetCommandCombinations() {
-					acceptedCmdIds := acceptedComb.GetCommandIds()
-					if arraySortedEqual(acceptedCmdIds, completedCmdIds) {
+					acceptedCmdIds := make(map[string]bool)
+					for _, cid := range acceptedComb.GetCommandIds() {
+						acceptedCmdIds[cid] = true
+					}
+
+					for _, cid := range completedCmdIds {
+						delete(acceptedCmdIds, cid)
+					}
+					if len(acceptedCmdIds) == 0 {
 						return true
 					}
 				}
@@ -57,21 +62,4 @@ func WaitForDeciderTriggerType(
 			panic(fmt.Sprintf("unsupported decider trigger type: %v, this shouldn't happen as activity should have validated it", triggerType))
 		}
 	}
-}
-
-func arraySortedEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	aCopy := make([]string, len(a))
-	bCopy := make([]string, len(b))
-
-	copy(aCopy, a)
-	copy(bCopy, b)
-
-	sort.Strings(aCopy)
-	sort.Strings(bCopy)
-
-	return reflect.DeepEqual(aCopy, bCopy)
 }
