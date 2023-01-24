@@ -105,6 +105,13 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	panicAtHttpError(err, httpResp)
 	assertions.Equal(iwfidl.RUNNING, descResp.GetWorkflowStatus())
 
+	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+		WorkflowId:        wfId,
+		SignalChannelName: anycommandconbination.SignalNameAndId3,
+		SignalValue:       &signalValue,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
 	// send 2nd signal for s2
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
@@ -132,12 +139,24 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 
 	var s1CommandResults iwfidl.CommandResults
 	var s2CommandResults iwfidl.CommandResults
-	s1ResultJsonStr := "{\"signalResults\":[{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, {\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"WAITING\"}],\"timerResults\":[{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}]}"
+	s1ResultJsonStr := "{\"signalResults\":[" +
+		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
+		"{\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"WAITING\"}," +
+		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"WAITING\"}" +
+		"],\"timerResults\":[" +
+		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}" +
+		"]}"
 	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
 	if err != nil {
 		panic(err)
 	}
-	s2ResultsJsonStr := "{\"signalResults\":[{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, {\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}],\"timerResults\":[{\"commandId\":\"test-timer-1\",\"timerStatus\":\"SCHEDULED\"}]}"
+	s2ResultsJsonStr := "{\"signalResults\":[" +
+		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
+		"{\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}," +
+		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}" +
+		"],\"timerResults\":[" +
+		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"SCHEDULED\"}" +
+		"]}"
 	err = json.Unmarshal([]byte(s2ResultsJsonStr), &s2CommandResults)
 	if err != nil {
 		panic(err)
