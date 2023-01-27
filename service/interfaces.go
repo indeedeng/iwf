@@ -73,9 +73,10 @@ type (
 	}
 
 	DumpAllInternalResponse struct {
-		InterStateChannelReceived        map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo        StateExecutionCounterInfo
-		StateExecutionsCompletedCommands map[string]StateExecutionCompletedCommands
+		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
+		StateExecutionCounterInfo               StateExecutionCounterInfo
+		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
+		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
 	}
 
 	StateExecutionCounterInfo struct {
@@ -84,7 +85,13 @@ type (
 		TotalPendingStateExeCount int
 	}
 
-	StateExecutionCompletedCommands struct {
+	PendingStateExecutionRequestCommands struct {
+		TimerCommands             []iwfidl.TimerCommand
+		SignalCommands            []iwfidl.SignalCommand
+		InterStateChannelCommands []iwfidl.InterStateChannelCommand
+	}
+
+	PendingStateExecutionCompletedCommands struct {
 		CompletedTimerCommands             map[int]bool
 		CompletedSignalCommands            map[int]*iwfidl.EncodedObject
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject

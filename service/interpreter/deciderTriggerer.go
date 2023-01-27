@@ -50,9 +50,11 @@ func WaitForDeciderTriggerType(
 					}
 
 					for _, cid := range completedCmdIds {
-						acceptedCmdIds[cid]--
-						if acceptedCmdIds[cid] == 0 {
-							delete(acceptedCmdIds, cid)
+						if acceptedCmdIds[cid] > 0 {
+							acceptedCmdIds[cid]--
+							if acceptedCmdIds[cid] == 0 {
+								delete(acceptedCmdIds, cid)
+							}
 						}
 					}
 					if len(acceptedCmdIds) == 0 {

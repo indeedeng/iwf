@@ -320,7 +320,11 @@ func executeState(
 		}
 	}
 
-	continueAsNewer.AddStateExecutionCompletedCommands(stateExeId, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds)
+	continueAsNewer.AddPendingStateExecution(
+		stateExeId,
+		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
+		commandReq.GetTimerCommands(), commandReq.GetSignalCommands(), commandReq.GetInterStateChannelCommands(),
+	)
 	WaitForDeciderTriggerType(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds)
 	commandReqDone = true
 
@@ -423,7 +427,7 @@ func executeState(
 	}
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
-	continueAsNewer.DeleteStateExecutionCompletedCommands(stateExeId)
+	continueAsNewer.DeletePendingStateExecution(stateExeId)
 
 	return &decision, nil
 }
