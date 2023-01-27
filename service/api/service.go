@@ -180,7 +180,8 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 		var errMsg string
 		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(getErr)
 		if errType != "" {
-			if errType == string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE) {
+			errTypeEnum := iwfidl.WorkflowErrorType(errType)
+			if errTypeEnum == iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE {
 				err = s.client.GetApplicationErrorDetails(getErr, &outputsToReturnWf)
 				if err != nil {
 					return nil, s.handleError(err)
@@ -195,7 +196,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			return &iwfidl.WorkflowGetResponse{
 				WorkflowRunId:  descResp.RunId,
 				WorkflowStatus: iwfidl.FAILED,
-				ErrorType:      ptr.Any(iwfidl.WorkflowErrorType(errType)),
+				ErrorType:      ptr.Any(errTypeEnum),
 				ErrorMessage:   iwfidl.PtrString(errMsg),
 				Results:        outputsToReturnWf,
 			}, nil
@@ -208,7 +209,6 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			return &iwfidl.WorkflowGetResponse{
 				WorkflowRunId:  descResp.RunId,
 				WorkflowStatus: descResp.Status,
-				ErrorType:      ptr.Any(iwfidl.WorkflowErrorType(errType)),
 			}, nil
 		}
 	}
