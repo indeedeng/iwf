@@ -78,7 +78,7 @@ func NewUnifiedContext(ctx interface{}) UnifiedContext {
 }
 
 type WorkflowProvider interface {
-	NewApplicationError(message, errType string, details ...interface{}) error
+	NewApplicationError(errType string, details interface{}) error
 	GetWorkflowInfo(ctx UnifiedContext) WorkflowInfo
 	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error

@@ -1,10 +1,10 @@
 package cadence
 
 import (
-	"fmt"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
+	"go.uber.org/cadence"
 	"go.uber.org/cadence/workflow"
 	"time"
 )
@@ -17,8 +17,8 @@ func (w *workflowProvider) GetBackendType() service.BackendType {
 	return service.BackendTypeCadence
 }
 
-func (w *workflowProvider) NewApplicationError(message, errType string, details ...interface{}) error {
-	return fmt.Errorf("application error: error type: %v, message %v, details %v", errType, message, details)
+func (w *workflowProvider) NewApplicationError(errType string, details interface{}) error {
+	return cadence.NewCustomError(errType, details)
 }
 
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {

@@ -147,34 +147,38 @@ func (s *serviceImpl) ApiV1WorkflowGetWithWaitPost(ctx context.Context, req iwfi
 	return s.doApiV1WorkflowGetPost(ctx, req, true)
 }
 
-func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest, waitIfStillRunning bool) (wresp *iwfidl.WorkflowGetResponse, retError *errors.ErrorAndStatus) {
-	resp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
+// withWait:
+//
+//	 because s.client.GetWorkflowResult will wait for the completion if workflow is running --
+//		when withWait is false, if workflow is not running and needResults is true, it will then call s.client.GetWorkflowResult to get results
+//		when withWait is true, it will do everything
+func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest, withWait bool) (wresp *iwfidl.WorkflowGetResponse, retError *errors.ErrorAndStatus) {
+	descResp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
 	if err != nil {
 		return nil, s.handleError(err)
 	}
 
 	var output service.InterpreterWorkflowOutput
-	if req.GetNeedsResults() || waitIfStillRunning {
-		if resp.Status == iwfidl.COMPLETED || waitIfStillRunning {
-			err := s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
-			if err != nil {
-				return nil, s.handleError(err)
-			}
+	var getErr error
+	if !withWait {
+		if descResp.Status != iwfidl.RUNNING && req.GetNeedsResults() {
+			getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 		}
+	} else {
+		getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 	}
 
-	status := resp.Status
-	if waitIfStillRunning {
-		// override because when GetWorkflowResult, the workflow is completed
+	status := descResp.Status
+	if getErr == nil {
 		status = iwfidl.COMPLETED
-	}
-
-	if err != nil {
+	} else {
+		// TODO return workflow failure correctly
+		// https://github.com/indeedeng/iwf/issues/154
 		return nil, s.handleError(err)
 	}
 
 	return &iwfidl.WorkflowGetResponse{
-		WorkflowRunId:  resp.RunId,
+		WorkflowRunId:  descResp.RunId,
 		WorkflowStatus: status,
 		Results:        output.StateCompletionOutputs,
 	}, nil
