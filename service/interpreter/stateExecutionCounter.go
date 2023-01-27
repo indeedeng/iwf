@@ -6,7 +6,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
-type stateExecutingManager struct {
+type StateExecutionCounter struct {
 	ctx      UnifiedContext
 	provider WorkflowProvider
 
@@ -15,8 +15,8 @@ type stateExecutingManager struct {
 	totalPendingStateExeCount int            // count the total pending states so that we know the workflow can complete when all threads reach "dead ends"
 }
 
-func NewStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider) *stateExecutingManager {
-	return &stateExecutingManager{
+func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider) *StateExecutionCounter {
+	return &StateExecutionCounter{
 		ctx:                       ctx,
 		provider:                  provider,
 		pendingStateIdCount:       make(map[string]int),
@@ -27,8 +27,8 @@ func NewStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider) *st
 
 func RebuildStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider,
 	executedStateIdCount map[string]int, pendingStateIdCount map[string]int, totalPendingStateExeCount int,
-) *stateExecutingManager {
-	return &stateExecutingManager{
+) *StateExecutionCounter {
+	return &StateExecutionCounter{
 		ctx:                       ctx,
 		provider:                  provider,
 		pendingStateIdCount:       pendingStateIdCount,
@@ -37,17 +37,21 @@ func RebuildStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider,
 	}
 }
 
-func (e *stateExecutingManager) Dump() (executedStateIdCount map[string]int, pendingStateIdCount map[string]int, totalPendingStateExeCount int) {
-	return e.executedStateIdCount, e.pendingStateIdCount, e.totalPendingStateExeCount
+func (e *StateExecutionCounter) Dump() service.StateExecutionCounterInfo {
+	return service.StateExecutionCounterInfo{
+		ExecutedStateIdCount:      e.executedStateIdCount,
+		PendingStateIdCount:       e.pendingStateIdCount,
+		TotalPendingStateExeCount: e.totalPendingStateExeCount,
+	}
 }
 
-func (e *stateExecutingManager) CreateNextExecutionId(stateId string) string {
+func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 	e.executedStateIdCount[stateId]++
 	id := e.executedStateIdCount[stateId]
 	return fmt.Sprintf("%v-%v", stateId, id)
 }
 
-func (e *stateExecutingManager) MarkStateExecutionsPending(states []iwfidl.StateMovement) error {
+func (e *StateExecutionCounter) MarkStateExecutionsPending(states []iwfidl.StateMovement) error {
 	needsUpdate := false
 	for _, s := range states {
 		e.pendingStateIdCount[s.StateId]++
@@ -63,7 +67,7 @@ func (e *stateExecutingManager) MarkStateExecutionsPending(states []iwfidl.State
 	return nil
 }
 
-func (e *stateExecutingManager) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
+func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
 	e.pendingStateIdCount[state.StateId]--
 	e.totalPendingStateExeCount--
 	if e.pendingStateIdCount[state.StateId] == 0 {
@@ -73,11 +77,11 @@ func (e *stateExecutingManager) MarkStateExecutionCompleted(state iwfidl.StateMo
 	return nil
 }
 
-func (e *stateExecutingManager) GetTotalPendingStateExecutions() int {
+func (e *StateExecutionCounter) GetTotalPendingStateExecutions() int {
 	return e.totalPendingStateExeCount
 }
 
-func (e *stateExecutingManager) updateSearchAttribute() error {
+func (e *StateExecutionCounter) updateSearchAttribute() error {
 	var executingStateIds []string
 	for sid := range e.pendingStateIdCount {
 		executingStateIds = append(executingStateIds, sid)

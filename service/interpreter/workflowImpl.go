@@ -48,20 +48,22 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	if err != nil {
 		return nil, err
 	}
-	err = SetQueryHandlersForContinueAsNew(ctx, provider, interStateChannel)
-	if err != nil {
-		return nil, err
-	}
 
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
-	stateExecutionMgr := NewStateExecutionManager(ctx, provider)
+	stateExecutionCounter := NewStateExecutionCounter(ctx, provider)
+
+	continueAsNewer := NewContinueAsNewer(interStateChannel, stateExecutionCounter)
+	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx, provider)
+	if err != nil {
+		return nil, err
+	}
 
 	for len(statesToExecuteQueue) > 0 {
 		// copy the whole slice(pointer)
 		statesToExecute := statesToExecuteQueue
-		err := stateExecutionMgr.MarkStateExecutionsPending(statesToExecuteQueue)
+		err := stateExecutionCounter.MarkStateExecutionsPending(statesToExecuteQueue)
 		if err != nil {
 			return nil, err
 		}
@@ -82,8 +84,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					return
 				}
 
-				stateExeId := stateExecutionMgr.CreateNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, timerProcessor)
+				stateExeId := stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, timerProcessor, continueAsNewer)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -109,7 +111,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-				err = stateExecutionMgr.MarkStateExecutionCompleted(state)
+				err = stateExecutionCounter.MarkStateExecutionCompleted(state)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -122,9 +124,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, waiting for all current started in this iteration to complete will also work,
 		//    but not as efficient as this one because it will take much longer time.
 		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
-		// For stateExecutionMgr.GetTotalPendingStateExecutions() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
+		// For stateExecutionCounter.GetTotalPendingStateExecutions() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
 		awaitError := provider.Await(ctx, func() bool {
-			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionMgr.GetTotalPendingStateExecutions() == 0
+			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalPendingStateExecutions() == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
@@ -193,6 +195,7 @@ func executeState(
 	persistenceManager *PersistenceManager,
 	interStateChannel *InterStateChannel,
 	timerProcessor *TimerProcessor,
+	continueAsNewer *ContinueAsNewer,
 ) (*iwfidl.StateDecision, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
@@ -317,6 +320,7 @@ func executeState(
 		}
 	}
 
+	continueAsNewer.AddStateExecutionCompletedCommands(stateExeId, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds)
 	WaitForDeciderTriggerType(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds)
 	commandReqDone = true
 
@@ -418,6 +422,8 @@ func executeState(
 		return nil, err
 	}
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
+
+	continueAsNewer.DeleteStateExecutionCompletedCommands(stateExeId)
 
 	return &decision, nil
 }
