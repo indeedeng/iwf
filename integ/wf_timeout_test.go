@@ -11,27 +11,27 @@ import (
 	"time"
 )
 
-func TestWorkflowCanceledTemporal(t *testing.T) {
+func TestWorkflowTimeoutTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowCanceled(t, service.BackendTypeTemporal)
+		doTestWorkflowTimeout(t, service.BackendTypeTemporal)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
-func TestWorkflowCanceledCadence(t *testing.T) {
+func TestWorkflowTimeoutadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowCanceled(t, service.BackendTypeCadence)
+		doTestWorkflowTimeout(t, service.BackendTypeCadence)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
-func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -48,20 +48,14 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := "wf-cancel-test" + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := "wf-timeout-test" + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        signal.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 1,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-
-	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
-	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
-		WorkflowId: wfId,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -76,7 +70,7 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
-		WorkflowStatus: iwfidl.CANCELED,
+		WorkflowStatus: iwfidl.TIMEOUT,
 		ErrorType:      nil,
 		ErrorMessage:   nil,
 	}, resp, "response not expected")
