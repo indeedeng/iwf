@@ -717,6 +717,8 @@ components:
     WorkflowGetResponse:
       example:
         workflowStatus: null
+        errorType: errorType
+        errorMessage: errorMessage
         workflowRunId: workflowRunId
         results:
         - completedStateOutput:
@@ -738,6 +740,10 @@ components:
           items:
             $ref: '#/components/schemas/StateCompletionOutput'
           type: array
+        errorType:
+          type: string
+        errorMessage:
+          type: string
       required:
       - workflowRunId
       - workflowStatus

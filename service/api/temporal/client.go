@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -31,6 +32,27 @@ func (t *temporalClient) IsWorkflowAlreadyStartedError(err error) bool {
 func (t *temporalClient) IsNotFoundError(err error) bool {
 	_, ok := err.(*serviceerror.NotFound)
 	return ok
+}
+
+func (t *temporalClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {
+	var applicationError *realtemporal.ApplicationError
+	isAppErr := errors.As(err, &applicationError)
+	if isAppErr {
+		return applicationError.Type()
+	}
+	return ""
+}
+
+func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interface{}) error {
+	var applicationError *realtemporal.ApplicationError
+	isAppErr := errors.As(err, &applicationError)
+	if !isAppErr {
+		return fmt.Errorf("not an application error. Critical code bug")
+	}
+	if applicationError.HasDetails() {
+		return applicationError.Details(detailsPtr)
+	}
+	return fmt.Errorf("application error doesn't have details. Critical code bug")
 }
 
 func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter) api.UnifiedClient {

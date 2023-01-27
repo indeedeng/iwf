@@ -158,23 +158,50 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 		return nil, s.handleError(err)
 	}
 
+	status := descResp.Status
 	var output service.InterpreterWorkflowOutput
 	var getErr error
 	if !withWait {
 		if descResp.Status != iwfidl.RUNNING && req.GetNeedsResults() {
 			getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
+			if getErr == nil {
+				status = iwfidl.COMPLETED
+			}
 		}
 	} else {
 		getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
+		if getErr == nil {
+			status = iwfidl.COMPLETED
+		}
 	}
 
-	status := descResp.Status
-	if getErr == nil {
-		status = iwfidl.COMPLETED
-	} else {
-		// TODO return workflow failure correctly
-		// https://github.com/indeedeng/iwf/issues/154
-		return nil, s.handleError(err)
+	if getErr != nil { // workflow closed at an abnormal state(failed/timeout/terminated/canceled)
+		var outputsToReturnWf []iwfidl.StateCompletionOutput
+		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(getErr)
+		if errType == service.WorkflowErrorTypeStateDecision {
+			err = s.client.GetApplicationErrorDetails(getErr, &outputsToReturnWf)
+			if err != nil {
+				return nil, s.handleError(err)
+			}
+
+			return &iwfidl.WorkflowGetResponse{
+				WorkflowRunId:  descResp.RunId,
+				WorkflowStatus: iwfidl.FAILED,
+				ErrorType:      &errType,
+				Results:        outputsToReturnWf,
+			}, nil
+		} else {
+			// it could be timeout/terminated/canceled/etc. We need to describe again to get the final status
+			descResp, err = s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
+			if err != nil {
+				return nil, s.handleError(err)
+			}
+			return &iwfidl.WorkflowGetResponse{
+				WorkflowRunId:  descResp.RunId,
+				WorkflowStatus: descResp.Status,
+				ErrorType:      &errType,
+			}, nil
+		}
 	}
 
 	return &iwfidl.WorkflowGetResponse{

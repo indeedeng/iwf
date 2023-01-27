@@ -94,7 +94,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				if err != nil {
 					errToFailWf = err
 				}
-				if gracefulComplete || forceComplete {
+				if gracefulComplete || forceComplete || forceFail {
 					outputsToReturnWf = append(outputsToReturnWf, *output)
 				}
 				if forceComplete {
