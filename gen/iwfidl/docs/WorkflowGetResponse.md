@@ -7,6 +7,8 @@ Name | Type | Description | Notes
 **WorkflowRunId** | **string** |  | 
 **WorkflowStatus** | [**WorkflowStatus**](WorkflowStatus.md) |  | 
 **Results** | Pointer to [**[]StateCompletionOutput**](StateCompletionOutput.md) |  | [optional] 
+**ErrorType** | Pointer to [**WorkflowErrorType**](WorkflowErrorType.md) |  | [optional] 
+**ErrorMessage** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -91,6 +93,56 @@ SetResults sets Results field to given value.
 `func (o *WorkflowGetResponse) HasResults() bool`
 
 HasResults returns a boolean if a field has been set.
+
+### GetErrorType
+
+`func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType`
+
+GetErrorType returns the ErrorType field if non-nil, zero value otherwise.
+
+### GetErrorTypeOk
+
+`func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool)`
+
+GetErrorTypeOk returns a tuple with the ErrorType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetErrorType
+
+`func (o *WorkflowGetResponse) SetErrorType(v WorkflowErrorType)`
+
+SetErrorType sets ErrorType field to given value.
+
+### HasErrorType
+
+`func (o *WorkflowGetResponse) HasErrorType() bool`
+
+HasErrorType returns a boolean if a field has been set.
+
+### GetErrorMessage
+
+`func (o *WorkflowGetResponse) GetErrorMessage() string`
+
+GetErrorMessage returns the ErrorMessage field if non-nil, zero value otherwise.
+
+### GetErrorMessageOk
+
+`func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool)`
+
+GetErrorMessageOk returns a tuple with the ErrorMessage field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetErrorMessage
+
+`func (o *WorkflowGetResponse) SetErrorMessage(v string)`
+
+SetErrorMessage sets ErrorMessage field to given value.
+
+### HasErrorMessage
+
+`func (o *WorkflowGetResponse) HasErrorMessage() bool`
+
+HasErrorMessage returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

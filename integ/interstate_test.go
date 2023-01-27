@@ -6,8 +6,6 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/interstate"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -59,23 +57,13 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           interstate.State1,
 	}).Execute()
-	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
-	}
-	if httpResp.StatusCode != http.StatusOK {
-		log.Fatalf("Status not success" + httpResp.Status)
-	}
+	panicAtHttpError(err, httpResp)
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
-	}
-	if httpResp.StatusCode != http.StatusOK {
-		log.Fatalf("Fail to get workflow" + httpResp.Status)
-	}
+	panicAtHttpError(err, httpResp)
 
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)

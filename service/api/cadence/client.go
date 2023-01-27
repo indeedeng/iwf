@@ -9,6 +9,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
+	realcadence "go.uber.org/cadence"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
@@ -32,6 +33,25 @@ func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
 func (t *cadenceClient) IsNotFoundError(err error) bool {
 	_, ok := err.(*shared.EntityNotExistsError)
 	return ok
+}
+
+func (t *cadenceClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {
+	cErr, ok := err.(*realcadence.CustomError)
+	if ok {
+		return cErr.Reason()
+	}
+	return ""
+}
+
+func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interface{}) error {
+	cErr, ok := err.(*realcadence.CustomError)
+	if ok {
+		if cErr.HasDetails() {
+			return cErr.Details(detailsPtr)
+		}
+		return fmt.Errorf("application error doesn't have details. Critical code bug")
+	}
+	return fmt.Errorf("not an application error. Critical code bug")
 }
 
 func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, converter encoded.DataConverter, closeFunc func()) api.UnifiedClient {

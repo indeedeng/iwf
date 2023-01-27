@@ -43,7 +43,7 @@ func fillRetryPolicyDefault(policy *iwfidl.RetryPolicy) {
 		policy.BackoffCoefficient = iwfidl.PtrFloat32(2)
 	}
 	if policy.MaximumIntervalSeconds == nil {
-		policy.MaximumAttempts = iwfidl.PtrInt32(100)
+		policy.MaximumIntervalSeconds = iwfidl.PtrInt32(100)
 	}
 	if policy.MaximumAttempts == nil {
 		policy.MaximumAttempts = iwfidl.PtrInt32(0)

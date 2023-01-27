@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
-	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -103,12 +102,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
-	}
-	if httpResp.StatusCode != http.StatusOK {
-		log.Fatalf("Status not success" + httpResp.Status)
-	}
+	panicAtHttpError(err, httpResp)
 
 	// start it again should return already started error
 	_, _, err = req.WorkflowStartRequest(startReq).Execute()
@@ -127,12 +121,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	if err != nil {
-		log.Fatalf("Fail to invoke get api %v", err)
-	}
-	if httpResp.StatusCode != http.StatusOK {
-		log.Fatalf("Fail to get workflow" + httpResp.Status)
-	}
+	panicAtHttpError(err, httpResp)
 
 	// use a wrong workflowId to test the error case
 	_, _, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{

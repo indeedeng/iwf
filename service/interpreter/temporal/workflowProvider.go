@@ -17,8 +17,8 @@ func (w *workflowProvider) GetBackendType() service.BackendType {
 	return service.BackendTypeTemporal
 }
 
-func (w *workflowProvider) NewApplicationError(message, errType string, details ...interface{}) error {
-	return temporal.NewApplicationError(message, errType, details...)
+func (w *workflowProvider) NewApplicationError(errType string, details interface{}) error {
+	return temporal.NewApplicationError("", errType, details)
 }
 
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {

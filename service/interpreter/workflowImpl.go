@@ -78,8 +78,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				state, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = provider.NewApplicationError(
+						string(iwfidl.SERVER_INTERNAL_ERROR_TYPE),
 						"critical code bug when passing state via context",
-						service.WorkflowErrorTypeUserInternalError,
 					)
 					return
 				}
@@ -94,7 +94,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				if err != nil {
 					errToFailWf = err
 				}
-				if gracefulComplete || forceComplete {
+				if gracefulComplete || forceComplete || forceFail {
 					outputsToReturnWf = append(outputsToReturnWf, *output)
 				}
 				if forceComplete {
@@ -102,8 +102,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 				if forceFail {
 					errToFailWf = provider.NewApplicationError(
-						fmt.Sprintf("user workflow decided to fail workflow execution stateId %s, stateExecutionId: %s", state.GetStateId(), stateExeId),
-						service.WorkflowErrorTypeUserWorkflowDecision,
+						string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
+						outputsToReturnWf,
 					)
 				}
 				if !shouldClose && decision.HasNextStates() {
@@ -173,13 +173,18 @@ func checkClosingWorkflow(
 		if stateId == service.ForceFailingWorkflowStateId {
 			shouldClose = true
 			forceFail = true
+			completeOutput = &iwfidl.StateCompletionOutput{
+				CompletedStateId:          currentStateId,
+				CompletedStateExecutionId: currentStateExeId,
+				CompletedStateOutput:      movement.StateInput,
+			}
 		}
 	}
 	if shouldClose && len(decision.NextStates) > 1 {
 		// Illegal decision
 		err = provider.NewApplicationError(
-			"closing workflow decision should have only one state movement, but got more than one",
-			service.WorkflowErrorTypeUserWorkflowError,
+			string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
+			"invalid state decisions. Closing workflow decision cannot be combined with other state decisions",
 		)
 		return
 	}

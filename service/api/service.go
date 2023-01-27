@@ -147,34 +147,78 @@ func (s *serviceImpl) ApiV1WorkflowGetWithWaitPost(ctx context.Context, req iwfi
 	return s.doApiV1WorkflowGetPost(ctx, req, true)
 }
 
-func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest, waitIfStillRunning bool) (wresp *iwfidl.WorkflowGetResponse, retError *errors.ErrorAndStatus) {
-	resp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
+// withWait:
+//
+//	 because s.client.GetWorkflowResult will wait for the completion if workflow is running --
+//		when withWait is false, if workflow is not running and needResults is true, it will then call s.client.GetWorkflowResult to get results
+//		when withWait is true, it will do everything
+func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest, withWait bool) (wresp *iwfidl.WorkflowGetResponse, retError *errors.ErrorAndStatus) {
+	descResp, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
 	if err != nil {
 		return nil, s.handleError(err)
 	}
 
+	status := descResp.Status
 	var output service.InterpreterWorkflowOutput
-	if req.GetNeedsResults() || waitIfStillRunning {
-		if resp.Status == iwfidl.COMPLETED || waitIfStillRunning {
-			err := s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
-			if err != nil {
-				return nil, s.handleError(err)
+	var getErr error
+	if !withWait {
+		if descResp.Status != iwfidl.RUNNING && req.GetNeedsResults() {
+			getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
+			if getErr == nil {
+				status = iwfidl.COMPLETED
 			}
+		}
+	} else {
+		getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
+		if getErr == nil {
+			status = iwfidl.COMPLETED
 		}
 	}
 
-	status := resp.Status
-	if waitIfStillRunning {
-		// override because when GetWorkflowResult, the workflow is completed
-		status = iwfidl.COMPLETED
-	}
+	if getErr != nil { // workflow closed at an abnormal state(failed/timeout/terminated/canceled)
+		var outputsToReturnWf []iwfidl.StateCompletionOutput
+		var errMsg string
+		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(getErr)
+		if errType != "" {
+			errTypeEnum := iwfidl.WorkflowErrorType(errType)
+			if errTypeEnum == iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE {
+				err = s.client.GetApplicationErrorDetails(getErr, &outputsToReturnWf)
+				if err != nil {
+					return nil, s.handleError(err)
+				}
+			} else {
+				err = s.client.GetApplicationErrorDetails(getErr, &errMsg)
+				if err != nil {
+					return nil, s.handleError(err)
+				}
+			}
 
-	if err != nil {
-		return nil, s.handleError(err)
+			var errMsgPtr *string
+			if errMsg != "" {
+				errMsgPtr = iwfidl.PtrString(errMsg)
+			}
+			return &iwfidl.WorkflowGetResponse{
+				WorkflowRunId:  descResp.RunId,
+				WorkflowStatus: iwfidl.FAILED,
+				ErrorType:      ptr.Any(errTypeEnum),
+				ErrorMessage:   errMsgPtr,
+				Results:        outputsToReturnWf,
+			}, nil
+		} else {
+			// it could be timeout/terminated/canceled/etc. We need to describe again to get the final status
+			descResp, err = s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
+			if err != nil {
+				return nil, s.handleError(err)
+			}
+			return &iwfidl.WorkflowGetResponse{
+				WorkflowRunId:  descResp.RunId,
+				WorkflowStatus: descResp.Status,
+			}, nil
+		}
 	}
 
 	return &iwfidl.WorkflowGetResponse{
-		WorkflowRunId:  resp.RunId,
+		WorkflowRunId:  descResp.RunId,
 		WorkflowStatus: status,
 		Results:        output.StateCompletionOutputs,
 	}, nil

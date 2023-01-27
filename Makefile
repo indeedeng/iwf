@@ -160,6 +160,9 @@ deps-all: ## Check for all dependency updates
 		| $(JQ_DEPS_AGE) \
 		| sort -n
 
+cleanTestCache:
+	$Q go clean -testcache
+
 integTests:
 	$Q go test -v ./integ
 

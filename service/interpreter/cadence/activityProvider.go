@@ -2,9 +2,9 @@ package cadence
 
 import (
 	"context"
-	"fmt"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/interpreter"
+	"go.uber.org/cadence"
 	"go.uber.org/cadence/activity"
 )
 
@@ -14,8 +14,8 @@ func init() {
 	interpreter.RegisterActivityProvider(service.BackendTypeCadence, &activityProvider{})
 }
 
-func (a *activityProvider) NewApplicationError(message, errType string, details ...interface{}) error {
-	return fmt.Errorf("application error: error type: %v, message %v, details %v", errType, message, details)
+func (a *activityProvider) NewApplicationError(errType string, details interface{}) error {
+	return cadence.NewCustomError(errType, details)
 }
 
 func (a *activityProvider) GetLogger(ctx context.Context) interpreter.UnifiedLogger {

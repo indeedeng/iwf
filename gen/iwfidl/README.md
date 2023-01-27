@@ -123,6 +123,7 @@ Class | Method | HTTP request | Description
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
  - [TimerStatus](docs/TimerStatus.md)
+ - [WorkflowErrorType](docs/WorkflowErrorType.md)
  - [WorkflowGetDataObjectsRequest](docs/WorkflowGetDataObjectsRequest.md)
  - [WorkflowGetDataObjectsResponse](docs/WorkflowGetDataObjectsResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)

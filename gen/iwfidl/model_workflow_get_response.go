@@ -19,6 +19,8 @@ type WorkflowGetResponse struct {
 	WorkflowRunId string `json:"workflowRunId"`
 	WorkflowStatus WorkflowStatus `json:"workflowStatus"`
 	Results []StateCompletionOutput `json:"results,omitempty"`
+	ErrorType *WorkflowErrorType `json:"errorType,omitempty"`
+	ErrorMessage *string `json:"errorMessage,omitempty"`
 }
 
 // NewWorkflowGetResponse instantiates a new WorkflowGetResponse object
@@ -120,6 +122,70 @@ func (o *WorkflowGetResponse) SetResults(v []StateCompletionOutput) {
 	o.Results = v
 }
 
+// GetErrorType returns the ErrorType field value if set, zero value otherwise.
+func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
+	if o == nil || isNil(o.ErrorType) {
+		var ret WorkflowErrorType
+		return ret
+	}
+	return *o.ErrorType
+}
+
+// GetErrorTypeOk returns a tuple with the ErrorType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
+	if o == nil || isNil(o.ErrorType) {
+    return nil, false
+	}
+	return o.ErrorType, true
+}
+
+// HasErrorType returns a boolean if a field has been set.
+func (o *WorkflowGetResponse) HasErrorType() bool {
+	if o != nil && !isNil(o.ErrorType) {
+		return true
+	}
+
+	return false
+}
+
+// SetErrorType gets a reference to the given WorkflowErrorType and assigns it to the ErrorType field.
+func (o *WorkflowGetResponse) SetErrorType(v WorkflowErrorType) {
+	o.ErrorType = &v
+}
+
+// GetErrorMessage returns the ErrorMessage field value if set, zero value otherwise.
+func (o *WorkflowGetResponse) GetErrorMessage() string {
+	if o == nil || isNil(o.ErrorMessage) {
+		var ret string
+		return ret
+	}
+	return *o.ErrorMessage
+}
+
+// GetErrorMessageOk returns a tuple with the ErrorMessage field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool) {
+	if o == nil || isNil(o.ErrorMessage) {
+    return nil, false
+	}
+	return o.ErrorMessage, true
+}
+
+// HasErrorMessage returns a boolean if a field has been set.
+func (o *WorkflowGetResponse) HasErrorMessage() bool {
+	if o != nil && !isNil(o.ErrorMessage) {
+		return true
+	}
+
+	return false
+}
+
+// SetErrorMessage gets a reference to the given string and assigns it to the ErrorMessage field.
+func (o *WorkflowGetResponse) SetErrorMessage(v string) {
+	o.ErrorMessage = &v
+}
+
 func (o WorkflowGetResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
@@ -130,6 +196,12 @@ func (o WorkflowGetResponse) MarshalJSON() ([]byte, error) {
 	}
 	if !isNil(o.Results) {
 		toSerialize["results"] = o.Results
+	}
+	if !isNil(o.ErrorType) {
+		toSerialize["errorType"] = o.ErrorType
+	}
+	if !isNil(o.ErrorMessage) {
+		toSerialize["errorMessage"] = o.ErrorMessage
 	}
 	return json.Marshal(toSerialize)
 }

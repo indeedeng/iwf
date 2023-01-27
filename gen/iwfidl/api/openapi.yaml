@@ -717,6 +717,8 @@ components:
     WorkflowGetResponse:
       example:
         workflowStatus: null
+        errorType: null
+        errorMessage: errorMessage
         workflowRunId: workflowRunId
         results:
         - completedStateOutput:
@@ -738,10 +740,21 @@ components:
           items:
             $ref: '#/components/schemas/StateCompletionOutput'
           type: array
+        errorType:
+          $ref: '#/components/schemas/WorkflowErrorType'
+        errorMessage:
+          type: string
       required:
       - workflowRunId
       - workflowStatus
       type: object
+    WorkflowErrorType:
+      enum:
+      - STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE
+      - STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE
+      - INVALID_USER_WORKFLOW_CODE_ERROR_TYPE
+      - SERVER_INTERNAL_ERROR_TYPE
+      type: string
     WorkflowStatus:
       enum:
       - RUNNING
