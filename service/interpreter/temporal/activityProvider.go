@@ -18,8 +18,8 @@ func (a *activityProvider) GetLogger(ctx context.Context) interpreter.UnifiedLog
 	return activity.GetLogger(ctx)
 }
 
-func (a *activityProvider) NewApplicationError(message, errType string, details ...interface{}) error {
-	return temporal.NewApplicationError(message, errType, details...)
+func (a *activityProvider) NewApplicationError(errType string, details interface{}) error {
+	return temporal.NewApplicationError("", errType, details)
 }
 
 func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.ActivityInfo {

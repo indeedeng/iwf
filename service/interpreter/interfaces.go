@@ -9,7 +9,7 @@ import (
 
 type ActivityProvider interface {
 	GetLogger(ctx context.Context) UnifiedLogger
-	NewApplicationError(message, errType string, details ...interface{}) error
+	NewApplicationError(errType string, details interface{}) error
 	GetActivityInfo(ctx context.Context) ActivityInfo
 }
 
