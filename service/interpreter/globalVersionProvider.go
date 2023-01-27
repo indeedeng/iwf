@@ -11,18 +11,18 @@ type globalVersioner struct {
 	workflowProvider WorkflowProvider
 }
 
-func newGlobalVersionProvider(workflowProvider WorkflowProvider) *globalVersioner {
+func NewGlobalVersionProvider(workflowProvider WorkflowProvider) *globalVersioner {
 	return &globalVersioner{
 		workflowProvider: workflowProvider,
 	}
 }
 
-func (p *globalVersioner) isAfterVersionOfUsingGlobalVersioning(ctx UnifiedContext) bool {
+func (p *globalVersioner) IsAfterVersionOfUsingGlobalVersioning(ctx UnifiedContext) bool {
 	version := p.workflowProvider.GetVersion(ctx, globalChangeId, 0, maxOfAllVersions)
 	return version >= startingVersionUsingGlobalVersioning
 }
 
-func (p *globalVersioner) upsertGlobalVersionSearchAttribute(ctx UnifiedContext) error {
+func (p *globalVersioner) UpsertGlobalVersionSearchAttribute(ctx UnifiedContext) error {
 	// TODO this bug in Cadence SDK may cause concurrent writes
 	// https://github.com/uber-go/cadence-client/issues/1198
 	if p.workflowProvider.GetBackendType() != service.BackendTypeCadence {

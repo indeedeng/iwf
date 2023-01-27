@@ -66,6 +66,36 @@ type (
 	}
 
 	InternalTimerStatus string
+
+	DumpAllInternalRequest struct {
+		PageSizeInBytes int
+		PageNum         int
+	}
+
+	DumpAllInternalResponse struct {
+		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
+		StateExecutionCounterInfo               StateExecutionCounterInfo
+		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
+		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
+	}
+
+	StateExecutionCounterInfo struct {
+		ExecutedStateIdCount      map[string]int
+		PendingStateIdCount       map[string]int
+		TotalPendingStateExeCount int
+	}
+
+	PendingStateExecutionRequestCommands struct {
+		TimerCommands             []iwfidl.TimerCommand
+		SignalCommands            []iwfidl.SignalCommand
+		InterStateChannelCommands []iwfidl.InterStateChannelCommand
+	}
+
+	PendingStateExecutionCompletedCommands struct {
+		CompletedTimerCommands             map[int]bool
+		CompletedSignalCommands            map[int]*iwfidl.EncodedObject
+		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject
+	}
 )
 
 const (

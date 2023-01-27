@@ -74,6 +74,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			SignalChannelName: SignalNameAndId1,
 		},
 		{
+			CommandId:         SignalNameAndId1,
+			SignalChannelName: SignalNameAndId1,
+		},
+		{
 			CommandId:         SignalNameAndId2,
 			SignalChannelName: SignalNameAndId2,
 		},
@@ -95,7 +99,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 						CommandCombinations: []iwfidl.CommandCombination{
 							{
 								CommandIds: []string{
-									TimerId1, SignalNameAndId1,
+									TimerId1, SignalNameAndId1, SignalNameAndId1, // wait for two SignalNameAndId1
 								},
 							},
 							{

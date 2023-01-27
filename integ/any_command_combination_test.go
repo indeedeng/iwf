@@ -66,7 +66,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		Data:     iwfidl.PtrString("test-data-1"),
 	}
 
-	// send the signal
+	// send the signals to S1
 	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
@@ -74,8 +74,14 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalValue:       &signalValue,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
+	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+		WorkflowId:        wfId,
+		SignalChannelName: anycommandconbination.SignalNameAndId1,
+		SignalValue:       &signalValue,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
 
-	// skip the timer
+	// skip the timer for S1
 	time.Sleep(time.Second * 2) // wait for a second so that timer is ready to be skipped
 	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
@@ -141,6 +147,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	var s2CommandResults iwfidl.CommandResults
 	s1ResultJsonStr := "{\"signalResults\":[" +
 		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
+		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
 		"{\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"WAITING\"}," +
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"WAITING\"}" +
 		"],\"timerResults\":[" +
@@ -152,6 +159,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}
 	s2ResultsJsonStr := "{\"signalResults\":[" +
 		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
+		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"WAITING\"}," +
 		"{\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}," +
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}" +
 		"],\"timerResults\":[" +
