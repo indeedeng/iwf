@@ -78,7 +78,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				state, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = provider.NewApplicationError(
-						service.WorkflowErrorTypeServerInternalError,
+						string(iwfidl.SERVER_INTERNAL_ERROR_TYPE),
 						"critical code bug when passing state via context",
 					)
 					return
@@ -102,7 +102,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 				if forceFail {
 					errToFailWf = provider.NewApplicationError(
-						service.WorkflowErrorTypeStateDecision,
+						string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
 						outputsToReturnWf,
 					)
 				}
@@ -183,7 +183,7 @@ func checkClosingWorkflow(
 	if shouldClose && len(decision.NextStates) > 1 {
 		// Illegal decision
 		err = provider.NewApplicationError(
-			service.WorkflowErrorTypeUserWorkflowError,
+			string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
 			"invalid state decisions. Closing workflow decision cannot be combined with other state decisions",
 		)
 		return

@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **WorkflowRunId** | **string** |  | 
 **WorkflowStatus** | [**WorkflowStatus**](WorkflowStatus.md) |  | 
 **Results** | Pointer to [**[]StateCompletionOutput**](StateCompletionOutput.md) |  | [optional] 
-**ErrorType** | Pointer to **string** |  | [optional] 
+**ErrorType** | Pointer to [**WorkflowErrorType**](WorkflowErrorType.md) |  | [optional] 
 **ErrorMessage** | Pointer to **string** |  | [optional] 
 
 ## Methods
@@ -96,20 +96,20 @@ HasResults returns a boolean if a field has been set.
 
 ### GetErrorType
 
-`func (o *WorkflowGetResponse) GetErrorType() string`
+`func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType`
 
 GetErrorType returns the ErrorType field if non-nil, zero value otherwise.
 
 ### GetErrorTypeOk
 
-`func (o *WorkflowGetResponse) GetErrorTypeOk() (*string, bool)`
+`func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool)`
 
 GetErrorTypeOk returns a tuple with the ErrorType field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetErrorType
 
-`func (o *WorkflowGetResponse) SetErrorType(v string)`
+`func (o *WorkflowGetResponse) SetErrorType(v WorkflowErrorType)`
 
 SetErrorType sets ErrorType field to given value.
 

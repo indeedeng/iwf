@@ -19,7 +19,7 @@ type WorkflowGetResponse struct {
 	WorkflowRunId string `json:"workflowRunId"`
 	WorkflowStatus WorkflowStatus `json:"workflowStatus"`
 	Results []StateCompletionOutput `json:"results,omitempty"`
-	ErrorType *string `json:"errorType,omitempty"`
+	ErrorType *WorkflowErrorType `json:"errorType,omitempty"`
 	ErrorMessage *string `json:"errorMessage,omitempty"`
 }
 
@@ -123,9 +123,9 @@ func (o *WorkflowGetResponse) SetResults(v []StateCompletionOutput) {
 }
 
 // GetErrorType returns the ErrorType field value if set, zero value otherwise.
-func (o *WorkflowGetResponse) GetErrorType() string {
+func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
 	if o == nil || isNil(o.ErrorType) {
-		var ret string
+		var ret WorkflowErrorType
 		return ret
 	}
 	return *o.ErrorType
@@ -133,7 +133,7 @@ func (o *WorkflowGetResponse) GetErrorType() string {
 
 // GetErrorTypeOk returns a tuple with the ErrorType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowGetResponse) GetErrorTypeOk() (*string, bool) {
+func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
 	if o == nil || isNil(o.ErrorType) {
     return nil, false
 	}
@@ -149,8 +149,8 @@ func (o *WorkflowGetResponse) HasErrorType() bool {
 	return false
 }
 
-// SetErrorType gets a reference to the given string and assigns it to the ErrorType field.
-func (o *WorkflowGetResponse) SetErrorType(v string) {
+// SetErrorType gets a reference to the given WorkflowErrorType and assigns it to the ErrorType field.
+func (o *WorkflowGetResponse) SetErrorType(v WorkflowErrorType) {
 	o.ErrorType = &v
 }
 

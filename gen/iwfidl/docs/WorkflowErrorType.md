@@ -1,0 +1,15 @@
+# WorkflowErrorType
+
+## Enum
+
+
+* `STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE` (value: `"STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE"`)
+
+* `INVALID_USER_WORKFLOW_CODE_ERROR_TYPE` (value: `"INVALID_USER_WORKFLOW_CODE_ERROR_TYPE"`)
+
+* `SERVER_INTERNAL_ERROR_TYPE` (value: `"SERVER_INTERNAL_ERROR_TYPE"`)
+
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

@@ -19,10 +19,6 @@ const (
 
 	SkipTimerSignalChannelName = "IwfSystemSkipTimerChannel"
 
-	WorkflowErrorTypeStateDecision       = "StateDecisionFailingWorkflow"
-	WorkflowErrorTypeUserWorkflowError   = "InvalidUserWorkflowCode"
-	WorkflowErrorTypeServerInternalError = "ServerInternalError"
-
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
 	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"

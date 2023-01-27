@@ -178,7 +178,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 	if getErr != nil { // workflow closed at an abnormal state(failed/timeout/terminated/canceled)
 		var outputsToReturnWf []iwfidl.StateCompletionOutput
 		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(getErr)
-		if errType == service.WorkflowErrorTypeStateDecision {
+		if errType == string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE) {
 			err = s.client.GetApplicationErrorDetails(getErr, &outputsToReturnWf)
 			if err != nil {
 				return nil, s.handleError(err)
@@ -187,7 +187,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			return &iwfidl.WorkflowGetResponse{
 				WorkflowRunId:  descResp.RunId,
 				WorkflowStatus: iwfidl.FAILED,
-				ErrorType:      &errType,
+				ErrorType:      ptr.Any(iwfidl.WorkflowErrorType(errType)),
 				Results:        outputsToReturnWf,
 			}, nil
 		} else {
@@ -199,7 +199,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			return &iwfidl.WorkflowGetResponse{
 				WorkflowRunId:  descResp.RunId,
 				WorkflowStatus: descResp.Status,
-				ErrorType:      &errType,
+				ErrorType:      ptr.Any(iwfidl.WorkflowErrorType(errType)),
 			}, nil
 		}
 	}
