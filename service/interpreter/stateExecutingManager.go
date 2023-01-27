@@ -10,44 +10,44 @@ type stateExecutingManager struct {
 	ctx      UnifiedContext
 	provider WorkflowProvider
 
-	stateIdCountMap     map[string]int // count the stateId being executed so that we can create stateExecutionId
-	pendingStateIdCount map[string]int // keep counting the pending stateIds so that we know times to upsert search attributes
-	totalPendingCount   int            // count the total pending states so that we know the workflow can complete when all threads reach "dead ends"
+	executedStateIdCount      map[string]int // count the stateId for how many times that have een executed so that we can create stateExecutionId
+	pendingStateIdCount       map[string]int // keep counting the pending stateIds so that we know times to upsert system search attributes service.SearchAttributeExecutingStateIds
+	totalPendingStateExeCount int            // count the total pending states so that we know the workflow can complete when all threads reach "dead ends"
 }
 
-func newStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider) *stateExecutingManager {
+func NewStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider) *stateExecutingManager {
 	return &stateExecutingManager{
-		ctx:                 ctx,
-		provider:            provider,
-		pendingStateIdCount: make(map[string]int),
-		stateIdCountMap:     make(map[string]int),
-		totalPendingCount:   0,
+		ctx:                       ctx,
+		provider:                  provider,
+		pendingStateIdCount:       make(map[string]int),
+		executedStateIdCount:      make(map[string]int),
+		totalPendingStateExeCount: 0,
 	}
 }
 
-func rebuildStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider,
-	stateIdCountMap map[string]int, pendingStateIdCount map[string]int, totalPendingCount int,
+func RebuildStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider,
+	executedStateIdCount map[string]int, pendingStateIdCount map[string]int, totalPendingStateExeCount int,
 ) *stateExecutingManager {
 	return &stateExecutingManager{
-		ctx:                 ctx,
-		provider:            provider,
-		pendingStateIdCount: pendingStateIdCount,
-		stateIdCountMap:     stateIdCountMap,
-		totalPendingCount:   totalPendingCount,
+		ctx:                       ctx,
+		provider:                  provider,
+		pendingStateIdCount:       pendingStateIdCount,
+		executedStateIdCount:      executedStateIdCount,
+		totalPendingStateExeCount: totalPendingStateExeCount,
 	}
 }
 
-func (e *stateExecutingManager) getCarryOverData() (stateIdCountMap map[string]int, pendingStateIdCount map[string]int, totalPendingCount int) {
-	return e.stateIdCountMap, e.pendingStateIdCount, e.totalPendingCount
+func (e *stateExecutingManager) Dump() (executedStateIdCount map[string]int, pendingStateIdCount map[string]int, totalPendingStateExeCount int) {
+	return e.executedStateIdCount, e.pendingStateIdCount, e.totalPendingStateExeCount
 }
 
-func (e *stateExecutingManager) createNextExecutionId(stateId string) string {
-	e.stateIdCountMap[stateId]++
-	id := e.stateIdCountMap[stateId]
+func (e *stateExecutingManager) CreateNextExecutionId(stateId string) string {
+	e.executedStateIdCount[stateId]++
+	id := e.executedStateIdCount[stateId]
 	return fmt.Sprintf("%v-%v", stateId, id)
 }
 
-func (e *stateExecutingManager) markStatesPending(states []iwfidl.StateMovement) error {
+func (e *stateExecutingManager) MarkStateExecutionsPending(states []iwfidl.StateMovement) error {
 	needsUpdate := false
 	for _, s := range states {
 		e.pendingStateIdCount[s.StateId]++
@@ -56,16 +56,16 @@ func (e *stateExecutingManager) markStatesPending(states []iwfidl.StateMovement)
 			needsUpdate = true
 		}
 	}
-	e.totalPendingCount += len(states)
+	e.totalPendingStateExeCount += len(states)
 	if needsUpdate {
 		return e.updateSearchAttribute()
 	}
 	return nil
 }
 
-func (e *stateExecutingManager) markStateCompleted(state iwfidl.StateMovement) error {
+func (e *stateExecutingManager) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
 	e.pendingStateIdCount[state.StateId]--
-	e.totalPendingCount -= 1
+	e.totalPendingStateExeCount--
 	if e.pendingStateIdCount[state.StateId] == 0 {
 		delete(e.pendingStateIdCount, state.StateId)
 		return e.updateSearchAttribute()
@@ -73,8 +73,8 @@ func (e *stateExecutingManager) markStateCompleted(state iwfidl.StateMovement) e
 	return nil
 }
 
-func (e *stateExecutingManager) getTotalPendingStates() int {
-	return e.totalPendingCount
+func (e *stateExecutingManager) GetTotalPendingStateExecutions() int {
+	return e.totalPendingStateExeCount
 }
 
 func (e *stateExecutingManager) updateSearchAttribute() error {

@@ -8,9 +8,9 @@ import (
 )
 
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
-	globalVersionProvider := newGlobalVersionProvider(provider)
-	if globalVersionProvider.isAfterVersionOfUsingGlobalVersioning(ctx) {
-		err := globalVersionProvider.upsertGlobalVersionSearchAttribute(ctx)
+	globalVersionProvider := NewGlobalVersionProvider(provider)
+	if globalVersionProvider.IsAfterVersionOfUsingGlobalVersioning(ctx) {
+		err := globalVersionProvider.UpsertGlobalVersionSearchAttribute(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +48,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	if err != nil {
 		return nil, err
 	}
-	err = setQueryHandlersForContinueAsNew(ctx, provider, interStateChannel)
+	err = SetQueryHandlersForContinueAsNew(ctx, provider, interStateChannel)
 	if err != nil {
 		return nil, err
 	}
@@ -56,12 +56,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
-	stateExecutionMgr := newStateExecutionManager(ctx, provider)
+	stateExecutionMgr := NewStateExecutionManager(ctx, provider)
 
 	for len(statesToExecuteQueue) > 0 {
 		// copy the whole slice(pointer)
 		statesToExecute := statesToExecuteQueue
-		err := stateExecutionMgr.markStatesPending(statesToExecuteQueue)
+		err := stateExecutionMgr.MarkStateExecutionsPending(statesToExecuteQueue)
 		if err != nil {
 			return nil, err
 		}
@@ -82,7 +82,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					return
 				}
 
-				stateExeId := stateExecutionMgr.createNextExecutionId(state.GetStateId())
+				stateExeId := stateExecutionMgr.CreateNextExecutionId(state.GetStateId())
 				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, timerProcessor)
 				if err != nil {
 					errToFailWf = err
@@ -109,7 +109,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-				err = stateExecutionMgr.markStateCompleted(state)
+				err = stateExecutionMgr.MarkStateExecutionCompleted(state)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -117,14 +117,14 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 
 		// The conditions here are quite tricky:
-		// For len(statesToExecuteQueue) > 0: First of all, we need some condition to wait here because all the stateToExecute are running in different thread.
+		// For len(statesToExecuteQueue) > 0: We need some condition to wait here because all the stateToExecute are running in different thread.
 		//    Right after the stateToExecute are pop from queue, the len(...) becomes zero. So when the len(...) >0, it means there are new states to execute pushed into the queue,
-		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, using totalPendingCount == 0 will work, but not as efficient as this one --
-		//    it will wait for all current pending to complete will take much longer time
+		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, waiting for all current started in this iteration to complete will also work,
+		//    but not as efficient as this one because it will take much longer time.
 		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
-		// For stateExecutionMgr.getTotalPendingStates() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
+		// For stateExecutionMgr.GetTotalPendingStateExecutions() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
 		awaitError := provider.Await(ctx, func() bool {
-			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionMgr.getTotalPendingStates() == 0
+			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionMgr.GetTotalPendingStateExecutions() == 0
 		})
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
