@@ -66,7 +66,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		Data:     iwfidl.PtrString("test-data-1"),
 	}
 
-	// send the signals
+	// send the signals to S1
 	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
@@ -81,7 +81,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	// skip the timer
+	// skip the timer for S1
 	time.Sleep(time.Second * 2) // wait for a second so that timer is ready to be skipped
 	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{

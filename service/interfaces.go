@@ -66,6 +66,15 @@ type (
 	}
 
 	InternalTimerStatus string
+
+	DumpAllInfoRequest struct {
+		PageSizeInBytes int
+		PageNum         int
+	}
+
+	DumpAllInfoResponse struct {
+		InterStateChannelReceived map[string][]*iwfidl.EncodedObject
+	}
 )
 
 const (

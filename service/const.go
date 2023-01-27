@@ -13,9 +13,9 @@ const (
 	StateStartApi  = "/api/v1/workflowState/start"
 	StateDecideApi = "/api/v1/workflowState/decide"
 
-	GetDataObjectsWorkflowQueryType   = "GetDataObjects"
-	GetCurrentTimerInfosQueryType     = "GetCurrentTimerInfos"
-	GetInterStateChannelDataQueryType = "GetInterStateChannelData"
+	GetDataObjectsWorkflowQueryType = "GetDataObjects"
+	GetCurrentTimerInfosQueryType   = "GetCurrentTimerInfos"
+	DumpAllInternalQueryType        = "DumpAllInternal"
 
 	SkipTimerSignalChannelName = "IwfSystemSkipTimerChannel"
 

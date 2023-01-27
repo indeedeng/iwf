@@ -19,7 +19,7 @@ func RebuildInterStateChannel(refill map[string][]*iwfidl.EncodedObject) *InterS
 	}
 }
 
-func (i *InterStateChannel) ReadData(channelNames []string) map[string][]*iwfidl.EncodedObject {
+func (i *InterStateChannel) ReadReceived(channelNames []string) map[string][]*iwfidl.EncodedObject {
 	if len(channelNames) == 0 {
 		return i.receivedData
 	}
