@@ -38,7 +38,7 @@ func (t *cadenceClient) IsNotFoundError(err error) bool {
 func (t *cadenceClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {
 	cErr, ok := err.(*realcadence.CustomError)
 	if ok {
-		cErr.Reason()
+		return cErr.Reason()
 	}
 	return ""
 }
