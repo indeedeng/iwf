@@ -193,11 +193,15 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 				}
 			}
 
+			var errMsgPtr *string
+			if errMsg != "" {
+				errMsgPtr = iwfidl.PtrString(errMsg)
+			}
 			return &iwfidl.WorkflowGetResponse{
 				WorkflowRunId:  descResp.RunId,
 				WorkflowStatus: iwfidl.FAILED,
 				ErrorType:      ptr.Any(errTypeEnum),
-				ErrorMessage:   iwfidl.PtrString(errMsg),
+				ErrorMessage:   errMsgPtr,
 				Results:        outputsToReturnWf,
 			}, nil
 		} else {

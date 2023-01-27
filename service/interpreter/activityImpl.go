@@ -116,7 +116,7 @@ func composeHttpError(provider ActivityProvider, err error, httpResp *http.Respo
 
 func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
 	if resp == nil || resp.CommandRequest == nil {
-		return fmt.Errorf("empty response or command request")
+		return nil
 	}
 	commandReq := resp.CommandRequest
 	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
