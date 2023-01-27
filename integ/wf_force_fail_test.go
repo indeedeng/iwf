@@ -49,7 +49,7 @@ func doTestWorkflowForceFail(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := "wf-cancel-test" + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := "wf-force-fail-test" + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
