@@ -66,8 +66,14 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		Data:     iwfidl.PtrString("test-data-1"),
 	}
 
-	// send the signal
+	// send the signals
 	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
+	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+		WorkflowId:        wfId,
+		SignalChannelName: anycommandconbination.SignalNameAndId1,
+		SignalValue:       &signalValue,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
 		SignalChannelName: anycommandconbination.SignalNameAndId1,

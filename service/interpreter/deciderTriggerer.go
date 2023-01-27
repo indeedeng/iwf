@@ -44,13 +44,16 @@ func WaitForDeciderTriggerType(
 				}
 
 				for _, acceptedComb := range commandReq.GetCommandCombinations() {
-					acceptedCmdIds := make(map[string]bool)
+					acceptedCmdIds := make(map[string]int)
 					for _, cid := range acceptedComb.GetCommandIds() {
-						acceptedCmdIds[cid] = true
+						acceptedCmdIds[cid]++
 					}
 
 					for _, cid := range completedCmdIds {
-						delete(acceptedCmdIds, cid)
+						acceptedCmdIds[cid]--
+						if acceptedCmdIds[cid] == 0 {
+							delete(acceptedCmdIds, cid)
+						}
 					}
 					if len(acceptedCmdIds) == 0 {
 						return true
