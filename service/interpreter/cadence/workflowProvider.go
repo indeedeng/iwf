@@ -21,6 +21,11 @@ func (w *workflowProvider) NewApplicationError(errType string, details interface
 	return cadence.NewCustomError(errType, details)
 }
 
+func (w *workflowProvider) IsApplicationError(err error) bool {
+	_, ok := err.(*cadence.CustomError)
+	return ok
+}
+
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {

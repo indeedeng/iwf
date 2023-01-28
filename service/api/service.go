@@ -210,9 +210,19 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			if err != nil {
 				return nil, s.handleError(err)
 			}
+			errMsg = ""
+			if descResp.Status == iwfidl.FAILED {
+				errMsg = "unknown workflow failure from interpreter implementation"
+				s.logger.Error(errMsg, tag.WorkflowID(req.GetWorkflowId()), tag.WorkflowRunID(descResp.RunId))
+			}
+			var errMsgPtr *string
+			if errMsg != "" {
+				errMsgPtr = iwfidl.PtrString(errMsg)
+			}
 			return &iwfidl.WorkflowGetResponse{
 				WorkflowRunId:  descResp.RunId,
 				WorkflowStatus: descResp.Status,
+				ErrorMessage:   errMsgPtr,
 			}, nil
 		}
 	}

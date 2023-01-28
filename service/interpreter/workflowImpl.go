@@ -234,7 +234,7 @@ func executeState(
 		},
 	}).Get(ctx, &startResponse)
 	if err != nil {
-		return nil, err
+		return nil, convertStateApiActivityError(provider, err)
 	}
 
 	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
@@ -333,9 +333,6 @@ func executeState(
 	WaitForDeciderTriggerType(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds)
 	commandReqDone = true
 
-	if err != nil {
-		return nil, err
-	}
 	commandRes := &iwfidl.CommandResults{}
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.FinishProcessing(stateExeId)
@@ -418,7 +415,7 @@ func executeState(
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {
-		return nil, err
+		return nil, convertStateApiActivityError(provider, err)
 	}
 
 	decision := decideResponse.GetStateDecision()
@@ -435,6 +432,13 @@ func executeState(
 	continueAsNewer.DeletePendingStateExecution(stateExeId)
 
 	return &decision, nil
+}
+
+func convertStateApiActivityError(provider WorkflowProvider, err error) error {
+	if provider.IsApplicationError(err) {
+		return err
+	}
+	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE), err.Error())
 }
 
 func getThreadName(prefix string, cmdId string, idx int) string {
