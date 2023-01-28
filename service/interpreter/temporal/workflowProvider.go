@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"errors"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
@@ -19,6 +20,11 @@ func (w *workflowProvider) GetBackendType() service.BackendType {
 
 func (w *workflowProvider) NewApplicationError(errType string, details interface{}) error {
 	return temporal.NewApplicationError("", errType, details)
+}
+
+func (w *workflowProvider) IsApplicationError(err error) bool {
+	var applicationError *temporal.ApplicationError
+	return errors.As(err, &applicationError)
 }
 
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {
