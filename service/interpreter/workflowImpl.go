@@ -54,7 +54,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 	stateExecutionCounter := NewStateExecutionCounter(ctx, provider)
 
-	continueAsNewer := NewContinueAsNewer(interStateChannel, stateExecutionCounter)
+	continueAsNewer := NewContinueAsNewer(interStateChannel, stateExecutionCounter, persistenceManager)
 	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx, provider)
 	if err != nil {
 		return nil, err

@@ -67,16 +67,13 @@ type (
 
 	InternalTimerStatus string
 
-	DumpAllInternalRequest struct {
-		PageSizeInBytes int
-		PageNum         int
-	}
-
 	DumpAllInternalResponse struct {
 		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
 		StateExecutionCounterInfo               StateExecutionCounterInfo
 		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
 		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
+		DataObjects                             []iwfidl.KeyValue
+		SearchAttributes                        []iwfidl.SearchAttribute
 	}
 
 	StateExecutionCounterInfo struct {
