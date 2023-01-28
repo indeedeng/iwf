@@ -10,25 +10,30 @@ type ContinueAsNewer struct {
 	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
 	interStateChannel                       *InterStateChannel
 	stateExecutionCounter                   *StateExecutionCounter
+	persistenceManager                      *PersistenceManager
 }
 
-func NewContinueAsNewer(interStateChannel *InterStateChannel, stateExecutionCounter *StateExecutionCounter) *ContinueAsNewer {
+func NewContinueAsNewer(
+	interStateChannel *InterStateChannel, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
+) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		interStateChannel:                       interStateChannel,
 		stateExecutionCounter:                   stateExecutionCounter,
+		persistenceManager:                      persistenceManager,
 		pendingStateExecutionsCompletedCommands: map[string]service.PendingStateExecutionCompletedCommands{},
 		pendingStateExecutionsRequestCommands:   map[string]service.PendingStateExecutionRequestCommands{},
 	}
 }
 
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext, provider WorkflowProvider) error {
-	err := provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func(request service.DumpAllInternalRequest) (*service.DumpAllInternalResponse, error) {
-		// TODO use request for pagination
+	err := provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
 		return &service.DumpAllInternalResponse{
 			InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
 			StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
 			PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
 			PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
+			DataObjects:                             c.persistenceManager.GetAllDataObjects(),
+			SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
 		}, nil
 	})
 	if err != nil {
