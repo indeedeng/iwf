@@ -99,7 +99,7 @@ type WorkflowProvider interface {
 }
 
 type ReceiveChannel interface {
-	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool)
+	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool) // TODO: check with Temporal about the API semantics -- Cadence says the return is "ok" but Temporal says it's "more"
 	ReceiveAsync(valuePtr interface{}) (ok bool)
 }
 
