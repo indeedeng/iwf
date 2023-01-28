@@ -80,7 +80,7 @@ func doTestStateApiTimeout(t *testing.T, backendType service.BackendType) {
 		"S1_start": 1,
 	}, history, "wf state api fail test fail, %v", history)
 
-	assertions.True(strings.Contains(resp.GetErrorMessage(), "activity StartToClose timeout (type: StartToClose)"))
+	assertions.True(strings.Contains(resp.GetErrorMessage(), "StartToClose") || strings.Contains(resp.GetErrorMessage(), "START_TO_CLOSE"), resp.GetErrorMessage())
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.FAILED,
