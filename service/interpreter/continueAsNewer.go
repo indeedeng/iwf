@@ -31,6 +31,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext, p
 	err := provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
 		return &service.DumpAllInternalResponse{
 			InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
+			SignalChannelReceived:                   c.signalReceiver.ReadReceived(nil),
 			StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
 			PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
 			PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,

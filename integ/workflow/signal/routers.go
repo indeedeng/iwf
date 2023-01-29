@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	WorkflowType = "signal"
-	State1       = "S1"
-	State2       = "S2"
-	SignalName   = "test-signal-name"
+	WorkflowType        = "signal"
+	State1              = "S1"
+	State2              = "S2"
+	SignalName          = "test-signal-name"
+	UnhandledSignalName = "test-unhandled-signal-name"
 )
 
 type handler struct {

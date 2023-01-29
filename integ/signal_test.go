@@ -60,6 +60,20 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
+	// signal for testing unhandled signals
+	for i := 0; i < 10; i++ {
+		req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
+		httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+			WorkflowId:        wfId,
+			SignalChannelName: signal.UnhandledSignalName,
+			SignalValue: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString(fmt.Sprintf("test-data-%v", i)),
+			},
+		}).Execute()
+		panicAtHttpError(err, httpResp2)
+	}
+
 	// signal the workflow
 	var signalVals []iwfidl.EncodedObject
 	for i := 0; i < 4; i++ {
@@ -102,4 +116,6 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	for i := 0; i < 4; i++ {
 		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
 	}
+
+	time.Sleep(time.Hour)
 }
