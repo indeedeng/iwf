@@ -41,6 +41,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 	persistenceManager := NewPersistenceManager(provider, input.InitSearchAttributes)
 	timerProcessor := NewTimerProcessor(ctx, provider)
+	signalReceiver := NewSignalReceiver(ctx, provider)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil
@@ -54,7 +55,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 	stateExecutionCounter := NewStateExecutionCounter(ctx, provider)
 
-	continueAsNewer := NewContinueAsNewer(interStateChannel, stateExecutionCounter, persistenceManager)
+	continueAsNewer := NewContinueAsNewer(interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
 	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx, provider)
 	if err != nil {
 		return nil, err
@@ -85,7 +86,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, timerProcessor, continueAsNewer)
+				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, signalReceiver, timerProcessor, continueAsNewer)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -199,6 +200,7 @@ func executeState(
 	stateExeId string,
 	persistenceManager *PersistenceManager,
 	interStateChannel *InterStateChannel,
+	signalReceiver *SignalReceiver,
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
 ) (*iwfidl.StateDecision, error) {
@@ -283,15 +285,13 @@ func executeState(
 				if !ok {
 					panic("critical code bug")
 				}
-				ch := provider.GetSignalChannel(ctx, cmd.GetSignalChannelName())
-				value := iwfidl.EncodedObject{}
 				received := false
 				_ = provider.Await(ctx, func() bool {
-					received = ch.ReceiveAsync(&value)
+					received = signalReceiver.HasSignal(cmd.SignalChannelName)
 					return received || commandReqDone
 				})
 				if received {
-					completedSignalCmds[idx] = &value
+					completedSignalCmds[idx] = signalReceiver.Retrieve(cmd.SignalChannelName)
 				}
 			})
 		}

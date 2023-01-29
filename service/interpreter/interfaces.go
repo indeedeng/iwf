@@ -94,6 +94,7 @@ type WorkflowProvider interface {
 	GetSignalChannel(ctx UnifiedContext, signalName string) (receiveChannel ReceiveChannel)
 	GetContextValue(ctx UnifiedContext, key string) interface{}
 	GetVersion(ctx UnifiedContext, changeID string, minSupported, maxSupported int) int
+	GetUnhandledSignalNames(ctx UnifiedContext) []string
 	GetBackendType() service.BackendType
 	GetLogger(ctx UnifiedContext) UnifiedLogger
 }
