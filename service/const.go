@@ -17,12 +17,17 @@ const (
 	GetCurrentTimerInfosQueryType   = "GetCurrentTimerInfos"
 	DumpAllInternalQueryType        = "DumpAllInternal"
 
-	SkipTimerSignalChannelName = "IwfSystemSkipTimerChannel"
-
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
 	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"
 
 	BackendTypeCadence  BackendType = "cadence"
 	BackendTypeTemporal BackendType = "temporal"
+
+	IwfSystemSignalPrefix      = "__IwfSystem_"
+	SkipTimerSignalChannelName = IwfSystemSignalPrefix + "SkipTimerChannel"
 )
+
+var ValidIwfSystemSignalNames map[string]bool = map[string]bool{
+	SkipTimerSignalChannelName: true,
+}

@@ -213,3 +213,11 @@ func (w *workflowProvider) GetLogger(ctx interpreter.UnifiedContext) interpreter
 		zlogger: zLogger,
 	}
 }
+
+func (w *workflowProvider) GetUnhandledSignalNames(ctx interpreter.UnifiedContext) []string {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+	return workflow.GetUnhandledSignalNames(wfCtx)
+}

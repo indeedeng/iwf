@@ -141,7 +141,7 @@ iwf-server:
 idl-code-gen: #generate/refresh go clent code for idl, do this after update the idl file
 	rm -Rf ./gen ; true
 	openapi-generator generate -i iwf-idl/iwf.yaml -g go -o gen/iwfidl/ -p packageName=iwfidl -p generateInterfaces=true -p isGoSubmodule=false --git-user-id indeedeng --git-repo-id iwf-idl
-	rm ./gen/iwfidl/go.* ; true
+	rm ./gen/iwfidl/go.* ; rm -rf ./gen/iwfidl/test; true
 
 bins: $(BINS)
 

@@ -94,12 +94,13 @@ type WorkflowProvider interface {
 	GetSignalChannel(ctx UnifiedContext, signalName string) (receiveChannel ReceiveChannel)
 	GetContextValue(ctx UnifiedContext, key string) interface{}
 	GetVersion(ctx UnifiedContext, changeID string, minSupported, maxSupported int) int
+	GetUnhandledSignalNames(ctx UnifiedContext) []string
 	GetBackendType() service.BackendType
 	GetLogger(ctx UnifiedContext) UnifiedLogger
 }
 
 type ReceiveChannel interface {
-	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool)
+	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool) // TODO: check with Temporal about the API semantics -- Cadence says the return is "ok" but Temporal says it's "more"
 	ReceiveAsync(valuePtr interface{}) (ok bool)
 }
 

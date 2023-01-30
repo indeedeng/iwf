@@ -11,13 +11,15 @@ type ContinueAsNewer struct {
 	interStateChannel                       *InterStateChannel
 	stateExecutionCounter                   *StateExecutionCounter
 	persistenceManager                      *PersistenceManager
+	signalReceiver                          *SignalReceiver
 }
 
 func NewContinueAsNewer(
-	interStateChannel *InterStateChannel, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
+	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		interStateChannel:                       interStateChannel,
+		signalReceiver:                          signalReceiver,
 		stateExecutionCounter:                   stateExecutionCounter,
 		persistenceManager:                      persistenceManager,
 		pendingStateExecutionsCompletedCommands: map[string]service.PendingStateExecutionCompletedCommands{},
@@ -29,6 +31,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext, p
 	err := provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
 		return &service.DumpAllInternalResponse{
 			InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
+			SignalChannelReceived:                   c.signalReceiver.ReadReceived(nil),
 			StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
 			PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
 			PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,

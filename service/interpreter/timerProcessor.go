@@ -21,7 +21,15 @@ func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProc
 		for {
 			ch := provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
 			val := service.SkipTimerSignalRequest{}
-			ch.Receive(ctx, &val)
+
+			err := provider.Await(ctx, func() bool {
+				return ch.ReceiveAsync(&val)
+			})
+			if err != nil {
+				// break the loop to prevent goroutine leakage
+				break
+			}
+
 			tp.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
 		}
 	})
