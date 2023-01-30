@@ -1,6 +1,7 @@
 package integ
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
 	"github.com/indeedeng/iwf/integ/workflow/common"
@@ -16,18 +17,33 @@ import (
 	"go.uber.org/cadence/encoded"
 	"log"
 	"net/http"
+	"time"
 )
 
 const testNamespace = "default"
 
 func createTemporalClient() client.Client {
 	temporalClient, err := client.Dial(client.Options{
+		HostPort:  *temporalHostPort,
 		Namespace: testNamespace,
 	})
-	if err != nil {
-		log.Fatalf("unable to connect to Temporal %v", err)
+	if err == nil {
+		return temporalClient
 	}
-	return temporalClient
+
+	for i := 0; i < 20; i++ {
+		fmt.Println("wait for Temporal to be up...last err: ", err)
+		time.Sleep(time.Second)
+		temporalClient, err = client.Dial(client.Options{
+			HostPort:  *temporalHostPort,
+			Namespace: testNamespace,
+		})
+		if err == nil {
+			return temporalClient
+		}
+	}
+	log.Fatalf("unable to connect to Temporal %v", err)
+	return nil
 }
 
 func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {

@@ -3,7 +3,7 @@ version: '3.9'
 # see .env file for the default value of the environment variables
 services:
   elasticsearch:
-    container_name: temporal-elasticsearch-iwf
+    container_name: elasticsearch
     environment:
       - cluster.routing.allocation.disk.threshold_enabled=true
       - cluster.routing.allocation.disk.watermark.low=512mb
@@ -14,21 +14,21 @@ services:
       - xpack.security.enabled=false
     image: elasticsearch:${ELASTICSEARCH_VERSION}
     networks:
-      - temporal-network
+      - testing-network
     expose:
       - 9200
   postgresql:
-    container_name: temporal-postgresql-iwf
+    container_name: temporal-postgresql
     environment:
       POSTGRES_PASSWORD: temporal
       POSTGRES_USER: temporal
     image: postgres:${POSTGRESQL_VERSION}
     networks:
-      - temporal-network
+      - testing-network
     expose:
       - 5432
   temporal:
-    container_name: temporal-iwf
+    container_name: temporal
     depends_on:
       - postgresql
       - elasticsearch
@@ -44,7 +44,7 @@ services:
       - ES_VERSION=v7
     image: temporalio/auto-setup:${TEMPORAL_VERSION}
     networks:
-      - temporal-network
+      - testing-network
     ports:
       - 7233:7233
     labels:
@@ -52,43 +52,20 @@ services:
     volumes:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
   temporal-admin-tools:
-    container_name: temporal-admin-tools-iwf
+    container_name: temporal-admin-tools
     depends_on:
       - temporal
     environment:
       - TEMPORAL_CLI_ADDRESS=temporal:7233
     image: temporalio/admin-tools:${TEMPORAL_VERSION}
     networks:
-      - temporal-network
+      - testing-network
     stdin_open: true
     tty: true
     volumes:
-     - ./init.sh:/etc/temporal/init.sh
+      - ./init.sh:/etc/temporal/init.sh
     entrypoint: sh -c "/etc/temporal/init.sh"
-  temporal-ui:
-    container_name: temporal-ui-iwf
-    depends_on:
-      - temporal
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
-    image: temporalio/ui:${TEMPORAL_UI_VERSION}
-    networks:
-      - temporal-network
-    ports:
-      - 8233:8080
-  iwf-server:
-    container_name: iwf-server
-    image: iworkflowio/iwf-server:latest #NOTE: you can change to version tag like v1.0.0-RC6
-    environment:
-      - AUTO_FIX_WORKER_URL=host.docker.internal # this will let iwf-server automatically replace all iwfWorkerUrls of "localhost" or "127.0.0.1" with "host.docker.internal"
-    networks:
-      - temporal-network
-    ports:
-      - 8801:8801
-    depends_on:
-      - temporal
 networks:
-  temporal-network:
+  testing-network:
     driver: bridge
-    name: temporal-network
+    name: testing-network

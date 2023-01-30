@@ -166,6 +166,9 @@ cleanTestCache:
 integTests:
 	$Q go test -v ./integ
 
+ci:
+	$Q go test -v ./integ -search=false -cadence=false -temporalHostPort=temporal:7233
+
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false
 
