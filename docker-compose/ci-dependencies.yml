@@ -63,8 +63,8 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./init.sh:/etc/temporal/init.sh
-    entrypoint: sh -c "/etc/temporal/init.sh"
+      - ./init-ci-integ.sh:/etc/temporal/init-ci-integ.sh
+    entrypoint: sh -c "/etc/temporal/init-ci-integ.sh"
 networks:
   testing-network:
     driver: bridge
