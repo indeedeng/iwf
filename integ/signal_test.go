@@ -38,7 +38,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(backendType)
+	uclient, closeFunc2 := doStartIwfServiceWithClient(backendType)
 	defer closeFunc2()
 
 	// start a workflow
@@ -61,17 +61,20 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	panicAtHttpError(err, httpResp)
 
 	// signal for testing unhandled signals
+	var unhandledSignalVals []*iwfidl.EncodedObject
 	for i := 0; i < 10; i++ {
+		sigVal := &iwfidl.EncodedObject{
+			Encoding: iwfidl.PtrString("json"),
+			Data:     iwfidl.PtrString(fmt.Sprintf("test-data-%v", i)),
+		}
 		req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 		httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 			WorkflowId:        wfId,
 			SignalChannelName: signal.UnhandledSignalName,
-			SignalValue: &iwfidl.EncodedObject{
-				Encoding: iwfidl.PtrString("json"),
-				Data:     iwfidl.PtrString(fmt.Sprintf("test-data-%v", i)),
-			},
+			SignalValue:       sigVal,
 		}).Execute()
 		panicAtHttpError(err, httpResp2)
+		unhandledSignalVals = append(unhandledSignalVals, sigVal)
 	}
 
 	// signal the workflow
@@ -117,5 +120,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
 	}
 
-	time.Sleep(time.Hour)
+	var dump service.DumpAllInternalResponse
+	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DumpAllInternalQueryType)
+	if err != nil {
+		panic(err)
+	}
+	assertions.Equal(unhandledSignalVals, dump.SignalChannelReceived[signal.UnhandledSignalName])
 }
