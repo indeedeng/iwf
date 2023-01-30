@@ -167,7 +167,7 @@ integTests:
 	$Q go test -v ./integ
 
 ci-integ-test:
-	$Q go test -v ./integ -search=false -cadence=false -temporalHostPort=temporal:7233 -dependencyWaitSeconds=60
+	$Q go test -v ./integ -search=false -cadence=false -dependencyWaitSeconds=60
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false
