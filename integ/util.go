@@ -31,7 +31,7 @@ func createTemporalClient() client.Client {
 		return temporalClient
 	}
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < *dependencyWaitSeconds; i++ {
 		fmt.Println("wait for Temporal to be up...last err: ", err)
 		time.Sleep(time.Second)
 		temporalClient, err = client.Dial(client.Options{

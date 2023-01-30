@@ -1,4 +1,4 @@
-name: "CI"
+name: CI Integration Test
 on:
   pull_request:
   push:
@@ -14,4 +14,4 @@ jobs:
       - name: "Set up environment"
         run: docker compose -f docker-compose/ci-dependencies.yml up -d
       - name: "Test server"
-        run: make ci
+        run: make ci-integ-test

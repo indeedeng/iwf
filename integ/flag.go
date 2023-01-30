@@ -17,3 +17,5 @@ var testSearchIntegTest = flag.Bool("search", true, "run search integ test again
 var searchWaitTimeIntegTest = flag.Int("searchWaitMs", 2000, "the amount of time to wait for ElasticSearch being able to search in milliseconds")
 
 var temporalHostPort = flag.String("temporalHostPort", "", "temporal host port")
+
+var dependencyWaitSeconds = flag.Int("dependencyWaitSeconds", 60, "the number of seconds waiting for dependencies to be up(Cadence/Temporal)")
