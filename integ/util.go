@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
-	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
@@ -16,7 +15,6 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
-	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/encoded"
 	"log"
 	"net/http"
@@ -101,8 +99,9 @@ func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.U
 		serviceClient, closeFunc, err := iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
 		if err != nil {
 			for i := 0; i < *dependencyWaitSeconds; i++ {
-				fmt.Println("wait for Temporal to be up...last err: ", err)
+				fmt.Println("wait for Cadence to be up...last err: ", err)
 				time.Sleep(time.Second)
+
 				serviceClient, closeFunc, err = iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
 				if err == nil {
 					break
@@ -111,11 +110,25 @@ func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.U
 			if err != nil {
 				log.Fatalf("cannot connnect to Cadence %v", err)
 			}
+		}
 
-			// TODO improve this hack...
-			_ = serviceClient.RegisterDomain(context.Background(), &shared.RegisterDomainRequest{
-				Name: iwfidl.PtrString(iwf.DefaultCadenceDomain),
-			})
+		for i := 0; i < *dependencyWaitSeconds; i++ {
+			fmt.Println("wait for Cadence domain/Search attributes to be ready...")
+			time.Sleep(time.Second)
+			resp, err := serviceClient.GetSearchAttributes(context.Background())
+			ready := false
+			if err == nil {
+				for key, _ := range resp.GetKeys() {
+					// NOTE: this is the last one we registered in init-ci-cadence.sh
+					if key == service.SearchAttributeIwfWorkflowType {
+						ready = true
+						break
+					}
+				}
+			}
+			if ready {
+				break
+			}
 		}
 
 		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, iwf.DefaultCadenceDomain)
