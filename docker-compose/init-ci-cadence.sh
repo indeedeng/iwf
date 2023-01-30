@@ -10,5 +10,6 @@ done
 
 yes | cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
 yes | cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
+cadence --do default domain register
 
 tail -f /dev/null

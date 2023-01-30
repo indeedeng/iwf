@@ -97,7 +97,17 @@ func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.U
 	} else if backendType == service.BackendTypeCadence {
 		serviceClient, closeFunc, err := iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
 		if err != nil {
-			log.Fatalf("cannot connnect to Cadence %v", err)
+			for i := 0; i < *dependencyWaitSeconds; i++ {
+				fmt.Println("wait for Temporal to be up...last err: ", err)
+				time.Sleep(time.Second)
+				serviceClient, closeFunc, err = iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
+				if err == nil {
+					break
+				}
+			}
+			if err != nil {
+				log.Fatalf("cannot connnect to Cadence %v", err)
+			}
 		}
 
 		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, iwf.DefaultCadenceDomain)
