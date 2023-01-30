@@ -1,9 +1,11 @@
 package integ
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
@@ -14,6 +16,7 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
+	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/encoded"
 	"log"
 	"net/http"
@@ -108,6 +111,11 @@ func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.U
 			if err != nil {
 				log.Fatalf("cannot connnect to Cadence %v", err)
 			}
+
+			// TODO improve this hack...
+			_ = serviceClient.RegisterDomain(context.Background(), &shared.RegisterDomainRequest{
+				Name: iwfidl.PtrString(iwf.DefaultCadenceDomain),
+			})
 		}
 
 		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, iwf.DefaultCadenceDomain)
