@@ -38,15 +38,20 @@ Here is the repository layout if you are interested to learn about it:
 
 
 ## How to run integration test
-### Run with our docker-compose file (Recommended)
+Use any of the below options to prepare the Cadence/Temporal dependencies,
+then run the whole integ test suite by this command: 
+
+`make integ-test`
+
+### Option 1: Run with our docker-compose file (Recommended)
 Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
 * Start both Cadence & Temporal as dependencies
 * Set up required system search attributes
-* Set up customized search attributes for integration test(`persistence_test.go`) 
+* Set up customized search attributes for integration test(`persistence_test.go`)
+* Temporal WebUI:  http://localhost:8080/
+* Cadence WebUI:  http://localhost:8088/
 
-Then run `make integ-test`
-
-### Run with your own Temporal service
+### Option 2: Run with your own Temporal service
 
 NOTE: For local testing it's recommended to use [temporal docker-compose](https://github.com/temporalio/docker-compose)
 
@@ -68,8 +73,7 @@ tctl adm cl asa -n IwfGlobalWorkflowVersion -t Int
 tctl adm cl asa -n IwfExecutingStateIds -t Keyword
 
 ```
-3. For `persistence_test.go` integTests, you need to register below custom search attributes.  
-Those Search Attributes are provided by default in temporal docker-compose by not by Temporalite.
+3. For `persistence_test.go` integTests, you need to register below custom search attributes. 
 ```shell
 tctl adm cl asa -n CustomKeywordField -t Keyword
 tctl adm cl asa -n CustomIntField -t Int
@@ -81,7 +85,7 @@ tctl adm cl asa -n CustomStringField -t text
 
 4. If you run into any issues with Search Attributes registration, use the below command to check the existing Search attributes:`tctl adm cl get-search-attributes`
 
-### Run with your own Cadence service
+### Option 3: Run with your own Cadence service
 1. You can run a local Cadence server following the [instructions](https://github.com/uber/cadence/tree/master/docker)
 ```
 docker-compose -f docker-compose-es-v7.yml up
