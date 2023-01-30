@@ -12,6 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: "Set up environment"
-        run: docker compose -f docker/compose/ci-dependencies.yml up -d
+        run: docker compose -f docker-compose/ci-dependencies.yml up -d
       - name: "Test server"
         run: make ci
