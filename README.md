@@ -220,9 +220,14 @@ Use `docker pull iworkflowio/iwf-server:latest` to update the latest image.Or up
 
 ## How to build & run locally
 * Run `make bins` to build the binary `iwf-server`
+* Make sure you have registered the system search attributes required by iWF server:
+  * Keyword: IwfWorkflowType 
+  * Int: IwfGlobalWorkflowVersion
+  * Keyword: IwfExecutingStateIds 
+  * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
 * Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter implementation. It requires to have local Temporal setup. See Run with local Temporal.
 * Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below instructions for setting up local Cadence. 
-* Run `make integTests` to run all integration tests. This by default requires to have both local Cadence and Temporal to be set up.
+ 
 
 ## How to use in production
 
