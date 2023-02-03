@@ -55,6 +55,25 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 
 func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
 	if backendType == service.BackendTypeTemporal {
+		if integCadenceUclient == nil {
+			return doOnceStartIwfServiceWithClient(backendType)
+		}
+		return integTemporalUclient, integTemporalUclientCloseFunc
+	}
+	if integCadenceUclient == nil {
+		return doOnceStartIwfServiceWithClient(backendType)
+	}
+	return integCadenceUclient, integCadenceUclientCloseFunc
+}
+
+var integCadenceUclient api.UnifiedClient
+var integCadenceUclientCloseFunc func()
+
+var integTemporalUclient api.UnifiedClient
+var integTemporalUclientCloseFunc func()
+
+func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
+	if backendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
 		logger, err := loggerimpl.NewDevelopment()
 		if err != nil {

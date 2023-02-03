@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
+	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/sdk/client"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
@@ -15,10 +16,11 @@ import (
 	"time"
 )
 
-// TODO move starting Cadence/Temporal workflow worker and iwf workflow handler here
 func TestMain(m *testing.M) {
 	flag.Parse()
 	var err error
+
+	fmt.Println("*temporalIntegTest, *cadenceIntegTest", *temporalIntegTest, *cadenceIntegTest)
 
 	if *temporalIntegTest {
 		var temporalClient client.Client
@@ -60,7 +62,6 @@ func TestMain(m *testing.M) {
 		var closeFunc func()
 		var serviceClient workflowserviceclient.Interface
 		serviceClient, closeFunc, err = iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
-		defer closeFunc()
 		for i := 0; i < *dependencyWaitSeconds; i++ {
 			ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
 			_, err = serviceClient.DescribeDomain(ctx, &shared.DescribeDomainRequest{
@@ -77,9 +78,21 @@ func TestMain(m *testing.M) {
 			log.Fatalf("Cadence service is not ready %v", err)
 		}
 		fmt.Println("Cadence service is now ready")
-
-		code := m.Run()
-		fmt.Println("finished running integ test with status code", code)
-		os.Exit(code)
+		closeFunc()
 	}
+
+	if !(*cadenceIntegTest && *temporalIntegTest) {
+		// hack for ci test to save the performance
+		// only start connection once
+		// TODO need to do this for outside of ci as well
+		if *cadenceIntegTest {
+			integCadenceUclient, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
+		} else {
+			integTemporalUclient, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
+		}
+	}
+
+	code := m.Run()
+	fmt.Println("finished running integ test with status code", code)
+	os.Exit(code)
 }
