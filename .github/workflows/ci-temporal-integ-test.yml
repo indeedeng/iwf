@@ -1,4 +1,4 @@
-name: CI Integration Test
+name: Temporal Integration Test
 on:
   pull_request:
   push:
