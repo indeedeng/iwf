@@ -1,8 +1,6 @@
 package integ
 
 import (
-	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
 	"github.com/indeedeng/iwf/integ/workflow/common"
@@ -18,7 +16,6 @@ import (
 	"go.uber.org/cadence/encoded"
 	"log"
 	"net/http"
-	"time"
 )
 
 const testNamespace = "default"
@@ -32,17 +29,6 @@ func createTemporalClient() client.Client {
 		return temporalClient
 	}
 
-	for i := 0; i < *dependencyWaitSeconds; i++ {
-		fmt.Println("wait for Temporal to be up...last err: ", err)
-		time.Sleep(time.Second)
-		temporalClient, err = client.Dial(client.Options{
-			HostPort:  *temporalHostPort,
-			Namespace: testNamespace,
-		})
-		if err == nil {
-			return temporalClient
-		}
-	}
 	log.Fatalf("unable to connect to Temporal %v", err)
 	return nil
 }
@@ -98,37 +84,7 @@ func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.U
 	} else if backendType == service.BackendTypeCadence {
 		serviceClient, closeFunc, err := iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
 		if err != nil {
-			for i := 0; i < *dependencyWaitSeconds; i++ {
-				fmt.Println("wait for Cadence to be up...last err: ", err)
-				time.Sleep(time.Second)
-
-				serviceClient, closeFunc, err = iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
-				if err == nil {
-					break
-				}
-			}
-			if err != nil {
-				log.Fatalf("cannot connnect to Cadence %v", err)
-			}
-		}
-
-		for i := 0; i < *dependencyWaitSeconds; i++ {
-			fmt.Println("wait for Cadence domain/Search attributes to be ready...")
-			time.Sleep(time.Second)
-			resp, err := serviceClient.GetSearchAttributes(context.Background())
-			ready := false
-			if err == nil {
-				for key, _ := range resp.GetKeys() {
-					// NOTE: this is the last one we registered in init-ci-cadence.sh
-					if key == service.SearchAttributeIwfWorkflowType {
-						ready = true
-						break
-					}
-				}
-			}
-			if ready {
-				break
-			}
+			log.Fatalf("cannot connnect to Cadence %v", err)
 		}
 
 		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, iwf.DefaultCadenceDomain)
