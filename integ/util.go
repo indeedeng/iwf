@@ -22,6 +22,7 @@ const testNamespace = "default"
 
 func createTemporalClient() client.Client {
 	temporalClient, err := client.Dial(client.Options{
+		HostPort:  *temporalHostPort,
 		Namespace: testNamespace,
 	})
 	if err != nil {
@@ -53,6 +54,23 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 }
 
 func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
+	if backendType == service.BackendTypeTemporal {
+		if integTemporalUclientCached == nil {
+			return doOnceStartIwfServiceWithClient(backendType)
+		}
+		return integTemporalUclientCached, func() {}
+	}
+
+	if integCadenceUclientCached == nil {
+		return doOnceStartIwfServiceWithClient(backendType)
+	}
+	return integCadenceUclientCached, func() {}
+}
+
+var integCadenceUclientCached api.UnifiedClient
+var integTemporalUclientCached api.UnifiedClient
+
+func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
 	if backendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
 		logger, err := loggerimpl.NewDevelopment()
