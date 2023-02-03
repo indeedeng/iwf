@@ -25,12 +25,10 @@ func createTemporalClient() client.Client {
 		HostPort:  *temporalHostPort,
 		Namespace: testNamespace,
 	})
-	if err == nil {
-		return temporalClient
+	if err != nil {
+		log.Fatalf("unable to connect to Temporal %v", err)
 	}
-
-	log.Fatalf("unable to connect to Temporal %v", err)
-	return nil
+	return temporalClient
 }
 
 func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {
