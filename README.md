@@ -1,5 +1,8 @@
 # iWF project - main & server repo 
 
+[![Build status](https://github.com/indeedeng/iwf/actions/workflows/ci-cadence-integ-test.yml/badge.svg?branch=main)](https://github.com/indeedeng/iwf/actions/workflows/ci-cadence-integ-test.yml)
+[![Build status](https://github.com/indeedeng/iwf/actions/workflows/ci-temporal-integ-test.yml/badge.svg?branch=main)](https://github.com/indeedeng/iwf/actions/workflows/ci-temporal-integ-test.yml)
+
 iWF is a platform providing an all-in-one tooling for building long-running business application. It provides an 
 abstraction for persistence(database, elasticSearch) and more! It aims to provide clean, simple and easy to use interface, 
 like an iPhone. 
