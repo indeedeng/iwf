@@ -10,6 +10,7 @@ import (
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"log"
+	"os"
 	"testing"
 	"time"
 )
@@ -76,5 +77,9 @@ func TestMain(m *testing.M) {
 			log.Fatalf("Cadence service is not ready %v", err)
 		}
 		fmt.Println("Cadence service is now ready")
+
+		code := m.Run()
+		fmt.Println("finished running integ test with status code", code)
+		os.Exit(code)
 	}
 }

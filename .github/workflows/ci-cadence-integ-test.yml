@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: "Set up environment"
-        run: docker compose -f docker-compose/ci-dependencies.yml up -d
-      - name: "Test server"
-        run: make ci-integ-test
+      - name: "Set up cadence environment"
+        run: docker compose -f docker-compose/ci-cadence-dependencies.yml up -d
+      - name: "Test against cadence"
+        run: make ci-cadence-integ-test

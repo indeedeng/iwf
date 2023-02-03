@@ -80,16 +80,6 @@ services:
     volumes:
       - ./init-ci-cadence.sh:/etc/cadence/init-ci-cadence.sh
     entrypoint: sh -c "/etc/cadence/init-ci-cadence.sh"
-  cadence-web: # TODO remove from ci
-    image: ubercadence/web:latest
-    environment:
-      - "CADENCE_TCHANNEL_PEERS=cadence:7933"
-    ports:
-      - "8088:8088"
-    depends_on:
-      - cadence
-    networks:
-      - testing-network
 networks:
   testing-network:
     driver: bridge
