@@ -333,11 +333,12 @@ components:
         maximumAttempts: 7
         initialIntervalSeconds: 5
         maximumIntervalSeconds: 2
-        backoffCoefficient: 5.637376656633329
+        backoffCoefficient: 5.637377
       properties:
         initialIntervalSeconds:
           type: integer
         backoffCoefficient:
+          format: float
           type: number
         maximumIntervalSeconds:
           type: integer
@@ -357,14 +358,14 @@ components:
           maximumAttempts: 7
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
-          backoffCoefficient: 5.637376656633329
+          backoffCoefficient: 5.637377
         decideApiTimeoutSeconds: 1
         startApiTimeoutSeconds: 6
         startApiRetryPolicy:
           maximumAttempts: 7
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
-          backoffCoefficient: 5.637376656633329
+          backoffCoefficient: 5.637377
         dataObjectsLoadingPolicy:
           partialLoadingKeys:
           - partialLoadingKeys
@@ -392,7 +393,7 @@ components:
           maximumAttempts: 7
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
-          backoffCoefficient: 5.637376656633329
+          backoffCoefficient: 5.637377
         searchAttributes:
         - stringValue: stringValue
           valueType: null
@@ -492,14 +493,14 @@ components:
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
-            backoffCoefficient: 5.637376656633329
+            backoffCoefficient: 5.637377
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
           startApiRetryPolicy:
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
-            backoffCoefficient: 5.637376656633329
+            backoffCoefficient: 5.637377
           dataObjectsLoadingPolicy:
             partialLoadingKeys:
             - partialLoadingKeys
@@ -511,7 +512,7 @@ components:
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
-            backoffCoefficient: 5.637376656633329
+            backoffCoefficient: 5.637377
           searchAttributes:
           - stringValue: stringValue
             valueType: null
@@ -1226,14 +1227,14 @@ components:
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
-                backoffCoefficient: 5.637376656633329
+                backoffCoefficient: 5.637377
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
               startApiRetryPolicy:
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
-                backoffCoefficient: 5.637376656633329
+                backoffCoefficient: 5.637377
               dataObjectsLoadingPolicy:
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1255,14 +1256,14 @@ components:
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
-                backoffCoefficient: 5.637376656633329
+                backoffCoefficient: 5.637377
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
               startApiRetryPolicy:
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
-                backoffCoefficient: 5.637376656633329
+                backoffCoefficient: 5.637377
               dataObjectsLoadingPolicy:
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1338,14 +1339,14 @@ components:
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
-              backoffCoefficient: 5.637376656633329
+              backoffCoefficient: 5.637377
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
             startApiRetryPolicy:
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
-              backoffCoefficient: 5.637376656633329
+              backoffCoefficient: 5.637377
             dataObjectsLoadingPolicy:
               partialLoadingKeys:
               - partialLoadingKeys
@@ -1367,14 +1368,14 @@ components:
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
-              backoffCoefficient: 5.637376656633329
+              backoffCoefficient: 5.637377
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
             startApiRetryPolicy:
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
-              backoffCoefficient: 5.637376656633329
+              backoffCoefficient: 5.637377
             dataObjectsLoadingPolicy:
               partialLoadingKeys:
               - partialLoadingKeys
@@ -1404,14 +1405,14 @@ components:
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
-            backoffCoefficient: 5.637376656633329
+            backoffCoefficient: 5.637377
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
           startApiRetryPolicy:
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
-            backoffCoefficient: 5.637376656633329
+            backoffCoefficient: 5.637377
           dataObjectsLoadingPolicy:
             partialLoadingKeys:
             - partialLoadingKeys
