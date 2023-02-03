@@ -128,6 +128,28 @@ services:
     volumes:
       - ./init-ci-cadence.sh:/etc/cadence/init-ci-cadence.sh
     entrypoint: sh -c "/etc/cadence/init-ci-cadence.sh"
+  cadence-web:
+    image: ubercadence/web:latest
+    environment:
+      - "CADENCE_TCHANNEL_PEERS=cadence:7933"
+    ports:
+      - "8088:8088"
+    depends_on:
+      - cadence
+    networks:
+      - testing-network
+  temporal-ui:
+    container_name: temporal-ui-iwf
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    image: temporalio/ui:${TEMPORAL_UI_VERSION}
+    networks:
+      - testing-network
+    ports:
+      - 8233:8080
 networks:
   testing-network:
     driver: bridge
