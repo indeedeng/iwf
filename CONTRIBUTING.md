@@ -38,10 +38,6 @@ Here is the repository layout if you are interested to learn about it:
 
 
 ## How to run integration test
-Use any of the below options to prepare the Cadence/Temporal dependencies,
-then run the whole integ test suite by this command: 
-
-`make integ-test`
 
 ### Option 1: Run with our docker-compose file (Recommended)
 Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
@@ -50,6 +46,10 @@ Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
 * Set up customized search attributes for integration test(`persistence_test.go`)
 * Temporal WebUI:  http://localhost:8080/
 * Cadence WebUI:  http://localhost:8088/
+
+Then run the whole integ test suite against Cadence+Temporal service by this command:
+
+`make integTests`
 
 ### Option 2: Run with your own Temporal service
 
@@ -85,6 +85,10 @@ tctl adm cl asa -n CustomStringField -t text
 
 4. If you run into any issues with Search Attributes registration, use the below command to check the existing Search attributes:`tctl adm cl get-search-attributes`
 
+Then run the whole integ test suite against Cadence+Temporal service by this command:
+
+`make temporalIntegTests`
+
 ### Option 3: Run with your own Cadence service
 1. You can run a local Cadence server following the [instructions](https://github.com/uber/cadence/tree/master/docker)
 ```
@@ -107,3 +111,7 @@ for Cadence to load the new search attributes. If you run the test too early, yo
  
 6. If you run into any issues with Search Attributes registration, use the below command to check the existing Search attributes:
 `cadence cl get-search-attr`
+
+Then run the whole integ test suite against Cadence+Temporal service by this command:
+
+`make cadenceIntegTests`
