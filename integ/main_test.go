@@ -81,14 +81,17 @@ func TestMain(m *testing.M) {
 		closeFunc()
 	}
 
+	var integCadenceUclientCloseFunc, integTemporalUclientCloseFunc func()
 	if !(*cadenceIntegTest && *temporalIntegTest) {
 		// hack for ci test to save the performance
 		// only start connection once
 		// TODO need to do this for outside of ci as well
 		if *cadenceIntegTest {
-			integCadenceUclient, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
+			integCadenceUclientCached, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
+			defer integCadenceUclientCloseFunc()
 		} else {
-			integTemporalUclient, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
+			integTemporalUclientCached, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
+			defer integTemporalUclientCloseFunc()
 		}
 	}
 
