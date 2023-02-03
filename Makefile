@@ -166,8 +166,8 @@ cleanTestCache:
 integTests:
 	$Q go test -v ./integ
 
-ci-integ-test:
-	$Q go test -v ./integ -search=false -dependencyWaitSeconds=60
+ci-cadence-integ-test:
+	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=60
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false

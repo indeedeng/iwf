@@ -2,10 +2,13 @@ package integ
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
-	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/sdk/client"
+	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
+	"go.uber.org/cadence/.gen/go/shared"
 	"log"
 	"testing"
 	"time"
@@ -13,18 +16,21 @@ import (
 
 // TODO move starting Cadence/Temporal workflow worker and iwf workflow handler here
 func TestMain(m *testing.M) {
+	flag.Parse()
 	var err error
 
 	if *temporalIntegTest {
 		var temporalClient client.Client
 		for i := 0; i < *dependencyWaitSeconds; i++ {
-			fmt.Println("wait for Temporal to be up...last err: ", err)
-			time.Sleep(time.Second)
 			temporalClient, err = client.Dial(client.Options{
 				HostPort:  *temporalHostPort,
 				Namespace: testNamespace,
 			})
-			if err == nil {
+			if err != nil {
+				fmt.Println("wait for Temporal to be up...last err: ", err)
+				time.Sleep(time.Second)
+
+			} else {
 				break
 			}
 		}
@@ -37,11 +43,11 @@ func TestMain(m *testing.M) {
 
 	if *cadenceIntegTest {
 		for i := 0; i < *dependencyWaitSeconds; i++ {
-			fmt.Println("wait for Cadence to be up...last err: ", err)
-			time.Sleep(time.Second)
-
 			_, _, err = iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
-			if err == nil {
+			if err != nil {
+				fmt.Println("wait for Cadence to be up...last err: ", err)
+				time.Sleep(time.Second)
+			} else {
 				break
 			}
 		}
@@ -50,23 +56,19 @@ func TestMain(m *testing.M) {
 		}
 		fmt.Println("connected to Cadence service")
 
-		serviceClient, closeFunc, err := iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
+		var closeFunc func()
+		var serviceClient workflowserviceclient.Interface
+		serviceClient, closeFunc, err = iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
 		defer closeFunc()
 		for i := 0; i < *dependencyWaitSeconds; i++ {
-			fmt.Println("wait for Cadence domain/Search attributes to be ready...")
-			time.Sleep(time.Second)
-			resp, err := serviceClient.GetSearchAttributes(context.Background())
-			ready := false
-			if err == nil {
-				for key, _ := range resp.GetKeys() {
-					// NOTE: this is the last one we registered in init-ci-cadence.sh
-					if key == service.SearchAttributeIwfWorkflowType {
-						ready = true
-						break
-					}
-				}
-			}
-			if ready {
+			ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+			_, err = serviceClient.DescribeDomain(ctx, &shared.DescribeDomainRequest{
+				Name: ptr.Any(iwf.DefaultCadenceDomain),
+			})
+			if err != nil {
+				fmt.Println("wait for Cadence domain to be ready...", err)
+				time.Sleep(time.Second)
+			} else {
 				break
 			}
 		}
