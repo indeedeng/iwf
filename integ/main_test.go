@@ -89,9 +89,11 @@ func TestMain(m *testing.M) {
 		if *cadenceIntegTest {
 			integCadenceUclientCached, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
 			defer integCadenceUclientCloseFunc()
+			fmt.Println("cached cadence client and iwf server")
 		} else {
 			integTemporalUclientCached, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
 			defer integTemporalUclientCloseFunc()
+			fmt.Println("cached temporal client and iwf server")
 		}
 	}
 
