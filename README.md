@@ -104,6 +104,9 @@ A WorkflowState is implemented with two APIs: `start` and `decide`.
 requested `Commands` are completed, `decide` API will be triggered. The number of commands can be zero, one or multiple.
 * `decide` API will decide next states to execute. Next states can be zero, one or multiple, and can be re-executed as different `stateExecutions`.
 
+![workflow diagram example](https://user-images.githubusercontent.com/4523955/217110563-ee3f52a0-5a86-440c-af04-30416f29e5db.png)
+
+
 ### Workflow execution and WorkflowState execution
 Application can start a workflow instance with a `workflowId` for any workflow definition. A workflow instance is called `WorkflowExecution`. 
 iWF server returns `runId` of UUID as the identifier of the WorkflowExecution. The runId is globally unique.  
@@ -177,9 +180,14 @@ There are two major communication mechanism in iWF:
 
 When designing an iWF workflow, it's useful to use iWF state diagrams like this template for visualization.
 
+![state diagram template](https://user-images.githubusercontent.com/4523955/217110210-56631d35-d353-4ecc-8c0c-b826a212a403.png)
+
 For example, the subscription workflow diagram:
 * [Java sample](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
 * [Golang sample](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/subscription)
+
+![subscription state diagram](https://user-images.githubusercontent.com/4523955/217110240-5dfe1d33-0b7c-49f2-8c12-b0d91c4eb970.png)
+
 
 ## Client APIs
 Client APIs are hosted by iWF server for user workflow application to interact with their workflow executions. 
