@@ -15,6 +15,3 @@ jobs:
         run: docker compose -f docker-compose/ci-temporal-dependencies.yml up -d
       - name: "Test against temporal"
         run: make ci-temporal-integ-test
-      - name: Dump docker logs on failure
-          if: failure()
-          uses: jwalton/gh-docker-logs@v2
