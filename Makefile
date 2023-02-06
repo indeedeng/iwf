@@ -173,7 +173,7 @@ cadenceIntegTests:
 	$Q go test -v ./integ -temporal=false
 
 ci-cadence-integ-test:
-	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=120
+	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=180
 
 ci-temporal-integ-test:
 	$Q go test -v ./integ -search=false -cadence=false -dependencyWaitSeconds=60
