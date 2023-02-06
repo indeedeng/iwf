@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for run in {1..60}; do
+for run in {1..120}; do
   sleep 1
   echo "now trying to register iWF system search attributes..."
   if yes | cadence adm cl asa --search_attr_key IwfGlobalWorkflowVersion --search_attr_type 2; then
