@@ -3,11 +3,10 @@
 [![Build status](https://github.com/indeedeng/iwf/actions/workflows/ci-cadence-integ-test.yml/badge.svg?branch=main)](https://github.com/indeedeng/iwf/actions/workflows/ci-cadence-integ-test.yml)
 [![Build status](https://github.com/indeedeng/iwf/actions/workflows/ci-temporal-integ-test.yml/badge.svg?branch=main)](https://github.com/indeedeng/iwf/actions/workflows/ci-temporal-integ-test.yml)
 
-iWF is a platform providing an all-in-one tooling for building long-running business application. It provides an 
-abstraction for persistence(database, elasticSearch) and more! It aims to provide clean, simple and easy to use interface, 
-like an iPhone. 
+**iWF will make you a 10x developer!**
 
-**It will not make you a 10x developer...but you may feel like one!**
+iWF is a platform providing all-in-one tooling for building long-running business application. It provides an 
+abstraction for persistence(database, elasticSearch) and more, with clean, simple and easy to use interface.
 
 A _long-running process_ is called **`Workflow`**. 
 
@@ -19,9 +18,10 @@ Related projects:
 * [OpenAPI definition between SDKs and server](https://github.com/indeedeng/iwf-idl). 
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) 
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
+  * [Product use case example: subscription](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
 * [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk)
-* [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples) 
-* More SDKs? Contribution is welcome. Any languages can be supported as long as implementing the [OpenAPI IDL](https://github.com/indeedeng/iwf-idl/blob/main/iwf.yaml).
+* [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples)
+  * [Product use case example: subscription](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/subscription)
 
 # Table of contents
 
@@ -34,6 +34,7 @@ Related projects:
     - [Commands](#commands)
     - [Persistence](#persistence)
     - [Communication](#communication)
+    - [Workflow Diagram](#iwf-workflow-design-diagram)
   - [Client APIs](#client-apis)
 - [Why iWF](#why-iwf)
   - [If you are familiar with Cadence/Temporal](#if-you-are-familiar-with-cadencetemporal)
@@ -101,7 +102,7 @@ or [Golang WorkflowState interface](https://github.com/iworkflowio/iwf-golang-sd
 A WorkflowState is implemented with two APIs: `start` and `decide`. 
 * `start` API is invoked immediately when a WorkflowState is started. It will return some `Commands` to server. When the 
 requested `Commands` are completed, `decide` API will be triggered. The number of commands can be zero, one or multiple.
-* `decide` API will decide next states to execute. Next states can be zero, one or multiple, and can be re-executed as different `stateExecutions`. 
+* `decide` API will decide next states to execute. Next states can be zero, one or multiple, and can be re-executed as different `stateExecutions`.
 
 ### Workflow execution and WorkflowState execution
 Application can start a workflow instance with a `workflowId` for any workflow definition. A workflow instance is called `WorkflowExecution`. 
@@ -171,6 +172,14 @@ Logically, each workflow type will have a persistence schema like below:
 There are two major communication mechanism in iWF:
 * `SignalChannel` is for receiving input from external asynchronously. It's used with `SignalCommand`.
 * `InterStateChannel`: for interaction between state executions. It's used with `InterStateChannelCommand`.
+
+### iWF workflow design diagram
+
+When designing an iWF workflow, it's useful to use iWF state diagrams like this template for visualization.
+
+For example, the subscription workflow diagram:
+* [Java sample](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
+* [Golang sample](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/subscription)
 
 ## Client APIs
 Client APIs are hosted by iWF server for user workflow application to interact with their workflow executions. 
