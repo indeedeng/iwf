@@ -13,5 +13,6 @@ done
 
 tctl search-attribute  create -name IwfGlobalWorkflowVersion -type Int -y
 tctl search-attribute  create -name IwfExecutingStateIds -type Keyword -y
+tctl namespace register default
 
 tail -f /dev/null
