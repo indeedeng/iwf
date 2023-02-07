@@ -55,6 +55,7 @@ Related projects:
 - [Monitoring and Operations](#monitoring-and-operations)
   - [iWF server](#iwf-server)
   - [iWF application](#iwf-application)
+  - [Debug & Troubleshooting](#troubleshooting)
 - [Development Plan](#development-plan)
 - [Some history](#some-history)
 - [Contribution](CONTRIBUTING.md)
@@ -394,7 +395,11 @@ Usually, you need to set up monitors/dashboards:
 * API availability 
 * API latency
 
+## Troubleshooting
 When something goes wrong in your applications, here are the tips:
+* Use query handlers like (`DumpAllInternal` or `GetCurrentTimerInfos`) in Cadence/Temporal WebUI to quickly understand the current status of the workflows.
+  * DumpAllInternal will return all the internal status or the pending states
+  * GetCurrentTimerInfos will return all the timers of the pending states
 * Let your worker service return error stacktrace as the response body to iWF server. E.g. like [this example of Spring Boot using ExceptionHandler](https://github.com/indeedeng/iwf-java-samples/blob/2d500093e2aaecf2d728f78366fee776a73efd29/src/main/java/io/iworkflow/controller/IwfWorkerApiController.java#L51). 
 * If you return the full stacktrace in response body, the pending activity view will show it to you! Then use Cadence/Temporal WebUI to debug your application.
 * All the input/output to your workflow are stored in the activity input/output of history event. The input is in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having errors.
