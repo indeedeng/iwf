@@ -23,13 +23,13 @@ do
   fi
 done
 
-echo "now waiting 20s for server to be ready, so that another script will register namespace/search attributes."
-
 for run in {1..60}; do
   sleep 1
   if nc -zv ${HOST}; then
     break
   fi
 done
-sleep 2
+
+echo "now waiting 10s for server to be ready, so that another script will register namespace/search attributes."
+sleep 10
 "${SRC_ROOT}/iwf-server" --config "${CONFIG_TEMPLATE_PATH}" start "$@"
