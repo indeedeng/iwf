@@ -8,11 +8,8 @@
 iWF is a platform providing all-in-one tooling for building long-running business application. It provides an 
 abstraction for persistence(database, elasticSearch) and more, with clean, simple and easy to use interface.
 
-A _long-running process_ is called **`Workflow`**. 
-
-It's a simple and powerful WorkflowAsCode general purpose workflow engine.
-
-The server is back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter.
+It's a simple and powerful WorkflowAsCode general purpose workflow engine. The server is back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter,
+preserved the same power of Cadence/Temporal(including scalability/reliability).
 
 Related projects:
 * [OpenAPI definition between SDKs and server](https://github.com/indeedeng/iwf-idl). 
@@ -91,6 +88,9 @@ stored in history events which are useful for debugging/troubleshooting, and no 
 ## Basic Concepts
 
 ### Workflow and WorkflowState definition
+
+A _long-running process_ is called **`Workflow`**.
+
 iWF lets you build long-running applications by implementing the workflow interface, e.g. 
 [Java Workflow interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java) 
 or [Golang Workflow interface](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow.go).
