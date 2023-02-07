@@ -9,7 +9,7 @@ iWF is a platform providing all-in-one tooling for building long-running busines
 abstraction for persistence(database, elasticSearch) and more, with clean, simple and easy to use interface.
 
 It's a simple and powerful WorkflowAsCode general purpose workflow engine. The server is back by [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) as an interpreter,
-preserved the same power（scalability/reliability)
+preserved the same power of Cadence/Temporal(including scalability/reliability).
 
 Related projects:
 * [OpenAPI definition between SDKs and server](https://github.com/indeedeng/iwf-idl). 
