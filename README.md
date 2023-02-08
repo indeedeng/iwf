@@ -34,7 +34,7 @@ Related projects:
     - [Workflow Diagram](#iwf-workflow-design-diagram)
   - [Client APIs](#client-apis)
 - [Why iWF](#why-iwf)
-  - [If you are familiar with Cadence/Temporal](#if-you-are-familiar-with-cadencetemporal)
+  - [If you are familiar with Cadence/Temporal/AWS SWF/Azure Durable Functions](#if-you-are-familiar-with-cadencetemporalaws-swfazure-durable-functions)
   - [If you are not](#if-you-are-not)
 - [How to run this server](#how-to-run-this-server)
   - [Using docker image & docker-compose](#using-docker-image--docker-compose)
@@ -194,22 +194,29 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 
 # Why iWF
 
-## If you are familiar with Cadence/Temporal
+## If you are familiar with Cadence/Temporal/AWS SWF/Azure Durable Functions
 * Check [iWF vs Cadence/Temporal](https://medium.com/@qlong/iwf-vs-cadence-temporal-1e11b35960fe) for 
 comparison with Cadence/Temporal.
+
+That article should still apply to AWS SWF and Azure Durable Functions:  
+* AWS SWF is the precedent of Cadence/Temporal with the same APIs but limited features/power compared to Cadence/Temporal.
+  * See [this post](https://news.ycombinator.com/item?id=19733880.) for comparison between SWF vs Cadence 
+* Azure Durable Functions shared the same programming model(replay workflow code) but also with limited features compared to Cadence/Temporal.
+  * Also read the [article](https://medium.com/@cgillum/common-pitfalls-with-durable-execution-frameworks-like-durable-functions-or-temporal-eaf635d4a8bb) about the pitfall about the programming model.
 
 ## If you are not
 * Check out this [article](https://medium.com/@qlong/iwf-vs-other-general-purposed-workflow-engines-f8f3e3d8993d) to understand difference between iWF and other workflow engines.
 
 iWF is an application platform that provides you a comprehensive tooling:
-* WorkflowAsCode for highly flexible/customizable business logic
+* WorkflowAsCode for highly flexible/customizable business logic, highly testable and easy to maintain
 * Parallel execution of multiple threads of business
 * Persistence storage for intermediate states stored as "dataObjects"
 * Persistence searchable attributes that can be used for flexible searching, even full text searching, backed by ElasticSearch
 * Receiving data from external system by Signal
 * Durable timer, and cron job scheduling
-* Reset workflow to let you recover the workflows from bad states easily 
-* Highly testable and easy to maintain
+* Reset workflow to let you recover the workflows from bad states easily
+* Troubleshooting/debugging is easy
+* Scalability/reliability
 * ...
 
 # How to run this server
