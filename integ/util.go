@@ -110,7 +110,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 			panic(err)
 		}
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
-		iwfService := api.NewService(uclient, logger)
+		iwfService := api.NewService(&config.Config{}, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
