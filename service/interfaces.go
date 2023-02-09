@@ -17,6 +17,12 @@ type (
 		StateOptions iwfidl.WorkflowStateOptions `json:"stateOptions,omitempty"`
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
+
+		Config WorkflowConfig `json:"config,omitempty"`
+	}
+
+	WorkflowConfig struct {
+		DisableSystemSearchAttributes bool `json:"disableSystemSearchAttributes,omitempty"`
 	}
 
 	InterpreterWorkflowOutput struct {

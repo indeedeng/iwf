@@ -9,19 +9,21 @@ import (
 type StateExecutionCounter struct {
 	ctx      UnifiedContext
 	provider WorkflowProvider
+	config   service.WorkflowConfig
 
 	executedStateIdCount      map[string]int // count the stateId for how many times that have een executed so that we can create stateExecutionId
 	pendingStateIdCount       map[string]int // keep counting the pending stateIds so that we know times to upsert system search attributes service.SearchAttributeExecutingStateIds
 	totalPendingStateExeCount int            // count the total pending states so that we know the workflow can complete when all threads reach "dead ends"
 }
 
-func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider) *StateExecutionCounter {
+func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config service.WorkflowConfig) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                       ctx,
 		provider:                  provider,
 		pendingStateIdCount:       make(map[string]int),
 		executedStateIdCount:      make(map[string]int),
 		totalPendingStateExeCount: 0,
+		config:                    config,
 	}
 }
 
@@ -85,6 +87,9 @@ func (e *StateExecutionCounter) updateSearchAttribute() error {
 	var executingStateIds []string
 	for sid := range e.pendingStateIdCount {
 		executingStateIds = append(executingStateIds, sid)
+	}
+	if e.config.DisableSystemSearchAttributes {
+		return nil
 	}
 	return e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 		service.SearchAttributeExecutingStateIds: executingStateIds,

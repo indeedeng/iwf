@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log"
 )
 
@@ -17,10 +18,10 @@ const WorkflowSkipTimerApiPath = "/api/v1/workflow/timer/skip"
 const WorkflowStopApiPath = "/api/v1/workflow/stop"
 
 // NewService returns a new router.
-func NewService(client UnifiedClient, logger log.Logger) *gin.Engine {
+func NewService(config *config.Config, client UnifiedClient, logger log.Logger) *gin.Engine {
 	router := gin.Default()
 
-	handler := newHandler(client, logger)
+	handler := newHandler(config, client, logger)
 
 	router.GET("/", handler.index)
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStart)
