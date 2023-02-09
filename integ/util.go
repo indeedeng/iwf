@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/api"
 	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
@@ -78,7 +79,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 			panic(err)
 		}
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter())
-		iwfService := api.NewService(uclient, logger)
+		iwfService := api.NewService(&config.Config{}, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
