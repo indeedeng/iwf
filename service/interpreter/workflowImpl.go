@@ -16,9 +16,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 	}
 
-	err := provider.UpsertSearchAttributes(ctx, map[string]interface{}{
-		service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
-	})
+	var err error
+	if !input.Config.DisableSystemSearchAttributes {
+		err = provider.UpsertSearchAttributes(ctx, map[string]interface{}{
+			service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
+		})
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +57,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
-	stateExecutionCounter := NewStateExecutionCounter(ctx, provider)
+	stateExecutionCounter := NewStateExecutionCounter(ctx, provider, input.Config)
 
 	continueAsNewer := NewContinueAsNewer(interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
 	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx, provider)

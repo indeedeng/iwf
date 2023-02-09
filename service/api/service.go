@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
@@ -18,17 +19,19 @@ type serviceImpl struct {
 	client    UnifiedClient
 	taskQueue string
 	logger    log.Logger
+	config    *config.Config
 }
 
 func (s *serviceImpl) Close() {
 	s.client.Close()
 }
 
-func NewApiService(client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
+func NewApiService(config *config.Config, client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
 	return &serviceImpl{
 		client:    client,
 		taskQueue: taskQueue,
 		logger:    logger,
+		config:    config,
 	}, nil
 }
 
@@ -54,6 +57,11 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		initSAs = req.WorkflowStartOptions.SearchAttributes
 	}
 
+	disableSystemSearchAttributes := false
+	if s.config.Backend.Temporal == nil && s.config.Backend.Cadence != nil {
+		disableSystemSearchAttributes = s.config.Backend.Cadence.DisableSystemSearchAttributes
+	}
+
 	input := service.InterpreterWorkflowInput{
 		IwfWorkflowType:      req.GetIwfWorkflowType(),
 		IwfWorkerUrl:         req.GetIwfWorkerUrl(),
@@ -61,6 +69,9 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		StateInput:           req.GetStateInput(),
 		StateOptions:         req.GetStateOptions(),
 		InitSearchAttributes: initSAs,
+		Config: service.WorkflowConfig{
+			DisableSystemSearchAttributes: disableSystemSearchAttributes,
+		},
 	}
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {

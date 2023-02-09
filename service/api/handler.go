@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
@@ -18,8 +19,8 @@ type handler struct {
 	logger log.Logger
 }
 
-func newHandler(client UnifiedClient, logger log.Logger) *handler {
-	svc, err := NewApiService(client, service.TaskQueue, logger)
+func newHandler(config *config.Config, client UnifiedClient, logger log.Logger) *handler {
+	svc, err := NewApiService(config, client, service.TaskQueue, logger)
 	if err != nil {
 		panic(err)
 	}

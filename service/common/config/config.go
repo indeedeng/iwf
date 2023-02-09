@@ -43,6 +43,10 @@ type (
 		HostPort string `yaml:"hostPort"`
 		// Domain to connect to, default to default
 		Domain string `yaml:"domain"`
+		// DisableSearchAttributes will not use system search attributes
+		// this is for Cadence service without advanced visibility because of
+		// https://github.com/uber/cadence/issues/5085
+		DisableSystemSearchAttributes bool `yaml:"disableSystemSearchAttributes"`
 	}
 
 	// Logger contains the config items for logger

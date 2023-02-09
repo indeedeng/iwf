@@ -162,7 +162,7 @@ func start(c *cli.Context) {
 func launchTemporalService(svcName string, config *config.Config, unifiedClient api.UnifiedClient, temporalClient client.Client, logger log.Logger) {
 	switch svcName {
 	case serviceAPI:
-		svc := api.NewService(unifiedClient, logger.WithTags(tag.Service(svcName)))
+		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
 		interpreter := temporal.NewInterpreterWorker(temporalClient, isvc.TaskQueue)
@@ -182,7 +182,7 @@ func launchCadenceService(
 	logger log.Logger) {
 	switch svcName {
 	case serviceAPI:
-		svc := api.NewService(unifiedClient, logger.WithTags(tag.Service(svcName)))
+		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
 		interpreter := cadence.NewInterpreterWorker(service, domain, isvc.TaskQueue, closeFunc)
