@@ -100,7 +100,7 @@ and once these commands are completed, the `decide` API is triggered. The number
 The same WorkflowState can be re-executed as different stateExecutions.
 
 
-![workflow diagram example](https://user-images.githubusercontent.com/4523955/218195142-f49bcb10-270a-4e84-88fa-1bca3736291e.png)
+![workflow diagram example](https://user-images.githubusercontent.com/4523955/218195868-17818b58-0d00-4523-8cc6-df4c04526c0d.png)
 
 
 ### Workflow execution and WorkflowState execution
@@ -202,13 +202,13 @@ iWF has two primary communication mechanisms:
 
 When creating an iWF workflow, utilizing state diagrams similar to this template can be beneficial for visualizing the process.
 
-![state diagram template](https://user-images.githubusercontent.com/4523955/218195152-609ea020-fd96-49ed-b27f-46ffd17ffaae.png)
+![state diagram template](https://user-images.githubusercontent.com/4523955/218195877-9c99f3ff-bba9-41db-86c6-e7352ed8b0f1.png)
 
 For example, the subscription workflow diagram:
 * [Java sample](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
 * [Golang sample](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/subscription)
 
-![subscription state diagram](https://user-images.githubusercontent.com/4523955/218195157-755651dd-9de4-4f5a-9df2-f6c0403c48cf.png)
+![subscription state diagram](https://user-images.githubusercontent.com/4523955/218195883-6d8c23ea-130a-481b-bb80-3e5bb3354176.png)
 
 
 ## Client APIs
