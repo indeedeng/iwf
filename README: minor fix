@@ -8,7 +8,7 @@
 iWF is an all-in-one platform for developing long-running business processes. It offers a convenient abstraction layer 
 for utilizing databases, ElasticSearch, message queues, durable timers, and more, with a clean, simple, and user-friendly interface.
 
-iWF is a versatile WorkflowAsCode engine that is both simple and powerful.By utilizing [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) 
+iWF is a versatile WorkflowAsCode engine that is both simple and powerful. By utilizing [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal) 
 as an interpreter on the backend, iWF preserves all the capabilities of Cadence/Temporal, while maintaining the same level of scalability and reliability.
 
 Related projects:
@@ -118,10 +118,6 @@ will be marked as completed. An instance of a WorkflowState's execution is refer
 and the `Number` represents the number of times the StateId has been started. The StateExecutionId is unique only within the context 
 of a specific WorkflowExecution.
 
-WorkflowId uniqueness and reuse: For the same workflowId, there must be at most one WorkflowExecution running at anytime. However,
-after a previous WorkflowExecution finished running (in any closed status),
-application may start a new WorkflowExecution with the same workflowId using appropriate `IdReusePolicy`.
-
 Uniqueness and Reuse of WorkflowId: At any given time, there can be only one WorkflowExecution running for a specific workflowId. 
 A new WorkflowExecution can be initiated using the same workflowId by setting the appropriate `IdReusePolicy` in WorkflowOptions. 
 * `ALLOW_IF_NO_RUNNING`
@@ -195,8 +191,8 @@ Logically, each workflow type will have a persistence schema like below:
 
 iWF has two primary communication mechanisms:
 
-* `SignalChannel`: is used for receiving input from external sources asynchronously. It is employed with the `SignalCommand`.
-* `InterStateChannel`: is used for communication between state executions. It is employed with the `InterStateChannelCommand`.
+* `SignalChannel`: is used for receiving input from external sources asynchronously. It is employed with the SignalCommand.
+* `InterStateChannel`: is used for communication between state executions. It is employed with the InterStateChannelCommand.
 
 ### iWF workflow design diagram
 
