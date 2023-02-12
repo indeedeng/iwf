@@ -18,5 +18,3 @@ jobs:
       - name: Dump docker logs
         if: always()
         uses: jwalton/gh-docker-logs@v2
-      - name: Go Coverage Badge
-        uses: tj-actions/coverage-badge-go@v2.1
