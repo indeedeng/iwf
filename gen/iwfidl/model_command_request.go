@@ -16,11 +16,11 @@ import (
 
 // CommandRequest struct for CommandRequest
 type CommandRequest struct {
-	DeciderTriggerType DeciderTriggerType `json:"deciderTriggerType"`
-	TimerCommands []TimerCommand `json:"timerCommands,omitempty"`
-	SignalCommands []SignalCommand `json:"signalCommands,omitempty"`
+	DeciderTriggerType        DeciderTriggerType         `json:"deciderTriggerType"`
+	TimerCommands             []TimerCommand             `json:"timerCommands,omitempty"`
+	SignalCommands            []SignalCommand            `json:"signalCommands,omitempty"`
 	InterStateChannelCommands []InterStateChannelCommand `json:"interStateChannelCommands,omitempty"`
-	CommandCombinations []CommandCombination `json:"commandCombinations,omitempty"`
+	CommandCombinations       []CommandCombination       `json:"commandCombinations,omitempty"`
 }
 
 // NewCommandRequest instantiates a new CommandRequest object
@@ -55,7 +55,7 @@ func (o *CommandRequest) GetDeciderTriggerType() DeciderTriggerType {
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetDeciderTriggerTypeOk() (*DeciderTriggerType, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.DeciderTriggerType, true
 }
@@ -78,7 +78,7 @@ func (o *CommandRequest) GetTimerCommands() []TimerCommand {
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetTimerCommandsOk() ([]TimerCommand, bool) {
 	if o == nil || isNil(o.TimerCommands) {
-    return nil, false
+		return nil, false
 	}
 	return o.TimerCommands, true
 }
@@ -110,7 +110,7 @@ func (o *CommandRequest) GetSignalCommands() []SignalCommand {
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetSignalCommandsOk() ([]SignalCommand, bool) {
 	if o == nil || isNil(o.SignalCommands) {
-    return nil, false
+		return nil, false
 	}
 	return o.SignalCommands, true
 }
@@ -142,7 +142,7 @@ func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelComma
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetInterStateChannelCommandsOk() ([]InterStateChannelCommand, bool) {
 	if o == nil || isNil(o.InterStateChannelCommands) {
-    return nil, false
+		return nil, false
 	}
 	return o.InterStateChannelCommands, true
 }
@@ -174,7 +174,7 @@ func (o *CommandRequest) GetCommandCombinations() []CommandCombination {
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetCommandCombinationsOk() ([]CommandCombination, bool) {
 	if o == nil || isNil(o.CommandCombinations) {
-    return nil, false
+		return nil, false
 	}
 	return o.CommandCombinations, true
 }
@@ -248,5 +248,3 @@ func (v *NullableCommandRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

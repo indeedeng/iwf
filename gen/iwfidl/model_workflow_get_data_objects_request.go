@@ -16,9 +16,9 @@ import (
 
 // WorkflowGetDataObjectsRequest struct for WorkflowGetDataObjectsRequest
 type WorkflowGetDataObjectsRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	Keys []string `json:"keys,omitempty"`
+	WorkflowId    string   `json:"workflowId"`
+	WorkflowRunId *string  `json:"workflowRunId,omitempty"`
+	Keys          []string `json:"keys,omitempty"`
 }
 
 // NewWorkflowGetDataObjectsRequest instantiates a new WorkflowGetDataObjectsRequest object
@@ -53,7 +53,7 @@ func (o *WorkflowGetDataObjectsRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetDataObjectsRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -76,7 +76,7 @@ func (o *WorkflowGetDataObjectsRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetDataObjectsRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -108,7 +108,7 @@ func (o *WorkflowGetDataObjectsRequest) GetKeys() []string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetDataObjectsRequest) GetKeysOk() ([]string, bool) {
 	if o == nil || isNil(o.Keys) {
-    return nil, false
+		return nil, false
 	}
 	return o.Keys, true
 }
@@ -176,5 +176,3 @@ func (v *NullableWorkflowGetDataObjectsRequest) UnmarshalJSON(src []byte) error 
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

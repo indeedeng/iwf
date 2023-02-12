@@ -16,7 +16,7 @@ import (
 
 // ErrorResponse struct for ErrorResponse
 type ErrorResponse struct {
-	Detail *string `json:"detail,omitempty"`
+	Detail    *string         `json:"detail,omitempty"`
 	SubStatus *ErrorSubStatus `json:"subStatus,omitempty"`
 }
 
@@ -50,7 +50,7 @@ func (o *ErrorResponse) GetDetail() string {
 // and a boolean to check if the value has been set.
 func (o *ErrorResponse) GetDetailOk() (*string, bool) {
 	if o == nil || isNil(o.Detail) {
-    return nil, false
+		return nil, false
 	}
 	return o.Detail, true
 }
@@ -82,7 +82,7 @@ func (o *ErrorResponse) GetSubStatus() ErrorSubStatus {
 // and a boolean to check if the value has been set.
 func (o *ErrorResponse) GetSubStatusOk() (*ErrorSubStatus, bool) {
 	if o == nil || isNil(o.SubStatus) {
-    return nil, false
+		return nil, false
 	}
 	return o.SubStatus, true
 }
@@ -147,5 +147,3 @@ func (v *NullableErrorResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

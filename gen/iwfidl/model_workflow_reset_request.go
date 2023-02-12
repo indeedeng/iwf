@@ -16,15 +16,15 @@ import (
 
 // WorkflowResetRequest struct for WorkflowResetRequest
 type WorkflowResetRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	ResetType WorkflowResetType `json:"resetType"`
-	HistoryEventId *int32 `json:"historyEventId,omitempty"`
-	Reason *string `json:"reason,omitempty"`
-	HistoryEventTime *string `json:"historyEventTime,omitempty"`
-	StateId *string `json:"stateId,omitempty"`
-	StateExecutionId *string `json:"stateExecutionId,omitempty"`
-	SkipSignalReapply *bool `json:"skipSignalReapply,omitempty"`
+	WorkflowId        string            `json:"workflowId"`
+	WorkflowRunId     *string           `json:"workflowRunId,omitempty"`
+	ResetType         WorkflowResetType `json:"resetType"`
+	HistoryEventId    *int32            `json:"historyEventId,omitempty"`
+	Reason            *string           `json:"reason,omitempty"`
+	HistoryEventTime  *string           `json:"historyEventTime,omitempty"`
+	StateId           *string           `json:"stateId,omitempty"`
+	StateExecutionId  *string           `json:"stateExecutionId,omitempty"`
+	SkipSignalReapply *bool             `json:"skipSignalReapply,omitempty"`
 }
 
 // NewWorkflowResetRequest instantiates a new WorkflowResetRequest object
@@ -60,7 +60,7 @@ func (o *WorkflowResetRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -83,7 +83,7 @@ func (o *WorkflowResetRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -116,7 +116,7 @@ func (o *WorkflowResetRequest) GetResetType() WorkflowResetType {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetResetTypeOk() (*WorkflowResetType, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.ResetType, true
 }
@@ -139,7 +139,7 @@ func (o *WorkflowResetRequest) GetHistoryEventId() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetHistoryEventIdOk() (*int32, bool) {
 	if o == nil || isNil(o.HistoryEventId) {
-    return nil, false
+		return nil, false
 	}
 	return o.HistoryEventId, true
 }
@@ -171,7 +171,7 @@ func (o *WorkflowResetRequest) GetReason() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetReasonOk() (*string, bool) {
 	if o == nil || isNil(o.Reason) {
-    return nil, false
+		return nil, false
 	}
 	return o.Reason, true
 }
@@ -203,7 +203,7 @@ func (o *WorkflowResetRequest) GetHistoryEventTime() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool) {
 	if o == nil || isNil(o.HistoryEventTime) {
-    return nil, false
+		return nil, false
 	}
 	return o.HistoryEventTime, true
 }
@@ -235,7 +235,7 @@ func (o *WorkflowResetRequest) GetStateId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetStateIdOk() (*string, bool) {
 	if o == nil || isNil(o.StateId) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateId, true
 }
@@ -267,7 +267,7 @@ func (o *WorkflowResetRequest) GetStateExecutionId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetStateExecutionIdOk() (*string, bool) {
 	if o == nil || isNil(o.StateExecutionId) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateExecutionId, true
 }
@@ -299,7 +299,7 @@ func (o *WorkflowResetRequest) GetSkipSignalReapply() bool {
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetSkipSignalReapplyOk() (*bool, bool) {
 	if o == nil || isNil(o.SkipSignalReapply) {
-    return nil, false
+		return nil, false
 	}
 	return o.SkipSignalReapply, true
 }
@@ -385,5 +385,3 @@ func (v *NullableWorkflowResetRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -17,9 +17,9 @@ import (
 // WorkflowStartOptions struct for WorkflowStartOptions
 type WorkflowStartOptions struct {
 	WorkflowIDReusePolicy *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
-	CronSchedule *string `json:"cronSchedule,omitempty"`
-	RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty"`
-	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
+	CronSchedule          *string                `json:"cronSchedule,omitempty"`
+	RetryPolicy           *RetryPolicy           `json:"retryPolicy,omitempty"`
+	SearchAttributes      []SearchAttribute      `json:"searchAttributes,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -52,7 +52,7 @@ func (o *WorkflowStartOptions) GetWorkflowIDReusePolicy() WorkflowIDReusePolicy 
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetWorkflowIDReusePolicyOk() (*WorkflowIDReusePolicy, bool) {
 	if o == nil || isNil(o.WorkflowIDReusePolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowIDReusePolicy, true
 }
@@ -84,7 +84,7 @@ func (o *WorkflowStartOptions) GetCronSchedule() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetCronScheduleOk() (*string, bool) {
 	if o == nil || isNil(o.CronSchedule) {
-    return nil, false
+		return nil, false
 	}
 	return o.CronSchedule, true
 }
@@ -116,7 +116,7 @@ func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetRetryPolicyOk() (*RetryPolicy, bool) {
 	if o == nil || isNil(o.RetryPolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.RetryPolicy, true
 }
@@ -148,7 +148,7 @@ func (o *WorkflowStartOptions) GetSearchAttributes() []SearchAttribute {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartOptions) GetSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || isNil(o.SearchAttributes) {
-    return nil, false
+		return nil, false
 	}
 	return o.SearchAttributes, true
 }
@@ -219,5 +219,3 @@ func (v *NullableWorkflowStartOptions) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

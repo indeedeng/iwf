@@ -16,8 +16,8 @@ import (
 
 // WorkflowSearchRequest struct for WorkflowSearchRequest
 type WorkflowSearchRequest struct {
-	Query string `json:"query"`
-	PageSize *int32 `json:"pageSize,omitempty"`
+	Query         string  `json:"query"`
+	PageSize      *int32  `json:"pageSize,omitempty"`
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
 
@@ -53,7 +53,7 @@ func (o *WorkflowSearchRequest) GetQuery() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchRequest) GetQueryOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.Query, true
 }
@@ -76,7 +76,7 @@ func (o *WorkflowSearchRequest) GetPageSize() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchRequest) GetPageSizeOk() (*int32, bool) {
 	if o == nil || isNil(o.PageSize) {
-    return nil, false
+		return nil, false
 	}
 	return o.PageSize, true
 }
@@ -108,7 +108,7 @@ func (o *WorkflowSearchRequest) GetNextPageToken() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchRequest) GetNextPageTokenOk() (*string, bool) {
 	if o == nil || isNil(o.NextPageToken) {
-    return nil, false
+		return nil, false
 	}
 	return o.NextPageToken, true
 }
@@ -176,5 +176,3 @@ func (v *NullableWorkflowSearchRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

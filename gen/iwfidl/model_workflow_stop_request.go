@@ -16,10 +16,10 @@ import (
 
 // WorkflowStopRequest struct for WorkflowStopRequest
 type WorkflowStopRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	Reason *string `json:"reason,omitempty"`
-	StopType *WorkflowStopType `json:"stopType,omitempty"`
+	WorkflowId    string            `json:"workflowId"`
+	WorkflowRunId *string           `json:"workflowRunId,omitempty"`
+	Reason        *string           `json:"reason,omitempty"`
+	StopType      *WorkflowStopType `json:"stopType,omitempty"`
 }
 
 // NewWorkflowStopRequest instantiates a new WorkflowStopRequest object
@@ -54,7 +54,7 @@ func (o *WorkflowStopRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -77,7 +77,7 @@ func (o *WorkflowStopRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -109,7 +109,7 @@ func (o *WorkflowStopRequest) GetReason() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetReasonOk() (*string, bool) {
 	if o == nil || isNil(o.Reason) {
-    return nil, false
+		return nil, false
 	}
 	return o.Reason, true
 }
@@ -141,7 +141,7 @@ func (o *WorkflowStopRequest) GetStopType() WorkflowStopType {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStopRequest) GetStopTypeOk() (*WorkflowStopType, bool) {
 	if o == nil || isNil(o.StopType) {
-    return nil, false
+		return nil, false
 	}
 	return o.StopType, true
 }
@@ -212,5 +212,3 @@ func (v *NullableWorkflowStopRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

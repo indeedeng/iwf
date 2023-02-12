@@ -16,11 +16,11 @@ import (
 
 // WorkflowStateStartResponse struct for WorkflowStateStartResponse
 type WorkflowStateStartResponse struct {
-	UpsertSearchAttributes []SearchAttribute `json:"upsertSearchAttributes,omitempty"`
-	UpsertDataObjects []KeyValue `json:"upsertDataObjects,omitempty"`
-	CommandRequest *CommandRequest `json:"commandRequest,omitempty"`
-	UpsertStateLocals []KeyValue `json:"upsertStateLocals,omitempty"`
-	RecordEvents []KeyValue `json:"recordEvents,omitempty"`
+	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
+	UpsertDataObjects          []KeyValue                    `json:"upsertDataObjects,omitempty"`
+	CommandRequest             *CommandRequest               `json:"commandRequest,omitempty"`
+	UpsertStateLocals          []KeyValue                    `json:"upsertStateLocals,omitempty"`
+	RecordEvents               []KeyValue                    `json:"recordEvents,omitempty"`
 	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
 }
 
@@ -54,7 +54,7 @@ func (o *WorkflowStateStartResponse) GetUpsertSearchAttributes() []SearchAttribu
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartResponse) GetUpsertSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || isNil(o.UpsertSearchAttributes) {
-    return nil, false
+		return nil, false
 	}
 	return o.UpsertSearchAttributes, true
 }
@@ -86,7 +86,7 @@ func (o *WorkflowStateStartResponse) GetUpsertDataObjects() []KeyValue {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartResponse) GetUpsertDataObjectsOk() ([]KeyValue, bool) {
 	if o == nil || isNil(o.UpsertDataObjects) {
-    return nil, false
+		return nil, false
 	}
 	return o.UpsertDataObjects, true
 }
@@ -118,7 +118,7 @@ func (o *WorkflowStateStartResponse) GetCommandRequest() CommandRequest {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartResponse) GetCommandRequestOk() (*CommandRequest, bool) {
 	if o == nil || isNil(o.CommandRequest) {
-    return nil, false
+		return nil, false
 	}
 	return o.CommandRequest, true
 }
@@ -150,7 +150,7 @@ func (o *WorkflowStateStartResponse) GetUpsertStateLocals() []KeyValue {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartResponse) GetUpsertStateLocalsOk() ([]KeyValue, bool) {
 	if o == nil || isNil(o.UpsertStateLocals) {
-    return nil, false
+		return nil, false
 	}
 	return o.UpsertStateLocals, true
 }
@@ -182,7 +182,7 @@ func (o *WorkflowStateStartResponse) GetRecordEvents() []KeyValue {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartResponse) GetRecordEventsOk() ([]KeyValue, bool) {
 	if o == nil || isNil(o.RecordEvents) {
-    return nil, false
+		return nil, false
 	}
 	return o.RecordEvents, true
 }
@@ -214,7 +214,7 @@ func (o *WorkflowStateStartResponse) GetPublishToInterStateChannel() []InterStat
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartResponse) GetPublishToInterStateChannelOk() ([]InterStateChannelPublishing, bool) {
 	if o == nil || isNil(o.PublishToInterStateChannel) {
-    return nil, false
+		return nil, false
 	}
 	return o.PublishToInterStateChannel, true
 }
@@ -291,5 +291,3 @@ func (v *NullableWorkflowStateStartResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

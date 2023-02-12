@@ -16,10 +16,10 @@ import (
 
 // WorkflowGetRequest struct for WorkflowGetRequest
 type WorkflowGetRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	NeedsResults *bool `json:"needsResults,omitempty"`
-	WaitTimeSeconds *int32 `json:"waitTimeSeconds,omitempty"`
+	WorkflowId      string  `json:"workflowId"`
+	WorkflowRunId   *string `json:"workflowRunId,omitempty"`
+	NeedsResults    *bool   `json:"needsResults,omitempty"`
+	WaitTimeSeconds *int32  `json:"waitTimeSeconds,omitempty"`
 }
 
 // NewWorkflowGetRequest instantiates a new WorkflowGetRequest object
@@ -54,7 +54,7 @@ func (o *WorkflowGetRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -77,7 +77,7 @@ func (o *WorkflowGetRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -109,7 +109,7 @@ func (o *WorkflowGetRequest) GetNeedsResults() bool {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetNeedsResultsOk() (*bool, bool) {
 	if o == nil || isNil(o.NeedsResults) {
-    return nil, false
+		return nil, false
 	}
 	return o.NeedsResults, true
 }
@@ -141,7 +141,7 @@ func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool) {
 	if o == nil || isNil(o.WaitTimeSeconds) {
-    return nil, false
+		return nil, false
 	}
 	return o.WaitTimeSeconds, true
 }
@@ -212,5 +212,3 @@ func (v *NullableWorkflowGetRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

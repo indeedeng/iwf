@@ -16,7 +16,7 @@ import (
 
 // WorkflowSearchResponseEntry struct for WorkflowSearchResponseEntry
 type WorkflowSearchResponseEntry struct {
-	WorkflowId string `json:"workflowId"`
+	WorkflowId    string `json:"workflowId"`
 	WorkflowRunId string `json:"workflowRunId"`
 }
 
@@ -53,7 +53,7 @@ func (o *WorkflowSearchResponseEntry) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponseEntry) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -77,7 +77,7 @@ func (o *WorkflowSearchResponseEntry) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponseEntry) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowRunId, true
 }
@@ -133,5 +133,3 @@ func (v *NullableWorkflowSearchResponseEntry) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

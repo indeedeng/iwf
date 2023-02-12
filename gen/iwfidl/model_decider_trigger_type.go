@@ -20,8 +20,8 @@ type DeciderTriggerType string
 
 // List of DeciderTriggerType
 const (
-	ALL_COMMAND_COMPLETED DeciderTriggerType = "ALL_COMMAND_COMPLETED"
-	ANY_COMMAND_COMPLETED DeciderTriggerType = "ANY_COMMAND_COMPLETED"
+	ALL_COMMAND_COMPLETED             DeciderTriggerType = "ALL_COMMAND_COMPLETED"
+	ANY_COMMAND_COMPLETED             DeciderTriggerType = "ANY_COMMAND_COMPLETED"
 	ANY_COMMAND_COMBINATION_COMPLETED DeciderTriggerType = "ANY_COMMAND_COMBINATION_COMPLETED"
 )
 
@@ -110,4 +110,3 @@ func (v *NullableDeciderTriggerType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

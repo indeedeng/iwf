@@ -21,9 +21,9 @@ type WorkflowErrorType string
 // List of WorkflowErrorType
 const (
 	STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE WorkflowErrorType = "STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE"
-	STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE WorkflowErrorType = "STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE"
-	INVALID_USER_WORKFLOW_CODE_ERROR_TYPE WorkflowErrorType = "INVALID_USER_WORKFLOW_CODE_ERROR_TYPE"
-	SERVER_INTERNAL_ERROR_TYPE WorkflowErrorType = "SERVER_INTERNAL_ERROR_TYPE"
+	STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE    WorkflowErrorType = "STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE"
+	INVALID_USER_WORKFLOW_CODE_ERROR_TYPE      WorkflowErrorType = "INVALID_USER_WORKFLOW_CODE_ERROR_TYPE"
+	SERVER_INTERNAL_ERROR_TYPE                 WorkflowErrorType = "SERVER_INTERNAL_ERROR_TYPE"
 )
 
 // All allowed values of WorkflowErrorType enum
@@ -112,4 +112,3 @@ func (v *NullableWorkflowErrorType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

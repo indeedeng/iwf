@@ -49,7 +49,7 @@ func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() ([]KeyValue, bool) {
 	if o == nil || isNil(o.Objects) {
-    return nil, false
+		return nil, false
 	}
 	return o.Objects, true
 }
@@ -111,5 +111,3 @@ func (v *NullableWorkflowGetDataObjectsResponse) UnmarshalJSON(src []byte) error
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

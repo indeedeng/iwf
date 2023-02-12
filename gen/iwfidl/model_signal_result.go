@@ -16,10 +16,10 @@ import (
 
 // SignalResult struct for SignalResult
 type SignalResult struct {
-	CommandId string `json:"commandId"`
+	CommandId           string               `json:"commandId"`
 	SignalRequestStatus ChannelRequestStatus `json:"signalRequestStatus"`
-	SignalChannelName string `json:"signalChannelName"`
-	SignalValue *EncodedObject `json:"signalValue,omitempty"`
+	SignalChannelName   string               `json:"signalChannelName"`
+	SignalValue         *EncodedObject       `json:"signalValue,omitempty"`
 }
 
 // NewSignalResult instantiates a new SignalResult object
@@ -56,7 +56,7 @@ func (o *SignalResult) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -80,7 +80,7 @@ func (o *SignalResult) GetSignalRequestStatus() ChannelRequestStatus {
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalRequestStatusOk() (*ChannelRequestStatus, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.SignalRequestStatus, true
 }
@@ -104,7 +104,7 @@ func (o *SignalResult) GetSignalChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalChannelNameOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.SignalChannelName, true
 }
@@ -127,7 +127,7 @@ func (o *SignalResult) GetSignalValue() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalValueOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.SignalValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.SignalValue, true
 }
@@ -198,5 +198,3 @@ func (v *NullableSignalResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -16,8 +16,8 @@ import (
 
 // InterStateChannelPublishing struct for InterStateChannelPublishing
 type InterStateChannelPublishing struct {
-	ChannelName string `json:"channelName"`
-	Value *EncodedObject `json:"value,omitempty"`
+	ChannelName string         `json:"channelName"`
+	Value       *EncodedObject `json:"value,omitempty"`
 }
 
 // NewInterStateChannelPublishing instantiates a new InterStateChannelPublishing object
@@ -52,7 +52,7 @@ func (o *InterStateChannelPublishing) GetChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelPublishing) GetChannelNameOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.ChannelName, true
 }
@@ -75,7 +75,7 @@ func (o *InterStateChannelPublishing) GetValue() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelPublishing) GetValueOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.Value) {
-    return nil, false
+		return nil, false
 	}
 	return o.Value, true
 }
@@ -140,5 +140,3 @@ func (v *NullableInterStateChannelPublishing) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -20,12 +20,12 @@ type SearchAttributeValueType string
 
 // List of SearchAttributeValueType
 const (
-	KEYWORD SearchAttributeValueType = "KEYWORD"
-	TEXT SearchAttributeValueType = "TEXT"
-	DATETIME SearchAttributeValueType = "DATETIME"
-	INT SearchAttributeValueType = "INT"
-	DOUBLE SearchAttributeValueType = "DOUBLE"
-	BOOL SearchAttributeValueType = "BOOL"
+	KEYWORD       SearchAttributeValueType = "KEYWORD"
+	TEXT          SearchAttributeValueType = "TEXT"
+	DATETIME      SearchAttributeValueType = "DATETIME"
+	INT           SearchAttributeValueType = "INT"
+	DOUBLE        SearchAttributeValueType = "DOUBLE"
+	BOOL          SearchAttributeValueType = "BOOL"
 	KEYWORD_ARRAY SearchAttributeValueType = "KEYWORD_ARRAY"
 )
 
@@ -118,4 +118,3 @@ func (v *NullableSearchAttributeValueType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

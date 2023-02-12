@@ -49,7 +49,7 @@ func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributes() []SearchAttr
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || isNil(o.SearchAttributes) {
-    return nil, false
+		return nil, false
 	}
 	return o.SearchAttributes, true
 }
@@ -111,5 +111,3 @@ func (v *NullableWorkflowGetSearchAttributesResponse) UnmarshalJSON(src []byte) 
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

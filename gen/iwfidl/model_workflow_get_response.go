@@ -16,11 +16,11 @@ import (
 
 // WorkflowGetResponse struct for WorkflowGetResponse
 type WorkflowGetResponse struct {
-	WorkflowRunId string `json:"workflowRunId"`
-	WorkflowStatus WorkflowStatus `json:"workflowStatus"`
-	Results []StateCompletionOutput `json:"results,omitempty"`
-	ErrorType *WorkflowErrorType `json:"errorType,omitempty"`
-	ErrorMessage *string `json:"errorMessage,omitempty"`
+	WorkflowRunId  string                  `json:"workflowRunId"`
+	WorkflowStatus WorkflowStatus          `json:"workflowStatus"`
+	Results        []StateCompletionOutput `json:"results,omitempty"`
+	ErrorType      *WorkflowErrorType      `json:"errorType,omitempty"`
+	ErrorMessage   *string                 `json:"errorMessage,omitempty"`
 }
 
 // NewWorkflowGetResponse instantiates a new WorkflowGetResponse object
@@ -56,7 +56,7 @@ func (o *WorkflowGetResponse) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowRunId, true
 }
@@ -80,7 +80,7 @@ func (o *WorkflowGetResponse) GetWorkflowStatus() WorkflowStatus {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*WorkflowStatus, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowStatus, true
 }
@@ -103,7 +103,7 @@ func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetResultsOk() ([]StateCompletionOutput, bool) {
 	if o == nil || isNil(o.Results) {
-    return nil, false
+		return nil, false
 	}
 	return o.Results, true
 }
@@ -135,7 +135,7 @@ func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
 	if o == nil || isNil(o.ErrorType) {
-    return nil, false
+		return nil, false
 	}
 	return o.ErrorType, true
 }
@@ -167,7 +167,7 @@ func (o *WorkflowGetResponse) GetErrorMessage() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool) {
 	if o == nil || isNil(o.ErrorMessage) {
-    return nil, false
+		return nil, false
 	}
 	return o.ErrorMessage, true
 }
@@ -241,5 +241,3 @@ func (v *NullableWorkflowGetResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

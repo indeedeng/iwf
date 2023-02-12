@@ -49,7 +49,7 @@ func (o *CommandCombination) GetCommandIds() []string {
 // and a boolean to check if the value has been set.
 func (o *CommandCombination) GetCommandIdsOk() ([]string, bool) {
 	if o == nil || isNil(o.CommandIds) {
-    return nil, false
+		return nil, false
 	}
 	return o.CommandIds, true
 }
@@ -111,5 +111,3 @@ func (v *NullableCommandCombination) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

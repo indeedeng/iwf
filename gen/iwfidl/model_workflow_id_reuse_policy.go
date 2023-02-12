@@ -21,9 +21,9 @@ type WorkflowIDReusePolicy string
 // List of WorkflowIDReusePolicy
 const (
 	ALLOW_DUPLICATE_FAILED_ONLY WorkflowIDReusePolicy = "ALLOW_DUPLICATE_FAILED_ONLY"
-	ALLOW_DUPLICATE WorkflowIDReusePolicy = "ALLOW_DUPLICATE"
-	REJECT_DUPLICATE WorkflowIDReusePolicy = "REJECT_DUPLICATE"
-	TERMINATE_IF_RUNNING WorkflowIDReusePolicy = "TERMINATE_IF_RUNNING"
+	ALLOW_DUPLICATE             WorkflowIDReusePolicy = "ALLOW_DUPLICATE"
+	REJECT_DUPLICATE            WorkflowIDReusePolicy = "REJECT_DUPLICATE"
+	TERMINATE_IF_RUNNING        WorkflowIDReusePolicy = "TERMINATE_IF_RUNNING"
 )
 
 // All allowed values of WorkflowIDReusePolicy enum
@@ -112,4 +112,3 @@ func (v *NullableWorkflowIDReusePolicy) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

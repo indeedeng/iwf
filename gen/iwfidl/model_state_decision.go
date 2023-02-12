@@ -49,7 +49,7 @@ func (o *StateDecision) GetNextStates() []StateMovement {
 // and a boolean to check if the value has been set.
 func (o *StateDecision) GetNextStatesOk() ([]StateMovement, bool) {
 	if o == nil || isNil(o.NextStates) {
-    return nil, false
+		return nil, false
 	}
 	return o.NextStates, true
 }
@@ -111,5 +111,3 @@ func (v *NullableStateDecision) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

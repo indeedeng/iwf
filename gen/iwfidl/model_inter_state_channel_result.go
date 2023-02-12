@@ -16,10 +16,10 @@ import (
 
 // InterStateChannelResult struct for InterStateChannelResult
 type InterStateChannelResult struct {
-	CommandId string `json:"commandId"`
+	CommandId     string               `json:"commandId"`
 	RequestStatus ChannelRequestStatus `json:"requestStatus"`
-	ChannelName string `json:"channelName"`
-	Value *EncodedObject `json:"value,omitempty"`
+	ChannelName   string               `json:"channelName"`
+	Value         *EncodedObject       `json:"value,omitempty"`
 }
 
 // NewInterStateChannelResult instantiates a new InterStateChannelResult object
@@ -56,7 +56,7 @@ func (o *InterStateChannelResult) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -80,7 +80,7 @@ func (o *InterStateChannelResult) GetRequestStatus() ChannelRequestStatus {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetRequestStatusOk() (*ChannelRequestStatus, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.RequestStatus, true
 }
@@ -104,7 +104,7 @@ func (o *InterStateChannelResult) GetChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetChannelNameOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.ChannelName, true
 }
@@ -127,7 +127,7 @@ func (o *InterStateChannelResult) GetValue() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetValueOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.Value) {
-    return nil, false
+		return nil, false
 	}
 	return o.Value, true
 }
@@ -198,5 +198,3 @@ func (v *NullableInterStateChannelResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

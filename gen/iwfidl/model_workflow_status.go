@@ -20,12 +20,12 @@ type WorkflowStatus string
 
 // List of WorkflowStatus
 const (
-	RUNNING WorkflowStatus = "RUNNING"
-	COMPLETED WorkflowStatus = "COMPLETED"
-	FAILED WorkflowStatus = "FAILED"
-	TIMEOUT WorkflowStatus = "TIMEOUT"
-	TERMINATED WorkflowStatus = "TERMINATED"
-	CANCELED WorkflowStatus = "CANCELED"
+	RUNNING          WorkflowStatus = "RUNNING"
+	COMPLETED        WorkflowStatus = "COMPLETED"
+	FAILED           WorkflowStatus = "FAILED"
+	TIMEOUT          WorkflowStatus = "TIMEOUT"
+	TERMINATED       WorkflowStatus = "TERMINATED"
+	CANCELED         WorkflowStatus = "CANCELED"
 	CONTINUED_AS_NEW WorkflowStatus = "CONTINUED_AS_NEW"
 )
 
@@ -118,4 +118,3 @@ func (v *NullableWorkflowStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

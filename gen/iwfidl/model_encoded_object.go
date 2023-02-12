@@ -17,7 +17,7 @@ import (
 // EncodedObject struct for EncodedObject
 type EncodedObject struct {
 	Encoding *string `json:"encoding,omitempty"`
-	Data *string `json:"data,omitempty"`
+	Data     *string `json:"data,omitempty"`
 }
 
 // NewEncodedObject instantiates a new EncodedObject object
@@ -50,7 +50,7 @@ func (o *EncodedObject) GetEncoding() string {
 // and a boolean to check if the value has been set.
 func (o *EncodedObject) GetEncodingOk() (*string, bool) {
 	if o == nil || isNil(o.Encoding) {
-    return nil, false
+		return nil, false
 	}
 	return o.Encoding, true
 }
@@ -82,7 +82,7 @@ func (o *EncodedObject) GetData() string {
 // and a boolean to check if the value has been set.
 func (o *EncodedObject) GetDataOk() (*string, bool) {
 	if o == nil || isNil(o.Data) {
-    return nil, false
+		return nil, false
 	}
 	return o.Data, true
 }
@@ -147,5 +147,3 @@ func (v *NullableEncodedObject) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -16,9 +16,9 @@ import (
 
 // CommandResults struct for CommandResults
 type CommandResults struct {
-	SignalResults []SignalResult `json:"signalResults,omitempty"`
+	SignalResults            []SignalResult            `json:"signalResults,omitempty"`
 	InterStateChannelResults []InterStateChannelResult `json:"interStateChannelResults,omitempty"`
-	TimerResults []TimerResult `json:"timerResults,omitempty"`
+	TimerResults             []TimerResult             `json:"timerResults,omitempty"`
 }
 
 // NewCommandResults instantiates a new CommandResults object
@@ -51,7 +51,7 @@ func (o *CommandResults) GetSignalResults() []SignalResult {
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetSignalResultsOk() ([]SignalResult, bool) {
 	if o == nil || isNil(o.SignalResults) {
-    return nil, false
+		return nil, false
 	}
 	return o.SignalResults, true
 }
@@ -83,7 +83,7 @@ func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetInterStateChannelResultsOk() ([]InterStateChannelResult, bool) {
 	if o == nil || isNil(o.InterStateChannelResults) {
-    return nil, false
+		return nil, false
 	}
 	return o.InterStateChannelResults, true
 }
@@ -115,7 +115,7 @@ func (o *CommandResults) GetTimerResults() []TimerResult {
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetTimerResultsOk() ([]TimerResult, bool) {
 	if o == nil || isNil(o.TimerResults) {
-    return nil, false
+		return nil, false
 	}
 	return o.TimerResults, true
 }
@@ -183,5 +183,3 @@ func (v *NullableCommandResults) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

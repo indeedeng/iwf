@@ -17,12 +17,12 @@ import (
 // WorkflowStateOptions struct for WorkflowStateOptions
 type WorkflowStateOptions struct {
 	SearchAttributesLoadingPolicy *PersistenceLoadingPolicy `json:"searchAttributesLoadingPolicy,omitempty"`
-	DataObjectsLoadingPolicy *PersistenceLoadingPolicy `json:"dataObjectsLoadingPolicy,omitempty"`
-	CommandCarryOverPolicy *CommandCarryOverPolicy `json:"commandCarryOverPolicy,omitempty"`
-	StartApiTimeoutSeconds *int32 `json:"startApiTimeoutSeconds,omitempty"`
-	DecideApiTimeoutSeconds *int32 `json:"decideApiTimeoutSeconds,omitempty"`
-	StartApiRetryPolicy *RetryPolicy `json:"startApiRetryPolicy,omitempty"`
-	DecideApiRetryPolicy *RetryPolicy `json:"decideApiRetryPolicy,omitempty"`
+	DataObjectsLoadingPolicy      *PersistenceLoadingPolicy `json:"dataObjectsLoadingPolicy,omitempty"`
+	CommandCarryOverPolicy        *CommandCarryOverPolicy   `json:"commandCarryOverPolicy,omitempty"`
+	StartApiTimeoutSeconds        *int32                    `json:"startApiTimeoutSeconds,omitempty"`
+	DecideApiTimeoutSeconds       *int32                    `json:"decideApiTimeoutSeconds,omitempty"`
+	StartApiRetryPolicy           *RetryPolicy              `json:"startApiRetryPolicy,omitempty"`
+	DecideApiRetryPolicy          *RetryPolicy              `json:"decideApiRetryPolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -55,7 +55,7 @@ func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicy() PersistenceLoa
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
 	if o == nil || isNil(o.SearchAttributesLoadingPolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.SearchAttributesLoadingPolicy, true
 }
@@ -87,7 +87,7 @@ func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicy() PersistenceLoadingP
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetDataObjectsLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
 	if o == nil || isNil(o.DataObjectsLoadingPolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.DataObjectsLoadingPolicy, true
 }
@@ -119,7 +119,7 @@ func (o *WorkflowStateOptions) GetCommandCarryOverPolicy() CommandCarryOverPolic
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetCommandCarryOverPolicyOk() (*CommandCarryOverPolicy, bool) {
 	if o == nil || isNil(o.CommandCarryOverPolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.CommandCarryOverPolicy, true
 }
@@ -151,7 +151,7 @@ func (o *WorkflowStateOptions) GetStartApiTimeoutSeconds() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetStartApiTimeoutSecondsOk() (*int32, bool) {
 	if o == nil || isNil(o.StartApiTimeoutSeconds) {
-    return nil, false
+		return nil, false
 	}
 	return o.StartApiTimeoutSeconds, true
 }
@@ -183,7 +183,7 @@ func (o *WorkflowStateOptions) GetDecideApiTimeoutSeconds() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetDecideApiTimeoutSecondsOk() (*int32, bool) {
 	if o == nil || isNil(o.DecideApiTimeoutSeconds) {
-    return nil, false
+		return nil, false
 	}
 	return o.DecideApiTimeoutSeconds, true
 }
@@ -215,7 +215,7 @@ func (o *WorkflowStateOptions) GetStartApiRetryPolicy() RetryPolicy {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetStartApiRetryPolicyOk() (*RetryPolicy, bool) {
 	if o == nil || isNil(o.StartApiRetryPolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.StartApiRetryPolicy, true
 }
@@ -247,7 +247,7 @@ func (o *WorkflowStateOptions) GetDecideApiRetryPolicy() RetryPolicy {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateOptions) GetDecideApiRetryPolicyOk() (*RetryPolicy, bool) {
 	if o == nil || isNil(o.DecideApiRetryPolicy) {
-    return nil, false
+		return nil, false
 	}
 	return o.DecideApiRetryPolicy, true
 }
@@ -327,5 +327,3 @@ func (v *NullableWorkflowStateOptions) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

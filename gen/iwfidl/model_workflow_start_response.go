@@ -49,7 +49,7 @@ func (o *WorkflowStartResponse) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartResponse) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -111,5 +111,3 @@ func (v *NullableWorkflowStartResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

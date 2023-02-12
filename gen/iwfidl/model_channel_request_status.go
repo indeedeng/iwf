@@ -20,7 +20,7 @@ type ChannelRequestStatus string
 
 // List of ChannelRequestStatus
 const (
-	WAITING ChannelRequestStatus = "WAITING"
+	WAITING  ChannelRequestStatus = "WAITING"
 	RECEIVED ChannelRequestStatus = "RECEIVED"
 )
 
@@ -108,4 +108,3 @@ func (v *NullableChannelRequestStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

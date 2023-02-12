@@ -16,8 +16,8 @@ import (
 
 // StateMovement struct for StateMovement
 type StateMovement struct {
-	StateId string `json:"stateId"`
-	StateInput *EncodedObject `json:"stateInput,omitempty"`
+	StateId      string                `json:"stateId"`
+	StateInput   *EncodedObject        `json:"stateInput,omitempty"`
 	StateOptions *WorkflowStateOptions `json:"stateOptions,omitempty"`
 }
 
@@ -53,7 +53,7 @@ func (o *StateMovement) GetStateId() string {
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.StateId, true
 }
@@ -76,7 +76,7 @@ func (o *StateMovement) GetStateInput() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateInputOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.StateInput) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateInput, true
 }
@@ -108,7 +108,7 @@ func (o *StateMovement) GetStateOptions() WorkflowStateOptions {
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
 	if o == nil || isNil(o.StateOptions) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateOptions, true
 }
@@ -176,5 +176,3 @@ func (v *NullableStateMovement) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

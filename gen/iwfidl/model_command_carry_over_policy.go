@@ -49,7 +49,7 @@ func (o *CommandCarryOverPolicy) GetCommandCarryOverType() CommandCarryOverType 
 // and a boolean to check if the value has been set.
 func (o *CommandCarryOverPolicy) GetCommandCarryOverTypeOk() (*CommandCarryOverType, bool) {
 	if o == nil || isNil(o.CommandCarryOverType) {
-    return nil, false
+		return nil, false
 	}
 	return o.CommandCarryOverType, true
 }
@@ -111,5 +111,3 @@ func (v *NullableCommandCarryOverPolicy) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

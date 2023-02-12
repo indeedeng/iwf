@@ -16,7 +16,7 @@ import (
 
 // TimerResult struct for TimerResult
 type TimerResult struct {
-	CommandId string `json:"commandId"`
+	CommandId   string      `json:"commandId"`
 	TimerStatus TimerStatus `json:"timerStatus"`
 }
 
@@ -53,7 +53,7 @@ func (o *TimerResult) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *TimerResult) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -77,7 +77,7 @@ func (o *TimerResult) GetTimerStatus() TimerStatus {
 // and a boolean to check if the value has been set.
 func (o *TimerResult) GetTimerStatusOk() (*TimerStatus, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.TimerStatus, true
 }
@@ -133,5 +133,3 @@ func (v *NullableTimerResult) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

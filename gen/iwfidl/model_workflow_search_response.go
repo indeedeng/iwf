@@ -17,7 +17,7 @@ import (
 // WorkflowSearchResponse struct for WorkflowSearchResponse
 type WorkflowSearchResponse struct {
 	WorkflowExecutions []WorkflowSearchResponseEntry `json:"workflowExecutions,omitempty"`
-	NextPageToken *string `json:"nextPageToken,omitempty"`
+	NextPageToken      *string                       `json:"nextPageToken,omitempty"`
 }
 
 // NewWorkflowSearchResponse instantiates a new WorkflowSearchResponse object
@@ -50,7 +50,7 @@ func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchRespons
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponse) GetWorkflowExecutionsOk() ([]WorkflowSearchResponseEntry, bool) {
 	if o == nil || isNil(o.WorkflowExecutions) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowExecutions, true
 }
@@ -82,7 +82,7 @@ func (o *WorkflowSearchResponse) GetNextPageToken() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponse) GetNextPageTokenOk() (*string, bool) {
 	if o == nil || isNil(o.NextPageToken) {
-    return nil, false
+		return nil, false
 	}
 	return o.NextPageToken, true
 }
@@ -147,5 +147,3 @@ func (v *NullableWorkflowSearchResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -16,10 +16,10 @@ import (
 
 // RetryPolicy struct for RetryPolicy
 type RetryPolicy struct {
-	InitialIntervalSeconds *int32 `json:"initialIntervalSeconds,omitempty"`
-	BackoffCoefficient *float32 `json:"backoffCoefficient,omitempty"`
-	MaximumIntervalSeconds *int32 `json:"maximumIntervalSeconds,omitempty"`
-	MaximumAttempts *int32 `json:"maximumAttempts,omitempty"`
+	InitialIntervalSeconds *int32   `json:"initialIntervalSeconds,omitempty"`
+	BackoffCoefficient     *float32 `json:"backoffCoefficient,omitempty"`
+	MaximumIntervalSeconds *int32   `json:"maximumIntervalSeconds,omitempty"`
+	MaximumAttempts        *int32   `json:"maximumAttempts,omitempty"`
 }
 
 // NewRetryPolicy instantiates a new RetryPolicy object
@@ -52,7 +52,7 @@ func (o *RetryPolicy) GetInitialIntervalSeconds() int32 {
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool) {
 	if o == nil || isNil(o.InitialIntervalSeconds) {
-    return nil, false
+		return nil, false
 	}
 	return o.InitialIntervalSeconds, true
 }
@@ -84,7 +84,7 @@ func (o *RetryPolicy) GetBackoffCoefficient() float32 {
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetBackoffCoefficientOk() (*float32, bool) {
 	if o == nil || isNil(o.BackoffCoefficient) {
-    return nil, false
+		return nil, false
 	}
 	return o.BackoffCoefficient, true
 }
@@ -116,7 +116,7 @@ func (o *RetryPolicy) GetMaximumIntervalSeconds() int32 {
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool) {
 	if o == nil || isNil(o.MaximumIntervalSeconds) {
-    return nil, false
+		return nil, false
 	}
 	return o.MaximumIntervalSeconds, true
 }
@@ -148,7 +148,7 @@ func (o *RetryPolicy) GetMaximumAttempts() int32 {
 // and a boolean to check if the value has been set.
 func (o *RetryPolicy) GetMaximumAttemptsOk() (*int32, bool) {
 	if o == nil || isNil(o.MaximumAttempts) {
-    return nil, false
+		return nil, false
 	}
 	return o.MaximumAttempts, true
 }
@@ -219,5 +219,3 @@ func (v *NullableRetryPolicy) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

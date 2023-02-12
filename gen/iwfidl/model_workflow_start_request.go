@@ -16,14 +16,14 @@ import (
 
 // WorkflowStartRequest struct for WorkflowStartRequest
 type WorkflowStartRequest struct {
-	WorkflowId string `json:"workflowId"`
-	IwfWorkflowType string `json:"iwfWorkflowType"`
-	WorkflowTimeoutSeconds int32 `json:"workflowTimeoutSeconds"`
-	IwfWorkerUrl string `json:"iwfWorkerUrl"`
-	StartStateId string `json:"startStateId"`
-	StateInput *EncodedObject `json:"stateInput,omitempty"`
-	StateOptions *WorkflowStateOptions `json:"stateOptions,omitempty"`
-	WorkflowStartOptions *WorkflowStartOptions `json:"workflowStartOptions,omitempty"`
+	WorkflowId             string                `json:"workflowId"`
+	IwfWorkflowType        string                `json:"iwfWorkflowType"`
+	WorkflowTimeoutSeconds int32                 `json:"workflowTimeoutSeconds"`
+	IwfWorkerUrl           string                `json:"iwfWorkerUrl"`
+	StartStateId           string                `json:"startStateId"`
+	StateInput             *EncodedObject        `json:"stateInput,omitempty"`
+	StateOptions           *WorkflowStateOptions `json:"stateOptions,omitempty"`
+	WorkflowStartOptions   *WorkflowStartOptions `json:"workflowStartOptions,omitempty"`
 }
 
 // NewWorkflowStartRequest instantiates a new WorkflowStartRequest object
@@ -62,7 +62,7 @@ func (o *WorkflowStartRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -86,7 +86,7 @@ func (o *WorkflowStartRequest) GetIwfWorkflowType() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetIwfWorkflowTypeOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.IwfWorkflowType, true
 }
@@ -110,7 +110,7 @@ func (o *WorkflowStartRequest) GetWorkflowTimeoutSeconds() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowTimeoutSecondsOk() (*int32, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowTimeoutSeconds, true
 }
@@ -134,7 +134,7 @@ func (o *WorkflowStartRequest) GetIwfWorkerUrl() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetIwfWorkerUrlOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.IwfWorkerUrl, true
 }
@@ -158,7 +158,7 @@ func (o *WorkflowStartRequest) GetStartStateId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStartStateIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.StartStateId, true
 }
@@ -181,7 +181,7 @@ func (o *WorkflowStartRequest) GetStateInput() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStateInputOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.StateInput) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateInput, true
 }
@@ -213,7 +213,7 @@ func (o *WorkflowStartRequest) GetStateOptions() WorkflowStateOptions {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
 	if o == nil || isNil(o.StateOptions) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateOptions, true
 }
@@ -245,7 +245,7 @@ func (o *WorkflowStartRequest) GetWorkflowStartOptions() WorkflowStartOptions {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowStartOptionsOk() (*WorkflowStartOptions, bool) {
 	if o == nil || isNil(o.WorkflowStartOptions) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowStartOptions, true
 }
@@ -328,5 +328,3 @@ func (v *NullableWorkflowStartRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-
