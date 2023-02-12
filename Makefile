@@ -163,6 +163,10 @@ deps-all: ## Check for all dependency updates
 cleanTestCache:
 	$Q go clean -testcache
 
+integTestsWithCover:
+	$Q go test -v -cover ./integ -coverprofile coverage.out -coverpkg ./... -search=false -cadence=false
+	$Q go tool cover -func coverage.out -o coverage.out  # Replaces coverage.out with the analysis of coverage.out
+
 integTests:
 	$Q go test -v ./integ
 
@@ -176,7 +180,8 @@ ci-cadence-integ-test:
 	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=180
 
 ci-temporal-integ-test:
-	$Q go test -v ./integ -search=false -cadence=false -dependencyWaitSeconds=60
+	$Q go test -v -cover ./integ -coverprofile coverage.out -coverpkg ./... -search=false -cadence=false -dependencyWaitSeconds=60
+	$Q go tool cover -func coverage.out -o coverage.out  # Replaces coverage.out with the analysis of coverage.out
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false
