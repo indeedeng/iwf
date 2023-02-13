@@ -16,9 +16,9 @@ import (
 
 // WorkflowGetSearchAttributesRequest struct for WorkflowGetSearchAttributesRequest
 type WorkflowGetSearchAttributesRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	Keys []SearchAttributeKeyAndType `json:"keys,omitempty"`
+	WorkflowId    string                      `json:"workflowId"`
+	WorkflowRunId *string                     `json:"workflowRunId,omitempty"`
+	Keys          []SearchAttributeKeyAndType `json:"keys,omitempty"`
 }
 
 // NewWorkflowGetSearchAttributesRequest instantiates a new WorkflowGetSearchAttributesRequest object
@@ -53,7 +53,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -76,7 +76,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -108,7 +108,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetKeys() []SearchAttributeKeyAndTy
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetKeysOk() ([]SearchAttributeKeyAndType, bool) {
 	if o == nil || isNil(o.Keys) {
-    return nil, false
+		return nil, false
 	}
 	return o.Keys, true
 }
@@ -176,5 +176,3 @@ func (v *NullableWorkflowGetSearchAttributesRequest) UnmarshalJSON(src []byte) e
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -17,7 +17,7 @@ import (
 // PersistenceLoadingPolicy struct for PersistenceLoadingPolicy
 type PersistenceLoadingPolicy struct {
 	PersistenceLoadingType *PersistenceLoadingType `json:"persistenceLoadingType,omitempty"`
-	PartialLoadingKeys []string `json:"partialLoadingKeys,omitempty"`
+	PartialLoadingKeys     []string                `json:"partialLoadingKeys,omitempty"`
 }
 
 // NewPersistenceLoadingPolicy instantiates a new PersistenceLoadingPolicy object
@@ -50,7 +50,7 @@ func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() PersistenceLoadin
 // and a boolean to check if the value has been set.
 func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*PersistenceLoadingType, bool) {
 	if o == nil || isNil(o.PersistenceLoadingType) {
-    return nil, false
+		return nil, false
 	}
 	return o.PersistenceLoadingType, true
 }
@@ -82,7 +82,7 @@ func (o *PersistenceLoadingPolicy) GetPartialLoadingKeys() []string {
 // and a boolean to check if the value has been set.
 func (o *PersistenceLoadingPolicy) GetPartialLoadingKeysOk() ([]string, bool) {
 	if o == nil || isNil(o.PartialLoadingKeys) {
-    return nil, false
+		return nil, false
 	}
 	return o.PartialLoadingKeys, true
 }
@@ -147,5 +147,3 @@ func (v *NullablePersistenceLoadingPolicy) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

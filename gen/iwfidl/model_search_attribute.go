@@ -16,13 +16,13 @@ import (
 
 // SearchAttribute struct for SearchAttribute
 type SearchAttribute struct {
-	Key *string `json:"key,omitempty"`
-	StringValue *string `json:"stringValue,omitempty"`
-	IntegerValue *int64 `json:"integerValue,omitempty"`
-	DoubleValue *float64 `json:"doubleValue,omitempty"`
-	BoolValue *bool `json:"boolValue,omitempty"`
-	StringArrayValue []string `json:"stringArrayValue,omitempty"`
-	ValueType *SearchAttributeValueType `json:"valueType,omitempty"`
+	Key              *string                   `json:"key,omitempty"`
+	StringValue      *string                   `json:"stringValue,omitempty"`
+	IntegerValue     *int64                    `json:"integerValue,omitempty"`
+	DoubleValue      *float64                  `json:"doubleValue,omitempty"`
+	BoolValue        *bool                     `json:"boolValue,omitempty"`
+	StringArrayValue []string                  `json:"stringArrayValue,omitempty"`
+	ValueType        *SearchAttributeValueType `json:"valueType,omitempty"`
 }
 
 // NewSearchAttribute instantiates a new SearchAttribute object
@@ -55,7 +55,7 @@ func (o *SearchAttribute) GetKey() string {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetKeyOk() (*string, bool) {
 	if o == nil || isNil(o.Key) {
-    return nil, false
+		return nil, false
 	}
 	return o.Key, true
 }
@@ -87,7 +87,7 @@ func (o *SearchAttribute) GetStringValue() string {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetStringValueOk() (*string, bool) {
 	if o == nil || isNil(o.StringValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.StringValue, true
 }
@@ -119,7 +119,7 @@ func (o *SearchAttribute) GetIntegerValue() int64 {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetIntegerValueOk() (*int64, bool) {
 	if o == nil || isNil(o.IntegerValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.IntegerValue, true
 }
@@ -151,7 +151,7 @@ func (o *SearchAttribute) GetDoubleValue() float64 {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetDoubleValueOk() (*float64, bool) {
 	if o == nil || isNil(o.DoubleValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.DoubleValue, true
 }
@@ -183,7 +183,7 @@ func (o *SearchAttribute) GetBoolValue() bool {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetBoolValueOk() (*bool, bool) {
 	if o == nil || isNil(o.BoolValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.BoolValue, true
 }
@@ -215,7 +215,7 @@ func (o *SearchAttribute) GetStringArrayValue() []string {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetStringArrayValueOk() ([]string, bool) {
 	if o == nil || isNil(o.StringArrayValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.StringArrayValue, true
 }
@@ -247,7 +247,7 @@ func (o *SearchAttribute) GetValueType() SearchAttributeValueType {
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetValueTypeOk() (*SearchAttributeValueType, bool) {
 	if o == nil || isNil(o.ValueType) {
-    return nil, false
+		return nil, false
 	}
 	return o.ValueType, true
 }
@@ -327,5 +327,3 @@ func (v *NullableSearchAttribute) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

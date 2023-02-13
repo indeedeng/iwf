@@ -16,12 +16,12 @@ import (
 
 // WorkflowStateStartRequest struct for WorkflowStateStartRequest
 type WorkflowStateStartRequest struct {
-	Context Context `json:"context"`
-	WorkflowType string `json:"workflowType"`
-	WorkflowStateId string `json:"workflowStateId"`
-	StateInput *EncodedObject `json:"stateInput,omitempty"`
+	Context          Context           `json:"context"`
+	WorkflowType     string            `json:"workflowType"`
+	WorkflowStateId  string            `json:"workflowStateId"`
+	StateInput       *EncodedObject    `json:"stateInput,omitempty"`
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
-	DataObjects []KeyValue `json:"dataObjects,omitempty"`
+	DataObjects      []KeyValue        `json:"dataObjects,omitempty"`
 }
 
 // NewWorkflowStateStartRequest instantiates a new WorkflowStateStartRequest object
@@ -58,7 +58,7 @@ func (o *WorkflowStateStartRequest) GetContext() Context {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetContextOk() (*Context, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.Context, true
 }
@@ -82,7 +82,7 @@ func (o *WorkflowStateStartRequest) GetWorkflowType() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetWorkflowTypeOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowType, true
 }
@@ -106,7 +106,7 @@ func (o *WorkflowStateStartRequest) GetWorkflowStateId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetWorkflowStateIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowStateId, true
 }
@@ -129,7 +129,7 @@ func (o *WorkflowStateStartRequest) GetStateInput() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetStateInputOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.StateInput) {
-    return nil, false
+		return nil, false
 	}
 	return o.StateInput, true
 }
@@ -161,7 +161,7 @@ func (o *WorkflowStateStartRequest) GetSearchAttributes() []SearchAttribute {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetSearchAttributesOk() ([]SearchAttribute, bool) {
 	if o == nil || isNil(o.SearchAttributes) {
-    return nil, false
+		return nil, false
 	}
 	return o.SearchAttributes, true
 }
@@ -193,7 +193,7 @@ func (o *WorkflowStateStartRequest) GetDataObjects() []KeyValue {
 // and a boolean to check if the value has been set.
 func (o *WorkflowStateStartRequest) GetDataObjectsOk() ([]KeyValue, bool) {
 	if o == nil || isNil(o.DataObjects) {
-    return nil, false
+		return nil, false
 	}
 	return o.DataObjects, true
 }
@@ -270,5 +270,3 @@ func (v *NullableWorkflowStateStartRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

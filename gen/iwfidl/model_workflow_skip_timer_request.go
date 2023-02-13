@@ -16,11 +16,11 @@ import (
 
 // WorkflowSkipTimerRequest struct for WorkflowSkipTimerRequest
 type WorkflowSkipTimerRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	WorkflowStateExecutionId string `json:"workflowStateExecutionId"`
-	TimerCommandId *string `json:"timerCommandId,omitempty"`
-	TimerCommandIndex *int32 `json:"timerCommandIndex,omitempty"`
+	WorkflowId               string  `json:"workflowId"`
+	WorkflowRunId            *string `json:"workflowRunId,omitempty"`
+	WorkflowStateExecutionId string  `json:"workflowStateExecutionId"`
+	TimerCommandId           *string `json:"timerCommandId,omitempty"`
+	TimerCommandIndex        *int32  `json:"timerCommandIndex,omitempty"`
 }
 
 // NewWorkflowSkipTimerRequest instantiates a new WorkflowSkipTimerRequest object
@@ -56,7 +56,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -79,7 +79,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -112,7 +112,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowStateExecutionId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetWorkflowStateExecutionIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowStateExecutionId, true
 }
@@ -135,7 +135,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIdOk() (*string, bool) {
 	if o == nil || isNil(o.TimerCommandId) {
-    return nil, false
+		return nil, false
 	}
 	return o.TimerCommandId, true
 }
@@ -167,7 +167,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIndex() int32 {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIndexOk() (*int32, bool) {
 	if o == nil || isNil(o.TimerCommandIndex) {
-    return nil, false
+		return nil, false
 	}
 	return o.TimerCommandIndex, true
 }
@@ -241,5 +241,3 @@ func (v *NullableWorkflowSkipTimerRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

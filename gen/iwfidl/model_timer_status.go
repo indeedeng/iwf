@@ -21,7 +21,7 @@ type TimerStatus string
 // List of TimerStatus
 const (
 	SCHEDULED TimerStatus = "SCHEDULED"
-	FIRED TimerStatus = "FIRED"
+	FIRED     TimerStatus = "FIRED"
 )
 
 // All allowed values of TimerStatus enum
@@ -108,4 +108,3 @@ func (v *NullableTimerStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

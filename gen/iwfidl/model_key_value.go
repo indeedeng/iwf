@@ -16,7 +16,7 @@ import (
 
 // KeyValue struct for KeyValue
 type KeyValue struct {
-	Key *string `json:"key,omitempty"`
+	Key   *string        `json:"key,omitempty"`
 	Value *EncodedObject `json:"value,omitempty"`
 }
 
@@ -50,7 +50,7 @@ func (o *KeyValue) GetKey() string {
 // and a boolean to check if the value has been set.
 func (o *KeyValue) GetKeyOk() (*string, bool) {
 	if o == nil || isNil(o.Key) {
-    return nil, false
+		return nil, false
 	}
 	return o.Key, true
 }
@@ -82,7 +82,7 @@ func (o *KeyValue) GetValue() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *KeyValue) GetValueOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.Value) {
-    return nil, false
+		return nil, false
 	}
 	return o.Value, true
 }
@@ -147,5 +147,3 @@ func (v *NullableKeyValue) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

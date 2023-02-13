@@ -16,12 +16,12 @@ import (
 
 // Context struct for Context
 type Context struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId string `json:"workflowRunId"`
-	WorkflowStartedTimestamp int64 `json:"workflowStartedTimestamp"`
-	StateExecutionId string `json:"stateExecutionId"`
-	FirstAttemptTimestamp *int64 `json:"firstAttemptTimestamp,omitempty"`
-	Attempt *int32 `json:"attempt,omitempty"`
+	WorkflowId               string `json:"workflowId"`
+	WorkflowRunId            string `json:"workflowRunId"`
+	WorkflowStartedTimestamp int64  `json:"workflowStartedTimestamp"`
+	StateExecutionId         string `json:"stateExecutionId"`
+	FirstAttemptTimestamp    *int64 `json:"firstAttemptTimestamp,omitempty"`
+	Attempt                  *int32 `json:"attempt,omitempty"`
 }
 
 // NewContext instantiates a new Context object
@@ -59,7 +59,7 @@ func (o *Context) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -83,7 +83,7 @@ func (o *Context) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowRunId, true
 }
@@ -107,7 +107,7 @@ func (o *Context) GetWorkflowStartedTimestamp() int64 {
 // and a boolean to check if the value has been set.
 func (o *Context) GetWorkflowStartedTimestampOk() (*int64, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowStartedTimestamp, true
 }
@@ -131,7 +131,7 @@ func (o *Context) GetStateExecutionId() string {
 // and a boolean to check if the value has been set.
 func (o *Context) GetStateExecutionIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.StateExecutionId, true
 }
@@ -154,7 +154,7 @@ func (o *Context) GetFirstAttemptTimestamp() int64 {
 // and a boolean to check if the value has been set.
 func (o *Context) GetFirstAttemptTimestampOk() (*int64, bool) {
 	if o == nil || isNil(o.FirstAttemptTimestamp) {
-    return nil, false
+		return nil, false
 	}
 	return o.FirstAttemptTimestamp, true
 }
@@ -186,7 +186,7 @@ func (o *Context) GetAttempt() int32 {
 // and a boolean to check if the value has been set.
 func (o *Context) GetAttemptOk() (*int32, bool) {
 	if o == nil || isNil(o.Attempt) {
-    return nil, false
+		return nil, false
 	}
 	return o.Attempt, true
 }
@@ -263,5 +263,3 @@ func (v *NullableContext) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

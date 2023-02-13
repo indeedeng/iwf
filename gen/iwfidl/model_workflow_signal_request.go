@@ -16,10 +16,10 @@ import (
 
 // WorkflowSignalRequest struct for WorkflowSignalRequest
 type WorkflowSignalRequest struct {
-	WorkflowId string `json:"workflowId"`
-	WorkflowRunId *string `json:"workflowRunId,omitempty"`
-	SignalChannelName string `json:"signalChannelName"`
-	SignalValue *EncodedObject `json:"signalValue,omitempty"`
+	WorkflowId        string         `json:"workflowId"`
+	WorkflowRunId     *string        `json:"workflowRunId,omitempty"`
+	SignalChannelName string         `json:"signalChannelName"`
+	SignalValue       *EncodedObject `json:"signalValue,omitempty"`
 }
 
 // NewWorkflowSignalRequest instantiates a new WorkflowSignalRequest object
@@ -55,7 +55,7 @@ func (o *WorkflowSignalRequest) GetWorkflowId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetWorkflowIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.WorkflowId, true
 }
@@ -78,7 +78,7 @@ func (o *WorkflowSignalRequest) GetWorkflowRunId() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetWorkflowRunIdOk() (*string, bool) {
 	if o == nil || isNil(o.WorkflowRunId) {
-    return nil, false
+		return nil, false
 	}
 	return o.WorkflowRunId, true
 }
@@ -111,7 +111,7 @@ func (o *WorkflowSignalRequest) GetSignalChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetSignalChannelNameOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.SignalChannelName, true
 }
@@ -134,7 +134,7 @@ func (o *WorkflowSignalRequest) GetSignalValue() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetSignalValueOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.SignalValue) {
-    return nil, false
+		return nil, false
 	}
 	return o.SignalValue, true
 }
@@ -205,5 +205,3 @@ func (v *NullableWorkflowSignalRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

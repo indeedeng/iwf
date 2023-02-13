@@ -16,7 +16,7 @@ import (
 
 // SignalCommand struct for SignalCommand
 type SignalCommand struct {
-	CommandId string `json:"commandId"`
+	CommandId         string `json:"commandId"`
 	SignalChannelName string `json:"signalChannelName"`
 }
 
@@ -53,7 +53,7 @@ func (o *SignalCommand) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *SignalCommand) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -77,7 +77,7 @@ func (o *SignalCommand) GetSignalChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *SignalCommand) GetSignalChannelNameOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.SignalChannelName, true
 }
@@ -133,5 +133,3 @@ func (v *NullableSignalCommand) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

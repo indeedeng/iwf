@@ -20,7 +20,7 @@ type PersistenceLoadingType string
 
 // List of PersistenceLoadingType
 const (
-	ALL_WITHOUT_LOCKING PersistenceLoadingType = "LOAD_ALL_WITHOUT_LOCKING"
+	ALL_WITHOUT_LOCKING     PersistenceLoadingType = "LOAD_ALL_WITHOUT_LOCKING"
 	PARTIAL_WITHOUT_LOCKING PersistenceLoadingType = "LOAD_PARTIAL_WITHOUT_LOCKING"
 )
 
@@ -108,4 +108,3 @@ func (v *NullablePersistenceLoadingType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

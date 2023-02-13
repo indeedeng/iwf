@@ -141,7 +141,7 @@ iwf-server:
 idl-code-gen: #generate/refresh go clent code for idl, do this after update the idl file
 	rm -Rf ./gen ; true
 	openapi-generator generate -i iwf-idl/iwf.yaml -g go -o gen/iwfidl/ -p packageName=iwfidl -p generateInterfaces=true -p isGoSubmodule=false --git-user-id indeedeng --git-repo-id iwf-idl
-	rm ./gen/iwfidl/go.* ; rm -rf ./gen/iwfidl/test; true
+	rm ./gen/iwfidl/go.* ; rm -rf ./gen/iwfidl/test; gofmt -s -w gen; true
 
 bins: $(BINS)
 
@@ -163,6 +163,10 @@ deps-all: ## Check for all dependency updates
 cleanTestCache:
 	$Q go clean -testcache
 
+integTestsWithCover:
+	$Q go test -v -cover ./integ -coverprofile coverage.out -coverpkg ./... -search=false -cadence=false
+	$Q go tool cover -func coverage.out -o coverage.out  # Replaces coverage.out with the analysis of coverage.out
+
 integTests:
 	$Q go test -v ./integ
 
@@ -176,7 +180,8 @@ ci-cadence-integ-test:
 	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=180
 
 ci-temporal-integ-test:
-	$Q go test -v ./integ -search=false -cadence=false -dependencyWaitSeconds=60
+	$Q go test -v -cover ./integ -coverprofile coverage.out -coverpkg ./... -search=false -cadence=false -dependencyWaitSeconds=60
+	$Q go tool cover -func coverage.out -o coverage.out  # Replaces coverage.out with the analysis of coverage.out
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false

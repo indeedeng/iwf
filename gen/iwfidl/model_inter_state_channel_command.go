@@ -16,7 +16,7 @@ import (
 
 // InterStateChannelCommand struct for InterStateChannelCommand
 type InterStateChannelCommand struct {
-	CommandId string `json:"commandId"`
+	CommandId   string `json:"commandId"`
 	ChannelName string `json:"channelName"`
 }
 
@@ -53,7 +53,7 @@ func (o *InterStateChannelCommand) GetCommandId() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelCommand) GetCommandIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CommandId, true
 }
@@ -77,7 +77,7 @@ func (o *InterStateChannelCommand) GetChannelName() string {
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelCommand) GetChannelNameOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.ChannelName, true
 }
@@ -133,5 +133,3 @@ func (v *NullableInterStateChannelCommand) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -16,9 +16,9 @@ import (
 
 // StateCompletionOutput struct for StateCompletionOutput
 type StateCompletionOutput struct {
-	CompletedStateId string `json:"completedStateId"`
-	CompletedStateExecutionId string `json:"completedStateExecutionId"`
-	CompletedStateOutput *EncodedObject `json:"completedStateOutput,omitempty"`
+	CompletedStateId          string         `json:"completedStateId"`
+	CompletedStateExecutionId string         `json:"completedStateExecutionId"`
+	CompletedStateOutput      *EncodedObject `json:"completedStateOutput,omitempty"`
 }
 
 // NewStateCompletionOutput instantiates a new StateCompletionOutput object
@@ -54,7 +54,7 @@ func (o *StateCompletionOutput) GetCompletedStateId() string {
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CompletedStateId, true
 }
@@ -78,7 +78,7 @@ func (o *StateCompletionOutput) GetCompletedStateExecutionId() string {
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateExecutionIdOk() (*string, bool) {
 	if o == nil {
-    return nil, false
+		return nil, false
 	}
 	return &o.CompletedStateExecutionId, true
 }
@@ -101,7 +101,7 @@ func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, bool) {
 	if o == nil || isNil(o.CompletedStateOutput) {
-    return nil, false
+		return nil, false
 	}
 	return o.CompletedStateOutput, true
 }
@@ -169,5 +169,3 @@ func (v *NullableStateCompletionOutput) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

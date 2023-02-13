@@ -16,7 +16,7 @@ import (
 
 // SearchAttributeKeyAndType struct for SearchAttributeKeyAndType
 type SearchAttributeKeyAndType struct {
-	Key *string `json:"key,omitempty"`
+	Key       *string                   `json:"key,omitempty"`
 	ValueType *SearchAttributeValueType `json:"valueType,omitempty"`
 }
 
@@ -50,7 +50,7 @@ func (o *SearchAttributeKeyAndType) GetKey() string {
 // and a boolean to check if the value has been set.
 func (o *SearchAttributeKeyAndType) GetKeyOk() (*string, bool) {
 	if o == nil || isNil(o.Key) {
-    return nil, false
+		return nil, false
 	}
 	return o.Key, true
 }
@@ -82,7 +82,7 @@ func (o *SearchAttributeKeyAndType) GetValueType() SearchAttributeValueType {
 // and a boolean to check if the value has been set.
 func (o *SearchAttributeKeyAndType) GetValueTypeOk() (*SearchAttributeValueType, bool) {
 	if o == nil || isNil(o.ValueType) {
-    return nil, false
+		return nil, false
 	}
 	return o.ValueType, true
 }
@@ -147,5 +147,3 @@ func (v *NullableSearchAttributeKeyAndType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -20,10 +20,10 @@ type WorkflowResetType string
 
 // List of WorkflowResetType
 const (
-	HISTORY_EVENT_ID WorkflowResetType = "HISTORY_EVENT_ID"
-	BEGINNING WorkflowResetType = "BEGINNING"
+	HISTORY_EVENT_ID   WorkflowResetType = "HISTORY_EVENT_ID"
+	BEGINNING          WorkflowResetType = "BEGINNING"
 	HISTORY_EVENT_TIME WorkflowResetType = "HISTORY_EVENT_TIME"
-	STATE_ID WorkflowResetType = "STATE_ID"
+	STATE_ID           WorkflowResetType = "STATE_ID"
 	STATE_EXECUTION_ID WorkflowResetType = "STATE_EXECUTION_ID"
 )
 
@@ -114,4 +114,3 @@ func (v *NullableWorkflowResetType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
