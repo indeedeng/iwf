@@ -390,8 +390,11 @@ For more information, please see the [document](https://docs.google.com/document
 
 <img width="916" alt="history diagram" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
 
-# Posts & Articles  
+# Posts & Articles & Reference 
+* Temporal adopted as [the first community drive DSL framework/abstraction](https://github.com/temporalio/awesome-temporal) of Temporal
+* Cadence adopted in its [README](https://github.com/uber/cadence#cadence), [official documentation](https://cadenceworkflow.io/docs/get-started/#what-s-next) and [Cadence community spotlight](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/) 
 * [A Letter to Cadence/Temporal, and Workflow Tech Community](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
 * [iWF vs Cadence/Temporal](https://medium.com/@qlong/iwf-vs-cadence-temporal-1e11b35960fe)
 * [iWF vs other general purposed workflow Engines](https://medium.com/@qlong/iwf-vs-other-general-purposed-workflow-engines-f8f3e3d8993d)
 * [Cadence® iWF](https://www.instaclustr.com/blog/cadence-iwf/?utm_content=1669999382&utm_medium=linkedin&utm_source=organicsocial)
+
