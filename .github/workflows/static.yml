@@ -2,17 +2,10 @@ name: static check
 on: pull_request
 
 jobs:
-  golangci:
-    strategy:
-      matrix:
-        go: [1.18]
-        os: [macos-latest, windows-latest]
-    name: lint
-    runs-on: ${{ matrix.os }}
+  golangci-lint:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ matrix.go }}
-      - uses: actions/checkout@v3
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: reviewdog/action-golangci-lint@v2
