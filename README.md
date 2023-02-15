@@ -361,11 +361,10 @@ For API service, set up monitors/dashboards:
 * API availability
 * API latency
 
-The interpreter worker service is just a standard Cadence/Temporal workflow application. Follow the developer guides:
+The interpreter worker service is just a standard Cadence/Temporal workflow application. Follow the developer guides.
 
-*
-
-For [Cadence to set up monitor/dashboards ](https://cadenceworkflow.io/docs/operation-guide/monitor/#cadence-application-monitoring)
+* For
+  [Cadence to set up monitor/dashboards ](https://cadenceworkflow.io/docs/operation-guide/monitor/#cadence-application-monitoring)
 
 * For [Temporal to set up monitor/dashboards](https://github.com/temporalio/dashboards)
   and [metrics definition](https://docs.temporal.io/references/sdk-metrics)
