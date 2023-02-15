@@ -163,7 +163,7 @@ deps-all: ## Check for all dependency updates
 cleanTestCache:
 	$Q go clean -testcache
 
-integTestsTemporalWithCover: # for local debugging 
+integTestsTemporalWithCover: # for local debugging
 	$Q go test -v -cover ./integ -coverprofile coverage.out -coverpkg ./service/... -cadence=false
 	$Q go tool cover -func coverage.out -o coverage.out
 
