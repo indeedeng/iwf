@@ -39,7 +39,7 @@ func NewPersistenceLoadingPolicyWithDefaults() *PersistenceLoadingPolicy {
 
 // GetPersistenceLoadingType returns the PersistenceLoadingType field value if set, zero value otherwise.
 func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() PersistenceLoadingType {
-	if o == nil || isNil(o.PersistenceLoadingType) {
+	if o == nil || o.PersistenceLoadingType == nil {
 		var ret PersistenceLoadingType
 		return ret
 	}
@@ -49,7 +49,7 @@ func (o *PersistenceLoadingPolicy) GetPersistenceLoadingType() PersistenceLoadin
 // GetPersistenceLoadingTypeOk returns a tuple with the PersistenceLoadingType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*PersistenceLoadingType, bool) {
-	if o == nil || isNil(o.PersistenceLoadingType) {
+	if o == nil || o.PersistenceLoadingType == nil {
 		return nil, false
 	}
 	return o.PersistenceLoadingType, true
@@ -57,7 +57,7 @@ func (o *PersistenceLoadingPolicy) GetPersistenceLoadingTypeOk() (*PersistenceLo
 
 // HasPersistenceLoadingType returns a boolean if a field has been set.
 func (o *PersistenceLoadingPolicy) HasPersistenceLoadingType() bool {
-	if o != nil && !isNil(o.PersistenceLoadingType) {
+	if o != nil && o.PersistenceLoadingType != nil {
 		return true
 	}
 
@@ -71,7 +71,7 @@ func (o *PersistenceLoadingPolicy) SetPersistenceLoadingType(v PersistenceLoadin
 
 // GetPartialLoadingKeys returns the PartialLoadingKeys field value if set, zero value otherwise.
 func (o *PersistenceLoadingPolicy) GetPartialLoadingKeys() []string {
-	if o == nil || isNil(o.PartialLoadingKeys) {
+	if o == nil || o.PartialLoadingKeys == nil {
 		var ret []string
 		return ret
 	}
@@ -81,7 +81,7 @@ func (o *PersistenceLoadingPolicy) GetPartialLoadingKeys() []string {
 // GetPartialLoadingKeysOk returns a tuple with the PartialLoadingKeys field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *PersistenceLoadingPolicy) GetPartialLoadingKeysOk() ([]string, bool) {
-	if o == nil || isNil(o.PartialLoadingKeys) {
+	if o == nil || o.PartialLoadingKeys == nil {
 		return nil, false
 	}
 	return o.PartialLoadingKeys, true
@@ -89,7 +89,7 @@ func (o *PersistenceLoadingPolicy) GetPartialLoadingKeysOk() ([]string, bool) {
 
 // HasPartialLoadingKeys returns a boolean if a field has been set.
 func (o *PersistenceLoadingPolicy) HasPartialLoadingKeys() bool {
-	if o != nil && !isNil(o.PartialLoadingKeys) {
+	if o != nil && o.PartialLoadingKeys != nil {
 		return true
 	}
 
@@ -103,10 +103,10 @@ func (o *PersistenceLoadingPolicy) SetPartialLoadingKeys(v []string) {
 
 func (o PersistenceLoadingPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.PersistenceLoadingType) {
+	if o.PersistenceLoadingType != nil {
 		toSerialize["persistenceLoadingType"] = o.PersistenceLoadingType
 	}
-	if !isNil(o.PartialLoadingKeys) {
+	if o.PartialLoadingKeys != nil {
 		toSerialize["partialLoadingKeys"] = o.PartialLoadingKeys
 	}
 	return json.Marshal(toSerialize)

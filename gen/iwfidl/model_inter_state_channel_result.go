@@ -116,7 +116,7 @@ func (o *InterStateChannelResult) SetChannelName(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *InterStateChannelResult) GetValue() EncodedObject {
-	if o == nil || isNil(o.Value) {
+	if o == nil || o.Value == nil {
 		var ret EncodedObject
 		return ret
 	}
@@ -126,7 +126,7 @@ func (o *InterStateChannelResult) GetValue() EncodedObject {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetValueOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.Value) {
+	if o == nil || o.Value == nil {
 		return nil, false
 	}
 	return o.Value, true
@@ -134,7 +134,7 @@ func (o *InterStateChannelResult) GetValueOk() (*EncodedObject, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *InterStateChannelResult) HasValue() bool {
-	if o != nil && !isNil(o.Value) {
+	if o != nil && o.Value != nil {
 		return true
 	}
 
@@ -157,7 +157,7 @@ func (o InterStateChannelResult) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["channelName"] = o.ChannelName
 	}
-	if !isNil(o.Value) {
+	if o.Value != nil {
 		toSerialize["value"] = o.Value
 	}
 	return json.Marshal(toSerialize)

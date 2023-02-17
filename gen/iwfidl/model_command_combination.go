@@ -38,7 +38,7 @@ func NewCommandCombinationWithDefaults() *CommandCombination {
 
 // GetCommandIds returns the CommandIds field value if set, zero value otherwise.
 func (o *CommandCombination) GetCommandIds() []string {
-	if o == nil || isNil(o.CommandIds) {
+	if o == nil || o.CommandIds == nil {
 		var ret []string
 		return ret
 	}
@@ -48,7 +48,7 @@ func (o *CommandCombination) GetCommandIds() []string {
 // GetCommandIdsOk returns a tuple with the CommandIds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandCombination) GetCommandIdsOk() ([]string, bool) {
-	if o == nil || isNil(o.CommandIds) {
+	if o == nil || o.CommandIds == nil {
 		return nil, false
 	}
 	return o.CommandIds, true
@@ -56,7 +56,7 @@ func (o *CommandCombination) GetCommandIdsOk() ([]string, bool) {
 
 // HasCommandIds returns a boolean if a field has been set.
 func (o *CommandCombination) HasCommandIds() bool {
-	if o != nil && !isNil(o.CommandIds) {
+	if o != nil && o.CommandIds != nil {
 		return true
 	}
 
@@ -70,7 +70,7 @@ func (o *CommandCombination) SetCommandIds(v []string) {
 
 func (o CommandCombination) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.CommandIds) {
+	if o.CommandIds != nil {
 		toSerialize["commandIds"] = o.CommandIds
 	}
 	return json.Marshal(toSerialize)

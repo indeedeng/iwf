@@ -92,7 +92,7 @@ func (o *WorkflowGetResponse) SetWorkflowStatus(v WorkflowStatus) {
 
 // GetResults returns the Results field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
-	if o == nil || isNil(o.Results) {
+	if o == nil || o.Results == nil {
 		var ret []StateCompletionOutput
 		return ret
 	}
@@ -102,7 +102,7 @@ func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
 // GetResultsOk returns a tuple with the Results field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetResultsOk() ([]StateCompletionOutput, bool) {
-	if o == nil || isNil(o.Results) {
+	if o == nil || o.Results == nil {
 		return nil, false
 	}
 	return o.Results, true
@@ -110,7 +110,7 @@ func (o *WorkflowGetResponse) GetResultsOk() ([]StateCompletionOutput, bool) {
 
 // HasResults returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasResults() bool {
-	if o != nil && !isNil(o.Results) {
+	if o != nil && o.Results != nil {
 		return true
 	}
 
@@ -124,7 +124,7 @@ func (o *WorkflowGetResponse) SetResults(v []StateCompletionOutput) {
 
 // GetErrorType returns the ErrorType field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
-	if o == nil || isNil(o.ErrorType) {
+	if o == nil || o.ErrorType == nil {
 		var ret WorkflowErrorType
 		return ret
 	}
@@ -134,7 +134,7 @@ func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
 // GetErrorTypeOk returns a tuple with the ErrorType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
-	if o == nil || isNil(o.ErrorType) {
+	if o == nil || o.ErrorType == nil {
 		return nil, false
 	}
 	return o.ErrorType, true
@@ -142,7 +142,7 @@ func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
 
 // HasErrorType returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasErrorType() bool {
-	if o != nil && !isNil(o.ErrorType) {
+	if o != nil && o.ErrorType != nil {
 		return true
 	}
 
@@ -156,7 +156,7 @@ func (o *WorkflowGetResponse) SetErrorType(v WorkflowErrorType) {
 
 // GetErrorMessage returns the ErrorMessage field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetErrorMessage() string {
-	if o == nil || isNil(o.ErrorMessage) {
+	if o == nil || o.ErrorMessage == nil {
 		var ret string
 		return ret
 	}
@@ -166,7 +166,7 @@ func (o *WorkflowGetResponse) GetErrorMessage() string {
 // GetErrorMessageOk returns a tuple with the ErrorMessage field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool) {
-	if o == nil || isNil(o.ErrorMessage) {
+	if o == nil || o.ErrorMessage == nil {
 		return nil, false
 	}
 	return o.ErrorMessage, true
@@ -174,7 +174,7 @@ func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool) {
 
 // HasErrorMessage returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasErrorMessage() bool {
-	if o != nil && !isNil(o.ErrorMessage) {
+	if o != nil && o.ErrorMessage != nil {
 		return true
 	}
 
@@ -194,13 +194,13 @@ func (o WorkflowGetResponse) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowStatus"] = o.WorkflowStatus
 	}
-	if !isNil(o.Results) {
+	if o.Results != nil {
 		toSerialize["results"] = o.Results
 	}
-	if !isNil(o.ErrorType) {
+	if o.ErrorType != nil {
 		toSerialize["errorType"] = o.ErrorType
 	}
-	if !isNil(o.ErrorMessage) {
+	if o.ErrorMessage != nil {
 		toSerialize["errorMessage"] = o.ErrorMessage
 	}
 	return json.Marshal(toSerialize)

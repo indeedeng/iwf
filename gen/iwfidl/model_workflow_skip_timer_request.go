@@ -68,7 +68,7 @@ func (o *WorkflowSkipTimerRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
 	}
@@ -78,7 +78,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -86,7 +86,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowSkipTimerRequest) HasWorkflowRunId() bool {
-	if o != nil && !isNil(o.WorkflowRunId) {
+	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
 
@@ -124,7 +124,7 @@ func (o *WorkflowSkipTimerRequest) SetWorkflowStateExecutionId(v string) {
 
 // GetTimerCommandId returns the TimerCommandId field value if set, zero value otherwise.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandId() string {
-	if o == nil || isNil(o.TimerCommandId) {
+	if o == nil || o.TimerCommandId == nil {
 		var ret string
 		return ret
 	}
@@ -134,7 +134,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandId() string {
 // GetTimerCommandIdOk returns a tuple with the TimerCommandId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIdOk() (*string, bool) {
-	if o == nil || isNil(o.TimerCommandId) {
+	if o == nil || o.TimerCommandId == nil {
 		return nil, false
 	}
 	return o.TimerCommandId, true
@@ -142,7 +142,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIdOk() (*string, bool) {
 
 // HasTimerCommandId returns a boolean if a field has been set.
 func (o *WorkflowSkipTimerRequest) HasTimerCommandId() bool {
-	if o != nil && !isNil(o.TimerCommandId) {
+	if o != nil && o.TimerCommandId != nil {
 		return true
 	}
 
@@ -156,7 +156,7 @@ func (o *WorkflowSkipTimerRequest) SetTimerCommandId(v string) {
 
 // GetTimerCommandIndex returns the TimerCommandIndex field value if set, zero value otherwise.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIndex() int32 {
-	if o == nil || isNil(o.TimerCommandIndex) {
+	if o == nil || o.TimerCommandIndex == nil {
 		var ret int32
 		return ret
 	}
@@ -166,7 +166,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIndex() int32 {
 // GetTimerCommandIndexOk returns a tuple with the TimerCommandIndex field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIndexOk() (*int32, bool) {
-	if o == nil || isNil(o.TimerCommandIndex) {
+	if o == nil || o.TimerCommandIndex == nil {
 		return nil, false
 	}
 	return o.TimerCommandIndex, true
@@ -174,7 +174,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIndexOk() (*int32, bool) {
 
 // HasTimerCommandIndex returns a boolean if a field has been set.
 func (o *WorkflowSkipTimerRequest) HasTimerCommandIndex() bool {
-	if o != nil && !isNil(o.TimerCommandIndex) {
+	if o != nil && o.TimerCommandIndex != nil {
 		return true
 	}
 
@@ -191,16 +191,16 @@ func (o WorkflowSkipTimerRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if !isNil(o.WorkflowRunId) {
+	if o.WorkflowRunId != nil {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	if true {
 		toSerialize["workflowStateExecutionId"] = o.WorkflowStateExecutionId
 	}
-	if !isNil(o.TimerCommandId) {
+	if o.TimerCommandId != nil {
 		toSerialize["timerCommandId"] = o.TimerCommandId
 	}
-	if !isNil(o.TimerCommandIndex) {
+	if o.TimerCommandIndex != nil {
 		toSerialize["timerCommandIndex"] = o.TimerCommandIndex
 	}
 	return json.Marshal(toSerialize)

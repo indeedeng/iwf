@@ -39,7 +39,7 @@ func NewEncodedObjectWithDefaults() *EncodedObject {
 
 // GetEncoding returns the Encoding field value if set, zero value otherwise.
 func (o *EncodedObject) GetEncoding() string {
-	if o == nil || isNil(o.Encoding) {
+	if o == nil || o.Encoding == nil {
 		var ret string
 		return ret
 	}
@@ -49,7 +49,7 @@ func (o *EncodedObject) GetEncoding() string {
 // GetEncodingOk returns a tuple with the Encoding field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EncodedObject) GetEncodingOk() (*string, bool) {
-	if o == nil || isNil(o.Encoding) {
+	if o == nil || o.Encoding == nil {
 		return nil, false
 	}
 	return o.Encoding, true
@@ -57,7 +57,7 @@ func (o *EncodedObject) GetEncodingOk() (*string, bool) {
 
 // HasEncoding returns a boolean if a field has been set.
 func (o *EncodedObject) HasEncoding() bool {
-	if o != nil && !isNil(o.Encoding) {
+	if o != nil && o.Encoding != nil {
 		return true
 	}
 
@@ -71,7 +71,7 @@ func (o *EncodedObject) SetEncoding(v string) {
 
 // GetData returns the Data field value if set, zero value otherwise.
 func (o *EncodedObject) GetData() string {
-	if o == nil || isNil(o.Data) {
+	if o == nil || o.Data == nil {
 		var ret string
 		return ret
 	}
@@ -81,7 +81,7 @@ func (o *EncodedObject) GetData() string {
 // GetDataOk returns a tuple with the Data field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EncodedObject) GetDataOk() (*string, bool) {
-	if o == nil || isNil(o.Data) {
+	if o == nil || o.Data == nil {
 		return nil, false
 	}
 	return o.Data, true
@@ -89,7 +89,7 @@ func (o *EncodedObject) GetDataOk() (*string, bool) {
 
 // HasData returns a boolean if a field has been set.
 func (o *EncodedObject) HasData() bool {
-	if o != nil && !isNil(o.Data) {
+	if o != nil && o.Data != nil {
 		return true
 	}
 
@@ -103,10 +103,10 @@ func (o *EncodedObject) SetData(v string) {
 
 func (o EncodedObject) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.Encoding) {
+	if o.Encoding != nil {
 		toSerialize["encoding"] = o.Encoding
 	}
-	if !isNil(o.Data) {
+	if o.Data != nil {
 		toSerialize["data"] = o.Data
 	}
 	return json.Marshal(toSerialize)

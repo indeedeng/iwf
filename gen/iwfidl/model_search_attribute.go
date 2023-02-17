@@ -44,7 +44,7 @@ func NewSearchAttributeWithDefaults() *SearchAttribute {
 
 // GetKey returns the Key field value if set, zero value otherwise.
 func (o *SearchAttribute) GetKey() string {
-	if o == nil || isNil(o.Key) {
+	if o == nil || o.Key == nil {
 		var ret string
 		return ret
 	}
@@ -54,7 +54,7 @@ func (o *SearchAttribute) GetKey() string {
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetKeyOk() (*string, bool) {
-	if o == nil || isNil(o.Key) {
+	if o == nil || o.Key == nil {
 		return nil, false
 	}
 	return o.Key, true
@@ -62,7 +62,7 @@ func (o *SearchAttribute) GetKeyOk() (*string, bool) {
 
 // HasKey returns a boolean if a field has been set.
 func (o *SearchAttribute) HasKey() bool {
-	if o != nil && !isNil(o.Key) {
+	if o != nil && o.Key != nil {
 		return true
 	}
 
@@ -76,7 +76,7 @@ func (o *SearchAttribute) SetKey(v string) {
 
 // GetStringValue returns the StringValue field value if set, zero value otherwise.
 func (o *SearchAttribute) GetStringValue() string {
-	if o == nil || isNil(o.StringValue) {
+	if o == nil || o.StringValue == nil {
 		var ret string
 		return ret
 	}
@@ -86,7 +86,7 @@ func (o *SearchAttribute) GetStringValue() string {
 // GetStringValueOk returns a tuple with the StringValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetStringValueOk() (*string, bool) {
-	if o == nil || isNil(o.StringValue) {
+	if o == nil || o.StringValue == nil {
 		return nil, false
 	}
 	return o.StringValue, true
@@ -94,7 +94,7 @@ func (o *SearchAttribute) GetStringValueOk() (*string, bool) {
 
 // HasStringValue returns a boolean if a field has been set.
 func (o *SearchAttribute) HasStringValue() bool {
-	if o != nil && !isNil(o.StringValue) {
+	if o != nil && o.StringValue != nil {
 		return true
 	}
 
@@ -108,7 +108,7 @@ func (o *SearchAttribute) SetStringValue(v string) {
 
 // GetIntegerValue returns the IntegerValue field value if set, zero value otherwise.
 func (o *SearchAttribute) GetIntegerValue() int64 {
-	if o == nil || isNil(o.IntegerValue) {
+	if o == nil || o.IntegerValue == nil {
 		var ret int64
 		return ret
 	}
@@ -118,7 +118,7 @@ func (o *SearchAttribute) GetIntegerValue() int64 {
 // GetIntegerValueOk returns a tuple with the IntegerValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetIntegerValueOk() (*int64, bool) {
-	if o == nil || isNil(o.IntegerValue) {
+	if o == nil || o.IntegerValue == nil {
 		return nil, false
 	}
 	return o.IntegerValue, true
@@ -126,7 +126,7 @@ func (o *SearchAttribute) GetIntegerValueOk() (*int64, bool) {
 
 // HasIntegerValue returns a boolean if a field has been set.
 func (o *SearchAttribute) HasIntegerValue() bool {
-	if o != nil && !isNil(o.IntegerValue) {
+	if o != nil && o.IntegerValue != nil {
 		return true
 	}
 
@@ -140,7 +140,7 @@ func (o *SearchAttribute) SetIntegerValue(v int64) {
 
 // GetDoubleValue returns the DoubleValue field value if set, zero value otherwise.
 func (o *SearchAttribute) GetDoubleValue() float64 {
-	if o == nil || isNil(o.DoubleValue) {
+	if o == nil || o.DoubleValue == nil {
 		var ret float64
 		return ret
 	}
@@ -150,7 +150,7 @@ func (o *SearchAttribute) GetDoubleValue() float64 {
 // GetDoubleValueOk returns a tuple with the DoubleValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetDoubleValueOk() (*float64, bool) {
-	if o == nil || isNil(o.DoubleValue) {
+	if o == nil || o.DoubleValue == nil {
 		return nil, false
 	}
 	return o.DoubleValue, true
@@ -158,7 +158,7 @@ func (o *SearchAttribute) GetDoubleValueOk() (*float64, bool) {
 
 // HasDoubleValue returns a boolean if a field has been set.
 func (o *SearchAttribute) HasDoubleValue() bool {
-	if o != nil && !isNil(o.DoubleValue) {
+	if o != nil && o.DoubleValue != nil {
 		return true
 	}
 
@@ -172,7 +172,7 @@ func (o *SearchAttribute) SetDoubleValue(v float64) {
 
 // GetBoolValue returns the BoolValue field value if set, zero value otherwise.
 func (o *SearchAttribute) GetBoolValue() bool {
-	if o == nil || isNil(o.BoolValue) {
+	if o == nil || o.BoolValue == nil {
 		var ret bool
 		return ret
 	}
@@ -182,7 +182,7 @@ func (o *SearchAttribute) GetBoolValue() bool {
 // GetBoolValueOk returns a tuple with the BoolValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetBoolValueOk() (*bool, bool) {
-	if o == nil || isNil(o.BoolValue) {
+	if o == nil || o.BoolValue == nil {
 		return nil, false
 	}
 	return o.BoolValue, true
@@ -190,7 +190,7 @@ func (o *SearchAttribute) GetBoolValueOk() (*bool, bool) {
 
 // HasBoolValue returns a boolean if a field has been set.
 func (o *SearchAttribute) HasBoolValue() bool {
-	if o != nil && !isNil(o.BoolValue) {
+	if o != nil && o.BoolValue != nil {
 		return true
 	}
 
@@ -204,7 +204,7 @@ func (o *SearchAttribute) SetBoolValue(v bool) {
 
 // GetStringArrayValue returns the StringArrayValue field value if set, zero value otherwise.
 func (o *SearchAttribute) GetStringArrayValue() []string {
-	if o == nil || isNil(o.StringArrayValue) {
+	if o == nil || o.StringArrayValue == nil {
 		var ret []string
 		return ret
 	}
@@ -214,7 +214,7 @@ func (o *SearchAttribute) GetStringArrayValue() []string {
 // GetStringArrayValueOk returns a tuple with the StringArrayValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetStringArrayValueOk() ([]string, bool) {
-	if o == nil || isNil(o.StringArrayValue) {
+	if o == nil || o.StringArrayValue == nil {
 		return nil, false
 	}
 	return o.StringArrayValue, true
@@ -222,7 +222,7 @@ func (o *SearchAttribute) GetStringArrayValueOk() ([]string, bool) {
 
 // HasStringArrayValue returns a boolean if a field has been set.
 func (o *SearchAttribute) HasStringArrayValue() bool {
-	if o != nil && !isNil(o.StringArrayValue) {
+	if o != nil && o.StringArrayValue != nil {
 		return true
 	}
 
@@ -236,7 +236,7 @@ func (o *SearchAttribute) SetStringArrayValue(v []string) {
 
 // GetValueType returns the ValueType field value if set, zero value otherwise.
 func (o *SearchAttribute) GetValueType() SearchAttributeValueType {
-	if o == nil || isNil(o.ValueType) {
+	if o == nil || o.ValueType == nil {
 		var ret SearchAttributeValueType
 		return ret
 	}
@@ -246,7 +246,7 @@ func (o *SearchAttribute) GetValueType() SearchAttributeValueType {
 // GetValueTypeOk returns a tuple with the ValueType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SearchAttribute) GetValueTypeOk() (*SearchAttributeValueType, bool) {
-	if o == nil || isNil(o.ValueType) {
+	if o == nil || o.ValueType == nil {
 		return nil, false
 	}
 	return o.ValueType, true
@@ -254,7 +254,7 @@ func (o *SearchAttribute) GetValueTypeOk() (*SearchAttributeValueType, bool) {
 
 // HasValueType returns a boolean if a field has been set.
 func (o *SearchAttribute) HasValueType() bool {
-	if o != nil && !isNil(o.ValueType) {
+	if o != nil && o.ValueType != nil {
 		return true
 	}
 
@@ -268,25 +268,25 @@ func (o *SearchAttribute) SetValueType(v SearchAttributeValueType) {
 
 func (o SearchAttribute) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.Key) {
+	if o.Key != nil {
 		toSerialize["key"] = o.Key
 	}
-	if !isNil(o.StringValue) {
+	if o.StringValue != nil {
 		toSerialize["stringValue"] = o.StringValue
 	}
-	if !isNil(o.IntegerValue) {
+	if o.IntegerValue != nil {
 		toSerialize["integerValue"] = o.IntegerValue
 	}
-	if !isNil(o.DoubleValue) {
+	if o.DoubleValue != nil {
 		toSerialize["doubleValue"] = o.DoubleValue
 	}
-	if !isNil(o.BoolValue) {
+	if o.BoolValue != nil {
 		toSerialize["boolValue"] = o.BoolValue
 	}
-	if !isNil(o.StringArrayValue) {
+	if o.StringArrayValue != nil {
 		toSerialize["stringArrayValue"] = o.StringArrayValue
 	}
-	if !isNil(o.ValueType) {
+	if o.ValueType != nil {
 		toSerialize["valueType"] = o.ValueType
 	}
 	return json.Marshal(toSerialize)

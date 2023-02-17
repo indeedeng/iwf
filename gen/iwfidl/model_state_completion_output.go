@@ -90,7 +90,7 @@ func (o *StateCompletionOutput) SetCompletedStateExecutionId(v string) {
 
 // GetCompletedStateOutput returns the CompletedStateOutput field value if set, zero value otherwise.
 func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
-	if o == nil || isNil(o.CompletedStateOutput) {
+	if o == nil || o.CompletedStateOutput == nil {
 		var ret EncodedObject
 		return ret
 	}
@@ -100,7 +100,7 @@ func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
 // GetCompletedStateOutputOk returns a tuple with the CompletedStateOutput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.CompletedStateOutput) {
+	if o == nil || o.CompletedStateOutput == nil {
 		return nil, false
 	}
 	return o.CompletedStateOutput, true
@@ -108,7 +108,7 @@ func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, boo
 
 // HasCompletedStateOutput returns a boolean if a field has been set.
 func (o *StateCompletionOutput) HasCompletedStateOutput() bool {
-	if o != nil && !isNil(o.CompletedStateOutput) {
+	if o != nil && o.CompletedStateOutput != nil {
 		return true
 	}
 
@@ -128,7 +128,7 @@ func (o StateCompletionOutput) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["completedStateExecutionId"] = o.CompletedStateExecutionId
 	}
-	if !isNil(o.CompletedStateOutput) {
+	if o.CompletedStateOutput != nil {
 		toSerialize["completedStateOutput"] = o.CompletedStateOutput
 	}
 	return json.Marshal(toSerialize)

@@ -65,7 +65,7 @@ func (o *WorkflowGetSearchAttributesRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
 	}
@@ -75,7 +75,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -83,7 +83,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowGetSearchAttributesRequest) HasWorkflowRunId() bool {
-	if o != nil && !isNil(o.WorkflowRunId) {
+	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
 
@@ -97,7 +97,7 @@ func (o *WorkflowGetSearchAttributesRequest) SetWorkflowRunId(v string) {
 
 // GetKeys returns the Keys field value if set, zero value otherwise.
 func (o *WorkflowGetSearchAttributesRequest) GetKeys() []SearchAttributeKeyAndType {
-	if o == nil || isNil(o.Keys) {
+	if o == nil || o.Keys == nil {
 		var ret []SearchAttributeKeyAndType
 		return ret
 	}
@@ -107,7 +107,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetKeys() []SearchAttributeKeyAndTy
 // GetKeysOk returns a tuple with the Keys field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetKeysOk() ([]SearchAttributeKeyAndType, bool) {
-	if o == nil || isNil(o.Keys) {
+	if o == nil || o.Keys == nil {
 		return nil, false
 	}
 	return o.Keys, true
@@ -115,7 +115,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetKeysOk() ([]SearchAttributeKeyAn
 
 // HasKeys returns a boolean if a field has been set.
 func (o *WorkflowGetSearchAttributesRequest) HasKeys() bool {
-	if o != nil && !isNil(o.Keys) {
+	if o != nil && o.Keys != nil {
 		return true
 	}
 
@@ -132,10 +132,10 @@ func (o WorkflowGetSearchAttributesRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if !isNil(o.WorkflowRunId) {
+	if o.WorkflowRunId != nil {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
-	if !isNil(o.Keys) {
+	if o.Keys != nil {
 		toSerialize["keys"] = o.Keys
 	}
 	return json.Marshal(toSerialize)

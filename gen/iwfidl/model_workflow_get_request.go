@@ -66,7 +66,7 @@ func (o *WorkflowGetRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowGetRequest) GetWorkflowRunId() string {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
 	}
@@ -76,7 +76,7 @@ func (o *WorkflowGetRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -84,7 +84,7 @@ func (o *WorkflowGetRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowGetRequest) HasWorkflowRunId() bool {
-	if o != nil && !isNil(o.WorkflowRunId) {
+	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
 
@@ -98,7 +98,7 @@ func (o *WorkflowGetRequest) SetWorkflowRunId(v string) {
 
 // GetNeedsResults returns the NeedsResults field value if set, zero value otherwise.
 func (o *WorkflowGetRequest) GetNeedsResults() bool {
-	if o == nil || isNil(o.NeedsResults) {
+	if o == nil || o.NeedsResults == nil {
 		var ret bool
 		return ret
 	}
@@ -108,7 +108,7 @@ func (o *WorkflowGetRequest) GetNeedsResults() bool {
 // GetNeedsResultsOk returns a tuple with the NeedsResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetNeedsResultsOk() (*bool, bool) {
-	if o == nil || isNil(o.NeedsResults) {
+	if o == nil || o.NeedsResults == nil {
 		return nil, false
 	}
 	return o.NeedsResults, true
@@ -116,7 +116,7 @@ func (o *WorkflowGetRequest) GetNeedsResultsOk() (*bool, bool) {
 
 // HasNeedsResults returns a boolean if a field has been set.
 func (o *WorkflowGetRequest) HasNeedsResults() bool {
-	if o != nil && !isNil(o.NeedsResults) {
+	if o != nil && o.NeedsResults != nil {
 		return true
 	}
 
@@ -130,7 +130,7 @@ func (o *WorkflowGetRequest) SetNeedsResults(v bool) {
 
 // GetWaitTimeSeconds returns the WaitTimeSeconds field value if set, zero value otherwise.
 func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32 {
-	if o == nil || isNil(o.WaitTimeSeconds) {
+	if o == nil || o.WaitTimeSeconds == nil {
 		var ret int32
 		return ret
 	}
@@ -140,7 +140,7 @@ func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32 {
 // GetWaitTimeSecondsOk returns a tuple with the WaitTimeSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool) {
-	if o == nil || isNil(o.WaitTimeSeconds) {
+	if o == nil || o.WaitTimeSeconds == nil {
 		return nil, false
 	}
 	return o.WaitTimeSeconds, true
@@ -148,7 +148,7 @@ func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool) {
 
 // HasWaitTimeSeconds returns a boolean if a field has been set.
 func (o *WorkflowGetRequest) HasWaitTimeSeconds() bool {
-	if o != nil && !isNil(o.WaitTimeSeconds) {
+	if o != nil && o.WaitTimeSeconds != nil {
 		return true
 	}
 
@@ -165,13 +165,13 @@ func (o WorkflowGetRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if !isNil(o.WorkflowRunId) {
+	if o.WorkflowRunId != nil {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
-	if !isNil(o.NeedsResults) {
+	if o.NeedsResults != nil {
 		toSerialize["needsResults"] = o.NeedsResults
 	}
-	if !isNil(o.WaitTimeSeconds) {
+	if o.WaitTimeSeconds != nil {
 		toSerialize["waitTimeSeconds"] = o.WaitTimeSeconds
 	}
 	return json.Marshal(toSerialize)

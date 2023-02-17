@@ -38,7 +38,7 @@ func NewWorkflowGetDataObjectsResponseWithDefaults() *WorkflowGetDataObjectsResp
 
 // GetObjects returns the Objects field value if set, zero value otherwise.
 func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue {
-	if o == nil || isNil(o.Objects) {
+	if o == nil || o.Objects == nil {
 		var ret []KeyValue
 		return ret
 	}
@@ -48,7 +48,7 @@ func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue {
 // GetObjectsOk returns a tuple with the Objects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() ([]KeyValue, bool) {
-	if o == nil || isNil(o.Objects) {
+	if o == nil || o.Objects == nil {
 		return nil, false
 	}
 	return o.Objects, true
@@ -56,7 +56,7 @@ func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() ([]KeyValue, bool) {
 
 // HasObjects returns a boolean if a field has been set.
 func (o *WorkflowGetDataObjectsResponse) HasObjects() bool {
-	if o != nil && !isNil(o.Objects) {
+	if o != nil && o.Objects != nil {
 		return true
 	}
 
@@ -70,7 +70,7 @@ func (o *WorkflowGetDataObjectsResponse) SetObjects(v []KeyValue) {
 
 func (o WorkflowGetDataObjectsResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if !isNil(o.Objects) {
+	if o.Objects != nil {
 		toSerialize["objects"] = o.Objects
 	}
 	return json.Marshal(toSerialize)

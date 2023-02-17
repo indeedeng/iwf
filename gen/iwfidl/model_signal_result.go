@@ -116,7 +116,7 @@ func (o *SignalResult) SetSignalChannelName(v string) {
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
 func (o *SignalResult) GetSignalValue() EncodedObject {
-	if o == nil || isNil(o.SignalValue) {
+	if o == nil || o.SignalValue == nil {
 		var ret EncodedObject
 		return ret
 	}
@@ -126,7 +126,7 @@ func (o *SignalResult) GetSignalValue() EncodedObject {
 // GetSignalValueOk returns a tuple with the SignalValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalValueOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.SignalValue) {
+	if o == nil || o.SignalValue == nil {
 		return nil, false
 	}
 	return o.SignalValue, true
@@ -134,7 +134,7 @@ func (o *SignalResult) GetSignalValueOk() (*EncodedObject, bool) {
 
 // HasSignalValue returns a boolean if a field has been set.
 func (o *SignalResult) HasSignalValue() bool {
-	if o != nil && !isNil(o.SignalValue) {
+	if o != nil && o.SignalValue != nil {
 		return true
 	}
 
@@ -157,7 +157,7 @@ func (o SignalResult) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["signalChannelName"] = o.SignalChannelName
 	}
-	if !isNil(o.SignalValue) {
+	if o.SignalValue != nil {
 		toSerialize["signalValue"] = o.SignalValue
 	}
 	return json.Marshal(toSerialize)

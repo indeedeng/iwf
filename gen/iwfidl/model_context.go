@@ -143,7 +143,7 @@ func (o *Context) SetStateExecutionId(v string) {
 
 // GetFirstAttemptTimestamp returns the FirstAttemptTimestamp field value if set, zero value otherwise.
 func (o *Context) GetFirstAttemptTimestamp() int64 {
-	if o == nil || isNil(o.FirstAttemptTimestamp) {
+	if o == nil || o.FirstAttemptTimestamp == nil {
 		var ret int64
 		return ret
 	}
@@ -153,7 +153,7 @@ func (o *Context) GetFirstAttemptTimestamp() int64 {
 // GetFirstAttemptTimestampOk returns a tuple with the FirstAttemptTimestamp field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Context) GetFirstAttemptTimestampOk() (*int64, bool) {
-	if o == nil || isNil(o.FirstAttemptTimestamp) {
+	if o == nil || o.FirstAttemptTimestamp == nil {
 		return nil, false
 	}
 	return o.FirstAttemptTimestamp, true
@@ -161,7 +161,7 @@ func (o *Context) GetFirstAttemptTimestampOk() (*int64, bool) {
 
 // HasFirstAttemptTimestamp returns a boolean if a field has been set.
 func (o *Context) HasFirstAttemptTimestamp() bool {
-	if o != nil && !isNil(o.FirstAttemptTimestamp) {
+	if o != nil && o.FirstAttemptTimestamp != nil {
 		return true
 	}
 
@@ -175,7 +175,7 @@ func (o *Context) SetFirstAttemptTimestamp(v int64) {
 
 // GetAttempt returns the Attempt field value if set, zero value otherwise.
 func (o *Context) GetAttempt() int32 {
-	if o == nil || isNil(o.Attempt) {
+	if o == nil || o.Attempt == nil {
 		var ret int32
 		return ret
 	}
@@ -185,7 +185,7 @@ func (o *Context) GetAttempt() int32 {
 // GetAttemptOk returns a tuple with the Attempt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Context) GetAttemptOk() (*int32, bool) {
-	if o == nil || isNil(o.Attempt) {
+	if o == nil || o.Attempt == nil {
 		return nil, false
 	}
 	return o.Attempt, true
@@ -193,7 +193,7 @@ func (o *Context) GetAttemptOk() (*int32, bool) {
 
 // HasAttempt returns a boolean if a field has been set.
 func (o *Context) HasAttempt() bool {
-	if o != nil && !isNil(o.Attempt) {
+	if o != nil && o.Attempt != nil {
 		return true
 	}
 
@@ -219,10 +219,10 @@ func (o Context) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["stateExecutionId"] = o.StateExecutionId
 	}
-	if !isNil(o.FirstAttemptTimestamp) {
+	if o.FirstAttemptTimestamp != nil {
 		toSerialize["firstAttemptTimestamp"] = o.FirstAttemptTimestamp
 	}
-	if !isNil(o.Attempt) {
+	if o.Attempt != nil {
 		toSerialize["attempt"] = o.Attempt
 	}
 	return json.Marshal(toSerialize)

@@ -1110,6 +1110,7 @@ components:
               data: data
               encoding: encoding
             requestStatus: null
+          stateStartApiSucceeded: true
           timerResults:
           - timerStatus: null
             commandId: commandId
@@ -1523,6 +1524,7 @@ components:
             data: data
             encoding: encoding
           requestStatus: null
+        stateStartApiSucceeded: true
         timerResults:
         - timerStatus: null
           commandId: commandId
@@ -1541,6 +1543,8 @@ components:
           items:
             $ref: '#/components/schemas/TimerResult'
           type: array
+        stateStartApiSucceeded:
+          type: boolean
       type: object
     TimerCommand:
       example:

@@ -67,7 +67,7 @@ func (o *CommandRequest) SetDeciderTriggerType(v DeciderTriggerType) {
 
 // GetTimerCommands returns the TimerCommands field value if set, zero value otherwise.
 func (o *CommandRequest) GetTimerCommands() []TimerCommand {
-	if o == nil || isNil(o.TimerCommands) {
+	if o == nil || o.TimerCommands == nil {
 		var ret []TimerCommand
 		return ret
 	}
@@ -77,7 +77,7 @@ func (o *CommandRequest) GetTimerCommands() []TimerCommand {
 // GetTimerCommandsOk returns a tuple with the TimerCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetTimerCommandsOk() ([]TimerCommand, bool) {
-	if o == nil || isNil(o.TimerCommands) {
+	if o == nil || o.TimerCommands == nil {
 		return nil, false
 	}
 	return o.TimerCommands, true
@@ -85,7 +85,7 @@ func (o *CommandRequest) GetTimerCommandsOk() ([]TimerCommand, bool) {
 
 // HasTimerCommands returns a boolean if a field has been set.
 func (o *CommandRequest) HasTimerCommands() bool {
-	if o != nil && !isNil(o.TimerCommands) {
+	if o != nil && o.TimerCommands != nil {
 		return true
 	}
 
@@ -99,7 +99,7 @@ func (o *CommandRequest) SetTimerCommands(v []TimerCommand) {
 
 // GetSignalCommands returns the SignalCommands field value if set, zero value otherwise.
 func (o *CommandRequest) GetSignalCommands() []SignalCommand {
-	if o == nil || isNil(o.SignalCommands) {
+	if o == nil || o.SignalCommands == nil {
 		var ret []SignalCommand
 		return ret
 	}
@@ -109,7 +109,7 @@ func (o *CommandRequest) GetSignalCommands() []SignalCommand {
 // GetSignalCommandsOk returns a tuple with the SignalCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetSignalCommandsOk() ([]SignalCommand, bool) {
-	if o == nil || isNil(o.SignalCommands) {
+	if o == nil || o.SignalCommands == nil {
 		return nil, false
 	}
 	return o.SignalCommands, true
@@ -117,7 +117,7 @@ func (o *CommandRequest) GetSignalCommandsOk() ([]SignalCommand, bool) {
 
 // HasSignalCommands returns a boolean if a field has been set.
 func (o *CommandRequest) HasSignalCommands() bool {
-	if o != nil && !isNil(o.SignalCommands) {
+	if o != nil && o.SignalCommands != nil {
 		return true
 	}
 
@@ -131,7 +131,7 @@ func (o *CommandRequest) SetSignalCommands(v []SignalCommand) {
 
 // GetInterStateChannelCommands returns the InterStateChannelCommands field value if set, zero value otherwise.
 func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelCommand {
-	if o == nil || isNil(o.InterStateChannelCommands) {
+	if o == nil || o.InterStateChannelCommands == nil {
 		var ret []InterStateChannelCommand
 		return ret
 	}
@@ -141,7 +141,7 @@ func (o *CommandRequest) GetInterStateChannelCommands() []InterStateChannelComma
 // GetInterStateChannelCommandsOk returns a tuple with the InterStateChannelCommands field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetInterStateChannelCommandsOk() ([]InterStateChannelCommand, bool) {
-	if o == nil || isNil(o.InterStateChannelCommands) {
+	if o == nil || o.InterStateChannelCommands == nil {
 		return nil, false
 	}
 	return o.InterStateChannelCommands, true
@@ -149,7 +149,7 @@ func (o *CommandRequest) GetInterStateChannelCommandsOk() ([]InterStateChannelCo
 
 // HasInterStateChannelCommands returns a boolean if a field has been set.
 func (o *CommandRequest) HasInterStateChannelCommands() bool {
-	if o != nil && !isNil(o.InterStateChannelCommands) {
+	if o != nil && o.InterStateChannelCommands != nil {
 		return true
 	}
 
@@ -163,7 +163,7 @@ func (o *CommandRequest) SetInterStateChannelCommands(v []InterStateChannelComma
 
 // GetCommandCombinations returns the CommandCombinations field value if set, zero value otherwise.
 func (o *CommandRequest) GetCommandCombinations() []CommandCombination {
-	if o == nil || isNil(o.CommandCombinations) {
+	if o == nil || o.CommandCombinations == nil {
 		var ret []CommandCombination
 		return ret
 	}
@@ -173,7 +173,7 @@ func (o *CommandRequest) GetCommandCombinations() []CommandCombination {
 // GetCommandCombinationsOk returns a tuple with the CommandCombinations field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandRequest) GetCommandCombinationsOk() ([]CommandCombination, bool) {
-	if o == nil || isNil(o.CommandCombinations) {
+	if o == nil || o.CommandCombinations == nil {
 		return nil, false
 	}
 	return o.CommandCombinations, true
@@ -181,7 +181,7 @@ func (o *CommandRequest) GetCommandCombinationsOk() ([]CommandCombination, bool)
 
 // HasCommandCombinations returns a boolean if a field has been set.
 func (o *CommandRequest) HasCommandCombinations() bool {
-	if o != nil && !isNil(o.CommandCombinations) {
+	if o != nil && o.CommandCombinations != nil {
 		return true
 	}
 
@@ -198,16 +198,16 @@ func (o CommandRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["deciderTriggerType"] = o.DeciderTriggerType
 	}
-	if !isNil(o.TimerCommands) {
+	if o.TimerCommands != nil {
 		toSerialize["timerCommands"] = o.TimerCommands
 	}
-	if !isNil(o.SignalCommands) {
+	if o.SignalCommands != nil {
 		toSerialize["signalCommands"] = o.SignalCommands
 	}
-	if !isNil(o.InterStateChannelCommands) {
+	if o.InterStateChannelCommands != nil {
 		toSerialize["interStateChannelCommands"] = o.InterStateChannelCommands
 	}
-	if !isNil(o.CommandCombinations) {
+	if o.CommandCombinations != nil {
 		toSerialize["commandCombinations"] = o.CommandCombinations
 	}
 	return json.Marshal(toSerialize)

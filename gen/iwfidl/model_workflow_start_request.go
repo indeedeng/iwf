@@ -170,7 +170,7 @@ func (o *WorkflowStartRequest) SetStartStateId(v string) {
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetStateInput() EncodedObject {
-	if o == nil || isNil(o.StateInput) {
+	if o == nil || o.StateInput == nil {
 		var ret EncodedObject
 		return ret
 	}
@@ -180,7 +180,7 @@ func (o *WorkflowStartRequest) GetStateInput() EncodedObject {
 // GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStateInputOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.StateInput) {
+	if o == nil || o.StateInput == nil {
 		return nil, false
 	}
 	return o.StateInput, true
@@ -188,7 +188,7 @@ func (o *WorkflowStartRequest) GetStateInputOk() (*EncodedObject, bool) {
 
 // HasStateInput returns a boolean if a field has been set.
 func (o *WorkflowStartRequest) HasStateInput() bool {
-	if o != nil && !isNil(o.StateInput) {
+	if o != nil && o.StateInput != nil {
 		return true
 	}
 
@@ -202,7 +202,7 @@ func (o *WorkflowStartRequest) SetStateInput(v EncodedObject) {
 
 // GetStateOptions returns the StateOptions field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetStateOptions() WorkflowStateOptions {
-	if o == nil || isNil(o.StateOptions) {
+	if o == nil || o.StateOptions == nil {
 		var ret WorkflowStateOptions
 		return ret
 	}
@@ -212,7 +212,7 @@ func (o *WorkflowStartRequest) GetStateOptions() WorkflowStateOptions {
 // GetStateOptionsOk returns a tuple with the StateOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
-	if o == nil || isNil(o.StateOptions) {
+	if o == nil || o.StateOptions == nil {
 		return nil, false
 	}
 	return o.StateOptions, true
@@ -220,7 +220,7 @@ func (o *WorkflowStartRequest) GetStateOptionsOk() (*WorkflowStateOptions, bool)
 
 // HasStateOptions returns a boolean if a field has been set.
 func (o *WorkflowStartRequest) HasStateOptions() bool {
-	if o != nil && !isNil(o.StateOptions) {
+	if o != nil && o.StateOptions != nil {
 		return true
 	}
 
@@ -234,7 +234,7 @@ func (o *WorkflowStartRequest) SetStateOptions(v WorkflowStateOptions) {
 
 // GetWorkflowStartOptions returns the WorkflowStartOptions field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetWorkflowStartOptions() WorkflowStartOptions {
-	if o == nil || isNil(o.WorkflowStartOptions) {
+	if o == nil || o.WorkflowStartOptions == nil {
 		var ret WorkflowStartOptions
 		return ret
 	}
@@ -244,7 +244,7 @@ func (o *WorkflowStartRequest) GetWorkflowStartOptions() WorkflowStartOptions {
 // GetWorkflowStartOptionsOk returns a tuple with the WorkflowStartOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowStartOptionsOk() (*WorkflowStartOptions, bool) {
-	if o == nil || isNil(o.WorkflowStartOptions) {
+	if o == nil || o.WorkflowStartOptions == nil {
 		return nil, false
 	}
 	return o.WorkflowStartOptions, true
@@ -252,7 +252,7 @@ func (o *WorkflowStartRequest) GetWorkflowStartOptionsOk() (*WorkflowStartOption
 
 // HasWorkflowStartOptions returns a boolean if a field has been set.
 func (o *WorkflowStartRequest) HasWorkflowStartOptions() bool {
-	if o != nil && !isNil(o.WorkflowStartOptions) {
+	if o != nil && o.WorkflowStartOptions != nil {
 		return true
 	}
 
@@ -281,13 +281,13 @@ func (o WorkflowStartRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["startStateId"] = o.StartStateId
 	}
-	if !isNil(o.StateInput) {
+	if o.StateInput != nil {
 		toSerialize["stateInput"] = o.StateInput
 	}
-	if !isNil(o.StateOptions) {
+	if o.StateOptions != nil {
 		toSerialize["stateOptions"] = o.StateOptions
 	}
-	if !isNil(o.WorkflowStartOptions) {
+	if o.WorkflowStartOptions != nil {
 		toSerialize["workflowStartOptions"] = o.WorkflowStartOptions
 	}
 	return json.Marshal(toSerialize)

@@ -2,9 +2,10 @@ package interpreter
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"time"
 )
 
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
@@ -228,7 +229,7 @@ func executeState(
 	}
 
 	var startResponse *iwfidl.WorkflowStateStartResponse
-	err := provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
+	errorFromActivity := provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateStartRequest{
 			Context:          exeCtx,
@@ -239,11 +240,8 @@ func executeState(
 			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 		},
 	}).Get(ctx, &startResponse)
-	if err != nil {
-		return nil, convertStateApiActivityError(provider, err)
-	}
 
-	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
+	err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
 	}
@@ -338,6 +336,7 @@ func executeState(
 	commandReqDone = true
 
 	commandRes := &iwfidl.CommandResults{}
+	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errorFromActivity == nil)
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.FinishProcessing(stateExeId)
 

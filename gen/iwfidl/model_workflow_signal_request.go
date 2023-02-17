@@ -67,7 +67,7 @@ func (o *WorkflowSignalRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowSignalRequest) GetWorkflowRunId() string {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
 	}
@@ -77,7 +77,7 @@ func (o *WorkflowSignalRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -85,7 +85,7 @@ func (o *WorkflowSignalRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowSignalRequest) HasWorkflowRunId() bool {
-	if o != nil && !isNil(o.WorkflowRunId) {
+	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
 
@@ -123,7 +123,7 @@ func (o *WorkflowSignalRequest) SetSignalChannelName(v string) {
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
 func (o *WorkflowSignalRequest) GetSignalValue() EncodedObject {
-	if o == nil || isNil(o.SignalValue) {
+	if o == nil || o.SignalValue == nil {
 		var ret EncodedObject
 		return ret
 	}
@@ -133,7 +133,7 @@ func (o *WorkflowSignalRequest) GetSignalValue() EncodedObject {
 // GetSignalValueOk returns a tuple with the SignalValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetSignalValueOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.SignalValue) {
+	if o == nil || o.SignalValue == nil {
 		return nil, false
 	}
 	return o.SignalValue, true
@@ -141,7 +141,7 @@ func (o *WorkflowSignalRequest) GetSignalValueOk() (*EncodedObject, bool) {
 
 // HasSignalValue returns a boolean if a field has been set.
 func (o *WorkflowSignalRequest) HasSignalValue() bool {
-	if o != nil && !isNil(o.SignalValue) {
+	if o != nil && o.SignalValue != nil {
 		return true
 	}
 
@@ -158,13 +158,13 @@ func (o WorkflowSignalRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if !isNil(o.WorkflowRunId) {
+	if o.WorkflowRunId != nil {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	if true {
 		toSerialize["signalChannelName"] = o.SignalChannelName
 	}
-	if !isNil(o.SignalValue) {
+	if o.SignalValue != nil {
 		toSerialize["signalValue"] = o.SignalValue
 	}
 	return json.Marshal(toSerialize)

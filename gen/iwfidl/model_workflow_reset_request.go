@@ -72,7 +72,7 @@ func (o *WorkflowResetRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetWorkflowRunId() string {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		var ret string
 		return ret
 	}
@@ -82,7 +82,7 @@ func (o *WorkflowResetRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || o.WorkflowRunId == nil {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -90,7 +90,7 @@ func (o *WorkflowResetRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasWorkflowRunId() bool {
-	if o != nil && !isNil(o.WorkflowRunId) {
+	if o != nil && o.WorkflowRunId != nil {
 		return true
 	}
 
@@ -128,7 +128,7 @@ func (o *WorkflowResetRequest) SetResetType(v WorkflowResetType) {
 
 // GetHistoryEventId returns the HistoryEventId field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetHistoryEventId() int32 {
-	if o == nil || isNil(o.HistoryEventId) {
+	if o == nil || o.HistoryEventId == nil {
 		var ret int32
 		return ret
 	}
@@ -138,7 +138,7 @@ func (o *WorkflowResetRequest) GetHistoryEventId() int32 {
 // GetHistoryEventIdOk returns a tuple with the HistoryEventId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetHistoryEventIdOk() (*int32, bool) {
-	if o == nil || isNil(o.HistoryEventId) {
+	if o == nil || o.HistoryEventId == nil {
 		return nil, false
 	}
 	return o.HistoryEventId, true
@@ -146,7 +146,7 @@ func (o *WorkflowResetRequest) GetHistoryEventIdOk() (*int32, bool) {
 
 // HasHistoryEventId returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasHistoryEventId() bool {
-	if o != nil && !isNil(o.HistoryEventId) {
+	if o != nil && o.HistoryEventId != nil {
 		return true
 	}
 
@@ -160,7 +160,7 @@ func (o *WorkflowResetRequest) SetHistoryEventId(v int32) {
 
 // GetReason returns the Reason field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetReason() string {
-	if o == nil || isNil(o.Reason) {
+	if o == nil || o.Reason == nil {
 		var ret string
 		return ret
 	}
@@ -170,7 +170,7 @@ func (o *WorkflowResetRequest) GetReason() string {
 // GetReasonOk returns a tuple with the Reason field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetReasonOk() (*string, bool) {
-	if o == nil || isNil(o.Reason) {
+	if o == nil || o.Reason == nil {
 		return nil, false
 	}
 	return o.Reason, true
@@ -178,7 +178,7 @@ func (o *WorkflowResetRequest) GetReasonOk() (*string, bool) {
 
 // HasReason returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasReason() bool {
-	if o != nil && !isNil(o.Reason) {
+	if o != nil && o.Reason != nil {
 		return true
 	}
 
@@ -192,7 +192,7 @@ func (o *WorkflowResetRequest) SetReason(v string) {
 
 // GetHistoryEventTime returns the HistoryEventTime field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetHistoryEventTime() string {
-	if o == nil || isNil(o.HistoryEventTime) {
+	if o == nil || o.HistoryEventTime == nil {
 		var ret string
 		return ret
 	}
@@ -202,7 +202,7 @@ func (o *WorkflowResetRequest) GetHistoryEventTime() string {
 // GetHistoryEventTimeOk returns a tuple with the HistoryEventTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool) {
-	if o == nil || isNil(o.HistoryEventTime) {
+	if o == nil || o.HistoryEventTime == nil {
 		return nil, false
 	}
 	return o.HistoryEventTime, true
@@ -210,7 +210,7 @@ func (o *WorkflowResetRequest) GetHistoryEventTimeOk() (*string, bool) {
 
 // HasHistoryEventTime returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasHistoryEventTime() bool {
-	if o != nil && !isNil(o.HistoryEventTime) {
+	if o != nil && o.HistoryEventTime != nil {
 		return true
 	}
 
@@ -224,7 +224,7 @@ func (o *WorkflowResetRequest) SetHistoryEventTime(v string) {
 
 // GetStateId returns the StateId field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetStateId() string {
-	if o == nil || isNil(o.StateId) {
+	if o == nil || o.StateId == nil {
 		var ret string
 		return ret
 	}
@@ -234,7 +234,7 @@ func (o *WorkflowResetRequest) GetStateId() string {
 // GetStateIdOk returns a tuple with the StateId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetStateIdOk() (*string, bool) {
-	if o == nil || isNil(o.StateId) {
+	if o == nil || o.StateId == nil {
 		return nil, false
 	}
 	return o.StateId, true
@@ -242,7 +242,7 @@ func (o *WorkflowResetRequest) GetStateIdOk() (*string, bool) {
 
 // HasStateId returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasStateId() bool {
-	if o != nil && !isNil(o.StateId) {
+	if o != nil && o.StateId != nil {
 		return true
 	}
 
@@ -256,7 +256,7 @@ func (o *WorkflowResetRequest) SetStateId(v string) {
 
 // GetStateExecutionId returns the StateExecutionId field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetStateExecutionId() string {
-	if o == nil || isNil(o.StateExecutionId) {
+	if o == nil || o.StateExecutionId == nil {
 		var ret string
 		return ret
 	}
@@ -266,7 +266,7 @@ func (o *WorkflowResetRequest) GetStateExecutionId() string {
 // GetStateExecutionIdOk returns a tuple with the StateExecutionId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetStateExecutionIdOk() (*string, bool) {
-	if o == nil || isNil(o.StateExecutionId) {
+	if o == nil || o.StateExecutionId == nil {
 		return nil, false
 	}
 	return o.StateExecutionId, true
@@ -274,7 +274,7 @@ func (o *WorkflowResetRequest) GetStateExecutionIdOk() (*string, bool) {
 
 // HasStateExecutionId returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasStateExecutionId() bool {
-	if o != nil && !isNil(o.StateExecutionId) {
+	if o != nil && o.StateExecutionId != nil {
 		return true
 	}
 
@@ -288,7 +288,7 @@ func (o *WorkflowResetRequest) SetStateExecutionId(v string) {
 
 // GetSkipSignalReapply returns the SkipSignalReapply field value if set, zero value otherwise.
 func (o *WorkflowResetRequest) GetSkipSignalReapply() bool {
-	if o == nil || isNil(o.SkipSignalReapply) {
+	if o == nil || o.SkipSignalReapply == nil {
 		var ret bool
 		return ret
 	}
@@ -298,7 +298,7 @@ func (o *WorkflowResetRequest) GetSkipSignalReapply() bool {
 // GetSkipSignalReapplyOk returns a tuple with the SkipSignalReapply field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowResetRequest) GetSkipSignalReapplyOk() (*bool, bool) {
-	if o == nil || isNil(o.SkipSignalReapply) {
+	if o == nil || o.SkipSignalReapply == nil {
 		return nil, false
 	}
 	return o.SkipSignalReapply, true
@@ -306,7 +306,7 @@ func (o *WorkflowResetRequest) GetSkipSignalReapplyOk() (*bool, bool) {
 
 // HasSkipSignalReapply returns a boolean if a field has been set.
 func (o *WorkflowResetRequest) HasSkipSignalReapply() bool {
-	if o != nil && !isNil(o.SkipSignalReapply) {
+	if o != nil && o.SkipSignalReapply != nil {
 		return true
 	}
 
@@ -323,28 +323,28 @@ func (o WorkflowResetRequest) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["workflowId"] = o.WorkflowId
 	}
-	if !isNil(o.WorkflowRunId) {
+	if o.WorkflowRunId != nil {
 		toSerialize["workflowRunId"] = o.WorkflowRunId
 	}
 	if true {
 		toSerialize["resetType"] = o.ResetType
 	}
-	if !isNil(o.HistoryEventId) {
+	if o.HistoryEventId != nil {
 		toSerialize["historyEventId"] = o.HistoryEventId
 	}
-	if !isNil(o.Reason) {
+	if o.Reason != nil {
 		toSerialize["reason"] = o.Reason
 	}
-	if !isNil(o.HistoryEventTime) {
+	if o.HistoryEventTime != nil {
 		toSerialize["historyEventTime"] = o.HistoryEventTime
 	}
-	if !isNil(o.StateId) {
+	if o.StateId != nil {
 		toSerialize["stateId"] = o.StateId
 	}
-	if !isNil(o.StateExecutionId) {
+	if o.StateExecutionId != nil {
 		toSerialize["stateExecutionId"] = o.StateExecutionId
 	}
-	if !isNil(o.SkipSignalReapply) {
+	if o.SkipSignalReapply != nil {
 		toSerialize["skipSignalReapply"] = o.SkipSignalReapply
 	}
 	return json.Marshal(toSerialize)
