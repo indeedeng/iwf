@@ -143,13 +143,14 @@ of a specific WorkflowExecution.
 
 ### Commands
 
-The following are the three types of commands:
+iWF provides three types of commands:
 
 * `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External application can use
   SignalWorkflow API to signal a workflow.
 * `TimerCommand`: will wait for a **durable timer** to fire.
+* `InterStateChannelCommand`: see [InterStateChannelCommand](#advanced-commands) as an advanced concept
 
-The start API can return multiple commands and choose a different DeciderTriggerType to trigger the decide API.
+The start API can return multiple commands along with a DeciderTriggerType for how to trigger the decide API.
 The available options for the DeciderTriggerType are:
 
 * `AllCommandCompleted`: This option waits for all commands to be completed.
@@ -208,7 +209,7 @@ iWF has two primary communication mechanisms:
 * `SignalChannel`: is used for receiving input from external sources asynchronously. It is employed with the
   SignalCommand.
 * `InterStateChannel`: is used for communication between state executions. It is employed with the
-  InterStateChannelCommand.
+  InterStateChannelCommand. Read more about [InterStateChannelCommand](#advanced-commands) as an advanced concept
 
 ### iWF workflow design diagram
 
@@ -334,7 +335,7 @@ for Cadence/Temporal activity input/output limit(2MB by default). User can use o
 policy `LOAD_PARTIAL_WITHOUT_LOCKING`
 to specify certain DataObjects/SearchAttributes only to load for this WorkflowState.
 
-`WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataObject/SearchAttribute, it can be
+`WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataObject/SearchAttribute, they can be
 done in parallel without locking.
 iWF will provide more advanced policy to allow loading with "locking" in the future.
 
@@ -342,7 +343,8 @@ iWF will provide more advanced policy to allow loading with "locking" in the fut
 
 By default, the workflow execution will fail when Start/Decide API max out the retry attempts. In some cases that
 workflow want to ignore the errors.
-A new future is [WIP](https://github.com/indeedeng/iwf/issues/148) to introduce a `StartApiFailurePolicy` to allow this.
+A new feature is [WIP](https://github.com/indeedeng/iwf/issues/148) to introduce a `StartApiFailurePolicy` to allow
+this.
 
 Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
 exception/error.
@@ -353,8 +355,7 @@ exception/error.
 execution.
 It's for synchronizing the logic among multiple threads in a workflow. It's used with `InterStateChannel`.
 
-For example, it can be used to let a main thread to wait for all others threads to complete before the main thread
-complete the workflow.
+For example, it can be used to let thread A to wait for thread B before thread A to continue.
 
 # Why iWF
 
