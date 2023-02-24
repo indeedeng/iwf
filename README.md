@@ -41,6 +41,7 @@ Related projects:
         - [Communication](#communication)
         - [Workflow Diagram](#iwf-workflow-design-diagram)
     - [Client APIs](#client-apis)
+    - [Advanced Concepts](#advanced-concepts)
 - [Why iWF](#why-iwf)
     - [If you are familiar with Cadence/Temporal/AWS SWF/Azure Durable Functions](#if-you-are-familiar-with-cadencetemporalaws-swfazure-durable-functions)
     - [If you are not](#if-you-are-not)
@@ -147,7 +148,6 @@ The following are the three types of commands:
 * `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External application can use
   SignalWorkflow API to signal a workflow.
 * `TimerCommand`: will wait for a **durable timer** to fire.
-* `InterStateChannelCommand`: will wait for a value to be published from another state in the same workflow execution
 
 The start API can return multiple commands and choose a different DeciderTriggerType to trigger the decide API.
 The available options for the DeciderTriggerType are:
@@ -321,8 +321,10 @@ By default, the API timeout is 30s with infinite backoff retry:
 
 - InitialIntervalSeconds: 1
 - MaxInternalSeconds:100
-- MaximumAttempts: 0 # zero means infinite attempts
+- MaximumAttempts: 0
 - BackoffCoefficient: 2
+
+Where zero means infinite attempts.
 
 #### Persistence loading policy
 
@@ -344,6 +346,15 @@ A new future is [WIP](https://github.com/indeedeng/iwf/issues/148) to introduce 
 
 Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
 exception/error.
+
+### Advanced Commands
+
+`InterStateChannelCommand` is a command to wait for a value to be published from another state in the same workflow
+execution.
+It's for synchronizing the logic among multiple threads in a workflow. It's used with `InterStateChannel`.
+
+For example, it can be used to let a main thread to wait for all others threads to complete before the main thread
+complete the workflow.
 
 # Why iWF
 
