@@ -41,6 +41,7 @@ Related projects:
         - [Communication](#communication)
         - [Workflow Diagram](#iwf-workflow-design-diagram)
     - [Client APIs](#client-apis)
+    - [Advanced Concepts](#advanced-concepts)
 - [Why iWF](#why-iwf)
     - [If you are familiar with Cadence/Temporal/AWS SWF/Azure Durable Functions](#if-you-are-familiar-with-cadencetemporalaws-swfazure-durable-functions)
     - [If you are not](#if-you-are-not)
@@ -140,27 +141,6 @@ and the `Number` represents the number of times the StateId has been started. Th
 the context
 of a specific WorkflowExecution.
 
-Uniqueness and Reuse of WorkflowId: At any given time, there can be only one WorkflowExecution running for a specific
-workflowId.
-A new WorkflowExecution can be initiated using the same workflowId by setting the appropriate `IdReusePolicy` in
-WorkflowOptions.
-
-* `ALLOW_IF_NO_RUNNING`
-    * Allow starting workflow if there is no execution running with the workflowId
-    * This is the default policy if not specified in WorkflowOptions
-    * Equivalent to `ALLOW_DUPLICATE` in Cadence/Temporal IdReusePolicy
-* `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY`
-    * Allow starting workflow if a previous Workflow Execution with the same Workflow Id does not have a Completed
-      status.
-      Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated or Cancelled workflow
-      execution.
-    * Equivalent to `ALLOW_DUPLICATE_FAILED_ONLY` in Cadence/Temporal IdReusePolicy
-* `DISALLOW_REUSE`
-    * Not allow to start a new workflow execution with the same workflowId.
-    * Equivalent to `REJECT_DUPLICATE` in Cadence/Temporal IdReusePolicy
-* `TERMINATE_IF_RUNNING`
-    * Always allow starting workflow no matter what -- iWF server will terminate the current running one if it exists.
-
 ### Commands
 
 The following are the three types of commands:
@@ -168,7 +148,6 @@ The following are the three types of commands:
 * `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External application can use
   SignalWorkflow API to signal a workflow.
 * `TimerCommand`: will wait for a **durable timer** to fire.
-* `InterStateChannelCommand`: will wait for a value to be published from another state in the same workflow execution
 
 The start API can return multiple commands and choose a different DeciderTriggerType to trigger the decide API.
 The available options for the DeciderTriggerType are:
@@ -258,6 +237,124 @@ Client APIs are hosted by iWF server for user workflow application to interact w
 * Get workflow search attributes: get the search attributes of a workflow execution
 * Reset workflow: reset a workflow to previous states
 * Skip timer: skip a timer of a workflow (usually for testing or operation)
+
+## Advanced Concepts
+
+### WorkflowOptions
+
+iWF let you deeply customize the workflow behaviors with the below options.
+
+#### IdReusePolicy for WorkflowId
+
+At any given time, there can be only one WorkflowExecution running for a specific workflowId.
+A new WorkflowExecution can be initiated using the same workflowId by setting the appropriate `IdReusePolicy` in
+WorkflowOptions.
+
+* `ALLOW_IF_NO_RUNNING` or `ALLOW_DUPLICATE`
+    * Allow starting workflow if there is no execution running with the workflowId
+    * This is the **default policy** if not specified in WorkflowOptions
+* `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY` or `ALLOW_DUPLICATE_FAILED_ONLY`
+    * Allow starting workflow if a previous Workflow Execution with the same Workflow Id does not have a Completed
+      status.
+      Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated or Cancelled workflow
+      execution.
+* `DISALLOW_REUSE` or `REJECT_DUPLICATE`
+    * Not allow to start a new workflow execution with the same workflowId.
+* `TERMINATE_IF_RUNNING`
+    * Always allow starting workflow no matter what -- iWF server will terminate the current running one if it exists.
+
+NOTE: the names `ALLOW_DUPLICATE`/`ALLOW_DUPLICATE_FAILED_ONLY`/`REJECT_DUPLICATE` are inherited from Cadence/Temporal
+but iWF provides more accurate names as alternatives.
+
+#### CRON Schedule
+
+iWF allows you to start a workflow with a fixed cron schedule like below
+
+```text
+// CronSchedule - Optional cron schedule for workflow. If a cron schedule is specified, the workflow will run
+// as a cron based on the schedule. The scheduling will be based on UTC time. The schedule for the next run only happens
+// after the current run is completed/failed/timeout. If a RetryPolicy is also supplied, and the workflow failed
+// or timed out, the workflow will be retried based on the retry policy. While the workflow is retrying, it won't
+// schedule its next run. If the next schedule is due while the workflow is running (or retrying), then it will skip
+that
+// schedule. Cron workflow will not stop until it is terminated or cancelled (by returning cadence.CanceledError).
+// The cron spec is as follows:
+// ┌───────────── minute (0 - 59)
+// │ ┌───────────── hour (0 - 23)
+// │ │ ┌───────────── day of the month (1 - 31)
+// │ │ │ ┌───────────── month (1 - 12)
+// │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday)
+// │ │ │ │ │
+// │ │ │ │ │
+// * * * * *
+```
+
+NOTE:
+
+* iWF also
+  supports [more advanced cron expressions](https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format)
+* The [crontab guru](https://crontab.guru/) site is useful for testing your cron expressions.
+* To cancel a cron schedule, use terminate of cancel type to stop the workflow execution.
+* By default, there is no cron schedule.
+
+#### RetryPolicy for workflow
+
+Workflow execution can have a backoff retry policy which will retry on failed or timeout.
+
+By default, there is no retry policy.
+
+#### Initial Search Attributes
+
+Client can specify some initial search attributes when starting the workflow.
+
+By default, there is no initial search attributes.
+
+### WorkflowStateOptions
+
+Similarly, users can customize the WorkflowState
+
+#### Start/Decide API timeout and retry policy
+
+Users can customize the API timeout and retry policy for WorkflowState Start and Decide API.
+
+By default, the API timeout is 30s with infinite backoff retry:
+
+- InitialIntervalSeconds: 1
+- MaxInternalSeconds:100
+- MaximumAttempts: 0
+- BackoffCoefficient: 2
+
+Where zero means infinite attempts.
+
+#### Persistence loading policy
+
+When a state API loads DataObjects/SearchAttributes, by default it will load everything which could cause size limit
+error
+for Cadence/Temporal activity input/output limit(2MB by default). User can use other loading
+policy `LOAD_PARTIAL_WITHOUT_LOCKING`
+to specify certain DataObjects/SearchAttributes only to load for this WorkflowState.
+
+`WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataObject/SearchAttribute, it can be
+done in parallel without locking.
+iWF will provide more advanced policy to allow loading with "locking" in the future.
+
+#### Start API failure policy
+
+By default, the workflow execution will fail when Start/Decide API max out the retry attempts. In some cases that
+workflow want to ignore the errors.
+A new future is [WIP](https://github.com/indeedeng/iwf/issues/148) to introduce a `StartApiFailurePolicy` to allow this.
+
+Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
+exception/error.
+
+### Advanced Commands
+
+`InterStateChannelCommand` is a command to wait for a value to be published from another state in the same workflow
+execution.
+It's for synchronizing the logic among multiple threads in a workflow. It's used with `InterStateChannel`.
+
+For example, it can be used to let a main thread to wait for all others threads to complete before the main thread
+complete the workflow.
 
 # Why iWF
 
