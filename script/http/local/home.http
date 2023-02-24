@@ -1,7 +1,7 @@
 ### test home page
 GET http://localhost:8801/
 
-### test start API
+### start API
 POST http://localhost:8801/api/v1/workflow/start
 Content-Type: application/json
 
@@ -15,7 +15,9 @@ Content-Type: application/json
   "stateOptions": {}
 }
 
-### test reset API NOTE: try different resetType: BEGINNING, HISTORY_EVENT_ID, HISTORY_EVENT_TIME, STATE_ID, STATE_EXECUTION_ID
+### reset API
+### NOTE: supported resetType: BEGINNING, HISTORY_EVENT_ID, HISTORY_EVENT_TIME, STATE_ID, STATE_EXECUTION_ID
+### each reset type may require one supplement field, e.g. HISTORY_EVENT_ID requires historyEventId
 POST http://localhost:8801/api/v1/workflow/reset
 Content-Type: application/json
 
@@ -23,8 +25,18 @@ Content-Type: application/json
   "workflowId": "timer1672340240",
   "workflowRunId": "",
   "resetType": "STATE_ID",
-  "historyEventId":15,
+  "historyEventId": 15,
   "historyEventTime": "150m",
   "stateId": "S1",
   "stateExecutionId": "S2-1"
+}
+
+### skip timer API
+POST http://localhost:8801/api/v1/workflow/timer/skip
+Content-Type: application/json
+
+{
+  "workflowId": "subscription-test-id1677259121",
+  "workflowStateExecutionId": "ChargeCurrentBillState-7",
+  "timerCommandIndex": 0
 }
