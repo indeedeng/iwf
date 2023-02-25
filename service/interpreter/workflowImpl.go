@@ -241,7 +241,7 @@ func executeState(
 		},
 	}).Get(ctx, &startResponse)
 
-	if state.StateOptions == nil || state.StateOptions.StartApiRetryPolicy == nil || state.StateOptions.GetStartApiFailurePolicy() == iwfidl.FAIL_WORKFLOW_ON_START_API_FAILURE {
+	if errorFromActivity != nil && (state.StateOptions == nil || state.StateOptions.StartApiFailurePolicy == nil || state.StateOptions.GetStartApiFailurePolicy() == iwfidl.FAIL_WORKFLOW_ON_START_API_FAILURE) {
 		return nil, errorFromActivity
 	}
 
@@ -341,7 +341,7 @@ func executeState(
 
 	commandRes := &iwfidl.CommandResults{}
 
-	if state.StateOptions != nil && state.StateOptions.StartApiRetryPolicy != nil && state.StateOptions.GetStartApiFailurePolicy() == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE {
+	if state.StateOptions != nil && state.StateOptions.StartApiFailurePolicy != nil && state.StateOptions.GetStartApiFailurePolicy() == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE {
 		commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errorFromActivity == nil)
 	}
 
