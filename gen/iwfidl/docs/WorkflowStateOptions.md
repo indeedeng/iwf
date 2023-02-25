@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **DecideApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **StartApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 **DecideApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
+**StartApiFailurePolicy** | Pointer to [**StartApiFailurePolicy**](StartApiFailurePolicy.md) |  | [optional] 
 
 ## Methods
 
@@ -205,6 +206,31 @@ SetDecideApiRetryPolicy sets DecideApiRetryPolicy field to given value.
 `func (o *WorkflowStateOptions) HasDecideApiRetryPolicy() bool`
 
 HasDecideApiRetryPolicy returns a boolean if a field has been set.
+
+### GetStartApiFailurePolicy
+
+`func (o *WorkflowStateOptions) GetStartApiFailurePolicy() StartApiFailurePolicy`
+
+GetStartApiFailurePolicy returns the StartApiFailurePolicy field if non-nil, zero value otherwise.
+
+### GetStartApiFailurePolicyOk
+
+`func (o *WorkflowStateOptions) GetStartApiFailurePolicyOk() (*StartApiFailurePolicy, bool)`
+
+GetStartApiFailurePolicyOk returns a tuple with the StartApiFailurePolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStartApiFailurePolicy
+
+`func (o *WorkflowStateOptions) SetStartApiFailurePolicy(v StartApiFailurePolicy)`
+
+SetStartApiFailurePolicy sets StartApiFailurePolicy field to given value.
+
+### HasStartApiFailurePolicy
+
+`func (o *WorkflowStateOptions) HasStartApiFailurePolicy() bool`
+
+HasStartApiFailurePolicy returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

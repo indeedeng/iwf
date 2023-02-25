@@ -345,6 +345,11 @@ components:
         maximumAttempts:
           type: integer
       type: object
+    StartApiFailurePolicy:
+      enum:
+      - FAIL_WORKFLOW_ON_START_API_FAILURE
+      - PROCEED_TO_DECIDE_ON_START_API_FAILURE
+      type: string
     WorkflowStateOptions:
       example:
         searchAttributesLoadingPolicy:
@@ -371,6 +376,7 @@ components:
           - partialLoadingKeys
           - partialLoadingKeys
           persistenceLoadingType: null
+        startApiFailurePolicy: null
       properties:
         searchAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
@@ -386,6 +392,8 @@ components:
           $ref: '#/components/schemas/RetryPolicy'
         decideApiRetryPolicy:
           $ref: '#/components/schemas/RetryPolicy'
+        startApiFailurePolicy:
+          $ref: '#/components/schemas/StartApiFailurePolicy'
       type: object
     WorkflowStartOptions:
       example:
@@ -506,6 +514,7 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          startApiFailurePolicy: null
         iwfWorkflowType: iwfWorkflowType
         workflowStartOptions:
           retryPolicy:
@@ -1241,6 +1250,7 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              startApiFailurePolicy: null
             stateInput:
               data: data
               encoding: encoding
@@ -1270,6 +1280,7 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              startApiFailurePolicy: null
             stateInput:
               data: data
               encoding: encoding
@@ -1353,6 +1364,7 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            startApiFailurePolicy: null
           stateInput:
             data: data
             encoding: encoding
@@ -1382,6 +1394,7 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            startApiFailurePolicy: null
           stateInput:
             data: data
             encoding: encoding
@@ -1419,6 +1432,7 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          startApiFailurePolicy: null
         stateInput:
           data: data
           encoding: encoding

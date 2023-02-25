@@ -23,6 +23,7 @@ type WorkflowStateOptions struct {
 	DecideApiTimeoutSeconds       *int32                    `json:"decideApiTimeoutSeconds,omitempty"`
 	StartApiRetryPolicy           *RetryPolicy              `json:"startApiRetryPolicy,omitempty"`
 	DecideApiRetryPolicy          *RetryPolicy              `json:"decideApiRetryPolicy,omitempty"`
+	StartApiFailurePolicy         *StartApiFailurePolicy    `json:"startApiFailurePolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -266,6 +267,38 @@ func (o *WorkflowStateOptions) SetDecideApiRetryPolicy(v RetryPolicy) {
 	o.DecideApiRetryPolicy = &v
 }
 
+// GetStartApiFailurePolicy returns the StartApiFailurePolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetStartApiFailurePolicy() StartApiFailurePolicy {
+	if o == nil || o.StartApiFailurePolicy == nil {
+		var ret StartApiFailurePolicy
+		return ret
+	}
+	return *o.StartApiFailurePolicy
+}
+
+// GetStartApiFailurePolicyOk returns a tuple with the StartApiFailurePolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetStartApiFailurePolicyOk() (*StartApiFailurePolicy, bool) {
+	if o == nil || o.StartApiFailurePolicy == nil {
+		return nil, false
+	}
+	return o.StartApiFailurePolicy, true
+}
+
+// HasStartApiFailurePolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasStartApiFailurePolicy() bool {
+	if o != nil && o.StartApiFailurePolicy != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStartApiFailurePolicy gets a reference to the given StartApiFailurePolicy and assigns it to the StartApiFailurePolicy field.
+func (o *WorkflowStateOptions) SetStartApiFailurePolicy(v StartApiFailurePolicy) {
+	o.StartApiFailurePolicy = &v
+}
+
 func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.SearchAttributesLoadingPolicy != nil {
@@ -288,6 +321,9 @@ func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	}
 	if o.DecideApiRetryPolicy != nil {
 		toSerialize["decideApiRetryPolicy"] = o.DecideApiRetryPolicy
+	}
+	if o.StartApiFailurePolicy != nil {
+		toSerialize["startApiFailurePolicy"] = o.StartApiFailurePolicy
 	}
 	return json.Marshal(toSerialize)
 }

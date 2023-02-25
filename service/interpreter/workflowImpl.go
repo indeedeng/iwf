@@ -241,6 +241,10 @@ func executeState(
 		},
 	}).Get(ctx, &startResponse)
 
+	if state.StateOptions == nil || state.StateOptions.StartApiRetryPolicy == nil || state.StateOptions.GetStartApiFailurePolicy() == iwfidl.FAIL_WORKFLOW_ON_START_API_FAILURE {
+		return nil, errorFromActivity
+	}
+
 	err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, err
@@ -336,7 +340,11 @@ func executeState(
 	commandReqDone = true
 
 	commandRes := &iwfidl.CommandResults{}
-	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errorFromActivity == nil)
+
+	if state.StateOptions != nil && state.StateOptions.StartApiRetryPolicy != nil && state.StateOptions.GetStartApiFailurePolicy() == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE {
+		commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errorFromActivity == nil)
+	}
+
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.FinishProcessing(stateExeId)
 
