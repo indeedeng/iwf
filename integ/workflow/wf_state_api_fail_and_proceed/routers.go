@@ -46,7 +46,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
-	panic("should not get here")
+	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{})
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

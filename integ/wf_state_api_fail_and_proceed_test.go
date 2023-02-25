@@ -9,7 +9,6 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -82,8 +81,6 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType)
 
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
-		WorkflowStatus: iwfidl.FAILED,
-		ErrorType:      ptr.Any(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
-		ErrorMessage:   iwfidl.PtrString("statusCode: 400, responseBody: {}, errMsg: 400 Bad Request"),
+		WorkflowStatus: iwfidl.COMPLETED,
 	}, resp, "response not expected")
 }
