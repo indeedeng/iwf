@@ -2,14 +2,15 @@ package integ
 
 import (
 	"context"
+	"strconv"
+	"testing"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
-	"strconv"
-	"testing"
-	"time"
 )
 
 func TestStateApiFailTemporal(t *testing.T) {
@@ -82,6 +83,6 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType) {
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.FAILED,
 		ErrorType:      ptr.Any(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
-		ErrorMessage:   iwfidl.PtrString("statusCode: 400, responseBody: {}, errMsg: 400 Bad Request  (%!s(*string=<nil>))"),
+		ErrorMessage:   iwfidl.PtrString("statusCode: 400, responseBody: {}, errMsg: 400 Bad Request"),
 	}, resp, "response not expected")
 }
