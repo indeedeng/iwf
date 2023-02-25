@@ -1,4 +1,4 @@
-package wf_state_api_fail
+package wf_state_api_fail_and_proceed
 
 import (
 	"log"
