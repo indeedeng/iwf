@@ -242,7 +242,7 @@ func executeState(
 	}).Get(ctx, &startResponse)
 
 	if errorFromActivity != nil && (state.StateOptions == nil || state.StateOptions.StartApiFailurePolicy == nil || state.StateOptions.GetStartApiFailurePolicy() == iwfidl.FAIL_WORKFLOW_ON_START_API_FAILURE) {
-		return nil, errorFromActivity
+		return nil, convertStateApiActivityError(provider, errorFromActivity)
 	}
 
 	err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
