@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the InterStateChannelResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &InterStateChannelResult{}
+
 // InterStateChannelResult struct for InterStateChannelResult
 type InterStateChannelResult struct {
 	CommandId     string               `json:"commandId"`
@@ -116,7 +119,7 @@ func (o *InterStateChannelResult) SetChannelName(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *InterStateChannelResult) GetValue() EncodedObject {
-	if o == nil || isNil(o.Value) {
+	if o == nil || IsNil(o.Value) {
 		var ret EncodedObject
 		return ret
 	}
@@ -126,7 +129,7 @@ func (o *InterStateChannelResult) GetValue() EncodedObject {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelResult) GetValueOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.Value) {
+	if o == nil || IsNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -134,7 +137,7 @@ func (o *InterStateChannelResult) GetValueOk() (*EncodedObject, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *InterStateChannelResult) HasValue() bool {
-	if o != nil && !isNil(o.Value) {
+	if o != nil && !IsNil(o.Value) {
 		return true
 	}
 
@@ -147,20 +150,22 @@ func (o *InterStateChannelResult) SetValue(v EncodedObject) {
 }
 
 func (o InterStateChannelResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["commandId"] = o.CommandId
-	}
-	if true {
-		toSerialize["requestStatus"] = o.RequestStatus
-	}
-	if true {
-		toSerialize["channelName"] = o.ChannelName
-	}
-	if !isNil(o.Value) {
-		toSerialize["value"] = o.Value
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o InterStateChannelResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["commandId"] = o.CommandId
+	toSerialize["requestStatus"] = o.RequestStatus
+	toSerialize["channelName"] = o.ChannelName
+	if !IsNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	return toSerialize, nil
 }
 
 type NullableInterStateChannelResult struct {

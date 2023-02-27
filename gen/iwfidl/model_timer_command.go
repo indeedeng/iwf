@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TimerCommand type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TimerCommand{}
+
 // TimerCommand struct for TimerCommand
 type TimerCommand struct {
 	CommandId                  string `json:"commandId"`
@@ -88,14 +91,18 @@ func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int64) {
 }
 
 func (o TimerCommand) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["commandId"] = o.CommandId
-	}
-	if true {
-		toSerialize["firingUnixTimestampSeconds"] = o.FiringUnixTimestampSeconds
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TimerCommand) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["commandId"] = o.CommandId
+	toSerialize["firingUnixTimestampSeconds"] = o.FiringUnixTimestampSeconds
+	return toSerialize, nil
 }
 
 type NullableTimerCommand struct {

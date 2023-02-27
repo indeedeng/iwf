@@ -30,6 +30,7 @@ docs/SearchAttributeKeyAndType.md
 docs/SearchAttributeValueType.md
 docs/SignalCommand.md
 docs/SignalResult.md
+docs/StartApiFailurePolicy.md
 docs/StateCompletionOutput.md
 docs/StateDecision.md
 docs/StateMovement.md
@@ -89,6 +90,7 @@ model_search_attribute_key_and_type.go
 model_search_attribute_value_type.go
 model_signal_command.go
 model_signal_result.go
+model_start_api_failure_policy.go
 model_state_completion_output.go
 model_state_decision.go
 model_state_movement.go

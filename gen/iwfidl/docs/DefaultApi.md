@@ -34,7 +34,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -98,7 +98,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -162,7 +162,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -226,7 +226,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -290,7 +290,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -354,7 +354,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -418,7 +418,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -426,7 +426,7 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background()).WorkflowSignalRequest(workflowSignalRequest).Execute()
+    r, err := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background()).WorkflowSignalRequest(workflowSignalRequest).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowSignalPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -480,7 +480,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -544,7 +544,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -608,7 +608,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -672,7 +672,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -680,7 +680,7 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background()).WorkflowStopRequest(workflowStopRequest).Execute()
+    r, err := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background()).WorkflowStopRequest(workflowStopRequest).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowStopPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -734,7 +734,7 @@ import (
     "context"
     "fmt"
     "os"
-    openapiclient "./openapi"
+    openapiclient "github.com/indeedeng/iwf-idl"
 )
 
 func main() {
@@ -742,7 +742,7 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background()).WorkflowSkipTimerRequest(workflowSkipTimerRequest).Execute()
+    r, err := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background()).WorkflowSkipTimerRequest(workflowSkipTimerRequest).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowTimerSkipPost``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)

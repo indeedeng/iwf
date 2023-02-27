@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowGetResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowGetResponse{}
+
 // WorkflowGetResponse struct for WorkflowGetResponse
 type WorkflowGetResponse struct {
 	WorkflowRunId  string                  `json:"workflowRunId"`
@@ -92,7 +95,7 @@ func (o *WorkflowGetResponse) SetWorkflowStatus(v WorkflowStatus) {
 
 // GetResults returns the Results field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
-	if o == nil || isNil(o.Results) {
+	if o == nil || IsNil(o.Results) {
 		var ret []StateCompletionOutput
 		return ret
 	}
@@ -102,7 +105,7 @@ func (o *WorkflowGetResponse) GetResults() []StateCompletionOutput {
 // GetResultsOk returns a tuple with the Results field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetResultsOk() ([]StateCompletionOutput, bool) {
-	if o == nil || isNil(o.Results) {
+	if o == nil || IsNil(o.Results) {
 		return nil, false
 	}
 	return o.Results, true
@@ -110,7 +113,7 @@ func (o *WorkflowGetResponse) GetResultsOk() ([]StateCompletionOutput, bool) {
 
 // HasResults returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasResults() bool {
-	if o != nil && !isNil(o.Results) {
+	if o != nil && !IsNil(o.Results) {
 		return true
 	}
 
@@ -124,7 +127,7 @@ func (o *WorkflowGetResponse) SetResults(v []StateCompletionOutput) {
 
 // GetErrorType returns the ErrorType field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
-	if o == nil || isNil(o.ErrorType) {
+	if o == nil || IsNil(o.ErrorType) {
 		var ret WorkflowErrorType
 		return ret
 	}
@@ -134,7 +137,7 @@ func (o *WorkflowGetResponse) GetErrorType() WorkflowErrorType {
 // GetErrorTypeOk returns a tuple with the ErrorType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
-	if o == nil || isNil(o.ErrorType) {
+	if o == nil || IsNil(o.ErrorType) {
 		return nil, false
 	}
 	return o.ErrorType, true
@@ -142,7 +145,7 @@ func (o *WorkflowGetResponse) GetErrorTypeOk() (*WorkflowErrorType, bool) {
 
 // HasErrorType returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasErrorType() bool {
-	if o != nil && !isNil(o.ErrorType) {
+	if o != nil && !IsNil(o.ErrorType) {
 		return true
 	}
 
@@ -156,7 +159,7 @@ func (o *WorkflowGetResponse) SetErrorType(v WorkflowErrorType) {
 
 // GetErrorMessage returns the ErrorMessage field value if set, zero value otherwise.
 func (o *WorkflowGetResponse) GetErrorMessage() string {
-	if o == nil || isNil(o.ErrorMessage) {
+	if o == nil || IsNil(o.ErrorMessage) {
 		var ret string
 		return ret
 	}
@@ -166,7 +169,7 @@ func (o *WorkflowGetResponse) GetErrorMessage() string {
 // GetErrorMessageOk returns a tuple with the ErrorMessage field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool) {
-	if o == nil || isNil(o.ErrorMessage) {
+	if o == nil || IsNil(o.ErrorMessage) {
 		return nil, false
 	}
 	return o.ErrorMessage, true
@@ -174,7 +177,7 @@ func (o *WorkflowGetResponse) GetErrorMessageOk() (*string, bool) {
 
 // HasErrorMessage returns a boolean if a field has been set.
 func (o *WorkflowGetResponse) HasErrorMessage() bool {
-	if o != nil && !isNil(o.ErrorMessage) {
+	if o != nil && !IsNil(o.ErrorMessage) {
 		return true
 	}
 
@@ -187,23 +190,27 @@ func (o *WorkflowGetResponse) SetErrorMessage(v string) {
 }
 
 func (o WorkflowGetResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
-	if true {
-		toSerialize["workflowStatus"] = o.WorkflowStatus
-	}
-	if !isNil(o.Results) {
-		toSerialize["results"] = o.Results
-	}
-	if !isNil(o.ErrorType) {
-		toSerialize["errorType"] = o.ErrorType
-	}
-	if !isNil(o.ErrorMessage) {
-		toSerialize["errorMessage"] = o.ErrorMessage
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowGetResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowRunId"] = o.WorkflowRunId
+	toSerialize["workflowStatus"] = o.WorkflowStatus
+	if !IsNil(o.Results) {
+		toSerialize["results"] = o.Results
+	}
+	if !IsNil(o.ErrorType) {
+		toSerialize["errorType"] = o.ErrorType
+	}
+	if !IsNil(o.ErrorMessage) {
+		toSerialize["errorMessage"] = o.ErrorMessage
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowGetResponse struct {

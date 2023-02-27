@@ -15,7 +15,6 @@ Install the following dependencies:
 
 ```shell
 go get github.com/stretchr/testify/assert
-go get golang.org/x/oauth2
 go get golang.org/x/net/context
 ```
 
@@ -117,6 +116,7 @@ Class | Method | HTTP request | Description
  - [SearchAttributeValueType](docs/SearchAttributeValueType.md)
  - [SignalCommand](docs/SignalCommand.md)
  - [SignalResult](docs/SignalResult.md)
+ - [StartApiFailurePolicy](docs/StartApiFailurePolicy.md)
  - [StateCompletionOutput](docs/StateCompletionOutput.md)
  - [StateDecision](docs/StateDecision.md)
  - [StateMovement](docs/StateMovement.md)

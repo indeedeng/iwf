@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Context type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Context{}
+
 // Context struct for Context
 type Context struct {
 	WorkflowId               string `json:"workflowId"`
@@ -143,7 +146,7 @@ func (o *Context) SetStateExecutionId(v string) {
 
 // GetFirstAttemptTimestamp returns the FirstAttemptTimestamp field value if set, zero value otherwise.
 func (o *Context) GetFirstAttemptTimestamp() int64 {
-	if o == nil || isNil(o.FirstAttemptTimestamp) {
+	if o == nil || IsNil(o.FirstAttemptTimestamp) {
 		var ret int64
 		return ret
 	}
@@ -153,7 +156,7 @@ func (o *Context) GetFirstAttemptTimestamp() int64 {
 // GetFirstAttemptTimestampOk returns a tuple with the FirstAttemptTimestamp field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Context) GetFirstAttemptTimestampOk() (*int64, bool) {
-	if o == nil || isNil(o.FirstAttemptTimestamp) {
+	if o == nil || IsNil(o.FirstAttemptTimestamp) {
 		return nil, false
 	}
 	return o.FirstAttemptTimestamp, true
@@ -161,7 +164,7 @@ func (o *Context) GetFirstAttemptTimestampOk() (*int64, bool) {
 
 // HasFirstAttemptTimestamp returns a boolean if a field has been set.
 func (o *Context) HasFirstAttemptTimestamp() bool {
-	if o != nil && !isNil(o.FirstAttemptTimestamp) {
+	if o != nil && !IsNil(o.FirstAttemptTimestamp) {
 		return true
 	}
 
@@ -175,7 +178,7 @@ func (o *Context) SetFirstAttemptTimestamp(v int64) {
 
 // GetAttempt returns the Attempt field value if set, zero value otherwise.
 func (o *Context) GetAttempt() int32 {
-	if o == nil || isNil(o.Attempt) {
+	if o == nil || IsNil(o.Attempt) {
 		var ret int32
 		return ret
 	}
@@ -185,7 +188,7 @@ func (o *Context) GetAttempt() int32 {
 // GetAttemptOk returns a tuple with the Attempt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Context) GetAttemptOk() (*int32, bool) {
-	if o == nil || isNil(o.Attempt) {
+	if o == nil || IsNil(o.Attempt) {
 		return nil, false
 	}
 	return o.Attempt, true
@@ -193,7 +196,7 @@ func (o *Context) GetAttemptOk() (*int32, bool) {
 
 // HasAttempt returns a boolean if a field has been set.
 func (o *Context) HasAttempt() bool {
-	if o != nil && !isNil(o.Attempt) {
+	if o != nil && !IsNil(o.Attempt) {
 		return true
 	}
 
@@ -206,26 +209,26 @@ func (o *Context) SetAttempt(v int32) {
 }
 
 func (o Context) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowId"] = o.WorkflowId
-	}
-	if true {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
-	if true {
-		toSerialize["workflowStartedTimestamp"] = o.WorkflowStartedTimestamp
-	}
-	if true {
-		toSerialize["stateExecutionId"] = o.StateExecutionId
-	}
-	if !isNil(o.FirstAttemptTimestamp) {
-		toSerialize["firstAttemptTimestamp"] = o.FirstAttemptTimestamp
-	}
-	if !isNil(o.Attempt) {
-		toSerialize["attempt"] = o.Attempt
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Context) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowId"] = o.WorkflowId
+	toSerialize["workflowRunId"] = o.WorkflowRunId
+	toSerialize["workflowStartedTimestamp"] = o.WorkflowStartedTimestamp
+	toSerialize["stateExecutionId"] = o.StateExecutionId
+	if !IsNil(o.FirstAttemptTimestamp) {
+		toSerialize["firstAttemptTimestamp"] = o.FirstAttemptTimestamp
+	}
+	if !IsNil(o.Attempt) {
+		toSerialize["attempt"] = o.Attempt
+	}
+	return toSerialize, nil
 }
 
 type NullableContext struct {

@@ -14,11 +14,15 @@ import (
 	"encoding/json"
 )
 
+// checks if the CommandResults type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CommandResults{}
+
 // CommandResults struct for CommandResults
 type CommandResults struct {
 	SignalResults            []SignalResult            `json:"signalResults,omitempty"`
 	InterStateChannelResults []InterStateChannelResult `json:"interStateChannelResults,omitempty"`
 	TimerResults             []TimerResult             `json:"timerResults,omitempty"`
+	StateStartApiSucceeded   *bool                     `json:"stateStartApiSucceeded,omitempty"`
 }
 
 // NewCommandResults instantiates a new CommandResults object
@@ -40,7 +44,7 @@ func NewCommandResultsWithDefaults() *CommandResults {
 
 // GetSignalResults returns the SignalResults field value if set, zero value otherwise.
 func (o *CommandResults) GetSignalResults() []SignalResult {
-	if o == nil || isNil(o.SignalResults) {
+	if o == nil || IsNil(o.SignalResults) {
 		var ret []SignalResult
 		return ret
 	}
@@ -50,7 +54,7 @@ func (o *CommandResults) GetSignalResults() []SignalResult {
 // GetSignalResultsOk returns a tuple with the SignalResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetSignalResultsOk() ([]SignalResult, bool) {
-	if o == nil || isNil(o.SignalResults) {
+	if o == nil || IsNil(o.SignalResults) {
 		return nil, false
 	}
 	return o.SignalResults, true
@@ -58,7 +62,7 @@ func (o *CommandResults) GetSignalResultsOk() ([]SignalResult, bool) {
 
 // HasSignalResults returns a boolean if a field has been set.
 func (o *CommandResults) HasSignalResults() bool {
-	if o != nil && !isNil(o.SignalResults) {
+	if o != nil && !IsNil(o.SignalResults) {
 		return true
 	}
 
@@ -72,7 +76,7 @@ func (o *CommandResults) SetSignalResults(v []SignalResult) {
 
 // GetInterStateChannelResults returns the InterStateChannelResults field value if set, zero value otherwise.
 func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult {
-	if o == nil || isNil(o.InterStateChannelResults) {
+	if o == nil || IsNil(o.InterStateChannelResults) {
 		var ret []InterStateChannelResult
 		return ret
 	}
@@ -82,7 +86,7 @@ func (o *CommandResults) GetInterStateChannelResults() []InterStateChannelResult
 // GetInterStateChannelResultsOk returns a tuple with the InterStateChannelResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetInterStateChannelResultsOk() ([]InterStateChannelResult, bool) {
-	if o == nil || isNil(o.InterStateChannelResults) {
+	if o == nil || IsNil(o.InterStateChannelResults) {
 		return nil, false
 	}
 	return o.InterStateChannelResults, true
@@ -90,7 +94,7 @@ func (o *CommandResults) GetInterStateChannelResultsOk() ([]InterStateChannelRes
 
 // HasInterStateChannelResults returns a boolean if a field has been set.
 func (o *CommandResults) HasInterStateChannelResults() bool {
-	if o != nil && !isNil(o.InterStateChannelResults) {
+	if o != nil && !IsNil(o.InterStateChannelResults) {
 		return true
 	}
 
@@ -104,7 +108,7 @@ func (o *CommandResults) SetInterStateChannelResults(v []InterStateChannelResult
 
 // GetTimerResults returns the TimerResults field value if set, zero value otherwise.
 func (o *CommandResults) GetTimerResults() []TimerResult {
-	if o == nil || isNil(o.TimerResults) {
+	if o == nil || IsNil(o.TimerResults) {
 		var ret []TimerResult
 		return ret
 	}
@@ -114,7 +118,7 @@ func (o *CommandResults) GetTimerResults() []TimerResult {
 // GetTimerResultsOk returns a tuple with the TimerResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandResults) GetTimerResultsOk() ([]TimerResult, bool) {
-	if o == nil || isNil(o.TimerResults) {
+	if o == nil || IsNil(o.TimerResults) {
 		return nil, false
 	}
 	return o.TimerResults, true
@@ -122,7 +126,7 @@ func (o *CommandResults) GetTimerResultsOk() ([]TimerResult, bool) {
 
 // HasTimerResults returns a boolean if a field has been set.
 func (o *CommandResults) HasTimerResults() bool {
-	if o != nil && !isNil(o.TimerResults) {
+	if o != nil && !IsNil(o.TimerResults) {
 		return true
 	}
 
@@ -134,18 +138,61 @@ func (o *CommandResults) SetTimerResults(v []TimerResult) {
 	o.TimerResults = v
 }
 
+// GetStateStartApiSucceeded returns the StateStartApiSucceeded field value if set, zero value otherwise.
+func (o *CommandResults) GetStateStartApiSucceeded() bool {
+	if o == nil || IsNil(o.StateStartApiSucceeded) {
+		var ret bool
+		return ret
+	}
+	return *o.StateStartApiSucceeded
+}
+
+// GetStateStartApiSucceededOk returns a tuple with the StateStartApiSucceeded field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandResults) GetStateStartApiSucceededOk() (*bool, bool) {
+	if o == nil || IsNil(o.StateStartApiSucceeded) {
+		return nil, false
+	}
+	return o.StateStartApiSucceeded, true
+}
+
+// HasStateStartApiSucceeded returns a boolean if a field has been set.
+func (o *CommandResults) HasStateStartApiSucceeded() bool {
+	if o != nil && !IsNil(o.StateStartApiSucceeded) {
+		return true
+	}
+
+	return false
+}
+
+// SetStateStartApiSucceeded gets a reference to the given bool and assigns it to the StateStartApiSucceeded field.
+func (o *CommandResults) SetStateStartApiSucceeded(v bool) {
+	o.StateStartApiSucceeded = &v
+}
+
 func (o CommandResults) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if !isNil(o.SignalResults) {
-		toSerialize["signalResults"] = o.SignalResults
-	}
-	if !isNil(o.InterStateChannelResults) {
-		toSerialize["interStateChannelResults"] = o.InterStateChannelResults
-	}
-	if !isNil(o.TimerResults) {
-		toSerialize["timerResults"] = o.TimerResults
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CommandResults) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.SignalResults) {
+		toSerialize["signalResults"] = o.SignalResults
+	}
+	if !IsNil(o.InterStateChannelResults) {
+		toSerialize["interStateChannelResults"] = o.InterStateChannelResults
+	}
+	if !IsNil(o.TimerResults) {
+		toSerialize["timerResults"] = o.TimerResults
+	}
+	if !IsNil(o.StateStartApiSucceeded) {
+		toSerialize["stateStartApiSucceeded"] = o.StateStartApiSucceeded
+	}
+	return toSerialize, nil
 }
 
 type NullableCommandResults struct {

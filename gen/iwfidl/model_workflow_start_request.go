@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowStartRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowStartRequest{}
+
 // WorkflowStartRequest struct for WorkflowStartRequest
 type WorkflowStartRequest struct {
 	WorkflowId             string                `json:"workflowId"`
@@ -170,7 +173,7 @@ func (o *WorkflowStartRequest) SetStartStateId(v string) {
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetStateInput() EncodedObject {
-	if o == nil || isNil(o.StateInput) {
+	if o == nil || IsNil(o.StateInput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -180,7 +183,7 @@ func (o *WorkflowStartRequest) GetStateInput() EncodedObject {
 // GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStateInputOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.StateInput) {
+	if o == nil || IsNil(o.StateInput) {
 		return nil, false
 	}
 	return o.StateInput, true
@@ -188,7 +191,7 @@ func (o *WorkflowStartRequest) GetStateInputOk() (*EncodedObject, bool) {
 
 // HasStateInput returns a boolean if a field has been set.
 func (o *WorkflowStartRequest) HasStateInput() bool {
-	if o != nil && !isNil(o.StateInput) {
+	if o != nil && !IsNil(o.StateInput) {
 		return true
 	}
 
@@ -202,7 +205,7 @@ func (o *WorkflowStartRequest) SetStateInput(v EncodedObject) {
 
 // GetStateOptions returns the StateOptions field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetStateOptions() WorkflowStateOptions {
-	if o == nil || isNil(o.StateOptions) {
+	if o == nil || IsNil(o.StateOptions) {
 		var ret WorkflowStateOptions
 		return ret
 	}
@@ -212,7 +215,7 @@ func (o *WorkflowStartRequest) GetStateOptions() WorkflowStateOptions {
 // GetStateOptionsOk returns a tuple with the StateOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
-	if o == nil || isNil(o.StateOptions) {
+	if o == nil || IsNil(o.StateOptions) {
 		return nil, false
 	}
 	return o.StateOptions, true
@@ -220,7 +223,7 @@ func (o *WorkflowStartRequest) GetStateOptionsOk() (*WorkflowStateOptions, bool)
 
 // HasStateOptions returns a boolean if a field has been set.
 func (o *WorkflowStartRequest) HasStateOptions() bool {
-	if o != nil && !isNil(o.StateOptions) {
+	if o != nil && !IsNil(o.StateOptions) {
 		return true
 	}
 
@@ -234,7 +237,7 @@ func (o *WorkflowStartRequest) SetStateOptions(v WorkflowStateOptions) {
 
 // GetWorkflowStartOptions returns the WorkflowStartOptions field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetWorkflowStartOptions() WorkflowStartOptions {
-	if o == nil || isNil(o.WorkflowStartOptions) {
+	if o == nil || IsNil(o.WorkflowStartOptions) {
 		var ret WorkflowStartOptions
 		return ret
 	}
@@ -244,7 +247,7 @@ func (o *WorkflowStartRequest) GetWorkflowStartOptions() WorkflowStartOptions {
 // GetWorkflowStartOptionsOk returns a tuple with the WorkflowStartOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartRequest) GetWorkflowStartOptionsOk() (*WorkflowStartOptions, bool) {
-	if o == nil || isNil(o.WorkflowStartOptions) {
+	if o == nil || IsNil(o.WorkflowStartOptions) {
 		return nil, false
 	}
 	return o.WorkflowStartOptions, true
@@ -252,7 +255,7 @@ func (o *WorkflowStartRequest) GetWorkflowStartOptionsOk() (*WorkflowStartOption
 
 // HasWorkflowStartOptions returns a boolean if a field has been set.
 func (o *WorkflowStartRequest) HasWorkflowStartOptions() bool {
-	if o != nil && !isNil(o.WorkflowStartOptions) {
+	if o != nil && !IsNil(o.WorkflowStartOptions) {
 		return true
 	}
 
@@ -265,32 +268,30 @@ func (o *WorkflowStartRequest) SetWorkflowStartOptions(v WorkflowStartOptions) {
 }
 
 func (o WorkflowStartRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowId"] = o.WorkflowId
-	}
-	if true {
-		toSerialize["iwfWorkflowType"] = o.IwfWorkflowType
-	}
-	if true {
-		toSerialize["workflowTimeoutSeconds"] = o.WorkflowTimeoutSeconds
-	}
-	if true {
-		toSerialize["iwfWorkerUrl"] = o.IwfWorkerUrl
-	}
-	if true {
-		toSerialize["startStateId"] = o.StartStateId
-	}
-	if !isNil(o.StateInput) {
-		toSerialize["stateInput"] = o.StateInput
-	}
-	if !isNil(o.StateOptions) {
-		toSerialize["stateOptions"] = o.StateOptions
-	}
-	if !isNil(o.WorkflowStartOptions) {
-		toSerialize["workflowStartOptions"] = o.WorkflowStartOptions
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowStartRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowId"] = o.WorkflowId
+	toSerialize["iwfWorkflowType"] = o.IwfWorkflowType
+	toSerialize["workflowTimeoutSeconds"] = o.WorkflowTimeoutSeconds
+	toSerialize["iwfWorkerUrl"] = o.IwfWorkerUrl
+	toSerialize["startStateId"] = o.StartStateId
+	if !IsNil(o.StateInput) {
+		toSerialize["stateInput"] = o.StateInput
+	}
+	if !IsNil(o.StateOptions) {
+		toSerialize["stateOptions"] = o.StateOptions
+	}
+	if !IsNil(o.WorkflowStartOptions) {
+		toSerialize["workflowStartOptions"] = o.WorkflowStartOptions
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowStartRequest struct {

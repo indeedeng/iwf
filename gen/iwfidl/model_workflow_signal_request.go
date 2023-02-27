@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowSignalRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowSignalRequest{}
+
 // WorkflowSignalRequest struct for WorkflowSignalRequest
 type WorkflowSignalRequest struct {
 	WorkflowId        string         `json:"workflowId"`
@@ -67,7 +70,7 @@ func (o *WorkflowSignalRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowSignalRequest) GetWorkflowRunId() string {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -77,7 +80,7 @@ func (o *WorkflowSignalRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || isNil(o.WorkflowRunId) {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -85,7 +88,7 @@ func (o *WorkflowSignalRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowSignalRequest) HasWorkflowRunId() bool {
-	if o != nil && !isNil(o.WorkflowRunId) {
+	if o != nil && !IsNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -123,7 +126,7 @@ func (o *WorkflowSignalRequest) SetSignalChannelName(v string) {
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
 func (o *WorkflowSignalRequest) GetSignalValue() EncodedObject {
-	if o == nil || isNil(o.SignalValue) {
+	if o == nil || IsNil(o.SignalValue) {
 		var ret EncodedObject
 		return ret
 	}
@@ -133,7 +136,7 @@ func (o *WorkflowSignalRequest) GetSignalValue() EncodedObject {
 // GetSignalValueOk returns a tuple with the SignalValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSignalRequest) GetSignalValueOk() (*EncodedObject, bool) {
-	if o == nil || isNil(o.SignalValue) {
+	if o == nil || IsNil(o.SignalValue) {
 		return nil, false
 	}
 	return o.SignalValue, true
@@ -141,7 +144,7 @@ func (o *WorkflowSignalRequest) GetSignalValueOk() (*EncodedObject, bool) {
 
 // HasSignalValue returns a boolean if a field has been set.
 func (o *WorkflowSignalRequest) HasSignalValue() bool {
-	if o != nil && !isNil(o.SignalValue) {
+	if o != nil && !IsNil(o.SignalValue) {
 		return true
 	}
 
@@ -154,20 +157,24 @@ func (o *WorkflowSignalRequest) SetSignalValue(v EncodedObject) {
 }
 
 func (o WorkflowSignalRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowId"] = o.WorkflowId
-	}
-	if !isNil(o.WorkflowRunId) {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
-	if true {
-		toSerialize["signalChannelName"] = o.SignalChannelName
-	}
-	if !isNil(o.SignalValue) {
-		toSerialize["signalValue"] = o.SignalValue
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowSignalRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowId"] = o.WorkflowId
+	if !IsNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
+	}
+	toSerialize["signalChannelName"] = o.SignalChannelName
+	if !IsNil(o.SignalValue) {
+		toSerialize["signalValue"] = o.SignalValue
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowSignalRequest struct {

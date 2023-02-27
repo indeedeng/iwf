@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the CommandCombination type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CommandCombination{}
+
 // CommandCombination struct for CommandCombination
 type CommandCombination struct {
 	CommandIds []string `json:"commandIds,omitempty"`
@@ -38,7 +41,7 @@ func NewCommandCombinationWithDefaults() *CommandCombination {
 
 // GetCommandIds returns the CommandIds field value if set, zero value otherwise.
 func (o *CommandCombination) GetCommandIds() []string {
-	if o == nil || isNil(o.CommandIds) {
+	if o == nil || IsNil(o.CommandIds) {
 		var ret []string
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *CommandCombination) GetCommandIds() []string {
 // GetCommandIdsOk returns a tuple with the CommandIds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CommandCombination) GetCommandIdsOk() ([]string, bool) {
-	if o == nil || isNil(o.CommandIds) {
+	if o == nil || IsNil(o.CommandIds) {
 		return nil, false
 	}
 	return o.CommandIds, true
@@ -56,7 +59,7 @@ func (o *CommandCombination) GetCommandIdsOk() ([]string, bool) {
 
 // HasCommandIds returns a boolean if a field has been set.
 func (o *CommandCombination) HasCommandIds() bool {
-	if o != nil && !isNil(o.CommandIds) {
+	if o != nil && !IsNil(o.CommandIds) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *CommandCombination) SetCommandIds(v []string) {
 }
 
 func (o CommandCombination) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if !isNil(o.CommandIds) {
-		toSerialize["commandIds"] = o.CommandIds
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CommandCombination) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.CommandIds) {
+		toSerialize["commandIds"] = o.CommandIds
+	}
+	return toSerialize, nil
 }
 
 type NullableCommandCombination struct {

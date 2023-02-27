@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowSearchRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowSearchRequest{}
+
 // WorkflowSearchRequest struct for WorkflowSearchRequest
 type WorkflowSearchRequest struct {
 	Query         string  `json:"query"`
@@ -65,7 +68,7 @@ func (o *WorkflowSearchRequest) SetQuery(v string) {
 
 // GetPageSize returns the PageSize field value if set, zero value otherwise.
 func (o *WorkflowSearchRequest) GetPageSize() int32 {
-	if o == nil || isNil(o.PageSize) {
+	if o == nil || IsNil(o.PageSize) {
 		var ret int32
 		return ret
 	}
@@ -75,7 +78,7 @@ func (o *WorkflowSearchRequest) GetPageSize() int32 {
 // GetPageSizeOk returns a tuple with the PageSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchRequest) GetPageSizeOk() (*int32, bool) {
-	if o == nil || isNil(o.PageSize) {
+	if o == nil || IsNil(o.PageSize) {
 		return nil, false
 	}
 	return o.PageSize, true
@@ -83,7 +86,7 @@ func (o *WorkflowSearchRequest) GetPageSizeOk() (*int32, bool) {
 
 // HasPageSize returns a boolean if a field has been set.
 func (o *WorkflowSearchRequest) HasPageSize() bool {
-	if o != nil && !isNil(o.PageSize) {
+	if o != nil && !IsNil(o.PageSize) {
 		return true
 	}
 
@@ -97,7 +100,7 @@ func (o *WorkflowSearchRequest) SetPageSize(v int32) {
 
 // GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
 func (o *WorkflowSearchRequest) GetNextPageToken() string {
-	if o == nil || isNil(o.NextPageToken) {
+	if o == nil || IsNil(o.NextPageToken) {
 		var ret string
 		return ret
 	}
@@ -107,7 +110,7 @@ func (o *WorkflowSearchRequest) GetNextPageToken() string {
 // GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchRequest) GetNextPageTokenOk() (*string, bool) {
-	if o == nil || isNil(o.NextPageToken) {
+	if o == nil || IsNil(o.NextPageToken) {
 		return nil, false
 	}
 	return o.NextPageToken, true
@@ -115,7 +118,7 @@ func (o *WorkflowSearchRequest) GetNextPageTokenOk() (*string, bool) {
 
 // HasNextPageToken returns a boolean if a field has been set.
 func (o *WorkflowSearchRequest) HasNextPageToken() bool {
-	if o != nil && !isNil(o.NextPageToken) {
+	if o != nil && !IsNil(o.NextPageToken) {
 		return true
 	}
 
@@ -128,17 +131,23 @@ func (o *WorkflowSearchRequest) SetNextPageToken(v string) {
 }
 
 func (o WorkflowSearchRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["query"] = o.Query
-	}
-	if !isNil(o.PageSize) {
-		toSerialize["pageSize"] = o.PageSize
-	}
-	if !isNil(o.NextPageToken) {
-		toSerialize["nextPageToken"] = o.NextPageToken
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowSearchRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["query"] = o.Query
+	if !IsNil(o.PageSize) {
+		toSerialize["pageSize"] = o.PageSize
+	}
+	if !IsNil(o.NextPageToken) {
+		toSerialize["nextPageToken"] = o.NextPageToken
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowSearchRequest struct {

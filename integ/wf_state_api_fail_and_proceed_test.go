@@ -7,35 +7,34 @@ import (
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail"
+	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStateApiFailTemporal(t *testing.T) {
+func TestStateApiFailAndProceedTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiFail(t, service.BackendTypeTemporal)
+		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
-func TestStateApiFailCadence(t *testing.T) {
+func TestStateApiFailAndProceedCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiFail(t, service.BackendTypeCadence)
+		doTestStateApiFailAndProceed(t, service.BackendTypeCadence)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
-func doTestStateApiFail(t *testing.T, backendType service.BackendType) {
+func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
-	wfHandler := wf_state_api_fail.NewHandler()
+	wfHandler := wf_state_api_fail_and_proceed.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
@@ -50,18 +49,19 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType) {
 			},
 		},
 	})
-	wfId := wf_state_api_fail.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := wf_state_api_fail_and_proceed.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        wf_state_api_fail.WorkflowType,
+		IwfWorkflowType:        wf_state_api_fail_and_proceed.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           wf_state_api_fail.State1,
+		StartStateId:           wf_state_api_fail_and_proceed.State1,
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			StartApiRetryPolicy: &iwfidl.RetryPolicy{
 				MaximumAttempts: iwfidl.PtrInt32(1),
 			},
+			StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
@@ -76,14 +76,12 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType) {
 	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
-		"S1_start": 1,
-	}, history, "wf state api fail test fail, %v", history)
+		"S1_start":  1,
+		"S1_decide": 1,
+	}, history, "wf state api fail and proceed test fail, %v", history)
 
-	// TODO: fix (%!s(*string=<nil>)) in the error message
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
-		WorkflowStatus: iwfidl.FAILED,
-		ErrorType:      ptr.Any(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
-		ErrorMessage:   iwfidl.PtrString("statusCode: 400, responseBody: {}, errMsg: 400 Bad Request  (%!s(*string=<nil>))"),
+		WorkflowStatus: iwfidl.COMPLETED,
 	}, resp, "response not expected")
 }
