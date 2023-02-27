@@ -79,6 +79,7 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType) {
 		"S1_start": 1,
 	}, history, "wf state api fail test fail, %v", history)
 
+	// TODO: fix (%!s(*string=<nil>)) in the error message
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.FAILED,
