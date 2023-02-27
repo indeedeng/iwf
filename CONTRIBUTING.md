@@ -34,8 +34,18 @@ Here is the repository layout if you are interested to learn about it:
 1. Install openapi-generator using Homebrew if you haven't. See more [documentation](https://openapi-generator.tech/docs/installation)
 2. Check out the idl submodule by running the command: `git submodule update --init --recursive`
 3. Run the command `git submodule update --remote --merge` to update IDL to the latest commit
-4. Run `make idl-code-gen` to refresh the generated code
+4. Run `make idl-code-gen` to refresh the generated code. The command requires to have `openapi-generator` CLI.See the [openapi-generator doc](https://openapi-generator.tech/docs/installation/) for how to install it. And you may also need to upgrade it to the latest if it's older than what we are currently using.
 
+An easy way to install openapi-generator CLI is to use Homebrew:
+```
+brew install openapi-generator
+
+```
+And to upgrade it:
+```
+brew update && brew upgrade openapi-generator
+
+```
 
 ## How to run integration test
 
@@ -46,6 +56,8 @@ Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
 * Set up customized search attributes for integration test(`persistence_test.go`)
 * Temporal WebUI:  http://localhost:8080/
 * Cadence WebUI:  http://localhost:8088/
+
+NOTE: You need to wait for up to 60s before you can run with Cadence because of this [issue](https://github.com/uber/cadence/issues/5076).
 
 Then run the whole integ test suite against Cadence+Temporal service by this command:
 
@@ -102,7 +114,7 @@ cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
 cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
 ```
 After registering, it may take [up 60s](https://github.com/uber/cadence/blob/d618e32ac5ea05c411cca08c3e4859e800daa1e0/docker/config_template.yaml#L286) 
-for Cadence to load the new search attributes. If you run the test too early, you may see error:  `"IwfWorkflowType is not a valid search attribute key"`
+because of this [issue](https://github.com/uber/cadence/issues/5076). for Cadence to load the new search attributes. If you run the test too early, you may see error:  `"IwfWorkflowType is not a valid search attribute key"`.
 
 4. For Cadence docker compose, go to Cadence http://localhost:8088/domains/default/workflows?range=last-30-days
 
