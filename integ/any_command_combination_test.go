@@ -3,13 +3,14 @@ package integ
 import (
 	"context"
 	"encoding/json"
+	"strconv"
+	"testing"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	anycommandconbination "github.com/indeedeng/iwf/integ/workflow/any_command_combination"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
-	"strconv"
-	"testing"
-	"time"
 )
 
 func TestAnyCommandCombinationWorkflowTemporal(t *testing.T) {
@@ -152,6 +153,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"WAITING\"}" +
 		"],\"timerResults\":[" +
 		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}" +
+		"{\"StateStartApiSucceeded\":\"true\"}" +
 		"]}"
 	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
 	if err != nil {
@@ -164,6 +166,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}" +
 		"],\"timerResults\":[" +
 		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"SCHEDULED\"}" +
+		"{\"StateStartApiSucceeded\":\"true\"}" +
 		"]}"
 	err = json.Unmarshal([]byte(s2ResultsJsonStr), &s2CommandResults)
 	if err != nil {
