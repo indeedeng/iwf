@@ -76,8 +76,9 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType)
 	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
-		"S1_start": 1,
-	}, history, "wf state api fail test fail, %v", history)
+		"S1_start":  1,
+		"S1_decide": 1,
+	}, history, "wf state api fail and proceed test fail, %v", history)
 
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),

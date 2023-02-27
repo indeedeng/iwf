@@ -46,6 +46,20 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+	var req iwfidl.WorkflowStateDecideRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received state decide request, ", req)
+
+	if req.GetCommandResults().StateStartApiSucceeded == nil || *req.GetCommandResults().StateStartApiSucceeded {
+		panic("stateStartApiSucceeded should be false")
+	}
+
+	if req.GetWorkflowType() == WorkflowType {
+		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+	}
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{})
 }
 
