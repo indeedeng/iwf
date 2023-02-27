@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowGetSearchAttributesResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowGetSearchAttributesResponse{}
+
 // WorkflowGetSearchAttributesResponse struct for WorkflowGetSearchAttributesResponse
 type WorkflowGetSearchAttributesResponse struct {
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
@@ -38,7 +41,7 @@ func NewWorkflowGetSearchAttributesResponseWithDefaults() *WorkflowGetSearchAttr
 
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
 func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributes() []SearchAttribute {
-	if o == nil || o.SearchAttributes == nil {
+	if o == nil || IsNil(o.SearchAttributes) {
 		var ret []SearchAttribute
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributes() []SearchAttr
 // GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributesOk() ([]SearchAttribute, bool) {
-	if o == nil || o.SearchAttributes == nil {
+	if o == nil || IsNil(o.SearchAttributes) {
 		return nil, false
 	}
 	return o.SearchAttributes, true
@@ -56,7 +59,7 @@ func (o *WorkflowGetSearchAttributesResponse) GetSearchAttributesOk() ([]SearchA
 
 // HasSearchAttributes returns a boolean if a field has been set.
 func (o *WorkflowGetSearchAttributesResponse) HasSearchAttributes() bool {
-	if o != nil && o.SearchAttributes != nil {
+	if o != nil && !IsNil(o.SearchAttributes) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *WorkflowGetSearchAttributesResponse) SetSearchAttributes(v []SearchAttr
 }
 
 func (o WorkflowGetSearchAttributesResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.SearchAttributes != nil {
-		toSerialize["searchAttributes"] = o.SearchAttributes
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowGetSearchAttributesResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.SearchAttributes) {
+		toSerialize["searchAttributes"] = o.SearchAttributes
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowGetSearchAttributesResponse struct {

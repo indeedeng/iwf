@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowStartResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowStartResponse{}
+
 // WorkflowStartResponse struct for WorkflowStartResponse
 type WorkflowStartResponse struct {
 	WorkflowRunId *string `json:"workflowRunId,omitempty"`
@@ -38,7 +41,7 @@ func NewWorkflowStartResponseWithDefaults() *WorkflowStartResponse {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowStartResponse) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *WorkflowStartResponse) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowStartResponse) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -56,7 +59,7 @@ func (o *WorkflowStartResponse) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowStartResponse) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
+	if o != nil && !IsNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *WorkflowStartResponse) SetWorkflowRunId(v string) {
 }
 
 func (o WorkflowStartResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.WorkflowRunId != nil {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowStartResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowStartResponse struct {

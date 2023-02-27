@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowGetRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowGetRequest{}
+
 // WorkflowGetRequest struct for WorkflowGetRequest
 type WorkflowGetRequest struct {
 	WorkflowId      string  `json:"workflowId"`
@@ -66,7 +69,7 @@ func (o *WorkflowGetRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowGetRequest) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -76,7 +79,7 @@ func (o *WorkflowGetRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -84,7 +87,7 @@ func (o *WorkflowGetRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowGetRequest) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
+	if o != nil && !IsNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -98,7 +101,7 @@ func (o *WorkflowGetRequest) SetWorkflowRunId(v string) {
 
 // GetNeedsResults returns the NeedsResults field value if set, zero value otherwise.
 func (o *WorkflowGetRequest) GetNeedsResults() bool {
-	if o == nil || o.NeedsResults == nil {
+	if o == nil || IsNil(o.NeedsResults) {
 		var ret bool
 		return ret
 	}
@@ -108,7 +111,7 @@ func (o *WorkflowGetRequest) GetNeedsResults() bool {
 // GetNeedsResultsOk returns a tuple with the NeedsResults field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetNeedsResultsOk() (*bool, bool) {
-	if o == nil || o.NeedsResults == nil {
+	if o == nil || IsNil(o.NeedsResults) {
 		return nil, false
 	}
 	return o.NeedsResults, true
@@ -116,7 +119,7 @@ func (o *WorkflowGetRequest) GetNeedsResultsOk() (*bool, bool) {
 
 // HasNeedsResults returns a boolean if a field has been set.
 func (o *WorkflowGetRequest) HasNeedsResults() bool {
-	if o != nil && o.NeedsResults != nil {
+	if o != nil && !IsNil(o.NeedsResults) {
 		return true
 	}
 
@@ -130,7 +133,7 @@ func (o *WorkflowGetRequest) SetNeedsResults(v bool) {
 
 // GetWaitTimeSeconds returns the WaitTimeSeconds field value if set, zero value otherwise.
 func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32 {
-	if o == nil || o.WaitTimeSeconds == nil {
+	if o == nil || IsNil(o.WaitTimeSeconds) {
 		var ret int32
 		return ret
 	}
@@ -140,7 +143,7 @@ func (o *WorkflowGetRequest) GetWaitTimeSeconds() int32 {
 // GetWaitTimeSecondsOk returns a tuple with the WaitTimeSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool) {
-	if o == nil || o.WaitTimeSeconds == nil {
+	if o == nil || IsNil(o.WaitTimeSeconds) {
 		return nil, false
 	}
 	return o.WaitTimeSeconds, true
@@ -148,7 +151,7 @@ func (o *WorkflowGetRequest) GetWaitTimeSecondsOk() (*int32, bool) {
 
 // HasWaitTimeSeconds returns a boolean if a field has been set.
 func (o *WorkflowGetRequest) HasWaitTimeSeconds() bool {
-	if o != nil && o.WaitTimeSeconds != nil {
+	if o != nil && !IsNil(o.WaitTimeSeconds) {
 		return true
 	}
 
@@ -161,20 +164,26 @@ func (o *WorkflowGetRequest) SetWaitTimeSeconds(v int32) {
 }
 
 func (o WorkflowGetRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowId"] = o.WorkflowId
-	}
-	if o.WorkflowRunId != nil {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
-	if o.NeedsResults != nil {
-		toSerialize["needsResults"] = o.NeedsResults
-	}
-	if o.WaitTimeSeconds != nil {
-		toSerialize["waitTimeSeconds"] = o.WaitTimeSeconds
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowGetRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowId"] = o.WorkflowId
+	if !IsNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
+	}
+	if !IsNil(o.NeedsResults) {
+		toSerialize["needsResults"] = o.NeedsResults
+	}
+	if !IsNil(o.WaitTimeSeconds) {
+		toSerialize["waitTimeSeconds"] = o.WaitTimeSeconds
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowGetRequest struct {

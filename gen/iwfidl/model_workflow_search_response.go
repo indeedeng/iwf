@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowSearchResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowSearchResponse{}
+
 // WorkflowSearchResponse struct for WorkflowSearchResponse
 type WorkflowSearchResponse struct {
 	WorkflowExecutions []WorkflowSearchResponseEntry `json:"workflowExecutions,omitempty"`
@@ -39,7 +42,7 @@ func NewWorkflowSearchResponseWithDefaults() *WorkflowSearchResponse {
 
 // GetWorkflowExecutions returns the WorkflowExecutions field value if set, zero value otherwise.
 func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchResponseEntry {
-	if o == nil || o.WorkflowExecutions == nil {
+	if o == nil || IsNil(o.WorkflowExecutions) {
 		var ret []WorkflowSearchResponseEntry
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *WorkflowSearchResponse) GetWorkflowExecutions() []WorkflowSearchRespons
 // GetWorkflowExecutionsOk returns a tuple with the WorkflowExecutions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponse) GetWorkflowExecutionsOk() ([]WorkflowSearchResponseEntry, bool) {
-	if o == nil || o.WorkflowExecutions == nil {
+	if o == nil || IsNil(o.WorkflowExecutions) {
 		return nil, false
 	}
 	return o.WorkflowExecutions, true
@@ -57,7 +60,7 @@ func (o *WorkflowSearchResponse) GetWorkflowExecutionsOk() ([]WorkflowSearchResp
 
 // HasWorkflowExecutions returns a boolean if a field has been set.
 func (o *WorkflowSearchResponse) HasWorkflowExecutions() bool {
-	if o != nil && o.WorkflowExecutions != nil {
+	if o != nil && !IsNil(o.WorkflowExecutions) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *WorkflowSearchResponse) SetWorkflowExecutions(v []WorkflowSearchRespons
 
 // GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
 func (o *WorkflowSearchResponse) GetNextPageToken() string {
-	if o == nil || o.NextPageToken == nil {
+	if o == nil || IsNil(o.NextPageToken) {
 		var ret string
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *WorkflowSearchResponse) GetNextPageToken() string {
 // GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSearchResponse) GetNextPageTokenOk() (*string, bool) {
-	if o == nil || o.NextPageToken == nil {
+	if o == nil || IsNil(o.NextPageToken) {
 		return nil, false
 	}
 	return o.NextPageToken, true
@@ -89,7 +92,7 @@ func (o *WorkflowSearchResponse) GetNextPageTokenOk() (*string, bool) {
 
 // HasNextPageToken returns a boolean if a field has been set.
 func (o *WorkflowSearchResponse) HasNextPageToken() bool {
-	if o != nil && o.NextPageToken != nil {
+	if o != nil && !IsNil(o.NextPageToken) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *WorkflowSearchResponse) SetNextPageToken(v string) {
 }
 
 func (o WorkflowSearchResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.WorkflowExecutions != nil {
-		toSerialize["workflowExecutions"] = o.WorkflowExecutions
-	}
-	if o.NextPageToken != nil {
-		toSerialize["nextPageToken"] = o.NextPageToken
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowSearchResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.WorkflowExecutions) {
+		toSerialize["workflowExecutions"] = o.WorkflowExecutions
+	}
+	if !IsNil(o.NextPageToken) {
+		toSerialize["nextPageToken"] = o.NextPageToken
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowSearchResponse struct {

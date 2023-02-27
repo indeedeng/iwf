@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the StateCompletionOutput type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &StateCompletionOutput{}
+
 // StateCompletionOutput struct for StateCompletionOutput
 type StateCompletionOutput struct {
 	CompletedStateId          string         `json:"completedStateId"`
@@ -90,7 +93,7 @@ func (o *StateCompletionOutput) SetCompletedStateExecutionId(v string) {
 
 // GetCompletedStateOutput returns the CompletedStateOutput field value if set, zero value otherwise.
 func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
-	if o == nil || o.CompletedStateOutput == nil {
+	if o == nil || IsNil(o.CompletedStateOutput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -100,7 +103,7 @@ func (o *StateCompletionOutput) GetCompletedStateOutput() EncodedObject {
 // GetCompletedStateOutputOk returns a tuple with the CompletedStateOutput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, bool) {
-	if o == nil || o.CompletedStateOutput == nil {
+	if o == nil || IsNil(o.CompletedStateOutput) {
 		return nil, false
 	}
 	return o.CompletedStateOutput, true
@@ -108,7 +111,7 @@ func (o *StateCompletionOutput) GetCompletedStateOutputOk() (*EncodedObject, boo
 
 // HasCompletedStateOutput returns a boolean if a field has been set.
 func (o *StateCompletionOutput) HasCompletedStateOutput() bool {
-	if o != nil && o.CompletedStateOutput != nil {
+	if o != nil && !IsNil(o.CompletedStateOutput) {
 		return true
 	}
 
@@ -121,17 +124,21 @@ func (o *StateCompletionOutput) SetCompletedStateOutput(v EncodedObject) {
 }
 
 func (o StateCompletionOutput) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["completedStateId"] = o.CompletedStateId
-	}
-	if true {
-		toSerialize["completedStateExecutionId"] = o.CompletedStateExecutionId
-	}
-	if o.CompletedStateOutput != nil {
-		toSerialize["completedStateOutput"] = o.CompletedStateOutput
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o StateCompletionOutput) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["completedStateId"] = o.CompletedStateId
+	toSerialize["completedStateExecutionId"] = o.CompletedStateExecutionId
+	if !IsNil(o.CompletedStateOutput) {
+		toSerialize["completedStateOutput"] = o.CompletedStateOutput
+	}
+	return toSerialize, nil
 }
 
 type NullableStateCompletionOutput struct {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowSkipTimerRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowSkipTimerRequest{}
+
 // WorkflowSkipTimerRequest struct for WorkflowSkipTimerRequest
 type WorkflowSkipTimerRequest struct {
 	WorkflowId               string  `json:"workflowId"`
@@ -68,7 +71,7 @@ func (o *WorkflowSkipTimerRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -78,7 +81,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -86,7 +89,7 @@ func (o *WorkflowSkipTimerRequest) GetWorkflowRunIdOk() (*string, bool) {
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowSkipTimerRequest) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
+	if o != nil && !IsNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -124,7 +127,7 @@ func (o *WorkflowSkipTimerRequest) SetWorkflowStateExecutionId(v string) {
 
 // GetTimerCommandId returns the TimerCommandId field value if set, zero value otherwise.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandId() string {
-	if o == nil || o.TimerCommandId == nil {
+	if o == nil || IsNil(o.TimerCommandId) {
 		var ret string
 		return ret
 	}
@@ -134,7 +137,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandId() string {
 // GetTimerCommandIdOk returns a tuple with the TimerCommandId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIdOk() (*string, bool) {
-	if o == nil || o.TimerCommandId == nil {
+	if o == nil || IsNil(o.TimerCommandId) {
 		return nil, false
 	}
 	return o.TimerCommandId, true
@@ -142,7 +145,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIdOk() (*string, bool) {
 
 // HasTimerCommandId returns a boolean if a field has been set.
 func (o *WorkflowSkipTimerRequest) HasTimerCommandId() bool {
-	if o != nil && o.TimerCommandId != nil {
+	if o != nil && !IsNil(o.TimerCommandId) {
 		return true
 	}
 
@@ -156,7 +159,7 @@ func (o *WorkflowSkipTimerRequest) SetTimerCommandId(v string) {
 
 // GetTimerCommandIndex returns the TimerCommandIndex field value if set, zero value otherwise.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIndex() int32 {
-	if o == nil || o.TimerCommandIndex == nil {
+	if o == nil || IsNil(o.TimerCommandIndex) {
 		var ret int32
 		return ret
 	}
@@ -166,7 +169,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIndex() int32 {
 // GetTimerCommandIndexOk returns a tuple with the TimerCommandIndex field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowSkipTimerRequest) GetTimerCommandIndexOk() (*int32, bool) {
-	if o == nil || o.TimerCommandIndex == nil {
+	if o == nil || IsNil(o.TimerCommandIndex) {
 		return nil, false
 	}
 	return o.TimerCommandIndex, true
@@ -174,7 +177,7 @@ func (o *WorkflowSkipTimerRequest) GetTimerCommandIndexOk() (*int32, bool) {
 
 // HasTimerCommandIndex returns a boolean if a field has been set.
 func (o *WorkflowSkipTimerRequest) HasTimerCommandIndex() bool {
-	if o != nil && o.TimerCommandIndex != nil {
+	if o != nil && !IsNil(o.TimerCommandIndex) {
 		return true
 	}
 
@@ -187,23 +190,27 @@ func (o *WorkflowSkipTimerRequest) SetTimerCommandIndex(v int32) {
 }
 
 func (o WorkflowSkipTimerRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowId"] = o.WorkflowId
-	}
-	if o.WorkflowRunId != nil {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
-	if true {
-		toSerialize["workflowStateExecutionId"] = o.WorkflowStateExecutionId
-	}
-	if o.TimerCommandId != nil {
-		toSerialize["timerCommandId"] = o.TimerCommandId
-	}
-	if o.TimerCommandIndex != nil {
-		toSerialize["timerCommandIndex"] = o.TimerCommandIndex
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowSkipTimerRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowId"] = o.WorkflowId
+	if !IsNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
+	}
+	toSerialize["workflowStateExecutionId"] = o.WorkflowStateExecutionId
+	if !IsNil(o.TimerCommandId) {
+		toSerialize["timerCommandId"] = o.TimerCommandId
+	}
+	if !IsNil(o.TimerCommandIndex) {
+		toSerialize["timerCommandIndex"] = o.TimerCommandIndex
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowSkipTimerRequest struct {

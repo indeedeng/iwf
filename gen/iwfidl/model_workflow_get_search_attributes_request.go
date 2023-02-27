@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowGetSearchAttributesRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowGetSearchAttributesRequest{}
+
 // WorkflowGetSearchAttributesRequest struct for WorkflowGetSearchAttributesRequest
 type WorkflowGetSearchAttributesRequest struct {
 	WorkflowId    string                      `json:"workflowId"`
@@ -65,7 +68,7 @@ func (o *WorkflowGetSearchAttributesRequest) SetWorkflowId(v string) {
 
 // GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
 func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		var ret string
 		return ret
 	}
@@ -75,7 +78,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunId() string {
 // GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool) {
-	if o == nil || o.WorkflowRunId == nil {
+	if o == nil || IsNil(o.WorkflowRunId) {
 		return nil, false
 	}
 	return o.WorkflowRunId, true
@@ -83,7 +86,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetWorkflowRunIdOk() (*string, bool
 
 // HasWorkflowRunId returns a boolean if a field has been set.
 func (o *WorkflowGetSearchAttributesRequest) HasWorkflowRunId() bool {
-	if o != nil && o.WorkflowRunId != nil {
+	if o != nil && !IsNil(o.WorkflowRunId) {
 		return true
 	}
 
@@ -97,7 +100,7 @@ func (o *WorkflowGetSearchAttributesRequest) SetWorkflowRunId(v string) {
 
 // GetKeys returns the Keys field value if set, zero value otherwise.
 func (o *WorkflowGetSearchAttributesRequest) GetKeys() []SearchAttributeKeyAndType {
-	if o == nil || o.Keys == nil {
+	if o == nil || IsNil(o.Keys) {
 		var ret []SearchAttributeKeyAndType
 		return ret
 	}
@@ -107,7 +110,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetKeys() []SearchAttributeKeyAndTy
 // GetKeysOk returns a tuple with the Keys field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetSearchAttributesRequest) GetKeysOk() ([]SearchAttributeKeyAndType, bool) {
-	if o == nil || o.Keys == nil {
+	if o == nil || IsNil(o.Keys) {
 		return nil, false
 	}
 	return o.Keys, true
@@ -115,7 +118,7 @@ func (o *WorkflowGetSearchAttributesRequest) GetKeysOk() ([]SearchAttributeKeyAn
 
 // HasKeys returns a boolean if a field has been set.
 func (o *WorkflowGetSearchAttributesRequest) HasKeys() bool {
-	if o != nil && o.Keys != nil {
+	if o != nil && !IsNil(o.Keys) {
 		return true
 	}
 
@@ -128,17 +131,23 @@ func (o *WorkflowGetSearchAttributesRequest) SetKeys(v []SearchAttributeKeyAndTy
 }
 
 func (o WorkflowGetSearchAttributesRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["workflowId"] = o.WorkflowId
-	}
-	if o.WorkflowRunId != nil {
-		toSerialize["workflowRunId"] = o.WorkflowRunId
-	}
-	if o.Keys != nil {
-		toSerialize["keys"] = o.Keys
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowGetSearchAttributesRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["workflowId"] = o.WorkflowId
+	if !IsNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
+	}
+	if !IsNil(o.Keys) {
+		toSerialize["keys"] = o.Keys
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowGetSearchAttributesRequest struct {

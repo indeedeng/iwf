@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the WorkflowGetDataObjectsResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowGetDataObjectsResponse{}
+
 // WorkflowGetDataObjectsResponse struct for WorkflowGetDataObjectsResponse
 type WorkflowGetDataObjectsResponse struct {
 	Objects []KeyValue `json:"objects,omitempty"`
@@ -38,7 +41,7 @@ func NewWorkflowGetDataObjectsResponseWithDefaults() *WorkflowGetDataObjectsResp
 
 // GetObjects returns the Objects field value if set, zero value otherwise.
 func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue {
-	if o == nil || o.Objects == nil {
+	if o == nil || IsNil(o.Objects) {
 		var ret []KeyValue
 		return ret
 	}
@@ -48,7 +51,7 @@ func (o *WorkflowGetDataObjectsResponse) GetObjects() []KeyValue {
 // GetObjectsOk returns a tuple with the Objects field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() ([]KeyValue, bool) {
-	if o == nil || o.Objects == nil {
+	if o == nil || IsNil(o.Objects) {
 		return nil, false
 	}
 	return o.Objects, true
@@ -56,7 +59,7 @@ func (o *WorkflowGetDataObjectsResponse) GetObjectsOk() ([]KeyValue, bool) {
 
 // HasObjects returns a boolean if a field has been set.
 func (o *WorkflowGetDataObjectsResponse) HasObjects() bool {
-	if o != nil && o.Objects != nil {
+	if o != nil && !IsNil(o.Objects) {
 		return true
 	}
 
@@ -69,11 +72,19 @@ func (o *WorkflowGetDataObjectsResponse) SetObjects(v []KeyValue) {
 }
 
 func (o WorkflowGetDataObjectsResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Objects != nil {
-		toSerialize["objects"] = o.Objects
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o WorkflowGetDataObjectsResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Objects) {
+		toSerialize["objects"] = o.Objects
+	}
+	return toSerialize, nil
 }
 
 type NullableWorkflowGetDataObjectsResponse struct {

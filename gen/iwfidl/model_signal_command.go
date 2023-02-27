@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SignalCommand type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SignalCommand{}
+
 // SignalCommand struct for SignalCommand
 type SignalCommand struct {
 	CommandId         string `json:"commandId"`
@@ -88,14 +91,18 @@ func (o *SignalCommand) SetSignalChannelName(v string) {
 }
 
 func (o SignalCommand) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["commandId"] = o.CommandId
-	}
-	if true {
-		toSerialize["signalChannelName"] = o.SignalChannelName
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o SignalCommand) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["commandId"] = o.CommandId
+	toSerialize["signalChannelName"] = o.SignalChannelName
+	return toSerialize, nil
 }
 
 type NullableSignalCommand struct {

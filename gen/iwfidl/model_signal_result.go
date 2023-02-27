@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the SignalResult type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &SignalResult{}
+
 // SignalResult struct for SignalResult
 type SignalResult struct {
 	CommandId           string               `json:"commandId"`
@@ -116,7 +119,7 @@ func (o *SignalResult) SetSignalChannelName(v string) {
 
 // GetSignalValue returns the SignalValue field value if set, zero value otherwise.
 func (o *SignalResult) GetSignalValue() EncodedObject {
-	if o == nil || o.SignalValue == nil {
+	if o == nil || IsNil(o.SignalValue) {
 		var ret EncodedObject
 		return ret
 	}
@@ -126,7 +129,7 @@ func (o *SignalResult) GetSignalValue() EncodedObject {
 // GetSignalValueOk returns a tuple with the SignalValue field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SignalResult) GetSignalValueOk() (*EncodedObject, bool) {
-	if o == nil || o.SignalValue == nil {
+	if o == nil || IsNil(o.SignalValue) {
 		return nil, false
 	}
 	return o.SignalValue, true
@@ -134,7 +137,7 @@ func (o *SignalResult) GetSignalValueOk() (*EncodedObject, bool) {
 
 // HasSignalValue returns a boolean if a field has been set.
 func (o *SignalResult) HasSignalValue() bool {
-	if o != nil && o.SignalValue != nil {
+	if o != nil && !IsNil(o.SignalValue) {
 		return true
 	}
 
@@ -147,20 +150,22 @@ func (o *SignalResult) SetSignalValue(v EncodedObject) {
 }
 
 func (o SignalResult) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["commandId"] = o.CommandId
-	}
-	if true {
-		toSerialize["signalRequestStatus"] = o.SignalRequestStatus
-	}
-	if true {
-		toSerialize["signalChannelName"] = o.SignalChannelName
-	}
-	if o.SignalValue != nil {
-		toSerialize["signalValue"] = o.SignalValue
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o SignalResult) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["commandId"] = o.CommandId
+	toSerialize["signalRequestStatus"] = o.SignalRequestStatus
+	toSerialize["signalChannelName"] = o.SignalChannelName
+	if !IsNil(o.SignalValue) {
+		toSerialize["signalValue"] = o.SignalValue
+	}
+	return toSerialize, nil
 }
 
 type NullableSignalResult struct {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the StateMovement type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &StateMovement{}
+
 // StateMovement struct for StateMovement
 type StateMovement struct {
 	StateId      string                `json:"stateId"`
@@ -65,7 +68,7 @@ func (o *StateMovement) SetStateId(v string) {
 
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *StateMovement) GetStateInput() EncodedObject {
-	if o == nil || o.StateInput == nil {
+	if o == nil || IsNil(o.StateInput) {
 		var ret EncodedObject
 		return ret
 	}
@@ -75,7 +78,7 @@ func (o *StateMovement) GetStateInput() EncodedObject {
 // GetStateInputOk returns a tuple with the StateInput field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateInputOk() (*EncodedObject, bool) {
-	if o == nil || o.StateInput == nil {
+	if o == nil || IsNil(o.StateInput) {
 		return nil, false
 	}
 	return o.StateInput, true
@@ -83,7 +86,7 @@ func (o *StateMovement) GetStateInputOk() (*EncodedObject, bool) {
 
 // HasStateInput returns a boolean if a field has been set.
 func (o *StateMovement) HasStateInput() bool {
-	if o != nil && o.StateInput != nil {
+	if o != nil && !IsNil(o.StateInput) {
 		return true
 	}
 
@@ -97,7 +100,7 @@ func (o *StateMovement) SetStateInput(v EncodedObject) {
 
 // GetStateOptions returns the StateOptions field value if set, zero value otherwise.
 func (o *StateMovement) GetStateOptions() WorkflowStateOptions {
-	if o == nil || o.StateOptions == nil {
+	if o == nil || IsNil(o.StateOptions) {
 		var ret WorkflowStateOptions
 		return ret
 	}
@@ -107,7 +110,7 @@ func (o *StateMovement) GetStateOptions() WorkflowStateOptions {
 // GetStateOptionsOk returns a tuple with the StateOptions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *StateMovement) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
-	if o == nil || o.StateOptions == nil {
+	if o == nil || IsNil(o.StateOptions) {
 		return nil, false
 	}
 	return o.StateOptions, true
@@ -115,7 +118,7 @@ func (o *StateMovement) GetStateOptionsOk() (*WorkflowStateOptions, bool) {
 
 // HasStateOptions returns a boolean if a field has been set.
 func (o *StateMovement) HasStateOptions() bool {
-	if o != nil && o.StateOptions != nil {
+	if o != nil && !IsNil(o.StateOptions) {
 		return true
 	}
 
@@ -128,17 +131,23 @@ func (o *StateMovement) SetStateOptions(v WorkflowStateOptions) {
 }
 
 func (o StateMovement) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["stateId"] = o.StateId
-	}
-	if o.StateInput != nil {
-		toSerialize["stateInput"] = o.StateInput
-	}
-	if o.StateOptions != nil {
-		toSerialize["stateOptions"] = o.StateOptions
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o StateMovement) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["stateId"] = o.StateId
+	if !IsNil(o.StateInput) {
+		toSerialize["stateInput"] = o.StateInput
+	}
+	if !IsNil(o.StateOptions) {
+		toSerialize["stateOptions"] = o.StateOptions
+	}
+	return toSerialize, nil
 }
 
 type NullableStateMovement struct {

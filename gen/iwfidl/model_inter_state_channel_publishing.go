@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the InterStateChannelPublishing type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &InterStateChannelPublishing{}
+
 // InterStateChannelPublishing struct for InterStateChannelPublishing
 type InterStateChannelPublishing struct {
 	ChannelName string         `json:"channelName"`
@@ -64,7 +67,7 @@ func (o *InterStateChannelPublishing) SetChannelName(v string) {
 
 // GetValue returns the Value field value if set, zero value otherwise.
 func (o *InterStateChannelPublishing) GetValue() EncodedObject {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		var ret EncodedObject
 		return ret
 	}
@@ -74,7 +77,7 @@ func (o *InterStateChannelPublishing) GetValue() EncodedObject {
 // GetValueOk returns a tuple with the Value field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelPublishing) GetValueOk() (*EncodedObject, bool) {
-	if o == nil || o.Value == nil {
+	if o == nil || IsNil(o.Value) {
 		return nil, false
 	}
 	return o.Value, true
@@ -82,7 +85,7 @@ func (o *InterStateChannelPublishing) GetValueOk() (*EncodedObject, bool) {
 
 // HasValue returns a boolean if a field has been set.
 func (o *InterStateChannelPublishing) HasValue() bool {
-	if o != nil && o.Value != nil {
+	if o != nil && !IsNil(o.Value) {
 		return true
 	}
 
@@ -95,14 +98,20 @@ func (o *InterStateChannelPublishing) SetValue(v EncodedObject) {
 }
 
 func (o InterStateChannelPublishing) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["channelName"] = o.ChannelName
-	}
-	if o.Value != nil {
-		toSerialize["value"] = o.Value
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o InterStateChannelPublishing) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["channelName"] = o.ChannelName
+	if !IsNil(o.Value) {
+		toSerialize["value"] = o.Value
+	}
+	return toSerialize, nil
 }
 
 type NullableInterStateChannelPublishing struct {

@@ -340,10 +340,7 @@ func executeState(
 	commandReqDone = true
 
 	commandRes := &iwfidl.CommandResults{}
-
-	if state.StateOptions != nil && state.StateOptions.StartApiFailurePolicy != nil && state.StateOptions.GetStartApiFailurePolicy() == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE {
-		commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errStartApi == nil)
-	}
+	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errStartApi == nil)
 
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.FinishProcessing(stateExeId)
