@@ -152,7 +152,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"{\"commandId\":\"test-signal-name2\",\"signalChannelName\":\"test-signal-name2\",\"signalRequestStatus\":\"WAITING\"}," +
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"WAITING\"}" +
 		"],\"timerResults\":[" +
-		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}=" +
+		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}" +
 		"\"stateStartApiSucceeded\":\"true\"}"
 	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
 	if err != nil {
