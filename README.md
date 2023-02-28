@@ -343,8 +343,11 @@ iWF will provide more advanced policy to allow loading with "locking" in the fut
 
 By default, the workflow execution will fail when Start/Decide API max out the retry attempts. In some cases that
 workflow want to ignore the errors.
-A new feature is [WIP](https://github.com/indeedeng/iwf/issues/148) to introduce a `StartApiFailurePolicy` to allow
-this.
+
+Using `PROCEED_TO_DECIDE_ON_START_API_FAILURE` for `StartApiFailurePolicy` will let workflow continue to execute decide
+API when start API fails with maxing out all the retry attempts (therefore, you should override the default infinite
+retry
+attempts to a different number).
 
 Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
 exception/error.
@@ -514,7 +517,7 @@ Cadence/Temporal.
 ### 1.0
 
 - [x] Start workflow API
-- [x] Executing `start`/`decide` APIs and completing workflow
+- [x] Executing start/decide APIs and completing workflow
 - [x] Parallel execution of multiple states
 - [x] Timer command
 - [x] Signal command
@@ -548,6 +551,10 @@ Cadence/Temporal.
 
 - [x] Support failing workflow with results
 - [x] Support differentiate different uncompleted workflow closed status for GetWorkflow
+
+### 1.4
+
+- [x] Support PROCEED_TO_DECIDE_ON_START_API_FAILURE for StartApiFailurePolicy
 
 ### Future
 
