@@ -90,7 +90,7 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 	}
 
 	if options.RetryPolicy != nil {
-		workflowOptions.RetryPolicy = retry.ConvertTemporalRetryPolicy(options.RetryPolicy)
+		workflowOptions.RetryPolicy = retry.ConvertTemporalWorkflowRetryPolicy(options.RetryPolicy)
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)
