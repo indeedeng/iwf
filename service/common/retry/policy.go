@@ -21,17 +21,24 @@ func ConvertCadenceWorkflowRetryPolicy(policy *iwfidl.WorkflowRetryPolicy) *work
 	}
 }
 
-func ConvertCadenceRetryPolicy(policy *iwfidl.RetryPolicy) *workflow.RetryPolicy {
+func ConvertCadenceActivityRetryPolicy(policy *iwfidl.RetryPolicy) *workflow.RetryPolicy {
 	if policy == nil {
 		return nil
 	}
-	fillRetryPolicyDefault(policy)
+	fillActivityRetryPolicyDefault(policy)
+
+	// in Cadence, ExpirationInterval is the timeout include all retries
+	expirationInterval := time.Duration(0)
+	if policy.GetMaximumIntervalSeconds() > 0 {
+		expirationInterval = time.Second * time.Duration(policy.GetMaximumIntervalSeconds())
+	}
 
 	return &workflow.RetryPolicy{
 		InitialInterval:    time.Second * time.Duration(policy.GetInitialIntervalSeconds()),
 		MaximumInterval:    time.Second * time.Duration(policy.GetMaximumIntervalSeconds()),
 		MaximumAttempts:    policy.GetMaximumAttempts(),
 		BackoffCoefficient: float64(policy.GetBackoffCoefficient()),
+		ExpirationInterval: expirationInterval,
 	}
 }
 
@@ -49,11 +56,11 @@ func ConvertTemporalWorkflowRetryPolicy(policy *iwfidl.WorkflowRetryPolicy) *tem
 	}
 }
 
-func ConvertTemporalRetryPolicy(policy *iwfidl.RetryPolicy) *temporal.RetryPolicy {
+func ConvertTemporalActivityRetryPolicy(policy *iwfidl.RetryPolicy) *temporal.RetryPolicy {
 	if policy == nil {
 		return nil
 	}
-	fillRetryPolicyDefault(policy)
+	fillActivityRetryPolicyDefault(policy)
 
 	return &temporal.RetryPolicy{
 		InitialInterval:    time.Second * time.Duration(policy.GetInitialIntervalSeconds()),
@@ -63,7 +70,7 @@ func ConvertTemporalRetryPolicy(policy *iwfidl.RetryPolicy) *temporal.RetryPolic
 	}
 }
 
-func fillRetryPolicyDefault(policy *iwfidl.RetryPolicy) {
+func fillActivityRetryPolicyDefault(policy *iwfidl.RetryPolicy) {
 	if policy.InitialIntervalSeconds == nil {
 		policy.InitialIntervalSeconds = iwfidl.PtrInt32(1)
 	}
@@ -75,6 +82,9 @@ func fillRetryPolicyDefault(policy *iwfidl.RetryPolicy) {
 	}
 	if policy.MaximumAttempts == nil {
 		policy.MaximumAttempts = iwfidl.PtrInt32(0)
+	}
+	if policy.MaximumAttemptsDurationSeconds == nil {
+		policy.MaximumAttemptsDurationSeconds = iwfidl.PtrInt32(0)
 	}
 }
 

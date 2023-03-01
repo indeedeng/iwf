@@ -102,9 +102,17 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
+
+	// in Temporal, scheduled to close timeout is the timeout include all retries
+	scheduledToCloseTimeout := time.Duration(0)
+	if options.RetryPolicy.GetMaximumIntervalSeconds() > 0 {
+		scheduledToCloseTimeout = time.Second * time.Duration(options.RetryPolicy.GetMaximumIntervalSeconds())
+	}
+
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
-		StartToCloseTimeout: options.StartToCloseTimeout,
-		RetryPolicy:         retry.ConvertTemporalRetryPolicy(options.RetryPolicy),
+		ScheduleToCloseTimeout: scheduledToCloseTimeout,
+		StartToCloseTimeout:    options.StartToCloseTimeout,
+		RetryPolicy:            retry.ConvertTemporalActivityRetryPolicy(options.RetryPolicy),
 	})
 	return interpreter.NewUnifiedContext(wfCtx2)
 }
