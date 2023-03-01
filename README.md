@@ -331,7 +331,7 @@ Where zero means infinite attempts.
 Both MaximumAttempts and MaximumAttemptsDurationSeconds are used for controlling the maximum attempts for the retry
 policy.
 MaximumAttempts is directly by number of attempts, where MaximumAttemptsDurationSeconds is by the total time duration of
-all attempts including retries.
+all attempts including retries. It will be capped to the minimum if both are provided.
 
 #### Persistence loading policy
 
