@@ -60,7 +60,7 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType) {
 		StartStateId:           wf_state_api_fail.State1,
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			StartApiRetryPolicy: &iwfidl.RetryPolicy{
-				MaximumAttempts: iwfidl.PtrInt32(1),
+				MaximumAttemptsDurationSeconds: iwfidl.PtrInt32(1),
 			},
 		},
 	}).Execute()

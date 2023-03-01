@@ -105,8 +105,8 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 
 	// in Temporal, scheduled to close timeout is the timeout include all retries
 	scheduledToCloseTimeout := time.Duration(0)
-	if options.RetryPolicy.GetMaximumIntervalSeconds() > 0 {
-		scheduledToCloseTimeout = time.Second * time.Duration(options.RetryPolicy.GetMaximumIntervalSeconds())
+	if options.RetryPolicy.GetMaximumAttemptsDurationSeconds() > 0 {
+		scheduledToCloseTimeout = time.Second * time.Duration(options.RetryPolicy.GetMaximumAttemptsDurationSeconds())
 	}
 
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{

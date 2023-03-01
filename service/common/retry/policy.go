@@ -29,8 +29,8 @@ func ConvertCadenceActivityRetryPolicy(policy *iwfidl.RetryPolicy) *workflow.Ret
 
 	// in Cadence, ExpirationInterval is the timeout include all retries
 	expirationInterval := time.Duration(0)
-	if policy.GetMaximumIntervalSeconds() > 0 {
-		expirationInterval = time.Second * time.Duration(policy.GetMaximumIntervalSeconds())
+	if policy.GetMaximumAttemptsDurationSeconds() > 0 {
+		expirationInterval = time.Second * time.Duration(policy.GetMaximumAttemptsDurationSeconds())
 	}
 
 	return &workflow.RetryPolicy{
