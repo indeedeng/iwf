@@ -17,10 +17,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: "Set up Cadence/Temporal environment"
         run: docker compose -f docker-compose/ci-cadence-temporal-dependencies.yml up -d
-      - name: "Test against temporal"
-        run: make ci-temporal-integ-test
-      - name: "Test against cadence"
-        run: make ci-cadence-integ-test
+      - name: "Test against cadence/temporal"
+        run: make ci-cadence-temporal-integ-test
       - name: Dump docker logs
         if: always()
         uses: jwalton/gh-docker-logs@v2
