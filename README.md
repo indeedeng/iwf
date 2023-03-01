@@ -485,6 +485,9 @@ Usually, you need to set up monitors/dashboards:
 * API availability
 * API latency
 
+In addition to the workflow failure monitors. You can get it from Cadence/Temporal, or you need to emit it within the
+iWF workflow (since workflow failure is from a Decide API decision)
+
 ## Troubleshooting
 
 When something goes wrong in your applications, here are the tips:
