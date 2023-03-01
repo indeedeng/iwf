@@ -1,4 +1,4 @@
-# RetryPolicy
+# WorkflowRetryPolicy
 
 ## Properties
 
@@ -8,151 +8,125 @@ Name | Type | Description | Notes
 **BackoffCoefficient** | Pointer to **float32** |  | [optional] 
 **MaximumIntervalSeconds** | Pointer to **int32** |  | [optional] 
 **MaximumAttempts** | Pointer to **int32** |  | [optional] 
-**MaximumAttemptsDurationSeconds** | Pointer to **int32** |  | [optional] 
 
 ## Methods
 
-### NewRetryPolicy
+### NewWorkflowRetryPolicy
 
-`func NewRetryPolicy() *RetryPolicy`
+`func NewWorkflowRetryPolicy() *WorkflowRetryPolicy`
 
-NewRetryPolicy instantiates a new RetryPolicy object
+NewWorkflowRetryPolicy instantiates a new WorkflowRetryPolicy object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewRetryPolicyWithDefaults
+### NewWorkflowRetryPolicyWithDefaults
 
-`func NewRetryPolicyWithDefaults() *RetryPolicy`
+`func NewWorkflowRetryPolicyWithDefaults() *WorkflowRetryPolicy`
 
-NewRetryPolicyWithDefaults instantiates a new RetryPolicy object
+NewWorkflowRetryPolicyWithDefaults instantiates a new WorkflowRetryPolicy object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetInitialIntervalSeconds
 
-`func (o *RetryPolicy) GetInitialIntervalSeconds() int32`
+`func (o *WorkflowRetryPolicy) GetInitialIntervalSeconds() int32`
 
 GetInitialIntervalSeconds returns the InitialIntervalSeconds field if non-nil, zero value otherwise.
 
 ### GetInitialIntervalSecondsOk
 
-`func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool)`
+`func (o *WorkflowRetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool)`
 
 GetInitialIntervalSecondsOk returns a tuple with the InitialIntervalSeconds field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetInitialIntervalSeconds
 
-`func (o *RetryPolicy) SetInitialIntervalSeconds(v int32)`
+`func (o *WorkflowRetryPolicy) SetInitialIntervalSeconds(v int32)`
 
 SetInitialIntervalSeconds sets InitialIntervalSeconds field to given value.
 
 ### HasInitialIntervalSeconds
 
-`func (o *RetryPolicy) HasInitialIntervalSeconds() bool`
+`func (o *WorkflowRetryPolicy) HasInitialIntervalSeconds() bool`
 
 HasInitialIntervalSeconds returns a boolean if a field has been set.
 
 ### GetBackoffCoefficient
 
-`func (o *RetryPolicy) GetBackoffCoefficient() float32`
+`func (o *WorkflowRetryPolicy) GetBackoffCoefficient() float32`
 
 GetBackoffCoefficient returns the BackoffCoefficient field if non-nil, zero value otherwise.
 
 ### GetBackoffCoefficientOk
 
-`func (o *RetryPolicy) GetBackoffCoefficientOk() (*float32, bool)`
+`func (o *WorkflowRetryPolicy) GetBackoffCoefficientOk() (*float32, bool)`
 
 GetBackoffCoefficientOk returns a tuple with the BackoffCoefficient field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetBackoffCoefficient
 
-`func (o *RetryPolicy) SetBackoffCoefficient(v float32)`
+`func (o *WorkflowRetryPolicy) SetBackoffCoefficient(v float32)`
 
 SetBackoffCoefficient sets BackoffCoefficient field to given value.
 
 ### HasBackoffCoefficient
 
-`func (o *RetryPolicy) HasBackoffCoefficient() bool`
+`func (o *WorkflowRetryPolicy) HasBackoffCoefficient() bool`
 
 HasBackoffCoefficient returns a boolean if a field has been set.
 
 ### GetMaximumIntervalSeconds
 
-`func (o *RetryPolicy) GetMaximumIntervalSeconds() int32`
+`func (o *WorkflowRetryPolicy) GetMaximumIntervalSeconds() int32`
 
 GetMaximumIntervalSeconds returns the MaximumIntervalSeconds field if non-nil, zero value otherwise.
 
 ### GetMaximumIntervalSecondsOk
 
-`func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool)`
+`func (o *WorkflowRetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool)`
 
 GetMaximumIntervalSecondsOk returns a tuple with the MaximumIntervalSeconds field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetMaximumIntervalSeconds
 
-`func (o *RetryPolicy) SetMaximumIntervalSeconds(v int32)`
+`func (o *WorkflowRetryPolicy) SetMaximumIntervalSeconds(v int32)`
 
 SetMaximumIntervalSeconds sets MaximumIntervalSeconds field to given value.
 
 ### HasMaximumIntervalSeconds
 
-`func (o *RetryPolicy) HasMaximumIntervalSeconds() bool`
+`func (o *WorkflowRetryPolicy) HasMaximumIntervalSeconds() bool`
 
 HasMaximumIntervalSeconds returns a boolean if a field has been set.
 
 ### GetMaximumAttempts
 
-`func (o *RetryPolicy) GetMaximumAttempts() int32`
+`func (o *WorkflowRetryPolicy) GetMaximumAttempts() int32`
 
 GetMaximumAttempts returns the MaximumAttempts field if non-nil, zero value otherwise.
 
 ### GetMaximumAttemptsOk
 
-`func (o *RetryPolicy) GetMaximumAttemptsOk() (*int32, bool)`
+`func (o *WorkflowRetryPolicy) GetMaximumAttemptsOk() (*int32, bool)`
 
 GetMaximumAttemptsOk returns a tuple with the MaximumAttempts field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetMaximumAttempts
 
-`func (o *RetryPolicy) SetMaximumAttempts(v int32)`
+`func (o *WorkflowRetryPolicy) SetMaximumAttempts(v int32)`
 
 SetMaximumAttempts sets MaximumAttempts field to given value.
 
 ### HasMaximumAttempts
 
-`func (o *RetryPolicy) HasMaximumAttempts() bool`
+`func (o *WorkflowRetryPolicy) HasMaximumAttempts() bool`
 
 HasMaximumAttempts returns a boolean if a field has been set.
-
-### GetMaximumAttemptsDurationSeconds
-
-`func (o *RetryPolicy) GetMaximumAttemptsDurationSeconds() int32`
-
-GetMaximumAttemptsDurationSeconds returns the MaximumAttemptsDurationSeconds field if non-nil, zero value otherwise.
-
-### GetMaximumAttemptsDurationSecondsOk
-
-`func (o *RetryPolicy) GetMaximumAttemptsDurationSecondsOk() (*int32, bool)`
-
-GetMaximumAttemptsDurationSecondsOk returns a tuple with the MaximumAttemptsDurationSeconds field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetMaximumAttemptsDurationSeconds
-
-`func (o *RetryPolicy) SetMaximumAttemptsDurationSeconds(v int32)`
-
-SetMaximumAttemptsDurationSeconds sets MaximumAttemptsDurationSeconds field to given value.
-
-### HasMaximumAttemptsDurationSeconds
-
-`func (o *RetryPolicy) HasMaximumAttemptsDurationSeconds() bool`
-
-HasMaximumAttemptsDurationSeconds returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -48,6 +48,7 @@ docs/WorkflowIDReusePolicy.md
 docs/WorkflowResetRequest.md
 docs/WorkflowResetResponse.md
 docs/WorkflowResetType.md
+docs/WorkflowRetryPolicy.md
 docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
@@ -108,6 +109,7 @@ model_workflow_id_reuse_policy.go
 model_workflow_reset_request.go
 model_workflow_reset_response.go
 model_workflow_reset_type.go
+model_workflow_retry_policy.go
 model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go

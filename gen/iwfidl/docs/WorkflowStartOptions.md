@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowIDReusePolicy** | Pointer to [**WorkflowIDReusePolicy**](WorkflowIDReusePolicy.md) |  | [optional] 
 **CronSchedule** | Pointer to **string** |  | [optional] 
-**RetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
+**RetryPolicy** | Pointer to [**WorkflowRetryPolicy**](WorkflowRetryPolicy.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 
 ## Methods
@@ -80,20 +80,20 @@ HasCronSchedule returns a boolean if a field has been set.
 
 ### GetRetryPolicy
 
-`func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy`
+`func (o *WorkflowStartOptions) GetRetryPolicy() WorkflowRetryPolicy`
 
 GetRetryPolicy returns the RetryPolicy field if non-nil, zero value otherwise.
 
 ### GetRetryPolicyOk
 
-`func (o *WorkflowStartOptions) GetRetryPolicyOk() (*RetryPolicy, bool)`
+`func (o *WorkflowStartOptions) GetRetryPolicyOk() (*WorkflowRetryPolicy, bool)`
 
 GetRetryPolicyOk returns a tuple with the RetryPolicy field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetRetryPolicy
 
-`func (o *WorkflowStartOptions) SetRetryPolicy(v RetryPolicy)`
+`func (o *WorkflowStartOptions) SetRetryPolicy(v WorkflowRetryPolicy)`
 
 SetRetryPolicy sets RetryPolicy field to given value.
 

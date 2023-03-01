@@ -301,9 +301,9 @@ components:
       example:
         stringValue: stringValue
         valueType: null
-        integerValue: 9
+        integerValue: 1
         boolValue: true
-        doubleValue: 3.616076749251911
+        doubleValue: 1.0246457001441578
         stringArrayValue:
         - stringArrayValue
         - stringArrayValue
@@ -330,10 +330,30 @@ components:
       type: object
     RetryPolicy:
       example:
+        maximumAttemptsDurationSeconds: 9
         maximumAttempts: 7
         initialIntervalSeconds: 5
         maximumIntervalSeconds: 2
         backoffCoefficient: 5.637377
+      properties:
+        initialIntervalSeconds:
+          type: integer
+        backoffCoefficient:
+          format: float
+          type: number
+        maximumIntervalSeconds:
+          type: integer
+        maximumAttempts:
+          type: integer
+        maximumAttemptsDurationSeconds:
+          type: integer
+      type: object
+    WorkflowRetryPolicy:
+      example:
+        maximumAttempts: 7
+        initialIntervalSeconds: 3
+        maximumIntervalSeconds: 4
+        backoffCoefficient: 2.027123
       properties:
         initialIntervalSeconds:
           type: integer
@@ -360,6 +380,7 @@ components:
         commandCarryOverPolicy:
           commandCarryOverType: null
         decideApiRetryPolicy:
+          maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
@@ -367,6 +388,7 @@ components:
         decideApiTimeoutSeconds: 1
         startApiTimeoutSeconds: 6
         startApiRetryPolicy:
+          maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
@@ -399,24 +421,24 @@ components:
       example:
         retryPolicy:
           maximumAttempts: 7
-          initialIntervalSeconds: 5
-          maximumIntervalSeconds: 2
-          backoffCoefficient: 5.637377
+          initialIntervalSeconds: 3
+          maximumIntervalSeconds: 4
+          backoffCoefficient: 2.027123
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -429,7 +451,7 @@ components:
         cronSchedule:
           type: string
         retryPolicy:
-          $ref: '#/components/schemas/RetryPolicy'
+          $ref: '#/components/schemas/WorkflowRetryPolicy'
         searchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
@@ -498,6 +520,7 @@ components:
           commandCarryOverPolicy:
             commandCarryOverType: null
           decideApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
@@ -505,6 +528,7 @@ components:
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
           startApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
@@ -519,24 +543,24 @@ components:
         workflowStartOptions:
           retryPolicy:
             maximumAttempts: 7
-            initialIntervalSeconds: 5
-            maximumIntervalSeconds: 2
-            backoffCoefficient: 5.637377
+            initialIntervalSeconds: 3
+            maximumIntervalSeconds: 4
+            backoffCoefficient: 2.027123
           searchAttributes:
           - stringValue: stringValue
             valueType: null
-            integerValue: 9
+            integerValue: 1
             boolValue: true
-            doubleValue: 3.616076749251911
+            doubleValue: 1.0246457001441578
             stringArrayValue:
             - stringArrayValue
             - stringArrayValue
             key: key
           - stringValue: stringValue
             valueType: null
-            integerValue: 9
+            integerValue: 1
             boolValue: true
-            doubleValue: 3.616076749251911
+            doubleValue: 1.0246457001441578
             stringArrayValue:
             - stringArrayValue
             - stringArrayValue
@@ -684,18 +708,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -912,18 +936,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -980,18 +1004,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1136,18 +1160,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1197,18 +1221,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 9
+          integerValue: 1
           boolValue: true
-          doubleValue: 3.616076749251911
+          doubleValue: 1.0246457001441578
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1234,6 +1258,7 @@ components:
               commandCarryOverPolicy:
                 commandCarryOverType: null
               decideApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
@@ -1241,6 +1266,7 @@ components:
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
               startApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
@@ -1264,6 +1290,7 @@ components:
               commandCarryOverPolicy:
                 commandCarryOverType: null
               decideApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
@@ -1271,6 +1298,7 @@ components:
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
               startApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
@@ -1348,6 +1376,7 @@ components:
             commandCarryOverPolicy:
               commandCarryOverType: null
             decideApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
@@ -1355,6 +1384,7 @@ components:
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
             startApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
@@ -1378,6 +1408,7 @@ components:
             commandCarryOverPolicy:
               commandCarryOverType: null
             decideApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
@@ -1385,6 +1416,7 @@ components:
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
             startApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
@@ -1416,6 +1448,7 @@ components:
           commandCarryOverPolicy:
             commandCarryOverType: null
           decideApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
@@ -1423,6 +1456,7 @@ components:
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
           startApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2

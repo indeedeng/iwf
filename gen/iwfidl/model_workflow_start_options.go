@@ -21,7 +21,7 @@ var _ MappedNullable = &WorkflowStartOptions{}
 type WorkflowStartOptions struct {
 	WorkflowIDReusePolicy *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
 	CronSchedule          *string                `json:"cronSchedule,omitempty"`
-	RetryPolicy           *RetryPolicy           `json:"retryPolicy,omitempty"`
+	RetryPolicy           *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
 	SearchAttributes      []SearchAttribute      `json:"searchAttributes,omitempty"`
 }
 
@@ -107,9 +107,9 @@ func (o *WorkflowStartOptions) SetCronSchedule(v string) {
 }
 
 // GetRetryPolicy returns the RetryPolicy field value if set, zero value otherwise.
-func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy {
+func (o *WorkflowStartOptions) GetRetryPolicy() WorkflowRetryPolicy {
 	if o == nil || IsNil(o.RetryPolicy) {
-		var ret RetryPolicy
+		var ret WorkflowRetryPolicy
 		return ret
 	}
 	return *o.RetryPolicy
@@ -117,7 +117,7 @@ func (o *WorkflowStartOptions) GetRetryPolicy() RetryPolicy {
 
 // GetRetryPolicyOk returns a tuple with the RetryPolicy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStartOptions) GetRetryPolicyOk() (*RetryPolicy, bool) {
+func (o *WorkflowStartOptions) GetRetryPolicyOk() (*WorkflowRetryPolicy, bool) {
 	if o == nil || IsNil(o.RetryPolicy) {
 		return nil, false
 	}
@@ -133,8 +133,8 @@ func (o *WorkflowStartOptions) HasRetryPolicy() bool {
 	return false
 }
 
-// SetRetryPolicy gets a reference to the given RetryPolicy and assigns it to the RetryPolicy field.
-func (o *WorkflowStartOptions) SetRetryPolicy(v RetryPolicy) {
+// SetRetryPolicy gets a reference to the given WorkflowRetryPolicy and assigns it to the RetryPolicy field.
+func (o *WorkflowStartOptions) SetRetryPolicy(v WorkflowRetryPolicy) {
 	o.RetryPolicy = &v
 }
 
