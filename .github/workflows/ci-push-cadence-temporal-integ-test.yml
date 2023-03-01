@@ -1,4 +1,4 @@
-name: Temporal Integration Test
+name: Temporal/Cadence 2-in-1 Integration Test
 on:
   pull_request:
   push:
