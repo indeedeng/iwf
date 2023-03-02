@@ -118,6 +118,8 @@ A WorkflowState is implemented using two APIs: the `start` API and the `decide` 
 
 The same WorkflowState can be re-executed as different stateExecutions.
 
+The start/decide APIs can call any external APIs as part of the implementations.
+
 ![workflow diagram example](https://user-images.githubusercontent.com/4523955/218195868-17818b58-0d00-4523-8cc6-df4c04526c0d.png)
 
 ### Workflow execution and WorkflowState execution
