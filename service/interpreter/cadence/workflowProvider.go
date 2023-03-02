@@ -108,7 +108,7 @@ func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, o
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
 		StartToCloseTimeout:    options.StartToCloseTimeout,
 		ScheduleToStartTimeout: unlimited,
-		RetryPolicy:            retry.ConvertCadenceRetryPolicy(options.RetryPolicy),
+		RetryPolicy:            retry.ConvertCadenceActivityRetryPolicy(options.RetryPolicy),
 	})
 	return interpreter.NewUnifiedContext(wfCtx2)
 }

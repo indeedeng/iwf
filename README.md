@@ -118,6 +118,8 @@ A WorkflowState is implemented using two APIs: the `start` API and the `decide` 
 
 The same WorkflowState can be re-executed as different stateExecutions.
 
+The start/decide APIs can call any external APIs as part of the implementations.
+
 ![workflow diagram example](https://user-images.githubusercontent.com/4523955/218195868-17818b58-0d00-4523-8cc6-df4c04526c0d.png)
 
 ### Workflow execution and WorkflowState execution
@@ -323,9 +325,15 @@ By default, the API timeout is 30s with infinite backoff retry:
 - InitialIntervalSeconds: 1
 - MaxInternalSeconds:100
 - MaximumAttempts: 0
+- MaximumAttemptsDurationSeconds: 0
 - BackoffCoefficient: 2
 
 Where zero means infinite attempts.
+
+Both MaximumAttempts and MaximumAttemptsDurationSeconds are used for controlling the maximum attempts for the retry
+policy.
+MaximumAttempts is directly by number of attempts, where MaximumAttemptsDurationSeconds is by the total time duration of
+all attempts including retries. It will be capped to the minimum if both are provided.
 
 #### Persistence loading policy
 
@@ -478,6 +486,9 @@ Usually, you need to set up monitors/dashboards:
 
 * API availability
 * API latency
+
+In addition to the workflow failure monitors. You can get it from Cadence/Temporal, or you need to emit it within the
+iWF workflow (since workflow failure is from a Decide API decision)
 
 ## Troubleshooting
 

@@ -90,7 +90,7 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 	}
 
 	if options.RetryPolicy != nil {
-		workflowOptions.RetryPolicy = retry.ConvertCadenceRetryPolicy(options.RetryPolicy)
+		workflowOptions.RetryPolicy = retry.ConvertCadenceWorkflowRetryPolicy(options.RetryPolicy)
 	}
 
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)

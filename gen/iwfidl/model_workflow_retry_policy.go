@@ -14,37 +14,36 @@ import (
 	"encoding/json"
 )
 
-// checks if the RetryPolicy type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &RetryPolicy{}
+// checks if the WorkflowRetryPolicy type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WorkflowRetryPolicy{}
 
-// RetryPolicy struct for RetryPolicy
-type RetryPolicy struct {
-	InitialIntervalSeconds         *int32   `json:"initialIntervalSeconds,omitempty"`
-	BackoffCoefficient             *float32 `json:"backoffCoefficient,omitempty"`
-	MaximumIntervalSeconds         *int32   `json:"maximumIntervalSeconds,omitempty"`
-	MaximumAttempts                *int32   `json:"maximumAttempts,omitempty"`
-	MaximumAttemptsDurationSeconds *int32   `json:"maximumAttemptsDurationSeconds,omitempty"`
+// WorkflowRetryPolicy struct for WorkflowRetryPolicy
+type WorkflowRetryPolicy struct {
+	InitialIntervalSeconds *int32   `json:"initialIntervalSeconds,omitempty"`
+	BackoffCoefficient     *float32 `json:"backoffCoefficient,omitempty"`
+	MaximumIntervalSeconds *int32   `json:"maximumIntervalSeconds,omitempty"`
+	MaximumAttempts        *int32   `json:"maximumAttempts,omitempty"`
 }
 
-// NewRetryPolicy instantiates a new RetryPolicy object
+// NewWorkflowRetryPolicy instantiates a new WorkflowRetryPolicy object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRetryPolicy() *RetryPolicy {
-	this := RetryPolicy{}
+func NewWorkflowRetryPolicy() *WorkflowRetryPolicy {
+	this := WorkflowRetryPolicy{}
 	return &this
 }
 
-// NewRetryPolicyWithDefaults instantiates a new RetryPolicy object
+// NewWorkflowRetryPolicyWithDefaults instantiates a new WorkflowRetryPolicy object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewRetryPolicyWithDefaults() *RetryPolicy {
-	this := RetryPolicy{}
+func NewWorkflowRetryPolicyWithDefaults() *WorkflowRetryPolicy {
+	this := WorkflowRetryPolicy{}
 	return &this
 }
 
 // GetInitialIntervalSeconds returns the InitialIntervalSeconds field value if set, zero value otherwise.
-func (o *RetryPolicy) GetInitialIntervalSeconds() int32 {
+func (o *WorkflowRetryPolicy) GetInitialIntervalSeconds() int32 {
 	if o == nil || IsNil(o.InitialIntervalSeconds) {
 		var ret int32
 		return ret
@@ -54,7 +53,7 @@ func (o *RetryPolicy) GetInitialIntervalSeconds() int32 {
 
 // GetInitialIntervalSecondsOk returns a tuple with the InitialIntervalSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool) {
+func (o *WorkflowRetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool) {
 	if o == nil || IsNil(o.InitialIntervalSeconds) {
 		return nil, false
 	}
@@ -62,7 +61,7 @@ func (o *RetryPolicy) GetInitialIntervalSecondsOk() (*int32, bool) {
 }
 
 // HasInitialIntervalSeconds returns a boolean if a field has been set.
-func (o *RetryPolicy) HasInitialIntervalSeconds() bool {
+func (o *WorkflowRetryPolicy) HasInitialIntervalSeconds() bool {
 	if o != nil && !IsNil(o.InitialIntervalSeconds) {
 		return true
 	}
@@ -71,12 +70,12 @@ func (o *RetryPolicy) HasInitialIntervalSeconds() bool {
 }
 
 // SetInitialIntervalSeconds gets a reference to the given int32 and assigns it to the InitialIntervalSeconds field.
-func (o *RetryPolicy) SetInitialIntervalSeconds(v int32) {
+func (o *WorkflowRetryPolicy) SetInitialIntervalSeconds(v int32) {
 	o.InitialIntervalSeconds = &v
 }
 
 // GetBackoffCoefficient returns the BackoffCoefficient field value if set, zero value otherwise.
-func (o *RetryPolicy) GetBackoffCoefficient() float32 {
+func (o *WorkflowRetryPolicy) GetBackoffCoefficient() float32 {
 	if o == nil || IsNil(o.BackoffCoefficient) {
 		var ret float32
 		return ret
@@ -86,7 +85,7 @@ func (o *RetryPolicy) GetBackoffCoefficient() float32 {
 
 // GetBackoffCoefficientOk returns a tuple with the BackoffCoefficient field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetBackoffCoefficientOk() (*float32, bool) {
+func (o *WorkflowRetryPolicy) GetBackoffCoefficientOk() (*float32, bool) {
 	if o == nil || IsNil(o.BackoffCoefficient) {
 		return nil, false
 	}
@@ -94,7 +93,7 @@ func (o *RetryPolicy) GetBackoffCoefficientOk() (*float32, bool) {
 }
 
 // HasBackoffCoefficient returns a boolean if a field has been set.
-func (o *RetryPolicy) HasBackoffCoefficient() bool {
+func (o *WorkflowRetryPolicy) HasBackoffCoefficient() bool {
 	if o != nil && !IsNil(o.BackoffCoefficient) {
 		return true
 	}
@@ -103,12 +102,12 @@ func (o *RetryPolicy) HasBackoffCoefficient() bool {
 }
 
 // SetBackoffCoefficient gets a reference to the given float32 and assigns it to the BackoffCoefficient field.
-func (o *RetryPolicy) SetBackoffCoefficient(v float32) {
+func (o *WorkflowRetryPolicy) SetBackoffCoefficient(v float32) {
 	o.BackoffCoefficient = &v
 }
 
 // GetMaximumIntervalSeconds returns the MaximumIntervalSeconds field value if set, zero value otherwise.
-func (o *RetryPolicy) GetMaximumIntervalSeconds() int32 {
+func (o *WorkflowRetryPolicy) GetMaximumIntervalSeconds() int32 {
 	if o == nil || IsNil(o.MaximumIntervalSeconds) {
 		var ret int32
 		return ret
@@ -118,7 +117,7 @@ func (o *RetryPolicy) GetMaximumIntervalSeconds() int32 {
 
 // GetMaximumIntervalSecondsOk returns a tuple with the MaximumIntervalSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool) {
+func (o *WorkflowRetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool) {
 	if o == nil || IsNil(o.MaximumIntervalSeconds) {
 		return nil, false
 	}
@@ -126,7 +125,7 @@ func (o *RetryPolicy) GetMaximumIntervalSecondsOk() (*int32, bool) {
 }
 
 // HasMaximumIntervalSeconds returns a boolean if a field has been set.
-func (o *RetryPolicy) HasMaximumIntervalSeconds() bool {
+func (o *WorkflowRetryPolicy) HasMaximumIntervalSeconds() bool {
 	if o != nil && !IsNil(o.MaximumIntervalSeconds) {
 		return true
 	}
@@ -135,12 +134,12 @@ func (o *RetryPolicy) HasMaximumIntervalSeconds() bool {
 }
 
 // SetMaximumIntervalSeconds gets a reference to the given int32 and assigns it to the MaximumIntervalSeconds field.
-func (o *RetryPolicy) SetMaximumIntervalSeconds(v int32) {
+func (o *WorkflowRetryPolicy) SetMaximumIntervalSeconds(v int32) {
 	o.MaximumIntervalSeconds = &v
 }
 
 // GetMaximumAttempts returns the MaximumAttempts field value if set, zero value otherwise.
-func (o *RetryPolicy) GetMaximumAttempts() int32 {
+func (o *WorkflowRetryPolicy) GetMaximumAttempts() int32 {
 	if o == nil || IsNil(o.MaximumAttempts) {
 		var ret int32
 		return ret
@@ -150,7 +149,7 @@ func (o *RetryPolicy) GetMaximumAttempts() int32 {
 
 // GetMaximumAttemptsOk returns a tuple with the MaximumAttempts field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetMaximumAttemptsOk() (*int32, bool) {
+func (o *WorkflowRetryPolicy) GetMaximumAttemptsOk() (*int32, bool) {
 	if o == nil || IsNil(o.MaximumAttempts) {
 		return nil, false
 	}
@@ -158,7 +157,7 @@ func (o *RetryPolicy) GetMaximumAttemptsOk() (*int32, bool) {
 }
 
 // HasMaximumAttempts returns a boolean if a field has been set.
-func (o *RetryPolicy) HasMaximumAttempts() bool {
+func (o *WorkflowRetryPolicy) HasMaximumAttempts() bool {
 	if o != nil && !IsNil(o.MaximumAttempts) {
 		return true
 	}
@@ -167,43 +166,11 @@ func (o *RetryPolicy) HasMaximumAttempts() bool {
 }
 
 // SetMaximumAttempts gets a reference to the given int32 and assigns it to the MaximumAttempts field.
-func (o *RetryPolicy) SetMaximumAttempts(v int32) {
+func (o *WorkflowRetryPolicy) SetMaximumAttempts(v int32) {
 	o.MaximumAttempts = &v
 }
 
-// GetMaximumAttemptsDurationSeconds returns the MaximumAttemptsDurationSeconds field value if set, zero value otherwise.
-func (o *RetryPolicy) GetMaximumAttemptsDurationSeconds() int32 {
-	if o == nil || IsNil(o.MaximumAttemptsDurationSeconds) {
-		var ret int32
-		return ret
-	}
-	return *o.MaximumAttemptsDurationSeconds
-}
-
-// GetMaximumAttemptsDurationSecondsOk returns a tuple with the MaximumAttemptsDurationSeconds field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *RetryPolicy) GetMaximumAttemptsDurationSecondsOk() (*int32, bool) {
-	if o == nil || IsNil(o.MaximumAttemptsDurationSeconds) {
-		return nil, false
-	}
-	return o.MaximumAttemptsDurationSeconds, true
-}
-
-// HasMaximumAttemptsDurationSeconds returns a boolean if a field has been set.
-func (o *RetryPolicy) HasMaximumAttemptsDurationSeconds() bool {
-	if o != nil && !IsNil(o.MaximumAttemptsDurationSeconds) {
-		return true
-	}
-
-	return false
-}
-
-// SetMaximumAttemptsDurationSeconds gets a reference to the given int32 and assigns it to the MaximumAttemptsDurationSeconds field.
-func (o *RetryPolicy) SetMaximumAttemptsDurationSeconds(v int32) {
-	o.MaximumAttemptsDurationSeconds = &v
-}
-
-func (o RetryPolicy) MarshalJSON() ([]byte, error) {
+func (o WorkflowRetryPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -211,7 +178,7 @@ func (o RetryPolicy) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o RetryPolicy) ToMap() (map[string]interface{}, error) {
+func (o WorkflowRetryPolicy) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.InitialIntervalSeconds) {
 		toSerialize["initialIntervalSeconds"] = o.InitialIntervalSeconds
@@ -225,44 +192,41 @@ func (o RetryPolicy) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.MaximumAttempts) {
 		toSerialize["maximumAttempts"] = o.MaximumAttempts
 	}
-	if !IsNil(o.MaximumAttemptsDurationSeconds) {
-		toSerialize["maximumAttemptsDurationSeconds"] = o.MaximumAttemptsDurationSeconds
-	}
 	return toSerialize, nil
 }
 
-type NullableRetryPolicy struct {
-	value *RetryPolicy
+type NullableWorkflowRetryPolicy struct {
+	value *WorkflowRetryPolicy
 	isSet bool
 }
 
-func (v NullableRetryPolicy) Get() *RetryPolicy {
+func (v NullableWorkflowRetryPolicy) Get() *WorkflowRetryPolicy {
 	return v.value
 }
 
-func (v *NullableRetryPolicy) Set(val *RetryPolicy) {
+func (v *NullableWorkflowRetryPolicy) Set(val *WorkflowRetryPolicy) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableRetryPolicy) IsSet() bool {
+func (v NullableWorkflowRetryPolicy) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableRetryPolicy) Unset() {
+func (v *NullableWorkflowRetryPolicy) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableRetryPolicy(val *RetryPolicy) *NullableRetryPolicy {
-	return &NullableRetryPolicy{value: val, isSet: true}
+func NewNullableWorkflowRetryPolicy(val *WorkflowRetryPolicy) *NullableWorkflowRetryPolicy {
+	return &NullableWorkflowRetryPolicy{value: val, isSet: true}
 }
 
-func (v NullableRetryPolicy) MarshalJSON() ([]byte, error) {
+func (v NullableWorkflowRetryPolicy) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableRetryPolicy) UnmarshalJSON(src []byte) error {
+func (v *NullableWorkflowRetryPolicy) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -134,6 +134,7 @@ Class | Method | HTTP request | Description
  - [WorkflowResetRequest](docs/WorkflowResetRequest.md)
  - [WorkflowResetResponse](docs/WorkflowResetResponse.md)
  - [WorkflowResetType](docs/WorkflowResetType.md)
+ - [WorkflowRetryPolicy](docs/WorkflowRetryPolicy.md)
  - [WorkflowSearchRequest](docs/WorkflowSearchRequest.md)
  - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
  - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
