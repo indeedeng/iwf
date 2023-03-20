@@ -1,7 +1,7 @@
 ### test home page
 GET http://localhost:8801/
 
-### start API POST https://iwf-service-dfr-assistant.sandbox.qa.indeed.net/dfr-assistant/api/v1/workflow/start
+### start API POST
 POST http://localhost:8801/default/api/v1/workflow/start
 Content-Type: application/json
 
