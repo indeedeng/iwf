@@ -1,8 +1,8 @@
 ### test home page
 GET http://localhost:8801/
 
-### start API
-POST http://localhost:8801/api/v1/workflow/start
+### start API POST
+POST http://localhost:8801//api/v1/workflow/start
 Content-Type: application/json
 
 {
@@ -11,8 +11,10 @@ Content-Type: application/json
   "workflowTimeoutSeconds": 10,
   "iwfWorkerUrl": "http://localhost:8080",
   "startStateId": "test_state_1",
-  "stateInput": {},
-  "stateOptions": {}
+  "stateInput": {
+    "encoding": "json",
+    "data": "\"a string\""
+  }
 }
 
 ### reset API
@@ -22,13 +24,10 @@ POST http://localhost:8801/api/v1/workflow/reset
 Content-Type: application/json
 
 {
-  "workflowId": "timer1672340240",
-  "workflowRunId": "",
+  "workflowId": "2b85e588-12fd-456d-ad99-df51bda6cce8",
   "resetType": "STATE_ID",
-  "historyEventId": 15,
-  "historyEventTime": "150m",
-  "stateId": "S1",
-  "stateExecutionId": "S2-1"
+  "stateId": "WaitAndPrepareState",
+  "skipSignalReapply": true
 }
 
 ### skip timer API
@@ -36,7 +35,20 @@ POST http://localhost:8801/api/v1/workflow/timer/skip
 Content-Type: application/json
 
 {
-  "workflowId": "subscription-test-id1677259121",
-  "workflowStateExecutionId": "ChargeCurrentBillState-7",
+  "workflowId": "2b85e588-12fd-456d-ad99-df51bda6cce8",
+  "workflowStateExecutionId": "WaitAndPrepareState-1",
   "timerCommandIndex": 0
+}
+
+### signal workflow
+POST http://localhost:8801/api/v1/workflow/signal
+Content-Type: application/json
+
+{
+  "workflowId": "3d8659b1-b985-4b50-9350-e34bdfee2b95",
+  "signalChannelName": "sendNow",
+  "signalValue": {
+    "encoding": "jsonType",
+    "data": "\"a string value\""
+  }
 }

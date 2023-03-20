@@ -3,6 +3,7 @@ package integ
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
@@ -139,5 +140,17 @@ func panicAtHttpError(err error, httpResp *http.Response) {
 	}
 	if httpResp.StatusCode != http.StatusOK {
 		panic("Status not success" + httpResp.Status)
+	}
+}
+
+func panicAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, resp *iwfidl.WorkflowGetResponse) {
+	if err != nil {
+		panic(err)
+	}
+	if httpResp.StatusCode != http.StatusOK {
+		panic("Status not success" + httpResp.Status)
+	}
+	if resp.WorkflowStatus != iwfidl.COMPLETED {
+		panic("Workflow uncompleted:" + resp.WorkflowStatus)
 	}
 }

@@ -16,6 +16,7 @@ func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProc
 	tp := &TimerProcessor{
 		provider:                        provider,
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
+		logger:                          provider.GetLogger(ctx),
 	}
 	provider.GoNamed(ctx, "skip-timer-signal-handler", func(ctx UnifiedContext) {
 		for {

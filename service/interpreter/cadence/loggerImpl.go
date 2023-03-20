@@ -12,13 +12,10 @@ type loggerImpl struct {
 func buildZapFields(keyvals []interface{}) []zap.Field {
 	var fields []zap.Field
 	if len(keyvals)%2 != 0 {
-		panic(fmt.Sprintf("invalid length for keyvals %v", len(keyvals)))
+		keyvals = append(keyvals, "")
 	}
 	for i := 0; i < len(keyvals); i += 2 {
-		key, ok := keyvals[i].(string)
-		if !ok {
-			panic(fmt.Sprintf("invalid keyvals for logging at %d %v ", i, keyvals))
-		}
+		key := fmt.Sprintf("%v", keyvals[i])
 		fields = append(fields, zap.Any(key, keyvals[i+1]))
 	}
 	return fields
