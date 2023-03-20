@@ -7,7 +7,6 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
 	"log"
-	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -133,12 +132,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	if err != nil {
-		log.Fatalf("Fail to invoke start api %v", err)
-	}
-	if httpResp.StatusCode != http.StatusOK {
-		log.Fatalf("Fail to get workflow" + httpResp.Status)
-	}
+	panicAtHttpError(err, httpResp)
 
 	history, data := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
@@ -150,4 +144,43 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 	duration := (data["fired_at"]).(int64) - (data["scheduled_at"]).(int64)
 	assertions.Equal("timer-cmd-id", data["timer_id"])
 	assertions.True(duration >= 9 && duration <= 11, duration)
+
+	// reset with all signals reserved (default behavior)
+	// however, the skip timer won't be able to re-apply because the timers won't be ready at that moment
+	req4 := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
+	_, httpResp, err = req4.WorkflowResetRequest(iwfidl.WorkflowResetRequest{
+		WorkflowId: wfId,
+		ResetType:  iwfidl.BEGINNING,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second)
+	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
+	if err != nil {
+		log.Fatalf("Fail to invoke query %v", err)
+	}
+	timer2.Status = service.TimerPending
+	timer3.Status = service.TimerPending
+	assertions.Equal(expectedTimerInfos, timerInfos)
+
+	req3 = apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
+	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
+		WorkflowId:               wfId,
+		WorkflowStateExecutionId: "S1-1",
+		TimerCommandId:           iwfidl.PtrString("timer-cmd-id-2"),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
+		WorkflowId:               wfId,
+		WorkflowStateExecutionId: "S1-1",
+		TimerCommandIndex:        iwfidl.PtrInt32(2),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	req2 = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	resp, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: wfId,
+	}).Execute()
+	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
 }
