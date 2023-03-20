@@ -2,7 +2,7 @@
 GET http://localhost:8801/
 
 ### start API POST
-POST http://localhost:8801/default/api/v1/workflow/start
+POST http://localhost:8801//api/v1/workflow/start
 Content-Type: application/json
 
 {
@@ -20,7 +20,7 @@ Content-Type: application/json
 ### reset API
 ### NOTE: supported resetType: BEGINNING, HISTORY_EVENT_ID, HISTORY_EVENT_TIME, STATE_ID, STATE_EXECUTION_ID
 ### each reset type may require one supplement field, e.g. HISTORY_EVENT_ID requires historyEventId
-POST https://iwf-service.net/ihp-workflow-rsvp/api/v1/workflow/reset
+POST http://localhost:8801/api/v1/workflow/reset
 Content-Type: application/json
 
 {
@@ -31,7 +31,7 @@ Content-Type: application/json
 }
 
 ### skip timer API
-POST https://iwf-service.net/ihp-workflow-rsvp/api/v1/workflow/timer/skip
+POST http://localhost:8801/api/v1/workflow/timer/skip
 Content-Type: application/json
 
 {
@@ -41,7 +41,7 @@ Content-Type: application/json
 }
 
 ### signal workflow
-POST https://iwf-service.net/ihp-workflow-rsvp/api/v1/workflow/signal
+POST http://localhost:8801/api/v1/workflow/signal
 Content-Type: application/json
 
 {
