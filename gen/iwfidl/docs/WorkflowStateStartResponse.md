@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertDataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**KeysOfLargeDataObjects** | Pointer to **[]string** |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
 **UpsertStateLocals** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **RecordEvents** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -79,6 +80,31 @@ SetUpsertDataObjects sets UpsertDataObjects field to given value.
 `func (o *WorkflowStateStartResponse) HasUpsertDataObjects() bool`
 
 HasUpsertDataObjects returns a boolean if a field has been set.
+
+### GetKeysOfLargeDataObjects
+
+`func (o *WorkflowStateStartResponse) GetKeysOfLargeDataObjects() []string`
+
+GetKeysOfLargeDataObjects returns the KeysOfLargeDataObjects field if non-nil, zero value otherwise.
+
+### GetKeysOfLargeDataObjectsOk
+
+`func (o *WorkflowStateStartResponse) GetKeysOfLargeDataObjectsOk() (*[]string, bool)`
+
+GetKeysOfLargeDataObjectsOk returns a tuple with the KeysOfLargeDataObjects field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetKeysOfLargeDataObjects
+
+`func (o *WorkflowStateStartResponse) SetKeysOfLargeDataObjects(v []string)`
+
+SetKeysOfLargeDataObjects sets KeysOfLargeDataObjects field to given value.
+
+### HasKeysOfLargeDataObjects
+
+`func (o *WorkflowStateStartResponse) HasKeysOfLargeDataObjects() bool`
+
+HasKeysOfLargeDataObjects returns a boolean if a field has been set.
 
 ### GetCommandRequest
 

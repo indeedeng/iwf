@@ -20,12 +20,16 @@ type WorkflowStopType string
 
 // List of WorkflowStopType
 const (
-	CANCEL WorkflowStopType = "CANCEL"
+	CANCEL    WorkflowStopType = "CANCEL"
+	TERMINATE WorkflowStopType = "TERMINATE"
+	FAIL      WorkflowStopType = "FAIL"
 )
 
 // All allowed values of WorkflowStopType enum
 var AllowedWorkflowStopTypeEnumValues = []WorkflowStopType{
 	"CANCEL",
+	"TERMINATE",
+	"FAIL",
 }
 
 func (v *WorkflowStopType) UnmarshalJSON(src []byte) error {

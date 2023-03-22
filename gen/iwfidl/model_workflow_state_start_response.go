@@ -21,6 +21,7 @@ var _ MappedNullable = &WorkflowStateStartResponse{}
 type WorkflowStateStartResponse struct {
 	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
 	UpsertDataObjects          []KeyValue                    `json:"upsertDataObjects,omitempty"`
+	KeysOfLargeDataObjects     []string                      `json:"keysOfLargeDataObjects,omitempty"`
 	CommandRequest             *CommandRequest               `json:"commandRequest,omitempty"`
 	UpsertStateLocals          []KeyValue                    `json:"upsertStateLocals,omitempty"`
 	RecordEvents               []KeyValue                    `json:"recordEvents,omitempty"`
@@ -106,6 +107,38 @@ func (o *WorkflowStateStartResponse) HasUpsertDataObjects() bool {
 // SetUpsertDataObjects gets a reference to the given []KeyValue and assigns it to the UpsertDataObjects field.
 func (o *WorkflowStateStartResponse) SetUpsertDataObjects(v []KeyValue) {
 	o.UpsertDataObjects = v
+}
+
+// GetKeysOfLargeDataObjects returns the KeysOfLargeDataObjects field value if set, zero value otherwise.
+func (o *WorkflowStateStartResponse) GetKeysOfLargeDataObjects() []string {
+	if o == nil || IsNil(o.KeysOfLargeDataObjects) {
+		var ret []string
+		return ret
+	}
+	return o.KeysOfLargeDataObjects
+}
+
+// GetKeysOfLargeDataObjectsOk returns a tuple with the KeysOfLargeDataObjects field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateStartResponse) GetKeysOfLargeDataObjectsOk() ([]string, bool) {
+	if o == nil || IsNil(o.KeysOfLargeDataObjects) {
+		return nil, false
+	}
+	return o.KeysOfLargeDataObjects, true
+}
+
+// HasKeysOfLargeDataObjects returns a boolean if a field has been set.
+func (o *WorkflowStateStartResponse) HasKeysOfLargeDataObjects() bool {
+	if o != nil && !IsNil(o.KeysOfLargeDataObjects) {
+		return true
+	}
+
+	return false
+}
+
+// SetKeysOfLargeDataObjects gets a reference to the given []string and assigns it to the KeysOfLargeDataObjects field.
+func (o *WorkflowStateStartResponse) SetKeysOfLargeDataObjects(v []string) {
+	o.KeysOfLargeDataObjects = v
 }
 
 // GetCommandRequest returns the CommandRequest field value if set, zero value otherwise.
@@ -251,6 +284,9 @@ func (o WorkflowStateStartResponse) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UpsertDataObjects) {
 		toSerialize["upsertDataObjects"] = o.UpsertDataObjects
+	}
+	if !IsNil(o.KeysOfLargeDataObjects) {
+		toSerialize["keysOfLargeDataObjects"] = o.KeysOfLargeDataObjects
 	}
 	if !IsNil(o.CommandRequest) {
 		toSerialize["commandRequest"] = o.CommandRequest

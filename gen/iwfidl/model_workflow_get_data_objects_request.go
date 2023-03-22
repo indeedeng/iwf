@@ -19,9 +19,10 @@ var _ MappedNullable = &WorkflowGetDataObjectsRequest{}
 
 // WorkflowGetDataObjectsRequest struct for WorkflowGetDataObjectsRequest
 type WorkflowGetDataObjectsRequest struct {
-	WorkflowId    string   `json:"workflowId"`
-	WorkflowRunId *string  `json:"workflowRunId,omitempty"`
-	Keys          []string `json:"keys,omitempty"`
+	WorkflowId              string   `json:"workflowId"`
+	WorkflowRunId           *string  `json:"workflowRunId,omitempty"`
+	Keys                    []string `json:"keys,omitempty"`
+	IncludeLargeDataObjects *bool    `json:"includeLargeDataObjects,omitempty"`
 }
 
 // NewWorkflowGetDataObjectsRequest instantiates a new WorkflowGetDataObjectsRequest object
@@ -130,6 +131,38 @@ func (o *WorkflowGetDataObjectsRequest) SetKeys(v []string) {
 	o.Keys = v
 }
 
+// GetIncludeLargeDataObjects returns the IncludeLargeDataObjects field value if set, zero value otherwise.
+func (o *WorkflowGetDataObjectsRequest) GetIncludeLargeDataObjects() bool {
+	if o == nil || IsNil(o.IncludeLargeDataObjects) {
+		var ret bool
+		return ret
+	}
+	return *o.IncludeLargeDataObjects
+}
+
+// GetIncludeLargeDataObjectsOk returns a tuple with the IncludeLargeDataObjects field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetDataObjectsRequest) GetIncludeLargeDataObjectsOk() (*bool, bool) {
+	if o == nil || IsNil(o.IncludeLargeDataObjects) {
+		return nil, false
+	}
+	return o.IncludeLargeDataObjects, true
+}
+
+// HasIncludeLargeDataObjects returns a boolean if a field has been set.
+func (o *WorkflowGetDataObjectsRequest) HasIncludeLargeDataObjects() bool {
+	if o != nil && !IsNil(o.IncludeLargeDataObjects) {
+		return true
+	}
+
+	return false
+}
+
+// SetIncludeLargeDataObjects gets a reference to the given bool and assigns it to the IncludeLargeDataObjects field.
+func (o *WorkflowGetDataObjectsRequest) SetIncludeLargeDataObjects(v bool) {
+	o.IncludeLargeDataObjects = &v
+}
+
 func (o WorkflowGetDataObjectsRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -146,6 +179,9 @@ func (o WorkflowGetDataObjectsRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Keys) {
 		toSerialize["keys"] = o.Keys
+	}
+	if !IsNil(o.IncludeLargeDataObjects) {
+		toSerialize["includeLargeDataObjects"] = o.IncludeLargeDataObjects
 	}
 	return toSerialize, nil
 }

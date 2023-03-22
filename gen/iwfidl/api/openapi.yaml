@@ -645,12 +645,15 @@ components:
     WorkflowStopType:
       enum:
       - CANCEL
+      - TERMINATE
+      - FAIL
       type: string
     WorkflowGetDataObjectsRequest:
       example:
         keys:
         - keys
         - keys
+        includeLargeDataObjects: true
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -662,6 +665,8 @@ components:
           items:
             type: string
           type: array
+        includeLargeDataObjects:
+          type: boolean
       required:
       - workflowId
       type: object
@@ -785,6 +790,7 @@ components:
     WorkflowErrorType:
       enum:
       - STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE
+      - CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE
       - STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE
       - INVALID_USER_WORKFLOW_CODE_ERROR_TYPE
       - SERVER_INTERNAL_ERROR_TYPE
@@ -1062,6 +1068,9 @@ components:
           value:
             data: data
             encoding: encoding
+        keysOfLargeDataObjects:
+        - keysOfLargeDataObjects
+        - keysOfLargeDataObjects
         upsertStateLocals:
         - value:
             data: data
@@ -1088,6 +1097,10 @@ components:
         upsertDataObjects:
           items:
             $ref: '#/components/schemas/KeyValue'
+          type: array
+        keysOfLargeDataObjects:
+          items:
+            type: string
           type: array
         commandRequest:
           $ref: '#/components/schemas/CommandRequest'
@@ -1321,6 +1334,9 @@ components:
           value:
             data: data
             encoding: encoding
+        keysOfLargeDataObjects:
+        - keysOfLargeDataObjects
+        - keysOfLargeDataObjects
         upsertStateLocals:
         - value:
             data: data
@@ -1349,6 +1365,10 @@ components:
         upsertDataObjects:
           items:
             $ref: '#/components/schemas/KeyValue'
+          type: array
+        keysOfLargeDataObjects:
+          items:
+            type: string
           type: array
         recordEvents:
           items:

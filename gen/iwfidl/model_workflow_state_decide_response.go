@@ -22,6 +22,7 @@ type WorkflowStateDecideResponse struct {
 	StateDecision              *StateDecision                `json:"stateDecision,omitempty"`
 	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
 	UpsertDataObjects          []KeyValue                    `json:"upsertDataObjects,omitempty"`
+	KeysOfLargeDataObjects     []string                      `json:"keysOfLargeDataObjects,omitempty"`
 	RecordEvents               []KeyValue                    `json:"recordEvents,omitempty"`
 	UpsertStateLocals          []KeyValue                    `json:"upsertStateLocals,omitempty"`
 	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
@@ -140,6 +141,38 @@ func (o *WorkflowStateDecideResponse) SetUpsertDataObjects(v []KeyValue) {
 	o.UpsertDataObjects = v
 }
 
+// GetKeysOfLargeDataObjects returns the KeysOfLargeDataObjects field value if set, zero value otherwise.
+func (o *WorkflowStateDecideResponse) GetKeysOfLargeDataObjects() []string {
+	if o == nil || IsNil(o.KeysOfLargeDataObjects) {
+		var ret []string
+		return ret
+	}
+	return o.KeysOfLargeDataObjects
+}
+
+// GetKeysOfLargeDataObjectsOk returns a tuple with the KeysOfLargeDataObjects field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateDecideResponse) GetKeysOfLargeDataObjectsOk() ([]string, bool) {
+	if o == nil || IsNil(o.KeysOfLargeDataObjects) {
+		return nil, false
+	}
+	return o.KeysOfLargeDataObjects, true
+}
+
+// HasKeysOfLargeDataObjects returns a boolean if a field has been set.
+func (o *WorkflowStateDecideResponse) HasKeysOfLargeDataObjects() bool {
+	if o != nil && !IsNil(o.KeysOfLargeDataObjects) {
+		return true
+	}
+
+	return false
+}
+
+// SetKeysOfLargeDataObjects gets a reference to the given []string and assigns it to the KeysOfLargeDataObjects field.
+func (o *WorkflowStateDecideResponse) SetKeysOfLargeDataObjects(v []string) {
+	o.KeysOfLargeDataObjects = v
+}
+
 // GetRecordEvents returns the RecordEvents field value if set, zero value otherwise.
 func (o *WorkflowStateDecideResponse) GetRecordEvents() []KeyValue {
 	if o == nil || IsNil(o.RecordEvents) {
@@ -254,6 +287,9 @@ func (o WorkflowStateDecideResponse) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UpsertDataObjects) {
 		toSerialize["upsertDataObjects"] = o.UpsertDataObjects
+	}
+	if !IsNil(o.KeysOfLargeDataObjects) {
+		toSerialize["keysOfLargeDataObjects"] = o.KeysOfLargeDataObjects
 	}
 	if !IsNil(o.RecordEvents) {
 		toSerialize["recordEvents"] = o.RecordEvents

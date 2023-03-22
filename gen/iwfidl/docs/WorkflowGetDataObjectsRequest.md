@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **Keys** | Pointer to **[]string** |  | [optional] 
+**IncludeLargeDataObjects** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -96,6 +97,31 @@ SetKeys sets Keys field to given value.
 `func (o *WorkflowGetDataObjectsRequest) HasKeys() bool`
 
 HasKeys returns a boolean if a field has been set.
+
+### GetIncludeLargeDataObjects
+
+`func (o *WorkflowGetDataObjectsRequest) GetIncludeLargeDataObjects() bool`
+
+GetIncludeLargeDataObjects returns the IncludeLargeDataObjects field if non-nil, zero value otherwise.
+
+### GetIncludeLargeDataObjectsOk
+
+`func (o *WorkflowGetDataObjectsRequest) GetIncludeLargeDataObjectsOk() (*bool, bool)`
+
+GetIncludeLargeDataObjectsOk returns a tuple with the IncludeLargeDataObjects field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetIncludeLargeDataObjects
+
+`func (o *WorkflowGetDataObjectsRequest) SetIncludeLargeDataObjects(v bool)`
+
+SetIncludeLargeDataObjects sets IncludeLargeDataObjects field to given value.
+
+### HasIncludeLargeDataObjects
+
+`func (o *WorkflowGetDataObjectsRequest) HasIncludeLargeDataObjects() bool`
+
+HasIncludeLargeDataObjects returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
