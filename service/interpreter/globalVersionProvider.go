@@ -4,7 +4,8 @@ import "github.com/indeedeng/iwf/service"
 
 const globalChangeId = "global"
 const startingVersionUsingGlobalVersioning = 1
-const maxOfAllVersions = startingVersionUsingGlobalVersioning
+const startingVersionUsingMemoForDataObjects = 2
+const maxOfAllVersions = startingVersionUsingMemoForDataObjects
 
 // see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type globalVersioner struct {
@@ -15,6 +16,11 @@ func NewGlobalVersionProvider(workflowProvider WorkflowProvider) *globalVersione
 	return &globalVersioner{
 		workflowProvider: workflowProvider,
 	}
+}
+
+func (p *globalVersioner) IsAfterVersionOfUsingMemoForDataObjects(ctx UnifiedContext) bool {
+	version := p.workflowProvider.GetVersion(ctx, globalChangeId, 0, maxOfAllVersions)
+	return version >= startingVersionUsingMemoForDataObjects
 }
 
 func (p *globalVersioner) IsAfterVersionOfUsingGlobalVersioning(ctx UnifiedContext) bool {
