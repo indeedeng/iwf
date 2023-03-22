@@ -255,7 +255,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(ctx, startResponse.GetUpsertDataObjects(), startResponse.GetKeysOfLargeDataObjects())
 	if err != nil {
 		return nil, err
 	}
@@ -437,7 +437,7 @@ func executeState(
 	if err != nil {
 		return nil, err
 	}
-	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(ctx, decideResponse.GetUpsertDataObjects(), decideResponse.GetKeysOfLargeDataObjects())
 	if err != nil {
 		return nil, err
 	}

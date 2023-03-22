@@ -35,6 +35,14 @@ func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
 }
 
+func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, memo map[string]interface{}) error {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+	return workflow.UpsertMemo(wfCtx, memo)
+}
+
 func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Duration) interpreter.Future {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {

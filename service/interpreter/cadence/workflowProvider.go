@@ -29,15 +29,20 @@ func (w *workflowProvider) IsApplicationError(err error) bool {
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
+}
+
+func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, memo map[string]interface{}) error {
+	// TODO Cadence is not supporting this yet
+	return nil
 }
 
 func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Duration) interpreter.Future {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	f := workflow.NewTimer(wfCtx, d)
 	return &futureImpl{
@@ -48,7 +53,7 @@ func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Durat
 func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) interpreter.WorkflowInfo {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	info := workflow.GetInfo(wfCtx)
 	return interpreter.WorkflowInfo{
@@ -63,7 +68,7 @@ func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) inter
 func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, queryType string, handler interface{}) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.SetQueryHandler(wfCtx, queryType, handler)
 }
@@ -71,7 +76,7 @@ func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, query
 func (w *workflowProvider) ExtendContextWithValue(parent interpreter.UnifiedContext, key string, val interface{}) interpreter.UnifiedContext {
 	wfCtx, ok := parent.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return interpreter.NewUnifiedContext(workflow.WithValue(wfCtx, key, val))
 }
@@ -79,7 +84,7 @@ func (w *workflowProvider) ExtendContextWithValue(parent interpreter.UnifiedCont
 func (w workflowProvider) GoNamed(ctx interpreter.UnifiedContext, name string, f func(ctx interpreter.UnifiedContext)) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	f2 := func(ctx workflow.Context) {
 		ctx2 := interpreter.NewUnifiedContext(ctx)
@@ -91,7 +96,7 @@ func (w workflowProvider) GoNamed(ctx interpreter.UnifiedContext, name string, f
 func (w *workflowProvider) Await(ctx interpreter.UnifiedContext, condition func() bool) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.Await(wfCtx, condition)
 }
@@ -99,7 +104,7 @@ func (w *workflowProvider) Await(ctx interpreter.UnifiedContext, condition func(
 func (w *workflowProvider) WithActivityOptions(ctx interpreter.UnifiedContext, options interpreter.ActivityOptions) interpreter.UnifiedContext {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 
 	// unlimited to match Temporal
@@ -124,7 +129,7 @@ func (t *futureImpl) IsReady() bool {
 func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 
 	return t.future.Get(wfCtx, valuePtr)
@@ -133,7 +138,7 @@ func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) e
 func (w *workflowProvider) ExecuteActivity(ctx interpreter.UnifiedContext, activity interface{}, args ...interface{}) (future interpreter.Future) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	f := workflow.ExecuteActivity(wfCtx, activity, args...)
 	return &futureImpl{
@@ -144,7 +149,7 @@ func (w *workflowProvider) ExecuteActivity(ctx interpreter.UnifiedContext, activ
 func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.Now(wfCtx)
 }
@@ -152,7 +157,7 @@ func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {
 func (w *workflowProvider) Sleep(ctx interpreter.UnifiedContext, d time.Duration) (err error) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.Sleep(wfCtx, d)
 }
@@ -160,7 +165,7 @@ func (w *workflowProvider) Sleep(ctx interpreter.UnifiedContext, d time.Duration
 func (w *workflowProvider) GetVersion(ctx interpreter.UnifiedContext, changeID string, minSupported, maxSupported int) int {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 
 	version := workflow.GetVersion(wfCtx, changeID, workflow.Version(minSupported), workflow.Version(maxSupported))
@@ -178,7 +183,7 @@ func (t *cadenceReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
 func (t *cadenceReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr interface{}) (more bool) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return t.channel.Receive(wfCtx, valuePtr)
 }
@@ -186,7 +191,7 @@ func (t *cadenceReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	wfChan := workflow.GetSignalChannel(wfCtx, signalName)
 	return &cadenceReceiveChannel{
@@ -197,7 +202,7 @@ func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, sign
 func (w *workflowProvider) GetContextValue(ctx interpreter.UnifiedContext, key string) interface{} {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return wfCtx.Value(key)
 }
@@ -217,7 +222,7 @@ func (w *workflowProvider) GetLogger(ctx interpreter.UnifiedContext) interpreter
 func (w *workflowProvider) GetUnhandledSignalNames(ctx interpreter.UnifiedContext) []string {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.GetUnhandledSignalNames(wfCtx)
 }

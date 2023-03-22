@@ -10,6 +10,7 @@ type PersistenceManager struct {
 	dataObjects      map[string]iwfidl.KeyValue
 	searchAttributes map[string]iwfidl.SearchAttribute
 	provider         WorkflowProvider
+	globalVersioner  *globalVersioner
 }
 
 func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute) *PersistenceManager {
@@ -21,6 +22,7 @@ func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwf
 		dataObjects:      make(map[string]iwfidl.KeyValue),
 		searchAttributes: searchAttributes,
 		provider:         provider,
+		globalVersioner:  NewGlobalVersionProvider(provider),
 	}
 }
 
@@ -141,9 +143,22 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(ctx UnifiedContext, a
 	return am.provider.UpsertSearchAttributes(ctx, attrsToUpsert)
 }
 
-func (am *PersistenceManager) ProcessUpsertDataObject(attributes []iwfidl.KeyValue) error {
+func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attributes []iwfidl.KeyValue, keysOfLargeDataObjects []string) error {
 	for _, attr := range attributes {
 		am.dataObjects[attr.GetKey()] = attr
 	}
-	return nil
+	if !am.globalVersioner.IsAfterVersionOfUsingMemoForDataObjects(ctx) {
+		// the old behavior is only using query to store data objects, so we are done
+		return nil
+	}
+	// for the new behavior, we also need to upsert to memo
+	largeDOKeys := map[string]bool{}
+	for _, k := range keysOfLargeDataObjects {
+		largeDOKeys[k] = true
+	}
+	memo := map[string]interface{}{}
+	for _, attr := range attributes {
+		memo[attr.GetKey()] = attr.GetValue()
+	}
+	return am.provider.UpsertMemo(ctx, memo)
 }
