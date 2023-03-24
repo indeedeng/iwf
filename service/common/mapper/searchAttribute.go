@@ -14,10 +14,10 @@ import (
 )
 
 func MapToInternalSearchAttributes(attributes []iwfidl.SearchAttribute) (map[string]interface{}, error) {
-	if len(attributes) == 0 {
-		return nil, nil
-	}
 	res := map[string]interface{}{}
+	if len(attributes) == 0 {
+		return res, nil
+	}
 	for _, attr := range attributes {
 		switch attr.GetValueType() {
 		case iwfidl.KEYWORD, iwfidl.TEXT:

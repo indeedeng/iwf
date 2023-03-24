@@ -54,6 +54,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		if err != nil {
 			return nil, s.handleError(err)
 		}
+		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
 		initSAs = req.WorkflowStartOptions.SearchAttributes
 	}
 
