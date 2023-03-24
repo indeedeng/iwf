@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/timeparser"
+	"log"
 	"strconv"
 	"testing"
 	"time"
@@ -41,7 +42,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(backendType)
+	uclient, closeFunc2 := doStartIwfServiceWithClient(backendType)
 	defer closeFunc2()
 
 	// start a workflow
@@ -56,6 +57,11 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	nowTime := time.Now()
 	notTimeNanoStr := fmt.Sprintf("%v", nowTime.UnixNano())
 	nowTimeStr := nowTime.Format(timeparser.DateTimeFormat)
+	expectedDatetimeSearchAttribute := iwfidl.SearchAttribute{
+		Key:         iwfidl.PtrString("CustomDatetimeField"),
+		ValueType:   ptr.Any(iwfidl.DATETIME),
+		StringValue: iwfidl.PtrString(nowTimeStr),
+	}
 
 	reqStart := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	wfReq := iwfidl.WorkflowStartRequest{
@@ -74,11 +80,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		},
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			SearchAttributes: []iwfidl.SearchAttribute{
-				{
-					Key:         iwfidl.PtrString("CustomDatetimeField"),
-					ValueType:   ptr.Any(iwfidl.DATETIME),
-					StringValue: iwfidl.PtrString(nowTimeStr),
-				},
+				expectedDatetimeSearchAttribute,
 			},
 		},
 	}
@@ -186,8 +188,21 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 		StringValue: iwfidl.PtrString(persistence.TestSearchAttributeKeywordValue2),
 	}
 
+	expectedSearchAttributeBool := iwfidl.SearchAttribute{
+		Key:       iwfidl.PtrString(persistence.TestSearchAttributeBoolKey),
+		ValueType: ptr.Any(iwfidl.BOOL),
+		BoolValue: ptr.Any(false),
+	}
+
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeKeyword}, searchResult1.GetSearchAttributes())
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
+
+	sasFromQuery := []iwfidl.SearchAttribute{}
+	err = uclient.QueryWorkflow(context.Background(), &sasFromQuery, wfId, "", service.GetSearchAttributesWorkflowQueryType)
+	if err != nil {
+		log.Fatalf("Fail to invoke query %v", err)
+	}
+	assertions.Equal([]iwfidl.SearchAttribute{expectedDatetimeSearchAttribute, expectedSearchAttributeKeyword, expectedSearchAttributeInt, expectedSearchAttributeBool}, sasFromQuery)
 
 	if *testSearchIntegTest {
 		// start more WFs in order to test pagination
