@@ -54,6 +54,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	if err != nil {
 		return nil, err
 	}
+	err = provider.SetQueryHandler(ctx, service.GetSearchAttributesWorkflowQueryType, func() ([]iwfidl.SearchAttribute, error) {
+		return persistenceManager.GetAllSearchAttributes(), nil
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
