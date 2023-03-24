@@ -7,9 +7,10 @@ import (
 )
 
 type StateExecutionCounter struct {
-	ctx      UnifiedContext
-	provider WorkflowProvider
-	config   service.WorkflowConfig
+	ctx             UnifiedContext
+	provider        WorkflowProvider
+	config          service.WorkflowConfig
+	globalVersioner *globalVersioner
 
 	executedStateIdCount      map[string]int // count the stateId for how many times that have een executed so that we can create stateExecutionId
 	pendingStateIdCount       map[string]int // keep counting the pending stateIds so that we know times to upsert system search attributes service.SearchAttributeExecutingStateIds
@@ -24,6 +25,7 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 		executedStateIdCount:      make(map[string]int),
 		totalPendingStateExeCount: 0,
 		config:                    config,
+		globalVersioner:           NewGlobalVersionProvider(provider, ctx),
 	}
 }
 
@@ -64,7 +66,7 @@ func (e *StateExecutionCounter) MarkStateExecutionsPending(states []iwfidl.State
 	}
 	e.totalPendingStateExeCount += len(states)
 	if needsUpdate {
-		return e.updateSearchAttribute()
+		return e.updateStateIdSearchAttribute()
 	}
 	return nil
 }
@@ -74,7 +76,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 	e.totalPendingStateExeCount--
 	if e.pendingStateIdCount[state.StateId] == 0 {
 		delete(e.pendingStateIdCount, state.StateId)
-		return e.updateSearchAttribute()
+		return e.updateStateIdSearchAttribute()
 	}
 	return nil
 }
@@ -83,7 +85,7 @@ func (e *StateExecutionCounter) GetTotalPendingStateExecutions() int {
 	return e.totalPendingStateExeCount
 }
 
-func (e *StateExecutionCounter) updateSearchAttribute() error {
+func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	var executingStateIds []string
 	for sid := range e.pendingStateIdCount {
 		executingStateIds = append(executingStateIds, sid)
@@ -91,7 +93,26 @@ func (e *StateExecutionCounter) updateSearchAttribute() error {
 	if e.config.DisableSystemSearchAttributes {
 		return nil
 	}
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {
+		// we don't clear search attributes because there are only two possible cases:
+		// 1. there will be another stateId being upsert right after this. So this will avoid calling the upsertSA twice
+		// 2. there will not be another stateId being upsert. Then this will be cleared before the workflow is closed.
+		// see workflowImpl.go to call ClearStateIdSearchAttributeFinally at the end
+		return nil
+	}
 	return e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 		service.SearchAttributeExecutingStateIds: executingStateIds,
 	})
+}
+
+// ClearStateIdSearchAttributeFinally should only be called at the end of workflow
+func (e *StateExecutionCounter) ClearStateIdSearchAttributeFinally() {
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && e.totalPendingStateExeCount == 0 {
+		err := e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
+			service.SearchAttributeExecutingStateIds: []string{},
+		})
+		if err != nil {
+			e.provider.GetLogger(e.ctx).Error("error for upseart SearchAttributeExecutingStateIds", err)
+		}
+	}
 }

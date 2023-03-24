@@ -74,6 +74,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		return nil, err
 	}
 
+	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
+	defer stateExecutionCounter.ClearStateIdSearchAttributeFinally()
+
 	for len(statesToExecuteQueue) > 0 {
 		// copy the whole slice(pointer)
 		statesToExecute := statesToExecuteQueue
