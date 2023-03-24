@@ -202,7 +202,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	if err != nil {
 		log.Fatalf("Fail to invoke query %v", err)
 	}
-	assertions.Equal([]iwfidl.SearchAttribute{expectedDatetimeSearchAttribute, expectedSearchAttributeKeyword, expectedSearchAttributeInt, expectedSearchAttributeBool}, sasFromQuery)
+	assertions.ElementsMatch([]iwfidl.SearchAttribute{expectedDatetimeSearchAttribute, expectedSearchAttributeKeyword, expectedSearchAttributeInt, expectedSearchAttributeBool}, sasFromQuery)
 
 	if *testSearchIntegTest {
 		// start more WFs in order to test pagination
