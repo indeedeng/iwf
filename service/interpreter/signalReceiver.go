@@ -34,6 +34,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider) *SignalRec
 				break
 			}
 			sr.failWorkflowByClient = true
+			break
 		}
 	})
 

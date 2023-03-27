@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -100,29 +101,31 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(ctx context.Context, req iwfidl.Wo
 func (s *serviceImpl) ApiV1WorkflowStopPost(ctx context.Context, req iwfidl.WorkflowStopRequest) (retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	if req.StopType == nil {
-		err := s.client.CancelWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
-		if err != nil {
-			return s.handleError(err)
-		}
+	wfId := req.GetWorkflowId()
+	runId := req.GetWorkflowRunId()
+	stopType := iwfidl.CANCEL
+	if req.StopType != nil {
+		stopType = req.GetStopType()
 	}
 
-	switch *req.StopType {
+	switch stopType {
 	case iwfidl.CANCEL:
-		err := s.client.CancelWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+		err := s.client.CancelWorkflow(ctx, wfId, runId)
 		if err != nil {
 			return s.handleError(err)
 		}
 	case iwfidl.TERMINATE:
-		err := s.client.TerminateWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+		err := s.client.TerminateWorkflow(ctx, wfId, runId, req.GetReason())
 		if err != nil {
 			return s.handleError(err)
 		}
 	case iwfidl.FAIL:
-		err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.FailWorkflowSignalChanncelName, service.FailWorkflowSignalRequest{})
+		err := s.client.SignalWorkflow(ctx, wfId, runId, service.FailWorkflowSignalChanncelName, service.FailWorkflowSignalRequest{Reason: req.GetReason()})
 		if err != nil {
 			return s.handleError(err)
 		}
+	default:
+		return s.handleError(fmt.Errorf("unsupported stop type: %v", stopType))
 	}
 
 	return nil

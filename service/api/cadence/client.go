@@ -109,8 +109,15 @@ func (t *cadenceClient) CancelWorkflow(ctx context.Context, workflowID string, r
 	return t.cClient.CancelWorkflow(ctx, workflowID, runID)
 }
 
-func (t *cadenceClient) TerminateWorkflow(ctx context.Context, workflowID string, runID string) error {
-	return t.cClient.TerminateWorkflow(ctx, workflowID, runID, "Force termiantion from user", nil)
+func (t *cadenceClient) TerminateWorkflow(ctx context.Context, workflowID string, runID string, reason string) error {
+	var reasonStr string
+	if reason == "" {
+		reasonStr = "Force termiantion from user"
+	} else {
+		reasonStr = reason
+	}
+
+	return t.cClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr, nil)
 }
 
 func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
