@@ -180,6 +180,7 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType) {
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
 		WorkflowId: wfId,
 		StopType:   iwfidl.FAIL.Ptr(),
+		Reason:     iwfidl.PtrString("fail reason"),
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -196,6 +197,6 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType) {
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.FAILED,
 		ErrorType:      iwfidl.CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE.Ptr(),
-		ErrorMessage:   iwfidl.PtrString("failed by client"),
+		ErrorMessage:   iwfidl.PtrString("fail reason"),
 	}, resp, "response not expected")
 }

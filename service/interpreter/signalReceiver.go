@@ -9,9 +9,10 @@ import (
 
 type SignalReceiver struct {
 	// key is channel name
-	receivedSignals      map[string][]*iwfidl.EncodedObject
-	failWorkflowByClient bool
-	provider             WorkflowProvider
+	receivedSignals            map[string][]*iwfidl.EncodedObject
+	failWorkflowByClient       bool
+	reasonFailWorkflowByClient *string
+	provider                   WorkflowProvider
 }
 
 func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider) *SignalReceiver {
@@ -29,10 +30,9 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider) *SignalRec
 			return ch.ReceiveAsync(&val)
 		})
 		if err != nil {
-			// break the loop to prevent goroutine leakage
 			return
 		}
-		sr.failWorkflowByClient = true
+		sr.failWorkflowByClient, sr.reasonFailWorkflowByClient = true, &val.Reason
 	})
 
 	provider.GoNamed(ctx, "signal-receiver-handler", func(ctx UnifiedContext) {
@@ -119,9 +119,13 @@ func (sr *SignalReceiver) DrainedAllSignals(ctx UnifiedContext) error {
 	})
 }
 
-func (sr *SignalReceiver) GetFailWorklowByClient() (bool, string) {
+func (sr *SignalReceiver) GetFailWorklowAndReasonByClient() (bool, string) {
+	reason := "fail by client"
+	if sr.reasonFailWorkflowByClient != nil {
+		reason = *sr.reasonFailWorkflowByClient
+	}
 	if sr.failWorkflowByClient {
-		return true, "failed by client"
+		return true, reason
 	} else {
 		return false, ""
 	}
