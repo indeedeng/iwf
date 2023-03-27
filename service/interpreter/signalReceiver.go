@@ -10,10 +10,8 @@ import (
 type SignalReceiver struct {
 	// key is channel name
 	receivedSignals      map[string][]*iwfidl.EncodedObject
-	iwfSystemSignals     map[string][]*iwfidl.EncodedObject
 	failWorkflowByClient bool
 	provider             WorkflowProvider
-	logger               UnifiedLogger
 }
 
 func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider) *SignalReceiver {
