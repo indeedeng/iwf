@@ -22,20 +22,17 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider) *SignalRec
 	}
 
 	provider.GoNamed(ctx, "fail-workflow-handler", func(ctx UnifiedContext) {
-		for {
-			ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChanncelName)
+		ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChanncelName)
 
-			val := service.FailWorkflowSignalRequest{}
-			err := provider.Await(ctx, func() bool {
-				return ch.ReceiveAsync(&val)
-			})
-			if err != nil {
-				// break the loop to prevent goroutine leakage
-				break
-			}
-			sr.failWorkflowByClient = true
-			break
+		val := service.FailWorkflowSignalRequest{}
+		err := provider.Await(ctx, func() bool {
+			return ch.ReceiveAsync(&val)
+		})
+		if err != nil {
+			// break the loop to prevent goroutine leakage
+			return
 		}
+		sr.failWorkflowByClient = true
 	})
 
 	provider.GoNamed(ctx, "signal-receiver-handler", func(ctx UnifiedContext) {
