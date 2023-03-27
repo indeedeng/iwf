@@ -2,14 +2,15 @@ package api
 
 import (
 	"context"
+	"net/http"
+	"time"
+
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/ptr"
-	"net/http"
-	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -99,10 +100,31 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(ctx context.Context, req iwfidl.Wo
 func (s *serviceImpl) ApiV1WorkflowStopPost(ctx context.Context, req iwfidl.WorkflowStopRequest) (retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	err := s.client.CancelWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
-	if err != nil {
-		return s.handleError(err)
+	if req.StopType == nil {
+		err := s.client.CancelWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+		if err != nil {
+			return s.handleError(err)
+		}
 	}
+
+	switch *req.StopType {
+	case iwfidl.CANCEL:
+		err := s.client.CancelWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+		if err != nil {
+			return s.handleError(err)
+		}
+	case iwfidl.TERMINATE:
+		err := s.client.TerminateWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId())
+		if err != nil {
+			return s.handleError(err)
+		}
+	case iwfidl.FAIL:
+		err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.FailWorkflowSignalChanncelName, service.FailWorkflowSignalRequest{})
+		if err != nil {
+			return s.handleError(err)
+		}
+	}
+
 	return nil
 }
 
