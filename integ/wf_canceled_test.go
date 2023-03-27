@@ -2,13 +2,14 @@ package integ
 
 import (
 	"context"
+	"strconv"
+	"testing"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/signal"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
-	"strconv"
-	"testing"
-	"time"
 )
 
 func TestWorkflowCanceledTemporal(t *testing.T) {
@@ -62,6 +63,7 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
 		WorkflowId: wfId,
+		StopType:   iwfidl.CANCEL.Ptr(),
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
