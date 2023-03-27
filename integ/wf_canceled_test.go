@@ -36,10 +36,10 @@ func TestWorkflowCanceledCadence(t *testing.T) {
 		doTestWorkflowCanceled(t, service.BackendTypeCadence)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 
-		doTestWorkflowTerminated(t, service.BackendTypeTemporal)
+		doTestWorkflowTerminated(t, service.BackendTypeCadence)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 
-		doTestWorkflowFail(t, service.BackendTypeTemporal)
+		doTestWorkflowFail(t, service.BackendTypeCadence)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
