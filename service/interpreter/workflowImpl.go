@@ -48,7 +48,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 	persistenceManager := NewPersistenceManager(provider, input.InitSearchAttributes)
 	timerProcessor := NewTimerProcessor(ctx, provider)
-	signalReceiver := NewSignalReceiver(ctx, provider)
+	continueAsNewCounter := NewContinueAsCounter(input.Config)
+	signalReceiver := NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil
@@ -68,8 +69,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 	stateExecutionCounter := NewStateExecutionCounter(ctx, provider, input.Config)
 
-	continueAsNewer := NewContinueAsNewer(interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
-	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx, provider)
+	continueAsNewer := NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
+	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
-				decision, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, signalReceiver, timerProcessor, continueAsNewer)
+				decision, stExcResType, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
 				if err != nil {
 					errToFailWf = err
 				}
@@ -228,6 +229,7 @@ func executeState(
 	signalReceiver *SignalReceiver,
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
+	continueAsNewCounter *ContinueAsNewCounter,
 ) (*iwfidl.StateDecision, stateExecResultType, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
@@ -259,7 +261,7 @@ func executeState(
 			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 		},
 	})
-	if continueAsNewer.CanContinueAsNew() && !future.IsReady() {
+	if continueAsNewCounter.IsThresholdMet() && !future.IsReady() {
 		return nil, startAborted, nil
 	}
 	var startResponse *iwfidl.WorkflowStateStartResponse
@@ -284,7 +286,7 @@ func executeState(
 
 	completedTimerCmds := map[int]bool{}
 	if len(commandReq.GetTimerCommands()) > 0 {
-		timerProcessor.StartProcessing(stateExeId, commandReq.GetTimerCommands())
+		timerProcessor.AddPendingTimers(stateExeId, commandReq.GetTimerCommands())
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
@@ -293,7 +295,10 @@ func executeState(
 					panic("critical code bug")
 				}
 
-				completed := timerProcessor.WaitForTimerCompleted(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
+				// Note that commandReqDoneOrCanceled is needed for two cases:
+				// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
+				// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
+				completed := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
 				if completed {
 					completedTimerCmds[idx] = true
 				}
@@ -318,6 +323,9 @@ func executeState(
 				received := false
 				_ = provider.Await(ctx, func() bool {
 					received = signalReceiver.HasSignal(cmd.SignalChannelName)
+					// Note that commandReqDoneOrCanceled is needed for two cases:
+					// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
+					// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
 					return received || commandReqDoneOrCanceled
 				})
 				if received {
@@ -345,6 +353,9 @@ func executeState(
 				received := false
 				_ = provider.Await(ctx, func() bool {
 					received = interStateChannel.HasData(cmd.ChannelName)
+					// Note that commandReqDoneOrCanceled is needed for two cases:
+					// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
+					// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
 					return received || commandReqDoneOrCanceled
 				})
 
@@ -360,18 +371,17 @@ func executeState(
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
 		commandReq.GetTimerCommands(), commandReq.GetSignalCommands(), commandReq.GetInterStateChannelCommands(),
 	)
-	WaitForDeciderTriggerOrContinueAsNew(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds, continueAsNewer)
-	if continueAsNewer.CanContinueAsNew() {
+	WaitForDeciderTriggerOrContinueAsNew(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds, continueAsNewCounter)
+	commandReqDoneOrCanceled = true
+	if continueAsNewCounter.IsThresholdMet() {
 		return nil, waitAborted, nil
 	}
-
-	commandReqDoneOrCanceled = true
 
 	commandRes := &iwfidl.CommandResults{}
 	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errStartApi == nil)
 
 	if len(commandReq.GetTimerCommands()) > 0 {
-		timerProcessor.FinishProcessing(stateExeId)
+		timerProcessor.RemovePendingTimersOfState(stateExeId)
 
 		var timerResults []iwfidl.TimerResult
 		for idx, cmd := range commandReq.GetTimerCommands() {
@@ -436,8 +446,7 @@ func executeState(
 	}
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
-	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
+	future = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:          exeCtx,
@@ -449,25 +458,30 @@ func executeState(
 			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 			StateInput:       state.StateInput,
 		},
-	}).Get(ctx, &decideResponse)
+	})
+	if continueAsNewCounter.IsThresholdMet() && !future.IsReady() {
+		return nil, decideAborted, nil
+	}
+	var decideResponse *iwfidl.WorkflowStateDecideResponse
+	err = future.Get(ctx, &decideResponse)
 	if err != nil {
-		return nil, convertStateApiActivityError(provider, err)
+		return nil, execFailure, convertStateApiActivityError(provider, err)
 	}
 
 	decision := decideResponse.GetStateDecision()
 	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
-		return nil, err
+		return nil, execFailure, err
 	}
 	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
-		return nil, err
+		return nil, execFailure, err
 	}
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
 	continueAsNewer.DeletePendingStateExecution(stateExeId)
 
-	return &decision, nil
+	return &decision, decideCompleted, nil
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {

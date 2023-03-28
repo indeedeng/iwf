@@ -22,7 +22,9 @@ type (
 	}
 
 	WorkflowConfig struct {
-		DisableSystemSearchAttributes bool `json:"disableSystemSearchAttributes,omitempty"`
+		DisableSystemSearchAttributes                bool `json:"disableSystemSearchAttributes,omitempty"`
+		ContinueAsNewThresholdExecutedStateExecution int  `json:"continueAsNewThresholdExecutedStateExecution"`
+		ContinueAsNewThresholdSignalsReceived        int  `json:"continueAsNewThresholdSignalsReceived"`
 	}
 
 	InterpreterWorkflowOutput struct {

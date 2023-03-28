@@ -19,22 +19,7 @@ func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProc
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
 		logger:                          provider.GetLogger(ctx),
 	}
-	provider.GoNamed(ctx, "skip-timer-signal-handler", func(ctx UnifiedContext) {
-		for {
-			ch := provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
-			val := service.SkipTimerSignalRequest{}
 
-			err := provider.Await(ctx, func() bool {
-				return ch.ReceiveAsync(&val)
-			})
-			if err != nil {
-				// break the loop to prevent goroutine leakage
-				break
-			}
-
-			tp.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
-		}
-	})
 	err := provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
 		return service.GetCurrentTimerInfosQueryResponse{
 			StateExecutionCurrentTimerInfos: tp.stateExecutionCurrentTimerInfos,
@@ -60,8 +45,10 @@ func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
 	timer.Status = service.TimerSkipped
 }
 
-// WaitForTimerCompleted waits for timer completed(fired or skipped), return false if the waiting is canceled by cancelWaiting bool pointer
-func (t *TimerProcessor) WaitForTimerCompleted(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
+// WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
+// return true when the timer is fired or canceled
+// return false if the waiting is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
+func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
 	timer := t.stateExecutionCurrentTimerInfos[stateExeId][timerIdx]
 	now := t.provider.Now(ctx).Unix()
 	fireAt := timer.FiringUnixTimestampSeconds
@@ -70,17 +57,20 @@ func (t *TimerProcessor) WaitForTimerCompleted(ctx UnifiedContext, stateExeId st
 	_ = t.provider.Await(ctx, func() bool {
 		return future.IsReady() || timer.Status == service.TimerSkipped || *cancelWaiting
 	})
-	if *cancelWaiting {
-		return false
+	if future.IsReady() || timer.Status == service.TimerSkipped {
+		return true
 	}
-	return true
+	// otherwise *cancelWaiting should return false to indicate that this timer isn't completed(fired or skipped)
+	return false
 }
 
-func (t *TimerProcessor) FinishProcessing(stateExeId string) {
+// RemovePendingTimersOfState is for when a state is completed, remove all its pending timers
+func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-func (t *TimerProcessor) StartProcessing(stateExeId string, commands []iwfidl.TimerCommand) {
+// AddPendingTimers so that we can start timers, or wait for being skipped
+func (t *TimerProcessor) AddPendingTimers(stateExeId string, commands []iwfidl.TimerCommand) {
 	timers := make([]*service.TimerInfo, len(commands))
 	for idx, cmd := range commands {
 		timer := service.TimerInfo{

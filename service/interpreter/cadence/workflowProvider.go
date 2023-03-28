@@ -9,9 +9,13 @@ import (
 	"time"
 )
 
-type workflowProvider struct{}
+type workflowProvider struct {
+	threadCount int
+}
 
-var defaultWorkflowProvider interpreter.WorkflowProvider = &workflowProvider{}
+func newCadenceWorkflowProvider() interpreter.WorkflowProvider {
+	return &workflowProvider{}
+}
 
 func (w *workflowProvider) GetBackendType() service.BackendType {
 	return service.BackendTypeCadence
@@ -76,16 +80,22 @@ func (w *workflowProvider) ExtendContextWithValue(parent interpreter.UnifiedCont
 	return interpreter.NewUnifiedContext(workflow.WithValue(wfCtx, key, val))
 }
 
-func (w workflowProvider) GoNamed(ctx interpreter.UnifiedContext, name string, f func(ctx interpreter.UnifiedContext)) {
+func (w *workflowProvider) GoNamed(ctx interpreter.UnifiedContext, name string, f func(ctx interpreter.UnifiedContext)) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to cadence workflow context")
 	}
 	f2 := func(ctx workflow.Context) {
 		ctx2 := interpreter.NewUnifiedContext(ctx)
+		w.threadCount++
 		f(ctx2)
+		w.threadCount--
 	}
 	workflow.GoNamed(wfCtx, name, f2)
+}
+
+func (w *workflowProvider) GetThreadCount() int {
+	return w.threadCount
 }
 
 func (w *workflowProvider) Await(ctx interpreter.UnifiedContext, condition func() bool) error {

@@ -12,7 +12,7 @@ type StateExecutionCounter struct {
 	config          service.WorkflowConfig
 	globalVersioner *globalVersioner
 
-	executedStateIdCount      map[string]int // count the stateId for how many times that have een executed so that we can create stateExecutionId
+	executedStateIdCount      map[string]int // count the stateId for how many times that have been executed so that we can create stateExecutionId
 	pendingStateIdCount       map[string]int // keep counting the pending stateIds so that we know times to upsert system search attributes service.SearchAttributeExecutingStateIds
 	totalPendingStateExeCount int            // count the total pending states so that we know the workflow can complete when all threads reach "dead ends"
 }

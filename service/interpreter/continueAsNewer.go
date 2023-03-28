@@ -6,6 +6,7 @@ import (
 )
 
 type ContinueAsNewer struct {
+	provider                                WorkflowProvider
 	pendingStateExecutionsRequestCommands   map[string]service.PendingStateExecutionRequestCommands
 	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
 	interStateChannel                       *InterStateChannel
@@ -23,9 +24,11 @@ const decideAborted stateExecResultType = "decideAborted"
 const decideCompleted stateExecResultType = "decideCompleted"
 
 func NewContinueAsNewer(
+	provider WorkflowProvider,
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
+		provider:                                provider,
 		interStateChannel:                       interStateChannel,
 		signalReceiver:                          signalReceiver,
 		stateExecutionCounter:                   stateExecutionCounter,
@@ -35,8 +38,8 @@ func NewContinueAsNewer(
 	}
 }
 
-func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext, provider WorkflowProvider) error {
-	err := provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
+func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
+	err := c.provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
 		return &service.DumpAllInternalResponse{
 			InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
 			SignalChannelReceived:                   c.signalReceiver.ReadReceived(nil),
@@ -76,6 +79,6 @@ func (c *ContinueAsNewer) DeletePendingStateExecution(stateExecutionId string) {
 }
 
 func (c *ContinueAsNewer) CanContinueAsNew() bool {
-	// TODO
+	// TODO drain all signals + all threads
 	return false
 }

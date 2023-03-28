@@ -12,13 +12,13 @@ func WaitForDeciderTriggerOrContinueAsNew(
 	completedTimerCmds map[int]bool,
 	completedSignalCmds map[int]*iwfidl.EncodedObject,
 	completedInterStateChannelCmds map[int]*iwfidl.EncodedObject,
-	continueAsNewer *ContinueAsNewer,
+	continueAsNewCounter *ContinueAsNewCounter,
 ) {
 	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
 		triggerType := commandReq.GetDeciderTriggerType()
 		if triggerType == iwfidl.ALL_COMMAND_COMPLETED {
 			_ = provider.Await(ctx, func() bool {
-				if continueAsNewer.CanContinueAsNew() {
+				if continueAsNewCounter.IsThresholdMet() {
 					return true
 				}
 
@@ -28,7 +28,7 @@ func WaitForDeciderTriggerOrContinueAsNew(
 			})
 		} else if triggerType == iwfidl.ANY_COMMAND_COMPLETED {
 			_ = provider.Await(ctx, func() bool {
-				if continueAsNewer.CanContinueAsNew() {
+				if continueAsNewCounter.IsThresholdMet() {
 					return true
 				}
 
@@ -38,7 +38,7 @@ func WaitForDeciderTriggerOrContinueAsNew(
 			})
 		} else if triggerType == iwfidl.ANY_COMMAND_COMBINATION_COMPLETED {
 			_ = provider.Await(ctx, func() bool {
-				if continueAsNewer.CanContinueAsNew() {
+				if continueAsNewCounter.IsThresholdMet() {
 					return true
 				}
 
