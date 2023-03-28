@@ -1,9 +1,10 @@
 package interpreter
 
 import (
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"time"
 )
 
 type TimerProcessor struct {

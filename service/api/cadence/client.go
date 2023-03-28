@@ -3,6 +3,8 @@ package cadence
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/api"
@@ -14,7 +16,6 @@ import (
 	"go.uber.org/cadence/.gen/go/shared"
 	"go.uber.org/cadence/client"
 	"go.uber.org/cadence/encoded"
-	"time"
 )
 
 type cadenceClient struct {
@@ -106,6 +107,17 @@ func (t *cadenceClient) SignalWorkflow(ctx context.Context, workflowID string, r
 
 func (t *cadenceClient) CancelWorkflow(ctx context.Context, workflowID string, runID string) error {
 	return t.cClient.CancelWorkflow(ctx, workflowID, runID)
+}
+
+func (t *cadenceClient) TerminateWorkflow(ctx context.Context, workflowID string, runID string, reason string) error {
+	var reasonStr string
+	if reason == "" {
+		reasonStr = "Force termiantion from user"
+	} else {
+		reasonStr = reason
+	}
+
+	return t.cClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr, nil)
 }
 
 func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {

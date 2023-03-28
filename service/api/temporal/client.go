@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/api"
@@ -106,6 +107,17 @@ func (t *temporalClient) SignalWorkflow(ctx context.Context, workflowID string, 
 
 func (t *temporalClient) CancelWorkflow(ctx context.Context, workflowID string, runID string) error {
 	return t.tClient.CancelWorkflow(ctx, workflowID, runID)
+}
+
+func (t *temporalClient) TerminateWorkflow(ctx context.Context, workflowID string, runID string, reason string) error {
+	var reasonStr string
+	if reason == "" {
+		reasonStr = "Force termiantion from user"
+	} else {
+		reasonStr = reason
+	}
+
+	return t.tClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr)
 }
 
 func (t *temporalClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {

@@ -71,6 +71,10 @@ type (
 		CommandIndex     int
 	}
 
+	FailWorkflowSignalRequest struct {
+		Reason string
+	}
+
 	InternalTimerStatus string
 
 	DumpAllInternalResponse struct {

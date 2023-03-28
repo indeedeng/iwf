@@ -1,23 +1,40 @@
 package interpreter
 
 import (
+	"strings"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"strings"
 )
 
 type SignalReceiver struct {
 	// key is channel name
-	receivedSignals map[string][]*iwfidl.EncodedObject
-	provider        WorkflowProvider
-	logger          UnifiedLogger
+	receivedSignals            map[string][]*iwfidl.EncodedObject
+	failWorkflowByClient       bool
+	reasonFailWorkflowByClient *string
+	provider                   WorkflowProvider
 }
 
 func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider) *SignalReceiver {
 	sr := &SignalReceiver{
-		provider:        provider,
-		receivedSignals: map[string][]*iwfidl.EncodedObject{},
+		provider:             provider,
+		receivedSignals:      map[string][]*iwfidl.EncodedObject{},
+		failWorkflowByClient: false,
 	}
+
+	provider.GoNamed(ctx, "fail-workflow-handler", func(ctx UnifiedContext) {
+		ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChanncelName)
+
+		val := service.FailWorkflowSignalRequest{}
+		err := provider.Await(ctx, func() bool {
+			return ch.ReceiveAsync(&val)
+		})
+		if err != nil {
+			return
+		}
+		sr.failWorkflowByClient, sr.reasonFailWorkflowByClient = true, &val.Reason
+	})
+
 	provider.GoNamed(ctx, "signal-receiver-handler", func(ctx UnifiedContext) {
 		for {
 
@@ -100,4 +117,16 @@ func (sr *SignalReceiver) DrainedAllSignals(ctx UnifiedContext) error {
 		}
 		return true
 	})
+}
+
+func (sr *SignalReceiver) GetFailWorklowAndReasonByClient() (bool, string) {
+	reason := "fail by client"
+	if sr.reasonFailWorkflowByClient != nil {
+		reason = *sr.reasonFailWorkflowByClient
+	}
+	if sr.failWorkflowByClient {
+		return true, reason
+	} else {
+		return false, ""
+	}
 }
