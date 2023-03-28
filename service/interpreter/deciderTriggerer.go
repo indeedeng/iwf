@@ -5,30 +5,43 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 )
 
-func WaitForDeciderTriggerType(
+func WaitForDeciderTriggerOrContinueAsNew(
 	provider WorkflowProvider,
 	ctx UnifiedContext,
 	commandReq iwfidl.CommandRequest,
 	completedTimerCmds map[int]bool,
 	completedSignalCmds map[int]*iwfidl.EncodedObject,
 	completedInterStateChannelCmds map[int]*iwfidl.EncodedObject,
+	continueAsNewer *ContinueAsNewer,
 ) {
 	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
 		triggerType := commandReq.GetDeciderTriggerType()
 		if triggerType == iwfidl.ALL_COMMAND_COMPLETED {
 			_ = provider.Await(ctx, func() bool {
+				if continueAsNewer.CanContinueAsNew() {
+					return true
+				}
+
 				return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
 					len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&
 					len(completedInterStateChannelCmds) == len(commandReq.GetInterStateChannelCommands())
 			})
 		} else if triggerType == iwfidl.ANY_COMMAND_COMPLETED {
 			_ = provider.Await(ctx, func() bool {
+				if continueAsNewer.CanContinueAsNew() {
+					return true
+				}
+
 				return len(completedTimerCmds)+
 					len(completedSignalCmds)+
 					len(completedInterStateChannelCmds) > 0
 			})
 		} else if triggerType == iwfidl.ANY_COMMAND_COMBINATION_COMPLETED {
 			_ = provider.Await(ctx, func() bool {
+				if continueAsNewer.CanContinueAsNew() {
+					return true
+				}
+
 				var completedCmdIds []string
 				for idx := range completedTimerCmds {
 					cmdId := commandReq.GetTimerCommands()[idx].CommandId

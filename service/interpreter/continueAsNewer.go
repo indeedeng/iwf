@@ -14,6 +14,14 @@ type ContinueAsNewer struct {
 	signalReceiver                          *SignalReceiver
 }
 
+type stateExecResultType string
+
+const execFailure stateExecResultType = "execFailure"
+const startAborted stateExecResultType = "startAborted"
+const waitAborted stateExecResultType = "waitAborted"
+const decideAborted stateExecResultType = "decideAborted"
+const decideCompleted stateExecResultType = "decideCompleted"
+
 func NewContinueAsNewer(
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
 ) *ContinueAsNewer {
@@ -65,4 +73,9 @@ func (c *ContinueAsNewer) AddPendingStateExecution(
 func (c *ContinueAsNewer) DeletePendingStateExecution(stateExecutionId string) {
 	delete(c.pendingStateExecutionsCompletedCommands, stateExecutionId)
 	delete(c.pendingStateExecutionsRequestCommands, stateExecutionId)
+}
+
+func (c *ContinueAsNewer) CanContinueAsNew() bool {
+	// TODO
+	return false
 }

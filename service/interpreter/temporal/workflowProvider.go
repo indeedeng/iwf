@@ -10,7 +10,9 @@ import (
 	"time"
 )
 
-type workflowProvider struct{}
+type workflowProvider struct {
+	threadCount int
+}
 
 var defaultWorkflowProvider interpreter.WorkflowProvider = &workflowProvider{}
 
