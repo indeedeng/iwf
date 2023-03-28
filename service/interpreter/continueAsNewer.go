@@ -7,6 +7,7 @@ import (
 
 type ContinueAsNewer struct {
 	provider                                WorkflowProvider
+	pendingStateExecution                   map[string]service.PendingStateExecution
 	pendingStateExecutionsRequestCommands   map[string]service.PendingStateExecutionRequestCommands
 	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
 	interStateChannel                       *InterStateChannel
@@ -14,14 +15,6 @@ type ContinueAsNewer struct {
 	persistenceManager                      *PersistenceManager
 	signalReceiver                          *SignalReceiver
 }
-
-type stateExecResultType string
-
-const execFailure stateExecResultType = "execFailure"
-const startAborted stateExecResultType = "startAborted"
-const waitAborted stateExecResultType = "waitAborted"
-const decideAborted stateExecResultType = "decideAborted"
-const decideCompleted stateExecResultType = "decideCompleted"
 
 func NewContinueAsNewer(
 	provider WorkflowProvider,
@@ -56,7 +49,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 	return nil
 }
 
-func (c *ContinueAsNewer) AddPendingStateExecution(
+func (c *ContinueAsNewer) AddPendingStateExecutionCommandStatus(
 	stateExecutionId string,
 	completedTimerCommands map[int]bool, completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
 	timerCommands []iwfidl.TimerCommand, signalCommands []iwfidl.SignalCommand, interStateChannelCommands []iwfidl.InterStateChannelCommand,
@@ -73,7 +66,7 @@ func (c *ContinueAsNewer) AddPendingStateExecution(
 	}
 }
 
-func (c *ContinueAsNewer) DeletePendingStateExecution(stateExecutionId string) {
+func (c *ContinueAsNewer) ClearPendingStateExecutionCommandStatus(stateExecutionId string) {
 	delete(c.pendingStateExecutionsCompletedCommands, stateExecutionId)
 	delete(c.pendingStateExecutionsRequestCommands, stateExecutionId)
 }
@@ -81,4 +74,11 @@ func (c *ContinueAsNewer) DeletePendingStateExecution(stateExecutionId string) {
 func (c *ContinueAsNewer) CanContinueAsNew() bool {
 	// TODO drain all signals + all threads
 	return false
+}
+
+func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus service.StateExecutionStatus, stateExeId string, state iwfidl.StateMovement) {
+	c.pendingStateExecution[stateExeId] = service.PendingStateExecution{
+		State:                state,
+		StateExecutionStatus: stateExecStatus,
+	}
 }

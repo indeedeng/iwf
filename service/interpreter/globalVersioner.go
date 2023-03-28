@@ -13,7 +13,7 @@ type globalVersioner struct {
 	ctx              UnifiedContext
 }
 
-func NewGlobalVersionProvider(workflowProvider WorkflowProvider, ctx UnifiedContext) *globalVersioner {
+func NewGlobalVersioner(workflowProvider WorkflowProvider, ctx UnifiedContext) *globalVersioner {
 	return &globalVersioner{
 		workflowProvider: workflowProvider,
 		ctx:              ctx,

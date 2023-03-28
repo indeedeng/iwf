@@ -10,7 +10,7 @@ import (
 
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
 	var err error
-	globalVersionProvider := NewGlobalVersionProvider(provider, ctx)
+	globalVersionProvider := NewGlobalVersioner(provider, ctx)
 	if globalVersionProvider.IsAfterVersionOfUsingGlobalVersioning() {
 		err = globalVersionProvider.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
@@ -88,11 +88,11 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		//reset to empty slice since each iteration will process all current states in the queue
 		statesToExecuteQueue = nil
 
-		for _, stateToExecute := range statesToExecute {
+		for _, stateToExecuteForLoopingOnly := range statesToExecute {
 			// execute in another thread for parallelism
 			// state must be passed via parameter https://stackoverflow.com/questions/67263092
-			stateCtx := provider.ExtendContextWithValue(ctx, "state", stateToExecute)
-			provider.GoNamed(stateCtx, stateToExecute.GetStateId(), func(ctx UnifiedContext) {
+			stateCtx := provider.ExtendContextWithValue(ctx, "state", stateToExecuteForLoopingOnly)
+			provider.GoNamed(stateCtx, stateToExecuteForLoopingOnly.GetStateId(), func(ctx UnifiedContext) {
 				state, ok := provider.GetContextValue(ctx, "state").(iwfidl.StateMovement)
 				if !ok {
 					errToFailWf = provider.NewApplicationError(
@@ -103,42 +103,56 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				stateExeId := stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
-				decision, stExcResType, err := executeState(ctx, provider, state, execution, stateExeId, persistenceManager, interStateChannel, signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
+				decision, stateExecStatus, err := executeState(
+					ctx, provider, state, execution, stateExeId, persistenceManager,
+					interStateChannel, signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
 				if err != nil {
 					errToFailWf = err
+					// state execution fail should fail the workflow, no more processing
+					return
 				}
 
-				shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
-				if err != nil {
-					errToFailWf = err
-				}
-				if gracefulComplete || forceComplete || forceFail {
-					outputsToReturnWf = append(outputsToReturnWf, *output)
-				}
-				if forceComplete {
-					forceCompleteWf = true
-				}
-				if forceFail {
-					errToFailWf = provider.NewApplicationError(
-						string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
-						outputsToReturnWf,
-					)
-				}
-				if !shouldClose && decision.HasNextStates() {
-					statesToExecuteQueue = append(statesToExecuteQueue, decision.GetNextStates()...)
-				}
+				if stateExecStatus == service.DecideApiCompletedStateExecutionStatus {
+					// NOTE: decision is only available on this DecideApiCompletedStateExecutionStatus
 
-				// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-				err = stateExecutionCounter.MarkStateExecutionCompleted(state)
-				if err != nil {
-					errToFailWf = err
+					shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
+					if err != nil {
+						errToFailWf = err
+						// no return so that it can fall through to call MarkStateExecutionCompleted
+					}
+					if gracefulComplete || forceComplete || forceFail {
+						outputsToReturnWf = append(outputsToReturnWf, *output)
+					}
+					if forceComplete {
+						forceCompleteWf = true
+					}
+					if forceFail {
+						errToFailWf = provider.NewApplicationError(
+							string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
+							outputsToReturnWf,
+						)
+						// no return so that it can fall through to call MarkStateExecutionCompleted
+					}
+					if !shouldClose && decision.HasNextStates() {
+						statesToExecuteQueue = append(statesToExecuteQueue, decision.GetNextStates()...)
+					}
+
+					// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
+					// doing this at last because upsertSearchAttribute is blocking call for workflow [decision] task
+					err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+					if err != nil {
+						errToFailWf = err
+					}
+				} else {
+					// if not completed (without error), then it's because of cancellation by continueAsNew
+					continueAsNewer.ProcessUncompletedStateExecution(stateExecStatus, stateExeId, state)
 				}
-			})
-		}
+			}) // end of executing one state
+		} // end loop of executing all states from the queue for one iteration
 
 		// The conditions here are quite tricky:
-		// For len(statesToExecuteQueue) > 0: We need some condition to wait here because all the stateToExecute are running in different thread.
-		//    Right after the stateToExecute are pop from queue, the len(...) becomes zero. So when the len(...) >0, it means there are new states to execute pushed into the queue,
+		// For len(statesToExecuteQueue) > 0: We need some condition to wait here because all the state execution are running in different thread.
+		//    Right after the queue are popped, the len(...) becomes zero. So when the len(...) >0, it means there are new states to execute pushed into the queue,
 		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, waiting for all current started in this iteration to complete will also work,
 		//    but not as efficient as this one because it will take much longer time.
 		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
@@ -166,7 +180,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			errToFailWf = awaitError
 			break
 		}
-	}
+	} // end main loop -- loop until no more state can be executed (dead end)
 
 	// gracefully complete workflow when all states are executed to dead ends
 	return &service.InterpreterWorkflowOutput{
@@ -230,7 +244,7 @@ func executeState(
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
 	continueAsNewCounter *ContinueAsNewCounter,
-) (*iwfidl.StateDecision, stateExecResultType, error) {
+) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
 	}
@@ -262,22 +276,22 @@ func executeState(
 		},
 	})
 	if continueAsNewCounter.IsThresholdMet() && !future.IsReady() {
-		return nil, startAborted, nil
+		return nil, service.StartApiAbortedStateExecutionStatus, nil
 	}
 	var startResponse *iwfidl.WorkflowStateStartResponse
 	errStartApi := future.Get(ctx, &startResponse)
 
 	if errStartApi != nil && !shouldProceedOnStartApiError(state) {
-		return nil, execFailure, convertStateApiActivityError(provider, errStartApi)
+		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
 	}
 
 	err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
 	if err != nil {
-		return nil, execFailure, err
+		return nil, service.FailureStateExecutionStatus, err
 	}
 	err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
 	if err != nil {
-		return nil, execFailure, err
+		return nil, service.FailureStateExecutionStatus, err
 	}
 	interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
@@ -366,7 +380,7 @@ func executeState(
 		}
 	}
 
-	continueAsNewer.AddPendingStateExecution(
+	continueAsNewer.AddPendingStateExecutionCommandStatus(
 		stateExeId,
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
 		commandReq.GetTimerCommands(), commandReq.GetSignalCommands(), commandReq.GetInterStateChannelCommands(),
@@ -374,7 +388,7 @@ func executeState(
 	WaitForDeciderTriggerOrContinueAsNew(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds, continueAsNewCounter)
 	commandReqDoneOrCanceled = true
 	if continueAsNewCounter.IsThresholdMet() {
-		return nil, waitAborted, nil
+		return nil, service.WaitingCommandsStateExecutionStatus, nil
 	}
 
 	commandRes := &iwfidl.CommandResults{}
@@ -460,28 +474,28 @@ func executeState(
 		},
 	})
 	if continueAsNewCounter.IsThresholdMet() && !future.IsReady() {
-		return nil, decideAborted, nil
+		return nil, service.WaitingCompletedStateExecutionStatus, nil
 	}
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
 	err = future.Get(ctx, &decideResponse)
 	if err != nil {
-		return nil, execFailure, convertStateApiActivityError(provider, err)
+		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
 	}
 
 	decision := decideResponse.GetStateDecision()
 	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
-		return nil, execFailure, err
+		return nil, service.FailureStateExecutionStatus, err
 	}
 	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
-		return nil, execFailure, err
+		return nil, service.FailureStateExecutionStatus, err
 	}
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
-	continueAsNewer.DeletePendingStateExecution(stateExeId)
+	continueAsNewer.ClearPendingStateExecutionCommandStatus(stateExeId)
 
-	return &decision, decideCompleted, nil
+	return &decision, service.DecideApiCompletedStateExecutionStatus, nil
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {

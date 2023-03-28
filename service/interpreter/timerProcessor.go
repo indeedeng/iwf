@@ -47,7 +47,7 @@ func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
 
 // WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
 // return true when the timer is fired or canceled
-// return false if the waiting is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
+// return false if the waitingCommands is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
 func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
 	timer := t.stateExecutionCurrentTimerInfos[stateExeId][timerIdx]
 	now := t.provider.Now(ctx).Unix()

@@ -82,7 +82,7 @@ type (
 	DumpAllInternalResponse struct {
 		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
 		SignalChannelReceived                   map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo               StateExecutionCounterInfo
+		StateExecutionCounterInfo               StateExecutionCounterInfo // for rebuilding StateExecutionCounter
 		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
 		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
 		DataObjects                             []iwfidl.KeyValue
@@ -90,9 +90,15 @@ type (
 	}
 
 	StateExecutionCounterInfo struct {
-		ExecutedStateIdCount      map[string]int
-		PendingStateIdCount       map[string]int
-		TotalPendingStateExeCount int
+		ExecutedStateIdCount      map[string]int // for stateExecutionId
+		PendingStateIdCount       map[string]int // for sys search attribute
+		TotalPendingStateExeCount int            // for "dead end"
+	}
+
+	PendingStateExecution struct {
+		State                iwfidl.StateMovement
+		DeciderTriggerType   iwfidl.DeciderTriggerType
+		StateExecutionStatus StateExecutionStatus
 	}
 
 	PendingStateExecutionRequestCommands struct {
@@ -107,6 +113,14 @@ type (
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject
 	}
 )
+
+type StateExecutionStatus string
+
+const FailureStateExecutionStatus StateExecutionStatus = "FailureStateExecutionStatus"                       // this will fail the workflow, no continueAsNew
+const StartApiAbortedStateExecutionStatus StateExecutionStatus = "StartApiAbortedStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from startApi
+const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommandsStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from waiting command
+const WaitingCompletedStateExecutionStatus StateExecutionStatus = "WaitingCompletedStateExecutionStatus"     // this will put the state into a special pending queue for continueAsNew from decideApi
+const DecideApiCompletedStateExecutionStatus StateExecutionStatus = "DecideApiCompletedStateExecutionStatus" // this will process as normal
 
 const (
 	TimerPending InternalTimerStatus = "Pending"
