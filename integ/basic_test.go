@@ -143,6 +143,8 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 			"S1_start":  1,
 			"S1_decide": 1,
 		}, history, "basic test fail, %v", history)
+
+		// TODO more assertion after implementing resuming for continueAsNew
 		return
 	}
 
