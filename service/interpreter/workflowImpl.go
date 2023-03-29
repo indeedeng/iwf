@@ -157,6 +157,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		//    but not as efficient as this one because it will take much longer time.
 		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
 		// For stateExecutionCounter.GetTotalPendingStateExecutions() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
+		// For continueAsNewCounter.IsThresholdMet(): this means workflow need to continueAsNew
 		awaitError := provider.Await(ctx, func() bool {
 			failByApi, errStr := signalReceiver.IsFailWorkflowRequested()
 			if failByApi {
@@ -167,8 +168,16 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 				return true
 			}
-			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalPendingStateExecutions() == 0
+			return len(statesToExecuteQueue) > 0 || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalPendingStateExecutions() == 0 || continueAsNewCounter.IsThresholdMet()
 		})
+		if continueAsNewCounter.IsThresholdMet() {
+			// NOTE: drain signals+thread before checking errToFailWf/forceCompleteWf so that we can close the workflow if possible
+			err := continueAsNewer.DrainAllSignalsAndThreads(ctx)
+			if err != nil {
+				awaitError = err
+			}
+		}
+
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
 				StateCompletionOutputs: outputsToReturnWf,
@@ -179,6 +188,10 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			// this could happen for cancellation
 			errToFailWf = awaitError
 			break
+		}
+		if continueAsNewCounter.IsThresholdMet() {
+			// at here, all signals + threads are drained, so it's safe to continueAsNew
+			return nil, continueAsNewer.DoItNow(ctx, execution, input.Config)
 		}
 	} // end main loop -- loop until no more state can be executed (dead end)
 

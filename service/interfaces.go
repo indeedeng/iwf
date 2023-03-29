@@ -19,6 +19,17 @@ type (
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
 		Config WorkflowConfig `json:"config,omitempty"`
+
+		// ContinueAsNew indicate this is input for continueAsNew, when true, all fields can be blank except for ContinueAsNewInput
+		ContinueAsNew bool `json:"continueAsNew"`
+
+		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
+	}
+
+	ContinueAsNewInput struct {
+		Config WorkflowConfig `json:"config,omitempty"`
+
+		IwfWorkflowExecution IwfWorkflowExecution `json:"iwfWorkflowExecution"`
 	}
 
 	WorkflowConfig struct {
@@ -45,7 +56,7 @@ type (
 		IwfWorkerUrl     string
 		WorkflowType     string
 		WorkflowId       string
-		RunId            string
+		RunId            string // this is the first runId including reset & continueAsNew
 		StartedTimestamp int64
 	}
 

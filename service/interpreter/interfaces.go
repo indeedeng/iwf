@@ -98,6 +98,7 @@ type WorkflowProvider interface {
 	GetUnhandledSignalNames(ctx UnifiedContext) []string
 	GetBackendType() service.BackendType
 	GetLogger(ctx UnifiedContext) UnifiedLogger
+	NewInterpreterContinueAsNewError(ctx UnifiedContext, input service.InterpreterWorkflowInput) error
 }
 
 type ReceiveChannel interface {

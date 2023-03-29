@@ -30,6 +30,14 @@ func (w *workflowProvider) IsApplicationError(err error) bool {
 	return ok
 }
 
+func (w *workflowProvider) NewInterpreterContinueAsNewError(ctx interpreter.UnifiedContext, input service.InterpreterWorkflowInput) error {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to cadence workflow context")
+	}
+	return workflow.NewContinueAsNewError(wfCtx, Interpreter, input)
+}
+
 func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext, attributes map[string]interface{}) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {

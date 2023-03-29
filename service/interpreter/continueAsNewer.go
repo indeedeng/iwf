@@ -71,7 +71,14 @@ func (c *ContinueAsNewer) ClearPendingStateExecutionCommandStatus(stateExecution
 	delete(c.pendingStateExecutionsRequestCommands, stateExecutionId)
 }
 
-func (c *ContinueAsNewer) CanContinueAsNew(ctx UnifiedContext) bool {
+func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {
+	// NOTE: consider using AwaitWithTimeout to get an alert when workflow stuck due to a bug in the draining logic for continueAsNew
+	return c.provider.Await(ctx, func() bool {
+		return c.canContinueAsNew(ctx)
+	})
+}
+
+func (c *ContinueAsNewer) canContinueAsNew(ctx UnifiedContext) bool {
 	// drain all signals + all threads
 	return c.signalReceiver.HaveAllUserAndSystemSignalsToReceive(ctx) && c.provider.GetThreadCount() == 0
 }
@@ -81,4 +88,14 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 		State:                state,
 		StateExecutionStatus: stateExecStatus,
 	}
+}
+
+func (c *ContinueAsNewer) DoItNow(ctx UnifiedContext, execution service.IwfWorkflowExecution, config service.WorkflowConfig) error {
+	return c.provider.NewInterpreterContinueAsNewError(ctx, service.InterpreterWorkflowInput{
+		ContinueAsNew: true,
+		ContinueAsNewInput: service.ContinueAsNewInput{
+			Config:               config,
+			IwfWorkflowExecution: execution,
+		},
+	})
 }
