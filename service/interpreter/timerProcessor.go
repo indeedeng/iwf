@@ -69,8 +69,7 @@ func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-// AddPendingTimers so that we can start timers, or wait for being skipped
-func (t *TimerProcessor) AddPendingTimers(stateExeId string, commands []iwfidl.TimerCommand) {
+func (t *TimerProcessor) StartTimers(stateExeId string, commands []iwfidl.TimerCommand) {
 	timers := make([]*service.TimerInfo, len(commands))
 	for idx, cmd := range commands {
 		timer := service.TimerInfo{

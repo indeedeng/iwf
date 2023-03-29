@@ -82,7 +82,7 @@ type (
 	DumpAllInternalResponse struct {
 		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
 		SignalChannelReceived                   map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo               StateExecutionCounterInfo // for rebuilding StateExecutionCounter
+		StateExecutionCounterInfo               StateExecutionCounterInfo
 		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
 		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
 		DataObjects                             []iwfidl.KeyValue

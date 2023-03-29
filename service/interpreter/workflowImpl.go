@@ -67,7 +67,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
-	stateExecutionCounter := NewStateExecutionCounter(ctx, provider, input.Config)
+	stateExecutionCounter := NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
 
 	continueAsNewer := NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
 	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx)
@@ -300,7 +300,7 @@ func executeState(
 
 	completedTimerCmds := map[int]bool{}
 	if len(commandReq.GetTimerCommands()) > 0 {
-		timerProcessor.AddPendingTimers(stateExeId, commandReq.GetTimerCommands())
+		timerProcessor.StartTimers(stateExeId, commandReq.GetTimerCommands())
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
 			provider.GoNamed(cmdCtx, getThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
@@ -385,7 +385,9 @@ func executeState(
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
 		commandReq.GetTimerCommands(), commandReq.GetSignalCommands(), commandReq.GetInterStateChannelCommands(),
 	)
-	WaitForDeciderTriggerOrContinueAsNew(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds, continueAsNewCounter)
+	_ = provider.Await(ctx, func() bool {
+		return IsDeciderTriggerConditionMet(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
+	})
 	commandReqDoneOrCanceled = true
 	if continueAsNewCounter.IsThresholdMet() {
 		return nil, service.WaitingCommandsStateExecutionStatus, nil

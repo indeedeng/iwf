@@ -54,6 +54,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 				break
 			}
 			if received {
+				continueAsNewCounter.IncSignalsReceived()
 				tp.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
 			} else {
 				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
@@ -89,6 +90,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 			}
 
 			for _, sigName := range toProcess {
+				continueAsNewCounter.IncSignalsReceived()
 				var sigVal iwfidl.EncodedObject
 				ch := provider.GetSignalChannel(ctx, sigName)
 				ch.Receive(ctx, &sigVal)
@@ -129,29 +131,31 @@ func (sr *SignalReceiver) ReadReceived(channelNames []string) map[string][]*iwfi
 	return data
 }
 
-// WaitForAllUserAndSystemSignalsToReceive will wait for all signals are received before a safe continueAsNew
+// HaveAllUserAndSystemSignalsToReceive will check for if signals are received for a safe continueAsNew
 // this includes both regular user signals and system signals
 // Note that being received doesn't mean being processed completed. ContinueAsNew should also wait for processing the received signals properly
-func (sr *SignalReceiver) WaitForAllUserAndSystemSignalsToReceive(ctx UnifiedContext) error {
-	return sr.provider.Await(ctx, func() bool {
-		unhandledSigs := sr.provider.GetUnhandledSignalNames(ctx)
+func (sr *SignalReceiver) HaveAllUserAndSystemSignalsToReceive(ctx UnifiedContext) bool {
+	unhandledSigs := sr.provider.GetUnhandledSignalNames(ctx)
+	if len(unhandledSigs) == 0 {
+		return true
+	}
 
-		for _, sigName := range unhandledSigs {
-			if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
-				if service.ValidIwfSystemSignalNames[sigName] {
-					// found a valid system signal, return false so that continueAsNew can wait for it
-					return false
-				}
-				// ignore invalid system signals because we can't process it
-				sr.provider.GetLogger(ctx).Error("ignore the invalid system signal", sigName)
-				continue
+	for _, sigName := range unhandledSigs {
+		if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
+			if service.ValidIwfSystemSignalNames[sigName] {
+				// found a valid system signal, return false so that continueAsNew can wait for it
+				return false
 			}
-			// found a regular signal, return false so that continueAsNew can wait for it
+			// ignore invalid system signals because we can't process it
+			sr.provider.GetLogger(ctx).Error("ignore the invalid system signal", sigName)
+			continue
+		} else {
+			// found a regular signal, return false
 			return false
 		}
-		// no unhandled signals
-		return true
-	})
+	}
+	// no unhandled system or user signals
+	return true
 }
 
 func (sr *SignalReceiver) GetFailWorklowAndReasonByClient() (bool, string) {

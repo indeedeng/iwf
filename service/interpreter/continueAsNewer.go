@@ -71,9 +71,9 @@ func (c *ContinueAsNewer) ClearPendingStateExecutionCommandStatus(stateExecution
 	delete(c.pendingStateExecutionsRequestCommands, stateExecutionId)
 }
 
-func (c *ContinueAsNewer) CanContinueAsNew() bool {
-	// TODO drain all signals + all threads
-	return false
+func (c *ContinueAsNewer) CanContinueAsNew(ctx UnifiedContext) bool {
+	// drain all signals + all threads
+	return c.signalReceiver.HaveAllUserAndSystemSignalsToReceive(ctx) && c.provider.GetThreadCount() == 0
 }
 
 func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus service.StateExecutionStatus, stateExeId string, state iwfidl.StateMovement) {

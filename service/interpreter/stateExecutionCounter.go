@@ -7,17 +7,18 @@ import (
 )
 
 type StateExecutionCounter struct {
-	ctx             UnifiedContext
-	provider        WorkflowProvider
-	config          service.WorkflowConfig
-	globalVersioner *globalVersioner
+	ctx                  UnifiedContext
+	provider             WorkflowProvider
+	config               service.WorkflowConfig
+	globalVersioner      *globalVersioner
+	continueAsNewCounter *ContinueAsNewCounter
 
 	executedStateIdCount      map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
 	pendingStateIdCount       map[string]int // For system search attributes service.SearchAttributeExecutingStateIds: keep counting the pending stateIds
 	totalPendingStateExeCount int            // For "dead ends": count the total pending states
 }
 
-func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config service.WorkflowConfig) *StateExecutionCounter {
+func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config service.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                       ctx,
 		provider:                  provider,
@@ -26,6 +27,7 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 		totalPendingStateExeCount: 0,
 		config:                    config,
 		globalVersioner:           NewGlobalVersioner(provider, ctx),
+		continueAsNewCounter:      continueAsNewCounter,
 	}
 }
 
@@ -74,6 +76,7 @@ func (e *StateExecutionCounter) MarkStateExecutionsPending(states []iwfidl.State
 func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
 	e.pendingStateIdCount[state.StateId]--
 	e.totalPendingStateExeCount--
+	e.continueAsNewCounter.IncExecutedStateExecution()
 	if e.pendingStateIdCount[state.StateId] == 0 {
 		delete(e.pendingStateIdCount, state.StateId)
 		return e.updateStateIdSearchAttribute()
