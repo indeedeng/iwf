@@ -9,12 +9,18 @@ type ContinueAsNewCounter struct {
 	signalsReceived                 int32
 	executedStateExecutionThreshold int32
 	signalsReceivedThreshold        int32
+
+	rootCtx  UnifiedContext
+	provider WorkflowProvider
 }
 
-func NewContinueAsCounter(config iwfidl.WorkflowConfig) *ContinueAsNewCounter {
+func NewContinueAsCounter(config iwfidl.WorkflowConfig, rootCtx UnifiedContext, provider WorkflowProvider) *ContinueAsNewCounter {
 	return &ContinueAsNewCounter{
 		executedStateExecutionThreshold: config.GetContinueAsNewThresholdExecutedStateExecution(),
 		signalsReceivedThreshold:        config.GetContinueAsNewThresholdSignalsReceived(),
+
+		rootCtx:  rootCtx,
+		provider: provider,
 	}
 }
 
@@ -27,6 +33,12 @@ func (c *ContinueAsNewCounter) IncSignalsReceived() {
 
 func (c *ContinueAsNewCounter) IsThresholdMet() bool {
 	// Note: when threshold == 0, it means unlimited
-	return (c.executedStateExecutionThreshold > 0 && c.executedStateExecution > c.executedStateExecutionThreshold) ||
-		(c.signalsReceivedThreshold > 0 && c.signalsReceived > c.signalsReceivedThreshold)
+
+	isMet := (c.executedStateExecutionThreshold > 0 && c.executedStateExecution >= c.executedStateExecutionThreshold) ||
+		(c.signalsReceivedThreshold > 0 && c.signalsReceived >= c.signalsReceivedThreshold)
+	if isMet {
+		c.provider.GetLogger(c.rootCtx).Info("continueAsNew condition is met", c.executedStateExecution, c.signalsReceived, "called at:"+LastCaller())
+	}
+
+	return isMet
 }

@@ -52,7 +52,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 	persistenceManager := NewPersistenceManager(provider, input.InitSearchAttributes)
 	timerProcessor := NewTimerProcessor(ctx, provider)
-	continueAsNewCounter := NewContinueAsCounter(input.Config)
+	continueAsNewCounter := NewContinueAsCounter(input.Config, ctx, provider)
 	signalReceiver := NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter)
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {

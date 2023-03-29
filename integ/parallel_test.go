@@ -17,12 +17,7 @@ func TestParallelWorkflowTemporal(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		// default
-		doTestParallelWorkflow(t, service.BackendTypeTemporal, iwfidl.WorkflowConfig{})
-
-		// continueAsNew
-		//doTestParallelWorkflow(t, service.BackendTypeTemporal, iwfidl.WorkflowConfig{
-		//	ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
-		//})
+		doTestParallelWorkflow(t, service.BackendTypeTemporal)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
@@ -32,12 +27,12 @@ func TestParallelWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestParallelWorkflow(t, service.BackendTypeCadence, iwfidl.WorkflowConfig{})
+		doTestParallelWorkflow(t, service.BackendTypeCadence)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
-func doTestParallelWorkflow(t *testing.T, backendType service.BackendType, config iwfidl.WorkflowConfig) {
+func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 	// start test workflow server
 	wfHandler := parallel.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -62,9 +57,6 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType, confi
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           parallel.State1,
-		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: &config,
-		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

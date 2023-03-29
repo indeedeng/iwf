@@ -74,6 +74,7 @@ func (c *ContinueAsNewer) ClearPendingStateExecutionCommandStatus(stateExecution
 }
 
 func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {
+	// TODO: add metric for before and after Await to monitor stuck
 	// NOTE: consider using AwaitWithTimeout to get an alert when workflow stuck due to a bug in the draining logic for continueAsNew
 	return c.provider.Await(ctx, func() bool {
 		return c.canContinueAsNew(ctx)

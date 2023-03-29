@@ -3,7 +3,6 @@ package basic
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
@@ -27,7 +26,6 @@ func NewHandler() *handler {
 
 // ApiV1WorkflowStartPost - for a workflow
 func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
-	workflow.WaitForMockLatency()
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -57,7 +55,6 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
-	workflow.WaitForMockLatency()
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
