@@ -90,7 +90,7 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 	}
 }
 
-func (c *ContinueAsNewer) DoIt(ctx UnifiedContext, execution service.IwfWorkflowExecution, config service.WorkflowConfig) error {
+func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, execution service.IwfWorkflowExecution, config service.WorkflowConfig) error {
 	return c.provider.NewInterpreterContinueAsNewError(ctx, service.InterpreterWorkflowInput{
 		ContinueAsNew: true,
 		ContinueAsNewInput: service.ContinueAsNewInput{
