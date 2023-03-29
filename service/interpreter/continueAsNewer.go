@@ -1,8 +1,10 @@
 package interpreter
 
 import (
+	"encoding/json"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 )
 
 type ContinueAsNewer struct {
@@ -98,4 +100,18 @@ func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, execution service
 			IwfWorkflowExecution: execution,
 		},
 	})
+}
+
+func ResumeFromPreviousRun(input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+	// TODO this is for test only, will be implemented in later PRs
+	data, err := json.Marshal(input)
+	return &service.InterpreterWorkflowOutput{
+		StateCompletionOutputs: []iwfidl.StateCompletionOutput{
+			{
+				CompletedStateOutput: &iwfidl.EncodedObject{
+					Data: ptr.Any(string(data)),
+				},
+			},
+		},
+	}, err
 }
