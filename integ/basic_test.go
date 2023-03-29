@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/integ/workflow"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"strconv"
@@ -19,13 +20,15 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestBasicWorkflow(t, service.BackendTypeTemporal)
-		// NOTE: basic wf is too fast so we have to make sure to have enough interval
-		du := time.Millisecond * time.Duration(*repeatInterval)
-		if *repeatIntegTest > 1 && du < time.Second {
-			du = time.Second
-		}
-		time.Sleep(du)
+		//doTestBasicWorkflow(t, service.BackendTypeTemporal, iwfidl.WorkflowConfig{})
+		smallWaitForFastTest()
+
+		workflow.SetMockApiLatencyMs(3000)
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, iwfidl.WorkflowConfig{
+			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
+		})
+		workflow.ClearMockApiLatencyMs()
+		smallWaitForFastTest()
 	}
 }
 
@@ -34,17 +37,12 @@ func TestBasicWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestBasicWorkflow(t, service.BackendTypeCadence)
-		// NOTE: basic wf is too fast so we have to make sure to have enough interval
-		du := time.Millisecond * time.Duration(*repeatInterval)
-		if *repeatIntegTest > 1 && du < time.Second {
-			du = time.Second
-		}
-		time.Sleep(du)
+		doTestBasicWorkflow(t, service.BackendTypeCadence, iwfidl.WorkflowConfig{})
+		smallWaitForFastTest()
 	}
 }
 
-func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := basic.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -75,6 +73,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		StartStateId:           basic.State1,
 		StateInput:             wfInput,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config:                &config,
 			WorkflowIDReusePolicy: ptr.Any(iwfidl.REJECT_DUPLICATE),
 			// CronSchedule:          iwfidl.PtrString("* * * * *"),
 			RetryPolicy: &iwfidl.WorkflowRetryPolicy{

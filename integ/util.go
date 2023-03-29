@@ -18,6 +18,7 @@ import (
 	"go.uber.org/cadence/encoded"
 	"log"
 	"net/http"
+	"time"
 )
 
 const testNamespace = "default"
@@ -153,4 +154,13 @@ func panicAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, r
 	if resp.WorkflowStatus != iwfidl.COMPLETED {
 		panic("Workflow uncompleted:" + resp.WorkflowStatus)
 	}
+}
+
+func smallWaitForFastTest() {
+	// NOTE: basic wf is too fast so we have to make sure to have enough interval
+	du := time.Millisecond * time.Duration(*repeatInterval)
+	if *repeatIntegTest > 1 && du < time.Second {
+		du = time.Second
+	}
+	time.Sleep(du)
 }
