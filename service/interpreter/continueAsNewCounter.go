@@ -1,18 +1,20 @@
 package interpreter
 
-import "github.com/indeedeng/iwf/service"
+import (
+	"github.com/indeedeng/iwf/gen/iwfidl"
+)
 
 type ContinueAsNewCounter struct {
-	executedStateExecution          int
-	signalsReceived                 int
-	executedStateExecutionThreshold int
-	signalsReceivedThreshold        int
+	executedStateExecution          int32
+	signalsReceived                 int32
+	executedStateExecutionThreshold int32
+	signalsReceivedThreshold        int32
 }
 
-func NewContinueAsCounter(config service.WorkflowConfig) *ContinueAsNewCounter {
+func NewContinueAsCounter(config iwfidl.WorkflowConfig) *ContinueAsNewCounter {
 	return &ContinueAsNewCounter{
-		executedStateExecutionThreshold: config.ContinueAsNewThresholdExecutedStateExecution,
-		signalsReceivedThreshold:        config.ContinueAsNewThresholdSignalsReceived,
+		executedStateExecutionThreshold: config.GetContinueAsNewThresholdExecutedStateExecution(),
+		signalsReceivedThreshold:        config.GetContinueAsNewThresholdSignalsReceived(),
 	}
 }
 

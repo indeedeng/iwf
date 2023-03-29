@@ -23,6 +23,7 @@ type WorkflowStartOptions struct {
 	CronSchedule          *string                `json:"cronSchedule,omitempty"`
 	RetryPolicy           *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
 	SearchAttributes      []SearchAttribute      `json:"searchAttributes,omitempty"`
+	Config                *WorkflowConfig        `json:"config,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -170,6 +171,38 @@ func (o *WorkflowStartOptions) SetSearchAttributes(v []SearchAttribute) {
 	o.SearchAttributes = v
 }
 
+// GetConfig returns the Config field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetConfig() WorkflowConfig {
+	if o == nil || IsNil(o.Config) {
+		var ret WorkflowConfig
+		return ret
+	}
+	return *o.Config
+}
+
+// GetConfigOk returns a tuple with the Config field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartOptions) GetConfigOk() (*WorkflowConfig, bool) {
+	if o == nil || IsNil(o.Config) {
+		return nil, false
+	}
+	return o.Config, true
+}
+
+// HasConfig returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasConfig() bool {
+	if o != nil && !IsNil(o.Config) {
+		return true
+	}
+
+	return false
+}
+
+// SetConfig gets a reference to the given WorkflowConfig and assigns it to the Config field.
+func (o *WorkflowStartOptions) SetConfig(v WorkflowConfig) {
+	o.Config = &v
+}
+
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o WorkflowStartOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
+	}
+	if !IsNil(o.Config) {
+		toSerialize["config"] = o.Config
 	}
 	return toSerialize, nil
 }

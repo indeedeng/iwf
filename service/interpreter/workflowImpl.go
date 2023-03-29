@@ -22,7 +22,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		return ResumeFromPreviousRun(input)
 	}
 
-	if !input.Config.DisableSystemSearchAttributes {
+	if !input.Config.GetDisableSystemSearchAttribute() {
 		if !globalVersionProvider.IsAfterVersionOfOptimizedUpsertSearchAttribute() {
 			// stop upsert it here since it's done in start workflow request
 			err = provider.UpsertSearchAttributes(ctx, map[string]interface{}{

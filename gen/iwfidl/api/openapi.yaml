@@ -444,6 +444,10 @@ components:
           - stringArrayValue
           key: key
         workflowIDReusePolicy: null
+        config:
+          continueAsNewThresholdExecutedStateExecution: 1
+          disableSystemSearchAttribute: true
+          continueAsNewThresholdSignalsReceived: 6
         cronSchedule: cronSchedule
       properties:
         workflowIDReusePolicy:
@@ -456,6 +460,8 @@ components:
           items:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
+        config:
+          $ref: '#/components/schemas/WorkflowConfig'
       type: object
     WorkflowIDReusePolicy:
       enum:
@@ -566,6 +572,10 @@ components:
             - stringArrayValue
             key: key
           workflowIDReusePolicy: null
+          config:
+            continueAsNewThresholdExecutedStateExecution: 1
+            disableSystemSearchAttribute: true
+            continueAsNewThresholdSignalsReceived: 6
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
@@ -955,10 +965,6 @@ components:
           - stringArrayValue
           - stringArrayValue
           key: key
-        config:
-          continueAsNewThresholdExecutedStateExecution: 5
-          disableSystemSearchAttribute: true
-          continueAsNewThresholdSignalsReceived: 5
         stateInput:
           data: data
           encoding: encoding
@@ -979,8 +985,6 @@ components:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
-        config:
-          $ref: '#/components/schemas/WorkflowConfig'
       required:
       - context
       - workflowStateId
@@ -1726,9 +1730,9 @@ components:
       type: object
     WorkflowConfig:
       example:
-        continueAsNewThresholdExecutedStateExecution: 5
+        continueAsNewThresholdExecutedStateExecution: 1
         disableSystemSearchAttribute: true
-        continueAsNewThresholdSignalsReceived: 5
+        continueAsNewThresholdSignalsReceived: 6
       properties:
         disableSystemSearchAttribute:
           type: boolean

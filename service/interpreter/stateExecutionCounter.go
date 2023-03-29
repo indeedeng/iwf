@@ -9,7 +9,7 @@ import (
 type StateExecutionCounter struct {
 	ctx                  UnifiedContext
 	provider             WorkflowProvider
-	config               service.WorkflowConfig
+	config               iwfidl.WorkflowConfig
 	globalVersioner      *globalVersioner
 	continueAsNewCounter *ContinueAsNewCounter
 
@@ -18,7 +18,7 @@ type StateExecutionCounter struct {
 	totalPendingStateExeCount int            // For "dead ends": count the total pending states
 }
 
-func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config service.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
+func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config iwfidl.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                       ctx,
 		provider:                  provider,
@@ -93,7 +93,7 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	for sid := range e.pendingStateIdCount {
 		executingStateIds = append(executingStateIds, sid)
 	}
-	if e.config.DisableSystemSearchAttributes {
+	if e.config.GetDisableSystemSearchAttribute() {
 		return nil
 	}
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {

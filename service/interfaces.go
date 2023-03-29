@@ -18,7 +18,7 @@ type (
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
-		Config WorkflowConfig `json:"config,omitempty"`
+		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
 		// ContinueAsNew indicate this is input for continueAsNew, when true, all fields can be blank except for ContinueAsNewInput
 		ContinueAsNew bool `json:"continueAsNew"`
@@ -27,15 +27,9 @@ type (
 	}
 
 	ContinueAsNewInput struct {
-		Config WorkflowConfig `json:"config,omitempty"`
+		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
 		IwfWorkflowExecution IwfWorkflowExecution `json:"iwfWorkflowExecution"`
-	}
-
-	WorkflowConfig struct {
-		DisableSystemSearchAttributes                bool `json:"disableSystemSearchAttributes,omitempty"`
-		ContinueAsNewThresholdExecutedStateExecution int  `json:"continueAsNewThresholdExecutedStateExecution"`
-		ContinueAsNewThresholdSignalsReceived        int  `json:"continueAsNewThresholdSignalsReceived"`
 	}
 
 	InterpreterWorkflowOutput struct {

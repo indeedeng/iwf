@@ -25,7 +25,6 @@ type WorkflowStateStartRequest struct {
 	StateInput       *EncodedObject    `json:"stateInput,omitempty"`
 	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
 	DataObjects      []KeyValue        `json:"dataObjects,omitempty"`
-	Config           *WorkflowConfig   `json:"config,omitempty"`
 }
 
 // NewWorkflowStateStartRequest instantiates a new WorkflowStateStartRequest object
@@ -216,38 +215,6 @@ func (o *WorkflowStateStartRequest) SetDataObjects(v []KeyValue) {
 	o.DataObjects = v
 }
 
-// GetConfig returns the Config field value if set, zero value otherwise.
-func (o *WorkflowStateStartRequest) GetConfig() WorkflowConfig {
-	if o == nil || IsNil(o.Config) {
-		var ret WorkflowConfig
-		return ret
-	}
-	return *o.Config
-}
-
-// GetConfigOk returns a tuple with the Config field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowStateStartRequest) GetConfigOk() (*WorkflowConfig, bool) {
-	if o == nil || IsNil(o.Config) {
-		return nil, false
-	}
-	return o.Config, true
-}
-
-// HasConfig returns a boolean if a field has been set.
-func (o *WorkflowStateStartRequest) HasConfig() bool {
-	if o != nil && !IsNil(o.Config) {
-		return true
-	}
-
-	return false
-}
-
-// SetConfig gets a reference to the given WorkflowConfig and assigns it to the Config field.
-func (o *WorkflowStateStartRequest) SetConfig(v WorkflowConfig) {
-	o.Config = &v
-}
-
 func (o WorkflowStateStartRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -269,9 +236,6 @@ func (o WorkflowStateStartRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataObjects) {
 		toSerialize["dataObjects"] = o.DataObjects
-	}
-	if !IsNil(o.Config) {
-		toSerialize["config"] = o.Config
 	}
 	return toSerialize, nil
 }
