@@ -158,7 +158,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
 		// For stateExecutionCounter.GetTotalPendingStateExecutions() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
 		awaitError := provider.Await(ctx, func() bool {
-			failByApi, errStr := signalReceiver.GetFailWorklowAndReasonByClient()
+			failByApi, errStr := signalReceiver.IsFailWorkflowRequested()
 			if failByApi {
 				errToFailWf = provider.NewApplicationError(
 					string(iwfidl.CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE),

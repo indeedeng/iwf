@@ -158,7 +158,7 @@ func (sr *SignalReceiver) HaveAllUserAndSystemSignalsToReceive(ctx UnifiedContex
 	return true
 }
 
-func (sr *SignalReceiver) GetFailWorklowAndReasonByClient() (bool, string) {
+func (sr *SignalReceiver) IsFailWorkflowRequested() (bool, string) {
 	reason := "fail by client"
 	if sr.reasonFailWorkflowByClient != nil {
 		reason = *sr.reasonFailWorkflowByClient
