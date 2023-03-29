@@ -955,6 +955,10 @@ components:
           - stringArrayValue
           - stringArrayValue
           key: key
+        config:
+          continueAsNewThresholdExecutedStateExecution: 5
+          disableSystemSearchAttribute: true
+          continueAsNewThresholdSignalsReceived: 5
         stateInput:
           data: data
           encoding: encoding
@@ -975,6 +979,8 @@ components:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
+        config:
+          $ref: '#/components/schemas/WorkflowConfig'
       required:
       - context
       - workflowStateId
@@ -1717,6 +1723,19 @@ components:
           $ref: '#/components/schemas/EncodedObject'
       required:
       - channelName
+      type: object
+    WorkflowConfig:
+      example:
+        continueAsNewThresholdExecutedStateExecution: 5
+        disableSystemSearchAttribute: true
+        continueAsNewThresholdSignalsReceived: 5
+      properties:
+        disableSystemSearchAttribute:
+          type: boolean
+        continueAsNewThresholdExecutedStateExecution:
+          type: integer
+        continueAsNewThresholdSignalsReceived:
+          type: integer
       type: object
     Context:
       example:
