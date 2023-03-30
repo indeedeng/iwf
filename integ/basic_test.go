@@ -19,13 +19,13 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestBasicWorkflow(t, service.BackendTypeTemporal)
-		// NOTE: basic wf is too fast so we have to make sure to have enough interval
-		du := time.Millisecond * time.Duration(*repeatInterval)
-		if *repeatIntegTest > 1 && du < time.Second {
-			du = time.Second
-		}
-		time.Sleep(du)
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
+			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
+		})
+		smallWaitForFastTest()
 	}
 }
 
@@ -34,17 +34,16 @@ func TestBasicWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestBasicWorkflow(t, service.BackendTypeCadence)
-		// NOTE: basic wf is too fast so we have to make sure to have enough interval
-		du := time.Millisecond * time.Duration(*repeatInterval)
-		if *repeatIntegTest > 1 && du < time.Second {
-			du = time.Second
-		}
-		time.Sleep(du)
+		doTestBasicWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestBasicWorkflow(t, service.BackendTypeCadence, &iwfidl.WorkflowConfig{
+			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
+		})
+		smallWaitForFastTest()
 	}
 }
 
-func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := basic.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -75,6 +74,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		StartStateId:           basic.State1,
 		StateInput:             wfInput,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config:                config,
 			WorkflowIDReusePolicy: ptr.Any(iwfidl.REJECT_DUPLICATE),
 			// CronSchedule:          iwfidl.PtrString("* * * * *"),
 			RetryPolicy: &iwfidl.WorkflowRetryPolicy{
@@ -136,6 +136,17 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType) {
 		log.Fatalf("should be error response")
 	}
 	assertions.Equal(errResp.GetSubStatus(), iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS)
+
+	if config != nil {
+		history, _ := wfHandler.GetTestResult()
+		assertions.Equalf(map[string]int64{
+			"S1_start":  1,
+			"S1_decide": 1,
+		}, history, "basic test fail, %v", history)
+
+		// TODO more assertion after implementing resuming for continueAsNew
+		return
+	}
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

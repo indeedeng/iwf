@@ -16,6 +16,7 @@ func TestParallelWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
+		// default
 		doTestParallelWorkflow(t, service.BackendTypeTemporal)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}

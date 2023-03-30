@@ -7,5 +7,5 @@ import (
 )
 
 func Interpreter(ctx workflow.Context, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
-	return interpreter.InterpreterImpl(interpreter.NewUnifiedContext(ctx), defaultWorkflowProvider, input)
+	return interpreter.InterpreterImpl(interpreter.NewUnifiedContext(ctx), newCadenceWorkflowProvider(), input)
 }

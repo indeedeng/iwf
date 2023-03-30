@@ -7,17 +7,18 @@ import (
 )
 
 type StateExecutionCounter struct {
-	ctx             UnifiedContext
-	provider        WorkflowProvider
-	config          service.WorkflowConfig
-	globalVersioner *globalVersioner
+	ctx                  UnifiedContext
+	provider             WorkflowProvider
+	config               iwfidl.WorkflowConfig
+	globalVersioner      *globalVersioner
+	continueAsNewCounter *ContinueAsNewCounter
 
-	executedStateIdCount      map[string]int // count the stateId for how many times that have een executed so that we can create stateExecutionId
-	pendingStateIdCount       map[string]int // keep counting the pending stateIds so that we know times to upsert system search attributes service.SearchAttributeExecutingStateIds
-	totalPendingStateExeCount int            // count the total pending states so that we know the workflow can complete when all threads reach "dead ends"
+	executedStateIdCount      map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
+	pendingStateIdCount       map[string]int // For system search attributes service.SearchAttributeExecutingStateIds: keep counting the pending stateIds
+	totalPendingStateExeCount int            // For "dead ends": count the total pending states
 }
 
-func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config service.WorkflowConfig) *StateExecutionCounter {
+func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config iwfidl.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                       ctx,
 		provider:                  provider,
@@ -25,7 +26,8 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 		executedStateIdCount:      make(map[string]int),
 		totalPendingStateExeCount: 0,
 		config:                    config,
-		globalVersioner:           NewGlobalVersionProvider(provider, ctx),
+		globalVersioner:           NewGlobalVersioner(provider, ctx),
+		continueAsNewCounter:      continueAsNewCounter,
 	}
 }
 
@@ -74,6 +76,7 @@ func (e *StateExecutionCounter) MarkStateExecutionsPending(states []iwfidl.State
 func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
 	e.pendingStateIdCount[state.StateId]--
 	e.totalPendingStateExeCount--
+	e.continueAsNewCounter.IncExecutedStateExecution()
 	if e.pendingStateIdCount[state.StateId] == 0 {
 		delete(e.pendingStateIdCount, state.StateId)
 		return e.updateStateIdSearchAttribute()
@@ -90,7 +93,7 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	for sid := range e.pendingStateIdCount {
 		executingStateIds = append(executingStateIds, sid)
 	}
-	if e.config.DisableSystemSearchAttributes {
+	if e.config.GetDisableSystemSearchAttribute() {
 		return nil
 	}
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {

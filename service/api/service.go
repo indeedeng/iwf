@@ -47,22 +47,29 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	}
 
 	var initSAs []iwfidl.SearchAttribute
+	var config iwfidl.WorkflowConfig
 	if req.WorkflowStartOptions != nil {
-		workflowOptions.WorkflowIDReusePolicy = req.WorkflowStartOptions.WorkflowIDReusePolicy
-		workflowOptions.CronSchedule = req.WorkflowStartOptions.CronSchedule
-		workflowOptions.RetryPolicy = req.WorkflowStartOptions.RetryPolicy
+		startOptions := req.WorkflowStartOptions
+		workflowOptions.WorkflowIDReusePolicy = startOptions.WorkflowIDReusePolicy
+		workflowOptions.CronSchedule = startOptions.CronSchedule
+		workflowOptions.RetryPolicy = startOptions.RetryPolicy
 		var err error
-		workflowOptions.SearchAttributes, err = mapper.MapToInternalSearchAttributes(req.WorkflowStartOptions.SearchAttributes)
+		workflowOptions.SearchAttributes, err = mapper.MapToInternalSearchAttributes(startOptions.SearchAttributes)
 		if err != nil {
 			return nil, s.handleError(err)
 		}
 		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
-		initSAs = req.WorkflowStartOptions.SearchAttributes
+		initSAs = startOptions.SearchAttributes
+		if startOptions.HasConfig() {
+			config = startOptions.GetConfig()
+		}
 	}
 
-	disableSystemSearchAttributes := false
-	if s.config.Backend.Temporal == nil && s.config.Backend.Cadence != nil {
-		disableSystemSearchAttributes = s.config.Backend.Cadence.DisableSystemSearchAttributes
+	if config.DisableSystemSearchAttribute == nil {
+		// allow override by yaml config
+		if s.config.Backend.Cadence != nil {
+			config.DisableSystemSearchAttribute = ptr.Any(s.config.Backend.Cadence.DisableSystemSearchAttributes)
+		}
 	}
 
 	input := service.InterpreterWorkflowInput{
@@ -72,9 +79,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		StateInput:           req.GetStateInput(),
 		StateOptions:         req.GetStateOptions(),
 		InitSearchAttributes: initSAs,
-		Config: service.WorkflowConfig{
-			DisableSystemSearchAttributes: disableSystemSearchAttributes,
-		},
+		Config:               config,
 	}
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {

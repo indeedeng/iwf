@@ -85,6 +85,7 @@ type WorkflowProvider interface {
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
 	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
+	GetThreadCount() int
 	Await(ctx UnifiedContext, condition func() bool) error
 	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext
 	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future Future)
@@ -97,6 +98,7 @@ type WorkflowProvider interface {
 	GetUnhandledSignalNames(ctx UnifiedContext) []string
 	GetBackendType() service.BackendType
 	GetLogger(ctx UnifiedContext) UnifiedLogger
+	NewInterpreterContinueAsNewError(ctx UnifiedContext, input service.InterpreterWorkflowInput) error
 }
 
 type ReceiveChannel interface {

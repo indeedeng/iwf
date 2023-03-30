@@ -18,11 +18,18 @@ type (
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
-		Config WorkflowConfig `json:"config,omitempty"`
+		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
+
+		// ContinueAsNew indicate this is input for continueAsNew, when true, all fields can be blank except for ContinueAsNewInput
+		ContinueAsNew bool `json:"continueAsNew"`
+
+		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
 	}
 
-	WorkflowConfig struct {
-		DisableSystemSearchAttributes bool `json:"disableSystemSearchAttributes,omitempty"`
+	ContinueAsNewInput struct {
+		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
+
+		IwfWorkflowExecution IwfWorkflowExecution `json:"iwfWorkflowExecution"`
 	}
 
 	InterpreterWorkflowOutput struct {
@@ -43,7 +50,7 @@ type (
 		IwfWorkerUrl     string
 		WorkflowType     string
 		WorkflowId       string
-		RunId            string
+		RunId            string // this is the first runId including reset & continueAsNew
 		StartedTimestamp int64
 	}
 
@@ -88,9 +95,15 @@ type (
 	}
 
 	StateExecutionCounterInfo struct {
-		ExecutedStateIdCount      map[string]int
-		PendingStateIdCount       map[string]int
-		TotalPendingStateExeCount int
+		ExecutedStateIdCount      map[string]int // for stateExecutionId
+		PendingStateIdCount       map[string]int // for sys search attribute
+		TotalPendingStateExeCount int            // for "dead end"
+	}
+
+	PendingStateExecution struct {
+		State                iwfidl.StateMovement
+		DeciderTriggerType   iwfidl.DeciderTriggerType
+		StateExecutionStatus StateExecutionStatus
 	}
 
 	PendingStateExecutionRequestCommands struct {
@@ -105,6 +118,14 @@ type (
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject
 	}
 )
+
+type StateExecutionStatus string
+
+const FailureStateExecutionStatus StateExecutionStatus = "FailureStateExecutionStatus"                       // this will fail the workflow, no continueAsNew
+const StartApiAbortedStateExecutionStatus StateExecutionStatus = "StartApiAbortedStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from startApi
+const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommandsStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from waiting command
+const WaitingCompletedStateExecutionStatus StateExecutionStatus = "WaitingCompletedStateExecutionStatus"     // this will put the state into a special pending queue for continueAsNew from decideApi
+const DecideApiCompletedStateExecutionStatus StateExecutionStatus = "DecideApiCompletedStateExecutionStatus" // this will process as normal
 
 const (
 	TimerPending InternalTimerStatus = "Pending"
