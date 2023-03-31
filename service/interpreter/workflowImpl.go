@@ -281,7 +281,8 @@ func executeState(
 		StateExecutionId:         stateExeId,
 	}
 
-	future := provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
+	var startResponse *iwfidl.WorkflowStateStartResponse
+	errStartApi := provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateStartRequest{
 			Context:          exeCtx,
@@ -291,12 +292,7 @@ func executeState(
 			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
 			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 		},
-	})
-	if continueAsNewCounter.IsThresholdMet() && !future.IsReady() {
-		return nil, service.StartApiAbortedStateExecutionStatus, nil
-	}
-	var startResponse *iwfidl.WorkflowStateStartResponse
-	errStartApi := future.Get(ctx, &startResponse)
+	}).Get(ctx, &startResponse)
 
 	if errStartApi != nil && !shouldProceedOnStartApiError(state) {
 		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
@@ -479,7 +475,8 @@ func executeState(
 	}
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
-	future = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
+	var decideResponse *iwfidl.WorkflowStateDecideResponse
+	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:          exeCtx,
@@ -491,12 +488,7 @@ func executeState(
 			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 			StateInput:       state.StateInput,
 		},
-	})
-	if continueAsNewCounter.IsThresholdMet() && !future.IsReady() {
-		return nil, service.WaitingCompletedStateExecutionStatus, nil
-	}
-	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = future.Get(ctx, &decideResponse)
+	}).Get(ctx, &decideResponse)
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
 	}

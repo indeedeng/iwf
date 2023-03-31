@@ -122,9 +122,7 @@ type (
 type StateExecutionStatus string
 
 const FailureStateExecutionStatus StateExecutionStatus = "FailureStateExecutionStatus"                       // this will fail the workflow, no continueAsNew
-const StartApiAbortedStateExecutionStatus StateExecutionStatus = "StartApiAbortedStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from startApi
 const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommandsStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from waiting command
-const WaitingCompletedStateExecutionStatus StateExecutionStatus = "WaitingCompletedStateExecutionStatus"     // this will put the state into a special pending queue for continueAsNew from decideApi
 const DecideApiCompletedStateExecutionStatus StateExecutionStatus = "DecideApiCompletedStateExecutionStatus" // this will process as normal
 
 const (
