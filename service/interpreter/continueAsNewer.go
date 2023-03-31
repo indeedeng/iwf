@@ -16,6 +16,7 @@ type ContinueAsNewer struct {
 	stateExecutionCounter                   *StateExecutionCounter
 	persistenceManager                      *PersistenceManager
 	signalReceiver                          *SignalReceiver
+	statesToExecuteQueue                    []iwfidl.StateMovement
 }
 
 func NewContinueAsNewer(
@@ -43,6 +44,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 			PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
 			DataObjects:                             c.persistenceManager.GetAllDataObjects(),
 			SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
+			StatesToExecuteQueue:                    c.statesToExecuteQueue,
 		}, nil
 	})
 	if err != nil {
@@ -93,7 +95,8 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 	}
 }
 
-func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, execution service.IwfWorkflowExecution, config iwfidl.WorkflowConfig) error {
+func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, execution service.IwfWorkflowExecution, config iwfidl.WorkflowConfig, statesToExecuteQueue []iwfidl.StateMovement) error {
+	c.statesToExecuteQueue = statesToExecuteQueue
 	return c.provider.NewInterpreterContinueAsNewError(ctx, service.InterpreterWorkflowInput{
 		ContinueAsNew: true,
 		ContinueAsNewInput: service.ContinueAsNewInput{

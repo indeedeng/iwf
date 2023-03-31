@@ -195,7 +195,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 		if continueAsNewCounter.IsThresholdMet() {
 			// at here, all signals + threads are drained, so it's safe to continueAsNew
-			return nil, continueAsNewer.ContinueToNewRun(ctx, execution, input.Config)
+			return nil, continueAsNewer.ContinueToNewRun(ctx, execution, input.Config, statesToExecuteQueue)
 		}
 	} // end main loop -- loop until no more state can be executed (dead end)
 
