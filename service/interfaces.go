@@ -92,7 +92,7 @@ type (
 		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
 		DataObjects                             []iwfidl.KeyValue
 		SearchAttributes                        []iwfidl.SearchAttribute
-		StatesToExecuteQueue                    []iwfidl.StateMovement
+		NonStartedStates                        []iwfidl.StateMovement
 	}
 
 	DumpAllInternalWithPaginationRequest struct {

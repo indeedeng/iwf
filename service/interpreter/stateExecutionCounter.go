@@ -57,16 +57,22 @@ func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 	return fmt.Sprintf("%v-%v", stateId, id)
 }
 
-func (e *StateExecutionCounter) MarkStateExecutionsPending(states []iwfidl.StateMovement) error {
+func (e *StateExecutionCounter) MarkStateExecutionsPending(stateReqs []StateRequest) error {
 	needsUpdate := false
-	for _, s := range states {
+	numOfNew := 0
+	for _, sr := range stateReqs {
+		if sr.IsPendingFromContinueAsNew() {
+			continue
+		}
+		s := sr.GetNewRequest()
+		numOfNew++
 		e.pendingStateIdCount[s.StateId]++
 		if e.pendingStateIdCount[s.StateId] == 1 {
 			// first time the stateId show up
 			needsUpdate = true
 		}
 	}
-	e.totalPendingStateExeCount += len(states)
+	e.totalPendingStateExeCount += numOfNew
 	if needsUpdate {
 		return e.updateStateIdSearchAttribute()
 	}

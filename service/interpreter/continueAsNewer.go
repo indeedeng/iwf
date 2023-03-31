@@ -19,7 +19,7 @@ type ContinueAsNewer struct {
 	pendingStateExecution                   []service.PendingStateExecution
 	pendingStateExecutionsRequestCommands   map[string]service.PendingStateExecutionRequestCommands
 	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
-	statesToExecuteQueue                    *[]iwfidl.StateMovement
+	stateRequestQueue                       *StateRequestQueue
 
 	interStateChannel     *InterStateChannel
 	stateExecutionCounter *StateExecutionCounter
@@ -30,7 +30,7 @@ type ContinueAsNewer struct {
 func NewContinueAsNewer(
 	provider WorkflowProvider,
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
-	persistenceManager *PersistenceManager, statesToExecuteQueue *[]iwfidl.StateMovement,
+	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		provider: provider,
@@ -38,7 +38,7 @@ func NewContinueAsNewer(
 		pendingStateExecution:                   nil,
 		pendingStateExecutionsCompletedCommands: map[string]service.PendingStateExecutionCompletedCommands{},
 		pendingStateExecutionsRequestCommands:   map[string]service.PendingStateExecutionRequestCommands{},
-		statesToExecuteQueue:                    statesToExecuteQueue,
+		stateRequestQueue:                       stateRequestQueue,
 
 		interStateChannel:     interStateChannel,
 		signalReceiver:        signalReceiver,
@@ -105,7 +105,7 @@ func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllIntern
 		PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
 		DataObjects:                             c.persistenceManager.GetAllDataObjects(),
 		SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
-		StatesToExecuteQueue:                    *c.statesToExecuteQueue,
+		NonStartedStates:                        c.stateRequestQueue.GetAllNonPendingRequest(),
 		PendingStateExecution:                   c.pendingStateExecution,
 	}
 }
@@ -187,15 +187,6 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 		State:                state,
 		StateExecutionStatus: stateExecStatus,
 	})
-}
-
-// ResumePendingStates is to resume the pending state executions.
-// However, resuming may introduce new state movements, it won't execute those, but put into statesToExecuteQueue instead
-// so that the main workflow code will execute them
-func (c *ContinueAsNewer) ResumePendingStates() {
-	for _, pending := range c.pendingStateExecution {
-
-	}
 }
 
 func ResumeFromPreviousRun(input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
