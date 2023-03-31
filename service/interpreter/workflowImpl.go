@@ -136,9 +136,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
 				}
 
-				// TODO continueAsNew will skip start api
 				decision, stateExecStatus, err := executeState(
-					ctx, provider, state, iwfExecution, stateExeId, persistenceManager,
+					ctx, provider, stateReq, iwfExecution, stateExeId, persistenceManager,
 					interStateChannel, signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
 				if err != nil {
 					errToFailWf = err
@@ -146,8 +145,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					return
 				}
 
-				if stateExecStatus == service.DecideApiCompletedStateExecutionStatus {
-					// NOTE: decision is only available on this DecideApiCompletedStateExecutionStatus
+				if stateExecStatus.StateExecutionStatusEnum == service.CompletedStateExecutionStatus {
+					// NOTE: decision is only available on this CompletedStateExecutionStatus
 
 					shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
 					if err != nil {
@@ -179,7 +178,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					}
 				} else {
 					// if not completed (without error), then it's because of cancellation by continueAsNew
-					continueAsNewer.ProcessUncompletedStateExecution(stateExecStatus, stateExeId, state)
+					continueAsNewer.ProcessUncompletedStateExecution(*stateExecStatus, stateExeId, state)
 				}
 			}) // end of executing one state
 		} // end loop of executing all states from the queue for one iteration
@@ -287,7 +286,7 @@ func checkClosingWorkflow(
 func executeState(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
-	state iwfidl.StateMovement,
+	stateReq StateRequest,
 	execution service.IwfWorkflowExecution,
 	stateExeId string,
 	persistenceManager *PersistenceManager,
@@ -296,57 +295,79 @@ func executeState(
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
 	continueAsNewCounter *ContinueAsNewCounter,
-) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
-	activityOptions := ActivityOptions{
-		StartToCloseTimeout: 30 * time.Second,
-	}
-	if state.StateOptions != nil {
-		if state.StateOptions.GetStartApiTimeoutSeconds() > 0 {
-			activityOptions.StartToCloseTimeout = time.Duration(state.StateOptions.GetStartApiTimeoutSeconds()) * time.Second
-		}
-		activityOptions.RetryPolicy = state.StateOptions.StartApiRetryPolicy
-	}
-
-	ctx = provider.WithActivityOptions(ctx, activityOptions)
-
-	exeCtx := iwfidl.Context{
+) (*iwfidl.StateDecision, *service.StateExecutionStatus, error) {
+	executionContext := iwfidl.Context{
 		WorkflowId:               execution.WorkflowId,
 		WorkflowRunId:            execution.RunId,
 		WorkflowStartedTimestamp: execution.StartedTimestamp,
 		StateExecutionId:         stateExeId,
 	}
+	activityOptions := ActivityOptions{
+		StartToCloseTimeout: 30 * time.Second,
+	}
 
+	var err error
+	var errStartApi error
 	var startResponse *iwfidl.WorkflowStateStartResponse
-	errStartApi := provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
-		IwfWorkerUrl: execution.IwfWorkerUrl,
-		Request: iwfidl.WorkflowStateStartRequest{
-			Context:          exeCtx,
-			WorkflowType:     execution.WorkflowType,
-			WorkflowStateId:  state.StateId,
-			StateInput:       state.StateInput,
-			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
-			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
-		},
-	}).Get(ctx, &startResponse)
-
-	if errStartApi != nil && !shouldProceedOnStartApiError(state) {
-		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
-	}
-
-	err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
-	if err != nil {
-		return nil, service.FailureStateExecutionStatus, err
-	}
-	err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
-	if err != nil {
-		return nil, service.FailureStateExecutionStatus, err
-	}
-	interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
-
-	commandReq := startResponse.GetCommandRequest()
+	var stateExecutionLocal []iwfidl.KeyValue
+	var commandReq iwfidl.CommandRequest
 	commandReqDoneOrCanceled := false
-
 	completedTimerCmds := map[int]bool{}
+	completedSignalCmds := map[int]*iwfidl.EncodedObject{}
+	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
+
+	var state iwfidl.StateMovement
+	isPendingFromContinueAsNew := stateReq.IsPendingFromContinueAsNew()
+	if isPendingFromContinueAsNew {
+		state = stateReq.GetPendingRequest().State
+	} else {
+		state = stateReq.GetNewRequest()
+	}
+
+	if isPendingFromContinueAsNew {
+		pendingReq := stateReq.GetPendingRequest()
+		stateExecutionLocal = pendingReq.StateExecutionStatus.StateExecutionLocals
+		commandReq =
+		// TODO fill out completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds, and commandReq
+	} else {
+		if state.StateOptions != nil {
+			if state.StateOptions.GetStartApiTimeoutSeconds() > 0 {
+				activityOptions.StartToCloseTimeout = time.Duration(state.StateOptions.GetStartApiTimeoutSeconds()) * time.Second
+			}
+			activityOptions.RetryPolicy = state.StateOptions.StartApiRetryPolicy
+		}
+
+		ctx = provider.WithActivityOptions(ctx, activityOptions)
+
+		errStartApi = provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
+			IwfWorkerUrl: execution.IwfWorkerUrl,
+			Request: iwfidl.WorkflowStateStartRequest{
+				Context:          executionContext,
+				WorkflowType:     execution.WorkflowType,
+				WorkflowStateId:  state.StateId,
+				StateInput:       state.StateInput,
+				SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
+				DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
+			},
+		}).Get(ctx, &startResponse)
+
+		if errStartApi != nil && !shouldProceedOnStartApiError(state) {
+			return nil, nil, convertStateApiActivityError(provider, errStartApi)
+		}
+
+		err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
+		if err != nil {
+			return nil, nil, err
+		}
+		err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
+		if err != nil {
+			return nil, nil, err
+		}
+		interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
+
+		commandReq = startResponse.GetCommandRequest()
+	}
+
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.StartTimers(stateExeId, commandReq.GetTimerCommands())
 		for idx, cmd := range commandReq.GetTimerCommands() {
@@ -368,7 +389,6 @@ func executeState(
 		}
 	}
 
-	completedSignalCmds := map[int]*iwfidl.EncodedObject{}
 	if len(commandReq.GetSignalCommands()) > 0 {
 		for idx, cmd := range commandReq.GetSignalCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
@@ -397,7 +417,6 @@ func executeState(
 		}
 	}
 
-	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 	if len(commandReq.GetInterStateChannelCommands()) > 0 {
 		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
@@ -434,11 +453,17 @@ func executeState(
 		commandReq.GetTimerCommands(), commandReq.GetSignalCommands(), commandReq.GetInterStateChannelCommands(),
 	)
 	_ = provider.Await(ctx, func() bool {
-		return IsDeciderTriggerConditionMet(provider, ctx, commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
+		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
 	})
 	commandReqDoneOrCanceled = true
-	if continueAsNewCounter.IsThresholdMet() {
-		return nil, service.WaitingCommandsStateExecutionStatus, nil
+	if !IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
+		// this means continueAsNewCounter.IsThresholdMet == true
+		// not using continueAsNewCounter.IsThresholdMet because deciderTrigger is higher prioritized
+		// it won't continueAsNew in those cases 1. start Api fail with proceed policy, 2. empty commands, 3. both commands and continueAsNew are met
+		return nil, &service.StateExecutionStatus{
+			StateExecutionStatusEnum: service.WaitingCommandsStateExecutionStatus,
+			StateExecutionLocals:     startResponse.UpsertStateLocals,
+		}, nil
 	}
 
 	commandRes := &iwfidl.CommandResults{}
@@ -514,34 +539,36 @@ func executeState(
 	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: execution.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
-			Context:          exeCtx,
+			Context:          executionContext,
 			WorkflowType:     execution.WorkflowType,
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
-			StateLocals:      startResponse.GetUpsertStateLocals(),
+			StateLocals:      stateExecutionLocal,
 			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
 			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
 			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)
 	if err != nil {
-		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
+		return nil, nil, convertStateApiActivityError(provider, err)
 	}
 
 	decision := decideResponse.GetStateDecision()
 	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
-		return nil, service.FailureStateExecutionStatus, err
+		return nil, nil, err
 	}
 	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
 	if err != nil {
-		return nil, service.FailureStateExecutionStatus, err
+		return nil, nil, err
 	}
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
 	continueAsNewer.ClearPendingStateExecutionCommandStatus(stateExeId)
 
-	return &decision, service.DecideApiCompletedStateExecutionStatus, nil
+	return &decision, &service.StateExecutionStatus{
+		StateExecutionStatusEnum: service.CompletedStateExecutionStatus,
+	}, nil
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {

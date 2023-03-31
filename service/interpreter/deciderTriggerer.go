@@ -6,8 +6,6 @@ import (
 )
 
 func IsDeciderTriggerConditionMet(
-	provider WorkflowProvider,
-	ctx UnifiedContext,
 	commandReq iwfidl.CommandRequest,
 	completedTimerCmds map[int]bool,
 	completedSignalCmds map[int]*iwfidl.EncodedObject,

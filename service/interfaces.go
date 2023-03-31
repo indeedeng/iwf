@@ -119,7 +119,6 @@ type (
 	PendingStateExecution struct {
 		StateExecutionId     string
 		State                iwfidl.StateMovement
-		DeciderTriggerType   iwfidl.DeciderTriggerType
 		StateExecutionStatus StateExecutionStatus
 	}
 
@@ -127,6 +126,7 @@ type (
 		TimerCommands             []iwfidl.TimerCommand
 		SignalCommands            []iwfidl.SignalCommand
 		InterStateChannelCommands []iwfidl.InterStateChannelCommand
+		DeciderTriggerType        iwfidl.DeciderTriggerType
 	}
 
 	PendingStateExecutionCompletedCommands struct {
@@ -136,11 +136,15 @@ type (
 	}
 )
 
-type StateExecutionStatus string
+type StateExecutionStatus struct {
+	StateExecutionStatusEnum StateExecutionStatusEnum `json:"stateExecutionStatusEnum"`
+	StateExecutionLocals     []iwfidl.KeyValue        `json:"stateExecutionLocals"`
+}
 
-const FailureStateExecutionStatus StateExecutionStatus = "FailureStateExecutionStatus"                       // this will fail the workflow, no continueAsNew
-const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommandsStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from waiting command
-const DecideApiCompletedStateExecutionStatus StateExecutionStatus = "DecideApiCompletedStateExecutionStatus" // this will process as normal
+type StateExecutionStatusEnum string
+
+const WaitingCommandsStateExecutionStatus StateExecutionStatusEnum = "WaitingCommands" // this will put the state into a special pending queue for continueAsNew from waiting command
+const CompletedStateExecutionStatus StateExecutionStatusEnum = "Completed"             // this will process as normal
 
 const (
 	TimerPending InternalTimerStatus = "Pending"
