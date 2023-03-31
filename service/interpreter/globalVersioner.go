@@ -8,29 +8,29 @@ const startingVersionOptimizedUpsertSearchAttribute = 2
 const maxOfAllVersions = startingVersionOptimizedUpsertSearchAttribute
 
 // see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
-type globalVersioner struct {
+type globalVersionerImpl struct {
 	workflowProvider WorkflowProvider
 	ctx              UnifiedContext
 }
 
-func NewGlobalVersioner(workflowProvider WorkflowProvider, ctx UnifiedContext) *globalVersioner {
-	return &globalVersioner{
+func NewGlobalVersioner(workflowProvider WorkflowProvider, ctx UnifiedContext) *globalVersionerImpl {
+	return &globalVersionerImpl{
 		workflowProvider: workflowProvider,
 		ctx:              ctx,
 	}
 }
 
-func (p *globalVersioner) IsAfterVersionOfUsingGlobalVersioning() bool {
+func (p *globalVersionerImpl) IsAfterVersionOfUsingGlobalVersioning() bool {
 	version := p.workflowProvider.GetVersion(p.ctx, globalChangeId, 0, maxOfAllVersions)
 	return version >= startingVersionUsingGlobalVersioning
 }
 
-func (p *globalVersioner) IsAfterVersionOfOptimizedUpsertSearchAttribute() bool {
+func (p *globalVersionerImpl) IsAfterVersionOfOptimizedUpsertSearchAttribute() bool {
 	version := p.workflowProvider.GetVersion(p.ctx, globalChangeId, 0, maxOfAllVersions)
 	return version >= startingVersionOptimizedUpsertSearchAttribute
 }
 
-func (p *globalVersioner) UpsertGlobalVersionSearchAttribute() error {
+func (p *globalVersionerImpl) UpsertGlobalVersionSearchAttribute() error {
 	// TODO this bug in Cadence SDK may cause concurrent writes
 	// https://github.com/uber-go/cadence-client/issues/1198
 	if p.workflowProvider.GetBackendType() != service.BackendTypeCadence {

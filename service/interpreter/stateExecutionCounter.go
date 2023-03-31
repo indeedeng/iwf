@@ -10,7 +10,7 @@ type StateExecutionCounter struct {
 	ctx                  UnifiedContext
 	provider             WorkflowProvider
 	config               iwfidl.WorkflowConfig
-	globalVersioner      *globalVersioner
+	globalVersioner      *globalVersionerImpl
 	continueAsNewCounter *ContinueAsNewCounter
 
 	executedStateIdCount      map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
