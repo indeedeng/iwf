@@ -19,7 +19,7 @@ type ContinueAsNewer struct {
 	pendingStateExecution                   []service.PendingStateExecution
 	pendingStateExecutionsRequestCommands   map[string]service.PendingStateExecutionRequestCommands
 	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
-	continuedStatesToExecuteQueue           []iwfidl.StateMovement
+	statesToExecuteQueue                    *[]iwfidl.StateMovement
 
 	interStateChannel     *InterStateChannel
 	stateExecutionCounter *StateExecutionCounter
@@ -28,17 +28,17 @@ type ContinueAsNewer struct {
 }
 
 func NewContinueAsNewer(
-	rootCtx UnifiedContext, provider WorkflowProvider,
-	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
+	provider WorkflowProvider,
+	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
+	persistenceManager *PersistenceManager, statesToExecuteQueue *[]iwfidl.StateMovement,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
-		rootCtx:  rootCtx,
 		provider: provider,
 
 		pendingStateExecution:                   nil,
 		pendingStateExecutionsCompletedCommands: map[string]service.PendingStateExecutionCompletedCommands{},
 		pendingStateExecutionsRequestCommands:   map[string]service.PendingStateExecutionRequestCommands{},
-		continuedStatesToExecuteQueue:           nil, // this one is nil until going to have a new run
+		statesToExecuteQueue:                    statesToExecuteQueue,
 
 		interStateChannel:     interStateChannel,
 		signalReceiver:        signalReceiver,
@@ -55,6 +55,9 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 	workflowId := provider.GetWorkflowInfo(ctx).WorkflowExecution.ID
 	runId := input.ContinueAsNewInput.PreviousInternalRunId
 	pageSize := input.Config.GetContinueAsNewPageSizeInBytes()
+	if pageSize == 0 {
+		pageSize = service.DefaultContinueAsNewPageSizeInBytes
+	}
 	var sb strings.Builder
 	lastChecksum := ""
 	pageNum := 0
@@ -102,7 +105,7 @@ func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllIntern
 		PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
 		DataObjects:                             c.persistenceManager.GetAllDataObjects(),
 		SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
-		StatesToExecuteQueue:                    c.continuedStatesToExecuteQueue,
+		StatesToExecuteQueue:                    *c.statesToExecuteQueue,
 		PendingStateExecution:                   c.pendingStateExecution,
 	}
 }
@@ -186,17 +189,12 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 	})
 }
 
-func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, input service.InterpreterWorkflowInput, statesToExecuteQueue []iwfidl.StateMovement) error {
-	c.continuedStatesToExecuteQueue = statesToExecuteQueue
-	return c.provider.NewInterpreterContinueAsNewError(ctx, input)
-}
-
 // ResumePendingStates is to resume the pending state executions.
-// However, resuming may introduce new state movements, it won't execute those, but put into queueToAppendNewStatesFromResume instead
+// However, resuming may introduce new state movements, it won't execute those, but put into statesToExecuteQueue instead
 // so that the main workflow code will execute them
-func (c *ContinueAsNewer) ResumePendingStates(queueToAppendNewStatesFromResume *[]iwfidl.StateMovement) {
+func (c *ContinueAsNewer) ResumePendingStates() {
 	for _, pending := range c.pendingStateExecution {
-		
+
 	}
 }
 
