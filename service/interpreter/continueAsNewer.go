@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/common/ptr"
 	"math"
 	"strings"
 	"time"
@@ -187,18 +186,4 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 		State:                state,
 		StateExecutionStatus: stateExecStatus,
 	})
-}
-
-func ResumeFromPreviousRun(input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
-	// TODO this is for test only, will be implemented in later PRs
-	data, err := json.Marshal(input)
-	return &service.InterpreterWorkflowOutput{
-		StateCompletionOutputs: []iwfidl.StateCompletionOutput{
-			{
-				CompletedStateOutput: &iwfidl.EncodedObject{
-					Data: ptr.Any(string(data)),
-				},
-			},
-		},
-	}, err
 }

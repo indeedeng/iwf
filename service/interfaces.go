@@ -84,7 +84,8 @@ type (
 	InternalTimerStatus string
 
 	DumpAllInternalResponse struct {
-		PendingStateExecution                   []PendingStateExecution
+		NonStartedStates                        []iwfidl.StateMovement  // NonStartedStates means they haven't started in the previous run
+		PendingStateExecution                   []PendingStateExecution // PendingStateExecution means they have started in the previous run
 		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
 		SignalsReceived                         map[string][]*iwfidl.EncodedObject
 		StateExecutionCounterInfo               StateExecutionCounterInfo
@@ -92,7 +93,6 @@ type (
 		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
 		DataObjects                             []iwfidl.KeyValue
 		SearchAttributes                        []iwfidl.SearchAttribute
-		NonStartedStates                        []iwfidl.StateMovement
 	}
 
 	DumpAllInternalWithPaginationRequest struct {
