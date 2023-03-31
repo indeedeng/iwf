@@ -10,9 +10,9 @@ import (
 
 func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
 	var err error
-	globalVersionProvider := NewGlobalVersioner(provider, ctx)
-	if globalVersionProvider.IsAfterVersionOfUsingGlobalVersioning() {
-		err = globalVersionProvider.UpsertGlobalVersionSearchAttribute()
+	globalVersioner := NewGlobalVersioner(provider, ctx)
+	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
+		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
 			return nil, err
 		}
@@ -23,7 +23,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	}
 
 	if !input.Config.GetDisableSystemSearchAttribute() {
-		if !globalVersionProvider.IsAfterVersionOfOptimizedUpsertSearchAttribute() {
+		if !globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() {
 			// stop upsert it here since it's done in start workflow request
 			err = provider.UpsertSearchAttributes(ctx, map[string]interface{}{
 				service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
