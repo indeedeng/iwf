@@ -18,13 +18,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 	}
 
-	if input.ContinueAsNew {
-		return ResumeFromPreviousRun(input)
-	}
-
 	if !input.Config.GetDisableSystemSearchAttribute() {
 		if !globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() {
-			// stop upsert it here since it's done in start workflow request
+			// we have stopped upsert here in new versions, because it's done in start workflow request
 			err = provider.UpsertSearchAttributes(ctx, map[string]interface{}{
 				service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
 			})
@@ -34,26 +30,56 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 	}
 
-	execution := service.IwfWorkflowExecution{
-		IwfWorkerUrl:     input.IwfWorkerUrl,
-		WorkflowType:     input.IwfWorkflowType,
-		WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-		RunId:            provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-		StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
-	}
-	interStateChannel := NewInterStateChannel()
-	statesToExecuteQueue := []iwfidl.StateMovement{
-		{
-			StateId:      input.StartStateId,
-			StateOptions: &input.StateOptions,
-			StateInput:   &input.StateInput,
-		},
-	}
+	var continueAsNewer *ContinueAsNewer
+	var iwfExecution service.IwfWorkflowExecution
+	var interStateChannel *InterStateChannel
+	var statesToExecuteQueue []iwfidl.StateMovement
+	var persistenceManager *PersistenceManager
+	var timerProcessor *TimerProcessor
+	var continueAsNewCounter *ContinueAsNewCounter
+	var signalReceiver *SignalReceiver
+	var stateExecutionCounter *StateExecutionCounter
+	if input.ContinueAsNew {
+		// special case, we have to initialize continueAsNewer so that it can be used to initialize others.
+		// other components should be initialized in the same order as non-continueAsNew
+		continueAsNewer = RebuildFromPreviousRun(ctx, provider, input)
 
-	persistenceManager := NewPersistenceManager(provider, input.InitSearchAttributes)
-	timerProcessor := NewTimerProcessor(ctx, provider)
-	continueAsNewCounter := NewContinueAsCounter(input.Config, ctx, provider)
-	signalReceiver := NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter)
+		iwfExecution = input.ContinueAsNewInput.IwfWorkflowExecution
+		interStateChannel = continueAsNewer.RebuildInterStateChannel()
+		statesToExecuteQueue = continueAsNewer.RebuildStatesToExecuteQueue()
+		persistenceManager = continueAsNewer.RebuildPersistenceManager()
+		timerProcessor = continueAsNewer.RebuildTimerProcessor()
+		signalReceiver = continueAsNewer.RebuildSignalReceiver()
+		// NOTE: no rebuild for this continueAsNewCounter, as all counters need to be reset to zeros
+		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
+		stateExecutionCounter = continueAsNewer.RebuildStateExecutionCounter()
+
+		// finally resume running the pending states
+		continueAsNewer.ResumePendingStates(&statesToExecuteQueue) // TODO: test case to test a pending state can decide to new states
+	} else {
+		iwfExecution = service.IwfWorkflowExecution{
+			IwfWorkerUrl:     input.IwfWorkerUrl,
+			WorkflowType:     input.IwfWorkflowType,
+			WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+			RunId:            provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
+		}
+		interStateChannel = NewInterStateChannel()
+
+		statesToExecuteQueue = []iwfidl.StateMovement{
+			{
+				StateId:      input.StartStateId,
+				StateOptions: &input.StateOptions,
+				StateInput:   &input.StateInput,
+			},
+		}
+		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
+		timerProcessor = NewTimerProcessor(ctx, provider)
+		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
+		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter)
+		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
+		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
+	}
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
 		return persistenceManager.GetDataObjectsByKey(req), nil
@@ -67,17 +93,14 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	if err != nil {
 		return nil, err
 	}
-
-	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
-	var outputsToReturnWf []iwfidl.StateCompletionOutput
-	var forceCompleteWf bool
-	stateExecutionCounter := NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
-
-	continueAsNewer := NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
 	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
+	var outputsToReturnWf []iwfidl.StateCompletionOutput
+	var forceCompleteWf bool
 
 	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
 	defer stateExecutionCounter.ClearStateIdSearchAttributeFinally()
@@ -108,7 +131,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 				stateExeId := stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
 				decision, stateExecStatus, err := executeState(
-					ctx, provider, state, execution, stateExeId, persistenceManager,
+					ctx, provider, state, iwfExecution, stateExeId, persistenceManager,
 					interStateChannel, signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
 				if err != nil {
 					errToFailWf = err
@@ -195,7 +218,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 		if continueAsNewCounter.IsThresholdMet() {
 			// at here, all signals + threads are drained, so it's safe to continueAsNew
-			return nil, continueAsNewer.ContinueToNewRun(ctx, execution, input.Config, statesToExecuteQueue)
+			input.ContinueAsNewInput = service.ContinueAsNewInput{
+				IwfWorkflowExecution:  iwfExecution,
+				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			}
+			input.ContinueAsNew = true
+			return nil, continueAsNewer.ContinueToNewRun(ctx, input, statesToExecuteQueue)
 		}
 	} // end main loop -- loop until no more state can be executed (dead end)
 

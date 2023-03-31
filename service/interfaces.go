@@ -20,16 +20,15 @@ type (
 
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
-		// ContinueAsNew indicate this is input for continueAsNew, when true, all fields can be blank except for ContinueAsNewInput
+		// ContinueAsNew indicate this is input for continueAsNew, when true, will ignore StartStateId, StateInput, StateOptions, InitSearchAttributes
 		ContinueAsNew bool `json:"continueAsNew"`
 
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
 	}
 
 	ContinueAsNewInput struct {
-		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
-
-		IwfWorkflowExecution IwfWorkflowExecution `json:"iwfWorkflowExecution"`
+		IwfWorkflowExecution  IwfWorkflowExecution `json:"iwfWorkflowExecution"`
+		PreviousInternalRunId string               `json:"previousInternalRunId"` // for loading from previous run
 	}
 
 	InterpreterWorkflowOutput struct {

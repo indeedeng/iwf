@@ -34,6 +34,11 @@ func NewContinueAsNewer(
 	}
 }
 
+func RebuildFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) *ContinueAsNewer {
+	// TODO
+	return nil
+}
+
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
 	err := c.provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
 		return &service.DumpAllInternalResponse{
@@ -95,15 +100,37 @@ func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus servi
 	}
 }
 
-func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, execution service.IwfWorkflowExecution, config iwfidl.WorkflowConfig, statesToExecuteQueue []iwfidl.StateMovement) error {
+func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, input service.InterpreterWorkflowInput, statesToExecuteQueue []iwfidl.StateMovement) error {
 	c.statesToExecuteQueue = statesToExecuteQueue
-	return c.provider.NewInterpreterContinueAsNewError(ctx, service.InterpreterWorkflowInput{
-		ContinueAsNew: true,
-		ContinueAsNewInput: service.ContinueAsNewInput{
-			Config:               config,
-			IwfWorkflowExecution: execution,
-		},
-	})
+	return c.provider.NewInterpreterContinueAsNewError(ctx, input)
+}
+
+func (c *ContinueAsNewer) RebuildInterStateChannel() *InterStateChannel {
+
+}
+
+func (c *ContinueAsNewer) RebuildStatesToExecuteQueue() []iwfidl.StateMovement {
+
+}
+
+func (c *ContinueAsNewer) RebuildPersistenceManager() *PersistenceManager {
+
+}
+
+func (c *ContinueAsNewer) RebuildTimerProcessor() *TimerProcessor {
+
+}
+
+func (c *ContinueAsNewer) RebuildSignalReceiver() *SignalReceiver {
+
+}
+
+func (c *ContinueAsNewer) RebuildStateExecutionCounter() *StateExecutionCounter {
+
+}
+
+func (c *ContinueAsNewer) ResumePendingStates(*[]iwfidl.StateMovement) {
+
 }
 
 func ResumeFromPreviousRun(input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
