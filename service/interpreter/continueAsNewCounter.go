@@ -36,9 +36,6 @@ func (c *ContinueAsNewCounter) IsThresholdMet() bool {
 
 	isMet := (c.executedStateExecutionThreshold > 0 && c.executedStateExecution >= c.executedStateExecutionThreshold) ||
 		(c.signalsReceivedThreshold > 0 && c.signalsReceived >= c.signalsReceivedThreshold)
-	if isMet {
-		c.provider.GetLogger(c.rootCtx).Info("continueAsNew condition is met", c.executedStateExecution, c.signalsReceived, "called at:"+LastCaller())
-	}
 
 	return isMet
 }

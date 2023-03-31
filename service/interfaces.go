@@ -84,8 +84,9 @@ type (
 	InternalTimerStatus string
 
 	DumpAllInternalResponse struct {
+		PendingStateExecution                   []PendingStateExecution
 		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
-		SignalChannelReceived                   map[string][]*iwfidl.EncodedObject
+		SignalsReceived                         map[string][]*iwfidl.EncodedObject
 		StateExecutionCounterInfo               StateExecutionCounterInfo
 		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
 		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
@@ -116,6 +117,7 @@ type (
 	}
 
 	PendingStateExecution struct {
+		StateExecutionId     string
 		State                iwfidl.StateMovement
 		DeciderTriggerType   iwfidl.DeciderTriggerType
 		StateExecutionStatus StateExecutionStatus

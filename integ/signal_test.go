@@ -125,7 +125,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 	if err != nil {
 		panic(err)
 	}
-	assertions.Equal(unhandledSignalVals, dump.SignalChannelReceived[signal.UnhandledSignalName])
+	assertions.Equal(unhandledSignalVals, dump.SignalsReceived[signal.UnhandledSignalName])
 
 	// reset with all signals reserved (default behavior)
 	// reset to beginning

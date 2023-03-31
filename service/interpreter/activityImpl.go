@@ -150,3 +150,7 @@ func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
 	// NOTE: we don't require decider trigger type when there is no commands
 	return nil
 }
+
+func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, workflowId, runId string, input service.DumpAllInternalWithPaginationRequest) (*service.DumpAllInternalWithPaginationResponse, error) {
+
+}

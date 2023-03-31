@@ -8,50 +8,102 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"math"
+	"strings"
+	"time"
 )
 
 type ContinueAsNewer struct {
-	provider                                WorkflowProvider
-	pendingStateExecution                   map[string]service.PendingStateExecution
+	rootCtx  UnifiedContext
+	provider WorkflowProvider
+
+	pendingStateExecution                   []service.PendingStateExecution
 	pendingStateExecutionsRequestCommands   map[string]service.PendingStateExecutionRequestCommands
 	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
-	interStateChannel                       *InterStateChannel
-	stateExecutionCounter                   *StateExecutionCounter
-	persistenceManager                      *PersistenceManager
-	signalReceiver                          *SignalReceiver
-	statesToExecuteQueue                    []iwfidl.StateMovement
+	continuedStatesToExecuteQueue           []iwfidl.StateMovement
+
+	interStateChannel     *InterStateChannel
+	stateExecutionCounter *StateExecutionCounter
+	persistenceManager    *PersistenceManager
+	signalReceiver        *SignalReceiver
 }
 
 func NewContinueAsNewer(
-	provider WorkflowProvider,
+	rootCtx UnifiedContext, provider WorkflowProvider,
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter, persistenceManager *PersistenceManager,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
-		provider:                                provider,
-		interStateChannel:                       interStateChannel,
-		signalReceiver:                          signalReceiver,
-		stateExecutionCounter:                   stateExecutionCounter,
-		persistenceManager:                      persistenceManager,
+		rootCtx:  rootCtx,
+		provider: provider,
+
+		pendingStateExecution:                   nil,
 		pendingStateExecutionsCompletedCommands: map[string]service.PendingStateExecutionCompletedCommands{},
 		pendingStateExecutionsRequestCommands:   map[string]service.PendingStateExecutionRequestCommands{},
+		continuedStatesToExecuteQueue:           nil, // this one is nil until going to have a new run
+
+		interStateChannel:     interStateChannel,
+		signalReceiver:        signalReceiver,
+		stateExecutionCounter: stateExecutionCounter,
+		persistenceManager:    persistenceManager,
 	}
 }
 
-func RebuildFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) *ContinueAsNewer {
-	// TODO
-	return nil
+func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.DumpAllInternalResponse, error) {
+	activityOptions := ActivityOptions{
+		StartToCloseTimeout: 10 * time.Second,
+	}
+	ctx = provider.WithActivityOptions(ctx, activityOptions)
+	workflowId := provider.GetWorkflowInfo(ctx).WorkflowExecution.ID
+	runId := input.ContinueAsNewInput.PreviousInternalRunId
+	pageSize := input.Config.GetContinueAsNewPageSizeInBytes()
+	var sb strings.Builder
+	lastChecksum := ""
+	pageNum := 0
+	for {
+		var resp service.DumpAllInternalWithPaginationResponse
+		err := provider.ExecuteActivity(ctx, DumpWorkflowInternal, workflowId, runId, service.DumpAllInternalWithPaginationRequest{
+			PageSizeInBytes: int(pageSize),
+			PageNum:         pageNum,
+		}).Get(ctx, &resp)
+		if err != nil {
+			return nil, err
+		}
+		if lastChecksum != "" && lastChecksum != resp.Checksum {
+			// reset to start from beginning
+			pageNum = 0
+			lastChecksum = ""
+			sb.Reset()
+			provider.GetLogger(ctx).Error("checksum has changed during the loading", lastChecksum, resp.Checksum)
+			continue
+		} else {
+			lastChecksum = resp.Checksum
+			sb.WriteString(resp.JsonData)
+			pageNum++
+			if pageNum >= resp.TotalPages {
+				break
+			}
+		}
+	}
+
+	var resp service.DumpAllInternalResponse
+	err := json.Unmarshal([]byte(sb.String()), &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
 }
 
 func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllInternalResponse {
 	return &service.DumpAllInternalResponse{
 		InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
-		SignalChannelReceived:                   c.signalReceiver.ReadReceived(nil),
+		SignalsReceived:                         c.signalReceiver.DumpReceived(nil),
 		StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
 		PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
 		PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
 		DataObjects:                             c.persistenceManager.GetAllDataObjects(),
 		SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
-		StatesToExecuteQueue:                    c.statesToExecuteQueue,
+		StatesToExecuteQueue:                    c.continuedStatesToExecuteQueue,
+		PendingStateExecution:                   c.pendingStateExecution,
 	}
 }
 
@@ -127,43 +179,25 @@ func (c *ContinueAsNewer) canContinueAsNew(ctx UnifiedContext) bool {
 }
 
 func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus service.StateExecutionStatus, stateExeId string, state iwfidl.StateMovement) {
-	c.pendingStateExecution[stateExeId] = service.PendingStateExecution{
+	c.pendingStateExecution = append(c.pendingStateExecution, service.PendingStateExecution{
+		StateExecutionId:     stateExeId,
 		State:                state,
 		StateExecutionStatus: stateExecStatus,
-	}
+	})
 }
 
 func (c *ContinueAsNewer) ContinueToNewRun(ctx UnifiedContext, input service.InterpreterWorkflowInput, statesToExecuteQueue []iwfidl.StateMovement) error {
-	c.statesToExecuteQueue = statesToExecuteQueue
+	c.continuedStatesToExecuteQueue = statesToExecuteQueue
 	return c.provider.NewInterpreterContinueAsNewError(ctx, input)
 }
 
-func (c *ContinueAsNewer) RebuildInterStateChannel() *InterStateChannel {
-
-}
-
-func (c *ContinueAsNewer) RebuildStatesToExecuteQueue() []iwfidl.StateMovement {
-
-}
-
-func (c *ContinueAsNewer) RebuildPersistenceManager() *PersistenceManager {
-
-}
-
-func (c *ContinueAsNewer) RebuildTimerProcessor() *TimerProcessor {
-
-}
-
-func (c *ContinueAsNewer) RebuildSignalReceiver() *SignalReceiver {
-
-}
-
-func (c *ContinueAsNewer) RebuildStateExecutionCounter() *StateExecutionCounter {
-
-}
-
-func (c *ContinueAsNewer) ResumePendingStates(statesToExecuteQueue *[]iwfidl.StateMovement) {
-
+// ResumePendingStates is to resume the pending state executions.
+// However, resuming may introduce new state movements, it won't execute those, but put into queueToAppendNewStatesFromResume instead
+// so that the main workflow code will execute them
+func (c *ContinueAsNewer) ResumePendingStates(queueToAppendNewStatesFromResume *[]iwfidl.StateMovement) {
+	for _, pending := range c.pendingStateExecution {
+		
+	}
 }
 
 func ResumeFromPreviousRun(input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {

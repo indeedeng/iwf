@@ -31,7 +31,7 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 	}
 }
 
-func RebuildStateExecutionManager(ctx UnifiedContext, provider WorkflowProvider,
+func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
 	executedStateIdCount map[string]int, pendingStateIdCount map[string]int, totalPendingStateExeCount int,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{

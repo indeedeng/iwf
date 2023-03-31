@@ -40,22 +40,22 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var signalReceiver *SignalReceiver
 	var stateExecutionCounter *StateExecutionCounter
 	if input.ContinueAsNew {
-		// The initialization order should be the same as for non-continueAsNew
-		// except for this special case -- continueAsNewer has to be initialized so that it can be used to initialize others.
-		// other components should be initialized in the same order as non-continueAsNew
-		continueAsNewer = RebuildFromPreviousRun(ctx, provider, input)
+		previous, err := LoadInternalsFromPreviousRun(ctx, provider, input)
+		if err != nil {
+			return nil, err
+		}
 
+		// The below initialization order should be the same as for non-continueAsNew
 		iwfExecution = input.ContinueAsNewInput.IwfWorkflowExecution
-		interStateChannel = continueAsNewer.RebuildInterStateChannel()
-		statesToExecuteQueue = continueAsNewer.RebuildStatesToExecuteQueue()
-		persistenceManager = continueAsNewer.RebuildPersistenceManager()
-		timerProcessor = continueAsNewer.RebuildTimerProcessor()
-		signalReceiver = continueAsNewer.RebuildSignalReceiver()
-		// NOTE: no rebuild for this continueAsNewCounter, as all counters need to be reset to zeros
+		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
+		statesToExecuteQueue = previous.StatesToExecuteQueue
+		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
+		timerProcessor = NewTimerProcessor(ctx, provider)
+		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
-		stateExecutionCounter = continueAsNewer.RebuildStateExecutionCounter()
-
-		// finally resume running the pending states
+		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
+			previous.StateExecutionCounterInfo.ExecutedStateIdCount, previous.StateExecutionCounterInfo.PendingStateIdCount, previous.StateExecutionCounterInfo.TotalPendingStateExeCount)
+		continueAsNewer = NewContinueAsNewer(ctx, provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
 		continueAsNewer.ResumePendingStates(&statesToExecuteQueue) // TODO: test case to test a pending state can decide to new states
 	} else {
 		iwfExecution = service.IwfWorkflowExecution{
@@ -77,9 +77,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter)
+		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
+		continueAsNewer = NewContinueAsNewer(ctx, provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager)
 	}
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {

@@ -15,10 +15,13 @@ type SignalReceiver struct {
 	provider                   WorkflowProvider
 }
 
-func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter) *SignalReceiver {
+func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter, initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
+	if initReceivedSignals == nil {
+		initReceivedSignals = map[string][]*iwfidl.EncodedObject{}
+	}
 	sr := &SignalReceiver{
 		provider:             provider,
-		receivedSignals:      map[string][]*iwfidl.EncodedObject{},
+		receivedSignals:      initReceivedSignals,
 		failWorkflowByClient: false,
 	}
 
@@ -120,7 +123,7 @@ func (sr *SignalReceiver) Retrieve(channelName string) *iwfidl.EncodedObject {
 	return sigVal
 }
 
-func (sr *SignalReceiver) ReadReceived(channelNames []string) map[string][]*iwfidl.EncodedObject {
+func (sr *SignalReceiver) DumpReceived(channelNames []string) map[string][]*iwfidl.EncodedObject {
 	if len(channelNames) == 0 {
 		return sr.receivedSignals
 	}
