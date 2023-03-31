@@ -447,6 +447,7 @@ components:
         config:
           continueAsNewThresholdExecutedStateExecution: 1
           disableSystemSearchAttribute: true
+          continueAsNewPageSizeInBytes: 7
           continueAsNewThresholdSignalsReceived: 6
         cronSchedule: cronSchedule
       properties:
@@ -575,6 +576,7 @@ components:
           config:
             continueAsNewThresholdExecutedStateExecution: 1
             disableSystemSearchAttribute: true
+            continueAsNewPageSizeInBytes: 7
             continueAsNewThresholdSignalsReceived: 6
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
@@ -1732,6 +1734,7 @@ components:
       example:
         continueAsNewThresholdExecutedStateExecution: 1
         disableSystemSearchAttribute: true
+        continueAsNewPageSizeInBytes: 7
         continueAsNewThresholdSignalsReceived: 6
       properties:
         disableSystemSearchAttribute:
@@ -1739,6 +1742,8 @@ components:
         continueAsNewThresholdExecutedStateExecution:
           type: integer
         continueAsNewThresholdSignalsReceived:
+          type: integer
+        continueAsNewPageSizeInBytes:
           type: integer
       type: object
     Context:

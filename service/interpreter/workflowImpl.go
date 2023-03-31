@@ -40,7 +40,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var signalReceiver *SignalReceiver
 	var stateExecutionCounter *StateExecutionCounter
 	if input.ContinueAsNew {
-		// special case, we have to initialize continueAsNewer so that it can be used to initialize others.
+		// The initialization order should be the same as for non-continueAsNew
+		// except for this special case -- continueAsNewer has to be initialized so that it can be used to initialize others.
 		// other components should be initialized in the same order as non-continueAsNew
 		continueAsNewer = RebuildFromPreviousRun(ctx, provider, input)
 

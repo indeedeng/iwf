@@ -1,10 +1,13 @@
 package interpreter
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"math"
 )
 
 type ContinueAsNewer struct {
@@ -39,23 +42,53 @@ func RebuildFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, input
 	return nil
 }
 
+func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllInternalResponse {
+	return &service.DumpAllInternalResponse{
+		InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
+		SignalChannelReceived:                   c.signalReceiver.ReadReceived(nil),
+		StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
+		PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
+		PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
+		DataObjects:                             c.persistenceManager.GetAllDataObjects(),
+		SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
+		StatesToExecuteQueue:                    c.statesToExecuteQueue,
+	}
+}
+
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
 	err := c.provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
-		return &service.DumpAllInternalResponse{
-			InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
-			SignalChannelReceived:                   c.signalReceiver.ReadReceived(nil),
-			StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
-			PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
-			PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
-			DataObjects:                             c.persistenceManager.GetAllDataObjects(),
-			SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
-			StatesToExecuteQueue:                    c.statesToExecuteQueue,
-		}, nil
+		return c.createDumpAllInternalResponse(), nil
 	})
 	if err != nil {
 		return err
 	}
-	return nil
+	return c.provider.SetQueryHandler(ctx, service.DumpAllInternalWithPaginationQueryType, func(req service.DumpAllInternalWithPaginationRequest) (*service.DumpAllInternalWithPaginationResponse, error) {
+		resp := c.createDumpAllInternalResponse()
+		data, err := json.Marshal(resp)
+		if err != nil {
+			return nil, err
+		}
+		checksum := md5.Sum(data)
+		pageSize := service.DefaultContinueAsNewPageSizeInBytes
+		if req.PageSizeInBytes > 0 {
+			pageSize = req.PageSizeInBytes
+		}
+		lenInDouble := float64(len(data))
+		totalPages := int(math.Ceil(lenInDouble / float64(pageSize)))
+		if req.PageNum >= totalPages {
+			return nil, fmt.Errorf("wrong pageNum, max is %v", totalPages-1)
+		}
+		start := pageSize * req.PageNum
+		end := start + pageSize
+		if end > len(data) {
+			end = len(data)
+		}
+		return &service.DumpAllInternalWithPaginationResponse{
+			Checksum:   string(checksum[:]),
+			TotalPages: totalPages,
+			JsonData:   string(data[start:end]),
+		}, nil
+	})
 }
 
 func (c *ContinueAsNewer) AddPendingStateExecutionCommandStatus(
@@ -129,7 +162,7 @@ func (c *ContinueAsNewer) RebuildStateExecutionCounter() *StateExecutionCounter 
 
 }
 
-func (c *ContinueAsNewer) ResumePendingStates(*[]iwfidl.StateMovement) {
+func (c *ContinueAsNewer) ResumePendingStates(statesToExecuteQueue *[]iwfidl.StateMovement) {
 
 }
 
