@@ -84,15 +84,14 @@ type (
 	InternalTimerStatus string
 
 	DumpAllInternalResponse struct {
-		NonStartedStates                        []iwfidl.StateMovement  // NonStartedStates means they haven't started in the previous run
-		PendingStateExecution                   []PendingStateExecution // PendingStateExecution means they have started in the previous run
-		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
-		SignalsReceived                         map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo               StateExecutionCounterInfo
-		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
-		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
-		DataObjects                             []iwfidl.KeyValue
-		SearchAttributes                        []iwfidl.SearchAttribute
+		NonStartedStates          []iwfidl.StateMovement           // NonStartedStates means they haven't started in the previous run
+		PendingStateExecutionMap  map[string]PendingStateExecution // stateExeId to PendingStateExecution
+		InterStateChannelReceived map[string][]*iwfidl.EncodedObject
+		SignalsReceived           map[string][]*iwfidl.EncodedObject
+		StateExecutionCounterInfo StateExecutionCounterInfo
+
+		DataObjects      []iwfidl.KeyValue
+		SearchAttributes []iwfidl.SearchAttribute
 	}
 
 	DumpAllInternalWithPaginationRequest struct {
@@ -117,34 +116,25 @@ type (
 	}
 
 	PendingStateExecution struct {
-		StateExecutionId     string
-		State                iwfidl.StateMovement
-		StateExecutionStatus StateExecutionStatus
-	}
-
-	PendingStateExecutionRequestCommands struct {
-		TimerCommands             []iwfidl.TimerCommand
-		SignalCommands            []iwfidl.SignalCommand
-		InterStateChannelCommands []iwfidl.InterStateChannelCommand
-		DeciderTriggerType        iwfidl.DeciderTriggerType
+		StateExecutionId                       string                                 `json:"stateExecutionId"`
+		State                                  iwfidl.StateMovement                   `json:"state"`
+		PendingStateExecutionCompletedCommands PendingStateExecutionCompletedCommands `json:"pendingStateExecutionCompletedCommands"`
+		CommandRequest                         iwfidl.CommandRequest                  `json:"commandRequest"`
+		StateExecutionLocals                   []iwfidl.KeyValue                      `json:"stateExecutionLocals"`
 	}
 
 	PendingStateExecutionCompletedCommands struct {
-		CompletedTimerCommands             map[int]bool
-		CompletedSignalCommands            map[int]*iwfidl.EncodedObject
-		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject
+		CompletedTimerCommands             map[int]bool                  `json:"completedTimerCommands"`
+		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
+		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
 	}
 )
 
-type StateExecutionStatus struct {
-	StateExecutionStatusEnum StateExecutionStatusEnum `json:"stateExecutionStatusEnum"`
-	StateExecutionLocals     []iwfidl.KeyValue        `json:"stateExecutionLocals"`
-}
+type StateExecutionStatus string
 
-type StateExecutionStatusEnum string
-
-const WaitingCommandsStateExecutionStatus StateExecutionStatusEnum = "WaitingCommands" // this will put the state into a special pending queue for continueAsNew from waiting command
-const CompletedStateExecutionStatus StateExecutionStatusEnum = "Completed"             // this will process as normal
+const FailureStateExecutionStatus StateExecutionStatus = "Failure"
+const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommands" // this will put the state into a special pending queue for continueAsNew from waiting command
+const CompletedStateExecutionStatus StateExecutionStatus = "Completed"             // this will process as normal
 
 const (
 	TimerPending InternalTimerStatus = "Pending"

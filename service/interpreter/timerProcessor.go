@@ -46,10 +46,13 @@ func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
 }
 
 // WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
-// return true when the timer is fired or canceled
+// return true when the timer is fired or skipped
 // return false if the waitingCommands is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
 func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
 	timer := t.stateExecutionCurrentTimerInfos[stateExeId][timerIdx]
+	if timer.Status == service.TimerFired || timer.Status == service.TimerSkipped {
+		return true
+	}
 	now := t.provider.Now(ctx).Unix()
 	fireAt := timer.FiringUnixTimestampSeconds
 	duration := time.Duration(fireAt-now) * time.Second
@@ -69,14 +72,24 @@ func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-func (t *TimerProcessor) StartTimers(stateExeId string, commands []iwfidl.TimerCommand) {
+func (t *TimerProcessor) StartTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]bool) {
 	timers := make([]*service.TimerInfo, len(commands))
 	for idx, cmd := range commands {
-		timer := service.TimerInfo{
-			CommandId:                  cmd.CommandId,
-			FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
-			Status:                     service.TimerPending,
+		var timer service.TimerInfo
+		if completedTimerCmds[idx] {
+			timer = service.TimerInfo{
+				CommandId:                  cmd.CommandId,
+				FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
+				Status:                     service.TimerFired, // TODO differentiate skipped and fire
+			}
+		} else {
+			timer = service.TimerInfo{
+				CommandId:                  cmd.CommandId,
+				FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
+				Status:                     service.TimerPending,
+			}
 		}
+
 		timers[idx] = &timer
 	}
 	t.stateExecutionCurrentTimerInfos[stateExeId] = timers

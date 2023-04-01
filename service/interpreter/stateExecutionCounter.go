@@ -57,7 +57,7 @@ func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 	return fmt.Sprintf("%v-%v", stateId, id)
 }
 
-func (e *StateExecutionCounter) MarkStateExecutionsPending(stateReqs []StateRequest) error {
+func (e *StateExecutionCounter) MarkStateExecutionsPendingIfHavenot(stateReqs []StateRequest) error {
 	needsUpdate := false
 	numOfNew := 0
 	for _, sr := range stateReqs {

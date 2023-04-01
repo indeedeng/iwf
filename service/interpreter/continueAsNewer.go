@@ -15,11 +15,9 @@ type ContinueAsNewer struct {
 	rootCtx  UnifiedContext
 	provider WorkflowProvider
 
-	pendingStateExecution                   []service.PendingStateExecution
-	pendingStateExecutionsRequestCommands   map[string]service.PendingStateExecutionRequestCommands
-	pendingStateExecutionsCompletedCommands map[string]service.PendingStateExecutionCompletedCommands
-	stateRequestQueue                       *StateRequestQueue
+	pendingStateExecutionMap map[string]service.PendingStateExecution // stateExeId to PendingStateExecution
 
+	stateRequestQueue     *StateRequestQueue
 	interStateChannel     *InterStateChannel
 	stateExecutionCounter *StateExecutionCounter
 	persistenceManager    *PersistenceManager
@@ -34,10 +32,8 @@ func NewContinueAsNewer(
 	return &ContinueAsNewer{
 		provider: provider,
 
-		pendingStateExecution:                   nil,
-		pendingStateExecutionsCompletedCommands: map[string]service.PendingStateExecutionCompletedCommands{},
-		pendingStateExecutionsRequestCommands:   map[string]service.PendingStateExecutionRequestCommands{},
-		stateRequestQueue:                       stateRequestQueue,
+		pendingStateExecutionMap: map[string]service.PendingStateExecution{},
+		stateRequestQueue:        stateRequestQueue,
 
 		interStateChannel:     interStateChannel,
 		signalReceiver:        signalReceiver,
@@ -97,15 +93,13 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 
 func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllInternalResponse {
 	return &service.DumpAllInternalResponse{
-		InterStateChannelReceived:               c.interStateChannel.ReadReceived(nil),
-		SignalsReceived:                         c.signalReceiver.DumpReceived(nil),
-		StateExecutionCounterInfo:               c.stateExecutionCounter.Dump(),
-		PendingStateExecutionsCompletedCommands: c.pendingStateExecutionsCompletedCommands,
-		PendingStateExecutionsRequestCommands:   c.pendingStateExecutionsRequestCommands,
-		DataObjects:                             c.persistenceManager.GetAllDataObjects(),
-		SearchAttributes:                        c.persistenceManager.GetAllSearchAttributes(),
-		NonStartedStates:                        c.stateRequestQueue.GetAllNonPendingRequest(),
-		PendingStateExecution:                   c.pendingStateExecution,
+		InterStateChannelReceived: c.interStateChannel.ReadReceived(nil),
+		SignalsReceived:           c.signalReceiver.DumpReceived(nil),
+		StateExecutionCounterInfo: c.stateExecutionCounter.Dump(),
+		DataObjects:               c.persistenceManager.GetAllDataObjects(),
+		SearchAttributes:          c.persistenceManager.GetAllSearchAttributes(),
+		NonStartedStates:          c.stateRequestQueue.GetAllNonStartedRequest(),
+		PendingStateExecutionMap:  c.pendingStateExecutionMap,
 	}
 }
 
@@ -145,26 +139,25 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 	})
 }
 
-func (c *ContinueAsNewer) AddPendingStateExecutionCommandStatus(
-	stateExecutionId string,
+func (c *ContinueAsNewer) AddPendingStateExecution(
+	stateExecutionId string, state iwfidl.StateMovement, stateExecLocals []iwfidl.KeyValue, commandRequest iwfidl.CommandRequest,
 	completedTimerCommands map[int]bool, completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
-	timerCommands []iwfidl.TimerCommand, signalCommands []iwfidl.SignalCommand, interStateChannelCommands []iwfidl.InterStateChannelCommand,
 ) {
-	c.pendingStateExecutionsCompletedCommands[stateExecutionId] = service.PendingStateExecutionCompletedCommands{
-		CompletedTimerCommands:             completedTimerCommands,
-		CompletedSignalCommands:            completedSignalCommands,
-		CompletedInterStateChannelCommands: completedInterStateChannelCommands,
-	}
-	c.pendingStateExecutionsRequestCommands[stateExecutionId] = service.PendingStateExecutionRequestCommands{
-		TimerCommands:             timerCommands,
-		SignalCommands:            signalCommands,
-		InterStateChannelCommands: interStateChannelCommands,
+	c.pendingStateExecutionMap[stateExecutionId] = service.PendingStateExecution{
+		StateExecutionId:     stateExecutionId,
+		State:                state,
+		StateExecutionLocals: stateExecLocals,
+		CommandRequest:       commandRequest,
+		PendingStateExecutionCompletedCommands: service.PendingStateExecutionCompletedCommands{
+			CompletedTimerCommands:             completedTimerCommands,
+			CompletedSignalCommands:            completedSignalCommands,
+			CompletedInterStateChannelCommands: completedInterStateChannelCommands,
+		},
 	}
 }
 
-func (c *ContinueAsNewer) ClearPendingStateExecutionCommandStatus(stateExecutionId string) {
-	delete(c.pendingStateExecutionsCompletedCommands, stateExecutionId)
-	delete(c.pendingStateExecutionsRequestCommands, stateExecutionId)
+func (c *ContinueAsNewer) ClearPendingStateExecution(stateExecutionId string) {
+	delete(c.pendingStateExecutionMap, stateExecutionId)
 }
 
 func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {
@@ -178,12 +171,4 @@ func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {
 func (c *ContinueAsNewer) canContinueAsNew(ctx UnifiedContext) bool {
 	// drain all signals + all threads
 	return c.signalReceiver.HaveAllUserAndSystemSignalsToReceive(ctx) && c.provider.GetThreadCount() == 0
-}
-
-func (c *ContinueAsNewer) ProcessUncompletedStateExecution(stateExecStatus service.StateExecutionStatus, stateExeId string, state iwfidl.StateMovement) {
-	c.pendingStateExecution = append(c.pendingStateExecution, service.PendingStateExecution{
-		StateExecutionId:     stateExeId,
-		State:                state,
-		StateExecutionStatus: stateExecStatus,
-	})
 }
