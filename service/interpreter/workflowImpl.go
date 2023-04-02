@@ -128,9 +128,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				var state iwfidl.StateMovement
 				var stateExeId string
 				if stateReq.IsResumeFromContinueAsNew() {
-					pendingReq := stateReq.GetResumeStateRequest()
-					state = pendingReq.State
-					stateExeId = pendingReq.StateExecutionId
+					resumeReq := stateReq.GetResumeStateRequest()
+					state = resumeReq.State
+					stateExeId = resumeReq.StateExecutionId
 				} else {
 					state = stateReq.GetNewStateRequest()
 					stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
@@ -171,7 +171,6 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					}
 
 					// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-					// doing this at last because upsertSearchAttribute is blocking call for workflow [decision] task
 					err = stateExecutionCounter.MarkStateExecutionCompleted(state)
 					if err != nil {
 						errToFailWf = err
@@ -314,18 +313,18 @@ func executeState(
 	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 
 	var state iwfidl.StateMovement
-	isPendingFromContinueAsNew := stateReq.IsResumeFromContinueAsNew()
-	if isPendingFromContinueAsNew {
+	isResumeFromContinueAsNew := stateReq.IsResumeFromContinueAsNew()
+	if isResumeFromContinueAsNew {
 		state = stateReq.GetResumeStateRequest().State
 	} else {
 		state = stateReq.GetNewStateRequest()
 	}
 
-	if isPendingFromContinueAsNew {
-		pendingReq := stateReq.GetResumeStateRequest()
-		stateExecutionLocal = pendingReq.StateExecutionLocals
-		commandReq = pendingReq.CommandRequest
-		completedCmds := pendingReq.StateExecutionCompletedCommands
+	if isResumeFromContinueAsNew {
+		resumeStateRequest := stateReq.GetResumeStateRequest()
+		stateExecutionLocal = resumeStateRequest.StateExecutionLocals
+		commandReq = resumeStateRequest.CommandRequest
+		completedCmds := resumeStateRequest.StateExecutionCompletedCommands
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds = completedCmds.CompletedTimerCommands, completedCmds.CompletedSignalCommands, completedCmds.CompletedInterStateChannelCommands
 	} else {
 		if state.StateOptions != nil {

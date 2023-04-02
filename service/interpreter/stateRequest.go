@@ -17,9 +17,9 @@ func CreateNewStateRequest(movement iwfidl.StateMovement) StateRequest {
 	}
 }
 
-func CreateResumeStateExecutionRequest(pendingRequest service.StateExecutionResumeInfo) StateRequest {
+func CreateResumeStateExecutionRequest(resumeRequest service.StateExecutionResumeInfo) StateRequest {
 	return StateRequest{
-		resumeStateRequest:        pendingRequest,
+		resumeStateRequest:        resumeRequest,
 		isResumeFromContinueAsNew: true,
 	}
 }
