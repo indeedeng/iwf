@@ -39,7 +39,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var continueAsNewCounter *ContinueAsNewCounter
 	var signalReceiver *SignalReceiver
 	var stateExecutionCounter *StateExecutionCounter
-	if input.ContinueAsNew {
+	if input.IsResumeFromContinueAsNew {
 		previous, err := LoadInternalsFromPreviousRun(ctx, provider, input)
 		if err != nil {
 			return nil, err
@@ -224,7 +224,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				IwfWorkflowExecution:  iwfExecution,
 				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 			}
-			input.ContinueAsNew = true
+			input.IsResumeFromContinueAsNew = true
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop -- loop until no more state can be executed (dead end)

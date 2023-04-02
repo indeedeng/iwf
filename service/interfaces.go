@@ -20,8 +20,8 @@ type (
 
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
-		// ContinueAsNew indicate this is input for continueAsNew, when true, will ignore StartStateId, StateInput, StateOptions, InitSearchAttributes
-		ContinueAsNew bool `json:"continueAsNew"`
+		// IsResumeFromContinueAsNew indicate this is input for continueAsNew, when true, will ignore StartStateId, StateInput, StateOptions, InitSearchAttributes
+		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew"`
 
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
 	}
