@@ -72,7 +72,7 @@ func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-func (t *TimerProcessor) StartTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]bool) {
+func (t *TimerProcessor) AddTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]bool) {
 	timers := make([]*service.TimerInfo, len(commands))
 	for idx, cmd := range commands {
 		var timer service.TimerInfo

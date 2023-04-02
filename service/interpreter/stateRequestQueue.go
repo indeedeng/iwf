@@ -13,25 +13,25 @@ type StateRequestQueue struct {
 func NewStateRequestQueue(initReq iwfidl.StateMovement) *StateRequestQueue {
 	return &StateRequestQueue{
 		queue: []StateRequest{
-			NewStateRequest(initReq),
+			CreateNewStateRequest(initReq),
 		},
 	}
 }
 
-func NewStateRequestQueueForContinueAsNew(initReqs []iwfidl.StateMovement, initResumeReqs map[string]service.PendingStateExecution) *StateRequestQueue {
+func NewStateRequestQueueWithResumeRequests(newReqs []iwfidl.StateMovement, resumeReqs map[string]service.StateExecutionResumeInfo) *StateRequestQueue {
 	var queue []StateRequest
-	for _, r := range initReqs {
-		queue = append(queue, NewStateRequest(r))
+	for _, r := range newReqs {
+		queue = append(queue, CreateNewStateRequest(r))
 	}
 
 	var keys []string
-	for k := range initResumeReqs {
+	for k := range resumeReqs {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		r := initResumeReqs[k]
-		queue = append(queue, NewPendingStateExecutionRequest(r))
+		r := resumeReqs[k]
+		queue = append(queue, CreateResumeStateExecutionRequest(r))
 	}
 
 	return &StateRequestQueue{}
@@ -49,19 +49,19 @@ func (srq *StateRequestQueue) TakeAll() []StateRequest {
 	return res
 }
 
-func (srq *StateRequestQueue) GetAllNonStartedRequest() []iwfidl.StateMovement {
+func (srq *StateRequestQueue) GetAllNewStateRequests() []iwfidl.StateMovement {
 	var res []iwfidl.StateMovement
 	for _, r := range srq.queue {
-		if r.IsPendingFromContinueAsNew() {
+		if r.IsResumeFromContinueAsNew() {
 			continue
 		}
-		res = append(res, r.GetNewRequest())
+		res = append(res, r.GetNewStateRequest())
 	}
 	return res
 }
 
-func (srq *StateRequestQueue) AddNewRequests(reqs []iwfidl.StateMovement) {
+func (srq *StateRequestQueue) AddNewStateRequests(reqs []iwfidl.StateMovement) {
 	for _, r := range reqs {
-		srq.queue = append(srq.queue, NewStateRequest(r))
+		srq.queue = append(srq.queue, CreateNewStateRequest(r))
 	}
 }

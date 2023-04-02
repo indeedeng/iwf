@@ -12,10 +12,9 @@ import (
 )
 
 type ContinueAsNewer struct {
-	rootCtx  UnifiedContext
 	provider WorkflowProvider
 
-	pendingStateExecutionMap map[string]service.PendingStateExecution // stateExeId to PendingStateExecution
+	StateExecutionToResumeMap map[string]service.StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
 
 	stateRequestQueue     *StateRequestQueue
 	interStateChannel     *InterStateChannel
@@ -32,8 +31,8 @@ func NewContinueAsNewer(
 	return &ContinueAsNewer{
 		provider: provider,
 
-		pendingStateExecutionMap: map[string]service.PendingStateExecution{},
-		stateRequestQueue:        stateRequestQueue,
+		StateExecutionToResumeMap: map[string]service.StateExecutionResumeInfo{},
+		stateRequestQueue:         stateRequestQueue,
 
 		interStateChannel:     interStateChannel,
 		signalReceiver:        signalReceiver,
@@ -93,13 +92,13 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 
 func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllInternalResponse {
 	return &service.DumpAllInternalResponse{
-		InterStateChannelReceived: c.interStateChannel.ReadReceived(nil),
-		SignalsReceived:           c.signalReceiver.DumpReceived(nil),
-		StateExecutionCounterInfo: c.stateExecutionCounter.Dump(),
-		DataObjects:               c.persistenceManager.GetAllDataObjects(),
-		SearchAttributes:          c.persistenceManager.GetAllSearchAttributes(),
-		NonStartedStates:          c.stateRequestQueue.GetAllNonStartedRequest(),
-		PendingStateExecutionMap:  c.pendingStateExecutionMap,
+		InterStateChannelReceived:  c.interStateChannel.ReadReceived(nil),
+		SignalsReceived:            c.signalReceiver.DumpReceived(nil),
+		StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
+		DataObjects:                c.persistenceManager.GetAllDataObjects(),
+		SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
+		StatesToStartFromBeginning: c.stateRequestQueue.GetAllNewStateRequests(),
+		StateExecutionsToResume:    c.StateExecutionToResumeMap,
 	}
 }
 
@@ -139,16 +138,16 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 	})
 }
 
-func (c *ContinueAsNewer) AddPendingStateExecution(
+func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(
 	stateExecutionId string, state iwfidl.StateMovement, stateExecLocals []iwfidl.KeyValue, commandRequest iwfidl.CommandRequest,
 	completedTimerCommands map[int]bool, completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
 ) {
-	c.pendingStateExecutionMap[stateExecutionId] = service.PendingStateExecution{
+	c.StateExecutionToResumeMap[stateExecutionId] = service.StateExecutionResumeInfo{
 		StateExecutionId:     stateExecutionId,
 		State:                state,
 		StateExecutionLocals: stateExecLocals,
 		CommandRequest:       commandRequest,
-		PendingStateExecutionCompletedCommands: service.PendingStateExecutionCompletedCommands{
+		StateExecutionCompletedCommands: service.StateExecutionCompletedCommands{
 			CompletedTimerCommands:             completedTimerCommands,
 			CompletedSignalCommands:            completedSignalCommands,
 			CompletedInterStateChannelCommands: completedInterStateChannelCommands,
@@ -156,8 +155,8 @@ func (c *ContinueAsNewer) AddPendingStateExecution(
 	}
 }
 
-func (c *ContinueAsNewer) ClearPendingStateExecution(stateExecutionId string) {
-	delete(c.pendingStateExecutionMap, stateExecutionId)
+func (c *ContinueAsNewer) RemoveStateExecutionToResume(stateExecutionId string) {
+	delete(c.StateExecutionToResumeMap, stateExecutionId)
 }
 
 func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {

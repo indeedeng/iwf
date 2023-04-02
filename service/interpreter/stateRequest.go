@@ -6,39 +6,39 @@ import (
 )
 
 type StateRequest struct {
-	newRequest               iwfidl.StateMovement
-	pendingFromContinueAsNew bool
-	pendingRequest           service.PendingStateExecution
+	newStateRequest           iwfidl.StateMovement
+	isResumeFromContinueAsNew bool
+	resumeStateRequest        service.StateExecutionResumeInfo
 }
 
-func NewStateRequest(movement iwfidl.StateMovement) StateRequest {
+func CreateNewStateRequest(movement iwfidl.StateMovement) StateRequest {
 	return StateRequest{
-		newRequest: movement,
+		newStateRequest: movement,
 	}
 }
 
-func NewPendingStateExecutionRequest(pendingRequest service.PendingStateExecution) StateRequest {
+func CreateResumeStateExecutionRequest(pendingRequest service.StateExecutionResumeInfo) StateRequest {
 	return StateRequest{
-		pendingRequest:           pendingRequest,
-		pendingFromContinueAsNew: true,
+		resumeStateRequest:        pendingRequest,
+		isResumeFromContinueAsNew: true,
 	}
 }
 
-func (sq StateRequest) GetNewRequest() iwfidl.StateMovement {
-	return sq.newRequest
+func (sq StateRequest) GetNewStateRequest() iwfidl.StateMovement {
+	return sq.newStateRequest
 }
 
-func (sq StateRequest) GetPendingRequest() service.PendingStateExecution {
-	return sq.pendingRequest
+func (sq StateRequest) GetResumeStateRequest() service.StateExecutionResumeInfo {
+	return sq.resumeStateRequest
 }
 
-func (sq StateRequest) IsPendingFromContinueAsNew() bool {
-	return sq.pendingFromContinueAsNew
+func (sq StateRequest) IsResumeFromContinueAsNew() bool {
+	return sq.isResumeFromContinueAsNew
 }
 
 func (sq StateRequest) GetStateId() string {
-	if sq.IsPendingFromContinueAsNew() {
-		return sq.pendingRequest.State.StateId
+	if sq.IsResumeFromContinueAsNew() {
+		return sq.resumeStateRequest.State.StateId
 	}
-	return sq.newRequest.StateId
+	return sq.newStateRequest.StateId
 }

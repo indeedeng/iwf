@@ -48,13 +48,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		// The below initialization order should be the same as for non-continueAsNew
 		iwfExecution = input.ContinueAsNewInput.IwfWorkflowExecution
 		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
-		stateRequestQueue = NewStateRequestQueueForContinueAsNew(previous.NonStartedStates, previous.PendingStateExecutionMap)
+		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
-			previous.StateExecutionCounterInfo.ExecutedStateIdCount, previous.StateExecutionCounterInfo.PendingStateIdCount, previous.StateExecutionCounterInfo.TotalPendingStateExeCount)
+			previous.StateExecutionCounterInfo.StateIdStartedCount, previous.StateExecutionCounterInfo.StateIdCurrentlyExecutingCount, previous.StateExecutionCounterInfo.TotalCurrentlyExecutingCount)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue)
 	} else {
 		iwfExecution = service.IwfWorkflowExecution{
@@ -101,12 +101,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 
 	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
-	defer stateExecutionCounter.ClearStateIdSearchAttributeFinally()
+	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
 
 	for !stateRequestQueue.IsEmpty() {
 
 		statesToExecute := stateRequestQueue.TakeAll()
-		err = stateExecutionCounter.MarkStateExecutionsPendingIfHavenot(statesToExecute)
+		err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
 		if err != nil {
 			return nil, err
 		}
@@ -127,12 +127,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 				var state iwfidl.StateMovement
 				var stateExeId string
-				if stateReq.IsPendingFromContinueAsNew() {
-					pendingReq := stateReq.GetPendingRequest()
+				if stateReq.IsResumeFromContinueAsNew() {
+					pendingReq := stateReq.GetResumeStateRequest()
 					state = pendingReq.State
 					stateExeId = pendingReq.StateExecutionId
 				} else {
-					state = stateReq.GetNewRequest()
+					state = stateReq.GetNewStateRequest()
 					stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
 				}
 
@@ -167,7 +167,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						// no return so that it can fall through to call MarkStateExecutionCompleted
 					}
 					if !shouldClose && decision.HasNextStates() {
-						stateRequestQueue.AddNewRequests(decision.GetNextStates())
+						stateRequestQueue.AddNewStateRequests(decision.GetNextStates())
 					}
 
 					// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
@@ -186,7 +186,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, waiting for all current started in this iteration to complete will also work,
 		//    but not as efficient as this one because it will take much longer time.
 		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
-		// For stateExecutionCounter.GetTotalPendingStateExecutions() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
+		// For stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
 		// For continueAsNewCounter.IsThresholdMet(): this means workflow need to continueAsNew
 		awaitError := provider.Await(ctx, func() bool {
 			failByApi, errStr := signalReceiver.IsFailWorkflowRequested()
@@ -198,7 +198,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 				return true
 			}
-			return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalPendingStateExecutions() == 0 || continueAsNewCounter.IsThresholdMet()
+			return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0 || continueAsNewCounter.IsThresholdMet()
 		})
 		if continueAsNewCounter.IsThresholdMet() {
 			// NOTE: drain signals+thread before checking errToFailWf/forceCompleteWf so that we can close the workflow if possible
@@ -314,18 +314,18 @@ func executeState(
 	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 
 	var state iwfidl.StateMovement
-	isPendingFromContinueAsNew := stateReq.IsPendingFromContinueAsNew()
+	isPendingFromContinueAsNew := stateReq.IsResumeFromContinueAsNew()
 	if isPendingFromContinueAsNew {
-		state = stateReq.GetPendingRequest().State
+		state = stateReq.GetResumeStateRequest().State
 	} else {
-		state = stateReq.GetNewRequest()
+		state = stateReq.GetNewStateRequest()
 	}
 
 	if isPendingFromContinueAsNew {
-		pendingReq := stateReq.GetPendingRequest()
+		pendingReq := stateReq.GetResumeStateRequest()
 		stateExecutionLocal = pendingReq.StateExecutionLocals
 		commandReq = pendingReq.CommandRequest
-		completedCmds := pendingReq.PendingStateExecutionCompletedCommands
+		completedCmds := pendingReq.StateExecutionCompletedCommands
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds = completedCmds.CompletedTimerCommands, completedCmds.CompletedSignalCommands, completedCmds.CompletedInterStateChannelCommands
 	} else {
 		if state.StateOptions != nil {
@@ -368,7 +368,7 @@ func executeState(
 	}
 
 	if len(commandReq.GetTimerCommands()) > 0 {
-		timerProcessor.StartTimers(stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
+		timerProcessor.AddTimers(stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			if completedTimerCmds[idx] {
 				// skip the completed timers(from continueAsNew)
@@ -458,7 +458,7 @@ func executeState(
 		}
 	}
 
-	continueAsNewer.AddPendingStateExecution(
+	continueAsNewer.AddPotentialStateExecutionToResume(
 		stateExeId, state, stateExecutionLocal, commandReq,
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
 	)
@@ -571,7 +571,7 @@ func executeState(
 	}
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
-	continueAsNewer.ClearPendingStateExecution(stateExeId)
+	continueAsNewer.RemoveStateExecutionToResume(stateExeId)
 
 	return &decision, service.CompletedStateExecutionStatus, nil
 }

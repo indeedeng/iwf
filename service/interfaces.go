@@ -84,11 +84,11 @@ type (
 	InternalTimerStatus string
 
 	DumpAllInternalResponse struct {
-		NonStartedStates          []iwfidl.StateMovement           // NonStartedStates means they haven't started in the previous run
-		PendingStateExecutionMap  map[string]PendingStateExecution // stateExeId to PendingStateExecution
-		InterStateChannelReceived map[string][]*iwfidl.EncodedObject
-		SignalsReceived           map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo StateExecutionCounterInfo
+		StatesToStartFromBeginning []iwfidl.StateMovement              // StatesToStartFromBeginning means they haven't started in the previous run
+		StateExecutionsToResume    map[string]StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
+		InterStateChannelReceived  map[string][]*iwfidl.EncodedObject
+		SignalsReceived            map[string][]*iwfidl.EncodedObject
+		StateExecutionCounterInfo  StateExecutionCounterInfo
 
 		DataObjects      []iwfidl.KeyValue
 		SearchAttributes []iwfidl.SearchAttribute
@@ -110,20 +110,20 @@ type (
 	}
 
 	StateExecutionCounterInfo struct {
-		ExecutedStateIdCount      map[string]int // for stateExecutionId
-		PendingStateIdCount       map[string]int // for sys search attribute
-		TotalPendingStateExeCount int            // for "dead end"
+		StateIdStartedCount            map[string]int // for stateExecutionId
+		StateIdCurrentlyExecutingCount map[string]int // for sys search attribute ExecutingStateIds
+		TotalCurrentlyExecutingCount   int            // for "dead end"
 	}
 
-	PendingStateExecution struct {
-		StateExecutionId                       string                                 `json:"stateExecutionId"`
-		State                                  iwfidl.StateMovement                   `json:"state"`
-		PendingStateExecutionCompletedCommands PendingStateExecutionCompletedCommands `json:"pendingStateExecutionCompletedCommands"`
-		CommandRequest                         iwfidl.CommandRequest                  `json:"commandRequest"`
-		StateExecutionLocals                   []iwfidl.KeyValue                      `json:"stateExecutionLocals"`
+	StateExecutionResumeInfo struct {
+		StateExecutionId                string                          `json:"stateExecutionId"`
+		State                           iwfidl.StateMovement            `json:"state"`
+		StateExecutionCompletedCommands StateExecutionCompletedCommands `json:"stateExecutionCompletedCommands"`
+		CommandRequest                  iwfidl.CommandRequest           `json:"commandRequest"`
+		StateExecutionLocals            []iwfidl.KeyValue               `json:"stateExecutionLocals"`
 	}
 
-	PendingStateExecutionCompletedCommands struct {
+	StateExecutionCompletedCommands struct {
 		CompletedTimerCommands             map[int]bool                  `json:"completedTimerCommands"`
 		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
