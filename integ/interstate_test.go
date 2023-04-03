@@ -31,7 +31,7 @@ func TestInterStateWorkflowCadence(t *testing.T) {
 	}
 }
 
-func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := interstate.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -56,6 +56,9 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           interstate.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

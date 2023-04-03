@@ -32,7 +32,7 @@ func TestSignalWorkflowCadence(t *testing.T) {
 	}
 }
 
-func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -57,6 +57,9 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

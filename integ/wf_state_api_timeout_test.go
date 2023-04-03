@@ -33,7 +33,7 @@ func TestStateApiTimeoutCadence(t *testing.T) {
 	}
 }
 
-func doTestStateApiTimeout(t *testing.T, backendType service.BackendType) {
+func doTestStateApiTimeout(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := wf_state_api_timeout.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -63,6 +63,9 @@ func doTestStateApiTimeout(t *testing.T, backendType service.BackendType) {
 			StartApiRetryPolicy: &iwfidl.RetryPolicy{
 				MaximumAttempts: iwfidl.PtrInt32(1),
 			},
+		},
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

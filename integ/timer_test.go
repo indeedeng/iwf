@@ -32,7 +32,7 @@ func TestTimerWorkflowCadence(t *testing.T) {
 	}
 }
 
-func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := timer.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -60,6 +60,9 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType) {
 		StartStateId:           timer.State1,
 		StateInput: &iwfidl.EncodedObject{
 			Data: iwfidl.PtrString(strconv.Itoa(int(nowTimestamp))),
+		},
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

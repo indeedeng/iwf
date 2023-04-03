@@ -31,7 +31,7 @@ func TestAnyCommandCloseWorkflowCadence(t *testing.T) {
 	}
 }
 
-func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := anycommandclose.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -56,6 +56,9 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           anycommandclose.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

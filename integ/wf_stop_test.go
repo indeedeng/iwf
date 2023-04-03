@@ -44,7 +44,7 @@ func TestWorkflowCanceledCadence(t *testing.T) {
 	}
 }
 
-func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -69,6 +69,9 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -96,7 +99,7 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 	}, resp, "response not expected")
 }
 
-func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -121,6 +124,9 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -148,7 +154,7 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType) {
 	}, resp, "response not expected")
 }
 
-func doTestWorkflowFail(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowFail(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -173,6 +179,9 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

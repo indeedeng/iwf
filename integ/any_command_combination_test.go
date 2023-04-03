@@ -33,7 +33,7 @@ func TestAnyCommandCombinationWorkflowCadence(t *testing.T) {
 	}
 }
 
-func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := anycommandconbination.NewHandler()
@@ -59,6 +59,9 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           anycommandconbination.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

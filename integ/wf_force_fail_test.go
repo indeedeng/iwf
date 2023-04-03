@@ -32,7 +32,7 @@ func TestWorkflowForceFailCadence(t *testing.T) {
 	}
 }
 
-func doTestWorkflowForceFail(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowForceFail(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := wf_force_fail.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -57,6 +57,9 @@ func doTestWorkflowForceFail(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           wf_force_fail.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

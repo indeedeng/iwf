@@ -32,7 +32,7 @@ func TestStateApiFailAndProceedCadence(t *testing.T) {
 	}
 }
 
-func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType) {
+func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := wf_state_api_fail_and_proceed.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -62,6 +62,9 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType)
 				MaximumAttempts: iwfidl.PtrInt32(1),
 			},
 			StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
+		},
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

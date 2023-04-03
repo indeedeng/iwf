@@ -36,7 +36,7 @@ func TestPersistenceWorkflowCadence(t *testing.T) {
 	}
 }
 
-func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	wfHandler := persistence.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -82,6 +82,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			SearchAttributes: []iwfidl.SearchAttribute{
 				expectedDatetimeSearchAttribute,
 			},
+			Config: config,
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
