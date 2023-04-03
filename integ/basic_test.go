@@ -34,7 +34,7 @@ func TestBasicWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestBasicWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestBasicWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestBasicWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
