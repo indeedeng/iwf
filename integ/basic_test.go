@@ -19,8 +19,8 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		//doTestBasicWorkflow(t, service.BackendTypeTemporal, nil)
-		//smallWaitForFastTest()
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
 
 		doTestBasicWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
 		smallWaitForFastTest()

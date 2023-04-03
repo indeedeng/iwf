@@ -29,8 +29,8 @@ func NewContinueAsNewer(
 		provider: provider,
 
 		StateExecutionToResumeMap: map[string]service.StateExecutionResumeInfo{},
-		stateRequestQueue:         stateRequestQueue,
-
+		
+		stateRequestQueue:     stateRequestQueue,
 		interStateChannel:     interStateChannel,
 		signalReceiver:        signalReceiver,
 		stateExecutionCounter: stateExecutionCounter,

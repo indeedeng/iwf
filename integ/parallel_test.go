@@ -17,8 +17,9 @@ func TestParallelWorkflowTemporal(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		// default
-		doTestParallelWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		//doTestParallelWorkflow(t, service.BackendTypeTemporal, nil)
+		doTestParallelWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -27,12 +28,12 @@ func TestParallelWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestParallelWorkflow(t, service.BackendTypeCadence)
+		doTestParallelWorkflow(t, service.BackendTypeCadence, nil)
 		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
 	}
 }
 
-func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestParallelWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := parallel.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -57,6 +58,9 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           parallel.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -77,6 +81,8 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 		"S11_decide": 1,
 		"S12_start":  1,
 		"S12_decide": 1,
+		"S13_start":  1,
+		"S13_decide": 1,
 
 		"S111_start":  1,
 		"S111_decide": 1,
@@ -92,39 +98,46 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType) {
 	}, history, "parallel test fail, %v", history)
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
-	assertions.Equal(4, len(resp2.GetResults()))
-	//assertions.Equal([]iwfidl.StateCompletionOutput{
-	//	{
-	//		CompletedStateId:          parallel.State111,
-	//		CompletedStateExecutionId: parallel.State111 + "-1",
-	//		CompletedStateOutput: &iwfidl.EncodedObject{
-	//			Encoding: iwfidl.PtrString("json"),
-	//			Data:     iwfidl.PtrString("from " + parallel.State111),
-	//		},
-	//	},
-	//	{
-	//		CompletedStateId:          parallel.State112,
-	//		CompletedStateExecutionId: parallel.State112 + "-1",
-	//		CompletedStateOutput: &iwfidl.EncodedObject{
-	//			Encoding: iwfidl.PtrString("json"),
-	//			Data:     iwfidl.PtrString("from " + parallel.State112),
-	//		},
-	//	},
-	//	{
-	//		CompletedStateId:          parallel.State121,
-	//		CompletedStateExecutionId: parallel.State121 + "-1",
-	//		CompletedStateOutput: &iwfidl.EncodedObject{
-	//			Encoding: iwfidl.PtrString("json"),
-	//			Data:     iwfidl.PtrString("from " + parallel.State121),
-	//		},
-	//	},
-	//	{
-	//		CompletedStateId:          parallel.State122,
-	//		CompletedStateExecutionId: parallel.State122 + "-1",
-	//		CompletedStateOutput: &iwfidl.EncodedObject{
-	//			Encoding: iwfidl.PtrString("json"),
-	//			Data:     iwfidl.PtrString("from " + parallel.State122),
-	//		},
-	//	},
-	//}, resp2.GetResults())
+	assertions.ElementsMatch([]iwfidl.StateCompletionOutput{
+		{
+			CompletedStateId:          parallel.State13,
+			CompletedStateExecutionId: parallel.State13 + "-1",
+			CompletedStateOutput: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString("from " + parallel.State13),
+			},
+		},
+		{
+			CompletedStateId:          parallel.State111,
+			CompletedStateExecutionId: parallel.State111 + "-1",
+			CompletedStateOutput: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString("from " + parallel.State111),
+			},
+		},
+		{
+			CompletedStateId:          parallel.State112,
+			CompletedStateExecutionId: parallel.State112 + "-1",
+			CompletedStateOutput: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString("from " + parallel.State112),
+			},
+		},
+		{
+			CompletedStateId:          parallel.State121,
+			CompletedStateExecutionId: parallel.State121 + "-1",
+			CompletedStateOutput: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString("from " + parallel.State121),
+			},
+		},
+		{
+			CompletedStateId:          parallel.State122,
+			CompletedStateExecutionId: parallel.State122 + "-1",
+			CompletedStateOutput: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString("from " + parallel.State122),
+			},
+		},
+	}, resp2.GetResults())
 }

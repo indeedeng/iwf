@@ -157,7 +157,6 @@ func panicAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, r
 }
 
 func smallWaitForFastTest() {
-	// NOTE: basic wf is too fast so we have to make sure to have enough interval
 	du := time.Millisecond * time.Duration(*repeatInterval)
 	if *repeatIntegTest > 1 && du < time.Second {
 		du = time.Second
