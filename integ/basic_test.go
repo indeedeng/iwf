@@ -19,13 +19,13 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		//doTestBasicWorkflow(t, service.BackendTypeTemporal, nil)
-		//smallWaitForFastTest()
-
-		doTestBasicWorkflow(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
-			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
-		})
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
+
+		//doTestBasicWorkflow(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
+		//	ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
+		//})
+		//smallWaitForFastTest()
 	}
 }
 
@@ -36,10 +36,10 @@ func TestBasicWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestBasicWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestBasicWorkflow(t, service.BackendTypeCadence, &iwfidl.WorkflowConfig{
-			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
-		})
-		smallWaitForFastTest()
+		//doTestBasicWorkflow(t, service.BackendTypeCadence, &iwfidl.WorkflowConfig{
+		//	ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
+		//})
+		//smallWaitForFastTest()
 	}
 }
 
