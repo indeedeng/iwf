@@ -34,7 +34,9 @@ func NewStateRequestQueueWithResumeRequests(startReqs []iwfidl.StateMovement, re
 		queue = append(queue, NewStateResumeRequest(r))
 	}
 
-	return &StateRequestQueue{}
+	return &StateRequestQueue{
+		queue: queue,
+	}
 }
 
 func (srq *StateRequestQueue) IsEmpty() bool {
