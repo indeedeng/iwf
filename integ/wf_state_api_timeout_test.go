@@ -18,8 +18,10 @@ func TestStateApiTimeoutTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiTimeout(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestStateApiTimeout(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestStateApiTimeout(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -28,8 +30,10 @@ func TestStateApiTimeoutCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiTimeout(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestStateApiTimeout(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestStateApiTimeout(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 

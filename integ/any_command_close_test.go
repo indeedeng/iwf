@@ -16,8 +16,10 @@ func TestAnyCommandCloseWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -26,8 +28,10 @@ func TestAnyCommandCloseWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 

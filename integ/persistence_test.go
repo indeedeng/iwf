@@ -21,8 +21,10 @@ func TestPersistenceWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -31,8 +33,10 @@ func TestPersistenceWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
