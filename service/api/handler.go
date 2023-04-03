@@ -91,6 +91,23 @@ func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 	return
 }
 
+func (h *handler) apiV1WorkflowInternalDump(c *gin.Context) {
+	var req iwfidl.WorkflowDumpRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+
+	resp, errResp := h.svc.ApiV1WorkflowDumpPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
 func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	var req iwfidl.WorkflowSearchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
