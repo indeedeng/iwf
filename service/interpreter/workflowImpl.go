@@ -365,7 +365,7 @@ func executeState(
 		interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
 		commandReq = startResponse.GetCommandRequest()
-		stateExecutionLocal = startResponse.UpsertStateLocals
+		stateExecutionLocal = startResponse.GetUpsertStateLocals()
 	}
 
 	if len(commandReq.GetTimerCommands()) > 0 {
