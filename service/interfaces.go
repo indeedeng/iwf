@@ -96,21 +96,6 @@ type (
 		SearchAttributes []iwfidl.SearchAttribute
 	}
 
-	DumpAllInternalWithPaginationRequest struct {
-		// default to DefaultContinueAsNewPageSizeInBytes(1024 * 1024), means 1MB
-		PageSizeInBytes int
-		// default to zero, means the first page
-		PageNum int
-	}
-
-	DumpAllInternalWithPaginationResponse struct {
-		// start over if the checksum is not matched anymore
-		Checksum   string `json:"checksum"`
-		TotalPages int    `json:"totalPages"`
-		// combine all the JsonData of all pages to deserialize into DumpAllInternalResponse
-		JsonData string `json:"jsonData"`
-	}
-
 	StateExecutionCounterInfo struct {
 		StateIdStartedCount            map[string]int // for stateExecutionId
 		StateIdCurrentlyExecutingCount map[string]int // for sys search attribute ExecutingStateIds

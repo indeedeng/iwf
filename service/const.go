@@ -13,11 +13,10 @@ const (
 	StateStartApi  = "/api/v1/workflowState/start"
 	StateDecideApi = "/api/v1/workflowState/decide"
 
-	GetDataObjectsWorkflowQueryType        = "GetDataObjects"
-	GetSearchAttributesWorkflowQueryType   = "GetSearchAttributes"
-	GetCurrentTimerInfosQueryType          = "GetCurrentTimerInfos"
-	DumpAllInternalQueryType               = "DumpAllInternal"
-	DumpAllInternalWithPaginationQueryType = "DumpAllInternalWithPagination"
+	GetDataObjectsWorkflowQueryType      = "GetDataObjects"
+	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"
+	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
+	DumpAllInternalQueryType             = "DumpAllInternal"
 
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"

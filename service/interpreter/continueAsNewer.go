@@ -1,12 +1,9 @@
 package interpreter
 
 import (
-	"crypto/md5"
 	"encoding/json"
-	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"math"
 	"strings"
 	"time"
 )
@@ -54,13 +51,16 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 	}
 	var sb strings.Builder
 	lastChecksum := ""
-	pageNum := 0
+	pageNum := int32(0)
 	for {
-		var resp service.DumpAllInternalWithPaginationResponse
-		err := provider.ExecuteActivity(ctx, DumpWorkflowInternal, workflowId, runId, service.DumpAllInternalWithPaginationRequest{
-			PageSizeInBytes: int(pageSize),
-			PageNum:         pageNum,
-		}).Get(ctx, &resp)
+		var resp iwfidl.WorkflowDumpResponse
+		err := provider.ExecuteActivity(ctx, DumpWorkflowInternal,
+			iwfidl.WorkflowDumpRequest{
+				WorkflowId:      workflowId,
+				WorkflowRunId:   runId,
+				PageNum:         pageNum,
+				PageSizeInBytes: pageSize,
+			}).Get(ctx, &resp)
 		if err != nil {
 			return nil, err
 		}
@@ -103,38 +103,8 @@ func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllIntern
 }
 
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
-	err := c.provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
+	return c.provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
 		return c.createDumpAllInternalResponse(), nil
-	})
-	if err != nil {
-		return err
-	}
-	return c.provider.SetQueryHandler(ctx, service.DumpAllInternalWithPaginationQueryType, func(req service.DumpAllInternalWithPaginationRequest) (*service.DumpAllInternalWithPaginationResponse, error) {
-		resp := c.createDumpAllInternalResponse()
-		data, err := json.Marshal(resp)
-		if err != nil {
-			return nil, err
-		}
-		checksum := md5.Sum(data)
-		pageSize := service.DefaultContinueAsNewPageSizeInBytes
-		if req.PageSizeInBytes > 0 {
-			pageSize = req.PageSizeInBytes
-		}
-		lenInDouble := float64(len(data))
-		totalPages := int(math.Ceil(lenInDouble / float64(pageSize)))
-		if req.PageNum >= totalPages {
-			return nil, fmt.Errorf("wrong pageNum, max is %v", totalPages-1)
-		}
-		start := pageSize * req.PageNum
-		end := start + pageSize
-		if end > len(data) {
-			end = len(data)
-		}
-		return &service.DumpAllInternalWithPaginationResponse{
-			Checksum:   string(checksum[:]),
-			TotalPages: totalPages,
-			JsonData:   string(data[start:end]),
-		}, nil
 	})
 }
 
