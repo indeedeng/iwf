@@ -16,8 +16,8 @@ func TestParallelWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		// default
-		//doTestParallelWorkflow(t, service.BackendTypeTemporal, nil)
+		doTestParallelWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
 		doTestParallelWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
@@ -29,7 +29,9 @@ func TestParallelWorkflowCadence(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestParallelWorkflow(t, service.BackendTypeCadence, nil)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		smallWaitForFastTest()
+		doTestParallelWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
