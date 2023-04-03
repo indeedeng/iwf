@@ -54,7 +54,7 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 	pageNum := int32(0)
 	for {
 		var resp iwfidl.WorkflowDumpResponse
-		err := provider.ExecuteActivity(ctx, DumpWorkflowInternal,
+		err := provider.ExecuteActivity(ctx, DumpWorkflowInternal, provider.GetBackendType(),
 			iwfidl.WorkflowDumpRequest{
 				WorkflowId:      workflowId,
 				WorkflowRunId:   runId,

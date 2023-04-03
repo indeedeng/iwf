@@ -22,8 +22,8 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 	return &StateExecutionCounter{
 		ctx:                             ctx,
 		provider:                        provider,
-		stateIdCurrentlyExecutingCounts: make(map[string]int),
 		stateIdStartedCounts:            make(map[string]int),
+		stateIdCurrentlyExecutingCounts: make(map[string]int),
 		totalCurrentlyExecutingCount:    0,
 		config:                          config,
 		globalVersioner:                 NewGlobalVersioner(provider, ctx),
@@ -33,6 +33,7 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 
 func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
 	stateIdStartedCounts map[string]int, stateIdCurrentlyExecutingCounts map[string]int, totalCurrentlyExecutingCount int,
+	config iwfidl.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                             ctx,
@@ -40,6 +41,9 @@ func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
 		stateIdStartedCounts:            stateIdStartedCounts,
 		stateIdCurrentlyExecutingCounts: stateIdCurrentlyExecutingCounts,
 		totalCurrentlyExecutingCount:    totalCurrentlyExecutingCount,
+		config:                          config,
+		globalVersioner:                 NewGlobalVersioner(provider, ctx),
+		continueAsNewCounter:            continueAsNewCounter,
 	}
 }
 

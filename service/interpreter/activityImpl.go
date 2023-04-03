@@ -155,7 +155,7 @@ func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
 func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("StateDecideActivity", "input", req)
+	logger.Info("DumpWorkflowInternal", "input", req)
 
 	apiAddress := config.GetApiServiceAddress()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{

@@ -29,7 +29,7 @@ type (
 		// Cadence config is the config to connect to Cadence
 		Cadence *CadenceConfig `yaml:"cadence"`
 		// ApiServiceAddress is the address that core engine workflow talks to API service
-		// default is 0:0:0:0:ApiConfig.Port
+		// default is http://localhost:ApiConfig.Port
 		ApiServiceAddress string `json:"serviceAddress"`
 	}
 
@@ -107,5 +107,5 @@ func SetApiServiceAddress(addr string) {
 }
 
 func SetApiServiceAddressByPort(port int) {
-	SetApiServiceAddress(fmt.Sprintf("0:0:0:0:%v", port))
+	SetApiServiceAddress(fmt.Sprintf("http://localhost:%v", port))
 }

@@ -37,6 +37,7 @@ func (iw *InterpreterWorker) Start() {
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)
 	iw.worker.RegisterActivity(interpreter.StateDecide)
+	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
 
 	err := iw.worker.Start()
 	if err != nil {

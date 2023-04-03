@@ -51,11 +51,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
+		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
-			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount)
+			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
+			input.Config, continueAsNewCounter)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue)
 	} else {
 		iwfExecution = service.IwfWorkflowExecution{
@@ -571,7 +572,7 @@ func executeState(
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
 	continueAsNewer.RemoveStateExecutionToResume(stateExeId)
-	
+
 	decision := decideResponse.GetStateDecision()
 	return &decision, service.CompletedStateExecutionStatus, nil
 }
