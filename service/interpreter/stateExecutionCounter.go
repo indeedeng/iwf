@@ -61,10 +61,10 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	needsUpdateSA := false
 	numOfNew := 0
 	for _, sr := range stateReqs {
-		if sr.IsResumeFromContinueAsNew() {
+		if sr.IsResumeRequest() {
 			continue
 		}
-		s := sr.GetNewStateRequest()
+		s := sr.GetStateStartRequest()
 		numOfNew++
 		e.stateIdCurrentlyExecutingCounts[s.StateId]++
 		if e.stateIdCurrentlyExecutingCounts[s.StateId] == 1 {

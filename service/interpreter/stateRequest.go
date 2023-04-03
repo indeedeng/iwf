@@ -6,39 +6,39 @@ import (
 )
 
 type StateRequest struct {
-	newStateRequest           iwfidl.StateMovement
-	isResumeFromContinueAsNew bool
-	resumeStateRequest        service.StateExecutionResumeInfo
+	stateStartRequest  iwfidl.StateMovement
+	isResumeRequest    bool
+	stateResumeRequest service.StateExecutionResumeInfo
 }
 
-func CreateNewStateRequest(movement iwfidl.StateMovement) StateRequest {
+func NewStateStartRequest(movement iwfidl.StateMovement) StateRequest {
 	return StateRequest{
-		newStateRequest: movement,
+		stateStartRequest: movement,
 	}
 }
 
-func CreateResumeStateExecutionRequest(resumeRequest service.StateExecutionResumeInfo) StateRequest {
+func NewStateResumeRequest(resumeRequest service.StateExecutionResumeInfo) StateRequest {
 	return StateRequest{
-		resumeStateRequest:        resumeRequest,
-		isResumeFromContinueAsNew: true,
+		stateResumeRequest: resumeRequest,
+		isResumeRequest:    true,
 	}
 }
 
-func (sq StateRequest) GetNewStateRequest() iwfidl.StateMovement {
-	return sq.newStateRequest
+func (sq StateRequest) GetStateStartRequest() iwfidl.StateMovement {
+	return sq.stateStartRequest
 }
 
-func (sq StateRequest) GetResumeStateRequest() service.StateExecutionResumeInfo {
-	return sq.resumeStateRequest
+func (sq StateRequest) GetStateResumeRequest() service.StateExecutionResumeInfo {
+	return sq.stateResumeRequest
 }
 
-func (sq StateRequest) IsResumeFromContinueAsNew() bool {
-	return sq.isResumeFromContinueAsNew
+func (sq StateRequest) IsResumeRequest() bool {
+	return sq.isResumeRequest
 }
 
 func (sq StateRequest) GetStateId() string {
-	if sq.IsResumeFromContinueAsNew() {
-		return sq.resumeStateRequest.State.StateId
+	if sq.IsResumeRequest() {
+		return sq.stateResumeRequest.State.StateId
 	}
-	return sq.newStateRequest.StateId
+	return sq.stateStartRequest.StateId
 }

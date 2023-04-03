@@ -97,7 +97,7 @@ func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllIntern
 		StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
 		DataObjects:                c.persistenceManager.GetAllDataObjects(),
 		SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
-		StatesToStartFromBeginning: c.stateRequestQueue.GetAllNewStateRequests(),
+		StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
 		StateExecutionsToResume:    c.StateExecutionToResumeMap,
 	}
 }

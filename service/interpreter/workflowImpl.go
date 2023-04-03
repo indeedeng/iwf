@@ -53,8 +53,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		timerProcessor = NewTimerProcessor(ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
+		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
-			previous.StateExecutionCounterInfo.StateIdStartedCount, previous.StateExecutionCounterInfo.StateIdCurrentlyExecutingCount, previous.StateExecutionCounterInfo.TotalCurrentlyExecutingCount)
+			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue)
 	} else {
 		iwfExecution = service.IwfWorkflowExecution{
@@ -127,12 +128,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 				var state iwfidl.StateMovement
 				var stateExeId string
-				if stateReq.IsResumeFromContinueAsNew() {
-					resumeReq := stateReq.GetResumeStateRequest()
+				if stateReq.IsResumeRequest() {
+					resumeReq := stateReq.GetStateResumeRequest()
 					state = resumeReq.State
 					stateExeId = resumeReq.StateExecutionId
 				} else {
-					state = stateReq.GetNewStateRequest()
+					state = stateReq.GetStateStartRequest()
 					stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
 				}
 
@@ -167,7 +168,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						// no return so that it can fall through to call MarkStateExecutionCompleted
 					}
 					if !shouldClose && decision.HasNextStates() {
-						stateRequestQueue.AddNewStateRequests(decision.GetNextStates())
+						stateRequestQueue.AddStateStartRequests(decision.GetNextStates())
 					}
 
 					// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
@@ -313,15 +314,15 @@ func executeState(
 	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 
 	var state iwfidl.StateMovement
-	isResumeFromContinueAsNew := stateReq.IsResumeFromContinueAsNew()
+	isResumeFromContinueAsNew := stateReq.IsResumeRequest()
 	if isResumeFromContinueAsNew {
-		state = stateReq.GetResumeStateRequest().State
+		state = stateReq.GetStateResumeRequest().State
 	} else {
-		state = stateReq.GetNewStateRequest()
+		state = stateReq.GetStateStartRequest()
 	}
 
 	if isResumeFromContinueAsNew {
-		resumeStateRequest := stateReq.GetResumeStateRequest()
+		resumeStateRequest := stateReq.GetStateResumeRequest()
 		stateExecutionLocal = resumeStateRequest.StateExecutionLocals
 		commandReq = resumeStateRequest.CommandRequest
 		completedCmds := resumeStateRequest.StateExecutionCompletedCommands
@@ -559,7 +560,6 @@ func executeState(
 		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
 	}
 
-	decision := decideResponse.GetStateDecision()
 	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
@@ -571,7 +571,8 @@ func executeState(
 	interStateChannel.ProcessPublishing(decideResponse.GetPublishToInterStateChannel())
 
 	continueAsNewer.RemoveStateExecutionToResume(stateExeId)
-
+	
+	decision := decideResponse.GetStateDecision()
 	return &decision, service.CompletedStateExecutionStatus, nil
 }
 

@@ -13,15 +13,15 @@ type StateRequestQueue struct {
 func NewStateRequestQueue(initReq iwfidl.StateMovement) *StateRequestQueue {
 	return &StateRequestQueue{
 		queue: []StateRequest{
-			CreateNewStateRequest(initReq),
+			NewStateStartRequest(initReq),
 		},
 	}
 }
 
-func NewStateRequestQueueWithResumeRequests(newReqs []iwfidl.StateMovement, resumeReqs map[string]service.StateExecutionResumeInfo) *StateRequestQueue {
+func NewStateRequestQueueWithResumeRequests(startReqs []iwfidl.StateMovement, resumeReqs map[string]service.StateExecutionResumeInfo) *StateRequestQueue {
 	var queue []StateRequest
-	for _, r := range newReqs {
-		queue = append(queue, CreateNewStateRequest(r))
+	for _, r := range startReqs {
+		queue = append(queue, NewStateStartRequest(r))
 	}
 
 	var keys []string
@@ -31,7 +31,7 @@ func NewStateRequestQueueWithResumeRequests(newReqs []iwfidl.StateMovement, resu
 	sort.Strings(keys)
 	for _, k := range keys {
 		r := resumeReqs[k]
-		queue = append(queue, CreateResumeStateExecutionRequest(r))
+		queue = append(queue, NewStateResumeRequest(r))
 	}
 
 	return &StateRequestQueue{}
@@ -49,19 +49,19 @@ func (srq *StateRequestQueue) TakeAll() []StateRequest {
 	return res
 }
 
-func (srq *StateRequestQueue) GetAllNewStateRequests() []iwfidl.StateMovement {
+func (srq *StateRequestQueue) GetAllStateStartRequests() []iwfidl.StateMovement {
 	var res []iwfidl.StateMovement
 	for _, r := range srq.queue {
-		if r.IsResumeFromContinueAsNew() {
+		if r.IsResumeRequest() {
 			continue
 		}
-		res = append(res, r.GetNewStateRequest())
+		res = append(res, r.GetStateStartRequest())
 	}
 	return res
 }
 
-func (srq *StateRequestQueue) AddNewStateRequests(reqs []iwfidl.StateMovement) {
+func (srq *StateRequestQueue) AddStateStartRequests(reqs []iwfidl.StateMovement) {
 	for _, r := range reqs {
-		srq.queue = append(srq.queue, CreateNewStateRequest(r))
+		srq.queue = append(srq.queue, NewStateStartRequest(r))
 	}
 }
