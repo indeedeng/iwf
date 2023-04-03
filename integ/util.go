@@ -164,3 +164,10 @@ func smallWaitForFastTest() {
 	}
 	time.Sleep(du)
 }
+
+func minimumContinueAsNewConfig() *iwfidl.WorkflowConfig {
+	return &iwfidl.WorkflowConfig{
+		ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
+		ContinueAsNewThresholdSignalsReceived:        iwfidl.PtrInt32(1),
+	}
+}
