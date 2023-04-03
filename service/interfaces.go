@@ -91,6 +91,7 @@ type (
 		InterStateChannelReceived  map[string][]*iwfidl.EncodedObject
 		SignalsReceived            map[string][]*iwfidl.EncodedObject
 		StateExecutionCounterInfo  StateExecutionCounterInfo
+		StateOutputs               []iwfidl.StateCompletionOutput
 
 		DataObjects      []iwfidl.KeyValue
 		SearchAttributes []iwfidl.SearchAttribute

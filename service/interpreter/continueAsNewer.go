@@ -18,23 +18,25 @@ type ContinueAsNewer struct {
 	stateExecutionCounter *StateExecutionCounter
 	persistenceManager    *PersistenceManager
 	signalReceiver        *SignalReceiver
+	outputCollector       *OutputCollector
 }
 
 func NewContinueAsNewer(
 	provider WorkflowProvider,
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
-	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue,
+	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		provider: provider,
 
 		StateExecutionToResumeMap: map[string]service.StateExecutionResumeInfo{},
-		
+
 		stateRequestQueue:     stateRequestQueue,
 		interStateChannel:     interStateChannel,
 		signalReceiver:        signalReceiver,
 		stateExecutionCounter: stateExecutionCounter,
 		persistenceManager:    persistenceManager,
+		outputCollector:       collector,
 	}
 }
 
@@ -99,6 +101,7 @@ func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllIntern
 		SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
 		StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
 		StateExecutionsToResume:    c.StateExecutionToResumeMap,
+		StateOutputs:               c.outputCollector.GetAll(),
 	}
 }
 

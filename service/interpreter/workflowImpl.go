@@ -39,6 +39,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var continueAsNewCounter *ContinueAsNewCounter
 	var signalReceiver *SignalReceiver
 	var stateExecutionCounter *StateExecutionCounter
+	var outputCollector *OutputCollector
 	if input.IsResumeFromContinueAsNew {
 		previous, err := LoadInternalsFromPreviousRun(ctx, provider, input)
 		if err != nil {
@@ -57,7 +58,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
 			input.Config, continueAsNewCounter)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue)
+		outputCollector = NewOutputCollector(previous.StateOutputs)
+		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector)
 	} else {
 		iwfExecution = service.IwfWorkflowExecution{
 			IwfWorkerUrl:     input.IwfWorkerUrl,
@@ -78,7 +80,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue)
+		outputCollector = NewOutputCollector(nil)
+		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector)
 	}
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
@@ -99,7 +102,6 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	}
 
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
-	var outputsToReturnWf []iwfidl.StateCompletionOutput
 	var forceCompleteWf bool
 
 	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
@@ -156,7 +158,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						// no return so that it can fall through to call MarkStateExecutionCompleted
 					}
 					if gracefulComplete || forceComplete || forceFail {
-						outputsToReturnWf = append(outputsToReturnWf, *output)
+						outputCollector.Add(*output)
 					}
 					if forceComplete {
 						forceCompleteWf = true
@@ -164,7 +166,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					if forceFail {
 						errToFailWf = provider.NewApplicationError(
 							string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
-							outputsToReturnWf,
+							outputCollector.GetAll(),
 						)
 						// no return so that it can fall through to call MarkStateExecutionCompleted
 					}
@@ -211,7 +213,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 		if errToFailWf != nil || forceCompleteWf {
 			return &service.InterpreterWorkflowOutput{
-				StateCompletionOutputs: outputsToReturnWf,
+				StateCompletionOutputs: outputCollector.GetAll(),
 			}, errToFailWf
 		}
 
@@ -237,7 +239,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 	// gracefully complete workflow when all states are executed to dead ends
 	return &service.InterpreterWorkflowOutput{
-		StateCompletionOutputs: outputsToReturnWf,
+		StateCompletionOutputs: outputCollector.GetAll(),
 	}, errToFailWf
 }
 
