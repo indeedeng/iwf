@@ -26,3 +26,15 @@ func TestTemporalReplay(t *testing.T) {
 	}
 
 }
+
+// NOTE: set TEMPORAL_DEBUG=true
+//func TestDebugTemporalReplay(t *testing.T) {
+//	replayer := worker.NewWorkflowReplayer()
+//
+//	replayer.RegisterWorkflow(temporal.Interpreter)
+//
+//	err := replayer.ReplayWorkflowHistoryFromJSONFile(nil, "history/debug.json")
+//	assertions := assert.New(t)
+//	assertions.Nil(err)
+//
+//}

@@ -205,14 +205,6 @@ func (t *cadenceReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
 	return t.channel.ReceiveAsync(valuePtr)
 }
 
-func (t *cadenceReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr interface{}) (more bool) {
-	wfCtx, ok := ctx.GetContext().(workflow.Context)
-	if !ok {
-		panic("cannot convert to cadence workflow context")
-	}
-	return t.channel.Receive(wfCtx, valuePtr)
-}
-
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {

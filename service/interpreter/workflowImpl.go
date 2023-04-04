@@ -204,8 +204,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0 || continueAsNewCounter.IsThresholdMet()
 		})
 		if continueAsNewCounter.IsThresholdMet() {
-			// NOTE: drain signals+thread before checking errToFailWf/forceCompleteWf so that we can close the workflow if possible
-			err := continueAsNewer.DrainAllSignalsAndThreads(ctx)
+			// NOTE: drain thread before checking errToFailWf/forceCompleteWf so that we can close the workflow if possible
+			err := continueAsNewer.DrainThreads(ctx)
 			if err != nil {
 				awaitError = err
 			}
@@ -233,6 +233,10 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 			}
 			input.IsResumeFromContinueAsNew = true
+
+			// NOTE: This must be the last thing before continueAsNew!!!
+			// Otherwise, there could be signals unhandled
+			signalReceiver.DrainAllUnreceivedSignals(ctx)
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop -- loop until no more state can be executed (dead end)

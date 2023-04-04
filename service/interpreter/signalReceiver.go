@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -106,13 +105,16 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 }
 
 func (sr *SignalReceiver) receiveSignal(ctx UnifiedContext, sigName string) {
-	var sigVal iwfidl.EncodedObject
 	ch := sr.provider.GetSignalChannel(ctx, sigName)
-	ch.Receive(ctx, &sigVal)
-
-	fmt.Println("before receiveSignal", sr.receivedSignals)
-	sr.receivedSignals[sigName] = append(sr.receivedSignals[sigName], &sigVal) // ????WHY????
-	fmt.Println("after receiveSignal", sr.receivedSignals)
+	for {
+		var sigVal iwfidl.EncodedObject
+		ok := ch.ReceiveAsync(&sigVal)
+		if ok {
+			sr.receivedSignals[sigName] = append(sr.receivedSignals[sigName], &sigVal)
+		} else {
+			break
+		}
+	}
 }
 
 func (sr *SignalReceiver) HasSignal(channelName string) bool {
@@ -158,9 +160,15 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 				sr.provider.GetLogger(ctx).Info("found a valid system signal before continueAsNew to carry over", sigName)
 				if sigName == service.SkipTimerSignalChannelName {
 					ch := sr.provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
-					val := service.SkipTimerSignalRequest{}
-					ch.Receive(ctx, &val)
-					sr.timerProcessor.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
+					for {
+						val := service.SkipTimerSignalRequest{}
+						ok := ch.ReceiveAsync(&val)
+						if ok {
+							sr.timerProcessor.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
+						} else {
+							break
+						}
+					}
 				}
 				continue
 			}

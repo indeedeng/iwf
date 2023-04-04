@@ -138,17 +138,15 @@ func (c *ContinueAsNewer) RemoveStateExecutionToResume(stateExecutionId string) 
 	delete(c.StateExecutionToResumeMap, stateExecutionId)
 }
 
-func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {
-	// drain all signals + all threads
-
+func (c *ContinueAsNewer) DrainThreads(ctx UnifiedContext) error {
 	// TODO: add metric for before and after Await to monitor stuck
 	// NOTE: consider using AwaitWithTimeout to get an alert when workflow stuck due to a bug in the draining logic for continueAsNew
-	c.signalReceiver.DrainAllUnreceivedSignals(ctx)
 
 	errWait := c.provider.Await(ctx, func() bool {
-		return c.canContinueAsNew(ctx)
+		return c.allTHreadsDrained(ctx)
 	})
-	c.provider.GetLogger(ctx).Info("done waiting for continueAsNew", errWait)
+	c.provider.GetLogger(ctx).Info("done draining threads for continueAsNew", errWait)
+
 	return errWait
 }
 
@@ -162,7 +160,7 @@ var inMemoryContinueAsNewMonitor = make(map[string]int)
 const warnThreshold = 2
 const errThreshold = 4
 
-func (c *ContinueAsNewer) canContinueAsNew(ctx UnifiedContext) bool {
+func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
 	remainingThreadCount := c.provider.GetThreadCount()
 	if remainingThreadCount == 0 {
 		return true
