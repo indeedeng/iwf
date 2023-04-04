@@ -19,8 +19,6 @@ func TestTimerWorkflowTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestTimerWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
-		smallWaitForFastTest()
 	}
 }
 
@@ -31,6 +29,24 @@ func TestTimerWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestTimerWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
+	}
+}
+
+func TestTimerWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestTimerWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
 		doTestTimerWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
@@ -153,7 +169,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	assertions.True(duration >= 9 && duration <= 11, duration)
 
 	// reset with all signals reserved (default behavior)
-	// however, the skip timer won't be able to re-apply because the timers won't be ready at that moment
+	// Therefore, the skip timer would be reapplied
 	req4 := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
 	_, httpResp, err = req4.WorkflowResetRequest(iwfidl.WorkflowResetRequest{
 		WorkflowId: wfId,
@@ -166,25 +182,10 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	if err != nil {
 		log.Fatalf("Fail to invoke query %v", err)
 	}
-	timer2.Status = service.TimerPending
-	timer3.Status = service.TimerPending
+	timer2.Status = service.TimerSkipped
+	timer3.Status = service.TimerSkipped
 	assertions.Equal(expectedTimerInfos, timerInfos)
-
-	req3 = apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
-	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
-		WorkflowId:               wfId,
-		WorkflowStateExecutionId: "S1-1",
-		TimerCommandId:           iwfidl.PtrString("timer-cmd-id-2"),
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-
-	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
-		WorkflowId:               wfId,
-		WorkflowStateExecutionId: "S1-1",
-		TimerCommandIndex:        iwfidl.PtrInt32(2),
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-
+	
 	req2 = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
