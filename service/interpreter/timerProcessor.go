@@ -79,25 +79,26 @@ func removeElement(s []service.StaleSkipTimerSignal, i int) []service.StaleSkipT
 // WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
 // return true when the timer is fired or skipped
 // return false if the waitingCommands is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
-func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
+func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) service.InternalTimerStatus {
 	timerInfos := t.stateExecutionCurrentTimerInfos[stateExeId]
 	if len(timerInfos) == 0 {
 		if *cancelWaiting {
 			// The waiting thread is later than the timer execState thread
 			// The execState thread got completed early and call RemovePendingTimersOfState to remove the timerInfos
-			return false
+			// returning pending here
+			return service.TimerPending
 		} else {
 			panic("bug: this shouldn't happen")
 		}
 	}
 	timer := timerInfos[timerIdx]
 	if timer.Status == service.TimerFired || timer.Status == service.TimerSkipped {
-		return true
+		return timer.Status
 	}
 	skippedByStaleSkip := t.RetryStaleSkipTimer()
 	if skippedByStaleSkip {
 		t.logger.Warn("timer skipped by stale skip signal", stateExeId, timerIdx)
-		return true
+		return service.TimerSkipped
 	}
 	now := t.provider.Now(ctx).Unix()
 	fireAt := timer.FiringUnixTimestampSeconds
@@ -106,11 +107,14 @@ func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExe
 	_ = t.provider.Await(ctx, func() bool {
 		return future.IsReady() || timer.Status == service.TimerSkipped || *cancelWaiting
 	})
-	if future.IsReady() || timer.Status == service.TimerSkipped {
-		return true
+	if timer.Status == service.TimerSkipped {
+		return service.TimerSkipped
+	}
+	if future.IsReady() {
+		return service.TimerFired
 	}
 	// otherwise *cancelWaiting should return false to indicate that this timer isn't completed(fired or skipped)
-	return false
+	return service.TimerPending
 }
 
 // RemovePendingTimersOfState is for when a state is completed, remove all its pending timers
@@ -118,15 +122,15 @@ func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-func (t *TimerProcessor) AddTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]bool) {
+func (t *TimerProcessor) AddTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]service.InternalTimerStatus) {
 	timers := make([]*service.TimerInfo, len(commands))
 	for idx, cmd := range commands {
 		var timer service.TimerInfo
-		if completedTimerCmds[idx] {
+		if status, ok := completedTimerCmds[idx]; ok {
 			timer = service.TimerInfo{
 				CommandId:                  cmd.CommandId,
 				FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
-				Status:                     service.TimerFired, // TODO differentiate skipped and fire
+				Status:                     status,
 			}
 		} else {
 			timer = service.TimerInfo{

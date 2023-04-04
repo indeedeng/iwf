@@ -320,7 +320,7 @@ func executeState(
 	var stateExecutionLocal []iwfidl.KeyValue
 	var commandReq iwfidl.CommandRequest
 	commandReqDoneOrCanceled := false
-	completedTimerCmds := map[int]bool{}
+	completedTimerCmds := map[int]service.InternalTimerStatus{}
 	completedSignalCmds := map[int]*iwfidl.EncodedObject{}
 	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 
@@ -381,7 +381,7 @@ func executeState(
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.AddTimers(stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
 		for idx, cmd := range commandReq.GetTimerCommands() {
-			if completedTimerCmds[idx] {
+			if _, ok := completedTimerCmds[idx]; ok {
 				// skip the completed timers(from continueAsNew)
 				continue
 			}
@@ -395,9 +395,9 @@ func executeState(
 				// Note that commandReqDoneOrCanceled is needed for two cases:
 				// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
 				// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
-				completed := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
-				if completed {
-					completedTimerCmds[idx] = true
+				status := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
+				if status == service.TimerSkipped || status == service.TimerFired {
+					completedTimerCmds[idx] = status
 				}
 			})
 		}
@@ -492,9 +492,10 @@ func executeState(
 
 		var timerResults []iwfidl.TimerResult
 		for idx, cmd := range commandReq.GetTimerCommands() {
-			status := iwfidl.FIRED
-			if !completedTimerCmds[idx] {
-				status = iwfidl.SCHEDULED
+			status := iwfidl.SCHEDULED
+			if _, ok := completedTimerCmds[idx]; ok {
+				// TODO expose skipped status to external
+				status = iwfidl.FIRED
 			}
 			timerResults = append(timerResults, iwfidl.TimerResult{
 				CommandId:   cmd.GetCommandId(),

@@ -113,7 +113,7 @@ type (
 	}
 
 	StateExecutionCompletedCommands struct {
-		CompletedTimerCommands             map[int]bool                  `json:"completedTimerCommands"`
+		CompletedTimerCommands             map[int]InternalTimerStatus   `json:"completedTimerCommands"`
 		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
 	}

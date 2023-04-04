@@ -116,7 +116,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 
 func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(
 	stateExecutionId string, state iwfidl.StateMovement, stateExecLocals []iwfidl.KeyValue, commandRequest iwfidl.CommandRequest,
-	completedTimerCommands map[int]bool, completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
+	completedTimerCommands map[int]service.InternalTimerStatus, completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
 ) {
 	c.StateExecutionToResumeMap[stateExecutionId] = service.StateExecutionResumeInfo{
 		StateExecutionId:     stateExecutionId,

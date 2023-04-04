@@ -3,11 +3,12 @@ package interpreter
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service"
 )
 
 func IsDeciderTriggerConditionMet(
 	commandReq iwfidl.CommandRequest,
-	completedTimerCmds map[int]bool,
+	completedTimerCmds map[int]service.InternalTimerStatus,
 	completedSignalCmds map[int]*iwfidl.EncodedObject,
 	completedInterStateChannelCmds map[int]*iwfidl.EncodedObject,
 ) bool {
