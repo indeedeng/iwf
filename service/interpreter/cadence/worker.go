@@ -1,6 +1,7 @@
 package cadence
 
 import (
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
@@ -16,6 +17,11 @@ type InterpreterWorker struct {
 }
 
 func NewInterpreterWorker(service workflowserviceclient.Interface, domain, tasklist string, closeFunc func()) *InterpreterWorker {
+	apiAddress := config.GetApiServiceAddress()
+	if apiAddress == "" {
+		panic("empty api address, must be initialized through config.SetApiServiceAddress()")
+	}
+
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,
@@ -35,6 +41,7 @@ func (iw *InterpreterWorker) Start() {
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)
 	iw.worker.RegisterActivity(interpreter.StateDecide)
+	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
 
 	err := iw.worker.Start()
 	if err != nil {

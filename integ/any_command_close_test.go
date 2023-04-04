@@ -16,8 +16,10 @@ func TestAnyCommandCloseWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -26,12 +28,14 @@ func TestAnyCommandCloseWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
-func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := anycommandclose.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -56,6 +60,9 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           anycommandclose.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

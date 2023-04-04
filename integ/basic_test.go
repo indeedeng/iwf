@@ -22,9 +22,7 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 		doTestBasicWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
 
-		doTestBasicWorkflow(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
-			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
-		})
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
@@ -36,9 +34,7 @@ func TestBasicWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestBasicWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestBasicWorkflow(t, service.BackendTypeCadence, &iwfidl.WorkflowConfig{
-			ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
-		})
+		doTestBasicWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
@@ -136,17 +132,6 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 		log.Fatalf("should be error response")
 	}
 	assertions.Equal(errResp.GetSubStatus(), iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS)
-
-	if config != nil {
-		history, _ := wfHandler.GetTestResult()
-		assertions.Equalf(map[string]int64{
-			"S1_start":  1,
-			"S1_decide": 1,
-		}, history, "basic test fail, %v", history)
-
-		// TODO more assertion after implementing resuming for continueAsNew
-		return
-	}
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

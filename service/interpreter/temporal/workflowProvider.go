@@ -11,11 +11,14 @@ import (
 )
 
 type workflowProvider struct {
-	threadCount int
+	threadCount        int
+	pendingThreadNames map[string]int
 }
 
 func newTemporalWorkflowProvider() interpreter.WorkflowProvider {
-	return &workflowProvider{}
+	return &workflowProvider{
+		pendingThreadNames: map[string]int{},
+	}
 }
 
 func (w *workflowProvider) GetBackendType() service.BackendType {
@@ -96,11 +99,20 @@ func (w *workflowProvider) GoNamed(ctx interpreter.UnifiedContext, name string, 
 	}
 	f2 := func(ctx workflow.Context) {
 		ctx2 := interpreter.NewUnifiedContext(ctx)
+		w.pendingThreadNames[name]++
 		w.threadCount++
 		f(ctx2)
+		w.pendingThreadNames[name]--
+		if w.pendingThreadNames[name] == 0 {
+			delete(w.pendingThreadNames, name)
+		}
 		w.threadCount--
 	}
 	workflow.GoNamed(wfCtx, name, f2)
+}
+
+func (w *workflowProvider) GetPendingThreadNames() map[string]int {
+	return w.pendingThreadNames
 }
 
 func (w *workflowProvider) GetThreadCount() int {
@@ -195,14 +207,6 @@ type temporalReceiveChannel struct {
 
 func (t *temporalReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
 	return t.channel.ReceiveAsync(valuePtr)
-}
-
-func (t *temporalReceiveChannel) Receive(ctx interpreter.UnifiedContext, valuePtr interface{}) (more bool) {
-	wfCtx, ok := ctx.GetContext().(workflow.Context)
-	if !ok {
-		panic("cannot convert to temporal workflow context")
-	}
-	return t.channel.Receive(wfCtx, valuePtr)
 }
 
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {

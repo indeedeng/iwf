@@ -18,8 +18,10 @@ func TestAnyCommandCombinationWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyCommandCombinationWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestAnyCommandCombinationWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestAnyCommandCombinationWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -28,12 +30,14 @@ func TestAnyCommandCombinationWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
-func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := anycommandconbination.NewHandler()
@@ -59,6 +63,9 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           anycommandconbination.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -128,12 +135,20 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	panicAtHttpError(err, httpResp)
 
 	// workflow should be completed now
-	time.Sleep(time.Second)
-	descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
-		WorkflowId: wfId,
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-	assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
+	if config == nil {
+		time.Sleep(time.Second)
+		descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+			WorkflowId: wfId,
+		}).Execute()
+		panicAtHttpError(err, httpResp)
+		assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
+	} else {
+		reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+		respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+			WorkflowId: wfId,
+		}).Execute()
+		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
+	}
 
 	history, data := wfHandler.GetTestResult()
 

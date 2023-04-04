@@ -15,6 +15,7 @@ const (
 	State1       = "S1"
 	State11      = "S11"
 	State12      = "S12"
+	State13      = "S13"
 	State111     = "S111"
 	State112     = "S112"
 	State121     = "S121"
@@ -76,6 +77,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				{
 					StateId: State12,
 				},
+				{
+					StateId: State13,
+				},
 			}
 		case State11:
 			// cause graceful complete to wait
@@ -98,6 +102,18 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 				{
 					StateId: State122,
+				},
+			}
+		case State13:
+			// cause graceful complete to wait
+			time.Sleep(time.Second * 1)
+			nextStates = []iwfidl.StateMovement{
+				{
+					StateId: service.GracefulCompletingWorkflowStateId,
+					StateInput: &iwfidl.EncodedObject{
+						Encoding: iwfidl.PtrString("json"),
+						Data:     iwfidl.PtrString("from " + req.GetWorkflowStateId()),
+					},
 				},
 			}
 		case State112, State121, State122, State111:

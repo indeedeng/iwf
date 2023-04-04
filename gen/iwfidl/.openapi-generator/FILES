@@ -38,6 +38,8 @@ docs/TimerCommand.md
 docs/TimerResult.md
 docs/TimerStatus.md
 docs/WorkflowConfig.md
+docs/WorkflowDumpRequest.md
+docs/WorkflowDumpResponse.md
 docs/WorkflowErrorType.md
 docs/WorkflowGetDataObjectsRequest.md
 docs/WorkflowGetDataObjectsResponse.md
@@ -100,6 +102,8 @@ model_timer_command.go
 model_timer_result.go
 model_timer_status.go
 model_workflow_config.go
+model_workflow_dump_request.go
+model_workflow_dump_response.go
 model_workflow_error_type.go
 model_workflow_get_data_objects_request.go
 model_workflow_get_data_objects_response.go

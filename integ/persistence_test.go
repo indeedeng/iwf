@@ -21,8 +21,11 @@ func TestPersistenceWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		// TODO fix test
+		//doTestPersistenceWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		//smallWaitForFastTest()
 	}
 }
 
@@ -31,12 +34,15 @@ func TestPersistenceWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		// TODO fix test
+		//doTestPersistenceWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		//smallWaitForFastTest()
 	}
 }
 
-func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	wfHandler := persistence.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -67,7 +73,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 	wfReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        persistence.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 40,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           persistence.State1,
 		StateOptions: &iwfidl.WorkflowStateOptions{
@@ -82,6 +88,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType) {
 			SearchAttributes: []iwfidl.SearchAttribute{
 				expectedDatetimeSearchAttribute,
 			},
+			Config: config,
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()

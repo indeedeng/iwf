@@ -16,8 +16,10 @@ func TestInterStateWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestInterStateWorkflow(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestInterStateWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestInterStateWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -26,12 +28,14 @@ func TestInterStateWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestInterStateWorkflow(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestInterStateWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestInterStateWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
-func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
+func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := interstate.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -56,6 +60,9 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           interstate.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

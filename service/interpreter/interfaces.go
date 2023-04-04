@@ -86,6 +86,7 @@ type WorkflowProvider interface {
 	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	GetThreadCount() int
+	GetPendingThreadNames() map[string]int
 	Await(ctx UnifiedContext, condition func() bool) error
 	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext
 	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future Future)
@@ -102,7 +103,6 @@ type WorkflowProvider interface {
 }
 
 type ReceiveChannel interface {
-	Receive(ctx UnifiedContext, valuePtr interface{}) (more bool) // TODO: check with Temporal about the API semantics -- Cadence says the return is "ok" but Temporal says it's "more"
 	ReceiveAsync(valuePtr interface{}) (ok bool)
 }
 

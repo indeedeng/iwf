@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
@@ -14,6 +15,11 @@ type InterpreterWorker struct {
 }
 
 func NewInterpreterWorker(temporalClient client.Client, taskQueue string) *InterpreterWorker {
+	apiAddress := config.GetApiServiceAddress()
+	if apiAddress == "" {
+		panic("empty api address, must be initialized through config.SetApiServiceAddress()")
+	}
+
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
 		taskQueue:      taskQueue,
@@ -31,6 +37,7 @@ func (iw *InterpreterWorker) Start() {
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)
 	iw.worker.RegisterActivity(interpreter.StateDecide)
+	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
 
 	err := iw.worker.Start()
 	if err != nil {

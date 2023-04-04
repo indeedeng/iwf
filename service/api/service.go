@@ -2,7 +2,10 @@ package api
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"time"
 
@@ -335,6 +338,41 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 		return s.handleError(err)
 	}
 	return nil
+}
+
+func (s *serviceImpl) ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
+	var internals service.DumpAllInternalResponse
+	{
+	}
+	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.DumpAllInternalQueryType)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	data, err := json.Marshal(internals)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+	checksum := md5.Sum(data)
+	pageSize := int32(service.DefaultContinueAsNewPageSizeInBytes)
+	if request.PageSizeInBytes > 0 {
+		pageSize = request.PageSizeInBytes
+	}
+	lenInDouble := float64(len(data))
+	totalPages := int32(math.Ceil(lenInDouble / float64(pageSize)))
+	if request.PageNum >= totalPages {
+		return nil, s.handleError(fmt.Errorf("wrong pageNum, max is %v", totalPages-1))
+	}
+	start := pageSize * request.PageNum
+	end := start + pageSize
+	if end > int32(len(data)) {
+		end = int32(len(data))
+	}
+	return &iwfidl.WorkflowDumpResponse{
+		Checksum:   string(checksum[:]),
+		TotalPages: totalPages,
+		JsonData:   string(data[start:end]),
+	}, nil
 }
 
 func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {

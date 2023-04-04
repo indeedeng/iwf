@@ -28,6 +28,8 @@ const (
 	IwfSystemSignalPrefix          = "__IwfSystem_"
 	SkipTimerSignalChannelName     = IwfSystemSignalPrefix + "SkipTimerChannel"
 	FailWorkflowSignalChanncelName = IwfSystemSignalPrefix + "FailWorkflowChannel"
+
+	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
 )
 
 var ValidIwfSystemSignalNames map[string]bool = map[string]bool{

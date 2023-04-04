@@ -17,14 +17,20 @@ func TestWorkflowCanceledTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowCanceled(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowCanceled(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestWorkflowCanceled(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 
-		doTestWorkflowTerminated(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowTerminated(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestWorkflowTerminated(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 
-		doTestWorkflowFail(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowFail(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestWorkflowFail(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -33,18 +39,24 @@ func TestWorkflowCanceledCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowCanceled(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowCanceled(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestWorkflowCanceled(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 
-		doTestWorkflowTerminated(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowTerminated(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestWorkflowTerminated(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 
-		doTestWorkflowFail(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowFail(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestWorkflowFail(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
-func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -69,6 +81,9 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -96,7 +111,7 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType) {
 	}, resp, "response not expected")
 }
 
-func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -121,6 +136,9 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -148,7 +166,7 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType) {
 	}, resp, "response not expected")
 }
 
-func doTestWorkflowFail(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowFail(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -173,6 +191,9 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

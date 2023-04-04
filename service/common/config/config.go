@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/uber-go/tally/v4/prometheus"
 	"gopkg.in/yaml.v3"
 	"log"
@@ -27,6 +28,9 @@ type (
 		Temporal *TemporalConfig `yaml:"temporal"`
 		// Cadence config is the config to connect to Cadence
 		Cadence *CadenceConfig `yaml:"cadence"`
+		// ApiServiceAddress is the address that core engine workflow talks to API service
+		// default is http://localhost:ApiConfig.Port
+		ApiServiceAddress string `json:"serviceAddress"`
 	}
 
 	TemporalConfig struct {
@@ -85,5 +89,23 @@ func NewConfig(configPath string) (*Config, error) {
 	if err := d.Decode(&config); err != nil {
 		return nil, err
 	}
+	if apiServiceAddress == "" {
+		SetApiServiceAddressByPort(config.Api.Port)
+	}
+
 	return config, nil
+}
+
+var apiServiceAddress string
+
+func GetApiServiceAddress() string {
+	return apiServiceAddress
+}
+
+func SetApiServiceAddress(addr string) {
+	apiServiceAddress = addr
+}
+
+func SetApiServiceAddressByPort(port int) {
+	SetApiServiceAddress(fmt.Sprintf("http://localhost:%v", port))
 }

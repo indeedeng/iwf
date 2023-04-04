@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/config"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -33,11 +34,11 @@ func StateStart(ctx context.Context, backendType service.BackendType, input serv
 	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(ctx)
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	if checkHttpError(err, httpResp) {
-		return nil, composeHttpError(provider, err, httpResp)
+		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
 	if err := checkResp(resp); err != nil {
-		return nil, composeRespError(provider, err, resp)
+		return nil, composeStartApiRespError(provider, err, resp)
 	}
 
 	return resp, nil
@@ -65,7 +66,7 @@ func StateDecide(ctx context.Context, backendType service.BackendType, input ser
 	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
 	if checkHttpError(err, httpResp) {
-		return nil, composeHttpError(provider, err, httpResp)
+		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 	return resp, nil
 }
@@ -85,7 +86,7 @@ func getIwfWorkerBaseUrlWithFix(url string) string {
 	return url
 }
 
-func composeRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
+func composeStartApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
 	respStr, _ := resp.MarshalJSON()
 	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
 		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))
@@ -98,7 +99,7 @@ func checkHttpError(err error, httpResp *http.Response) bool {
 	return false
 }
 
-func composeHttpError(provider ActivityProvider, err error, httpResp *http.Response) error {
+func composeHttpError(provider ActivityProvider, err error, httpResp *http.Response, errType string) error {
 	responseBody := "None"
 	var statusCode int
 	if httpResp != nil {
@@ -110,7 +111,7 @@ func composeHttpError(provider ActivityProvider, err error, httpResp *http.Respo
 		}
 		statusCode = httpResp.StatusCode
 	}
-	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
+	return provider.NewApplicationError(errType,
 		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, responseBody, err))
 }
 
@@ -149,4 +150,26 @@ func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
 	}
 	// NOTE: we don't require decider trigger type when there is no commands
 	return nil
+}
+
+func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
+	provider := getActivityProviderByType(backendType)
+	logger := provider.GetLogger(ctx)
+	logger.Info("DumpWorkflowInternal", "input", req)
+
+	apiAddress := config.GetApiServiceAddress()
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: apiAddress,
+			},
+		},
+	})
+
+	request := apiClient.DefaultApi.ApiV1WorkflowInternalDumpPost(ctx)
+	resp, httpResp, err := request.WorkflowDumpRequest(req).Execute()
+	if checkHttpError(err, httpResp) {
+		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.SERVER_INTERNAL_ERROR_TYPE))
+	}
+	return resp, nil
 }

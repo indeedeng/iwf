@@ -211,6 +211,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: skip the timer of a workflow
+  /api/v1/workflow/internal/dump:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowDumpRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDumpResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: dump internal info of a workflow
   /api/v1/workflowState/start:
     post:
       requestBody:
@@ -447,6 +468,7 @@ components:
         config:
           continueAsNewThresholdExecutedStateExecution: 1
           disableSystemSearchAttribute: true
+          continueAsNewPageSizeInBytes: 7
           continueAsNewThresholdSignalsReceived: 6
         cronSchedule: cronSchedule
       properties:
@@ -575,6 +597,7 @@ components:
           config:
             continueAsNewThresholdExecutedStateExecution: 1
             disableSystemSearchAttribute: true
+            continueAsNewPageSizeInBytes: 7
             continueAsNewThresholdSignalsReceived: 6
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
@@ -925,6 +948,44 @@ components:
           type: string
       required:
       - workflowRunId
+      type: object
+    WorkflowDumpRequest:
+      example:
+        pageSizeInBytes: 0
+        workflowRunId: workflowRunId
+        pageNum: 6
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        pageSizeInBytes:
+          type: integer
+        pageNum:
+          type: integer
+      required:
+      - pageNum
+      - pageSizeInBytes
+      - workflowId
+      - workflowRunId
+      type: object
+    WorkflowDumpResponse:
+      example:
+        jsonData: jsonData
+        checksum: checksum
+        totalPages: 0
+      properties:
+        checksum:
+          type: string
+        totalPages:
+          type: integer
+        jsonData:
+          type: string
+      required:
+      - checksum
+      - jsonData
+      - totalPages
       type: object
     WorkflowStateStartRequest:
       example:
@@ -1732,6 +1793,7 @@ components:
       example:
         continueAsNewThresholdExecutedStateExecution: 1
         disableSystemSearchAttribute: true
+        continueAsNewPageSizeInBytes: 7
         continueAsNewThresholdSignalsReceived: 6
       properties:
         disableSystemSearchAttribute:
@@ -1739,6 +1801,8 @@ components:
         continueAsNewThresholdExecutedStateExecution:
           type: integer
         continueAsNewThresholdSignalsReceived:
+          type: integer
+        continueAsNewPageSizeInBytes:
           type: integer
       type: object
     Context:

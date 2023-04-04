@@ -6,17 +6,22 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/sdk/client"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
 	"log"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 )
 
 func TestMain(m *testing.M) {
+	port, _ := strconv.Atoi(testIwfServerPort)
+	config.SetApiServiceAddressByPort(port)
+
 	flag.Parse()
 	var err error
 
@@ -88,11 +93,17 @@ func TestMain(m *testing.M) {
 		// TODO need to do this for outside of ci as well
 		if *cadenceIntegTest {
 			integCadenceUclientCached, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
-			defer integCadenceUclientCloseFunc()
+			defer func() {
+				fmt.Println("shutdown cadence client and iwf server")
+				integCadenceUclientCloseFunc()
+			}()
 			fmt.Println("cached cadence client and iwf server")
 		} else {
 			integTemporalUclientCached, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
-			defer integTemporalUclientCloseFunc()
+			defer func() {
+				fmt.Println("shutdown temporal client and iwf server")
+				integTemporalUclientCloseFunc()
+			}()
 			fmt.Println("cached temporal client and iwf server")
 		}
 	}

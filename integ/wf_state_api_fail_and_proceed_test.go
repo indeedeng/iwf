@@ -17,8 +17,10 @@ func TestStateApiFailAndProceedTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -27,12 +29,14 @@ func TestStateApiFailAndProceedCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiFailAndProceed(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
-func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType) {
+func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := wf_state_api_fail_and_proceed.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -62,6 +66,9 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType)
 				MaximumAttempts: iwfidl.PtrInt32(1),
 			},
 			StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
+		},
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

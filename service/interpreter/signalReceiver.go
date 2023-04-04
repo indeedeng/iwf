@@ -13,13 +13,18 @@ type SignalReceiver struct {
 	failWorkflowByClient       bool
 	reasonFailWorkflowByClient *string
 	provider                   WorkflowProvider
+	timerProcessor             *TimerProcessor
 }
 
-func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter) *SignalReceiver {
+func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter, initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
+	if initReceivedSignals == nil {
+		initReceivedSignals = map[string][]*iwfidl.EncodedObject{}
+	}
 	sr := &SignalReceiver{
 		provider:             provider,
-		receivedSignals:      map[string][]*iwfidl.EncodedObject{},
+		receivedSignals:      initReceivedSignals,
 		failWorkflowByClient: false,
+		timerProcessor:       tp,
 	}
 
 	provider.GoNamed(ctx, "fail-workflow-system-signal-handler", func(ctx UnifiedContext) {
@@ -63,7 +68,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 		}
 	})
 
-	provider.GoNamed(ctx, "user-signal-receiver-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "merged-signal-receiver-handler", func(ctx UnifiedContext) {
 		for {
 			var toProcess []string
 			err := provider.Await(ctx, func() bool {
@@ -91,17 +96,25 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 
 			for _, sigName := range toProcess {
 				continueAsNewCounter.IncSignalsReceived()
-				var sigVal iwfidl.EncodedObject
-				ch := provider.GetSignalChannel(ctx, sigName)
-				ch.Receive(ctx, &sigVal)
-				receivedChan := sr.receivedSignals[sigName]
-				receivedChan = append(receivedChan, &sigVal)
-				sr.receivedSignals[sigName] = receivedChan
+				sr.receiveSignal(ctx, sigName)
 			}
 			toProcess = nil
 		}
 	})
 	return sr
+}
+
+func (sr *SignalReceiver) receiveSignal(ctx UnifiedContext, sigName string) {
+	ch := sr.provider.GetSignalChannel(ctx, sigName)
+	for {
+		var sigVal iwfidl.EncodedObject
+		ok := ch.ReceiveAsync(&sigVal)
+		if ok {
+			sr.receivedSignals[sigName] = append(sr.receivedSignals[sigName], &sigVal)
+		} else {
+			break
+		}
+	}
 }
 
 func (sr *SignalReceiver) HasSignal(channelName string) bool {
@@ -120,7 +133,7 @@ func (sr *SignalReceiver) Retrieve(channelName string) *iwfidl.EncodedObject {
 	return sigVal
 }
 
-func (sr *SignalReceiver) ReadReceived(channelNames []string) map[string][]*iwfidl.EncodedObject {
+func (sr *SignalReceiver) DumpReceived(channelNames []string) map[string][]*iwfidl.EncodedObject {
 	if len(channelNames) == 0 {
 		return sr.receivedSignals
 	}
@@ -131,31 +144,43 @@ func (sr *SignalReceiver) ReadReceived(channelNames []string) map[string][]*iwfi
 	return data
 }
 
-// HaveAllUserAndSystemSignalsToReceive will check for if signals are received for a safe continueAsNew
-// this includes both regular user signals and system signals
-// Note that being received doesn't mean being processed completed. ContinueAsNew should also wait for processing the received signals properly
-func (sr *SignalReceiver) HaveAllUserAndSystemSignalsToReceive(ctx UnifiedContext) bool {
+// DrainAllUnreceivedSignals will retrieve signals that after signal handler threads are stopped,
+// so that the signals can be carried over to next run by continueAsNew.
+// This includes both regular user signals and system signals
+func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 	unhandledSigs := sr.provider.GetUnhandledSignalNames(ctx)
 	if len(unhandledSigs) == 0 {
-		return true
+		return
 	}
 
 	for _, sigName := range unhandledSigs {
 		if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
 			if service.ValidIwfSystemSignalNames[sigName] {
-				// found a valid system signal, return false so that continueAsNew can wait for it
-				return false
+
+				sr.provider.GetLogger(ctx).Info("found a valid system signal before continueAsNew to carry over", sigName)
+				if sigName == service.SkipTimerSignalChannelName {
+					ch := sr.provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
+					for {
+						val := service.SkipTimerSignalRequest{}
+						ok := ch.ReceiveAsync(&val)
+						if ok {
+							sr.timerProcessor.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
+						} else {
+							break
+						}
+					}
+				}
+				continue
 			}
 			// ignore invalid system signals because we can't process it
 			sr.provider.GetLogger(ctx).Error("ignore the invalid system signal", sigName)
 			continue
 		} else {
-			// found a regular signal, return false
-			return false
+			sr.provider.GetLogger(ctx).Info("found a valid user signal before continueAsNew to carry over", sigName)
+			sr.receiveSignal(ctx, sigName)
+			continue
 		}
 	}
-	// no unhandled system or user signals
-	return true
 }
 
 func (sr *SignalReceiver) IsFailWorkflowRequested() (bool, string) {

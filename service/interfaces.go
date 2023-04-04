@@ -20,16 +20,17 @@ type (
 
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
-		// ContinueAsNew indicate this is input for continueAsNew, when true, all fields can be blank except for ContinueAsNewInput
-		ContinueAsNew bool `json:"continueAsNew"`
+		// IsResumeFromContinueAsNew indicate this is input for continueAsNew
+		// when true, will ignore StartStateId, StateInput, StateOptions, InitSearchAttributes
+		// and use ContinueAsNewInput
+		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew"`
 
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
 	}
 
 	ContinueAsNewInput struct {
-		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
-
-		IwfWorkflowExecution IwfWorkflowExecution `json:"iwfWorkflowExecution"`
+		IwfWorkflowExecution  IwfWorkflowExecution `json:"iwfWorkflowExecution"`
+		PreviousInternalRunId string               `json:"previousInternalRunId"` // for loading from previous run
 	}
 
 	InterpreterWorkflowOutput struct {
@@ -85,47 +86,50 @@ type (
 	InternalTimerStatus string
 
 	DumpAllInternalResponse struct {
-		InterStateChannelReceived               map[string][]*iwfidl.EncodedObject
-		SignalChannelReceived                   map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo               StateExecutionCounterInfo
-		PendingStateExecutionsCompletedCommands map[string]PendingStateExecutionCompletedCommands
-		PendingStateExecutionsRequestCommands   map[string]PendingStateExecutionRequestCommands
-		DataObjects                             []iwfidl.KeyValue
-		SearchAttributes                        []iwfidl.SearchAttribute
+		StatesToStartFromBeginning []iwfidl.StateMovement              // StatesToStartFromBeginning means they haven't started in the previous run
+		StateExecutionsToResume    map[string]StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
+		InterStateChannelReceived  map[string][]*iwfidl.EncodedObject
+		SignalsReceived            map[string][]*iwfidl.EncodedObject
+		StateExecutionCounterInfo  StateExecutionCounterInfo
+		StateOutputs               []iwfidl.StateCompletionOutput
+		StaleSkipTimerSignals      []StaleSkipTimerSignal
+
+		DataObjects      []iwfidl.KeyValue
+		SearchAttributes []iwfidl.SearchAttribute
 	}
 
 	StateExecutionCounterInfo struct {
-		ExecutedStateIdCount      map[string]int // for stateExecutionId
-		PendingStateIdCount       map[string]int // for sys search attribute
-		TotalPendingStateExeCount int            // for "dead end"
+		StateIdStartedCount            map[string]int // for stateExecutionId
+		StateIdCurrentlyExecutingCount map[string]int // for sys search attribute ExecutingStateIds
+		TotalCurrentlyExecutingCount   int            // for "dead end"
 	}
 
-	PendingStateExecution struct {
-		State                iwfidl.StateMovement
-		DeciderTriggerType   iwfidl.DeciderTriggerType
-		StateExecutionStatus StateExecutionStatus
+	StateExecutionResumeInfo struct {
+		StateExecutionId                string                          `json:"stateExecutionId"`
+		State                           iwfidl.StateMovement            `json:"state"`
+		StateExecutionCompletedCommands StateExecutionCompletedCommands `json:"stateExecutionCompletedCommands"`
+		CommandRequest                  iwfidl.CommandRequest           `json:"commandRequest"`
+		StateExecutionLocals            []iwfidl.KeyValue               `json:"stateExecutionLocals"`
 	}
 
-	PendingStateExecutionRequestCommands struct {
-		TimerCommands             []iwfidl.TimerCommand
-		SignalCommands            []iwfidl.SignalCommand
-		InterStateChannelCommands []iwfidl.InterStateChannelCommand
+	StateExecutionCompletedCommands struct {
+		CompletedTimerCommands             map[int]InternalTimerStatus   `json:"completedTimerCommands"`
+		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
+		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
 	}
 
-	PendingStateExecutionCompletedCommands struct {
-		CompletedTimerCommands             map[int]bool
-		CompletedSignalCommands            map[int]*iwfidl.EncodedObject
-		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject
+	StaleSkipTimerSignal struct {
+		StateExecutionId  string
+		TimerCommandId    string
+		TimerCommandIndex int
 	}
 )
 
 type StateExecutionStatus string
 
-const FailureStateExecutionStatus StateExecutionStatus = "FailureStateExecutionStatus"                       // this will fail the workflow, no continueAsNew
-const StartApiAbortedStateExecutionStatus StateExecutionStatus = "StartApiAbortedStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from startApi
-const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommandsStateExecutionStatus"       // this will put the state into a special pending queue for continueAsNew from waiting command
-const WaitingCompletedStateExecutionStatus StateExecutionStatus = "WaitingCompletedStateExecutionStatus"     // this will put the state into a special pending queue for continueAsNew from decideApi
-const DecideApiCompletedStateExecutionStatus StateExecutionStatus = "DecideApiCompletedStateExecutionStatus" // this will process as normal
+const FailureStateExecutionStatus StateExecutionStatus = "Failure"
+const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommands" // this will put the state into a special pending queue for continueAsNew from waiting command
+const CompletedStateExecutionStatus StateExecutionStatus = "Completed"             // this will process as normal
 
 const (
 	TimerPending InternalTimerStatus = "Pending"

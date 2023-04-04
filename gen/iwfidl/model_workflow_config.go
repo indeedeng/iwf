@@ -22,6 +22,7 @@ type WorkflowConfig struct {
 	DisableSystemSearchAttribute                 *bool  `json:"disableSystemSearchAttribute,omitempty"`
 	ContinueAsNewThresholdExecutedStateExecution *int32 `json:"continueAsNewThresholdExecutedStateExecution,omitempty"`
 	ContinueAsNewThresholdSignalsReceived        *int32 `json:"continueAsNewThresholdSignalsReceived,omitempty"`
+	ContinueAsNewPageSizeInBytes                 *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -137,6 +138,38 @@ func (o *WorkflowConfig) SetContinueAsNewThresholdSignalsReceived(v int32) {
 	o.ContinueAsNewThresholdSignalsReceived = &v
 }
 
+// GetContinueAsNewPageSizeInBytes returns the ContinueAsNewPageSizeInBytes field value if set, zero value otherwise.
+func (o *WorkflowConfig) GetContinueAsNewPageSizeInBytes() int32 {
+	if o == nil || IsNil(o.ContinueAsNewPageSizeInBytes) {
+		var ret int32
+		return ret
+	}
+	return *o.ContinueAsNewPageSizeInBytes
+}
+
+// GetContinueAsNewPageSizeInBytesOk returns a tuple with the ContinueAsNewPageSizeInBytes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowConfig) GetContinueAsNewPageSizeInBytesOk() (*int32, bool) {
+	if o == nil || IsNil(o.ContinueAsNewPageSizeInBytes) {
+		return nil, false
+	}
+	return o.ContinueAsNewPageSizeInBytes, true
+}
+
+// HasContinueAsNewPageSizeInBytes returns a boolean if a field has been set.
+func (o *WorkflowConfig) HasContinueAsNewPageSizeInBytes() bool {
+	if o != nil && !IsNil(o.ContinueAsNewPageSizeInBytes) {
+		return true
+	}
+
+	return false
+}
+
+// SetContinueAsNewPageSizeInBytes gets a reference to the given int32 and assigns it to the ContinueAsNewPageSizeInBytes field.
+func (o *WorkflowConfig) SetContinueAsNewPageSizeInBytes(v int32) {
+	o.ContinueAsNewPageSizeInBytes = &v
+}
+
 func (o WorkflowConfig) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o WorkflowConfig) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ContinueAsNewThresholdSignalsReceived) {
 		toSerialize["continueAsNewThresholdSignalsReceived"] = o.ContinueAsNewThresholdSignalsReceived
+	}
+	if !IsNil(o.ContinueAsNewPageSizeInBytes) {
+		toSerialize["continueAsNewPageSizeInBytes"] = o.ContinueAsNewPageSizeInBytes
 	}
 	return toSerialize, nil
 }

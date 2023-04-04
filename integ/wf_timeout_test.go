@@ -16,8 +16,10 @@ func TestWorkflowTimeoutTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowTimeout(t, service.BackendTypeTemporal)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowTimeout(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+		doTestWorkflowTimeout(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
@@ -26,12 +28,14 @@ func TestWorkflowTimeoutadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowTimeout(t, service.BackendTypeCadence)
-		time.Sleep(time.Millisecond * time.Duration(*repeatInterval))
+		doTestWorkflowTimeout(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+		doTestWorkflowTimeout(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
 	}
 }
 
-func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType) {
+func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -56,6 +60,9 @@ func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType) {
 		WorkflowTimeoutSeconds: 1,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			Config: config,
+		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
