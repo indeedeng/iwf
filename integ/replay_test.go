@@ -36,5 +36,4 @@ func TestTemporalReplay(t *testing.T) {
 //	err := replayer.ReplayWorkflowHistoryFromJSONFile(nil, "history/debug.json")
 //	assertions := assert.New(t)
 //	assertions.Nil(err)
-//
 //}

@@ -135,12 +135,20 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	panicAtHttpError(err, httpResp)
 
 	// workflow should be completed now
-	time.Sleep(time.Second)
-	descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
-		WorkflowId: wfId,
-	}).Execute()
-	panicAtHttpError(err, httpResp)
-	assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
+	if config == nil {
+		time.Sleep(time.Second)
+		descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+			WorkflowId: wfId,
+		}).Execute()
+		panicAtHttpError(err, httpResp)
+		assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
+	} else {
+		reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+		respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+			WorkflowId: wfId,
+		}).Execute()
+		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
+	}
 
 	history, data := wfHandler.GetTestResult()
 

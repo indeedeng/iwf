@@ -80,7 +80,17 @@ func removeElement(s []service.StaleSkipTimerSignal, i int) []service.StaleSkipT
 // return true when the timer is fired or skipped
 // return false if the waitingCommands is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
 func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
-	timer := t.stateExecutionCurrentTimerInfos[stateExeId][timerIdx]
+	timerInfos := t.stateExecutionCurrentTimerInfos[stateExeId]
+	if len(timerInfos) == 0 {
+		if *cancelWaiting {
+			// The waiting thread is later than the timer execState thread
+			// The execState thread got completed early and call RemovePendingTimersOfState to remove the timerInfos
+			return false
+		} else {
+			panic("bug: this shouldn't happen")
+		}
+	}
+	timer := timerInfos[timerIdx]
 	if timer.Status == service.TimerFired || timer.Status == service.TimerSkipped {
 		return true
 	}
