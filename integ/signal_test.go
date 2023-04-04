@@ -17,10 +17,10 @@ func TestSignalWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		//doTestSignalWorkflow(t, service.BackendTypeTemporal, nil)
-		//smallWaitForFastTest()
+		doTestSignalWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
 		doTestSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
-		//smallWaitForFastTest()
+		smallWaitForFastTest()
 	}
 }
 
