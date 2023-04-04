@@ -135,6 +135,10 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	timer2.Status = service.TimerSkipped
 	assertions.Equal(expectedTimerInfos, timerInfos)
 
+	if config != nil {
+		// continueAsNew need more time to load previous internals and then set up query handler for skip timers
+		time.Sleep(time.Second * 2)
+	}
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
 		WorkflowStateExecutionId: "S1-1",
@@ -185,7 +189,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	timer2.Status = service.TimerSkipped
 	timer3.Status = service.TimerSkipped
 	assertions.Equal(expectedTimerInfos, timerInfos)
-	
+
 	req2 = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
