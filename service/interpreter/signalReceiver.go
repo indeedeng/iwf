@@ -159,6 +159,7 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 
 				sr.provider.GetLogger(ctx).Info("found a valid system signal before continueAsNew to carry over", sigName)
 				if sigName == service.SkipTimerSignalChannelName {
+					// TODO: add test case for carry over skip timer(signal_test.go)
 					ch := sr.provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
 					for {
 						val := service.SkipTimerSignalRequest{}
