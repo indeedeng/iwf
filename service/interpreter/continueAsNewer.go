@@ -19,12 +19,13 @@ type ContinueAsNewer struct {
 	persistenceManager    *PersistenceManager
 	signalReceiver        *SignalReceiver
 	outputCollector       *OutputCollector
+	timerProcessor        *TimerProcessor
 }
 
 func NewContinueAsNewer(
 	provider WorkflowProvider,
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
-	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector,
+	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector, timerProcessor *TimerProcessor,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		provider: provider,
@@ -37,6 +38,7 @@ func NewContinueAsNewer(
 		stateExecutionCounter: stateExecutionCounter,
 		persistenceManager:    persistenceManager,
 		outputCollector:       collector,
+		timerProcessor:        timerProcessor,
 	}
 }
 
@@ -102,6 +104,7 @@ func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllIntern
 		StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
 		StateExecutionsToResume:    c.StateExecutionToResumeMap,
 		StateOutputs:               c.outputCollector.GetAll(),
+		StaleSkipTimerSignals:      c.timerProcessor.Dump(),
 	}
 }
 
@@ -128,19 +131,53 @@ func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(
 	}
 }
 
+func (c *ContinueAsNewer) HasAnyStateExecutionToResume() bool {
+	return len(c.StateExecutionToResumeMap) > 0
+}
 func (c *ContinueAsNewer) RemoveStateExecutionToResume(stateExecutionId string) {
 	delete(c.StateExecutionToResumeMap, stateExecutionId)
 }
 
 func (c *ContinueAsNewer) DrainAllSignalsAndThreads(ctx UnifiedContext) error {
+	// drain all signals + all threads
+
 	// TODO: add metric for before and after Await to monitor stuck
 	// NOTE: consider using AwaitWithTimeout to get an alert when workflow stuck due to a bug in the draining logic for continueAsNew
-	return c.provider.Await(ctx, func() bool {
+	c.signalReceiver.DrainAllUnreceivedSignals(ctx)
+
+	errWait := c.provider.Await(ctx, func() bool {
 		return c.canContinueAsNew(ctx)
 	})
+	c.provider.GetLogger(ctx).Info("done waiting for continueAsNew", errWait)
+	return errWait
 }
 
+// if the DrainAllSignalsAndThreads await is being called more than a few times and cannot get through,
+// there is very likely something wrong in the continueAsNew logic
+// the key is runId, the value is how many times it has been called in this worker
+// Using this in memory counter sot hat we don't have to use AwaitWithTimeout which will consume a timer
+// TODO add TTL support because we don't have to keep the value in memory forever(likely a few hours or a day is enough)
+var inMemoryContinueAsNewMonitor = make(map[string]int)
+
+const warnThreshold = 2
+const errThreshold = 4
+
 func (c *ContinueAsNewer) canContinueAsNew(ctx UnifiedContext) bool {
-	// drain all signals + all threads
-	return c.signalReceiver.HaveAllUserAndSystemSignalsToReceive(ctx) && c.provider.GetThreadCount() == 0
+	remainingThreadCount := c.provider.GetThreadCount()
+	if remainingThreadCount == 0 {
+		return true
+	}
+
+	// TODO using a flag to control this debugging info
+	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
+	inMemoryContinueAsNewMonitor[runId]++
+
+	if inMemoryContinueAsNewMonitor[runId] >= errThreshold {
+		c.provider.GetLogger(ctx).Warn("continueAsNew is VERY LIKELY stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+		return false
+	}
+	if inMemoryContinueAsNewMonitor[runId] >= warnThreshold {
+		c.provider.GetLogger(ctx).Warn("continueAsNew may be stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+	}
+	return false
 }

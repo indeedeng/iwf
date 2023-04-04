@@ -9,15 +9,17 @@ import (
 
 type TimerProcessor struct {
 	stateExecutionCurrentTimerInfos map[string][]*service.TimerInfo
+	staleSkipTimerSignals           []service.StaleSkipTimerSignal
 	provider                        WorkflowProvider
 	logger                          UnifiedLogger
 }
 
-func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProcessor {
+func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider, staleSkipTimerSignals []service.StaleSkipTimerSignal) *TimerProcessor {
 	tp := &TimerProcessor{
 		provider:                        provider,
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
 		logger:                          provider.GetLogger(ctx),
+		staleSkipTimerSignals:           staleSkipTimerSignals,
 	}
 
 	err := provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
@@ -31,18 +33,47 @@ func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider) *TimerProc
 	return tp
 }
 
+func (t *TimerProcessor) Dump() []service.StaleSkipTimerSignal {
+	return t.staleSkipTimerSignals
+}
+
 func (t *TimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
 	return t.stateExecutionCurrentTimerInfos
 }
 
-func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
+// SkipTimer will attempt to skip a timer, return false if no valid timer found
+func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) bool {
 	timer, valid := service.ValidateTimerSkipRequest(t.stateExecutionCurrentTimerInfos, stateExeId, timerId, timerIdx)
 	if !valid {
 		// since we have checked it before sending signals, this should only happen in some vary rare cases for racing condition
-		t.logger.Error("invalid timer skip request received!", stateExeId, timerId, timerIdx)
-		return
+		t.logger.Warn("cannot process timer skip request, maybe state is already closed...putting into a stale skip timer queue", stateExeId, timerId, timerIdx)
+
+		t.staleSkipTimerSignals = append(t.staleSkipTimerSignals, service.StaleSkipTimerSignal{
+			StateExecutionId:  stateExeId,
+			TimerCommandId:    timerId,
+			TimerCommandIndex: timerIdx,
+		})
+		return false
 	}
 	timer.Status = service.TimerSkipped
+	return true
+}
+
+func (t *TimerProcessor) RetryStaleSkipTimer() bool {
+	for i, staleSkip := range t.staleSkipTimerSignals {
+		found := t.SkipTimer(staleSkip.StateExecutionId, staleSkip.TimerCommandId, staleSkip.TimerCommandIndex)
+		if found {
+			newList := removeElement(t.staleSkipTimerSignals, i)
+			t.staleSkipTimerSignals = newList
+			return true
+		}
+	}
+	return false
+}
+
+func removeElement(s []service.StaleSkipTimerSignal, i int) []service.StaleSkipTimerSignal {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
 
 // WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
@@ -51,6 +82,11 @@ func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) {
 func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) bool {
 	timer := t.stateExecutionCurrentTimerInfos[stateExeId][timerIdx]
 	if timer.Status == service.TimerFired || timer.Status == service.TimerSkipped {
+		return true
+	}
+	skippedByStaleSkip := t.RetryStaleSkipTimer()
+	if skippedByStaleSkip {
+		t.logger.Warn("timer skipped by stale skip signal", stateExeId, timerIdx)
 		return true
 	}
 	now := t.provider.Now(ctx).Unix()

@@ -92,6 +92,7 @@ type (
 		SignalsReceived            map[string][]*iwfidl.EncodedObject
 		StateExecutionCounterInfo  StateExecutionCounterInfo
 		StateOutputs               []iwfidl.StateCompletionOutput
+		StaleSkipTimerSignals      []StaleSkipTimerSignal
 
 		DataObjects      []iwfidl.KeyValue
 		SearchAttributes []iwfidl.SearchAttribute
@@ -115,6 +116,12 @@ type (
 		CompletedTimerCommands             map[int]bool                  `json:"completedTimerCommands"`
 		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
+	}
+
+	StaleSkipTimerSignal struct {
+		StateExecutionId  string
+		TimerCommandId    string
+		TimerCommandIndex int
 	}
 )
 

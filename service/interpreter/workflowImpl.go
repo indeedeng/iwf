@@ -51,7 +51,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
-		timerProcessor = NewTimerProcessor(ctx, provider)
+		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
@@ -59,7 +59,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
 			input.Config, continueAsNewCounter)
 		outputCollector = NewOutputCollector(previous.StateOutputs)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector)
+		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
 		iwfExecution = service.IwfWorkflowExecution{
 			IwfWorkerUrl:     input.IwfWorkerUrl,
@@ -76,12 +76,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			StateInput:   &input.StateInput,
 		})
 		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
-		timerProcessor = NewTimerProcessor(ctx, provider)
+		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector)
+		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
 
 	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
@@ -222,8 +222,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			errToFailWf = awaitError
 			break
 		}
-		if stateRequestQueue.IsEmpty() {
-			// if it is empty, then we don't need to do continue as new -- the workflow has reached "dead ends" and will just complete after the loop
+		if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() {
+			// if it is empty and no stateExecutionsToResume, then we don't need to do continue as new -- the workflow has reached "dead ends" and will just complete after the loop
 			break
 		}
 		if continueAsNewCounter.IsThresholdMet() {
@@ -382,7 +382,7 @@ func executeState(
 				continue
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
-			provider.GoNamed(cmdCtx, getCommandThreadName("timer", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
+			provider.GoNamed(cmdCtx, getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
 					panic("critical code bug")
@@ -407,7 +407,7 @@ func executeState(
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
-			provider.GoNamed(cmdCtx, getCommandThreadName("signal", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
+			provider.GoNamed(cmdCtx, getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
 				if !ok {
 					panic("critical code bug")
@@ -439,7 +439,7 @@ func executeState(
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
-			provider.GoNamed(cmdCtx, getCommandThreadName("interstate", cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
+			provider.GoNamed(cmdCtx, getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
 				if !ok {
 					panic("critical code bug")
@@ -602,6 +602,6 @@ func convertStateApiActivityError(provider WorkflowProvider, err error) error {
 	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE), err.Error())
 }
 
-func getCommandThreadName(prefix string, cmdId string, idx int) string {
-	return fmt.Sprintf("%v-%v-%v", prefix, cmdId, idx)
+func getCommandThreadName(prefix string, stateExecId, cmdId string, idx int) string {
+	return fmt.Sprintf("%v-%v-%v-%v", prefix, stateExecId, cmdId, idx)
 }
