@@ -337,11 +337,6 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 func (s *serviceImpl) ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
 	var internals service.DumpAllInternalResponse
 
-	_, ok := ctx.Deadline()
-	if !ok {
-		ctx, _ = context.WithTimeout(context.Background(), time.Second*5)
-	}
-
 	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.DumpAllInternalQueryType)
 	if err != nil {
 		return nil, s.handleError(err)
