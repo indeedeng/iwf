@@ -567,9 +567,13 @@ Cadence/Temporal.
 
 - [x] Support PROCEED_TO_DECIDE_ON_START_API_FAILURE for StartApiFailurePolicy
 
+### 1.5
+
+- [x] Auto continueAsNew([WIP](https://github.com/indeedeng/iwf/issues/107))
+- [x] Stop API supports terminate and fail workflows as stop types
+
 ### Future
 
-- [ ] Auto continueAsNew([WIP](https://github.com/indeedeng/iwf/issues/107))
 - [ ] WaitForMoreResults in StateDecision
 - [ ] LongRunningActivityCommand
 - [ ] More Decider trigger type
