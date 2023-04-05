@@ -14,12 +14,8 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-func NewInterpreterWorker(temporalClient client.Client, taskQueue string) *InterpreterWorker {
-	apiAddress := config.GetApiServiceAddress()
-	if apiAddress == "" {
-		panic("empty api address, must be initialized through config.SetApiServiceAddress()")
-	}
-
+func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string) *InterpreterWorker {
+	interpreter.SetSharedConfig(config)
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
 		taskQueue:      taskQueue,
@@ -32,7 +28,16 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, worker.Options{})
+	config := interpreter.GetSharedConfig()
+	options := worker.Options{
+		MaxConcurrentActivityTaskPollers: 10,
+		MaxConcurrentWorkflowTaskPollers: 10,
+	}
+	if config.Interpreter.Temporal != nil && config.Interpreter.Temporal.WorkerOptions != nil {
+		options = *config.Interpreter.Temporal.WorkerOptions
+	}
+	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
+	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)

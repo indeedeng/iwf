@@ -1,11 +1,11 @@
 api:
   port: 8801
-backend:
-#  {{- be := default .Env.BACKEND_TYPE "temporal" | lower -}}
-#    {{- if eq $be "temporal" }}
-    temporal:
-      hostPort: "temporal:7233"
-      namespace: "default"
+interpreter:
+  #  {{- be := default .Env.BACKEND_TYPE "temporal" | lower -}}
+  #    {{- if eq $be "temporal" }}
+  temporal:
+    hostPort: "temporal:7233"
+    namespace: "default"
 #    {{- end }}
 #    {{- if eq $be "temporal" }}
 #    cadence:

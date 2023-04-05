@@ -157,7 +157,8 @@ func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, 
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternal", "input", req)
 
-	apiAddress := config.GetApiServiceAddress()
+	apiAddress := config.GetApiServiceAddressWithDefault(GetSharedConfig())
+
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{

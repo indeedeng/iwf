@@ -46,7 +46,6 @@ func TestPersistenceWorkflowCadence(t *testing.T) {
 	}
 }
 
-// TODO fix test
 func TestPersistenceWorkflowCadenceContinueAsNew(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
@@ -88,7 +87,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 	wfReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        persistence.WorkflowType,
-		WorkflowTimeoutSeconds: 120,
+		WorkflowTimeoutSeconds: 20,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           persistence.State1,
 		StateOptions: &iwfidl.WorkflowStateOptions{

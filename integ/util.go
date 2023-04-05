@@ -9,7 +9,6 @@ import (
 	"github.com/indeedeng/iwf/service/api"
 	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
@@ -81,7 +80,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 			panic(err)
 		}
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter())
-		iwfService := api.NewService(&config.Config{}, uclient, logger)
+		iwfService := api.NewService(testConfig, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -93,7 +92,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(temporalClient, service.TaskQueue)
+		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue)
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()
@@ -112,7 +111,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 			panic(err)
 		}
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
-		iwfService := api.NewService(&config.Config{}, uclient, logger)
+		iwfService := api.NewService(testConfig, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -124,7 +123,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(testConfig, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()

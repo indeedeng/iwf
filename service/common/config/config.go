@@ -2,10 +2,14 @@ package config
 
 import (
 	"fmt"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/uber-go/tally/v4/prometheus"
+	temporalWorker "go.temporal.io/sdk/worker"
+	cadenceWorker "go.uber.org/cadence/worker"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
+	"time"
 )
 
 type (
@@ -14,8 +18,8 @@ type (
 		Log Logger `yaml:"log"`
 		// Api is the API config
 		Api ApiConfig `yaml:"api"`
-		// Backend is the service behind, either Cadence or Temporal is required
-		Backend Backend `yaml:"backend"`
+		// Interpreter is the service behind, either Cadence or Temporal is required
+		Interpreter Interpreter `yaml:"interpreter"`
 	}
 
 	ApiConfig struct {
@@ -23,14 +27,14 @@ type (
 		Port int `yaml:"port"`
 	}
 
-	Backend struct {
+	Interpreter struct {
 		// Temporal config is the config to connect to Temporal
 		Temporal *TemporalConfig `yaml:"temporal"`
 		// Cadence config is the config to connect to Cadence
-		Cadence *CadenceConfig `yaml:"cadence"`
-		// ApiServiceAddress is the address that core engine workflow talks to API service
-		// default is http://localhost:ApiConfig.Port
-		ApiServiceAddress string `json:"serviceAddress"`
+		Cadence                   *CadenceConfig `yaml:"cadence"`
+		DefaultWorkflowConfig     iwfidl.WorkflowConfig
+		InterpreterActivityConfig InterpreterActivityConfig
+		VerboseDebug              bool
 	}
 
 	TemporalConfig struct {
@@ -39,18 +43,29 @@ type (
 		// Namespace to connect to, default to default
 		Namespace string `yaml:"namespace"`
 		// Prometheus is configuring the metric exposer
-		Prometheus *prometheus.Configuration `yaml:"prometheus"`
+		Prometheus    *prometheus.Configuration `yaml:"prometheus"`
+		WorkerOptions *temporalWorker.Options
 	}
 
 	CadenceConfig struct {
 		// HostPort to connect to, default to 127.0.0.1:7833
 		HostPort string `yaml:"hostPort"`
 		// Domain to connect to, default to default
-		Domain string `yaml:"domain"`
-		// DisableSearchAttributes will not use system search attributes
-		// this is for Cadence service without advanced visibility because of
-		// https://github.com/uber/cadence/issues/5085
-		DisableSystemSearchAttributes bool `yaml:"disableSystemSearchAttributes"`
+		Domain        string `yaml:"domain"`
+		WorkerOptions *cadenceWorker.Options
+	}
+
+	InterpreterActivityConfig struct {
+		// ApiServiceAddress is the address that core engine workflow talks to API service
+		// It's used in DumpWorkflowInternal activity for continueAsNew
+		// default is http://localhost:ApiConfig.Port
+		ApiServiceAddress                  string `json:"serviceAddress"`
+		DumpWorkflowInternalActivityConfig *DumpWorkflowInternalActivityConfig
+	}
+
+	DumpWorkflowInternalActivityConfig struct {
+		StartToCloseTimeout time.Duration
+		RetryPolicy         *iwfidl.RetryPolicy
 	}
 
 	// Logger contains the config items for logger
@@ -89,23 +104,13 @@ func NewConfig(configPath string) (*Config, error) {
 	if err := d.Decode(&config); err != nil {
 		return nil, err
 	}
-	if apiServiceAddress == "" {
-		SetApiServiceAddressByPort(config.Api.Port)
-	}
 
 	return config, nil
 }
 
-var apiServiceAddress string
-
-func GetApiServiceAddress() string {
-	return apiServiceAddress
-}
-
-func SetApiServiceAddress(addr string) {
-	apiServiceAddress = addr
-}
-
-func SetApiServiceAddressByPort(port int) {
-	SetApiServiceAddress(fmt.Sprintf("http://localhost:%v", port))
+func GetApiServiceAddressWithDefault(config Config) string {
+	if config.Interpreter.InterpreterActivityConfig.ApiServiceAddress != "" {
+		return config.Interpreter.InterpreterActivityConfig.ApiServiceAddress
+	}
+	return fmt.Sprintf("http://localhost:%v", config.Api.Port)
 }

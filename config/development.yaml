@@ -4,7 +4,7 @@ log:
   levelKey: "level"
 api:
   port: 8801
-backend:
+interpreter:
   temporal:
     hostPort: localhost:7233
     namespace: default

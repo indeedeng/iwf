@@ -107,34 +107,34 @@ func start(c *cli.Context) {
 
 	// The client is a heavyweight object that should be created once per process.
 	var unifiedClient api.UnifiedClient
-	if config.Backend.Temporal != nil {
+	if config.Interpreter.Temporal != nil {
 		var metricHandler client.MetricsHandler
-		if config.Backend.Temporal.Prometheus != nil {
-			pscope := newPrometheusScope(*config.Backend.Temporal.Prometheus, logger)
+		if config.Interpreter.Temporal.Prometheus != nil {
+			pscope := newPrometheusScope(*config.Interpreter.Temporal.Prometheus, logger)
 			metricHandler = sdktally.NewMetricsHandler(pscope)
 		}
 
 		temporalClient, err := client.Dial(client.Options{
-			HostPort:       config.Backend.Temporal.HostPort,
-			Namespace:      config.Backend.Temporal.Namespace,
+			HostPort:       config.Interpreter.Temporal.HostPort,
+			Namespace:      config.Interpreter.Temporal.Namespace,
 			MetricsHandler: metricHandler,
 		})
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Backend.Temporal.Namespace, converter.GetDefaultDataConverter())
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter())
 
 		for _, svcName := range services {
-			go launchTemporalService(svcName, config, unifiedClient, temporalClient, logger)
+			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger)
 		}
-	} else if config.Backend.Cadence != nil {
+	} else if config.Interpreter.Cadence != nil {
 		hostPort := DefaultCadenceHostPort
 		domain := DefaultCadenceDomain
-		if config.Backend.Cadence.HostPort != "" {
-			hostPort = config.Backend.Cadence.HostPort
+		if config.Interpreter.Cadence.HostPort != "" {
+			hostPort = config.Interpreter.Cadence.HostPort
 		}
-		if config.Backend.Cadence.Domain != "" {
-			domain = config.Backend.Cadence.Domain
+		if config.Interpreter.Cadence.Domain != "" {
+			domain = config.Interpreter.Cadence.Domain
 		}
 		serviceClient, closeFunc, err := BuildCadenceServiceClient(hostPort)
 		if err != nil {
@@ -147,7 +147,7 @@ func start(c *cli.Context) {
 		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
 
 		for _, svcName := range services {
-			go launchCadenceService(svcName, config, unifiedClient, serviceClient, domain, closeFunc, logger)
+			go launchCadenceService(svcName, *config, unifiedClient, serviceClient, domain, closeFunc, logger)
 		}
 	} else {
 		panic("must provide either Cadence or Temporal config")
@@ -159,13 +159,13 @@ func start(c *cli.Context) {
 	wg.Wait()
 }
 
-func launchTemporalService(svcName string, config *config.Config, unifiedClient api.UnifiedClient, temporalClient client.Client, logger log.Logger) {
+func launchTemporalService(svcName string, config config.Config, unifiedClient api.UnifiedClient, temporalClient client.Client, logger log.Logger) {
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(temporalClient, isvc.TaskQueue)
+		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -174,7 +174,7 @@ func launchTemporalService(svcName string, config *config.Config, unifiedClient 
 
 func launchCadenceService(
 	svcName string,
-	config *config.Config,
+	config config.Config,
 	unifiedClient api.UnifiedClient,
 	service workflowserviceclient.Interface,
 	domain string,
@@ -185,7 +185,7 @@ func launchCadenceService(
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := cadence.NewInterpreterWorker(service, domain, isvc.TaskQueue, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)

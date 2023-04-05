@@ -24,14 +24,14 @@ type serviceImpl struct {
 	client    UnifiedClient
 	taskQueue string
 	logger    log.Logger
-	config    *config.Config
+	config    config.Config
 }
 
 func (s *serviceImpl) Close() {
 	s.client.Close()
 }
 
-func NewApiService(config *config.Config, client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
+func NewApiService(config config.Config, client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
 	return &serviceImpl{
 		client:    client,
 		taskQueue: taskQueue,
@@ -50,7 +50,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	}
 
 	var initSAs []iwfidl.SearchAttribute
-	var config iwfidl.WorkflowConfig
+	workflowConfig := s.config.Interpreter.DefaultWorkflowConfig
+
 	if req.WorkflowStartOptions != nil {
 		startOptions := req.WorkflowStartOptions
 		workflowOptions.WorkflowIDReusePolicy = startOptions.WorkflowIDReusePolicy
@@ -64,14 +65,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
 		initSAs = startOptions.SearchAttributes
 		if startOptions.HasConfig() {
-			config = startOptions.GetConfig()
-		}
-	}
-
-	if config.DisableSystemSearchAttribute == nil {
-		// allow override by yaml config
-		if s.config.Backend.Cadence != nil {
-			config.DisableSystemSearchAttribute = ptr.Any(s.config.Backend.Cadence.DisableSystemSearchAttributes)
+			workflowConfig = startOptions.GetConfig()
 		}
 	}
 
@@ -82,7 +76,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		StateInput:           req.GetStateInput(),
 		StateOptions:         req.GetStateOptions(),
 		InitSearchAttributes: initSAs,
-		Config:               config,
+		Config:               workflowConfig,
 	}
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
@@ -342,8 +336,12 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 
 func (s *serviceImpl) ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
 	var internals service.DumpAllInternalResponse
-	{
+
+	_, ok := ctx.Deadline()
+	if !ok {
+		ctx, _ = context.WithTimeout(context.Background(), time.Second*5)
 	}
+
 	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.DumpAllInternalQueryType)
 	if err != nil {
 		return nil, s.handleError(err)

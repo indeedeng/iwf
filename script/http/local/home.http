@@ -52,3 +52,14 @@ Content-Type: application/json
     "data": "\"a string value\""
   }
 }
+
+### dump workflow persistence1680717966708866000-4\",\"workflowRunId\":\"74fe9e9c-52a6-4c8e-9562-24eafbb95301
+POST http://localhost:9715/api/v1/workflow/internal/dump
+Content-Type: application/json
+
+{
+  "workflowId": "persistence1680717966708866000-4",
+  "workflowRunId": "74fe9e9c-52a6-4c8e-9562-24eafbb95301",
+  "pageSizeInBytes": 0,
+  "pageNum": 0
+}

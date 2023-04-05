@@ -16,12 +16,8 @@ type InterpreterWorker struct {
 	tasklist  string
 }
 
-func NewInterpreterWorker(service workflowserviceclient.Interface, domain, tasklist string, closeFunc func()) *InterpreterWorker {
-	apiAddress := config.GetApiServiceAddress()
-	if apiAddress == "" {
-		panic("empty api address, must be initialized through config.SetApiServiceAddress()")
-	}
-
+func NewInterpreterWorker(config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func()) *InterpreterWorker {
+	interpreter.SetSharedConfig(config)
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,
@@ -36,7 +32,16 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, worker.Options{})
+	config := interpreter.GetSharedConfig()
+	options := worker.Options{
+		MaxConcurrentActivityTaskPollers: 10,
+		MaxConcurrentDecisionTaskPollers: 10,
+	}
+	if config.Interpreter.Cadence != nil && config.Interpreter.Cadence.WorkerOptions != nil {
+		options = *config.Interpreter.Cadence.WorkerOptions
+	}
+	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, options)
+	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterActivity(interpreter.StateStart)

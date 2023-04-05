@@ -19,7 +19,7 @@ type handler struct {
 	logger log.Logger
 }
 
-func newHandler(config *config.Config, client UnifiedClient, logger log.Logger) *handler {
+func newHandler(config config.Config, client UnifiedClient, logger log.Logger) *handler {
 	svc, err := NewApiService(config, client, service.TaskQueue, logger)
 	if err != nil {
 		panic(err)
