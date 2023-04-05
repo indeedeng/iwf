@@ -31,9 +31,9 @@ type (
 		// Temporal config is the config to connect to Temporal
 		Temporal *TemporalConfig `yaml:"temporal"`
 		// Cadence config is the config to connect to Cadence
-		Cadence                   *CadenceConfig `yaml:"cadence"`
-		DefaultWorkflowConfig     iwfidl.WorkflowConfig
-		InterpreterActivityConfig InterpreterActivityConfig
+		Cadence                   *CadenceConfig            `yaml:"cadence"`
+		DefaultWorkflowConfig     iwfidl.WorkflowConfig     `json:"defaultWorkflowConfig"`
+		InterpreterActivityConfig InterpreterActivityConfig `yaml:"interpreterActivityConfig"`
 		VerboseDebug              bool
 	}
 
@@ -59,8 +59,8 @@ type (
 		// ApiServiceAddress is the address that core engine workflow talks to API service
 		// It's used in DumpWorkflowInternal activity for continueAsNew
 		// default is http://localhost:ApiConfig.Port
-		ApiServiceAddress                  string `json:"serviceAddress"`
-		DumpWorkflowInternalActivityConfig *DumpWorkflowInternalActivityConfig
+		ApiServiceAddress                  string                              `json:"serviceAddress"`
+		DumpWorkflowInternalActivityConfig *DumpWorkflowInternalActivityConfig `json:"dumpWorkflowInternalActivityConfig"`
 	}
 
 	DumpWorkflowInternalActivityConfig struct {
