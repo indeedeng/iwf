@@ -44,7 +44,10 @@ func NewContinueAsNewer(
 
 func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.DumpAllInternalResponse, error) {
 	activityOptions := ActivityOptions{
-		StartToCloseTimeout: 30 * time.Second, // TODO add config
+		StartToCloseTimeout: 2 * time.Second, // TODO add config
+		RetryPolicy: &iwfidl.RetryPolicy{
+			MaximumIntervalSeconds: iwfidl.PtrInt32(1),
+		},
 	}
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	workflowId := provider.GetWorkflowInfo(ctx).WorkflowExecution.ID
