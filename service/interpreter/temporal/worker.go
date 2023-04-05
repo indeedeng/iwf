@@ -31,6 +31,8 @@ func (iw *InterpreterWorker) Start() {
 	config := interpreter.GetSharedConfig()
 	options := worker.Options{
 		MaxConcurrentActivityTaskPollers: 10,
+		// TODO: this cannot be too small otherwise the persistence_test for continueAsNew will fail, probably a bug in Temporal goSDK.
+		// It seems work as "parallelism" of something... need to report a bug ticket...
 		MaxConcurrentWorkflowTaskPollers: 10,
 	}
 	if config.Interpreter.Temporal != nil && config.Interpreter.Temporal.WorkerOptions != nil {
