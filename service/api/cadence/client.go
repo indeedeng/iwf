@@ -3,6 +3,7 @@ package cadence
 import (
 	"context"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"time"
 
 	"github.com/google/uuid"
@@ -144,11 +145,26 @@ func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkf
 }
 
 func (t *cadenceClient) QueryWorkflow(ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{}) error {
-	qres, err := t.cClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
+	qres, err := queryWorkflowWithStrongConsistency(t, ctx, workflowID, runID, queryType, args)
 	if err != nil {
 		return err
 	}
 	return qres.Get(valuePtr)
+}
+
+func queryWorkflowWithStrongConsistency(t *cadenceClient, ctx context.Context, workflowID string, runID string, queryType string, args []interface{}) (encoded.Value, error) {
+	queryWorkflowWithOptionsRequest := &client.QueryWorkflowWithOptionsRequest{
+		WorkflowID:            workflowID,
+		RunID:                 runID,
+		QueryType:             queryType,
+		Args:                  args,
+		QueryConsistencyLevel: ptr.Any(shared.QueryConsistencyLevelStrong),
+	}
+	result, err := t.cClient.QueryWorkflowWithOptions(ctx, queryWorkflowWithOptionsRequest)
+	if err != nil {
+		return nil, err
+	}
+	return result.QueryResult, nil
 }
 
 func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*api.DescribeWorkflowExecutionResponse, error) {
