@@ -569,7 +569,7 @@ Cadence/Temporal.
 
 ### 1.5
 
-- [x] Auto continueAsNew([WIP](https://github.com/indeedeng/iwf/issues/107))
+- [x] Auto continueAsNew
 - [x] Stop API supports terminate and fail workflows as stop types
 
 ### Future
