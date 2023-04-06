@@ -87,9 +87,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	if config != nil {
-		time.Sleep(time.Second * 2)
-	}
+	time.Sleep(time.Second * 1)
 	timerInfos := service.GetCurrentTimerInfosQueryResponse{}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
 	if err != nil {
@@ -129,9 +127,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	if config != nil {
-		time.Sleep(time.Second * 2)
-	}
+	time.Sleep(time.Second * 1)
 	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
 	if err != nil {
@@ -140,10 +136,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	timer2.Status = service.TimerSkipped
 	assertions.Equal(expectedTimerInfos, timerInfos)
 
-	if config != nil {
-		// continueAsNew need more time to load previous internals and then set up query handler for skip timers
-		time.Sleep(time.Second * 2)
-	}
+	time.Sleep(time.Second * 1)
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
 		WorkflowStateExecutionId: "S1-1",
@@ -151,9 +144,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	if config != nil {
-		time.Sleep(time.Second * 2)
-	}
+	time.Sleep(time.Second * 1)
 	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
 	if err != nil {
