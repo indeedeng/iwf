@@ -1,8 +1,8 @@
-
 api:
   port: 8801
-backend:
+interpreter:
+  #  interpreterActivityConfig:
+  #    disableSystemSearchAttributes: true # set to true if you don't have advanced visibility in Cadence, see more https://github.com/uber/cadence/issues/5085
   cadence:
     hostPort: 127.0.0.1:7833
     domain: default
-    # disableSystemSearchAttributes: true # set to true if you don't have advanced visibility in Cadence, see more https://github.com/uber/cadence/issues/5085

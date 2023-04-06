@@ -31,6 +31,9 @@ func ConvertCadenceActivityRetryPolicy(policy *iwfidl.RetryPolicy) *workflow.Ret
 	expirationInterval := time.Duration(0)
 	if policy.GetMaximumAttemptsDurationSeconds() > 0 {
 		expirationInterval = time.Second * time.Duration(policy.GetMaximumAttemptsDurationSeconds())
+	} else {
+		// unlimited to match Temporal
+		expirationInterval = time.Hour * 24 * 365 * 1
 	}
 
 	return &workflow.RetryPolicy{
