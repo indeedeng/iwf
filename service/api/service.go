@@ -64,8 +64,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		}
 		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
 		initSAs = startOptions.SearchAttributes
-		if startOptions.HasConfig() {
-			workflowConfig = startOptions.GetConfig()
+		if startOptions.HasWorkflowConfigOverride() {
+			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
 	}
 
@@ -101,6 +101,17 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(ctx context.Context, req iwfidl.Wo
 	return nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowConfigUpdate(ctx context.Context, req iwfidl.WorkflowConfigUpdateRequest) (retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	err := s.client.SignalWorkflow(ctx,
+		req.GetWorkflowId(), req.GetWorkflowRunId(), service.UpdateConfigSignalChannelName, req)
+	if err != nil {
+		return s.handleError(err)
+	}
+	return nil
+}
+
 func (s *serviceImpl) ApiV1WorkflowStopPost(ctx context.Context, req iwfidl.WorkflowStopRequest) (retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
@@ -123,7 +134,7 @@ func (s *serviceImpl) ApiV1WorkflowStopPost(ctx context.Context, req iwfidl.Work
 			return s.handleError(err)
 		}
 	case iwfidl.FAIL:
-		err := s.client.SignalWorkflow(ctx, wfId, runId, service.FailWorkflowSignalChanncelName, service.FailWorkflowSignalRequest{Reason: req.GetReason()})
+		err := s.client.SignalWorkflow(ctx, wfId, runId, service.FailWorkflowSignalChannelName, service.FailWorkflowSignalRequest{Reason: req.GetReason()})
 		if err != nil {
 			return s.handleError(err)
 		}
@@ -335,9 +346,9 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 }
 
 func (s *serviceImpl) ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
-	var internals service.DumpAllInternalResponse
+	var internals service.ContinueAsNewDumpResponse
 
-	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.DumpAllInternalQueryType)
+	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.ContinueAsNewDumpQueryType)
 	if err != nil {
 		return nil, s.handleError(err)
 	}

@@ -61,7 +61,7 @@ func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType, config
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

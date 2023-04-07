@@ -14,9 +14,11 @@ type SignalReceiver struct {
 	reasonFailWorkflowByClient *string
 	provider                   WorkflowProvider
 	timerProcessor             *TimerProcessor
+	workflowConfiger           *WorkflowConfiger
 }
 
-func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter, initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
+func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter,
+	workflowConfiger *WorkflowConfiger, initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
 	if initReceivedSignals == nil {
 		initReceivedSignals = map[string][]*iwfidl.EncodedObject{}
 	}
@@ -25,22 +27,30 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 		receivedSignals:      initReceivedSignals,
 		failWorkflowByClient: false,
 		timerProcessor:       tp,
+		workflowConfiger:     workflowConfiger,
 	}
 
 	provider.GoNamed(ctx, "fail-workflow-system-signal-handler", func(ctx UnifiedContext) {
-		ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChanncelName)
+		for {
+			ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChannelName)
 
-		val := service.FailWorkflowSignalRequest{}
-		err := provider.Await(ctx, func() bool {
-			sr.failWorkflowByClient = ch.ReceiveAsync(&val)
-			// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
-			return sr.failWorkflowByClient || continueAsNewCounter.IsThresholdMet()
-		})
-		if err != nil {
-			return
-		}
-		if sr.failWorkflowByClient {
-			sr.reasonFailWorkflowByClient = &val.Reason
+			val := service.FailWorkflowSignalRequest{}
+			received := false
+			err := provider.Await(ctx, func() bool {
+				received = ch.ReceiveAsync(&val)
+				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
+				return received || continueAsNewCounter.IsThresholdMet()
+			})
+			if err != nil {
+				break
+			}
+			if received {
+				sr.failWorkflowByClient = true
+				sr.reasonFailWorkflowByClient = &val.Reason
+			} else {
+				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
+				break
+			}
 		}
 	})
 
@@ -68,7 +78,31 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 		}
 	})
 
-	provider.GoNamed(ctx, "merged-signal-receiver-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "update-config-system-signal-handler", func(ctx UnifiedContext) {
+		for {
+			ch := provider.GetSignalChannel(ctx, service.UpdateConfigSignalChannelName)
+			val := iwfidl.WorkflowConfigUpdateRequest{}
+
+			received := false
+			err := provider.Await(ctx, func() bool {
+				received = ch.ReceiveAsync(&val)
+				return received || continueAsNewCounter.IsThresholdMet()
+			})
+			if err != nil {
+				// break the loop to prevent goroutine leakage
+				break
+			}
+			if received {
+				continueAsNewCounter.IncSignalsReceived()
+				workflowConfiger.SetIfPresent(val.WorkflowConfig)
+			} else {
+				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
+				return
+			}
+		}
+	})
+
+	provider.GoNamed(ctx, "user-signal-receiver-handler", func(ctx UnifiedContext) {
 		for {
 			var toProcess []string
 			err := provider.Await(ctx, func() bool {
@@ -165,6 +199,29 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 						ok := ch.ReceiveAsync(&val)
 						if ok {
 							sr.timerProcessor.SkipTimer(val.StateExecutionId, val.CommandId, val.CommandIndex)
+						} else {
+							break
+						}
+					}
+				} else if sigName == service.UpdateConfigSignalChannelName {
+					ch := sr.provider.GetSignalChannel(ctx, service.UpdateConfigSignalChannelName)
+					for {
+						val := iwfidl.WorkflowConfigUpdateRequest{}
+						ok := ch.ReceiveAsync(&val)
+						if ok {
+							sr.workflowConfiger.SetIfPresent(val.WorkflowConfig)
+						} else {
+							break
+						}
+					}
+				} else if sigName == service.FailWorkflowSignalChannelName {
+					ch := sr.provider.GetSignalChannel(ctx, service.FailWorkflowSignalChannelName)
+					for {
+						val := service.FailWorkflowSignalRequest{}
+						ok := ch.ReceiveAsync(&val)
+						if ok {
+							sr.failWorkflowByClient = true
+							sr.reasonFailWorkflowByClient = &val.Reason
 						} else {
 							break
 						}

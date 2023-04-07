@@ -82,7 +82,7 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType, confi
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
@@ -137,7 +137,7 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
@@ -192,7 +192,7 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType, config *i
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

@@ -77,6 +77,7 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**ApiV1WorkflowConfigUpdatePost**](docs/DefaultApi.md#apiv1workflowconfigupdatepost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
 *DefaultApi* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultApi.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
@@ -125,6 +126,7 @@ Class | Method | HTTP request | Description
  - [TimerResult](docs/TimerResult.md)
  - [TimerStatus](docs/TimerStatus.md)
  - [WorkflowConfig](docs/WorkflowConfig.md)
+ - [WorkflowConfigUpdateRequest](docs/WorkflowConfigUpdateRequest.md)
  - [WorkflowDumpRequest](docs/WorkflowDumpRequest.md)
  - [WorkflowDumpResponse](docs/WorkflowDumpResponse.md)
  - [WorkflowErrorType](docs/WorkflowErrorType.md)

@@ -64,7 +64,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           anytimersignal.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

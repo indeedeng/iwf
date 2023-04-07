@@ -30,8 +30,12 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 	}
 
-	var continueAsNewer *ContinueAsNewer
-	var iwfExecution service.IwfWorkflowExecution
+	workflowConfiger := NewWorkflowConfiger(input.Config)
+	basicInfo := service.BasicInfo{
+		IwfWorkflowType: input.IwfWorkflowType,
+		IwfWorkerUrl:    input.IwfWorkerUrl,
+	}
+
 	var interStateChannel *InterStateChannel
 	var stateRequestQueue *StateRequestQueue
 	var persistenceManager *PersistenceManager
@@ -40,34 +44,30 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var signalReceiver *SignalReceiver
 	var stateExecutionCounter *StateExecutionCounter
 	var outputCollector *OutputCollector
+	var continueAsNewer *ContinueAsNewer
 	if input.IsResumeFromContinueAsNew {
-		previous, err := LoadInternalsFromPreviousRun(ctx, provider, input)
+		canInput := input.ContinueAsNewInput
+		config := workflowConfiger.Get()
+		previous, err := LoadInternalsFromPreviousRun(ctx, provider, canInput.PreviousInternalRunId, config.GetContinueAsNewPageSizeInBytes())
 		if err != nil {
 			return nil, err
 		}
 
 		// The below initialization order should be the same as for non-continueAsNew
-		iwfExecution = input.ContinueAsNewInput.IwfWorkflowExecution
+
 		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
-		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, previous.SignalsReceived)
+		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
+		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
-			input.Config, continueAsNewCounter)
+			workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(previous.StateOutputs)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
-		iwfExecution = service.IwfWorkflowExecution{
-			IwfWorkerUrl:     input.IwfWorkerUrl,
-			WorkflowType:     input.IwfWorkflowType,
-			WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-			RunId:            provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-			StartedTimestamp: provider.GetWorkflowInfo(ctx).WorkflowStartTime.Unix(),
-		}
 		interStateChannel = NewInterStateChannel()
 
 		stateRequestQueue = NewStateRequestQueue(iwfidl.StateMovement{
@@ -77,9 +77,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		})
 		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
-		continueAsNewCounter = NewContinueAsCounter(input.Config, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, nil)
-		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
+		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
+		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
+		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
@@ -97,6 +97,14 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		return nil, err
 	}
 	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = provider.SetQueryHandler(ctx, service.DebugDumpQueryType, func() (*service.DebugDumpResponse, error) {
+		return &service.DebugDumpResponse{
+			Config: workflowConfiger.Get(),
+		}, nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -141,8 +149,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				}
 
 				decision, stateExecStatus, err := executeState(
-					ctx, provider, stateReq, iwfExecution, stateExeId, persistenceManager,
-					interStateChannel, signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
+					ctx, provider, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
+					signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
 				if err != nil {
 					errToFailWf = err
 					// state execution fail should fail the workflow, no more processing
@@ -227,16 +235,28 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			break
 		}
 		if continueAsNewCounter.IsThresholdMet() {
-			// at here, all signals + threads are drained, so it's safe to continueAsNew
-			input.ContinueAsNewInput = service.ContinueAsNewInput{
-				IwfWorkflowExecution:  iwfExecution,
-				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-			}
-			input.IsResumeFromContinueAsNew = true
-
 			// NOTE: This must be the last thing before continueAsNew!!!
 			// Otherwise, there could be signals unhandled
 			signalReceiver.DrainAllUnreceivedSignals(ctx)
+
+			// at here, all signals + threads are drained, so it's safe to continueAsNew
+			// after draining signals, there could be some changes
+			// 1. last fail workflow signal
+			failByApi, errStr := signalReceiver.IsFailWorkflowRequested()
+			if failByApi {
+				return &service.InterpreterWorkflowOutput{
+						StateCompletionOutputs: outputCollector.GetAll(),
+					}, provider.NewApplicationError(
+						string(iwfidl.CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE),
+						errStr,
+					)
+			}
+			// 2. last update config, do it here because we use input to carry over config, not continueAsNewer query
+			input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
+			input.IsResumeFromContinueAsNew = true
+			input.ContinueAsNewInput = service.ContinueAsNewInput{
+				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			}
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop -- loop until no more state can be executed (dead end)
@@ -294,8 +314,8 @@ func checkClosingWorkflow(
 func executeState(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
+	basicInfo service.BasicInfo,
 	stateReq StateRequest,
-	execution service.IwfWorkflowExecution,
 	stateExeId string,
 	persistenceManager *PersistenceManager,
 	interStateChannel *InterStateChannel,
@@ -304,10 +324,11 @@ func executeState(
 	continueAsNewer *ContinueAsNewer,
 	continueAsNewCounter *ContinueAsNewCounter,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
+	info := provider.GetWorkflowInfo(ctx)
 	executionContext := iwfidl.Context{
-		WorkflowId:               execution.WorkflowId,
-		WorkflowRunId:            execution.RunId,
-		WorkflowStartedTimestamp: execution.StartedTimestamp,
+		WorkflowId:               info.WorkflowExecution.ID,
+		WorkflowRunId:            info.WorkflowExecution.RunID,
+		WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
 		StateExecutionId:         stateExeId,
 	}
 	activityOptions := ActivityOptions{
@@ -349,10 +370,10 @@ func executeState(
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
 		errStartApi = provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
-			IwfWorkerUrl: execution.IwfWorkerUrl,
+			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 			Request: iwfidl.WorkflowStateStartRequest{
 				Context:          executionContext,
-				WorkflowType:     execution.WorkflowType,
+				WorkflowType:     basicInfo.IwfWorkflowType,
 				WorkflowStateId:  state.StateId,
 				StateInput:       state.StateInput,
 				SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
@@ -556,10 +577,10 @@ func executeState(
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
 	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
-		IwfWorkerUrl: execution.IwfWorkerUrl,
+		IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:          executionContext,
-			WorkflowType:     execution.WorkflowType,
+			WorkflowType:     basicInfo.IwfWorkflowType,
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      stateExecutionLocal,

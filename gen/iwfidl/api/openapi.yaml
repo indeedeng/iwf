@@ -211,6 +211,24 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: skip the timer of a workflow
+  /api/v1/workflow/config/update:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowConfigUpdateRequest'
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: update the config of a workflow
   /api/v1/workflow/internal/dump:
     post:
       requestBody:
@@ -445,6 +463,10 @@ components:
           initialIntervalSeconds: 3
           maximumIntervalSeconds: 4
           backoffCoefficient: 2.027123
+        workflowConfigOverride:
+          disableSystemSearchAttribute: true
+          continueAsNewThreshold: 1
+          continueAsNewPageSizeInBytes: 6
         searchAttributes:
         - stringValue: stringValue
           valueType: null
@@ -465,11 +487,6 @@ components:
           - stringArrayValue
           key: key
         workflowIDReusePolicy: null
-        config:
-          continueAsNewThresholdExecutedStateExecution: 1
-          disableSystemSearchAttribute: true
-          continueAsNewPageSizeInBytes: 7
-          continueAsNewThresholdSignalsReceived: 6
         cronSchedule: cronSchedule
       properties:
         workflowIDReusePolicy:
@@ -482,7 +499,7 @@ components:
           items:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
-        config:
+        workflowConfigOverride:
           $ref: '#/components/schemas/WorkflowConfig'
       type: object
     WorkflowIDReusePolicy:
@@ -574,6 +591,10 @@ components:
             initialIntervalSeconds: 3
             maximumIntervalSeconds: 4
             backoffCoefficient: 2.027123
+          workflowConfigOverride:
+            disableSystemSearchAttribute: true
+            continueAsNewThreshold: 1
+            continueAsNewPageSizeInBytes: 6
           searchAttributes:
           - stringValue: stringValue
             valueType: null
@@ -594,11 +615,6 @@ components:
             - stringArrayValue
             key: key
           workflowIDReusePolicy: null
-          config:
-            continueAsNewThresholdExecutedStateExecution: 1
-            disableSystemSearchAttribute: true
-            continueAsNewPageSizeInBytes: 7
-            continueAsNewThresholdSignalsReceived: 6
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
@@ -1072,6 +1088,25 @@ components:
       required:
       - workflowId
       - workflowStateExecutionId
+      type: object
+    WorkflowConfigUpdateRequest:
+      example:
+        workflowConfig:
+          disableSystemSearchAttribute: true
+          continueAsNewThreshold: 1
+          continueAsNewPageSizeInBytes: 6
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        workflowConfig:
+          $ref: '#/components/schemas/WorkflowConfig'
+      required:
+      - workflowConfig
+      - workflowId
       type: object
     WorkflowStateStartResponse:
       example:
@@ -1791,16 +1826,13 @@ components:
       type: object
     WorkflowConfig:
       example:
-        continueAsNewThresholdExecutedStateExecution: 1
         disableSystemSearchAttribute: true
-        continueAsNewPageSizeInBytes: 7
-        continueAsNewThresholdSignalsReceived: 6
+        continueAsNewThreshold: 1
+        continueAsNewPageSizeInBytes: 6
       properties:
         disableSystemSearchAttribute:
           type: boolean
-        continueAsNewThresholdExecutedStateExecution:
-          type: integer
-        continueAsNewThresholdSignalsReceived:
+        continueAsNewThreshold:
           type: integer
         continueAsNewPageSizeInBytes:
           type: integer

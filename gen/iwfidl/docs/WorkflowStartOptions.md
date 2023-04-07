@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **CronSchedule** | Pointer to **string** |  | [optional] 
 **RetryPolicy** | Pointer to [**WorkflowRetryPolicy**](WorkflowRetryPolicy.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
-**Config** | Pointer to [**WorkflowConfig**](WorkflowConfig.md) |  | [optional] 
+**WorkflowConfigOverride** | Pointer to [**WorkflowConfig**](WorkflowConfig.md) |  | [optional] 
 
 ## Methods
 
@@ -129,30 +129,30 @@ SetSearchAttributes sets SearchAttributes field to given value.
 
 HasSearchAttributes returns a boolean if a field has been set.
 
-### GetConfig
+### GetWorkflowConfigOverride
 
-`func (o *WorkflowStartOptions) GetConfig() WorkflowConfig`
+`func (o *WorkflowStartOptions) GetWorkflowConfigOverride() WorkflowConfig`
 
-GetConfig returns the Config field if non-nil, zero value otherwise.
+GetWorkflowConfigOverride returns the WorkflowConfigOverride field if non-nil, zero value otherwise.
 
-### GetConfigOk
+### GetWorkflowConfigOverrideOk
 
-`func (o *WorkflowStartOptions) GetConfigOk() (*WorkflowConfig, bool)`
+`func (o *WorkflowStartOptions) GetWorkflowConfigOverrideOk() (*WorkflowConfig, bool)`
 
-GetConfigOk returns a tuple with the Config field if it's non-nil, zero value otherwise
+GetWorkflowConfigOverrideOk returns a tuple with the WorkflowConfigOverride field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetConfig
+### SetWorkflowConfigOverride
 
-`func (o *WorkflowStartOptions) SetConfig(v WorkflowConfig)`
+`func (o *WorkflowStartOptions) SetWorkflowConfigOverride(v WorkflowConfig)`
 
-SetConfig sets Config field to given value.
+SetWorkflowConfigOverride sets WorkflowConfigOverride field to given value.
 
-### HasConfig
+### HasWorkflowConfigOverride
 
-`func (o *WorkflowStartOptions) HasConfig() bool`
+`func (o *WorkflowStartOptions) HasWorkflowConfigOverride() bool`
 
-HasConfig returns a boolean if a field has been set.
+HasWorkflowConfigOverride returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

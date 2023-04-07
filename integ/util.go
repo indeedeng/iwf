@@ -165,7 +165,6 @@ func smallWaitForFastTest() {
 
 func minimumContinueAsNewConfig() *iwfidl.WorkflowConfig {
 	return &iwfidl.WorkflowConfig{
-		ContinueAsNewThresholdExecutedStateExecution: iwfidl.PtrInt32(1),
-		ContinueAsNewThresholdSignalsReceived:        iwfidl.PtrInt32(1),
+		ContinueAsNewThreshold: iwfidl.PtrInt32(1),
 	}
 }

@@ -5,8 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DisableSystemSearchAttribute** | Pointer to **bool** |  | [optional] 
-**ContinueAsNewThresholdExecutedStateExecution** | Pointer to **int32** |  | [optional] 
-**ContinueAsNewThresholdSignalsReceived** | Pointer to **int32** |  | [optional] 
+**ContinueAsNewThreshold** | Pointer to **int32** |  | [optional] 
 **ContinueAsNewPageSizeInBytes** | Pointer to **int32** |  | [optional] 
 
 ## Methods
@@ -53,55 +52,30 @@ SetDisableSystemSearchAttribute sets DisableSystemSearchAttribute field to given
 
 HasDisableSystemSearchAttribute returns a boolean if a field has been set.
 
-### GetContinueAsNewThresholdExecutedStateExecution
+### GetContinueAsNewThreshold
 
-`func (o *WorkflowConfig) GetContinueAsNewThresholdExecutedStateExecution() int32`
+`func (o *WorkflowConfig) GetContinueAsNewThreshold() int32`
 
-GetContinueAsNewThresholdExecutedStateExecution returns the ContinueAsNewThresholdExecutedStateExecution field if non-nil, zero value otherwise.
+GetContinueAsNewThreshold returns the ContinueAsNewThreshold field if non-nil, zero value otherwise.
 
-### GetContinueAsNewThresholdExecutedStateExecutionOk
+### GetContinueAsNewThresholdOk
 
-`func (o *WorkflowConfig) GetContinueAsNewThresholdExecutedStateExecutionOk() (*int32, bool)`
+`func (o *WorkflowConfig) GetContinueAsNewThresholdOk() (*int32, bool)`
 
-GetContinueAsNewThresholdExecutedStateExecutionOk returns a tuple with the ContinueAsNewThresholdExecutedStateExecution field if it's non-nil, zero value otherwise
+GetContinueAsNewThresholdOk returns a tuple with the ContinueAsNewThreshold field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetContinueAsNewThresholdExecutedStateExecution
+### SetContinueAsNewThreshold
 
-`func (o *WorkflowConfig) SetContinueAsNewThresholdExecutedStateExecution(v int32)`
+`func (o *WorkflowConfig) SetContinueAsNewThreshold(v int32)`
 
-SetContinueAsNewThresholdExecutedStateExecution sets ContinueAsNewThresholdExecutedStateExecution field to given value.
+SetContinueAsNewThreshold sets ContinueAsNewThreshold field to given value.
 
-### HasContinueAsNewThresholdExecutedStateExecution
+### HasContinueAsNewThreshold
 
-`func (o *WorkflowConfig) HasContinueAsNewThresholdExecutedStateExecution() bool`
+`func (o *WorkflowConfig) HasContinueAsNewThreshold() bool`
 
-HasContinueAsNewThresholdExecutedStateExecution returns a boolean if a field has been set.
-
-### GetContinueAsNewThresholdSignalsReceived
-
-`func (o *WorkflowConfig) GetContinueAsNewThresholdSignalsReceived() int32`
-
-GetContinueAsNewThresholdSignalsReceived returns the ContinueAsNewThresholdSignalsReceived field if non-nil, zero value otherwise.
-
-### GetContinueAsNewThresholdSignalsReceivedOk
-
-`func (o *WorkflowConfig) GetContinueAsNewThresholdSignalsReceivedOk() (*int32, bool)`
-
-GetContinueAsNewThresholdSignalsReceivedOk returns a tuple with the ContinueAsNewThresholdSignalsReceived field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetContinueAsNewThresholdSignalsReceived
-
-`func (o *WorkflowConfig) SetContinueAsNewThresholdSignalsReceived(v int32)`
-
-SetContinueAsNewThresholdSignalsReceived sets ContinueAsNewThresholdSignalsReceived field to given value.
-
-### HasContinueAsNewThresholdSignalsReceived
-
-`func (o *WorkflowConfig) HasContinueAsNewThresholdSignalsReceived() bool`
-
-HasContinueAsNewThresholdSignalsReceived returns a boolean if a field has been set.
+HasContinueAsNewThreshold returns a boolean if a field has been set.
 
 ### GetContinueAsNewPageSizeInBytes
 

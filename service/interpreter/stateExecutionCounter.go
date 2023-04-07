@@ -9,7 +9,7 @@ import (
 type StateExecutionCounter struct {
 	ctx                  UnifiedContext
 	provider             WorkflowProvider
-	config               iwfidl.WorkflowConfig
+	configer             *WorkflowConfiger
 	globalVersioner      *GlobalVersioner
 	continueAsNewCounter *ContinueAsNewCounter
 
@@ -18,14 +18,14 @@ type StateExecutionCounter struct {
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
-func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, config iwfidl.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
+func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                             ctx,
 		provider:                        provider,
 		stateIdStartedCounts:            make(map[string]int),
 		stateIdCurrentlyExecutingCounts: make(map[string]int),
 		totalCurrentlyExecutingCount:    0,
-		config:                          config,
+		configer:                        configer,
 		globalVersioner:                 NewGlobalVersioner(provider, ctx),
 		continueAsNewCounter:            continueAsNewCounter,
 	}
@@ -33,7 +33,7 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 
 func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
 	stateIdStartedCounts map[string]int, stateIdCurrentlyExecutingCounts map[string]int, totalCurrentlyExecutingCount int,
-	config iwfidl.WorkflowConfig, continueAsNewCounter *ContinueAsNewCounter,
+	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                             ctx,
@@ -41,7 +41,7 @@ func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
 		stateIdStartedCounts:            stateIdStartedCounts,
 		stateIdCurrentlyExecutingCounts: stateIdCurrentlyExecutingCounts,
 		totalCurrentlyExecutingCount:    totalCurrentlyExecutingCount,
-		config:                          config,
+		configer:                        configer,
 		globalVersioner:                 NewGlobalVersioner(provider, ctx),
 		continueAsNewCounter:            continueAsNewCounter,
 	}
@@ -103,7 +103,8 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
 	}
-	if e.config.GetDisableSystemSearchAttribute() {
+	config := e.configer.Get()
+	if config.GetDisableSystemSearchAttribute() {
 		return nil
 	}
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {

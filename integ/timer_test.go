@@ -82,7 +82,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 			Data: iwfidl.PtrString(strconv.Itoa(int(nowTimestamp))),
 		},
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

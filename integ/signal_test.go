@@ -37,6 +37,8 @@ func TestSignalWorkflowCadence(t *testing.T) {
 }
 
 func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+	assertions := assert.New(t)
+
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -62,10 +64,65 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           signal.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
+
+	// test update config
+	time.Sleep(time.Second)
+	var debugDump service.DebugDumpResponse
+	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
+	if err != nil {
+		panic(err)
+	}
+	expectedConfig := iwfidl.WorkflowConfig{}
+	if config != nil {
+		expectedConfig = *config
+	}
+	assertions.Equal(service.DebugDumpResponse{
+		Config: expectedConfig,
+	}, debugDump)
+
+	// update the disable system SA
+	reqUpdateConfig := apiClient.DefaultApi.ApiV1WorkflowConfigUpdatePost(context.Background())
+	httpResp, err = reqUpdateConfig.WorkflowConfigUpdateRequest(iwfidl.WorkflowConfigUpdateRequest{
+		WorkflowId: wfId,
+		WorkflowConfig: iwfidl.WorkflowConfig{
+			DisableSystemSearchAttribute: iwfidl.PtrBool(true),
+		},
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second)
+	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
+	if err != nil {
+		panic(err)
+	}
+	expectedConfig.DisableSystemSearchAttribute = iwfidl.PtrBool(true)
+	assertions.Equal(service.DebugDumpResponse{
+		Config: expectedConfig,
+	}, debugDump)
+
+	// update the pagination size
+	reqUpdateConfig = apiClient.DefaultApi.ApiV1WorkflowConfigUpdatePost(context.Background())
+	httpResp, err = reqUpdateConfig.WorkflowConfigUpdateRequest(iwfidl.WorkflowConfigUpdateRequest{
+		WorkflowId: wfId,
+		WorkflowConfig: iwfidl.WorkflowConfig{
+			ContinueAsNewPageSizeInBytes: iwfidl.PtrInt32(300),
+		},
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second)
+	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
+	if err != nil {
+		panic(err)
+	}
+	expectedConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(300)
+	assertions.Equal(service.DebugDumpResponse{
+		Config: expectedConfig,
+	}, debugDump)
 
 	// signal for testing unhandled signals
 	var unhandledSignalVals []*iwfidl.EncodedObject
@@ -111,7 +168,6 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	panicAtHttpError(err, httpResp)
 
 	history, data := wfHandler.GetTestResult()
-	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,
@@ -127,8 +183,8 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
 	}
 
-	var dump service.DumpAllInternalResponse
-	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DumpAllInternalQueryType)
+	var dump service.ContinueAsNewDumpResponse
+	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.ContinueAsNewDumpQueryType)
 	if err != nil {
 		panic(err)
 	}
