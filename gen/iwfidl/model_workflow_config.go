@@ -19,10 +19,9 @@ var _ MappedNullable = &WorkflowConfig{}
 
 // WorkflowConfig struct for WorkflowConfig
 type WorkflowConfig struct {
-	DisableSystemSearchAttribute                 *bool  `json:"disableSystemSearchAttribute,omitempty"`
-	ContinueAsNewThresholdExecutedStateExecution *int32 `json:"continueAsNewThresholdExecutedStateExecution,omitempty"`
-	ContinueAsNewThresholdSignalsReceived        *int32 `json:"continueAsNewThresholdSignalsReceived,omitempty"`
-	ContinueAsNewPageSizeInBytes                 *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
+	DisableSystemSearchAttribute *bool  `json:"disableSystemSearchAttribute,omitempty"`
+	ContinueAsNewThreshold       *int32 `json:"continueAsNewThreshold,omitempty"`
+	ContinueAsNewPageSizeInBytes *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -74,68 +73,36 @@ func (o *WorkflowConfig) SetDisableSystemSearchAttribute(v bool) {
 	o.DisableSystemSearchAttribute = &v
 }
 
-// GetContinueAsNewThresholdExecutedStateExecution returns the ContinueAsNewThresholdExecutedStateExecution field value if set, zero value otherwise.
-func (o *WorkflowConfig) GetContinueAsNewThresholdExecutedStateExecution() int32 {
-	if o == nil || IsNil(o.ContinueAsNewThresholdExecutedStateExecution) {
+// GetContinueAsNewThreshold returns the ContinueAsNewThreshold field value if set, zero value otherwise.
+func (o *WorkflowConfig) GetContinueAsNewThreshold() int32 {
+	if o == nil || IsNil(o.ContinueAsNewThreshold) {
 		var ret int32
 		return ret
 	}
-	return *o.ContinueAsNewThresholdExecutedStateExecution
+	return *o.ContinueAsNewThreshold
 }
 
-// GetContinueAsNewThresholdExecutedStateExecutionOk returns a tuple with the ContinueAsNewThresholdExecutedStateExecution field value if set, nil otherwise
+// GetContinueAsNewThresholdOk returns a tuple with the ContinueAsNewThreshold field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowConfig) GetContinueAsNewThresholdExecutedStateExecutionOk() (*int32, bool) {
-	if o == nil || IsNil(o.ContinueAsNewThresholdExecutedStateExecution) {
+func (o *WorkflowConfig) GetContinueAsNewThresholdOk() (*int32, bool) {
+	if o == nil || IsNil(o.ContinueAsNewThreshold) {
 		return nil, false
 	}
-	return o.ContinueAsNewThresholdExecutedStateExecution, true
+	return o.ContinueAsNewThreshold, true
 }
 
-// HasContinueAsNewThresholdExecutedStateExecution returns a boolean if a field has been set.
-func (o *WorkflowConfig) HasContinueAsNewThresholdExecutedStateExecution() bool {
-	if o != nil && !IsNil(o.ContinueAsNewThresholdExecutedStateExecution) {
+// HasContinueAsNewThreshold returns a boolean if a field has been set.
+func (o *WorkflowConfig) HasContinueAsNewThreshold() bool {
+	if o != nil && !IsNil(o.ContinueAsNewThreshold) {
 		return true
 	}
 
 	return false
 }
 
-// SetContinueAsNewThresholdExecutedStateExecution gets a reference to the given int32 and assigns it to the ContinueAsNewThresholdExecutedStateExecution field.
-func (o *WorkflowConfig) SetContinueAsNewThresholdExecutedStateExecution(v int32) {
-	o.ContinueAsNewThresholdExecutedStateExecution = &v
-}
-
-// GetContinueAsNewThresholdSignalsReceived returns the ContinueAsNewThresholdSignalsReceived field value if set, zero value otherwise.
-func (o *WorkflowConfig) GetContinueAsNewThresholdSignalsReceived() int32 {
-	if o == nil || IsNil(o.ContinueAsNewThresholdSignalsReceived) {
-		var ret int32
-		return ret
-	}
-	return *o.ContinueAsNewThresholdSignalsReceived
-}
-
-// GetContinueAsNewThresholdSignalsReceivedOk returns a tuple with the ContinueAsNewThresholdSignalsReceived field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowConfig) GetContinueAsNewThresholdSignalsReceivedOk() (*int32, bool) {
-	if o == nil || IsNil(o.ContinueAsNewThresholdSignalsReceived) {
-		return nil, false
-	}
-	return o.ContinueAsNewThresholdSignalsReceived, true
-}
-
-// HasContinueAsNewThresholdSignalsReceived returns a boolean if a field has been set.
-func (o *WorkflowConfig) HasContinueAsNewThresholdSignalsReceived() bool {
-	if o != nil && !IsNil(o.ContinueAsNewThresholdSignalsReceived) {
-		return true
-	}
-
-	return false
-}
-
-// SetContinueAsNewThresholdSignalsReceived gets a reference to the given int32 and assigns it to the ContinueAsNewThresholdSignalsReceived field.
-func (o *WorkflowConfig) SetContinueAsNewThresholdSignalsReceived(v int32) {
-	o.ContinueAsNewThresholdSignalsReceived = &v
+// SetContinueAsNewThreshold gets a reference to the given int32 and assigns it to the ContinueAsNewThreshold field.
+func (o *WorkflowConfig) SetContinueAsNewThreshold(v int32) {
+	o.ContinueAsNewThreshold = &v
 }
 
 // GetContinueAsNewPageSizeInBytes returns the ContinueAsNewPageSizeInBytes field value if set, zero value otherwise.
@@ -183,11 +150,8 @@ func (o WorkflowConfig) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DisableSystemSearchAttribute) {
 		toSerialize["disableSystemSearchAttribute"] = o.DisableSystemSearchAttribute
 	}
-	if !IsNil(o.ContinueAsNewThresholdExecutedStateExecution) {
-		toSerialize["continueAsNewThresholdExecutedStateExecution"] = o.ContinueAsNewThresholdExecutedStateExecution
-	}
-	if !IsNil(o.ContinueAsNewThresholdSignalsReceived) {
-		toSerialize["continueAsNewThresholdSignalsReceived"] = o.ContinueAsNewThresholdSignalsReceived
+	if !IsNil(o.ContinueAsNewThreshold) {
+		toSerialize["continueAsNewThreshold"] = o.ContinueAsNewThreshold
 	}
 	if !IsNil(o.ContinueAsNewPageSizeInBytes) {
 		toSerialize["continueAsNewPageSizeInBytes"] = o.ContinueAsNewPageSizeInBytes

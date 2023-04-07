@@ -19,11 +19,11 @@ var _ MappedNullable = &WorkflowStartOptions{}
 
 // WorkflowStartOptions struct for WorkflowStartOptions
 type WorkflowStartOptions struct {
-	WorkflowIDReusePolicy *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
-	CronSchedule          *string                `json:"cronSchedule,omitempty"`
-	RetryPolicy           *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
-	SearchAttributes      []SearchAttribute      `json:"searchAttributes,omitempty"`
-	Config                *WorkflowConfig        `json:"config,omitempty"`
+	WorkflowIDReusePolicy  *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
+	CronSchedule           *string                `json:"cronSchedule,omitempty"`
+	RetryPolicy            *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
+	SearchAttributes       []SearchAttribute      `json:"searchAttributes,omitempty"`
+	WorkflowConfigOverride *WorkflowConfig        `json:"workflowConfigOverride,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -171,36 +171,36 @@ func (o *WorkflowStartOptions) SetSearchAttributes(v []SearchAttribute) {
 	o.SearchAttributes = v
 }
 
-// GetConfig returns the Config field value if set, zero value otherwise.
-func (o *WorkflowStartOptions) GetConfig() WorkflowConfig {
-	if o == nil || IsNil(o.Config) {
+// GetWorkflowConfigOverride returns the WorkflowConfigOverride field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetWorkflowConfigOverride() WorkflowConfig {
+	if o == nil || IsNil(o.WorkflowConfigOverride) {
 		var ret WorkflowConfig
 		return ret
 	}
-	return *o.Config
+	return *o.WorkflowConfigOverride
 }
 
-// GetConfigOk returns a tuple with the Config field value if set, nil otherwise
+// GetWorkflowConfigOverrideOk returns a tuple with the WorkflowConfigOverride field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowStartOptions) GetConfigOk() (*WorkflowConfig, bool) {
-	if o == nil || IsNil(o.Config) {
+func (o *WorkflowStartOptions) GetWorkflowConfigOverrideOk() (*WorkflowConfig, bool) {
+	if o == nil || IsNil(o.WorkflowConfigOverride) {
 		return nil, false
 	}
-	return o.Config, true
+	return o.WorkflowConfigOverride, true
 }
 
-// HasConfig returns a boolean if a field has been set.
-func (o *WorkflowStartOptions) HasConfig() bool {
-	if o != nil && !IsNil(o.Config) {
+// HasWorkflowConfigOverride returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasWorkflowConfigOverride() bool {
+	if o != nil && !IsNil(o.WorkflowConfigOverride) {
 		return true
 	}
 
 	return false
 }
 
-// SetConfig gets a reference to the given WorkflowConfig and assigns it to the Config field.
-func (o *WorkflowStartOptions) SetConfig(v WorkflowConfig) {
-	o.Config = &v
+// SetWorkflowConfigOverride gets a reference to the given WorkflowConfig and assigns it to the WorkflowConfigOverride field.
+func (o *WorkflowStartOptions) SetWorkflowConfigOverride(v WorkflowConfig) {
+	o.WorkflowConfigOverride = &v
 }
 
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
@@ -225,8 +225,8 @@ func (o WorkflowStartOptions) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
-	if !IsNil(o.Config) {
-		toSerialize["config"] = o.Config
+	if !IsNil(o.WorkflowConfigOverride) {
+		toSerialize["workflowConfigOverride"] = o.WorkflowConfigOverride
 	}
 	return toSerialize, nil
 }

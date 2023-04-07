@@ -4,6 +4,7 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**ApiV1WorkflowConfigUpdatePost**](DefaultApi.md#ApiV1WorkflowConfigUpdatePost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
 [**ApiV1WorkflowDataobjectsGetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsGetPost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 [**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
@@ -18,6 +19,68 @@ Method | HTTP request | Description
 [**ApiV1WorkflowStopPost**](DefaultApi.md#ApiV1WorkflowStopPost) | **Post** /api/v1/workflow/stop | stop a workflow
 [**ApiV1WorkflowTimerSkipPost**](DefaultApi.md#ApiV1WorkflowTimerSkipPost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
 
+
+
+## ApiV1WorkflowConfigUpdatePost
+
+> ApiV1WorkflowConfigUpdatePost(ctx).WorkflowConfigUpdateRequest(workflowConfigUpdateRequest).Execute()
+
+update the config of a workflow
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    workflowConfigUpdateRequest := *openapiclient.NewWorkflowConfigUpdateRequest("WorkflowId_example", *openapiclient.NewWorkflowConfig()) // WorkflowConfigUpdateRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    r, err := apiClient.DefaultApi.ApiV1WorkflowConfigUpdatePost(context.Background()).WorkflowConfigUpdateRequest(workflowConfigUpdateRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowConfigUpdatePost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowConfigUpdatePostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowConfigUpdateRequest** | [**WorkflowConfigUpdateRequest**](WorkflowConfigUpdateRequest.md) |  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## ApiV1WorkflowDataobjectsGetPost
