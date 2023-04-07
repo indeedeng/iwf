@@ -169,7 +169,7 @@ func getDecisionEventIDByStateOrStateExecutionId(
 			}
 			if e.GetEventType() == shared.EventTypeActivityTaskScheduled {
 				typeName := e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName()
-				if strings.Contains(typeName, "StateStart") {
+				if strings.Contains(typeName, "StateStart") || strings.Contains(typeName, "StateApiWaitUntil") {
 					var backendType service.BackendType
 					var input service.StateStartActivityInput
 					err = converter.FromData(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)
