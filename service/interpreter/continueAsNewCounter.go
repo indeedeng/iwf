@@ -1,23 +1,17 @@
 package interpreter
 
-import (
-	"github.com/indeedeng/iwf/gen/iwfidl"
-)
-
 type ContinueAsNewCounter struct {
-	executedStateExecution          int32
-	signalsReceived                 int32
-	executedStateExecutionThreshold int32
-	signalsReceivedThreshold        int32
+	executedStateExecution int32
+	signalsReceived        int32
 
+	configer *WorkflowConfiger
 	rootCtx  UnifiedContext
 	provider WorkflowProvider
 }
 
-func NewContinueAsCounter(config iwfidl.WorkflowConfig, rootCtx UnifiedContext, provider WorkflowProvider) *ContinueAsNewCounter {
+func NewContinueAsCounter(configer *WorkflowConfiger, rootCtx UnifiedContext, provider WorkflowProvider) *ContinueAsNewCounter {
 	return &ContinueAsNewCounter{
-		executedStateExecutionThreshold: config.GetContinueAsNewThresholdExecutedStateExecution(),
-		signalsReceivedThreshold:        config.GetContinueAsNewThresholdSignalsReceived(),
+		configer: configer,
 
 		rootCtx:  rootCtx,
 		provider: provider,
@@ -34,8 +28,11 @@ func (c *ContinueAsNewCounter) IncSignalsReceived() {
 func (c *ContinueAsNewCounter) IsThresholdMet() bool {
 	// Note: when threshold == 0, it means unlimited
 
-	isMet := (c.executedStateExecutionThreshold > 0 && c.executedStateExecution >= c.executedStateExecutionThreshold) ||
-		(c.signalsReceivedThreshold > 0 && c.signalsReceived >= c.signalsReceivedThreshold)
+	config := c.configer.Get()
+	if config.GetContinueAsNewThreshold() == 0 {
+		return false
+	}
+	totalOperations := c.signalsReceived + c.executedStateExecution*2
 
-	return isMet
+	return totalOperations >= config.GetContinueAsNewThreshold()
 }

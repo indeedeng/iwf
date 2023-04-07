@@ -68,7 +68,7 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType, config *i
 			},
 		},
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

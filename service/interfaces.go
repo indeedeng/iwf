@@ -22,19 +22,23 @@ type (
 
 		// IsResumeFromContinueAsNew indicate this is input for continueAsNew
 		// when true, will ignore StartStateId, StateInput, StateOptions, InitSearchAttributes
-		// and use ContinueAsNewInput
 		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew"`
 
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
 	}
 
 	ContinueAsNewInput struct {
-		IwfWorkflowExecution  IwfWorkflowExecution `json:"iwfWorkflowExecution"`
-		PreviousInternalRunId string               `json:"previousInternalRunId"` // for loading from previous run
+		PreviousInternalRunId string `json:"previousInternalRunId"` // for loading from previous run
 	}
 
 	InterpreterWorkflowOutput struct {
 		StateCompletionOutputs []iwfidl.StateCompletionOutput `json:"stateCompletionOutputs,omitempty"`
+	}
+
+	BasicInfo struct {
+		IwfWorkflowType string `json:"iwfWorkflowType,omitempty"`
+
+		IwfWorkerUrl string `json:"iwfWorkerUrl,omitempty"`
 	}
 
 	StateStartActivityInput struct {
@@ -45,14 +49,6 @@ type (
 	StateDecideActivityInput struct {
 		IwfWorkerUrl string
 		Request      iwfidl.WorkflowStateDecideRequest
-	}
-
-	IwfWorkflowExecution struct {
-		IwfWorkerUrl     string
-		WorkflowType     string
-		WorkflowId       string
-		RunId            string // this is the first runId including reset & continueAsNew
-		StartedTimestamp int64
 	}
 
 	GetDataObjectsQueryRequest struct {

@@ -64,7 +64,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           anycommandconbination.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

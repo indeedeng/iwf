@@ -102,7 +102,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 			SearchAttributes: []iwfidl.SearchAttribute{
 				expectedDatetimeSearchAttribute,
 			},
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()

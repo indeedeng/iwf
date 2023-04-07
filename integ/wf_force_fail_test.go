@@ -62,7 +62,7 @@ func doTestWorkflowForceFail(t *testing.T, backendType service.BackendType, conf
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           wf_force_fail.State1,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			Config: config,
+			WorkflowConfigOverride: config,
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

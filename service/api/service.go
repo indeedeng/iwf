@@ -64,8 +64,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		}
 		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
 		initSAs = startOptions.SearchAttributes
-		if startOptions.HasConfig() {
-			workflowConfig = startOptions.GetConfig()
+		if startOptions.HasWorkflowConfigOverride() {
+			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
 	}
 
@@ -123,7 +123,7 @@ func (s *serviceImpl) ApiV1WorkflowStopPost(ctx context.Context, req iwfidl.Work
 			return s.handleError(err)
 		}
 	case iwfidl.FAIL:
-		err := s.client.SignalWorkflow(ctx, wfId, runId, service.FailWorkflowSignalChanncelName, service.FailWorkflowSignalRequest{Reason: req.GetReason()})
+		err := s.client.SignalWorkflow(ctx, wfId, runId, service.FailWorkflowSignalChannelName, service.FailWorkflowSignalRequest{Reason: req.GetReason()})
 		if err != nil {
 			return s.handleError(err)
 		}
