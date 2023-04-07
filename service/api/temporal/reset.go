@@ -163,7 +163,7 @@ func getDecisionEventIDByStateOrStateExecutionId(
 			}
 			if e.GetEventType() == enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED {
 				typeName := e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName()
-				if strings.Contains(typeName, "StateStart") {
+				if strings.Contains(typeName, "StateStart") || strings.Contains(typeName, "StateApiWaitUntil") {
 					var backendType service.BackendType
 					var input service.StateStartActivityInput
 					err = converter.FromPayloads(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)
