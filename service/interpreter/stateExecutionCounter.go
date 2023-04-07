@@ -121,6 +121,10 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 
 // ClearExecutingStateIdsSearchAttributeFinally should only be called at the end of workflow
 func (e *StateExecutionCounter) ClearExecutingStateIdsSearchAttributeFinally() {
+	config := e.configer.Get()
+	if config.GetDisableSystemSearchAttribute() {
+		return
+	}
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && e.totalCurrentlyExecutingCount == 0 {
 		err := e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 			service.SearchAttributeExecutingStateIds: []string{},
