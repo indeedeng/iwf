@@ -46,7 +46,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var outputCollector *OutputCollector
 	var continueAsNewer *ContinueAsNewer
 	if input.IsResumeFromContinueAsNew {
-		previous, err := LoadInternalsFromPreviousRun(ctx, provider, input)
+		canInput := input.ContinueAsNewInput
+		config := workflowConfiger.Get()
+		previous, err := LoadInternalsFromPreviousRun(ctx, provider, canInput.PreviousInternalRunId, config.GetContinueAsNewPageSizeInBytes())
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +64,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
-			input.Config, continueAsNewCounter)
+			workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(previous.StateOutputs)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
@@ -77,7 +79,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
-		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, input.Config, continueAsNewCounter)
+		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}

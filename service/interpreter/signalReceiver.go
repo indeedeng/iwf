@@ -102,7 +102,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 		}
 	})
 
-	provider.GoNamed(ctx, "merged-signal-receiver-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "user-signal-receiver-handler", func(ctx UnifiedContext) {
 		for {
 			var toProcess []string
 			err := provider.Await(ctx, func() bool {
