@@ -24,6 +24,11 @@ func TestBasicWorkflowTemporal(t *testing.T) {
 
 		doTestBasicWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
+
+		doTestBasicWorkflow(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
+			DisableSystemSearchAttribute: iwfidl.PtrBool(true),
+		})
+		smallWaitForFastTest()
 	}
 }
 
