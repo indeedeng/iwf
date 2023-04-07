@@ -324,6 +324,14 @@ func executeState(
 	continueAsNewer *ContinueAsNewer,
 	continueAsNewCounter *ContinueAsNewCounter,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
+	globalVersioner := NewGlobalVersioner(provider, ctx)
+	waitUntilApi := StateStart
+	executeApi := StateDecide
+	if globalVersioner.IsAfterVersionOfRenamedStateApi() {
+		waitUntilApi = StateApiWaitUntil
+		executeApi = StateApiExecute
+	}
+
 	info := provider.GetWorkflowInfo(ctx)
 	executionContext := iwfidl.Context{
 		WorkflowId:               info.WorkflowExecution.ID,
@@ -369,7 +377,7 @@ func executeState(
 
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
-		errStartApi = provider.ExecuteActivity(ctx, StateApiWaitUntil, provider.GetBackendType(), service.StateStartActivityInput{
+		errStartApi = provider.ExecuteActivity(ctx, waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
 			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 			Request: iwfidl.WorkflowStateStartRequest{
 				Context:          executionContext,
@@ -576,7 +584,7 @@ func executeState(
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = provider.ExecuteActivity(ctx, StateApiExecute, provider.GetBackendType(), service.StateDecideActivityInput{
+	err = provider.ExecuteActivity(ctx, executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:          executionContext,

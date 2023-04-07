@@ -15,6 +15,7 @@ var jsonHistoryFiles = []string{
 	"v2-basic-disable-system-searchattributes.json",
 	"v2-any-timer-signal-continue-as-new.json",
 	"v2-any-timer-signal.json",
+	"v3-basic.json",
 }
 
 func TestTemporalReplay(t *testing.T) {
