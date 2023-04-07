@@ -369,7 +369,7 @@ func executeState(
 
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
-		errStartApi = provider.ExecuteActivity(ctx, StateStart, provider.GetBackendType(), service.StateStartActivityInput{
+		errStartApi = provider.ExecuteActivity(ctx, StateApiWaitUntil, provider.GetBackendType(), service.StateStartActivityInput{
 			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 			Request: iwfidl.WorkflowStateStartRequest{
 				Context:          executionContext,
@@ -576,7 +576,7 @@ func executeState(
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = provider.ExecuteActivity(ctx, StateDecide, provider.GetBackendType(), service.StateDecideActivityInput{
+	err = provider.ExecuteActivity(ctx, StateApiExecute, provider.GetBackendType(), service.StateDecideActivityInput{
 		IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 		Request: iwfidl.WorkflowStateDecideRequest{
 			Context:          executionContext,

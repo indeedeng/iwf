@@ -44,8 +44,10 @@ func (iw *InterpreterWorker) Start() {
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
-	iw.worker.RegisterActivity(interpreter.StateStart)
-	iw.worker.RegisterActivity(interpreter.StateDecide)
+	iw.worker.RegisterActivity(interpreter.StateStart)  // TODO: remove in next release
+	iw.worker.RegisterActivity(interpreter.StateDecide) // TODO: remove in next release
+	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)
+	iw.worker.RegisterActivity(interpreter.StateApiExecute)
 	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
 
 	err := iw.worker.Start()

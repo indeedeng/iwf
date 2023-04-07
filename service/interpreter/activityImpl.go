@@ -12,7 +12,12 @@ import (
 	"strings"
 )
 
+// StateStart is Deprecated, will be removed in next release
 func StateStart(ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
+	return StateApiWaitUntil(ctx, backendType, input)
+}
+
+func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateStartActivity", "input", input)
@@ -44,7 +49,12 @@ func StateStart(ctx context.Context, backendType service.BackendType, input serv
 	return resp, nil
 }
 
+// StateDecide is deprecated. Will be removed in next release
 func StateDecide(ctx context.Context, backendType service.BackendType, input service.StateDecideActivityInput) (*iwfidl.WorkflowStateDecideResponse, error) {
+	return StateApiExecute(ctx, backendType, input)
+}
+
+func StateApiExecute(ctx context.Context, backendType service.BackendType, input service.StateDecideActivityInput) (*iwfidl.WorkflowStateDecideResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)
