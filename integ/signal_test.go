@@ -93,11 +93,33 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second)
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		panic(err)
 	}
 	expectedConfig.DisableSystemSearchAttribute = iwfidl.PtrBool(true)
+	assertions.Equal(service.DebugDumpResponse{
+		Config: expectedConfig,
+	}, debugDump)
+
+	// update the pagination size
+	reqUpdateConfig = apiClient.DefaultApi.ApiV1WorkflowConfigUpdatePost(context.Background())
+	httpResp, err = reqUpdateConfig.WorkflowConfigUpdateRequest(iwfidl.WorkflowConfigUpdateRequest{
+		WorkflowId: wfId,
+		WorkflowConfig: iwfidl.WorkflowConfig{
+			ContinueAsNewPageSizeInBytes: iwfidl.PtrInt32(300),
+		},
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second)
+	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
+	if err != nil {
+		panic(err)
+	}
+	expectedConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(300)
 	assertions.Equal(service.DebugDumpResponse{
 		Config: expectedConfig,
 	}, debugDump)
