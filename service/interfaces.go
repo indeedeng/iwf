@@ -81,7 +81,7 @@ type (
 
 	InternalTimerStatus string
 
-	DumpAllInternalResponse struct {
+	ContinueAsNewDumpResponse struct {
 		StatesToStartFromBeginning []iwfidl.StateMovement              // StatesToStartFromBeginning means they haven't started in the previous run
 		StateExecutionsToResume    map[string]StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
 		InterStateChannelReceived  map[string][]*iwfidl.EncodedObject

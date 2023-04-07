@@ -127,8 +127,8 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
 	}
 
-	var dump service.DumpAllInternalResponse
-	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DumpAllInternalQueryType)
+	var dump service.ContinueAsNewDumpResponse
+	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.ContinueAsNewDumpQueryType)
 	if err != nil {
 		panic(err)
 	}

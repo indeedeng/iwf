@@ -335,9 +335,9 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(ctx context.Context, request iw
 }
 
 func (s *serviceImpl) ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
-	var internals service.DumpAllInternalResponse
+	var internals service.ContinueAsNewDumpResponse
 
-	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.DumpAllInternalQueryType)
+	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.ContinueAsNewDumpQueryType)
 	if err != nil {
 		return nil, s.handleError(err)
 	}

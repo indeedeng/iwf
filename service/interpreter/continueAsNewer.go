@@ -42,7 +42,7 @@ func NewContinueAsNewer(
 	}
 }
 
-func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, previousRunId string, continueAsNewPageSizeInBytes int32) (*service.DumpAllInternalResponse, error) {
+func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, previousRunId string, continueAsNewPageSizeInBytes int32) (*service.ContinueAsNewDumpResponse, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 5 * time.Second,
 		RetryPolicy: &iwfidl.RetryPolicy{
@@ -96,7 +96,7 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 		}
 	}
 
-	var resp service.DumpAllInternalResponse
+	var resp service.ContinueAsNewDumpResponse
 	err := json.Unmarshal([]byte(sb.String()), &resp)
 	if err != nil {
 		return nil, err
@@ -105,23 +105,19 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 	return &resp, nil
 }
 
-func (c *ContinueAsNewer) createDumpAllInternalResponse() *service.DumpAllInternalResponse {
-	return &service.DumpAllInternalResponse{
-		InterStateChannelReceived:  c.interStateChannel.ReadReceived(nil),
-		SignalsReceived:            c.signalReceiver.DumpReceived(nil),
-		StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
-		DataObjects:                c.persistenceManager.GetAllDataObjects(),
-		SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
-		StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
-		StateExecutionsToResume:    c.StateExecutionToResumeMap,
-		StateOutputs:               c.outputCollector.GetAll(),
-		StaleSkipTimerSignals:      c.timerProcessor.Dump(),
-	}
-}
-
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
-	return c.provider.SetQueryHandler(ctx, service.DumpAllInternalQueryType, func() (*service.DumpAllInternalResponse, error) {
-		return c.createDumpAllInternalResponse(), nil
+	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryType, func() (*service.ContinueAsNewDumpResponse, error) {
+		return &service.ContinueAsNewDumpResponse{
+			InterStateChannelReceived:  c.interStateChannel.ReadReceived(nil),
+			SignalsReceived:            c.signalReceiver.DumpReceived(nil),
+			StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
+			DataObjects:                c.persistenceManager.GetAllDataObjects(),
+			SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
+			StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
+			StateExecutionsToResume:    c.StateExecutionToResumeMap,
+			StateOutputs:               c.outputCollector.GetAll(),
+			StaleSkipTimerSignals:      c.timerProcessor.Dump(),
+		}, nil
 	})
 }
 
