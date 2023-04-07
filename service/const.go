@@ -17,6 +17,7 @@ const (
 	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"
 	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
 	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
+	DebugDumpQueryType                   = "DebugNewDump"
 
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"

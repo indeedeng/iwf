@@ -94,6 +94,10 @@ type (
 		SearchAttributes []iwfidl.SearchAttribute
 	}
 
+	DebugDumpResponse struct {
+		Config iwfidl.WorkflowConfig
+	}
+
 	StateExecutionCounterInfo struct {
 		StateIdStartedCount            map[string]int // for stateExecutionId
 		StateIdCurrentlyExecutingCount map[string]int // for sys search attribute ExecutingStateIds
