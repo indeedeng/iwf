@@ -11,3 +11,5 @@ interpreter:
     prometheus:
       listenAddress: 0.0.0.0:8890
       timerType: histogram
+  defaultWorkflowConfig:
+    continueAsNewThreshold: 100
