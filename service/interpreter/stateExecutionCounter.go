@@ -90,7 +90,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 	options := state.GetStateOptions()
 	skipStart := options.GetSkipStartApi()
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
-	
+
 	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {
 		delete(e.stateIdCurrentlyExecutingCounts, state.StateId)
 		return e.updateStateIdSearchAttribute()
