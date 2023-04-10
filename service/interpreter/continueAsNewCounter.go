@@ -1,8 +1,8 @@
 package interpreter
 
 type ContinueAsNewCounter struct {
-	executedStateExecution int32
-	signalsReceived        int32
+	executedStateApis int32
+	signalsReceived   int32
 
 	configer *WorkflowConfiger
 	rootCtx  UnifiedContext
@@ -18,8 +18,12 @@ func NewContinueAsCounter(configer *WorkflowConfiger, rootCtx UnifiedContext, pr
 	}
 }
 
-func (c *ContinueAsNewCounter) IncExecutedStateExecution() {
-	c.executedStateExecution++
+func (c *ContinueAsNewCounter) IncExecutedStateExecution(skipStart bool) {
+	if skipStart {
+		c.executedStateApis++
+	} else {
+		c.executedStateApis += 2
+	}
 }
 func (c *ContinueAsNewCounter) IncSignalsReceived() {
 	c.signalsReceived++
@@ -32,7 +36,7 @@ func (c *ContinueAsNewCounter) IsThresholdMet() bool {
 	if config.GetContinueAsNewThreshold() == 0 {
 		return false
 	}
-	totalOperations := c.signalsReceived + c.executedStateExecution*2
+	totalOperations := c.signalsReceived + c.executedStateApis
 
 	return totalOperations >= config.GetContinueAsNewThreshold()
 }
