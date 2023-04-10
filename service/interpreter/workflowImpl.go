@@ -343,7 +343,6 @@ func executeState(
 		StartToCloseTimeout: 30 * time.Second,
 	}
 
-	var err error
 	var errStartApi error
 	var startResponse *iwfidl.WorkflowStateStartResponse
 	var stateExecutionLocal []iwfidl.KeyValue
@@ -359,6 +358,13 @@ func executeState(
 		state = stateReq.GetStateResumeRequest().State
 	} else {
 		state = stateReq.GetStateStartRequest()
+	}
+
+	options := state.GetStateOptions()
+	skipStart := options.GetSkipStartApi()
+	if skipStart {
+		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
+			nil, continueAsNewer, executeApi, stateExecutionLocal)
 	}
 
 	if isResumeFromContinueAsNew {
@@ -572,7 +578,25 @@ func executeState(
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
-	activityOptions = ActivityOptions{
+	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
+		commandRes, continueAsNewer, executeApi, stateExecutionLocal)
+}
+func executeStateDecide(
+	ctx UnifiedContext,
+	provider WorkflowProvider,
+	basicInfo service.BasicInfo,
+	state iwfidl.StateMovement,
+	stateExeId string,
+	persistenceManager *PersistenceManager,
+	interStateChannel *InterStateChannel,
+	executionContext iwfidl.Context,
+	commandRes *iwfidl.CommandResults,
+	continueAsNewer *ContinueAsNewer,
+	executeApi interface{},
+	stateExecutionLocal []iwfidl.KeyValue,
+) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
+	var err error
+	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
 	}
 	if state.StateOptions != nil {
