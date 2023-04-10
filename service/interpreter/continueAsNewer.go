@@ -181,7 +181,7 @@ func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
 		return false
 	}
 
-	elapsed := time.Now().Sub(initTime)
+	elapsed := time.Since(initTime)
 
 	if elapsed >= errThreshold {
 		c.provider.GetLogger(ctx).Warn("continueAsNew is VERY LIKELY stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
