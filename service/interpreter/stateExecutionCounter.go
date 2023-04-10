@@ -86,7 +86,11 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
 	e.stateIdCurrentlyExecutingCounts[state.StateId]--
 	e.totalCurrentlyExecutingCount--
-	e.continueAsNewCounter.IncExecutedStateExecution()
+
+	options := state.GetStateOptions()
+	skipStart := options.GetSkipStartApi()
+	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
+	
 	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {
 		delete(e.stateIdCurrentlyExecutingCounts, state.StateId)
 		return e.updateStateIdSearchAttribute()
