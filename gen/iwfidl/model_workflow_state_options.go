@@ -27,6 +27,7 @@ type WorkflowStateOptions struct {
 	StartApiRetryPolicy           *RetryPolicy              `json:"startApiRetryPolicy,omitempty"`
 	DecideApiRetryPolicy          *RetryPolicy              `json:"decideApiRetryPolicy,omitempty"`
 	StartApiFailurePolicy         *StartApiFailurePolicy    `json:"startApiFailurePolicy,omitempty"`
+	SkipStartApi                  *bool                     `json:"skipStartApi,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -302,6 +303,38 @@ func (o *WorkflowStateOptions) SetStartApiFailurePolicy(v StartApiFailurePolicy)
 	o.StartApiFailurePolicy = &v
 }
 
+// GetSkipStartApi returns the SkipStartApi field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetSkipStartApi() bool {
+	if o == nil || IsNil(o.SkipStartApi) {
+		var ret bool
+		return ret
+	}
+	return *o.SkipStartApi
+}
+
+// GetSkipStartApiOk returns a tuple with the SkipStartApi field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetSkipStartApiOk() (*bool, bool) {
+	if o == nil || IsNil(o.SkipStartApi) {
+		return nil, false
+	}
+	return o.SkipStartApi, true
+}
+
+// HasSkipStartApi returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasSkipStartApi() bool {
+	if o != nil && !IsNil(o.SkipStartApi) {
+		return true
+	}
+
+	return false
+}
+
+// SetSkipStartApi gets a reference to the given bool and assigns it to the SkipStartApi field.
+func (o *WorkflowStateOptions) SetSkipStartApi(v bool) {
+	o.SkipStartApi = &v
+}
+
 func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -335,6 +368,9 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.StartApiFailurePolicy) {
 		toSerialize["startApiFailurePolicy"] = o.StartApiFailurePolicy
+	}
+	if !IsNil(o.SkipStartApi) {
+		toSerialize["skipStartApi"] = o.SkipStartApi
 	}
 	return toSerialize, nil
 }

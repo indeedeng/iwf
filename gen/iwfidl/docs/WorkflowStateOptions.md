@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **StartApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 **DecideApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 **StartApiFailurePolicy** | Pointer to [**StartApiFailurePolicy**](StartApiFailurePolicy.md) |  | [optional] 
+**SkipStartApi** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -231,6 +232,31 @@ SetStartApiFailurePolicy sets StartApiFailurePolicy field to given value.
 `func (o *WorkflowStateOptions) HasStartApiFailurePolicy() bool`
 
 HasStartApiFailurePolicy returns a boolean if a field has been set.
+
+### GetSkipStartApi
+
+`func (o *WorkflowStateOptions) GetSkipStartApi() bool`
+
+GetSkipStartApi returns the SkipStartApi field if non-nil, zero value otherwise.
+
+### GetSkipStartApiOk
+
+`func (o *WorkflowStateOptions) GetSkipStartApiOk() (*bool, bool)`
+
+GetSkipStartApiOk returns a tuple with the SkipStartApi field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSkipStartApi
+
+`func (o *WorkflowStateOptions) SetSkipStartApi(v bool)`
+
+SetSkipStartApi sets SkipStartApi field to given value.
+
+### HasSkipStartApi
+
+`func (o *WorkflowStateOptions) HasSkipStartApi() bool`
+
+HasSkipStartApi returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
