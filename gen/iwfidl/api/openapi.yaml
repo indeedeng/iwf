@@ -437,6 +437,7 @@ components:
           - partialLoadingKeys
           - partialLoadingKeys
           persistenceLoadingType: null
+        skipStartApi: true
         startApiFailurePolicy: null
       properties:
         searchAttributesLoadingPolicy:
@@ -455,6 +456,8 @@ components:
           $ref: '#/components/schemas/RetryPolicy'
         startApiFailurePolicy:
           $ref: '#/components/schemas/StartApiFailurePolicy'
+        skipStartApi:
+          type: boolean
       type: object
     WorkflowStartOptions:
       example:
@@ -583,6 +586,7 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          skipStartApi: true
           startApiFailurePolicy: null
         iwfWorkflowType: iwfWorkflowType
         workflowStartOptions:
@@ -1385,6 +1389,7 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              skipStartApi: true
               startApiFailurePolicy: null
             stateInput:
               data: data
@@ -1417,6 +1422,7 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              skipStartApi: true
               startApiFailurePolicy: null
             stateInput:
               data: data
@@ -1503,6 +1509,7 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            skipStartApi: true
             startApiFailurePolicy: null
           stateInput:
             data: data
@@ -1535,6 +1542,7 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            skipStartApi: true
             startApiFailurePolicy: null
           stateInput:
             data: data
@@ -1575,6 +1583,7 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          skipStartApi: true
           startApiFailurePolicy: null
         stateInput:
           data: data

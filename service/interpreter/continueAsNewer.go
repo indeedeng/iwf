@@ -162,10 +162,10 @@ func (c *ContinueAsNewer) DrainThreads(ctx UnifiedContext) error {
 // the key is runId, the value is how many times it has been called in this worker
 // Using this in memory counter sot hat we don't have to use AwaitWithTimeout which will consume a timer
 // TODO add TTL support because we don't have to keep the value in memory forever(likely a few hours or a day is enough)
-var inMemoryContinueAsNewMonitor = make(map[string]int)
+var inMemoryContinueAsNewMonitor = make(map[string]time.Time)
 
-const warnThreshold = 2
-const errThreshold = 4
+const warnThreshold = time.Second * 5
+const errThreshold = time.Second * 15
 
 func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
 	remainingThreadCount := c.provider.GetThreadCount()
@@ -175,13 +175,19 @@ func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
 
 	// TODO using a flag to control this debugging info
 	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
-	inMemoryContinueAsNewMonitor[runId]++
+	initTime, ok := inMemoryContinueAsNewMonitor[runId]
+	if !ok {
+		inMemoryContinueAsNewMonitor[runId] = time.Now()
+		return false
+	}
 
-	if inMemoryContinueAsNewMonitor[runId] >= errThreshold {
+	elapsed := time.Since(initTime)
+
+	if elapsed >= errThreshold {
 		c.provider.GetLogger(ctx).Warn("continueAsNew is VERY LIKELY stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
 		return false
 	}
-	if inMemoryContinueAsNewMonitor[runId] >= warnThreshold {
+	if elapsed >= warnThreshold {
 		c.provider.GetLogger(ctx).Warn("continueAsNew may be stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
 	}
 	return false
