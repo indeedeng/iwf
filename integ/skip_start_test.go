@@ -85,6 +85,9 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			SkipStartApi: iwfidl.PtrBool(true),
 		},
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			WorkflowConfigOverride: config,
+		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	panicAtHttpError(err, httpResp)

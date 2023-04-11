@@ -117,10 +117,13 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 	for !stateRequestQueue.IsEmpty() {
 
-		statesToExecute := stateRequestQueue.TakeAll()
-		err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
-		if err != nil {
-			return nil, err
+		var statesToExecute []StateRequest
+		if !continueAsNewCounter.IsThresholdMet() {
+			statesToExecute = stateRequestQueue.TakeAll()
+			err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		for _, stateReqForLoopingOnly := range statesToExecute {
