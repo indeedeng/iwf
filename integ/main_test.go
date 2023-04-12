@@ -42,6 +42,7 @@ func TestMain(m *testing.M) {
 		}
 		temporalClient.Close()
 		fmt.Println("connected to Temporal namespace")
+		time.Sleep(time.Second * 1)
 	}
 
 	if *cadenceIntegTest {
