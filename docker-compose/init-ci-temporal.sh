@@ -11,6 +11,7 @@ for run in {1..60}; do
   fi
 done
 
+# see https://github.com/temporalio/temporal/issues/4160
 sleep 0.1
 tctl search-attribute  create -name IwfWorkflowType -type Keyword -y
 sleep 0.1
