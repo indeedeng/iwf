@@ -56,7 +56,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})
 			return
@@ -64,7 +64,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State21 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
 							CommandId:   "cmd-1",
@@ -78,7 +78,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State31 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
 							CommandId:   "cmd-2",
@@ -94,7 +94,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 
 				PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{

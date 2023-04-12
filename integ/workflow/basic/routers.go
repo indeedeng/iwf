@@ -44,7 +44,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})
 			return

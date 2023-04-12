@@ -95,7 +95,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					CommandRequest: &iwfidl.CommandRequest{
 						SignalCommands:     validSignalCommands,
 						TimerCommands:      validTimerCommands,
-						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED,
+						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED.Ptr(),
 						CommandCombinations: []iwfidl.CommandCombination{
 							{
 								CommandIds: []string{
@@ -117,7 +117,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					CommandRequest: &iwfidl.CommandRequest{
 						SignalCommands:     validSignalCommands,
 						TimerCommands:      invalidTimerCommands,
-						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED,
+						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED.Ptr(),
 					},
 				}
 				h.hasS1RetriedForInvalidCommandId = true
@@ -131,7 +131,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					CommandRequest: &iwfidl.CommandRequest{
 						SignalCommands:     validSignalCommands,
 						TimerCommands:      validTimerCommands,
-						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED,
+						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED.Ptr(),
 						CommandCombinations: []iwfidl.CommandCombination{
 							{
 								CommandIds: []string{
@@ -153,7 +153,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					CommandRequest: &iwfidl.CommandRequest{
 						SignalCommands:     invalidSignalCommands,
 						TimerCommands:      validTimerCommands,
-						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED,
+						DeciderTriggerType: iwfidl.ANY_COMMAND_COMBINATION_COMPLETED.Ptr(),
 					},
 				}
 				h.hasS2RetriedForInvalidCommandId = true
