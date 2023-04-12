@@ -1775,8 +1775,6 @@ components:
           items:
             $ref: '#/components/schemas/CommandCombination'
           type: array
-      required:
-      - deciderTriggerType
       type: object
     DeciderTriggerType:
       enum:
