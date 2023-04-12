@@ -1786,9 +1786,9 @@ components:
       type: string
     CommandWaitingType:
       enum:
-      - ALL_COMMAND_COMPLETED
-      - ANY_COMMAND_COMPLETED
-      - ANY_COMMAND_COMBINATION_COMPLETED
+      - ALL_COMPLETED
+      - ANY_COMPLETED
+      - ANY_COMBINATION_COMPLETED
       type: string
     CommandCombination:
       example:

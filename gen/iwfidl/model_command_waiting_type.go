@@ -20,16 +20,16 @@ type CommandWaitingType string
 
 // List of CommandWaitingType
 const (
-	ALL_COMMAND_COMPLETED             CommandWaitingType = "ALL_COMMAND_COMPLETED"
-	ANY_COMMAND_COMPLETED             CommandWaitingType = "ANY_COMMAND_COMPLETED"
-	ANY_COMMAND_COMBINATION_COMPLETED CommandWaitingType = "ANY_COMMAND_COMBINATION_COMPLETED"
+	ALL_COMPLETED             CommandWaitingType = "ALL_COMPLETED"
+	ANY_COMPLETED             CommandWaitingType = "ANY_COMPLETED"
+	ANY_COMBINATION_COMPLETED CommandWaitingType = "ANY_COMBINATION_COMPLETED"
 )
 
 // All allowed values of CommandWaitingType enum
 var AllowedCommandWaitingTypeEnumValues = []CommandWaitingType{
-	"ALL_COMMAND_COMPLETED",
-	"ANY_COMMAND_COMPLETED",
-	"ANY_COMMAND_COMBINATION_COMPLETED",
+	"ALL_COMPLETED",
+	"ANY_COMPLETED",
+	"ANY_COMBINATION_COMPLETED",
 }
 
 func (v *CommandWaitingType) UnmarshalJSON(src []byte) error {
