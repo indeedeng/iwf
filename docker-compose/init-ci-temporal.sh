@@ -3,7 +3,7 @@
 # use new version of tctl so that we can skip the prompt
 tctl config set version next
 
-for run in {1..60}; do
+for run in {1..120}; do
   sleep 1
   echo "now trying to register iWF system search attributes..."
   if tctl search-attribute  create -name IwfWorkflowType -type Keyword -y; then
