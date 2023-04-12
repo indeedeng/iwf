@@ -42,7 +42,9 @@ func TestMain(m *testing.M) {
 		}
 		temporalClient.Close()
 		fmt.Println("connected to Temporal namespace")
-		time.Sleep(time.Second * 1) // see https://github.com/temporalio/temporal/issues/4160
+		if *dependencyWaitSeconds > 0 {
+			time.Sleep(time.Second * 1) // see https://github.com/temporalio/temporal/issues/4160
+		}
 	}
 
 	if *cadenceIntegTest {
