@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/compatibility"
 )
 
 func IsDeciderTriggerConditionMet(
@@ -13,7 +14,7 @@ func IsDeciderTriggerConditionMet(
 	completedInterStateChannelCmds map[int]*iwfidl.EncodedObject,
 ) bool {
 	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
-		triggerType := commandReq.GetDeciderTriggerType()
+		triggerType := compatibility.GetDeciderTriggerType(commandReq)
 		if triggerType == iwfidl.ALL_COMMAND_COMPLETED {
 			return len(completedTimerCmds) == len(commandReq.GetTimerCommands()) &&
 				len(completedSignalCmds) == len(commandReq.GetSignalCommands()) &&

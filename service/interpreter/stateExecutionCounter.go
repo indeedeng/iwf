@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/compatibility"
 )
 
 type StateExecutionCounter struct {
@@ -88,7 +89,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 	e.totalCurrentlyExecutingCount--
 
 	options := state.GetStateOptions()
-	skipStart := options.GetSkipStartApi()
+	skipStart := compatibility.GetSkipStartApi(&options)
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
 
 	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {

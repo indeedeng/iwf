@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
 	"io/ioutil"
 	"net/http"
@@ -131,7 +132,7 @@ func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
 	}
 	commandReq := resp.CommandRequest
 	if len(commandReq.GetTimerCommands())+len(commandReq.GetSignalCommands())+len(commandReq.GetInterStateChannelCommands()) > 0 {
-		dtt := commandReq.GetDeciderTriggerType()
+		dtt := compatibility.GetDeciderTriggerType(*commandReq)
 		if dtt != iwfidl.ANY_COMMAND_COMPLETED && dtt != iwfidl.ALL_COMMAND_COMPLETED && dtt != iwfidl.ANY_COMMAND_COMBINATION_COMPLETED {
 			return fmt.Errorf("unsupported decider trigger type %s", dtt)
 		}
