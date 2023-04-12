@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"time"
@@ -61,7 +62,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 						},
 					},
 					TimerCommands:      timerCommands,
-					DeciderTriggerType: iwfidl.ANY_COMMAND_COMPLETED,
+					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
 				},
 			})
 			return

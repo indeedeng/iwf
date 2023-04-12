@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 )
@@ -53,7 +54,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 							SignalChannelName: SignalName2,
 						},
 					},
-					DeciderTriggerType: iwfidl.ANY_COMMAND_COMPLETED,
+					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
 				},
 			})
 			return
