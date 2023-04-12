@@ -342,7 +342,7 @@ components:
         valueType: null
         integerValue: 1
         boolValue: true
-        doubleValue: 1.0246457001441578
+        doubleValue: 6.84685269835264
         stringArrayValue:
         - stringArrayValue
         - stringArrayValue
@@ -389,10 +389,10 @@ components:
       type: object
     WorkflowRetryPolicy:
       example:
-        maximumAttempts: 7
-        initialIntervalSeconds: 3
-        maximumIntervalSeconds: 4
-        backoffCoefficient: 2.027123
+        maximumAttempts: 1
+        initialIntervalSeconds: 4
+        maximumIntervalSeconds: 1
+        backoffCoefficient: 7.386282
       properties:
         initialIntervalSeconds:
           type: integer
@@ -409,6 +409,11 @@ components:
       - FAIL_WORKFLOW_ON_START_API_FAILURE
       - PROCEED_TO_DECIDE_ON_START_API_FAILURE
       type: string
+    WaitUntilApiFailurePolicy:
+      enum:
+      - FAIL_WORKFLOW_ON_FAILURE
+      - PROCEED_ON_FAILURE
+      type: string
     WorkflowStateOptions:
       example:
         searchAttributesLoadingPolicy:
@@ -416,6 +421,21 @@ components:
           - partialLoadingKeys
           - partialLoadingKeys
           persistenceLoadingType: null
+        executeApiTimeoutSeconds: 2
+        startApiRetryPolicy:
+          maximumAttemptsDurationSeconds: 9
+          maximumAttempts: 7
+          initialIntervalSeconds: 5
+          maximumIntervalSeconds: 2
+          backoffCoefficient: 5.637377
+        waitUntilApiFailurePolicy: null
+        dataObjectsLoadingPolicy:
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
+        skipWaitUntil: true
+        startApiFailurePolicy: null
         commandCarryOverPolicy:
           commandCarryOverType: null
         decideApiRetryPolicy:
@@ -426,19 +446,20 @@ components:
           backoffCoefficient: 5.637377
         decideApiTimeoutSeconds: 1
         startApiTimeoutSeconds: 6
-        startApiRetryPolicy:
+        waitUntilApiRetryPolicy:
           maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
           backoffCoefficient: 5.637377
-        dataObjectsLoadingPolicy:
-          partialLoadingKeys:
-          - partialLoadingKeys
-          - partialLoadingKeys
-          persistenceLoadingType: null
         skipStartApi: true
-        startApiFailurePolicy: null
+        waitUntilApiTimeoutSeconds: 3
+        executeApiRetryPolicy:
+          maximumAttemptsDurationSeconds: 9
+          maximumAttempts: 7
+          initialIntervalSeconds: 5
+          maximumIntervalSeconds: 2
+          backoffCoefficient: 5.637377
       properties:
         searchAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
@@ -458,24 +479,36 @@ components:
           $ref: '#/components/schemas/StartApiFailurePolicy'
         skipStartApi:
           type: boolean
+        waitUntilApiTimeoutSeconds:
+          type: integer
+        executeApiTimeoutSeconds:
+          type: integer
+        waitUntilApiRetryPolicy:
+          $ref: '#/components/schemas/RetryPolicy'
+        executeApiRetryPolicy:
+          $ref: '#/components/schemas/RetryPolicy'
+        waitUntilApiFailurePolicy:
+          $ref: '#/components/schemas/WaitUntilApiFailurePolicy'
+        skipWaitUntil:
+          type: boolean
       type: object
     WorkflowStartOptions:
       example:
         retryPolicy:
-          maximumAttempts: 7
-          initialIntervalSeconds: 3
-          maximumIntervalSeconds: 4
-          backoffCoefficient: 2.027123
+          maximumAttempts: 1
+          initialIntervalSeconds: 4
+          maximumIntervalSeconds: 1
+          backoffCoefficient: 7.386282
         workflowConfigOverride:
           disableSystemSearchAttribute: true
-          continueAsNewThreshold: 1
-          continueAsNewPageSizeInBytes: 6
+          continueAsNewThreshold: 7
+          continueAsNewPageSizeInBytes: 1
         searchAttributes:
         - stringValue: stringValue
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -484,7 +517,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -565,6 +598,21 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          executeApiTimeoutSeconds: 2
+          startApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
+            maximumAttempts: 7
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
+            backoffCoefficient: 5.637377
+          waitUntilApiFailurePolicy: null
+          dataObjectsLoadingPolicy:
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
+          skipWaitUntil: true
+          startApiFailurePolicy: null
           commandCarryOverPolicy:
             commandCarryOverType: null
           decideApiRetryPolicy:
@@ -575,36 +623,37 @@ components:
             backoffCoefficient: 5.637377
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
-          startApiRetryPolicy:
+          waitUntilApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637377
-          dataObjectsLoadingPolicy:
-            partialLoadingKeys:
-            - partialLoadingKeys
-            - partialLoadingKeys
-            persistenceLoadingType: null
           skipStartApi: true
-          startApiFailurePolicy: null
+          waitUntilApiTimeoutSeconds: 3
+          executeApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
+            maximumAttempts: 7
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
+            backoffCoefficient: 5.637377
         iwfWorkflowType: iwfWorkflowType
         workflowStartOptions:
           retryPolicy:
-            maximumAttempts: 7
-            initialIntervalSeconds: 3
-            maximumIntervalSeconds: 4
-            backoffCoefficient: 2.027123
+            maximumAttempts: 1
+            initialIntervalSeconds: 4
+            maximumIntervalSeconds: 1
+            backoffCoefficient: 7.386282
           workflowConfigOverride:
             disableSystemSearchAttribute: true
-            continueAsNewThreshold: 1
-            continueAsNewPageSizeInBytes: 6
+            continueAsNewThreshold: 7
+            continueAsNewPageSizeInBytes: 1
           searchAttributes:
           - stringValue: stringValue
             valueType: null
             integerValue: 1
             boolValue: true
-            doubleValue: 1.0246457001441578
+            doubleValue: 6.84685269835264
             stringArrayValue:
             - stringArrayValue
             - stringArrayValue
@@ -613,7 +662,7 @@ components:
             valueType: null
             integerValue: 1
             boolValue: true
-            doubleValue: 1.0246457001441578
+            doubleValue: 6.84685269835264
             stringArrayValue:
             - stringArrayValue
             - stringArrayValue
@@ -765,7 +814,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -774,7 +823,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1032,7 +1081,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1041,7 +1090,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1097,8 +1146,8 @@ components:
       example:
         workflowConfig:
           disableSystemSearchAttribute: true
-          continueAsNewThreshold: 1
-          continueAsNewPageSizeInBytes: 6
+          continueAsNewThreshold: 7
+          continueAsNewPageSizeInBytes: 1
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -1119,7 +1168,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1128,7 +1177,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1161,6 +1210,7 @@ components:
           - commandIds:
             - commandIds
             - commandIds
+          commandWaitingType: null
           interStateChannelCommands:
           - channelName: channelName
             commandId: commandId
@@ -1275,7 +1325,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1284,7 +1334,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1336,7 +1386,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1345,7 +1395,7 @@ components:
           valueType: null
           integerValue: 1
           boolValue: true
-          doubleValue: 1.0246457001441578
+          doubleValue: 6.84685269835264
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1368,6 +1418,21 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              executeApiTimeoutSeconds: 2
+              startApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              waitUntilApiFailurePolicy: null
+              dataObjectsLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              skipWaitUntil: true
+              startApiFailurePolicy: null
               commandCarryOverPolicy:
                 commandCarryOverType: null
               decideApiRetryPolicy:
@@ -1378,19 +1443,20 @@ components:
                 backoffCoefficient: 5.637377
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
-              startApiRetryPolicy:
+              waitUntilApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
-              dataObjectsLoadingPolicy:
-                partialLoadingKeys:
-                - partialLoadingKeys
-                - partialLoadingKeys
-                persistenceLoadingType: null
               skipStartApi: true
-              startApiFailurePolicy: null
+              waitUntilApiTimeoutSeconds: 3
+              executeApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
             stateInput:
               data: data
               encoding: encoding
@@ -1401,6 +1467,21 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              executeApiTimeoutSeconds: 2
+              startApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              waitUntilApiFailurePolicy: null
+              dataObjectsLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              skipWaitUntil: true
+              startApiFailurePolicy: null
               commandCarryOverPolicy:
                 commandCarryOverType: null
               decideApiRetryPolicy:
@@ -1411,19 +1492,20 @@ components:
                 backoffCoefficient: 5.637377
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
-              startApiRetryPolicy:
+              waitUntilApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
-              dataObjectsLoadingPolicy:
-                partialLoadingKeys:
-                - partialLoadingKeys
-                - partialLoadingKeys
-                persistenceLoadingType: null
               skipStartApi: true
-              startApiFailurePolicy: null
+              waitUntilApiTimeoutSeconds: 3
+              executeApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
             stateInput:
               data: data
               encoding: encoding
@@ -1488,6 +1570,21 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            executeApiTimeoutSeconds: 2
+            startApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
+              maximumAttempts: 7
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
+              backoffCoefficient: 5.637377
+            waitUntilApiFailurePolicy: null
+            dataObjectsLoadingPolicy:
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
+            skipWaitUntil: true
+            startApiFailurePolicy: null
             commandCarryOverPolicy:
               commandCarryOverType: null
             decideApiRetryPolicy:
@@ -1498,19 +1595,20 @@ components:
               backoffCoefficient: 5.637377
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
-            startApiRetryPolicy:
+            waitUntilApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
               backoffCoefficient: 5.637377
-            dataObjectsLoadingPolicy:
-              partialLoadingKeys:
-              - partialLoadingKeys
-              - partialLoadingKeys
-              persistenceLoadingType: null
             skipStartApi: true
-            startApiFailurePolicy: null
+            waitUntilApiTimeoutSeconds: 3
+            executeApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
+              maximumAttempts: 7
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
+              backoffCoefficient: 5.637377
           stateInput:
             data: data
             encoding: encoding
@@ -1521,6 +1619,21 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            executeApiTimeoutSeconds: 2
+            startApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
+              maximumAttempts: 7
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
+              backoffCoefficient: 5.637377
+            waitUntilApiFailurePolicy: null
+            dataObjectsLoadingPolicy:
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
+            skipWaitUntil: true
+            startApiFailurePolicy: null
             commandCarryOverPolicy:
               commandCarryOverType: null
             decideApiRetryPolicy:
@@ -1531,19 +1644,20 @@ components:
               backoffCoefficient: 5.637377
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
-            startApiRetryPolicy:
+            waitUntilApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
               backoffCoefficient: 5.637377
-            dataObjectsLoadingPolicy:
-              partialLoadingKeys:
-              - partialLoadingKeys
-              - partialLoadingKeys
-              persistenceLoadingType: null
             skipStartApi: true
-            startApiFailurePolicy: null
+            waitUntilApiTimeoutSeconds: 3
+            executeApiRetryPolicy:
+              maximumAttemptsDurationSeconds: 9
+              maximumAttempts: 7
+              initialIntervalSeconds: 5
+              maximumIntervalSeconds: 2
+              backoffCoefficient: 5.637377
           stateInput:
             data: data
             encoding: encoding
@@ -1562,6 +1676,21 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          executeApiTimeoutSeconds: 2
+          startApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
+            maximumAttempts: 7
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
+            backoffCoefficient: 5.637377
+          waitUntilApiFailurePolicy: null
+          dataObjectsLoadingPolicy:
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
+          skipWaitUntil: true
+          startApiFailurePolicy: null
           commandCarryOverPolicy:
             commandCarryOverType: null
           decideApiRetryPolicy:
@@ -1572,19 +1701,20 @@ components:
             backoffCoefficient: 5.637377
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
-          startApiRetryPolicy:
+          waitUntilApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637377
-          dataObjectsLoadingPolicy:
-            partialLoadingKeys:
-            - partialLoadingKeys
-            - partialLoadingKeys
-            persistenceLoadingType: null
           skipStartApi: true
-          startApiFailurePolicy: null
+          waitUntilApiTimeoutSeconds: 3
+          executeApiRetryPolicy:
+            maximumAttemptsDurationSeconds: 9
+            maximumAttempts: 7
+            initialIntervalSeconds: 5
+            maximumIntervalSeconds: 2
+            backoffCoefficient: 5.637377
         stateInput:
           data: data
           encoding: encoding
@@ -1618,6 +1748,7 @@ components:
         - commandIds:
           - commandIds
           - commandIds
+        commandWaitingType: null
         interStateChannelCommands:
         - channelName: channelName
           commandId: commandId
@@ -1626,6 +1757,8 @@ components:
       properties:
         deciderTriggerType:
           $ref: '#/components/schemas/DeciderTriggerType'
+        commandWaitingType:
+          $ref: '#/components/schemas/CommandWaitingType'
         timerCommands:
           items:
             $ref: '#/components/schemas/TimerCommand'
@@ -1642,14 +1775,18 @@ components:
           items:
             $ref: '#/components/schemas/CommandCombination'
           type: array
-      required:
-      - deciderTriggerType
       type: object
     DeciderTriggerType:
       enum:
       - ALL_COMMAND_COMPLETED
       - ANY_COMMAND_COMPLETED
       - ANY_COMMAND_COMBINATION_COMPLETED
+      type: string
+    CommandWaitingType:
+      enum:
+      - ALL_COMPLETED
+      - ANY_COMPLETED
+      - ANY_COMBINATION_COMPLETED
       type: string
     CommandCombination:
       example:
@@ -1836,8 +1973,8 @@ components:
     WorkflowConfig:
       example:
         disableSystemSearchAttribute: true
-        continueAsNewThreshold: 1
-        continueAsNewPageSizeInBytes: 6
+        continueAsNewThreshold: 7
+        continueAsNewPageSizeInBytes: 1
       properties:
         disableSystemSearchAttribute:
           type: boolean

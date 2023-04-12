@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/compatibility"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -364,7 +365,7 @@ func executeState(
 	}
 
 	options := state.GetStateOptions()
-	skipStart := options.GetSkipStartApi()
+	skipStart := compatibility.GetSkipStartApi(&options)
 	if skipStart {
 		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 			nil, continueAsNewer, executeApi, stateExecutionLocal)
@@ -378,10 +379,11 @@ func executeState(
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds = completedCmds.CompletedTimerCommands, completedCmds.CompletedSignalCommands, completedCmds.CompletedInterStateChannelCommands
 	} else {
 		if state.StateOptions != nil {
-			if state.StateOptions.GetStartApiTimeoutSeconds() > 0 {
-				activityOptions.StartToCloseTimeout = time.Duration(state.StateOptions.GetStartApiTimeoutSeconds()) * time.Second
+			startApiTimeout := compatibility.GetStartApiTimeoutSeconds(state.StateOptions)
+			if startApiTimeout > 0 {
+				activityOptions.StartToCloseTimeout = time.Duration(startApiTimeout) * time.Second
 			}
-			activityOptions.RetryPolicy = state.StateOptions.StartApiRetryPolicy
+			activityOptions.RetryPolicy = compatibility.GetStartApiRetryPolicy(state.StateOptions)
 		}
 
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
@@ -603,10 +605,11 @@ func executeStateDecide(
 		StartToCloseTimeout: 30 * time.Second,
 	}
 	if state.StateOptions != nil {
-		if state.StateOptions.GetDecideApiTimeoutSeconds() > 0 {
-			activityOptions.StartToCloseTimeout = time.Duration(state.StateOptions.GetDecideApiTimeoutSeconds()) * time.Second
+		decideApiTimeout := compatibility.GetDecideApiTimeoutSeconds(state.StateOptions)
+		if decideApiTimeout > 0 {
+			activityOptions.StartToCloseTimeout = time.Duration(decideApiTimeout) * time.Second
 		}
-		activityOptions.RetryPolicy = state.StateOptions.DecideApiRetryPolicy
+		activityOptions.RetryPolicy = compatibility.GetDecideApiRetryPolicy(state.StateOptions)
 	}
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
@@ -649,11 +652,12 @@ func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {
 		return false
 	}
 
-	if state.StateOptions.StartApiFailurePolicy == nil {
+	policy := compatibility.GetStartApiFailurePolicy(state.StateOptions)
+	if policy == nil {
 		return false
 	}
 
-	return state.StateOptions.GetStartApiFailurePolicy() == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE
+	return *policy == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE
 }
 
 func convertStateApiActivityError(provider WorkflowProvider, err error) error {

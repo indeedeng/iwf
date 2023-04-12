@@ -54,6 +54,22 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 		},
 	})
 	wfId := wf_state_api_fail_and_proceed.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
+
+	stateOptions := &iwfidl.WorkflowStateOptions{
+		StartApiRetryPolicy: &iwfidl.RetryPolicy{
+			MaximumAttempts: iwfidl.PtrInt32(1),
+		},
+		StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
+	}
+	if config != nil {
+		stateOptions = &iwfidl.WorkflowStateOptions{
+			StartApiRetryPolicy: &iwfidl.RetryPolicy{
+				MaximumAttempts: iwfidl.PtrInt32(1),
+			},
+			WaitUntilApiFailurePolicy: iwfidl.PROCEED_ON_FAILURE.Ptr(),
+		}
+	}
+
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
@@ -61,12 +77,7 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           wf_state_api_fail_and_proceed.State1,
-		StateOptions: &iwfidl.WorkflowStateOptions{
-			StartApiRetryPolicy: &iwfidl.RetryPolicy{
-				MaximumAttempts: iwfidl.PtrInt32(1),
-			},
-			StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
-		},
+		StateOptions:           stateOptions,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

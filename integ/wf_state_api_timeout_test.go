@@ -63,8 +63,8 @@ func doTestStateApiTimeout(t *testing.T, backendType service.BackendType, config
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           wf_state_api_timeout.State1,
 		StateOptions: &iwfidl.WorkflowStateOptions{
-			StartApiTimeoutSeconds: iwfidl.PtrInt32(1),
-			StartApiRetryPolicy: &iwfidl.RetryPolicy{
+			WaitUntilApiTimeoutSeconds: iwfidl.PtrInt32(1),
+			WaitUntilApiRetryPolicy: &iwfidl.RetryPolicy{
 				MaximumAttempts: iwfidl.PtrInt32(1),
 			},
 		},

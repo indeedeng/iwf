@@ -104,7 +104,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
@@ -158,7 +158,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})
 			return
@@ -195,7 +195,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED,
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})
 			return

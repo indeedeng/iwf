@@ -4,7 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DeciderTriggerType** | [**DeciderTriggerType**](DeciderTriggerType.md) |  | 
+**DeciderTriggerType** | Pointer to [**DeciderTriggerType**](DeciderTriggerType.md) |  | [optional] 
+**CommandWaitingType** | Pointer to [**CommandWaitingType**](CommandWaitingType.md) |  | [optional] 
 **TimerCommands** | Pointer to [**[]TimerCommand**](TimerCommand.md) |  | [optional] 
 **SignalCommands** | Pointer to [**[]SignalCommand**](SignalCommand.md) |  | [optional] 
 **InterStateChannelCommands** | Pointer to [**[]InterStateChannelCommand**](InterStateChannelCommand.md) |  | [optional] 
@@ -14,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewCommandRequest
 
-`func NewCommandRequest(deciderTriggerType DeciderTriggerType, ) *CommandRequest`
+`func NewCommandRequest() *CommandRequest`
 
 NewCommandRequest instantiates a new CommandRequest object
 This constructor will assign default values to properties that have it defined,
@@ -48,6 +49,36 @@ and a boolean to check if the value has been set.
 
 SetDeciderTriggerType sets DeciderTriggerType field to given value.
 
+### HasDeciderTriggerType
+
+`func (o *CommandRequest) HasDeciderTriggerType() bool`
+
+HasDeciderTriggerType returns a boolean if a field has been set.
+
+### GetCommandWaitingType
+
+`func (o *CommandRequest) GetCommandWaitingType() CommandWaitingType`
+
+GetCommandWaitingType returns the CommandWaitingType field if non-nil, zero value otherwise.
+
+### GetCommandWaitingTypeOk
+
+`func (o *CommandRequest) GetCommandWaitingTypeOk() (*CommandWaitingType, bool)`
+
+GetCommandWaitingTypeOk returns a tuple with the CommandWaitingType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCommandWaitingType
+
+`func (o *CommandRequest) SetCommandWaitingType(v CommandWaitingType)`
+
+SetCommandWaitingType sets CommandWaitingType field to given value.
+
+### HasCommandWaitingType
+
+`func (o *CommandRequest) HasCommandWaitingType() bool`
+
+HasCommandWaitingType returns a boolean if a field has been set.
 
 ### GetTimerCommands
 
