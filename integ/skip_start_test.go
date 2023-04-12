@@ -83,7 +83,7 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 		StartStateId:           skipstart.State1,
 		StateInput:             wfInput,
 		StateOptions: &iwfidl.WorkflowStateOptions{
-			SkipStartApi: iwfidl.PtrBool(true),
+			SkipWaitUntil: iwfidl.PtrBool(true),
 		},
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,

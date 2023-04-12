@@ -77,15 +77,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 							StateId:    State2,
 							StateInput: req.StateInput,
 							StateOptions: &iwfidl.WorkflowStateOptions{
-								StartApiTimeoutSeconds:  iwfidl.PtrInt32(14),
-								DecideApiTimeoutSeconds: iwfidl.PtrInt32(15),
+								StartApiTimeoutSeconds:   iwfidl.PtrInt32(14),
+								ExecuteApiTimeoutSeconds: iwfidl.PtrInt32(15),
 								StartApiRetryPolicy: &iwfidl.RetryPolicy{
 									InitialIntervalSeconds: iwfidl.PtrInt32(14),
 									BackoffCoefficient:     iwfidl.PtrFloat32(14),
 									MaximumAttempts:        iwfidl.PtrInt32(14),
 									MaximumIntervalSeconds: iwfidl.PtrInt32(14),
 								},
-								DecideApiRetryPolicy: &iwfidl.RetryPolicy{
+								ExecuteApiRetryPolicy: &iwfidl.RetryPolicy{
 									InitialIntervalSeconds: iwfidl.PtrInt32(15),
 									BackoffCoefficient:     iwfidl.PtrFloat32(15),
 									MaximumAttempts:        iwfidl.PtrInt32(15),
