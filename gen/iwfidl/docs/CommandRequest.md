@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DeciderTriggerType** | [**DeciderTriggerType**](DeciderTriggerType.md) |  | 
+**CommandWaitingType** | Pointer to [**CommandWaitingType**](CommandWaitingType.md) |  | [optional] 
 **TimerCommands** | Pointer to [**[]TimerCommand**](TimerCommand.md) |  | [optional] 
 **SignalCommands** | Pointer to [**[]SignalCommand**](SignalCommand.md) |  | [optional] 
 **InterStateChannelCommands** | Pointer to [**[]InterStateChannelCommand**](InterStateChannelCommand.md) |  | [optional] 
@@ -48,6 +49,31 @@ and a boolean to check if the value has been set.
 
 SetDeciderTriggerType sets DeciderTriggerType field to given value.
 
+
+### GetCommandWaitingType
+
+`func (o *CommandRequest) GetCommandWaitingType() CommandWaitingType`
+
+GetCommandWaitingType returns the CommandWaitingType field if non-nil, zero value otherwise.
+
+### GetCommandWaitingTypeOk
+
+`func (o *CommandRequest) GetCommandWaitingTypeOk() (*CommandWaitingType, bool)`
+
+GetCommandWaitingTypeOk returns a tuple with the CommandWaitingType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCommandWaitingType
+
+`func (o *CommandRequest) SetCommandWaitingType(v CommandWaitingType)`
+
+SetCommandWaitingType sets CommandWaitingType field to given value.
+
+### HasCommandWaitingType
+
+`func (o *CommandRequest) HasCommandWaitingType() bool`
+
+HasCommandWaitingType returns a boolean if a field has been set.
 
 ### GetTimerCommands
 

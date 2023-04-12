@@ -12,6 +12,7 @@ docs/CommandCarryOverType.md
 docs/CommandCombination.md
 docs/CommandRequest.md
 docs/CommandResults.md
+docs/CommandWaitingType.md
 docs/Context.md
 docs/DeciderTriggerType.md
 docs/DefaultApi.md
@@ -37,6 +38,7 @@ docs/StateMovement.md
 docs/TimerCommand.md
 docs/TimerResult.md
 docs/TimerStatus.md
+docs/WaitUntilApiFailurePolicy.md
 docs/WorkflowConfig.md
 docs/WorkflowConfigUpdateRequest.md
 docs/WorkflowDumpRequest.md
@@ -78,6 +80,7 @@ model_command_carry_over_type.go
 model_command_combination.go
 model_command_request.go
 model_command_results.go
+model_command_waiting_type.go
 model_context.go
 model_decider_trigger_type.go
 model_encoded_object.go
@@ -102,6 +105,7 @@ model_state_movement.go
 model_timer_command.go
 model_timer_result.go
 model_timer_status.go
+model_wait_until_api_failure_policy.go
 model_workflow_config.go
 model_workflow_config_update_request.go
 model_workflow_dump_request.go

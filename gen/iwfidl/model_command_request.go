@@ -20,6 +20,7 @@ var _ MappedNullable = &CommandRequest{}
 // CommandRequest struct for CommandRequest
 type CommandRequest struct {
 	DeciderTriggerType        DeciderTriggerType         `json:"deciderTriggerType"`
+	CommandWaitingType        *CommandWaitingType        `json:"commandWaitingType,omitempty"`
 	TimerCommands             []TimerCommand             `json:"timerCommands,omitempty"`
 	SignalCommands            []SignalCommand            `json:"signalCommands,omitempty"`
 	InterStateChannelCommands []InterStateChannelCommand `json:"interStateChannelCommands,omitempty"`
@@ -66,6 +67,38 @@ func (o *CommandRequest) GetDeciderTriggerTypeOk() (*DeciderTriggerType, bool) {
 // SetDeciderTriggerType sets field value
 func (o *CommandRequest) SetDeciderTriggerType(v DeciderTriggerType) {
 	o.DeciderTriggerType = v
+}
+
+// GetCommandWaitingType returns the CommandWaitingType field value if set, zero value otherwise.
+func (o *CommandRequest) GetCommandWaitingType() CommandWaitingType {
+	if o == nil || IsNil(o.CommandWaitingType) {
+		var ret CommandWaitingType
+		return ret
+	}
+	return *o.CommandWaitingType
+}
+
+// GetCommandWaitingTypeOk returns a tuple with the CommandWaitingType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandRequest) GetCommandWaitingTypeOk() (*CommandWaitingType, bool) {
+	if o == nil || IsNil(o.CommandWaitingType) {
+		return nil, false
+	}
+	return o.CommandWaitingType, true
+}
+
+// HasCommandWaitingType returns a boolean if a field has been set.
+func (o *CommandRequest) HasCommandWaitingType() bool {
+	if o != nil && !IsNil(o.CommandWaitingType) {
+		return true
+	}
+
+	return false
+}
+
+// SetCommandWaitingType gets a reference to the given CommandWaitingType and assigns it to the CommandWaitingType field.
+func (o *CommandRequest) SetCommandWaitingType(v CommandWaitingType) {
+	o.CommandWaitingType = &v
 }
 
 // GetTimerCommands returns the TimerCommands field value if set, zero value otherwise.
@@ -207,6 +240,9 @@ func (o CommandRequest) MarshalJSON() ([]byte, error) {
 func (o CommandRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["deciderTriggerType"] = o.DeciderTriggerType
+	if !IsNil(o.CommandWaitingType) {
+		toSerialize["commandWaitingType"] = o.CommandWaitingType
+	}
 	if !IsNil(o.TimerCommands) {
 		toSerialize["timerCommands"] = o.TimerCommands
 	}
