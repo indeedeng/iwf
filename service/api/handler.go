@@ -142,6 +142,23 @@ func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	return
 }
 
+func (h *handler) apiV1WorkflowRpc(c *gin.Context) {
+	var req iwfidl.WorkflowRpcRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+
+	resp, errResp := h.svc.ApiV1WorkflowRpcPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
 func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	var req iwfidl.WorkflowGetDataObjectsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

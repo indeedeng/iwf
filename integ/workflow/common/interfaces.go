@@ -7,3 +7,8 @@ type WorkflowHandler interface {
 	ApiV1WorkflowStateDecide(c *gin.Context)
 	GetTestResult() (map[string]int64, map[string]interface{})
 }
+
+type WorkflowHandlerWithRpc interface {
+	WorkflowHandler
+	ApiV1WorkflowWorkerRpc(c *gin.Context)
+}

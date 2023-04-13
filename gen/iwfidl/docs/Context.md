@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | **string** |  | 
 **WorkflowStartedTimestamp** | **int64** |  | 
-**StateExecutionId** | **string** |  | 
+**StateExecutionId** | Pointer to **string** |  | [optional] 
 **FirstAttemptTimestamp** | Pointer to **int64** |  | [optional] 
 **Attempt** | Pointer to **int32** |  | [optional] 
 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 
 ### NewContext
 
-`func NewContext(workflowId string, workflowRunId string, workflowStartedTimestamp int64, stateExecutionId string, ) *Context`
+`func NewContext(workflowId string, workflowRunId string, workflowStartedTimestamp int64, ) *Context`
 
 NewContext instantiates a new Context object
 This constructor will assign default values to properties that have it defined,
@@ -109,6 +109,11 @@ and a boolean to check if the value has been set.
 
 SetStateExecutionId sets StateExecutionId field to given value.
 
+### HasStateExecutionId
+
+`func (o *Context) HasStateExecutionId() bool`
+
+HasStateExecutionId returns a boolean if a field has been set.
 
 ### GetFirstAttemptTimestamp
 

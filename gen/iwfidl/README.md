@@ -83,6 +83,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 *DefaultApi* | [**ApiV1WorkflowInternalDumpPost**](docs/DefaultApi.md#apiv1workflowinternaldumppost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
 *DefaultApi* | [**ApiV1WorkflowResetPost**](docs/DefaultApi.md#apiv1workflowresetpost) | **Post** /api/v1/workflow/reset | reset a workflow
+*DefaultApi* | [**ApiV1WorkflowRpcPost**](docs/DefaultApi.md#apiv1workflowrpcpost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
 *DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 *DefaultApi* | [**ApiV1WorkflowSearchattributesGetPost**](docs/DefaultApi.md#apiv1workflowsearchattributesgetpost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
 *DefaultApi* | [**ApiV1WorkflowSignalPost**](docs/DefaultApi.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
@@ -91,6 +92,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowStateStartPost**](docs/DefaultApi.md#apiv1workflowstatestartpost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
 *DefaultApi* | [**ApiV1WorkflowStopPost**](docs/DefaultApi.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
 *DefaultApi* | [**ApiV1WorkflowTimerSkipPost**](docs/DefaultApi.md#apiv1workflowtimerskippost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
+*DefaultApi* | [**ApiV1WorkflowWorkerRpcPost**](docs/DefaultApi.md#apiv1workflowworkerrpcpost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
 
 
 ## Documentation For Models
@@ -144,6 +146,8 @@ Class | Method | HTTP request | Description
  - [WorkflowResetResponse](docs/WorkflowResetResponse.md)
  - [WorkflowResetType](docs/WorkflowResetType.md)
  - [WorkflowRetryPolicy](docs/WorkflowRetryPolicy.md)
+ - [WorkflowRpcRequest](docs/WorkflowRpcRequest.md)
+ - [WorkflowRpcResponse](docs/WorkflowRpcResponse.md)
  - [WorkflowSearchRequest](docs/WorkflowSearchRequest.md)
  - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
  - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
@@ -160,6 +164,8 @@ Class | Method | HTTP request | Description
  - [WorkflowStatus](docs/WorkflowStatus.md)
  - [WorkflowStopRequest](docs/WorkflowStopRequest.md)
  - [WorkflowStopType](docs/WorkflowStopType.md)
+ - [WorkflowWorkerRpcRequest](docs/WorkflowWorkerRpcRequest.md)
+ - [WorkflowWorkerRpcResponse](docs/WorkflowWorkerRpcResponse.md)
 
 
 ## Documentation For Authorization

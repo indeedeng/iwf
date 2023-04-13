@@ -5,19 +5,20 @@ type (
 )
 
 const (
-	TaskQueue                         = "Interpreter_DEFAULT"
-	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
-	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
-	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
+	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
 
-	StateStartApi  = "/api/v1/workflowState/start"
-	StateDecideApi = "/api/v1/workflowState/decide"
+	TaskQueue = "Interpreter_DEFAULT"
+
+	StateStartApi        = "/api/v1/workflowState/start"
+	StateDecideApi       = "/api/v1/workflowState/decide"
+	WorkflowWorkerRpcApi = "/api/v1/workflowWorker/rpc"
 
 	GetDataObjectsWorkflowQueryType      = "GetDataObjects"
 	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"
 	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
 	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
 	DebugDumpQueryType                   = "DebugNewDump"
+	PrepareRpcQueryType                  = "PrepareRpcQueryType"
 
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
@@ -30,12 +31,24 @@ const (
 	SkipTimerSignalChannelName    = IwfSystemSignalPrefix + "SkipTimerChannel"
 	FailWorkflowSignalChannelName = IwfSystemSignalPrefix + "FailWorkflowChannel"
 	UpdateConfigSignalChannelName = IwfSystemSignalPrefix + "UpdateWorkflowConfig"
-
-	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
+	ExecuteRpcSignalChannelName   = IwfSystemSignalPrefix + "ExecuteRpc"
 )
 
-var ValidIwfSystemSignalNames map[string]bool = map[string]bool{
+var ValidIwfSystemSignalNames = map[string]bool{
 	SkipTimerSignalChannelName:    true,
 	FailWorkflowSignalChannelName: true,
 	UpdateConfigSignalChannelName: true,
+	ExecuteRpcSignalChannelName:   true,
+}
+
+const (
+	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
+	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
+	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
+)
+
+var ValidClosingWorkflowStateId = map[string]bool{
+	GracefulCompletingWorkflowStateId: true,
+	ForceCompletingWorkflowStateId:    true,
+	ForceFailingWorkflowStateId:       true,
 }

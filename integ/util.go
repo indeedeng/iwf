@@ -33,8 +33,17 @@ func createTemporalClient() client.Client {
 	return temporalClient
 }
 
+func startWorkflowWorkerWithRpc(handler common.WorkflowHandlerWithRpc) (closeFunc func()) {
+	router := gin.Default()
+	router.POST(service.WorkflowWorkerRpcApi, handler.ApiV1WorkflowWorkerRpc)
+	return doStartWorkflowWorker(handler, router)
+}
+
 func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {
 	router := gin.Default()
+	return doStartWorkflowWorker(handler, router)
+}
+func doStartWorkflowWorker(handler common.WorkflowHandler, router *gin.Engine) (closeFunc func()) {
 	router.POST(service.StateStartApi, handler.ApiV1WorkflowStateStart)
 	router.POST(service.StateDecideApi, handler.ApiV1WorkflowStateDecide)
 

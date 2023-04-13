@@ -56,6 +56,8 @@ docs/WorkflowResetRequest.md
 docs/WorkflowResetResponse.md
 docs/WorkflowResetType.md
 docs/WorkflowRetryPolicy.md
+docs/WorkflowRpcRequest.md
+docs/WorkflowRpcResponse.md
 docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
@@ -72,6 +74,8 @@ docs/WorkflowStateStartResponse.md
 docs/WorkflowStatus.md
 docs/WorkflowStopRequest.md
 docs/WorkflowStopType.md
+docs/WorkflowWorkerRpcRequest.md
+docs/WorkflowWorkerRpcResponse.md
 git_push.sh
 go.mod
 go.sum
@@ -124,6 +128,8 @@ model_workflow_reset_request.go
 model_workflow_reset_response.go
 model_workflow_reset_type.go
 model_workflow_retry_policy.go
+model_workflow_rpc_request.go
+model_workflow_rpc_response.go
 model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go
@@ -140,6 +146,8 @@ model_workflow_state_start_response.go
 model_workflow_status.go
 model_workflow_stop_request.go
 model_workflow_stop_type.go
+model_workflow_worker_rpc_request.go
+model_workflow_worker_rpc_response.go
 response.go
 test/api_default_test.go
 utils.go

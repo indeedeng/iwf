@@ -193,6 +193,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: reset a workflow
+  /api/v1/workflow/rpc:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowRpcRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRpcResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: execute an RPC of a workflow
   /api/v1/workflow/timer/skip:
     post:
       requestBody:
@@ -292,6 +313,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: for invoking WorkflowState.decide API
+  /api/v1/workflowWorker/rpc:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowWorkerRpcRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowWorkerRpcResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: for invoking workflow RPC API in the worker
 components:
   schemas:
     KeyValue:
@@ -1184,6 +1226,313 @@ components:
       - workflowConfig
       - workflowId
       type: object
+    WorkflowRpcRequest:
+      example:
+        input:
+          data: data
+          encoding: encoding
+        searchAttributesLoadingPolicy:
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
+        timeoutSeconds: 0
+        workflowRunId: workflowRunId
+        rpcName: rpcName
+        workflowId: workflowId
+        dataAttributesLoadingPolicy:
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        rpcName:
+          type: string
+        input:
+          $ref: '#/components/schemas/EncodedObject'
+        searchAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        dataAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        timeoutSeconds:
+          type: integer
+      required:
+      - rpcName
+      - workflowId
+      type: object
+    WorkflowRpcResponse:
+      example:
+        output:
+          data: data
+          encoding: encoding
+      properties:
+        output:
+          $ref: '#/components/schemas/EncodedObject'
+      type: object
+    WorkflowWorkerRpcRequest:
+      example:
+        input:
+          data: data
+          encoding: encoding
+        context:
+          firstAttemptTimestamp: 6
+          workflowStartedTimestamp: 0
+          workflowRunId: workflowRunId
+          attempt: 1
+          workflowId: workflowId
+          stateExecutionId: stateExecutionId
+        workflowType: workflowType
+        searchAttributes:
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        rpcName: rpcName
+        dataAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+      properties:
+        context:
+          $ref: '#/components/schemas/Context'
+        workflowType:
+          type: string
+        rpcName:
+          type: string
+        input:
+          $ref: '#/components/schemas/EncodedObject'
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
+        dataAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      required:
+      - context
+      - rpcName
+      - workflowType
+      type: object
+    WorkflowWorkerRpcResponse:
+      example:
+        output:
+          data: data
+          encoding: encoding
+        upsertSearchAttributes:
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        recordEvents:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        stateDecision:
+          nextStates:
+          - stateId: stateId
+            stateOptions:
+              searchAttributesLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              executeApiTimeoutSeconds: 2
+              startApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              waitUntilApiFailurePolicy: null
+              dataObjectsLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              skipWaitUntil: true
+              startApiFailurePolicy: null
+              dataAttributesLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              commandCarryOverPolicy:
+                commandCarryOverType: null
+              decideApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              decideApiTimeoutSeconds: 1
+              startApiTimeoutSeconds: 6
+              waitUntilApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              skipStartApi: true
+              waitUntilApiTimeoutSeconds: 3
+              executeApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+            stateInput:
+              data: data
+              encoding: encoding
+          - stateId: stateId
+            stateOptions:
+              searchAttributesLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              executeApiTimeoutSeconds: 2
+              startApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              waitUntilApiFailurePolicy: null
+              dataObjectsLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              skipWaitUntil: true
+              startApiFailurePolicy: null
+              dataAttributesLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
+              commandCarryOverPolicy:
+                commandCarryOverType: null
+              decideApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              decideApiTimeoutSeconds: 1
+              startApiTimeoutSeconds: 6
+              waitUntilApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+              skipStartApi: true
+              waitUntilApiTimeoutSeconds: 3
+              executeApiRetryPolicy:
+                maximumAttemptsDurationSeconds: 9
+                maximumAttempts: 7
+                initialIntervalSeconds: 5
+                maximumIntervalSeconds: 2
+                backoffCoefficient: 5.637377
+            stateInput:
+              data: data
+              encoding: encoding
+        upsertDataAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        publishToInterStateChannel:
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
+        - channelName: channelName
+          value:
+            data: data
+            encoding: encoding
+        upsertStateLocals:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+      properties:
+        output:
+          $ref: '#/components/schemas/EncodedObject'
+        stateDecision:
+          $ref: '#/components/schemas/StateDecision'
+        upsertSearchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
+        upsertDataAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        recordEvents:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        upsertStateLocals:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        publishToInterStateChannel:
+          items:
+            $ref: '#/components/schemas/InterStateChannelPublishing'
+          type: array
+      type: object
     WorkflowStateStartResponse:
       example:
         upsertSearchAttributes:
@@ -2055,8 +2404,6 @@ components:
         attempt:
           type: integer
       required:
-      - commandId
-      - stateExecutionId
       - workflowId
       - workflowRunId
       - workflowStartedTimestamp

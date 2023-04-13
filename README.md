@@ -571,6 +571,7 @@ Cadence/Temporal.
 
 - [x] Auto continueAsNew
 - [x] Stop API supports terminate and fail workflows as stop types
+- [x] RPC for request response 
 
 ### Future
 

@@ -15,10 +15,14 @@ type SignalReceiver struct {
 	provider                   WorkflowProvider
 	timerProcessor             *TimerProcessor
 	workflowConfiger           *WorkflowConfiger
+	interStateChannel          *InterStateChannel
+	stateRequestQueue          *StateRequestQueue
+	persistenceManager         *PersistenceManager
 }
 
-func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter,
-	workflowConfiger *WorkflowConfiger, initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
+func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interStateChannel *InterStateChannel, stateRequestQueue *StateRequestQueue,
+	persistenceManager *PersistenceManager, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter, workflowConfiger *WorkflowConfiger,
+	initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
 	if initReceivedSignals == nil {
 		initReceivedSignals = map[string][]*iwfidl.EncodedObject{}
 	}
@@ -28,6 +32,9 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 		failWorkflowByClient: false,
 		timerProcessor:       tp,
 		workflowConfiger:     workflowConfiger,
+		interStateChannel:    interStateChannel,
+		stateRequestQueue:    stateRequestQueue,
+		persistenceManager:   persistenceManager,
 	}
 
 	provider.GoNamed(ctx, "fail-workflow-system-signal-handler", func(ctx UnifiedContext) {
@@ -45,6 +52,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 				break
 			}
 			if received {
+				continueAsNewCounter.IncSignalsReceived()
 				sr.failWorkflowByClient = true
 				sr.reasonFailWorkflowByClient = &val.Reason
 			} else {
@@ -95,6 +103,35 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, tp *TimerP
 			if received {
 				continueAsNewCounter.IncSignalsReceived()
 				workflowConfiger.SetIfPresent(val.WorkflowConfig)
+			} else {
+				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
+				return
+			}
+		}
+	})
+
+	provider.GoNamed(ctx, "execute-rpc-signal-handler", func(ctx UnifiedContext) {
+		for {
+			ch := provider.GetSignalChannel(ctx, service.ExecuteRpcSignalChannelName)
+			var val service.ExecuteRpcSignalRequest
+
+			received := false
+			err := provider.Await(ctx, func() bool {
+				received = ch.ReceiveAsync(&val)
+				return received || continueAsNewCounter.IsThresholdMet()
+			})
+			if err != nil {
+				// break the loop to prevent goroutine leakage
+				break
+			}
+			if received {
+				continueAsNewCounter.IncSignalsReceived()
+				_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
+				_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
+				sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
+				if val.StateDecision != nil {
+					sr.stateRequestQueue.AddStateStartRequests(val.StateDecision.NextStates)
+				}
 			} else {
 				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
 				return
@@ -222,6 +259,22 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 						if ok {
 							sr.failWorkflowByClient = true
 							sr.reasonFailWorkflowByClient = &val.Reason
+						} else {
+							break
+						}
+					}
+				} else if sigName == service.ExecuteRpcSignalChannelName {
+					ch := sr.provider.GetSignalChannel(ctx, service.ExecuteRpcSignalChannelName)
+					for {
+						val := service.ExecuteRpcSignalRequest{}
+						ok := ch.ReceiveAsync(&val)
+						if ok {
+							_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
+							_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
+							sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
+							if val.StateDecision != nil {
+								sr.stateRequestQueue.AddStateStartRequests(val.StateDecision.NextStates)
+							}
 						} else {
 							break
 						}

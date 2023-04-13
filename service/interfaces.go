@@ -59,6 +59,30 @@ type (
 		DataObjects []iwfidl.KeyValue
 	}
 
+	PrepareRpcQueryRequest struct {
+		DataObjectsLoadingPolicy      *iwfidl.PersistenceLoadingPolicy
+		SearchAttributesLoadingPolicy *iwfidl.PersistenceLoadingPolicy
+	}
+
+	PrepareRpcQueryResponse struct {
+		DataObjects              []iwfidl.KeyValue
+		SearchAttributes         []iwfidl.SearchAttribute
+		WorkflowRunId            string
+		WorkflowStartedTimestamp int64
+		IwfWorkflowType          string
+		IwfWorkerUrl             string
+	}
+
+	ExecuteRpcSignalRequest struct {
+		RpcInput                    *iwfidl.EncodedObject
+		RpcOutput                   *iwfidl.EncodedObject
+		UpsertDataObjects           []iwfidl.KeyValue
+		UpsertSearchAttributes      []iwfidl.SearchAttribute
+		StateDecision               *iwfidl.StateDecision
+		RecordEvents                []iwfidl.KeyValue
+		InterStateChannelPublishing []iwfidl.InterStateChannelPublishing
+	}
+
 	GetCurrentTimerInfosQueryResponse struct {
 		StateExecutionCurrentTimerInfos map[string][]*TimerInfo // key is stateExecutionId
 	}
