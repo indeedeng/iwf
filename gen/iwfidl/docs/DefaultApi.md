@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 [**ApiV1WorkflowInternalDumpPost**](DefaultApi.md#ApiV1WorkflowInternalDumpPost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
 [**ApiV1WorkflowResetPost**](DefaultApi.md#ApiV1WorkflowResetPost) | **Post** /api/v1/workflow/reset | reset a workflow
+[**ApiV1WorkflowRpcPost**](DefaultApi.md#ApiV1WorkflowRpcPost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 [**ApiV1WorkflowSearchattributesGetPost**](DefaultApi.md#ApiV1WorkflowSearchattributesGetPost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
 [**ApiV1WorkflowSignalPost**](DefaultApi.md#ApiV1WorkflowSignalPost) | **Post** /api/v1/workflow/signal | signal a workflow
@@ -18,6 +19,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowStateStartPost**](DefaultApi.md#ApiV1WorkflowStateStartPost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
 [**ApiV1WorkflowStopPost**](DefaultApi.md#ApiV1WorkflowStopPost) | **Post** /api/v1/workflow/stop | stop a workflow
 [**ApiV1WorkflowTimerSkipPost**](DefaultApi.md#ApiV1WorkflowTimerSkipPost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
+[**ApiV1WorkflowWorkerRpcPost**](DefaultApi.md#ApiV1WorkflowWorkerRpcPost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
 
 
 
@@ -403,6 +405,70 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## ApiV1WorkflowRpcPost
+
+> WorkflowRpcResponse ApiV1WorkflowRpcPost(ctx).WorkflowRpcRequest(workflowRpcRequest).Execute()
+
+execute an RPC of a workflow
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    workflowRpcRequest := *openapiclient.NewWorkflowRpcRequest("WorkflowId_example", "RpcName_example") // WorkflowRpcRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background()).WorkflowRpcRequest(workflowRpcRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowRpcPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowRpcPost`: WorkflowRpcResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowRpcPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowRpcPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowRpcRequest** | [**WorkflowRpcRequest**](WorkflowRpcRequest.md) |  | 
+
+### Return type
+
+[**WorkflowRpcResponse**](WorkflowRpcResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## ApiV1WorkflowSearchPost
 
 > WorkflowSearchResponse ApiV1WorkflowSearchPost(ctx).WorkflowSearchRequest(workflowSearchRequest).Execute()
@@ -676,7 +742,7 @@ import (
 )
 
 func main() {
-    workflowStateDecideRequest := *openapiclient.NewWorkflowStateDecideRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123), "StateExecutionId_example"), "WorkflowType_example", "WorkflowStateId_example") // WorkflowStateDecideRequest |  (optional)
+    workflowStateDecideRequest := *openapiclient.NewWorkflowStateDecideRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123)), "WorkflowType_example", "WorkflowStateId_example") // WorkflowStateDecideRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -740,7 +806,7 @@ import (
 )
 
 func main() {
-    workflowStateStartRequest := *openapiclient.NewWorkflowStateStartRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123), "StateExecutionId_example"), "WorkflowType_example", "WorkflowStateId_example") // WorkflowStateStartRequest |  (optional)
+    workflowStateStartRequest := *openapiclient.NewWorkflowStateStartRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123)), "WorkflowType_example", "WorkflowStateId_example") // WorkflowStateStartRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -894,6 +960,70 @@ Name | Type | Description  | Notes
 ### Return type
 
  (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowWorkerRpcPost
+
+> WorkflowWorkerRpcResponse ApiV1WorkflowWorkerRpcPost(ctx).WorkflowWorkerRpcRequest(workflowWorkerRpcRequest).Execute()
+
+for invoking workflow RPC API in the worker
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    workflowWorkerRpcRequest := *openapiclient.NewWorkflowWorkerRpcRequest(*openapiclient.NewContext("WorkflowId_example", "WorkflowRunId_example", int64(123)), "WorkflowType_example", "RpcName_example") // WorkflowWorkerRpcRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(context.Background()).WorkflowWorkerRpcRequest(workflowWorkerRpcRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowWorkerRpcPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowWorkerRpcPost`: WorkflowWorkerRpcResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowWorkerRpcPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowWorkerRpcPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowWorkerRpcRequest** | [**WorkflowWorkerRpcRequest**](WorkflowWorkerRpcRequest.md) |  | 
+
+### Return type
+
+[**WorkflowWorkerRpcResponse**](WorkflowWorkerRpcResponse.md)
 
 ### Authorization
 
