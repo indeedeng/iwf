@@ -107,6 +107,7 @@ Class | Method | HTTP request | Description
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
  - [ErrorSubStatus](docs/ErrorSubStatus.md)
+ - [IDReusePolicy](docs/IDReusePolicy.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)
  - [InterStateChannelPublishing](docs/InterStateChannelPublishing.md)
  - [InterStateChannelResult](docs/InterStateChannelResult.md)
