@@ -310,21 +310,11 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.WorkflowRpcRequest) (wresp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	var dataObjectKeys []string
-	var searchAttributeKeys []string
-	if req.HasDataAttributesLoadingPolicy() {
-		policy := req.GetDataAttributesLoadingPolicy()
-		dataObjectKeys = policy.GetPartialLoadingKeys()
-	}
-	if req.HasSearchAttributesLoadingPolicy() {
-		policy := req.GetSearchAttributesLoadingPolicy()
-		searchAttributeKeys = policy.GetPartialLoadingKeys()
-	}
 	// query the workflow
 	var queryResp service.PrepareRpcQueryResponse
 	err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
-		DataObjectKeys:      dataObjectKeys,
-		SearchAttributeKeys: searchAttributeKeys,
+		DataObjectsLoadingPolicy:      req.DataAttributesLoadingPolicy,
+		SearchAttributesLoadingPolicy: req.SearchAttributesLoadingPolicy,
 	})
 	if err != nil {
 		return nil, s.handleError(err)

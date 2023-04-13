@@ -85,27 +85,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
 
-	err = provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
-		return persistenceManager.GetDataObjectsByKey(req), nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	err = provider.SetQueryHandler(ctx, service.GetSearchAttributesWorkflowQueryType, func() ([]iwfidl.SearchAttribute, error) {
-		return persistenceManager.GetAllSearchAttributes(), nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	err = continueAsNewer.SetQueryHandlersForContinueAsNew(ctx)
-	if err != nil {
-		return nil, err
-	}
-	err = provider.SetQueryHandler(ctx, service.DebugDumpQueryType, func() (*service.DebugDumpResponse, error) {
-		return &service.DebugDumpResponse{
-			Config: workflowConfiger.Get(),
-		}, nil
-	})
+	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -336,7 +316,7 @@ func executeState(
 		executeApi = StateApiExecute
 	}
 
-	info := provider.GetWorkflowInfo(ctx)
+	info := provider.GetWorkflowInfo(ctx) // TODO use firstRunId instead
 	executionContext := iwfidl.Context{
 		WorkflowId:               info.WorkflowExecution.ID,
 		WorkflowRunId:            info.WorkflowExecution.RunID,
@@ -388,6 +368,9 @@ func executeState(
 
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
+		saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
+		doLoadingPolicy := compatibility.GetDataObjectsLoadingPolicy(state.StateOptions)
+
 		errStartApi = provider.ExecuteActivity(ctx, waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
 			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 			Request: iwfidl.WorkflowStateStartRequest{
@@ -395,8 +378,8 @@ func executeState(
 				WorkflowType:     basicInfo.IwfWorkflowType,
 				WorkflowStateId:  state.StateId,
 				StateInput:       state.StateInput,
-				SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
-				DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
+				SearchAttributes: persistenceManager.LoadSearchAttributes(saLoadingPolicy),
+				DataObjects:      persistenceManager.LoadDataObjects(doLoadingPolicy),
 			},
 		}).Get(ctx, &startResponse)
 
@@ -612,6 +595,9 @@ func executeStateDecide(
 		activityOptions.RetryPolicy = compatibility.GetDecideApiRetryPolicy(state.StateOptions)
 	}
 
+	saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
+	doLoadingPolicy := compatibility.GetDataObjectsLoadingPolicy(state.StateOptions)
+
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
 	err = provider.ExecuteActivity(ctx, executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
@@ -622,8 +608,8 @@ func executeStateDecide(
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      stateExecutionLocal,
-			SearchAttributes: persistenceManager.LoadSearchAttributes(state.StateOptions),
-			DataObjects:      persistenceManager.LoadDataObjects(state.StateOptions),
+			SearchAttributes: persistenceManager.LoadSearchAttributes(saLoadingPolicy),
+			DataObjects:      persistenceManager.LoadDataObjects(doLoadingPolicy),
 			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)

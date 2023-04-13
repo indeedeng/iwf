@@ -6,6 +6,9 @@ import (
 )
 
 func GetStartApiTimeoutSeconds(stateOptions *iwfidl.WorkflowStateOptions) int32 {
+	if stateOptions == nil {
+		return 0
+	}
 	if stateOptions.HasStartApiTimeoutSeconds() {
 		return stateOptions.GetStartApiTimeoutSeconds()
 	}
@@ -13,6 +16,9 @@ func GetStartApiTimeoutSeconds(stateOptions *iwfidl.WorkflowStateOptions) int32 
 }
 
 func GetDecideApiTimeoutSeconds(stateOptions *iwfidl.WorkflowStateOptions) int32 {
+	if stateOptions == nil {
+		return 0
+	}
 	if stateOptions.HasDecideApiTimeoutSeconds() {
 		return stateOptions.GetDecideApiTimeoutSeconds()
 	}
@@ -20,6 +26,9 @@ func GetDecideApiTimeoutSeconds(stateOptions *iwfidl.WorkflowStateOptions) int32
 }
 
 func GetStartApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.RetryPolicy {
+	if stateOptions == nil {
+		return nil
+	}
 	if stateOptions.HasStartApiRetryPolicy() {
 		return stateOptions.StartApiRetryPolicy
 	}
@@ -27,6 +36,9 @@ func GetStartApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.R
 }
 
 func GetDecideApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.RetryPolicy {
+	if stateOptions == nil {
+		return nil
+	}
 	if stateOptions.HasDecideApiRetryPolicy() {
 		return stateOptions.DecideApiRetryPolicy
 	}
@@ -34,6 +46,9 @@ func GetDecideApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.
 }
 
 func GetDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions == nil {
+		return nil
+	}
 	if stateOptions.HasDataObjectsLoadingPolicy() {
 		return stateOptions.DataObjectsLoadingPolicy
 	}

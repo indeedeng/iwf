@@ -23,7 +23,6 @@ func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
 	}
 }
 
-// TODO this bug in Cadence SDK may cause the test to fail https://github.com/uber-go/cadence-client/issues/1198
 func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()

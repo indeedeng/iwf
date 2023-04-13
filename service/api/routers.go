@@ -18,7 +18,7 @@ const WorkflowSkipTimerApiPath = "/api/v1/workflow/timer/skip"
 const WorkflowStopApiPath = "/api/v1/workflow/stop"
 const WorkflowInternalDumpApiPath = "/api/v1/workflow/internal/dump"
 const WorkflowConfigUpdateApiPath = "/api/v1/workflow/config/update"
-const WorkflowRpcApiPath = "/api/v1/workflow/prc"
+const WorkflowRpcApiPath = "/api/v1/workflow/rpc"
 
 // NewService returns a new router.
 func NewService(config config.Config, client UnifiedClient, logger log.Logger) *gin.Engine {

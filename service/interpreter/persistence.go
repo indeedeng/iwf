@@ -3,7 +3,6 @@ package interpreter
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/mapper"
 )
 
@@ -63,13 +62,12 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 	}
 }
 
-func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.SearchAttribute {
+func (am *PersistenceManager) LoadSearchAttributes(loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.SearchAttribute {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
-	if stateOptions != nil && stateOptions.SearchAttributesLoadingPolicy != nil {
-		policy := stateOptions.GetSearchAttributesLoadingPolicy()
-		loadingType = policy.GetPersistenceLoadingType()
-		partialLoadingKeys = policy.PartialLoadingKeys
+	if loadingPolicy != nil {
+		loadingType = loadingPolicy.GetPersistenceLoadingType()
+		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
 	}
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllSearchAttributes()
@@ -90,13 +88,12 @@ func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.Workflow
 	}
 }
 
-func (am *PersistenceManager) LoadDataObjects(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.KeyValue {
+func (am *PersistenceManager) LoadDataObjects(loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.KeyValue {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
-	if stateOptions != nil && compatibility.GetDataObjectsLoadingPolicy(stateOptions) != nil {
-		policy := compatibility.GetDataObjectsLoadingPolicy(stateOptions)
-		loadingType = policy.GetPersistenceLoadingType()
-		partialLoadingKeys = policy.PartialLoadingKeys
+	if loadingPolicy != nil {
+		loadingType = loadingPolicy.GetPersistenceLoadingType()
+		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
 	}
 
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {

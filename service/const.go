@@ -9,8 +9,9 @@ const (
 
 	TaskQueue = "Interpreter_DEFAULT"
 
-	StateStartApi  = "/api/v1/workflowState/start"
-	StateDecideApi = "/api/v1/workflowState/decide"
+	StateStartApi        = "/api/v1/workflowState/start"
+	StateDecideApi       = "/api/v1/workflowState/decide"
+	WorkflowWorkerRpcApi = "/api/v1/workflowWorker/rpc"
 
 	GetDataObjectsWorkflowQueryType      = "GetDataObjects"
 	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"

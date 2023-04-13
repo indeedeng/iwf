@@ -60,8 +60,8 @@ type (
 	}
 
 	PrepareRpcQueryRequest struct {
-		DataObjectKeys      []string
-		SearchAttributeKeys []string
+		DataObjectsLoadingPolicy      *iwfidl.PersistenceLoadingPolicy
+		SearchAttributesLoadingPolicy *iwfidl.PersistenceLoadingPolicy
 	}
 
 	PrepareRpcQueryResponse struct {
