@@ -61,7 +61,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
+		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
@@ -79,7 +79,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
+		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)

@@ -7,10 +7,7 @@ type (
 const (
 	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
 
-	TaskQueue                         = "Interpreter_DEFAULT"
-	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
-	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
-	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
+	TaskQueue = "Interpreter_DEFAULT"
 
 	StateStartApi  = "/api/v1/workflowState/start"
 	StateDecideApi = "/api/v1/workflowState/decide"
@@ -41,4 +38,16 @@ var ValidIwfSystemSignalNames = map[string]bool{
 	FailWorkflowSignalChannelName: true,
 	UpdateConfigSignalChannelName: true,
 	ExecuteRpcSignalChannelName:   true,
+}
+
+const (
+	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
+	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
+	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
+)
+
+var ValidClosingWorkflowStateId = map[string]bool{
+	GracefulCompletingWorkflowStateId: true,
+	ForceCompletingWorkflowStateId:    true,
+	ForceFailingWorkflowStateId:       true,
 }

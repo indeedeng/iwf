@@ -361,6 +361,13 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	if checkHttpError(err, httpResp) {
 		return nil, s.handleErrorWithHttpResp(err, httpResp)
 	}
+	decision := resp.GetStateDecision()
+	for _, st := range decision.GetNextStates() {
+		if service.ValidClosingWorkflowStateId[st.GetStateId()] {
+			// TODO this need more work in workflow to support
+			return nil, s.handleError(fmt.Errorf("closing workflow in RPC is not supported yet"))
+		}
+	}
 
 	// send the signal
 	sigVal := service.ExecuteRpcSignalRequest{
