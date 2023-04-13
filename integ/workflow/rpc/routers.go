@@ -80,7 +80,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	log.Println("received workflow worker rpc request, ", req)
 
 	wfCtx := req.Context
-	if wfCtx.WorkflowStartedTimestamp <= 0 || wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
+	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
 		panic("invalid context in the request")
 	}
 	if req.WorkflowType != WorkflowType || req.RpcName != RPCName {
