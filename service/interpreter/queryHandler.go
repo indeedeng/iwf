@@ -8,7 +8,8 @@ import (
 func SetQueryHandlers(ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager, continueAsNewer *ContinueAsNewer,
 	workflowConfiger *WorkflowConfiger, basicInfo service.BasicInfo) error {
 	err := provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
-		return persistenceManager.GetDataObjectsByKey(req), nil
+		dos := persistenceManager.GetDataObjectsByKey(req)
+		return dos, nil
 	})
 	if err != nil {
 		return err

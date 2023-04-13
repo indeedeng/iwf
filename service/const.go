@@ -18,7 +18,7 @@ const (
 	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
 	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
 	DebugDumpQueryType                   = "DebugNewDump"
-	PrepareRpcQueryType                  = "GetDataObjects"
+	PrepareRpcQueryType                  = "PrepareRpcQueryType"
 
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
