@@ -5,6 +5,8 @@ type (
 )
 
 const (
+	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
+
 	TaskQueue                         = "Interpreter_DEFAULT"
 	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
 	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
@@ -18,6 +20,7 @@ const (
 	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
 	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
 	DebugDumpQueryType                   = "DebugNewDump"
+	PrepareRpcQueryType                  = "GetDataObjects"
 
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
@@ -30,12 +33,12 @@ const (
 	SkipTimerSignalChannelName    = IwfSystemSignalPrefix + "SkipTimerChannel"
 	FailWorkflowSignalChannelName = IwfSystemSignalPrefix + "FailWorkflowChannel"
 	UpdateConfigSignalChannelName = IwfSystemSignalPrefix + "UpdateWorkflowConfig"
-
-	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
+	ExecuteRpcSignalChannelName   = IwfSystemSignalPrefix + "ExecuteRpc"
 )
 
-var ValidIwfSystemSignalNames map[string]bool = map[string]bool{
+var ValidIwfSystemSignalNames = map[string]bool{
 	SkipTimerSignalChannelName:    true,
 	FailWorkflowSignalChannelName: true,
 	UpdateConfigSignalChannelName: true,
+	ExecuteRpcSignalChannelName:   true,
 }
