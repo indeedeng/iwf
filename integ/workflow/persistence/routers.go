@@ -281,7 +281,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 										TestSearchAttributeKeywordKey,
 									},
 								},
-								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+								DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
 										TestDataObjectKey,

@@ -130,7 +130,7 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 	})
 	wfId := "wf-cancel-test" + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
-	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	request := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        signal.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
@@ -139,7 +139,24 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
-	}).Execute()
+	}
+	startResp, httpResp, err := req.WorkflowStartRequest(request).Execute()
+	panicAtHttpError(err, httpResp)
+
+	assertions := assert.New(t)
+	// start it again should return already started error
+	_, _, err = req.WorkflowStartRequest(request).Execute()
+	assertions.NotNil(err)
+
+	// using terminate if running should go through
+	request.WorkflowStartOptions.WorkflowIDReusePolicy = iwfidl.TERMINATE_IF_RUNNING.Ptr()
+	_, httpResp, err = req.WorkflowStartRequest(request).Execute()
+	panicAtHttpError(err, httpResp)
+
+	// using the compatibility
+	request.WorkflowStartOptions.WorkflowIDReusePolicy = nil
+	request.WorkflowStartOptions.IdReusePolicy = iwfidl.ALLOW_TERMINATE_IF_RUNNING.Ptr()
+	startResp, httpResp, err = req.WorkflowStartRequest(request).Execute()
 	panicAtHttpError(err, httpResp)
 
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
@@ -155,8 +172,6 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 		WorkflowId: wfId,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
-
-	assertions := assert.New(t)
 
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),

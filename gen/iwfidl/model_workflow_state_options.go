@@ -34,6 +34,7 @@ type WorkflowStateOptions struct {
 	ExecuteApiRetryPolicy         *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
 	WaitUntilApiFailurePolicy     *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
 	SkipWaitUntil                 *bool                      `json:"skipWaitUntil,omitempty"`
+	DataAttributesLoadingPolicy   *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -533,6 +534,38 @@ func (o *WorkflowStateOptions) SetSkipWaitUntil(v bool) {
 	o.SkipWaitUntil = &v
 }
 
+// GetDataAttributesLoadingPolicy returns the DataAttributesLoadingPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetDataAttributesLoadingPolicy() PersistenceLoadingPolicy {
+	if o == nil || IsNil(o.DataAttributesLoadingPolicy) {
+		var ret PersistenceLoadingPolicy
+		return ret
+	}
+	return *o.DataAttributesLoadingPolicy
+}
+
+// GetDataAttributesLoadingPolicyOk returns a tuple with the DataAttributesLoadingPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
+	if o == nil || IsNil(o.DataAttributesLoadingPolicy) {
+		return nil, false
+	}
+	return o.DataAttributesLoadingPolicy, true
+}
+
+// HasDataAttributesLoadingPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasDataAttributesLoadingPolicy() bool {
+	if o != nil && !IsNil(o.DataAttributesLoadingPolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetDataAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the DataAttributesLoadingPolicy field.
+func (o *WorkflowStateOptions) SetDataAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
+	o.DataAttributesLoadingPolicy = &v
+}
+
 func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -587,6 +620,9 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SkipWaitUntil) {
 		toSerialize["skipWaitUntil"] = o.SkipWaitUntil
+	}
+	if !IsNil(o.DataAttributesLoadingPolicy) {
+		toSerialize["dataAttributesLoadingPolicy"] = o.DataAttributesLoadingPolicy
 	}
 	return toSerialize, nil
 }

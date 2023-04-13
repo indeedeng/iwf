@@ -24,6 +24,7 @@ type WorkflowStartOptions struct {
 	RetryPolicy            *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
 	SearchAttributes       []SearchAttribute      `json:"searchAttributes,omitempty"`
 	WorkflowConfigOverride *WorkflowConfig        `json:"workflowConfigOverride,omitempty"`
+	IdReusePolicy          *IDReusePolicy         `json:"idReusePolicy,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -203,6 +204,38 @@ func (o *WorkflowStartOptions) SetWorkflowConfigOverride(v WorkflowConfig) {
 	o.WorkflowConfigOverride = &v
 }
 
+// GetIdReusePolicy returns the IdReusePolicy field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetIdReusePolicy() IDReusePolicy {
+	if o == nil || IsNil(o.IdReusePolicy) {
+		var ret IDReusePolicy
+		return ret
+	}
+	return *o.IdReusePolicy
+}
+
+// GetIdReusePolicyOk returns a tuple with the IdReusePolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartOptions) GetIdReusePolicyOk() (*IDReusePolicy, bool) {
+	if o == nil || IsNil(o.IdReusePolicy) {
+		return nil, false
+	}
+	return o.IdReusePolicy, true
+}
+
+// HasIdReusePolicy returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasIdReusePolicy() bool {
+	if o != nil && !IsNil(o.IdReusePolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetIdReusePolicy gets a reference to the given IDReusePolicy and assigns it to the IdReusePolicy field.
+func (o *WorkflowStartOptions) SetIdReusePolicy(v IDReusePolicy) {
+	o.IdReusePolicy = &v
+}
+
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -227,6 +260,9 @@ func (o WorkflowStartOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.WorkflowConfigOverride) {
 		toSerialize["workflowConfigOverride"] = o.WorkflowConfigOverride
+	}
+	if !IsNil(o.IdReusePolicy) {
+		toSerialize["idReusePolicy"] = o.IdReusePolicy
 	}
 	return toSerialize, nil
 }

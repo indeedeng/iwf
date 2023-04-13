@@ -436,6 +436,11 @@ components:
           persistenceLoadingType: null
         skipWaitUntil: true
         startApiFailurePolicy: null
+        dataAttributesLoadingPolicy:
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
         commandCarryOverPolicy:
           commandCarryOverType: null
         decideApiRetryPolicy:
@@ -491,6 +496,8 @@ components:
           $ref: '#/components/schemas/WaitUntilApiFailurePolicy'
         skipWaitUntil:
           type: boolean
+        dataAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
       type: object
     WorkflowStartOptions:
       example:
@@ -503,6 +510,7 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 7
           continueAsNewPageSizeInBytes: 1
+        idReusePolicy: null
         searchAttributes:
         - stringValue: stringValue
           valueType: null
@@ -537,6 +545,8 @@ components:
           type: array
         workflowConfigOverride:
           $ref: '#/components/schemas/WorkflowConfig'
+        idReusePolicy:
+          $ref: '#/components/schemas/IDReusePolicy'
       type: object
     WorkflowIDReusePolicy:
       enum:
@@ -544,6 +554,13 @@ components:
       - ALLOW_DUPLICATE
       - REJECT_DUPLICATE
       - TERMINATE_IF_RUNNING
+      type: string
+    IDReusePolicy:
+      enum:
+      - ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY
+      - ALLOW_IF_NO_RUNNING
+      - DISALLOW_REUSE
+      - ALLOW_TERMINATE_IF_RUNNING
       type: string
     PersistenceLoadingPolicy:
       example:
@@ -613,6 +630,11 @@ components:
             persistenceLoadingType: null
           skipWaitUntil: true
           startApiFailurePolicy: null
+          dataAttributesLoadingPolicy:
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           commandCarryOverPolicy:
             commandCarryOverType: null
           decideApiRetryPolicy:
@@ -648,6 +670,7 @@ components:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 7
             continueAsNewPageSizeInBytes: 1
+          idReusePolicy: null
           searchAttributes:
           - stringValue: stringValue
             valueType: null
@@ -1433,6 +1456,11 @@ components:
                 persistenceLoadingType: null
               skipWaitUntil: true
               startApiFailurePolicy: null
+              dataAttributesLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               commandCarryOverPolicy:
                 commandCarryOverType: null
               decideApiRetryPolicy:
@@ -1482,6 +1510,11 @@ components:
                 persistenceLoadingType: null
               skipWaitUntil: true
               startApiFailurePolicy: null
+              dataAttributesLoadingPolicy:
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               commandCarryOverPolicy:
                 commandCarryOverType: null
               decideApiRetryPolicy:
@@ -1585,6 +1618,11 @@ components:
               persistenceLoadingType: null
             skipWaitUntil: true
             startApiFailurePolicy: null
+            dataAttributesLoadingPolicy:
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             commandCarryOverPolicy:
               commandCarryOverType: null
             decideApiRetryPolicy:
@@ -1634,6 +1672,11 @@ components:
               persistenceLoadingType: null
             skipWaitUntil: true
             startApiFailurePolicy: null
+            dataAttributesLoadingPolicy:
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             commandCarryOverPolicy:
               commandCarryOverType: null
             decideApiRetryPolicy:
@@ -1691,6 +1734,11 @@ components:
             persistenceLoadingType: null
           skipWaitUntil: true
           startApiFailurePolicy: null
+          dataAttributesLoadingPolicy:
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           commandCarryOverPolicy:
             commandCarryOverType: null
           decideApiRetryPolicy:

@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **RetryPolicy** | Pointer to [**WorkflowRetryPolicy**](WorkflowRetryPolicy.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **WorkflowConfigOverride** | Pointer to [**WorkflowConfig**](WorkflowConfig.md) |  | [optional] 
+**IdReusePolicy** | Pointer to [**IDReusePolicy**](IDReusePolicy.md) |  | [optional] 
 
 ## Methods
 
@@ -153,6 +154,31 @@ SetWorkflowConfigOverride sets WorkflowConfigOverride field to given value.
 `func (o *WorkflowStartOptions) HasWorkflowConfigOverride() bool`
 
 HasWorkflowConfigOverride returns a boolean if a field has been set.
+
+### GetIdReusePolicy
+
+`func (o *WorkflowStartOptions) GetIdReusePolicy() IDReusePolicy`
+
+GetIdReusePolicy returns the IdReusePolicy field if non-nil, zero value otherwise.
+
+### GetIdReusePolicyOk
+
+`func (o *WorkflowStartOptions) GetIdReusePolicyOk() (*IDReusePolicy, bool)`
+
+GetIdReusePolicyOk returns a tuple with the IdReusePolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetIdReusePolicy
+
+`func (o *WorkflowStartOptions) SetIdReusePolicy(v IDReusePolicy)`
+
+SetIdReusePolicy sets IdReusePolicy field to given value.
+
+### HasIdReusePolicy
+
+`func (o *WorkflowStartOptions) HasIdReusePolicy() bool`
+
+HasIdReusePolicy returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
