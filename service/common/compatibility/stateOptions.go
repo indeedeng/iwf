@@ -33,6 +33,13 @@ func GetDecideApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.
 	return stateOptions.ExecuteApiRetryPolicy
 }
 
+func GetDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions.HasDataObjectsLoadingPolicy() {
+		return stateOptions.DataObjectsLoadingPolicy
+	}
+	return stateOptions.DataAttributesLoadingPolicy
+}
+
 func GetStartApiFailurePolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.StartApiFailurePolicy {
 	if stateOptions.HasStartApiFailurePolicy() {
 		return stateOptions.StartApiFailurePolicy

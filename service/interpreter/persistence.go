@@ -3,6 +3,7 @@ package interpreter
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/mapper"
 )
 
@@ -92,8 +93,8 @@ func (am *PersistenceManager) LoadSearchAttributes(stateOptions *iwfidl.Workflow
 func (am *PersistenceManager) LoadDataObjects(stateOptions *iwfidl.WorkflowStateOptions) []iwfidl.KeyValue {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
-	if stateOptions != nil && stateOptions.DataObjectsLoadingPolicy != nil {
-		policy := stateOptions.GetDataObjectsLoadingPolicy()
+	if stateOptions != nil && compatibility.GetDataObjectsLoadingPolicy(stateOptions) != nil {
+		policy := compatibility.GetDataObjectsLoadingPolicy(stateOptions)
 		loadingType = policy.GetPersistenceLoadingType()
 		partialLoadingKeys = policy.PartialLoadingKeys
 	}
