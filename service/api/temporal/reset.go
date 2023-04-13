@@ -170,7 +170,7 @@ func getDecisionEventIDByStateOrStateExecutionId(
 					if err != nil {
 						return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", err)
 					}
-					if input.Request.WorkflowStateId == stateId || *input.Request.Context.StateExecutionId == stateExecutionId {
+					if input.Request.WorkflowStateId == stateId || input.Request.Context.GetStateExecutionId() == stateExecutionId {
 						if decisionFinishID == 0 {
 							return 0, composeErrorWithMessage("GetWorkflowExecutionHistory failed", fmt.Errorf("invalid history or something goes very wrong"))
 						}
