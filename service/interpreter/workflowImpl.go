@@ -341,7 +341,7 @@ func executeState(
 		WorkflowId:               info.WorkflowExecution.ID,
 		WorkflowRunId:            info.WorkflowExecution.RunID,
 		WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
-		StateExecutionId:         stateExeId,
+		StateExecutionId:         &stateExeId,
 	}
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 30 * time.Second,
