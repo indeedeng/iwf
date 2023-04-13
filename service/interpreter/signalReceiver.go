@@ -52,6 +52,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 				break
 			}
 			if received {
+				continueAsNewCounter.IncSignalsReceived()
 				sr.failWorkflowByClient = true
 				sr.reasonFailWorkflowByClient = &val.Reason
 			} else {
@@ -124,6 +125,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 				break
 			}
 			if received {
+				continueAsNewCounter.IncSignalsReceived()
 				_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
 				_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 				sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
