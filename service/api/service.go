@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/compatibility"
 	"math"
 	"net/http"
 	"time"
@@ -54,7 +55,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 
 	if req.WorkflowStartOptions != nil {
 		startOptions := req.WorkflowStartOptions
-		workflowOptions.WorkflowIDReusePolicy = startOptions.WorkflowIDReusePolicy
+		workflowOptions.WorkflowIDReusePolicy = compatibility.GetWorkflowIdReusePolicy(*startOptions)
 		workflowOptions.CronSchedule = startOptions.CronSchedule
 		workflowOptions.RetryPolicy = startOptions.RetryPolicy
 		var err error
