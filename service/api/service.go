@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/compatibility"
+	"io/ioutil"
 	"math"
 	"net/http"
 	"time"
@@ -306,6 +307,86 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 	}, nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.WorkflowRpcRequest) (wresp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	var dataObjectKeys []string
+	var searchAttributeKeys []string
+	if req.HasDataAttributesLoadingPolicy() {
+		policy := req.GetDataAttributesLoadingPolicy()
+		dataObjectKeys = policy.GetPartialLoadingKeys()
+	}
+	if req.HasSearchAttributesLoadingPolicy() {
+		policy := req.GetSearchAttributesLoadingPolicy()
+		searchAttributeKeys = policy.GetPartialLoadingKeys()
+	}
+	// query the workflow
+	var queryResp service.PrepareRpcQueryResponse
+	err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
+		DataObjectKeys:      dataObjectKeys,
+		SearchAttributeKeys: searchAttributeKeys,
+	})
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	// invoke worker rpc
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: queryResp.IwfWorkerUrl,
+			},
+		},
+	})
+	rpcCtx := ctx
+	var cancel context.CancelFunc
+	if req.GetTimeoutSeconds() > 0 {
+		rpcCtx, cancel = context.WithTimeout(rpcCtx, time.Duration(req.GetTimeoutSeconds())*time.Second)
+		defer cancel()
+	}
+	workerReq := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(rpcCtx)
+	workerRequest := iwfidl.WorkflowWorkerRpcRequest{
+		Context: iwfidl.Context{
+			WorkflowId:               req.WorkflowId,
+			WorkflowRunId:            queryResp.WorkflowRunId,
+			WorkflowStartedTimestamp: queryResp.WorkflowStartedTimestamp,
+		},
+		WorkflowType:     queryResp.IwfWorkflowType,
+		RpcName:          req.RpcName,
+		Input:            req.Input,
+		SearchAttributes: queryResp.SearchAttributes,
+		DataAttributes:   queryResp.DataObjects,
+	}
+	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
+	if checkHttpError(err, httpResp) {
+		return nil, s.handleErrorWithHttpResp(err, httpResp)
+	}
+
+	// send the signal
+	sigVal := service.ExecuteRpcSignalRequest{
+		RpcInput:                    req.Input,
+		RpcOutput:                   resp.Output,
+		UpsertDataObjects:           resp.UpsertDataAttributes,
+		UpsertSearchAttributes:      resp.UpsertSearchAttributes,
+		StateDecision:               resp.StateDecision,
+		RecordEvents:                resp.RecordEvents,
+		InterStateChannelPublishing: resp.PublishToInterStateChannel,
+	}
+	err = s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	return &iwfidl.WorkflowRpcResponse{Output: resp.Output}, nil
+}
+
+func checkHttpError(err error, httpResp *http.Response) bool {
+	if err != nil || (httpResp != nil && httpResp.StatusCode != http.StatusOK) {
+		return true
+	}
+	return false
+}
+
 func (s *serviceImpl) ApiV1WorkflowResetPost(ctx context.Context, req iwfidl.WorkflowResetRequest) (wresp *iwfidl.WorkflowResetResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
@@ -384,6 +465,25 @@ func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
 	return errors.NewErrorAndStatus(http.StatusBadRequest,
 		iwfidl.UNCATEGORIZED_SUB_STATUS,
 		"invalid request - "+msg)
+}
+
+func (s *serviceImpl) handleErrorWithHttpResp(err error, httpResp *http.Response) *errors.ErrorAndStatus {
+	if err != nil {
+		return s.handleError(err)
+	}
+	responseBody := "None"
+	var statusCode int
+	if httpResp != nil {
+		body, err := ioutil.ReadAll(httpResp.Body)
+		if err != nil {
+			responseBody = "cannot read body from http response"
+		} else {
+			responseBody = string(body)
+		}
+		statusCode = httpResp.StatusCode
+	}
+	httpErr := fmt.Errorf("unsuccessful http response, statusCode: %v, responseBody: %v", statusCode, responseBody)
+	return s.handleError(httpErr)
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {

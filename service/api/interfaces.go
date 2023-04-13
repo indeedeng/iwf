@@ -19,6 +19,7 @@ type ApiService interface {
 	ApiV1WorkflowGetPost(ctx context.Context, request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowGetWithWaitPost(ctx context.Context, request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowSearchPost(ctx context.Context, request iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *errors.ErrorAndStatus)
+	ApiV1WorkflowRpcPost(ctx context.Context, request iwfidl.WorkflowRpcRequest) (*iwfidl.WorkflowRpcResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowResetPost(ctx context.Context, request iwfidl.WorkflowResetRequest) (*iwfidl.WorkflowResetResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowSkipTimerPost(ctx context.Context, request iwfidl.WorkflowSkipTimerRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus)

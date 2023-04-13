@@ -74,11 +74,11 @@ type (
 	}
 
 	ExecuteRpcSignalRequest struct {
-		RpcInput                    iwfidl.EncodedObject
-		RpcOutput                   iwfidl.EncodedObject
+		RpcInput                    *iwfidl.EncodedObject
+		RpcOutput                   *iwfidl.EncodedObject
 		UpsertDataObjects           []iwfidl.KeyValue
 		UpsertSearchAttributes      []iwfidl.SearchAttribute
-		StateDecision               iwfidl.StateDecision
+		StateDecision               *iwfidl.StateDecision
 		RecordEvents                []iwfidl.KeyValue
 		InterStateChannelPublishing []iwfidl.InterStateChannelPublishing
 	}
