@@ -87,6 +87,21 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 
 	time.Sleep(time.Second * 1)
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+	rpcRespReadOnly, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+		WorkflowId: wfId,
+		RpcName:    rpc.RPCNameReadOnly,
+		Input:      &rpc.TestInput,
+		SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+			PersistenceLoadingType: iwfidl.PARTIAL_WITHOUT_LOCKING.Ptr(),
+			PartialLoadingKeys: []string{
+				rpc.TestSearchAttributeIntKey,
+			},
+		},
+		TimeoutSeconds: iwfidl.PtrInt32(2),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	reqRpc = apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 		WorkflowId: wfId,
 		RpcName:    rpc.RPCName,
@@ -121,22 +136,41 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 		Output: &rpc.TestOutput,
 	}, rpcResp, "rpc test fail, %v", rpcResp)
 
+	assertions.Equalf(&iwfidl.WorkflowRpcResponse{
+		Output: &rpc.TestOutput,
+	}, rpcResp, "rpc test fail, %v", rpcRespReadOnly)
+
 	assertions.Equalf(map[string]interface{}{
-		"rpc-data-attributes": []iwfidl.KeyValue{
+		rpc.RPCName + "-data-attributes": []iwfidl.KeyValue{
 			{
 				Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
 				Value: &rpc.TestDataObjectVal1,
 			},
 		},
-		"rpc-search-attributes": []iwfidl.SearchAttribute{
+		rpc.RPCName + "-search-attributes": []iwfidl.SearchAttribute{
 			{
 				Key:          iwfidl.PtrString(rpc.TestSearchAttributeIntKey),
 				IntegerValue: iwfidl.PtrInt64(rpc.TestSearchAttributeIntValue1),
 				ValueType:    ptr.Any(iwfidl.INT),
 			},
 		},
-		"rpc-input":                   &rpc.TestInput,
+		rpc.RPCName + "-input":        &rpc.TestInput,
 		rpc.TestInterStateChannelName: &rpc.TestInterstateChannelValue,
+
+		rpc.RPCNameReadOnly + "-data-attributes": []iwfidl.KeyValue{
+			{
+				Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
+				Value: &rpc.TestDataObjectVal1,
+			},
+		},
+		rpc.RPCNameReadOnly + "-search-attributes": []iwfidl.SearchAttribute{
+			{
+				Key:          iwfidl.PtrString(rpc.TestSearchAttributeIntKey),
+				IntegerValue: iwfidl.PtrInt64(rpc.TestSearchAttributeIntValue1),
+				ValueType:    ptr.Any(iwfidl.INT),
+			},
+		},
+		rpc.RPCNameReadOnly + "-input": &rpc.TestInput,
 	}, data, "rpc test fail, %v", data)
 
 	reqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
