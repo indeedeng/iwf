@@ -359,19 +359,23 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		}
 	}
 
-	// send the signal
-	sigVal := service.ExecuteRpcSignalRequest{
-		RpcInput:                    req.Input,
-		RpcOutput:                   resp.Output,
-		UpsertDataObjects:           resp.UpsertDataAttributes,
-		UpsertSearchAttributes:      resp.UpsertSearchAttributes,
-		StateDecision:               resp.StateDecision,
-		RecordEvents:                resp.RecordEvents,
-		InterStateChannelPublishing: resp.PublishToInterStateChannel,
-	}
-	err = s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
-	if err != nil {
-		return nil, s.handleError(err)
+	if len(resp.UpsertDataAttributes)+len(resp.UpsertSearchAttributes)+len(resp.PublishToInterStateChannel)+len(resp.RecordEvents)+len(decision.GetNextStates()) > 0 {
+		// if there is no mutation on the workflow, this RPC is "readonly", then don't send the signal
+
+		// send the signal
+		sigVal := service.ExecuteRpcSignalRequest{
+			RpcInput:                    req.Input,
+			RpcOutput:                   resp.Output,
+			UpsertDataObjects:           resp.UpsertDataAttributes,
+			UpsertSearchAttributes:      resp.UpsertSearchAttributes,
+			StateDecision:               resp.StateDecision,
+			RecordEvents:                resp.RecordEvents,
+			InterStateChannelPublishing: resp.PublishToInterStateChannel,
+		}
+		err = s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+		if err != nil {
+			return nil, s.handleError(err)
+		}
 	}
 
 	return &iwfidl.WorkflowRpcResponse{Output: resp.Output}, nil

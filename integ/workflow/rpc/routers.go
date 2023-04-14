@@ -16,6 +16,7 @@ const (
 	State2                    = "S2"
 	TestInterStateChannelName = "test-TestInterStateChannelName"
 	RPCName                   = "test-RPCName"
+	RPCNameReadOnly           = "test-RPC-readonly"
 
 	TestDataObjectKey = "test-data-object"
 
@@ -83,8 +84,19 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
 		panic("invalid context in the request")
 	}
-	if req.WorkflowType != WorkflowType || req.RpcName != RPCName {
-		panic("invalid rpc name")
+	if req.WorkflowType != WorkflowType || (req.RpcName != RPCName && req.RpcName != RPCNameReadOnly) {
+		panic("invalid rpc name:" + req.RpcName)
+	}
+
+	h.invokeData[req.RpcName+"-input"] = req.Input
+	h.invokeData[req.RpcName+"-search-attributes"] = req.SearchAttributes
+	h.invokeData[req.RpcName+"-data-attributes"] = req.DataAttributes
+
+	if req.RpcName == RPCNameReadOnly {
+		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+			Output: &TestOutput,
+		})
+		return
 	}
 
 	upsertSAs := []iwfidl.SearchAttribute{
@@ -99,10 +111,6 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 			ValueType:    ptr.Any(iwfidl.INT),
 		},
 	}
-
-	h.invokeData["rpc-input"] = req.Input
-	h.invokeData["rpc-search-attributes"] = req.SearchAttributes
-	h.invokeData["rpc-data-attributes"] = req.DataAttributes
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		Output: &TestOutput,
