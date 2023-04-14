@@ -91,7 +91,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	h.invokeData[req.RpcName+"-input"] = req.Input
 	h.invokeData[req.RpcName+"-search-attributes"] = req.SearchAttributes
 	h.invokeData[req.RpcName+"-data-attributes"] = req.DataAttributes
-	
+
 	if req.RpcName == RPCNameReadOnly {
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			Output: &TestOutput,
