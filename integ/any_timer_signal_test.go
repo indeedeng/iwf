@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	anytimersignal "github.com/indeedeng/iwf/integ/workflow/any_timer_signal"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
@@ -61,7 +62,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 		IwfWorkflowType:        anytimersignal.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           anytimersignal.State1,
+		StartStateId:           ptr.Any(anytimersignal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

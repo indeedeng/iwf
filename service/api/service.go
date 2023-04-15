@@ -74,7 +74,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	input := service.InterpreterWorkflowInput{
 		IwfWorkflowType:      req.GetIwfWorkflowType(),
 		IwfWorkerUrl:         req.GetIwfWorkerUrl(),
-		StartStateId:         req.GetStartStateId(),
+		StartStateId:         req.StartStateId,
 		StateInput:           req.GetStateInput(),
 		StateOptions:         req.GetStateOptions(),
 		InitSearchAttributes: initSAs,

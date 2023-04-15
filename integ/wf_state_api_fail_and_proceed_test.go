@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
 	"time"
@@ -76,7 +77,7 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 		IwfWorkflowType:        wf_state_api_fail_and_proceed.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           wf_state_api_fail_and_proceed.State1,
+		StartStateId:           ptr.Any(wf_state_api_fail_and_proceed.State1),
 		StateOptions:           stateOptions,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,

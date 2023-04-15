@@ -72,7 +72,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		interStateChannel = NewInterStateChannel()
 
 		stateRequestQueue = NewStateRequestQueue(iwfidl.StateMovement{
-			StateId:      input.StartStateId,
+			StateId:      *input.StartStateId, // TODO
 			StateOptions: &input.StateOptions,
 			StateInput:   &input.StateInput,
 		})

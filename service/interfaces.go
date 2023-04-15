@@ -10,7 +10,7 @@ type (
 
 		IwfWorkerUrl string `json:"iwfWorkerUrl,omitempty"`
 
-		StartStateId string `json:"startStateId,omitempty"`
+		StartStateId *string `json:"startStateId,omitempty"`
 
 		StateInput iwfidl.EncodedObject `json:"stateInput,omitempty"`
 

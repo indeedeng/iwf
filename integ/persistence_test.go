@@ -89,7 +89,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 		IwfWorkflowType:        persistence.WorkflowType,
 		WorkflowTimeoutSeconds: 20,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           persistence.State1,
+		StartStateId:           ptr.Any(persistence.State1),
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 				PersistenceLoadingType: ptr.Any(iwfidl.ALL_WITHOUT_LOCKING),

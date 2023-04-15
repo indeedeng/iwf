@@ -61,7 +61,7 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType, config *i
 		IwfWorkflowType:        wf_state_api_fail.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           wf_state_api_fail.State1,
+		StartStateId:           ptr.Any(wf_state_api_fail.State1),
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			StartApiRetryPolicy: &iwfidl.RetryPolicy{
 				MaximumAttemptsDurationSeconds: iwfidl.PtrInt32(1),

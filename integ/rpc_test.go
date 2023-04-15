@@ -78,7 +78,7 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 		IwfWorkflowType:        rpc.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           rpc.State1,
+		StartStateId:           ptr.Any(rpc.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"encoding/json"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
 	"time"
@@ -62,7 +63,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		IwfWorkflowType:        anycommandconbination.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           anycommandconbination.State1,
+		StartStateId:           ptr.Any(anycommandconbination.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

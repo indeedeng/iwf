@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"github.com/indeedeng/iwf/integ/workflow/skipstart"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
 	"time"
@@ -80,7 +81,7 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 		IwfWorkflowType:        skipstart.WorkflowType,
 		WorkflowTimeoutSeconds: 100,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           skipstart.State1,
+		StartStateId:           ptr.Any(skipstart.State1),
 		StateInput:             wfInput,
 		StateOptions: &iwfidl.WorkflowStateOptions{
 			SkipWaitUntil: iwfidl.PtrBool(true),

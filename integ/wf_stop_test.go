@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
 	"time"
@@ -80,7 +81,7 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType, confi
 		IwfWorkflowType:        signal.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           signal.State1,
+		StartStateId:           ptr.Any(signal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
@@ -135,7 +136,7 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 		IwfWorkflowType:        signal.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           signal.State1,
+		StartStateId:           ptr.Any(signal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
@@ -205,7 +206,7 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType, config *i
 		IwfWorkflowType:        signal.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           signal.State1,
+		StartStateId:           ptr.Any(signal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
