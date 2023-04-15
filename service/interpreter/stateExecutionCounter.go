@@ -135,7 +135,7 @@ func (e *StateExecutionCounter) ClearExecutingStateIdsSearchAttributeFinally() {
 			service.SearchAttributeExecutingStateIds: []string{},
 		})
 		if err != nil {
-			e.provider.GetLogger(e.ctx).Error("error for upseart SearchAttributeExecutingStateIds", err)
+			e.provider.GetLogger(e.ctx).Error("error for upsert SearchAttributeExecutingStateIds", err)
 		}
 	}
 }

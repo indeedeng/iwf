@@ -89,7 +89,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 
 	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
-	// TODO should not clear if it's continueAsNew
+	// Because it will check totalCurrentlyExecutingCount == 0, so it will also work for continueAsNew case
 	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
 
 	if !input.IsResumeFromContinueAsNew {
