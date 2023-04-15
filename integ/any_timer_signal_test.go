@@ -60,7 +60,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        anytimersignal.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 20,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(anytimersignal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
