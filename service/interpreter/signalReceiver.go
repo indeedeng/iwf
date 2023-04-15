@@ -293,14 +293,17 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 	}
 }
 
-func (sr *SignalReceiver) IsFailWorkflowRequested() (bool, string) {
+func (sr *SignalReceiver) IsFailWorkflowRequested() (bool, error) {
 	reason := "fail by client"
 	if sr.reasonFailWorkflowByClient != nil {
 		reason = *sr.reasonFailWorkflowByClient
 	}
 	if sr.failWorkflowByClient {
-		return true, reason
+		return true, sr.provider.NewApplicationError(
+			string(iwfidl.CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE),
+			reason,
+		)
 	} else {
-		return false, ""
+		return false, nil
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/parallel"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
@@ -59,7 +60,7 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType, confi
 		IwfWorkflowType:        parallel.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           parallel.State1,
+		StartStateId:           ptr.Any(parallel.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

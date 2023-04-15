@@ -289,7 +289,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/WorkerErrorResponse'
           description: Invalid input
       summary: for invoking WorkflowState.start API
   /api/v1/workflowState/decide:
@@ -310,7 +310,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/WorkerErrorResponse'
           description: Invalid input
       summary: for invoking WorkflowState.decide API
   /api/v1/workflowWorker/rpc:
@@ -331,7 +331,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/WorkerErrorResponse'
           description: Invalid input
       summary: for invoking workflow RPC API in the worker
 components:
@@ -634,18 +634,32 @@ components:
       enum:
       - NONE
       type: string
+    WorkerErrorResponse:
+      properties:
+        detail:
+          type: string
+        errorType:
+          type: string
+      type: object
     ErrorResponse:
       properties:
         detail:
           type: string
         subStatus:
           $ref: '#/components/schemas/ErrorSubStatus'
+        originalWorkerErrorDetail:
+          type: string
+        originalWorkerErrorType:
+          type: string
+        originalWorkerErrorStatus:
+          type: integer
       type: object
     ErrorSubStatus:
       enum:
       - UNCATEGORIZED_SUB_STATUS
       - WORKFLOW_ALREADY_STARTED_SUB_STATUS
       - WORKFLOW_NOT_EXISTS_SUB_STATUS
+      - WORKER_API_ERROR
       type: string
     WorkflowStartRequest:
       example:
@@ -759,7 +773,6 @@ components:
       required:
       - iwfWorkerUrl
       - iwfWorkflowType
-      - startStateId
       - workflowId
       - workflowTimeoutSeconds
       type: object

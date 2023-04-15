@@ -130,6 +130,7 @@ Class | Method | HTTP request | Description
  - [TimerResult](docs/TimerResult.md)
  - [TimerStatus](docs/TimerStatus.md)
  - [WaitUntilApiFailurePolicy](docs/WaitUntilApiFailurePolicy.md)
+ - [WorkerErrorResponse](docs/WorkerErrorResponse.md)
  - [WorkflowConfig](docs/WorkflowConfig.md)
  - [WorkflowConfigUpdateRequest](docs/WorkflowConfigUpdateRequest.md)
  - [WorkflowDumpRequest](docs/WorkflowDumpRequest.md)

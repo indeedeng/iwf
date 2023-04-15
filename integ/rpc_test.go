@@ -2,11 +2,13 @@ package integ
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/rpc"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"strconv"
 	"testing"
 	"time"
@@ -53,6 +55,7 @@ func TestRpcWorkflowCadenceContinueAsNew(t *testing.T) {
 }
 
 func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()
 	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
@@ -78,7 +81,7 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 		IwfWorkflowType:        rpc.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           rpc.State1,
+		StartStateId:           ptr.Any(rpc.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
@@ -100,6 +103,33 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 		TimeoutSeconds: iwfidl.PtrInt32(2),
 	}).Execute()
 	panicAtHttpError(err, httpResp)
+
+	reqRpc = apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+	_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+		WorkflowId: wfId,
+		RpcName:    rpc.RPCNameError,
+		Input:      &rpc.TestInput,
+		SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+			PersistenceLoadingType: iwfidl.PARTIAL_WITHOUT_LOCKING.Ptr(),
+			PartialLoadingKeys: []string{
+				rpc.TestSearchAttributeIntKey,
+			},
+		},
+		TimeoutSeconds: iwfidl.PtrInt32(2),
+	}).Execute()
+	assertions.NotNil(err)
+	assertions.Equalf(service.HttpStatusCodeWorkerApiError, httpResp.StatusCode, "http code")
+	var errResp iwfidl.ErrorResponse
+	body, err := ioutil.ReadAll(httpResp.Body)
+	assertions.Nil(err)
+	err = json.Unmarshal(body, &errResp)
+	assertions.Equalf(iwfidl.ErrorResponse{
+		Detail:                    ptr.Any("worker API error, status:502, errorType:test-type"),
+		SubStatus:                 iwfidl.WORKER_API_ERROR.Ptr(),
+		OriginalWorkerErrorStatus: iwfidl.PtrInt32(502),
+		OriginalWorkerErrorType:   iwfidl.PtrString("test-type"),
+		OriginalWorkerErrorDetail: iwfidl.PtrString("test-details"),
+	}, errResp, "body")
 
 	reqRpc = apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
@@ -124,7 +154,6 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
 
 	history, data := wfHandler.GetTestResult()
-	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,
@@ -171,6 +200,21 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 			},
 		},
 		rpc.RPCNameReadOnly + "-input": &rpc.TestInput,
+
+		rpc.RPCNameError + "-data-attributes": []iwfidl.KeyValue{
+			{
+				Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
+				Value: &rpc.TestDataObjectVal1,
+			},
+		},
+		rpc.RPCNameError + "-search-attributes": []iwfidl.SearchAttribute{
+			{
+				Key:          iwfidl.PtrString(rpc.TestSearchAttributeIntKey),
+				IntegerValue: iwfidl.PtrInt64(rpc.TestSearchAttributeIntValue1),
+				ValueType:    ptr.Any(iwfidl.INT),
+			},
+		},
+		rpc.RPCNameError + "-input": &rpc.TestInput,
 	}, data, "rpc test fail, %v", data)
 
 	reqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())

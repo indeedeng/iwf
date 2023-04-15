@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/timer"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"strconv"
@@ -77,7 +78,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 		IwfWorkflowType:        timer.WorkflowType,
 		WorkflowTimeoutSeconds: 30,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           timer.State1,
+		StartStateId:           ptr.Any(timer.State1),
 		StateInput: &iwfidl.EncodedObject{
 			Data: iwfidl.PtrString(strconv.Itoa(int(nowTimestamp))),
 		},

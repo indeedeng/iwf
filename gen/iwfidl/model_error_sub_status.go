@@ -23,6 +23,7 @@ const (
 	UNCATEGORIZED_SUB_STATUS            ErrorSubStatus = "UNCATEGORIZED_SUB_STATUS"
 	WORKFLOW_ALREADY_STARTED_SUB_STATUS ErrorSubStatus = "WORKFLOW_ALREADY_STARTED_SUB_STATUS"
 	WORKFLOW_NOT_EXISTS_SUB_STATUS      ErrorSubStatus = "WORKFLOW_NOT_EXISTS_SUB_STATUS"
+	WORKER_API_ERROR                    ErrorSubStatus = "WORKER_API_ERROR"
 )
 
 // All allowed values of ErrorSubStatus enum
@@ -30,6 +31,7 @@ var AllowedErrorSubStatusEnumValues = []ErrorSubStatus{
 	"UNCATEGORIZED_SUB_STATUS",
 	"WORKFLOW_ALREADY_STARTED_SUB_STATUS",
 	"WORKFLOW_NOT_EXISTS_SUB_STATUS",
+	"WORKER_API_ERROR",
 }
 
 func (v *ErrorSubStatus) UnmarshalJSON(src []byte) error {

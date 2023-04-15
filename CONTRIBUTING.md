@@ -100,6 +100,9 @@ tctl --ns default n re
 tctl adm cl asa -n IwfWorkflowType -t Keyword
 tctl adm cl asa -n IwfGlobalWorkflowVersion -t Int
 tctl adm cl asa -n IwfExecutingStateIds -t Keyword
+tctl adm cl asa -n ObjectId -t Keyword
+tctl adm cl asa -n ObjectType -t Keyword
+tctl adm cl asa -n ObjectExecutionId -t Keyword
 
 ```
 
@@ -136,6 +139,9 @@ docker-compose -f docker-compose-es-v7.yml up
 cadence adm cl asa --search_attr_key IwfGlobalWorkflowVersion --search_attr_type 2
 cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
 cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
+cadence adm cl asa --search_attr_key ObjectId --search_attr_type 1
+cadence adm cl asa --search_attr_key ObjectExecutionId --search_attr_type 1
+cadence adm cl asa --search_attr_key ObjectType --search_attr_type 1
 ```
 
 After registering, it may

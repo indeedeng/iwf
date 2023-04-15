@@ -65,6 +65,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 			return nil, s.handleError(err)
 		}
 		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
+		workflowOptions.SearchAttributes[service.SearchAttributeIwfObjectId] = req.WorkflowId
+		workflowOptions.SearchAttributes[service.SearchAttributeIwfObjectType] = req.IwfWorkflowType
 		initSAs = startOptions.SearchAttributes
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
@@ -74,7 +76,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	input := service.InterpreterWorkflowInput{
 		IwfWorkflowType:      req.GetIwfWorkflowType(),
 		IwfWorkerUrl:         req.GetIwfWorkerUrl(),
-		StartStateId:         req.GetStartStateId(),
+		StartStateId:         req.StartStateId,
 		StateInput:           req.GetStateInput(),
 		StateOptions:         req.GetStateOptions(),
 		InitSearchAttributes: initSAs,
@@ -349,7 +351,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	}
 	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
 	if checkHttpError(err, httpResp) {
-		return nil, s.handleErrorWithHttpResp(err, httpResp)
+		return nil, s.handleWorkerRpcApiError(err, httpResp)
 	}
 	decision := resp.GetStateDecision()
 	for _, st := range decision.GetNextStates() {
@@ -468,23 +470,38 @@ func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
 		"invalid request - "+msg)
 }
 
-func (s *serviceImpl) handleErrorWithHttpResp(err error, httpResp *http.Response) *errors.ErrorAndStatus {
+func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response) *errors.ErrorAndStatus {
+	detailedMessage := err.Error()
 	if err != nil {
-		return s.handleError(err)
+		detailedMessage = err.Error()
 	}
-	responseBody := "None"
-	var statusCode int
+
+	var originalStatusCode int
+	var workerError iwfidl.WorkerErrorResponse
 	if httpResp != nil {
+		originalStatusCode = httpResp.StatusCode
 		body, err := ioutil.ReadAll(httpResp.Body)
 		if err != nil {
-			responseBody = "cannot read body from http response"
+			detailedMessage = "cannot read body from http response"
 		} else {
-			responseBody = string(body)
+			err := json.Unmarshal(body, &workerError)
+			if err != nil {
+				detailedMessage = "unable to decode worker response body to WorkerErrorResponse: body" + string(body)
+			} else {
+				detailedMessage = fmt.Sprintf("worker API error, status:%v, errorType:%v", originalStatusCode, workerError.GetErrorType())
+			}
 		}
-		statusCode = httpResp.StatusCode
+
 	}
-	httpErr := fmt.Errorf("unsuccessful http response, statusCode: %v, responseBody: %v", statusCode, responseBody)
-	return s.handleError(httpErr)
+
+	return errors.NewErrorAndStatusWithWorkerError(
+		service.HttpStatusCodeWorkerApiError,
+		iwfidl.WORKER_API_ERROR,
+		detailedMessage,
+		workerError.GetDetail(),
+		workerError.GetErrorType(),
+		int32(originalStatusCode),
+	)
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {

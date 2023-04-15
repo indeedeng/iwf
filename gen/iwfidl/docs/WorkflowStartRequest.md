@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **IwfWorkflowType** | **string** |  | 
 **WorkflowTimeoutSeconds** | **int32** |  | 
 **IwfWorkerUrl** | **string** |  | 
-**StartStateId** | **string** |  | 
+**StartStateId** | Pointer to **string** |  | [optional] 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **StateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 **WorkflowStartOptions** | Pointer to [**WorkflowStartOptions**](WorkflowStartOptions.md) |  | [optional] 
@@ -17,7 +17,7 @@ Name | Type | Description | Notes
 
 ### NewWorkflowStartRequest
 
-`func NewWorkflowStartRequest(workflowId string, iwfWorkflowType string, workflowTimeoutSeconds int32, iwfWorkerUrl string, startStateId string, ) *WorkflowStartRequest`
+`func NewWorkflowStartRequest(workflowId string, iwfWorkflowType string, workflowTimeoutSeconds int32, iwfWorkerUrl string, ) *WorkflowStartRequest`
 
 NewWorkflowStartRequest instantiates a new WorkflowStartRequest object
 This constructor will assign default values to properties that have it defined,
@@ -131,6 +131,11 @@ and a boolean to check if the value has been set.
 
 SetStartStateId sets StartStateId field to given value.
 
+### HasStartStateId
+
+`func (o *WorkflowStartRequest) HasStartStateId() bool`
+
+HasStartStateId returns a boolean if a field has been set.
 
 ### GetStateInput
 

@@ -60,7 +60,7 @@ func doTestWorkflowForceFail(t *testing.T, backendType service.BackendType, conf
 		IwfWorkflowType:        wf_force_fail.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           wf_force_fail.State1,
+		StartStateId:           ptr.Any(wf_force_fail.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

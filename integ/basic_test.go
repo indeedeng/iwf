@@ -72,7 +72,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 		IwfWorkflowType:        basic.WorkflowType,
 		WorkflowTimeoutSeconds: 100,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           basic.State1,
+		StartStateId:           ptr.Any(basic.State1),
 		StateInput:             wfInput,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
