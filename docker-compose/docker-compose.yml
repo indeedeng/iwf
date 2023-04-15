@@ -63,8 +63,8 @@ services:
     stdin_open: true
     tty: true
     volumes:
-     - ./init.sh:/etc/temporal/init.sh
-    entrypoint: sh -c "/etc/temporal/init.sh"
+     - ./init-compose.sh:/etc/temporal/init-compose.sh
+    entrypoint: sh -c "/etc/temporal/init-compose.sh"
   temporal-ui:
     container_name: temporal-ui-iwf
     depends_on:

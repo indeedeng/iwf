@@ -20,9 +20,12 @@ const (
 	DebugDumpQueryType                   = "DebugNewDump"
 	PrepareRpcQueryType                  = "PrepareRpcQueryType"
 
-	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
-	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
-	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"
+	SearchAttributeGlobalVersion        = "IwfGlobalWorkflowVersion"
+	SearchAttributeExecutingStateIds    = "IwfExecutingStateIds"
+	SearchAttributeIwfWorkflowType      = "IwfWorkflowType"
+	SearchAttributeIwfObjectType        = "ObjectType"
+	SearchAttributeIwfObjectId          = "ObjectId"
+	SearchAttributeIwfObjectExecutionId = "ObjectExecutionId"
 
 	BackendTypeCadence  BackendType = "cadence"
 	BackendTypeTemporal BackendType = "temporal"

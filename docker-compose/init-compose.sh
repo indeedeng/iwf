@@ -10,9 +10,17 @@ for run in {1..60}; do
     break
   fi
 done
-
+sleep 0.1
+tctl search-attribute  create -name ObjectId -type Keyword -y
+sleep 0.1
+tctl search-attribute  create -name ObjectExecutionId -type Keyword -y
+sleep 0.1
+tctl search-attribute  create -name ObjectType -type Keyword -y
+sleep 0.1
 tctl search-attribute  create -name IwfGlobalWorkflowVersion -type Int -y
+sleep 0.1
 tctl search-attribute  create -name IwfExecutingStateIds -type Keyword -y
+sleep 0.1
 tctl namespace register default
 
 tail -f /dev/null
