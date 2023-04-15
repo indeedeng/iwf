@@ -351,7 +351,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	}
 	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
 	if checkHttpError(err, httpResp) {
-		return nil, s.handleErrorWithHttpResp(err, httpResp)
+		return nil, s.handleWorkerRpcApiError(err, httpResp)
 	}
 	decision := resp.GetStateDecision()
 	for _, st := range decision.GetNextStates() {
@@ -470,23 +470,37 @@ func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
 		"invalid request - "+msg)
 }
 
-func (s *serviceImpl) handleErrorWithHttpResp(err error, httpResp *http.Response) *errors.ErrorAndStatus {
+func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response) *errors.ErrorAndStatus {
 	if err != nil {
 		return s.handleError(err)
 	}
-	responseBody := "None"
-	var statusCode int
+	detailedMessage := "None"
+	var originalStatusCode int
+	var workerError iwfidl.WorkerErrorResponse
 	if httpResp != nil {
+		originalStatusCode = httpResp.StatusCode
 		body, err := ioutil.ReadAll(httpResp.Body)
 		if err != nil {
-			responseBody = "cannot read body from http response"
+			detailedMessage = "cannot read body from http response"
 		} else {
-			responseBody = string(body)
+			err := json.Unmarshal(body, &workerError)
+			if err != nil {
+				detailedMessage = "unable to decode worker response body to WorkerErrorResponse: body" + string(body)
+			} else {
+				detailedMessage = fmt.Sprintf("worker API error, status:%v, errorType:%v", originalStatusCode, workerError.GetErrorType())
+			}
 		}
-		statusCode = httpResp.StatusCode
+
 	}
-	httpErr := fmt.Errorf("unsuccessful http response, statusCode: %v, responseBody: %v", statusCode, responseBody)
-	return s.handleError(httpErr)
+
+	return errors.NewErrorAndStatusWithWorkerError(
+		420,
+		iwfidl.WORKER_API_ERROR,
+		detailedMessage,
+		workerError.GetDetail(),
+		workerError.GetErrorType(),
+		int32(originalStatusCode),
+	)
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {

@@ -19,3 +19,19 @@ func NewErrorAndStatus(statusCode int, subStatus iwfidl.ErrorSubStatus, details 
 		},
 	}
 }
+
+func NewErrorAndStatusWithWorkerError(
+	statusCode int, subStatus iwfidl.ErrorSubStatus, details string,
+	originalWorkerDetails string, originalWorkerErrType string, originalWorkerStatus int32,
+) *ErrorAndStatus {
+	return &ErrorAndStatus{
+		StatusCode: statusCode,
+		Error: iwfidl.ErrorResponse{
+			SubStatus:                 ptr.Any(subStatus),
+			Detail:                    iwfidl.PtrString(details),
+			OriginalWorkerErrorDetail: &originalWorkerDetails,
+			OriginalWorkerErrorStatus: &originalWorkerStatus,
+			OriginalWorkerErrorType:   &originalWorkerErrType,
+		},
+	}
+}
