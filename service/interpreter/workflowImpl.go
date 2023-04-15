@@ -70,12 +70,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
 		interStateChannel = NewInterStateChannel()
-
-		stateRequestQueue = NewStateRequestQueue(iwfidl.StateMovement{
-			StateId:      *input.StartStateId, // TODO
-			StateOptions: &input.StateOptions,
-			StateInput:   &input.StateInput,
-		})
+		stateRequestQueue = NewStateRequestQueue()
 		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
@@ -94,7 +89,33 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	var forceCompleteWf bool
 
 	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
+	// TODO should not clear if it's continueAsNew
 	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
+
+	if !input.IsResumeFromContinueAsNew {
+		// it's possible that a workflow is started without any starting state
+		// it will wait for a new state coming in (by RPC results)
+		if input.StartStateId == nil {
+			err = provider.Await(ctx, func() bool {
+				failWorkflowByClient, _ := signalReceiver.IsFailWorkflowRequested()
+				return !stateRequestQueue.IsEmpty() || failWorkflowByClient
+			})
+			if err != nil {
+				return nil, err
+			}
+			failWorkflowByClient, failErr := signalReceiver.IsFailWorkflowRequested()
+			if failWorkflowByClient {
+				return nil, failErr
+			}
+		} else {
+			startingState := iwfidl.StateMovement{
+				StateId:      *input.StartStateId,
+				StateOptions: &input.StateOptions,
+				StateInput:   &input.StateInput,
+			}
+			stateRequestQueue.AddStateStartRequests([]iwfidl.StateMovement{startingState})
+		}
+	}
 
 	for !stateRequestQueue.IsEmpty() {
 
@@ -184,13 +205,9 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		// For stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
 		// For continueAsNewCounter.IsThresholdMet(): this means workflow need to continueAsNew
 		awaitError := provider.Await(ctx, func() bool {
-			failByApi, errStr := signalReceiver.IsFailWorkflowRequested()
+			failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
 			if failByApi {
-				errToFailWf = provider.NewApplicationError(
-					string(iwfidl.CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE),
-					errStr,
-				)
-
+				errToFailWf = failErr
 				return true
 			}
 			return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0 || continueAsNewCounter.IsThresholdMet()
@@ -226,14 +243,11 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 			// at here, all signals + threads are drained, so it's safe to continueAsNew
 			// after draining signals, there could be some changes
 			// 1. last fail workflow signal
-			failByApi, errStr := signalReceiver.IsFailWorkflowRequested()
+			failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
 			if failByApi {
 				return &service.InterpreterWorkflowOutput{
-						StateCompletionOutputs: outputCollector.GetAll(),
-					}, provider.NewApplicationError(
-						string(iwfidl.CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE),
-						errStr,
-					)
+					StateCompletionOutputs: outputCollector.GetAll(),
+				}, failErr
 			}
 			// 2. last update config, do it here because we use input to carry over config, not continueAsNewer query
 			input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over

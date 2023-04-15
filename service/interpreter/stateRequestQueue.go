@@ -10,12 +10,8 @@ type StateRequestQueue struct {
 	queue []StateRequest
 }
 
-func NewStateRequestQueue(initReq iwfidl.StateMovement) *StateRequestQueue {
-	return &StateRequestQueue{
-		queue: []StateRequest{
-			NewStateStartRequest(initReq),
-		},
-	}
+func NewStateRequestQueue() *StateRequestQueue {
+	return &StateRequestQueue{}
 }
 
 func NewStateRequestQueueWithResumeRequests(startReqs []iwfidl.StateMovement, resumeReqs map[string]service.StateExecutionResumeInfo) *StateRequestQueue {
