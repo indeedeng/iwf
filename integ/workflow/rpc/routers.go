@@ -17,6 +17,7 @@ const (
 	TestInterStateChannelName = "test-TestInterStateChannelName"
 	RPCName                   = "test-RPCName"
 	RPCNameReadOnly           = "test-RPC-readonly"
+	RPCNameError              = "test-RPC-error"
 
 	TestDataObjectKey = "test-data-object"
 
@@ -28,6 +29,9 @@ const (
 	TestSearchAttributeBoolKey   = "CustomBoolField"
 	TestSearchAttributeIntValue1 = 1
 	TestSearchAttributeIntValue2 = 2
+
+	WorkerApiErrorDetails = "test-details"
+	WorkerApiErrorType    = "test-type"
 )
 
 type handler struct {
@@ -84,7 +88,8 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
 		panic("invalid context in the request")
 	}
-	if req.WorkflowType != WorkflowType || (req.RpcName != RPCName && req.RpcName != RPCNameReadOnly) {
+	if req.WorkflowType != WorkflowType ||
+		(req.RpcName != RPCName && req.RpcName != RPCNameReadOnly && req.RpcName != RPCNameError) {
 		panic("invalid rpc name:" + req.RpcName)
 	}
 
@@ -95,6 +100,13 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	if req.RpcName == RPCNameReadOnly {
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			Output: &TestOutput,
+		})
+		return
+	}
+	if req.RpcName == RPCNameError {
+		c.JSON(http.StatusBadGateway, iwfidl.WorkerErrorResponse{
+			Detail:    iwfidl.PtrString(WorkerApiErrorDetails),
+			ErrorType: iwfidl.PtrString(WorkerApiErrorType),
 		})
 		return
 	}

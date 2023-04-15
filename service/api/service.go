@@ -471,10 +471,11 @@ func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
 }
 
 func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response) *errors.ErrorAndStatus {
+	detailedMessage := err.Error()
 	if err != nil {
-		return s.handleError(err)
+		detailedMessage = err.Error()
 	}
-	detailedMessage := "None"
+
 	var originalStatusCode int
 	var workerError iwfidl.WorkerErrorResponse
 	if httpResp != nil {
@@ -494,7 +495,7 @@ func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response
 	}
 
 	return errors.NewErrorAndStatusWithWorkerError(
-		420,
+		service.HttpStatusCodeWorkerApiError,
 		iwfidl.WORKER_API_ERROR,
 		detailedMessage,
 		workerError.GetDetail(),

@@ -7,6 +7,9 @@ type (
 const (
 	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
 
+	// HttpStatusCodeWorkerApiError is a special deprecated code for this because I can't find an official one for this case
+	HttpStatusCodeWorkerApiError = 420
+
 	TaskQueue = "Interpreter_DEFAULT"
 
 	StateStartApi        = "/api/v1/workflowState/start"
