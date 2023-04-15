@@ -1556,7 +1556,7 @@ func (a *DefaultApiService) ApiV1WorkflowStateDecidePostExecute(r ApiApiV1Workfl
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v ErrorResponse
+			var v WorkerErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1672,7 +1672,7 @@ func (a *DefaultApiService) ApiV1WorkflowStateStartPostExecute(r ApiApiV1Workflo
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v ErrorResponse
+			var v WorkerErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1996,7 +1996,7 @@ func (a *DefaultApiService) ApiV1WorkflowWorkerRpcPostExecute(r ApiApiV1Workflow
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v ErrorResponse
+			var v WorkerErrorResponse
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

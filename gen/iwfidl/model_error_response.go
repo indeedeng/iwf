@@ -19,8 +19,11 @@ var _ MappedNullable = &ErrorResponse{}
 
 // ErrorResponse struct for ErrorResponse
 type ErrorResponse struct {
-	Detail    *string         `json:"detail,omitempty"`
-	SubStatus *ErrorSubStatus `json:"subStatus,omitempty"`
+	Detail                    *string         `json:"detail,omitempty"`
+	SubStatus                 *ErrorSubStatus `json:"subStatus,omitempty"`
+	OriginalWorkerErrorDetail *string         `json:"originalWorkerErrorDetail,omitempty"`
+	OriginalWorkerErrorType   *string         `json:"originalWorkerErrorType,omitempty"`
+	OriginalWorkerErrorStatus *int32          `json:"originalWorkerErrorStatus,omitempty"`
 }
 
 // NewErrorResponse instantiates a new ErrorResponse object
@@ -104,6 +107,102 @@ func (o *ErrorResponse) SetSubStatus(v ErrorSubStatus) {
 	o.SubStatus = &v
 }
 
+// GetOriginalWorkerErrorDetail returns the OriginalWorkerErrorDetail field value if set, zero value otherwise.
+func (o *ErrorResponse) GetOriginalWorkerErrorDetail() string {
+	if o == nil || IsNil(o.OriginalWorkerErrorDetail) {
+		var ret string
+		return ret
+	}
+	return *o.OriginalWorkerErrorDetail
+}
+
+// GetOriginalWorkerErrorDetailOk returns a tuple with the OriginalWorkerErrorDetail field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ErrorResponse) GetOriginalWorkerErrorDetailOk() (*string, bool) {
+	if o == nil || IsNil(o.OriginalWorkerErrorDetail) {
+		return nil, false
+	}
+	return o.OriginalWorkerErrorDetail, true
+}
+
+// HasOriginalWorkerErrorDetail returns a boolean if a field has been set.
+func (o *ErrorResponse) HasOriginalWorkerErrorDetail() bool {
+	if o != nil && !IsNil(o.OriginalWorkerErrorDetail) {
+		return true
+	}
+
+	return false
+}
+
+// SetOriginalWorkerErrorDetail gets a reference to the given string and assigns it to the OriginalWorkerErrorDetail field.
+func (o *ErrorResponse) SetOriginalWorkerErrorDetail(v string) {
+	o.OriginalWorkerErrorDetail = &v
+}
+
+// GetOriginalWorkerErrorType returns the OriginalWorkerErrorType field value if set, zero value otherwise.
+func (o *ErrorResponse) GetOriginalWorkerErrorType() string {
+	if o == nil || IsNil(o.OriginalWorkerErrorType) {
+		var ret string
+		return ret
+	}
+	return *o.OriginalWorkerErrorType
+}
+
+// GetOriginalWorkerErrorTypeOk returns a tuple with the OriginalWorkerErrorType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ErrorResponse) GetOriginalWorkerErrorTypeOk() (*string, bool) {
+	if o == nil || IsNil(o.OriginalWorkerErrorType) {
+		return nil, false
+	}
+	return o.OriginalWorkerErrorType, true
+}
+
+// HasOriginalWorkerErrorType returns a boolean if a field has been set.
+func (o *ErrorResponse) HasOriginalWorkerErrorType() bool {
+	if o != nil && !IsNil(o.OriginalWorkerErrorType) {
+		return true
+	}
+
+	return false
+}
+
+// SetOriginalWorkerErrorType gets a reference to the given string and assigns it to the OriginalWorkerErrorType field.
+func (o *ErrorResponse) SetOriginalWorkerErrorType(v string) {
+	o.OriginalWorkerErrorType = &v
+}
+
+// GetOriginalWorkerErrorStatus returns the OriginalWorkerErrorStatus field value if set, zero value otherwise.
+func (o *ErrorResponse) GetOriginalWorkerErrorStatus() int32 {
+	if o == nil || IsNil(o.OriginalWorkerErrorStatus) {
+		var ret int32
+		return ret
+	}
+	return *o.OriginalWorkerErrorStatus
+}
+
+// GetOriginalWorkerErrorStatusOk returns a tuple with the OriginalWorkerErrorStatus field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ErrorResponse) GetOriginalWorkerErrorStatusOk() (*int32, bool) {
+	if o == nil || IsNil(o.OriginalWorkerErrorStatus) {
+		return nil, false
+	}
+	return o.OriginalWorkerErrorStatus, true
+}
+
+// HasOriginalWorkerErrorStatus returns a boolean if a field has been set.
+func (o *ErrorResponse) HasOriginalWorkerErrorStatus() bool {
+	if o != nil && !IsNil(o.OriginalWorkerErrorStatus) {
+		return true
+	}
+
+	return false
+}
+
+// SetOriginalWorkerErrorStatus gets a reference to the given int32 and assigns it to the OriginalWorkerErrorStatus field.
+func (o *ErrorResponse) SetOriginalWorkerErrorStatus(v int32) {
+	o.OriginalWorkerErrorStatus = &v
+}
+
 func (o ErrorResponse) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -119,6 +218,15 @@ func (o ErrorResponse) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SubStatus) {
 		toSerialize["subStatus"] = o.SubStatus
+	}
+	if !IsNil(o.OriginalWorkerErrorDetail) {
+		toSerialize["originalWorkerErrorDetail"] = o.OriginalWorkerErrorDetail
+	}
+	if !IsNil(o.OriginalWorkerErrorType) {
+		toSerialize["originalWorkerErrorType"] = o.OriginalWorkerErrorType
+	}
+	if !IsNil(o.OriginalWorkerErrorStatus) {
+		toSerialize["originalWorkerErrorStatus"] = o.OriginalWorkerErrorStatus
 	}
 	return toSerialize, nil
 }
