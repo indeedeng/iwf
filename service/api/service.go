@@ -65,8 +65,6 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 			return nil, s.handleError(err)
 		}
 		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
-		workflowOptions.SearchAttributes[service.SearchAttributeIwfObjectId] = req.WorkflowId
-		workflowOptions.SearchAttributes[service.SearchAttributeIwfObjectType] = req.IwfWorkflowType
 		initSAs = startOptions.SearchAttributes
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()

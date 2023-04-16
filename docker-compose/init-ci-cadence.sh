@@ -10,9 +10,6 @@ done
 
 yes | cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
 yes | cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
-yes | cadence adm cl asa --search_attr_key ObjectId --search_attr_type 1
-yes | cadence adm cl asa --search_attr_key ObjectExecutionId --search_attr_type 1
-yes | cadence adm cl asa --search_attr_key ObjectType --search_attr_type 1
 
 
 # see https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md#option-3-run-with-your-own-cadence-service

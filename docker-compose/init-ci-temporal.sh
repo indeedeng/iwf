@@ -13,12 +13,6 @@ done
 
 # see https://github.com/temporalio/temporal/issues/4160
 sleep 0.1
-tctl search-attribute  create -name ObjectId -type Keyword -y
-sleep 0.1
-tctl search-attribute  create -name ObjectExecutionId -type Keyword -y
-sleep 0.1
-tctl search-attribute  create -name ObjectType -type Keyword -y
-sleep 0.1
 tctl search-attribute  create -name IwfWorkflowType -type Keyword -y
 sleep 0.1
 tctl search-attribute  create -name IwfGlobalWorkflowVersion -type Int -y
