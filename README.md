@@ -433,9 +433,6 @@ the version tag.
     * Keyword: IwfWorkflowType
     * Int: IwfGlobalWorkflowVersion
     * Keyword: IwfExecutingStateIds
-    * Keyword: ObjectId
-    * Keyword: ObjectExecutionId
-    * Keyword: ObjectType
     * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
     * For Cadence without advancedVisibility enabled,
       set [disableSystemSearchAttributes](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L8)
@@ -455,9 +452,6 @@ and workflow service.
     * Keyword: IwfWorkflowType
     * Int: IwfGlobalWorkflowVersion
     * Keyword: IwfExecutingStateIds
-    * Keyword: ObjectId
-    * Keyword: ObjectExecutionId
-    * Keyword: ObjectType
     * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
     * For Cadence without advancedVisibility enabled,
       set [disableSystemSearchAttributes](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L8)
