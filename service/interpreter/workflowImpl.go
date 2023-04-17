@@ -178,7 +178,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						if gracefulComplete {
 							shouldGracefulComplete = true
 						}
-						if gracefulComplete || forceComplete || forceFail {
+						if (gracefulComplete || forceComplete || forceFail) && output != nil {
 							outputCollector.Add(*output)
 						}
 						if forceComplete {
