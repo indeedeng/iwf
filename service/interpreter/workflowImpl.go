@@ -313,7 +313,6 @@ func checkClosingWorkflow(
 		}
 		if stateId == service.DeadEndWorkflowStateId {
 			canGoNext = false
-			forceFail = true
 			systemStateId = true
 		}
 	}
