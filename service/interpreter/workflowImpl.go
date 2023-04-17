@@ -87,6 +87,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
 	var forceCompleteWf bool
+	var shouldGracefulComplete bool
 
 	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
 	// Because it will check totalCurrentlyExecutingCount == 0, so it will also work for continueAsNew case
@@ -95,19 +96,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	if !input.IsResumeFromContinueAsNew {
 		// it's possible that a workflow is started without any starting state
 		// it will wait for a new state coming in (by RPC results)
-		if input.StartStateId == nil {
-			err = provider.Await(ctx, func() bool {
-				failWorkflowByClient, _ := signalReceiver.IsFailWorkflowRequested()
-				return !stateRequestQueue.IsEmpty() || failWorkflowByClient
-			})
-			if err != nil {
-				return nil, err
-			}
-			failWorkflowByClient, failErr := signalReceiver.IsFailWorkflowRequested()
-			if failWorkflowByClient {
-				return nil, failErr
-			}
-		} else {
+		if input.StartStateId != nil {
 			startingState := iwfidl.StateMovement{
 				StateId:      *input.StartStateId,
 				StateOptions: &input.StateOptions,
@@ -117,147 +106,167 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		}
 	}
 
-	for !stateRequestQueue.IsEmpty() {
-
-		var statesToExecute []StateRequest
-		if !continueAsNewCounter.IsThresholdMet() {
-			statesToExecute = stateRequestQueue.TakeAll()
-			err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		for _, stateReqForLoopingOnly := range statesToExecute {
-			// execute in another thread for parallelism
-			// state must be passed via parameter https://stackoverflow.com/questions/67263092
-			stateCtx := provider.ExtendContextWithValue(ctx, "stateReq", stateReqForLoopingOnly)
-			provider.GoNamed(stateCtx, "state-execution-thread:"+stateReqForLoopingOnly.GetStateId(), func(ctx UnifiedContext) {
-				stateReq, ok := provider.GetContextValue(ctx, "stateReq").(StateRequest)
-				if !ok {
-					errToFailWf = provider.NewApplicationError(
-						string(iwfidl.SERVER_INTERNAL_ERROR_TYPE),
-						"critical code bug when passing state request via context",
-					)
-					return
-				}
-
-				var state iwfidl.StateMovement
-				var stateExeId string
-				if stateReq.IsResumeRequest() {
-					resumeReq := stateReq.GetStateResumeRequest()
-					state = resumeReq.State
-					stateExeId = resumeReq.StateExecutionId
-				} else {
-					state = stateReq.GetStateStartRequest()
-					stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
-				}
-
-				decision, stateExecStatus, err := executeState(
-					ctx, provider, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
-					signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
-				if err != nil {
-					errToFailWf = err
-					// state execution fail should fail the workflow, no more processing
-					return
-				}
-
-				if stateExecStatus == service.CompletedStateExecutionStatus {
-					// NOTE: decision is only available on this CompletedStateExecutionStatus
-
-					shouldClose, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
-					if err != nil {
-						errToFailWf = err
-						// no return so that it can fall through to call MarkStateExecutionCompleted
-					}
-					if gracefulComplete || forceComplete || forceFail {
-						outputCollector.Add(*output)
-					}
-					if forceComplete {
-						forceCompleteWf = true
-					}
-					if forceFail {
-						errToFailWf = provider.NewApplicationError(
-							string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
-							outputCollector.GetAll(),
-						)
-						// no return so that it can fall through to call MarkStateExecutionCompleted
-					}
-					if !shouldClose && decision.HasNextStates() {
-						stateRequestQueue.AddStateStartRequests(decision.GetNextStates())
-					}
-
-					// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-					err = stateExecutionCounter.MarkStateExecutionCompleted(state)
-					if err != nil {
-						errToFailWf = err
-					}
-				}
-			}) // end of executing one state
-		} // end loop of executing all states from the queue for one iteration
-
-		// The conditions here are quite tricky:
-		// For !stateRequestQueue.IsEmpty(): We need some condition to wait here because all the state execution are running in different thread.
-		//    Right after the queue are popped it becomes empty. When it's not empty, it means there are new states to execute pushed into the queue,
-		//    and it's time to wake up the outer loop to go to next iteration. Alternatively, waiting for all current started in this iteration to complete will also work,
-		//    but not as efficient as this one because it will take much longer time.
-		// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
-		// For stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
-		// For continueAsNewCounter.IsThresholdMet(): this means workflow need to continueAsNew
-		awaitError := provider.Await(ctx, func() bool {
-			failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
-			if failByApi {
-				errToFailWf = failErr
-				return true
-			}
-			return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0 || continueAsNewCounter.IsThresholdMet()
+	for {
+		err = provider.Await(ctx, func() bool {
+			failWorkflowByClient, _ := signalReceiver.IsFailWorkflowRequested()
+			return !stateRequestQueue.IsEmpty() || failWorkflowByClient || shouldGracefulComplete
 		})
-		if continueAsNewCounter.IsThresholdMet() {
-			// NOTE: drain thread before checking errToFailWf/forceCompleteWf so that we can close the workflow if possible
-			err := continueAsNewer.DrainThreads(ctx)
-			if err != nil {
-				awaitError = err
+		if err != nil {
+			return nil, err
+		}
+		failWorkflowByClient, failErr := signalReceiver.IsFailWorkflowRequested()
+		if failWorkflowByClient {
+			return nil, failErr
+		}
+		if shouldGracefulComplete && stateRequestQueue.IsEmpty() {
+			break
+		}
+
+		for !stateRequestQueue.IsEmpty() {
+
+			var statesToExecute []StateRequest
+			if !continueAsNewCounter.IsThresholdMet() {
+				statesToExecute = stateRequestQueue.TakeAll()
+				err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
+				if err != nil {
+					return nil, err
+				}
 			}
-		}
 
-		if errToFailWf != nil || forceCompleteWf {
-			return &service.InterpreterWorkflowOutput{
-				StateCompletionOutputs: outputCollector.GetAll(),
-			}, errToFailWf
-		}
+			for _, stateReqForLoopingOnly := range statesToExecute {
+				// execute in another thread for parallelism
+				// state must be passed via parameter https://stackoverflow.com/questions/67263092
+				stateCtx := provider.ExtendContextWithValue(ctx, "stateReq", stateReqForLoopingOnly)
+				provider.GoNamed(stateCtx, "state-execution-thread:"+stateReqForLoopingOnly.GetStateId(), func(ctx UnifiedContext) {
+					stateReq, ok := provider.GetContextValue(ctx, "stateReq").(StateRequest)
+					if !ok {
+						errToFailWf = provider.NewApplicationError(
+							string(iwfidl.SERVER_INTERNAL_ERROR_TYPE),
+							"critical code bug when passing state request via context",
+						)
+						return
+					}
 
-		if awaitError != nil {
-			// this could happen for cancellation
-			errToFailWf = awaitError
-			break
-		}
-		if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() {
-			// if it is empty and no stateExecutionsToResume, then we don't need to do continue as new -- the workflow has reached "dead ends" and will just complete after the loop
-			break
-		}
-		if continueAsNewCounter.IsThresholdMet() {
-			// NOTE: This must be the last thing before continueAsNew!!!
-			// Otherwise, there could be signals unhandled
-			signalReceiver.DrainAllUnreceivedSignals(ctx)
+					var state iwfidl.StateMovement
+					var stateExeId string
+					if stateReq.IsResumeRequest() {
+						resumeReq := stateReq.GetStateResumeRequest()
+						state = resumeReq.State
+						stateExeId = resumeReq.StateExecutionId
+					} else {
+						state = stateReq.GetStateStartRequest()
+						stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
+					}
 
-			// at here, all signals + threads are drained, so it's safe to continueAsNew
-			// after draining signals, there could be some changes
-			// 1. last fail workflow signal
-			failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
-			if failByApi {
+					decision, stateExecStatus, err := executeState(
+						ctx, provider, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
+						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
+					if err != nil {
+						errToFailWf = err
+						// state execution fail should fail the workflow, no more processing
+						return
+					}
+
+					if stateExecStatus == service.CompletedStateExecutionStatus {
+						// NOTE: decision is only available on this CompletedStateExecutionStatus
+
+						canGoNext, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
+						if err != nil {
+							errToFailWf = err
+							// no return so that it can fall through to call MarkStateExecutionCompleted
+						}
+						if gracefulComplete {
+							shouldGracefulComplete = true
+						}
+						if gracefulComplete || forceComplete || forceFail {
+							outputCollector.Add(*output)
+						}
+						if forceComplete {
+							forceCompleteWf = true
+						}
+						if forceFail {
+							errToFailWf = provider.NewApplicationError(
+								string(iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE),
+								outputCollector.GetAll(),
+							)
+							// no return so that it can fall through to call MarkStateExecutionCompleted
+						}
+						if canGoNext && decision.HasNextStates() {
+							stateRequestQueue.AddStateStartRequests(decision.GetNextStates())
+						}
+
+						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
+						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+						if err != nil {
+							errToFailWf = err
+						}
+					}
+				}) // end of executing one state
+			} // end loop of executing all states from the queue for one iteration
+
+			// The conditions here are quite tricky:
+			// For !stateRequestQueue.IsEmpty(): We need some condition to wait here because all the state execution are running in different thread.
+			//    Right after the queue are popped it becomes empty. When it's not empty, it means there are new states to execute pushed into the queue,
+			//    and it's time to wake up the outer loop to go to next iteration. Alternatively, waiting for all current started in this iteration to complete will also work,
+			//    but not as efficient as this one because it will take much longer time.
+			// For errToFailWf != nil || forceCompleteWf: this means we need to close workflow immediately
+			// For stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0: this means all the state executions have reach "Dead Ends" so the workflow can complete gracefully without output
+			// For continueAsNewCounter.IsThresholdMet(): this means workflow need to continueAsNew
+			awaitError := provider.Await(ctx, func() bool {
+				failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
+				if failByApi {
+					errToFailWf = failErr
+					return true
+				}
+				return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0 || continueAsNewCounter.IsThresholdMet()
+			})
+			if continueAsNewCounter.IsThresholdMet() {
+				// NOTE: drain thread before checking errToFailWf/forceCompleteWf so that we can close the workflow if possible
+				err := continueAsNewer.DrainThreads(ctx)
+				if err != nil {
+					awaitError = err
+				}
+			}
+
+			if errToFailWf != nil || forceCompleteWf {
 				return &service.InterpreterWorkflowOutput{
 					StateCompletionOutputs: outputCollector.GetAll(),
-				}, failErr
+				}, errToFailWf
 			}
-			// 2. last update config, do it here because we use input to carry over config, not continueAsNewer query
-			input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
-			input.IsResumeFromContinueAsNew = true
-			input.ContinueAsNewInput = service.ContinueAsNewInput{
-				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+
+			if awaitError != nil {
+				// this could happen for cancellation
+				errToFailWf = awaitError
+				break
 			}
-			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
-		}
-	} // end main loop -- loop until no more state can be executed (dead end)
+			if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() {
+				// if it is empty and no stateExecutionsToResume, then we don't need to do continue as new -- the workflow has reached "dead ends" and will just complete after the loop
+				break
+			}
+			if continueAsNewCounter.IsThresholdMet() {
+				// NOTE: This must be the last thing before continueAsNew!!!
+				// Otherwise, there could be signals unhandled
+				signalReceiver.DrainAllUnreceivedSignals(ctx)
+
+				// at here, all signals + threads are drained, so it's safe to continueAsNew
+				// after draining signals, there could be some changes
+				// 1. last fail workflow signal
+				failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
+				if failByApi {
+					return &service.InterpreterWorkflowOutput{
+						StateCompletionOutputs: outputCollector.GetAll(),
+					}, failErr
+				}
+				// 2. last update config, do it here because we use input to carry over config, not continueAsNewer query
+				input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
+				input.IsResumeFromContinueAsNew = true
+				input.ContinueAsNewInput = service.ContinueAsNewInput{
+					PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				}
+				return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
+			}
+		} // end main loop -- loop until no more state can be executed (dead end)
+	}
 
 	// gracefully complete workflow when all states are executed to dead ends
 	return &service.InterpreterWorkflowOutput{
@@ -267,12 +276,15 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 func checkClosingWorkflow(
 	provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
-) (shouldClose, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
+) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
+	canGoNext = true
+	systemStateId := false
 	for _, movement := range decision.GetNextStates() {
 		stateId := movement.GetStateId()
 		if stateId == service.GracefulCompletingWorkflowStateId {
-			shouldClose = true
+			canGoNext = false
 			gracefulComplete = true
+			systemStateId = true
 			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
@@ -280,8 +292,9 @@ func checkClosingWorkflow(
 			}
 		}
 		if stateId == service.ForceCompletingWorkflowStateId {
-			shouldClose = true
+			canGoNext = false
 			forceComplete = true
+			systemStateId = true
 			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
@@ -289,16 +302,27 @@ func checkClosingWorkflow(
 			}
 		}
 		if stateId == service.ForceFailingWorkflowStateId {
-			shouldClose = true
+			canGoNext = false
 			forceFail = true
+			systemStateId = true
 			completeOutput = &iwfidl.StateCompletionOutput{
 				CompletedStateId:          currentStateId,
 				CompletedStateExecutionId: currentStateExeId,
 				CompletedStateOutput:      movement.StateInput,
 			}
 		}
+		if stateId == service.DeadEndWorkflowStateId {
+			canGoNext = false
+			forceFail = true
+			systemStateId = true
+		}
 	}
-	if shouldClose && len(decision.NextStates) > 1 {
+	if len(decision.GetNextStates()) == 0 {
+		// legacy to keep compatibility for old code that use empty decision as graceful complete
+		gracefulComplete = true
+		canGoNext = false
+	}
+	if systemStateId && len(decision.NextStates) > 1 {
 		// Illegal decision
 		err = provider.NewApplicationError(
 			string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),

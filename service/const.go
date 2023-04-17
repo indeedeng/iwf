@@ -48,10 +48,12 @@ const (
 	GracefulCompletingWorkflowStateId = "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
 	ForceCompletingWorkflowStateId    = "_SYS_FORCE_COMPLETING_WORKFLOW"
 	ForceFailingWorkflowStateId       = "_SYS_FORCE_FAILING_WORKFLOW"
+	DeadEndWorkflowStateId            = "_SYS_DEAD_END"
 )
 
 var ValidClosingWorkflowStateId = map[string]bool{
 	GracefulCompletingWorkflowStateId: true,
 	ForceCompletingWorkflowStateId:    true,
 	ForceFailingWorkflowStateId:       true,
+	DeadEndWorkflowStateId:            true,
 }
