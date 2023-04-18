@@ -3,6 +3,7 @@ package interstate
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 	"time"
@@ -158,7 +159,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData[State31+"received"] = results.GetInterStateChannelResults()[0].GetValue()
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				// dead end
+				// old legacy dead end
 				StateDecision: &iwfidl.StateDecision{},
 			})
 			return
@@ -167,8 +168,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		if req.GetWorkflowStateId() == State22 {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				// dead end
-				StateDecision: &iwfidl.StateDecision{},
+				// real new dead end
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: service.DeadEndWorkflowStateId,
+						},
+					},
+				},
 				PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
 					{
 						ChannelName: channel2,
