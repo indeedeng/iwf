@@ -15,8 +15,6 @@ fi
 echo "now trying to register iWF system search attributes..."
 for run in {1..120}; do
   sleep 1
-  tctl search-attribute  create -name IwfWorkflowType -type Keyword -y;
-  sleep 0.1
   tctl search-attribute  create -name IwfWorkflowType -type Keyword -y
   sleep 0.1
   tctl search-attribute  create -name IwfGlobalWorkflowVersion -type Int -y
