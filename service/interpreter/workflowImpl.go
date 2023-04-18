@@ -253,6 +253,10 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						StateCompletionOutputs: outputCollector.GetAll(),
 					}, failErr
 				}
+				if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() && shouldGracefulComplete {
+					// if it is empty and no stateExecutionsToResume and request a graceful complete just complete the loop
+					break
+				}
 				// 2. last update config, do it here because we use input to carry over config, not continueAsNewer query
 				input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
 				input.IsResumeFromContinueAsNew = true

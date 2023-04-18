@@ -21,8 +21,6 @@ func TestAnyCommandCombinationWorkflowTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyCommandCombinationWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestAnyCommandCombinationWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
-		smallWaitForFastTest()
 	}
 }
 
@@ -33,6 +31,24 @@ func TestAnyCommandCombinationWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
+	}
+}
+
+func TestAnyCommandCombinationWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCombinationWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestAnyCommandCombinationWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
@@ -61,7 +77,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        anycommandconbination.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 20,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(anycommandconbination.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
