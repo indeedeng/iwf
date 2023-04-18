@@ -76,7 +76,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        deadend.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 20,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
@@ -87,7 +87,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	// invoke an RPC to trigger the state execution
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	for i := 0; i < 3; i++ {
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 2)
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
 			RpcName:    deadend.RPCName,

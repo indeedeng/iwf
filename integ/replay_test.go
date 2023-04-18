@@ -13,8 +13,8 @@ var jsonHistoryFiles = []string{
 	"v2-persistence.json",
 	"v2-basic.json",
 	"v2-basic-disable-system-searchattributes.json",
-	"v2-any-timer-signal-continue-as-new.json",
 	"v2-any-timer-signal.json",
+	"v3-any-timer-signal-continue-as-new.json",
 	"v3-basic.json",
 	"v3-skip-start.json",
 }
@@ -27,7 +27,7 @@ func TestTemporalReplay(t *testing.T) {
 	for _, f := range jsonHistoryFiles {
 		err := replayer.ReplayWorkflowHistoryFromJSONFile(nil, "history/"+f)
 		assertions := assert.New(t)
-		assertions.Nil(err)
+		assertions.Nil(err, "fail at replay history for: "+f)
 	}
 
 }

@@ -239,10 +239,6 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				errToFailWf = awaitError
 				break
 			}
-			if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() {
-				// if it is empty and no stateExecutionsToResume, then we don't need to do continue as new -- the workflow has reached "dead ends" and will just complete after the loop
-				break
-			}
 			if continueAsNewCounter.IsThresholdMet() {
 				// NOTE: This must be the last thing before continueAsNew!!!
 				// Otherwise, there could be signals unhandled

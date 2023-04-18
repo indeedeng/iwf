@@ -175,6 +175,9 @@ func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
 
 	// TODO using a flag to control this debugging info
 	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
+
+	c.provider.GetLogger(ctx).Debug("continueAsNew is in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+
 	initTime, ok := inMemoryContinueAsNewMonitor[runId]
 	if !ok {
 		inMemoryContinueAsNewMonitor[runId] = time.Now()
