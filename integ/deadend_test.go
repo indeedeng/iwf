@@ -84,11 +84,10 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(time.Second * 1)
-
 	// invoke an RPC to trigger the state execution
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	for i := 0; i < 3; i++ {
+		time.Sleep(time.Second * 1)
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
 			RpcName:    deadend.RPCName,
