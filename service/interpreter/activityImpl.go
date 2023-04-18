@@ -7,10 +7,9 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
+	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strings"
 )
 
 // StateStart is Deprecated, will be removed in next release
@@ -22,7 +21,7 @@ func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, inp
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateStartActivity", "input", input)
-	iwfWorkerBaseUrl := getIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
+	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
@@ -60,7 +59,7 @@ func StateApiExecute(ctx context.Context, backendType service.BackendType, input
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)
 
-	iwfWorkerBaseUrl := getIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
+	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
@@ -80,21 +79,6 @@ func StateApiExecute(ctx context.Context, backendType service.BackendType, input
 		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 	return resp, nil
-}
-
-func getIwfWorkerBaseUrlWithFix(url string) string {
-	autofixUrl := os.Getenv("AUTO_FIX_WORKER_URL")
-	if autofixUrl != "" {
-		url = strings.Replace(url, "localhost", autofixUrl, 1)
-		url = strings.Replace(url, "127.0.0.1", autofixUrl, 1)
-	}
-	autofixPortEnv := os.Getenv("AUTO_FIX_WORKER_PORT_FROM_ENV")
-	if autofixPortEnv != "" {
-		envVal := os.Getenv(autofixPortEnv)
-		url = strings.Replace(url, "$"+autofixPortEnv+"$", envVal, 1)
-	}
-
-	return url
 }
 
 func composeStartApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {

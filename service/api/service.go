@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/compatibility"
+	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -320,11 +321,12 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		return nil, s.handleError(err)
 	}
 
+	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(queryResp.IwfWorkerUrl)
 	// invoke worker rpc
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
-				URL: queryResp.IwfWorkerUrl,
+				URL: iwfWorkerBaseUrl,
 			},
 		},
 	})
