@@ -35,7 +35,7 @@ User application creates ObjectWorkflow by implementing the Workflow interface, 
 An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
 | Name             |                                                                 Description                                                                  | 
-|------------------|:-------------------------------------------------------------------------------------------------------------------------------------------- | 
+|:------------------|:-------------------------------------------------------------------------------------------------------------------------------------------- | 
 | Data Attribute   |                                                      Persistence field to storing data                                                       | 
 | Search Attribute |                                                         "Searchable data attribute"                                                          | 
 | Signal Channel   |                                       Asynchronous message queue for the workflow object for external                                        |
