@@ -30,7 +30,7 @@ Related projects:
 
 A _long-running process_ is called **`ObjectWorkflow`**.
 
-iWF enables the building of long-running applications by implementing the Workflow interface, e.g. in Java
+iWF enables the building of long-running applications by implementing the Workflow interface, e.g. in
 [Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java).
 An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
