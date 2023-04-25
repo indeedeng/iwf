@@ -35,8 +35,8 @@ iWF enables the building of long-running applications by implementing the Workfl
 An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
 | Name             |                                                                 Description                                                                  | 
-|------------------|:--------------------------------------------------------------------------------------------------------------------------------------------:| 
-| Data attribute   |                                                      Persistence field to storing data                                                       | 
+|------------------|:-------------------------------------------------------------------------------------------------------------------------------------------- | 
+| Data Attribute   |                                                      Persistence field to storing data                                                       | 
 | Search Attribute |                                                         "Searchable data attribute"                                                          | 
 | Signal Channel   |                                       Asynchronous message queue for the workflow object for external                                        |
 | Internal Channel |                                              An internal message queue for workflow states/RPC                                               |
@@ -44,6 +44,7 @@ An implementation of the interface is referred to as a `WorkflowDefinition`, con
 | RPC              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution |
 
 You can use a diagram to outline a workflow definition like this:
+
 ![Example workflow diagram](https://user-images.githubusercontent.com/4523955/234424825-ff3673c0-af23-4eb7-887d-b1f421f3aaa4.png)
 
 Logically, this workflow definition will have a persistence schema like below:
@@ -85,6 +86,7 @@ or
 ![decision flow2](https://user-images.githubusercontent.com/4523955/234428082-649be7f4-a699-406c-91cc-d8d25a41ae60.png)
 
 If combining with some commands, it can be like this:
+
 ![decision flow3](https://user-images.githubusercontent.com/4523955/234428326-a697cc35-31d6-4b94-9d4c-fbf65474ecf6.png)
 
 
@@ -127,7 +129,7 @@ They are completely different:
 ![signals vs rpc](https://user-images.githubusercontent.com/4523955/234428638-a0075124-1992-4d54-a15b-69a037b4f8fa.png)
 
 | vs             |        Availability        |                                        Latency |                                    Workflow Requirement |
-|----------------|:--------------------------:|-----------------------------------------------:|--------------------------------------------------------:|
+|----------------|:-------------------------- |:----------------------------------------------- |:-------------------------------------------------------- |
 | Signal Channel |            High            |                                            Low |                     Requires a WorkflowState to process |
 | RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker |                               No WorkflowState required |
 
