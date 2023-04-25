@@ -9,151 +9,95 @@
 
 **iWF will make you a 10x developer!**
 
-iWF is an all-in-one platform for developing long-running business processes. It offers a convenient abstraction layer
-for utilizing databases, ElasticSearch, message queues, durable timers, and more, with a clean, simple, and
-user-friendly interface.
+iWF is an all-in-one platform for developing long-running business processes. It offers a convenient abstraction for durable timers, 
+background execution with backoff retry, persistence, indexing, message queues, RPC, and more. You will build reliable/scalable backend applications
+much faster than ever. 
 
-iWF is a versatile WorkflowAsCode engine that is both simple and powerful. By
-utilizing [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal)
-as an interpreter on the backend, iWF preserves all the capabilities of Cadence/Temporal, while maintaining the same
-level of scalability and reliability.
+iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
 
 Related projects:
 
-* [OpenAPI definition between SDKs and server](https://github.com/indeedeng/iwf-idl).
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk)
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
-    * [Product use case example: subscription](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
-* [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk)
+* [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk) (V2 is WIP)
 * [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples)
-    * [Product use case example: subscription](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/subscription)
-
-# Table of contents
-
-- [Community & Help](#community--help)
-- [What is iWF](#what-is-iwf)
-    - [Architecture](#architecture)
-    - [Basic Concepts](#basic-concepts)
-        - [Workflow and WorkflowState definition](#workflow-and-workflowstate-definition)
-        - [Workflow execution and WorkflowState execution](#workflow-execution-and-workflowstate-execution)
-        - [Commands](#commands)
-        - [Persistence](#persistence)
-        - [Communication](#communication)
-        - [Workflow Diagram](#iwf-workflow-design-diagram)
-    - [Client APIs](#client-apis)
-    - [Advanced Concepts](#advanced-concepts)
-- [Why iWF](#why-iwf)
-    - [If you are familiar with Cadence/Temporal/AWS SWF/Azure Durable Functions](#if-you-are-familiar-with-cadencetemporalaws-swfazure-durable-functions)
-    - [If you are not](#if-you-are-not)
-- [How to run this server](#how-to-run-this-server)
-    - [Using docker image & docker-compose](#using-docker-image--docker-compose)
-    - [How to build & run locally](#how-to-build--run-locally)
-    - [How to use in production](#how-to-use-in-production)
-- [Monitoring and Operations](#monitoring-and-operations)
-    - [iWF server](#iwf-server)
-    - [iWF application](#iwf-application)
-    - [Debug & Troubleshooting](#troubleshooting)
-    - [Operation](#operation)
-- [Development Plan](#development-plan)
-- [How to migrate from Cadence/Temporal](#how-to-migrate-from-cadencetemporal)
-- [Some history](#some-history)
-- [Contribution](CONTRIBUTING.md)
-- [Posts & Articles](#posts--articles--reference)
-
-# Community & Help
-
-* [Slack Channels](https://join.slack.com/t/iwfglobal/shared_invite/zt-1mgi9q6gw-aog6KBuTHFu1KolBerBaLA)
-* [Github Discussion](https://github.com/indeedeng/iwf/discussions)
-* [StackOverflow](https://stackoverflow.com/questions/tagged/iwf)
-* [Github Issues](https://github.com/indeedeng/iwf/issues)
 
 # What is iWF
 
-## Architecture
-
-An iWF application is composed of several iWF workflow workers. These workers host two REST APIs for
-WorkflowState `start` and `decide`.
-The application utilizes the iWF SDKs to communicate with an iWF server and perform actions on workflow executions, such
-as starting, stopping,
-signaling, and retrieving results
-
-The iWF server provides the APIs, which are also RESTful, as a iWF API service. Internally, this API service
-communicates
-with the Cadence/Temporal service as its backend.
-
-In addition to hosting the iWF API service, the iWF server includes Cadence/Temporal workers that
-host [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
-This interpreter workflow interprets any iWF workflows into the Cadence/Temporal workflow. It then invokes the two
-application
-worker APIs (WorkflowState `start` and `decide`) through Cadence/Temporal activities. As a result, all REST API requests
-and responses
-are recorded as history events, which can be useful for debugging and troubleshooting purposes.
-This means that there's no need to replay the application workflow code.
-
-![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
-
-* See [Design doc](https://docs.google.com/document/d/1BpJuHf67ibaOWmN_uWw_pbrBVyb6U1PILXyzohxA5Ms/edit) for more
-  details.
 
 ## Basic Concepts
 
-### Workflow and WorkflowState definition
 
-A _long-running process_ is called **`Workflow`**.
+A _long-running process_ is called **`ObjectWorkflow`**.
 
-iWF enables the building of long-running applications by implementing the Workflow interface in either
-[Golang](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow.go) or
-[Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/Workflow.java).
-An implementation of the interface is referred to as a `WorkflowDefinition`.
+iWF enables the building of long-running applications by implementing the Workflow interface, e.g. in Java
+[Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java).
+An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
-A WorkflowDefinition consists of multiple WorkflowStates, which can be implemented using either
-the [Java WorkflowState interface](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/WorkflowState.java)
-or [Golang WorkflowState interface](https://github.com/iworkflowio/iwf-golang-sdk/blob/main/iwf/workflow_state.go).
-A WorkflowState is implemented using two APIs: the `start` API and the `decide` API:
+| Name             |                                                                 Description                                                                  | 
+|------------------|:--------------------------------------------------------------------------------------------------------------------------------------------:| 
+| Data attribute   |                                                      Persistence field to storing data                                                       | 
+| Search Attribute |                                                         "Searchable data attribute"                                                          | 
+| Signal Channel   |                                       Asynchronous message queue for the workflow object for external                                        |
+| Internal Channel |                                              An internal message queue for workflow states/RPC                                               |
+| Workflow State   |           A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute           |
+| RPC              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution |
 
-* The `start` API is invoked as soon as a WorkflowState is started. It returns a set of Commands to the server,
-  and once these commands are completed, the `decide` API is triggered. The number of commands can range from zero to
-  multiple.
-* The `decide` API determines the next set of states to be executed. The next states can range from zero to multiple.
+You can use a diagram to outline a workflow definition like this:
+![Example workflow diagram](https://user-images.githubusercontent.com/4523955/234424825-ff3673c0-af23-4eb7-887d-b1f421f3aaa4.png)
 
-The same WorkflowState can be re-executed as different stateExecutions.
+Logically, this workflow definition will have a persistence schema like below:
 
-The start/decide APIs can call any external APIs as part of the implementations.
+| Workflow Execution   | Search Attr A | Search Attr B | Data Attr C | Data Attr D |
+|----------------------|---------------|:-------------:|------------:|------------:|
+| Workflow Execution 1 | val 1         |     val 2     |       val 3 |       val 4 |
+| Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
+| ...                  | ...           |      ...      |         ... |         ... |
 
-![workflow diagram example](https://user-images.githubusercontent.com/4523955/218195868-17818b58-0d00-4523-8cc6-df4c04526c0d.png)
+And the schema just defined and maintained in your code along with other business logic.
 
-### Workflow execution and WorkflowState execution
+## Workflow State
+A workflow state is like “a small workflow” of 1~2 steps:
 
-An application can initiate a workflow instance for any WorkflowDefinition using a `workflowId`. The instance of a
-workflow is referred
-to as a `WorkflowExecution`. The iWF server returns a `runId`, which is a universally unique identifier (UUID), as the
-identifier for the WorkflowExecution. The runId is guaranteed to be globally unique.
+**[ waitUntil ] → execute**
 
-:warning: Note:
-> Depending on the context, the term "workflow" may refer to a WorkflowExecution (most commonly), a WorkflowDefinition,
-> or both.
+The full detailed execution flow is like this:
 
-For a running WorkflowExecution, there must be at least one WorkflowState being executed, and if there are none, the
-WorkflowExecution
-will be marked as completed. An instance of a WorkflowState's execution is referred to as a `StateExecution` and is
-identified by a
-`StateExecutionId`. The StateExecutionId is formatted as `<StateId>-<Number>`, where the `StateId` is defined by the
-WorkflowState definition
-and the `Number` represents the number of times the StateId has been started. The StateExecutionId is unique only within
-the context
-of a specific WorkflowExecution.
+![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234427642-0a9e9332-0587-44f5-a71d-175ebb03c170.png)
 
-### Commands
+The execute API will return some StateDecision:
+* Single next state 
+  * Go to to different state
+  * Go to the same state as a loop
+  * Go the the previous state as a loop
+* Multiple next states, executing as multi threads in parallel
+* Dead end -- Just stop the thread
+* Graceful complete -- Stop the thread, and also will stop the workflow when all other threads are stopped
+* Force complete -- Stop the workflow immediately
+* Force fail  -- Stop the workflow immediately with failure
+
+With decisions, a "complex" workflow definitions can have a flow like this:
+
+![decision flow1](https://user-images.githubusercontent.com/4523955/234428066-629453a6-e385-47cf-9408-835f5aaf4b3a.png)
+
+or
+
+![decision flow2](https://user-images.githubusercontent.com/4523955/234428082-649be7f4-a699-406c-91cc-d8d25a41ae60.png)
+
+If combining with some commands, it can be like this:
+![decision flow3](https://user-images.githubusercontent.com/4523955/234428326-a697cc35-31d6-4b94-9d4c-fbf65474ecf6.png)
+
+
+### Commands for WorkflowState's WaitUntil API
 
 iWF provides three types of commands:
 
 * `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External application can use
   SignalWorkflow API to signal a workflow.
 * `TimerCommand`: will wait for a **durable timer** to fire.
-* `InterStateChannelCommand`: see [InterStateChannelCommand](#advanced-commands) as an advanced concept
+* `InternalChannelCommand`: will wait for a message from InternalChannel.
 
-The start API can return multiple commands along with a DeciderTriggerType for how to trigger the decide API.
-The available options for the DeciderTriggerType are:
+The waitUntil API can return multiple commands along with a `CommandWaitingType`:
 
 * `AllCommandCompleted`: This option waits for all commands to be completed.
 
@@ -162,86 +106,32 @@ The available options for the DeciderTriggerType are:
 * `AnyCommandCombinationCompleted`: This option waits for any combination of the commands in a specified list to be
   completed.
 
-### Persistence
+## RPC
 
-iWF offers a highly simplified persistence abstraction, which eliminates the need for developers to interact with
-any database systems to register or maintain schemas. The only schema that needs to be defined is in the workflow code.
+In addition to read/write persistence fields, a RPC can **trigger new state executions, and publish message to InternalChannel, all atomically.**
 
-* `DataObject`
-    * are used for sharing data values across the workflow.
-    * can be retrieved by external application using GetDataObjects API
-    * can be viewed in Cadence/Temporal WebUI in QueryHandler tab
-* `SearchAttribute`:
-    * are used for sharing data values across the workflow similarly to DataObjects
-    * can be retrieved by external application using GetSearchAttributes API
-    * are used for searching for workflows by external application using `SearchWorkflow` API
-    * are used for searching for workflows in Cadence/Temporal WebUI in Advanced tab
-    * any search attribute type must be registered in Cadence/Temporal server before using for searching because it is
-      backed up ElasticSearch
-    * See [Temporal doc](https://docs.temporal.io/concepts/what-is-a-search-attribute)
-      and [Cadence doc](https://cadenceworkflow.io/docs/concepts/search-workflows/) to understand more about
-      SearchAttribute
-* `StateLocals`
-    * are used for passing data values from the `start` API to the `decide` API within the same StateExecution,
-      thereby reducing the need to use DataObjects
-* `RecordEvents`
-    * are used to record events within the state execution and are useful for debugging using the Workflow history. They
-      can be used to record the input and output of dependency RPC calls, for example
 
-Logically, each workflow type will have a persistence schema like below:
+`RPC` triggering state executions  is an important pattern to ensure consistency across dependencies for critical business – this 
+solves a very common problem in many existing distributed systems, almost everywhere.
 
-```text
-+-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
-| workflowId  | runId | dataObject key1 | dataObject key2 | searchAttribute key1 | searchAttribute key2 | ... |
-+-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
-| your-wf-id1 | uuid1 | valu1           | value2          | keyword-value1       | 123(integer)         | ... |
-+-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
-| your-wf-id1 | uuid2 | value3          | value4          | keyword-value2       | 456(integer)         | ... |
-+-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
-| your-wf-id2 | uuid3 | value5          | value5          | keyword-value3       | 789(integer)         | ... |
-+-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
-| ...         | ...   | ...             | ...             | ...                  | ...                  | ... |
-+-------------+-------+-----------------+-----------------+----------------------+----------------------+-----+
-```
+![flow with RPC](https://user-images.githubusercontent.com/4523955/234428514-0dfaba96-91c6-4aa2-9fbb-f3e1904f3c24.png)
 
-### Communication
+### Signal Channel vs RPC
 
-iWF has two primary communication mechanisms:
+They are completely different:
+* Signal is sent to iWF service without waiting for response of the processing
+* RPC will wait for worker to process the RPC request synchronously
+* Signal will be held in a signal channel until a workflow state consumes it
+* RPC will be processed by worker immediately
 
-* `SignalChannel`: is used for receiving input from external sources asynchronously. It is employed with the
-  SignalCommand.
-* `InterStateChannel`: is used for communication between state executions. It is employed with the
-  InterStateChannelCommand. Read more about [InterStateChannelCommand](#advanced-commands) as an advanced concept
+![signals vs rpc](https://user-images.githubusercontent.com/4523955/234428638-a0075124-1992-4d54-a15b-69a037b4f8fa.png)
 
-### iWF workflow design diagram
+| vs             |        Availability        |                                        Latency |                                    Workflow Requirement |
+|----------------|:--------------------------:|-----------------------------------------------:|--------------------------------------------------------:|
+| Signal Channel |            High            |                                            Low |                     Requires a WorkflowState to process |
+| RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker |                               No WorkflowState required |
 
-When creating an iWF workflow, utilizing state diagrams similar to this template can be beneficial for visualizing the
-process.
-
-![state diagram template](https://user-images.githubusercontent.com/4523955/218195877-9c99f3ff-bba9-41db-86c6-e7352ed8b0f1.png)
-
-For example, the subscription workflow diagram:
-
-* [Java sample](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
-* [Golang sample](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/subscription)
-
-![subscription state diagram](https://user-images.githubusercontent.com/4523955/218195883-6d8c23ea-130a-481b-bb80-3e5bb3354176.png)
-
-## Client APIs
-
-Client APIs are hosted by iWF server for user workflow application to interact with their workflow executions.
-
-* Start workflow: start a new workflow execution
-* Stop workflow: stop a workflow execution
-* Signal workflow: send a signal to a workflow execution
-* Search workflow: search for workflows using a query language like SQL with search attributes
-* Get workflow: get basic information about a workflow like status and results(if completed or waiting for completed)
-* Get workflow data objects: get the dataObjects of a workflow execution
-* Get workflow search attributes: get the search attributes of a workflow execution
-* Reset workflow: reset a workflow to previous states
-* Skip timer: skip a timer of a workflow (usually for testing or operation)
-
-## Advanced Concepts
+## Advanced Customization
 
 ### WorkflowOptions
 
@@ -253,21 +143,18 @@ At any given time, there can be only one WorkflowExecution running for a specifi
 A new WorkflowExecution can be initiated using the same workflowId by setting the appropriate `IdReusePolicy` in
 WorkflowOptions.
 
-* `ALLOW_IF_NO_RUNNING` or `ALLOW_DUPLICATE`
+* `ALLOW_IF_NO_RUNNING` 
     * Allow starting workflow if there is no execution running with the workflowId
     * This is the **default policy** if not specified in WorkflowOptions
-* `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY` or `ALLOW_DUPLICATE_FAILED_ONLY`
+* `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY`
     * Allow starting workflow if a previous Workflow Execution with the same Workflow Id does not have a Completed
       status.
       Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated or Cancelled workflow
       execution.
-* `DISALLOW_REUSE` or `REJECT_DUPLICATE`
+* `DISALLOW_REUSE` 
     * Not allow to start a new workflow execution with the same workflowId.
-* `TERMINATE_IF_RUNNING`
+* `ALLOW_TERMINATE_IF_RUNNING`
     * Always allow starting workflow no matter what -- iWF server will terminate the current running one if it exists.
-
-NOTE: the names `ALLOW_DUPLICATE`/`ALLOW_DUPLICATE_FAILED_ONLY`/`REJECT_DUPLICATE` are inherited from Cadence/Temporal
-but iWF provides more accurate names as alternatives.
 
 #### CRON Schedule
 
@@ -316,9 +203,9 @@ By default, there is no initial search attributes.
 
 Similarly, users can customize the WorkflowState
 
-#### Start/Decide API timeout and retry policy
+#### WorkflowState WaitUntil/Execute API timeout and retry policy
 
-Users can customize the API timeout and retry policy for WorkflowState Start and Decide API.
+Users can customize the API timeout and retry policy.
 
 By default, the API timeout is 30s with infinite backoff retry:
 
@@ -345,67 +232,44 @@ to specify certain DataObjects/SearchAttributes only to load for this WorkflowSt
 
 `WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataObject/SearchAttribute, they can be
 done in parallel without locking.
-iWF will provide more advanced policy to allow loading with "locking" in the future.
 
-#### Start API failure policy
+#### WaitUntil API failure policy
 
-By default, the workflow execution will fail when Start/Decide API max out the retry attempts. In some cases that
+By default, the workflow execution will fail when API max out the retry attempts. In some cases that
 workflow want to ignore the errors.
 
-Using `PROCEED_TO_DECIDE_ON_START_API_FAILURE` for `StartApiFailurePolicy` will let workflow continue to execute decide
-API when start API fails with maxing out all the retry attempts (therefore, you should override the default infinite
-retry
-attempts to a different number).
+Using `PROCEED_ON_API_FAILURE` for `WaitUntilApiFailurePolicy` will let workflow continue to execute decide
+API when the API fails with maxing out all the retry attempts (therefore, you should override the default infinite
+retry attempts to a different number).
 
 Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
 exception/error.
 
-### Advanced Commands
+## Limitation
 
-`InterStateChannelCommand` is a command to wait for a value to be published from another state in the same workflow
-execution.
-It's for synchronizing the logic among multiple threads in a workflow. It's used with `InterStateChannel`.
+Though iWF can be used for a very wide range of use case even just CRUD, iWF is NOT for everything. It is not suitable for use cases like:
 
-For example, it can be used to let thread A to wait for thread B before thread A to continue.
+* High performance transaction( within 10ms)
+* High throughput for a single object(like a single record in database) for hot partition issue
+* Join operation across different workflows
+* Transaction for operation across multiple workflows
 
-# Why iWF
 
-## If you are familiar with Cadence/Temporal/AWS SWF/Azure Durable Functions
+# Architecture
 
-Check [iWF vs Cadence/Temporal](https://medium.com/@qlong/iwf-vs-cadence-temporal-1e11b35960fe) for
-comparison with Cadence/Temporal.
+An iWF application is composed of several iWF workflow workers. These workers host REST APIs for server to call. 
+An application also perform actions on workflow executions, such as starting, stopping, signaling, and retrieving results 
+by calling iWF service APIs.
 
-The article should still apply to AWS SWF and Azure Durable Functions:
+The iWF server provides the APIs. Internally, this API service communicates with the Cadence/Temporal service as its backend.
 
-* AWS SWF is the predecessor of Cadence/Temporal and shares the same API, but its capabilities and features are more
-  limited when compared.
-    * For a comparison between SWF and Cadence, refer to [this post](https://news.ycombinator.com/item?id=19733880.)
-* Azure Durable Functions shared the same programming model(replay based workflow execution engine) but also with
-  limited features compared to Cadence/Temporal.
-    * Additionally, it is recommended to read
-      this [article](https://medium.com/@cgillum/common-pitfalls-with-durable-execution-frameworks-like-durable-functions-or-temporal-eaf635d4a8bb)
-      about the pitfall about the programming model
+In addition to hosting the iWF API service, the iWF server includes Cadence/Temporal workers that
+host [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
+This interpreter workflow interprets any iWF workflows into the Cadence/Temporal workflow. 
 
-## If you are not
+![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
 
-Check out this [article](https://medium.com/@qlong/iwf-vs-other-general-purposed-workflow-engines-f8f3e3d8993d) to
-understand difference between iWF and other workflow engines.
-
-**TL;DR:**
-
-* WorkflowAsCode for highly flexible/customizable business logic, highly testable and easy to maintain
-* Parallel execution of multiple threads of business
-* Persistence storage for intermediate states stored as "dataObjects"
-* Persistence searchable attributes that can be used for flexible searching, even full text searching, backed by
-  ElasticSearch
-* Receiving data from external system by Signal
-* Durable timer, and cron job scheduling
-* Reset workflow to let you recover the workflows from bad states easily
-* Troubleshooting/debugging is easy
-* Scalability/reliability
-* ...
-
-# How to run this server
+# How to use
 
 ## Using docker image & docker-compose
 
@@ -442,53 +306,6 @@ the version tag.
 * Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below
   instructions for setting up local Cadence.
 
-## How to use in production
-
-You can customize the docker image, or just use the [api](https://github.com/indeedeng/iwf/tree/main/service/api)
-and [interpreter](https://github.com/indeedeng/iwf/tree/main/service/interpreter) that are exposed as the api service
-and workflow service.
-
-* Also make sure you have registered the system search attributes required by iWF server:
-    * Keyword: IwfWorkflowType
-    * Int: IwfGlobalWorkflowVersion
-    * Keyword: IwfExecutingStateIds
-    * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
-    * For Cadence without advancedVisibility enabled,
-      set [disableSystemSearchAttributes](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L8)
-      to true
-
-For more info, contact qlong.seattle@gmail.com
-
-# Monitoring and Operations
-
-## iWF server
-
-There are two components for iWF server: API service and interpreter worker service.
-
-For API service, set up monitors/dashboards:
-
-* API availability
-* API latency
-
-The interpreter worker service is just a standard Cadence/Temporal workflow application. Follow the developer guides.
-
-* For
-  [Cadence to set up monitor/dashboards ](https://cadenceworkflow.io/docs/operation-guide/monitor/#cadence-application-monitoring)
-
-* For [Temporal to set up monitor/dashboards](https://github.com/temporalio/dashboards)
-  and [metrics definition](https://docs.temporal.io/references/sdk-metrics)
-
-## iWF application
-
-As you may realize, iWF application is a typical REST microservice. You just need the standard ways to operate it.
-
-Usually, you need to set up monitors/dashboards:
-
-* API availability
-* API latency
-
-In addition to the workflow failure monitors. You can get it from Cadence/Temporal, or you need to emit it within the
-iWF workflow (since workflow failure is from a Decide API decision)
 
 ## Troubleshooting
 
@@ -518,82 +335,6 @@ use [some HTTP script like this](./script/http/local/home.http) to operate on wo
 * Skip a timer
 * etc, any APIs supported by the [iWF server API schema](https://github.com/indeedeng/iwf-idl/blob/main/iwf.yaml)
 
-# How to migrate from Cadence/Temporal
-
-Check this [wiki](https://github.com/indeedeng/iwf/wiki/How-to-migrate-from-Cadence-Temporal) for how to migrate from
-Cadence/Temporal.
-
-# Development Plan
-
-### 1.0
-
-- [x] Start workflow API
-- [x] Executing start/decide APIs and completing workflow
-- [x] Parallel execution of multiple states
-- [x] Timer command
-- [x] Signal command
-- [x] SearchAttributeRW
-- [x] DataObjectRW
-- [x] StateLocal
-- [x] Signal workflow API
-- [x] Get DataObjects/SearchAttributes API
-- [x] Get workflow info API
-- [x] Search workflow API
-- [x] Stop workflow API
-- [x] Reset workflow API
-- [x] Command type(s) for inter-state communications (e.g. internal channel)
-- [x] AnyCommandCompleted Decider trigger type
-- [x] More workflow start options: IdReusePolicy, cron schedule, retry
-- [x] StateOption: Start/Decide API timeout and retry policy
-- [x] Reset workflow by stateId or stateExecutionId
-- [x] StateOption.PersistenceLoadingPolicy: LOAD_PARTIAL_WITHOUT_LOCKING
-
-### 1.1
-
-- [x] More Search attribute types: Datetime, double, bool, keyword array, text
-- [x] More workflow start options: initial search attributes
-
-### 1.2
-
-- [x] Skip timer API for testing/operation
-- [x] Decider trigger type: any command combination
-
-### 1.3
-
-- [x] Support failing workflow with results
-- [x] Support differentiate different uncompleted workflow closed status for GetWorkflow
-
-### 1.4
-
-- [x] Support PROCEED_TO_DECIDE_ON_START_API_FAILURE for StartApiFailurePolicy
-
-### 1.5
-
-- [x] Auto continueAsNew
-- [x] Stop API supports terminate and fail workflows as stop types
-- [x] RPC for request response 
-
-### Future
-
-- [ ] WaitForMoreResults in StateDecision
-- [ ] LongRunningActivityCommand
-- [ ] More Decider trigger type
-- [ ] Failing workflow details
-- [ ] StateOption.PersistenceLoadingPolicy: LOAD_ALL_WITH_EXCLUSIVE_LOCK and LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
-
-# Some history
-
-AWS introduced SWF in 2012, but later switched to Step Functions in 2016 because they found it difficult to support.
-Cadence and Temporal picked up where SWF left off and extend with more features and more robust, but keeping the same
-programming models. Programming with SWF/Cadence/Temporal is challenging because it exposes too many internal details.
-iWF was created to offer the same level of power as Cadence and Temporal, but with a clean and simple API that hides
-all the underlying complexity.
-
-For more information, please see
-the [document](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CRPPYJY3OBbuWrPE).
-
-<img width="916" alt="history diagram" src="https://user-images.githubusercontent.com/4523955/201188875-32e1d070-ab53-4ac5-92fd-bb8ed16dd7dc.png">
-
 # Posts & Articles & Reference
 
 * Temporal adopted
@@ -601,8 +342,3 @@ the [document](https://docs.google.com/document/d/1zyCKvy4S2l7XBVJzZuS65OIsqV9CR
 * Cadence adopted in its [README](https://github.com/uber/cadence#cadence)
   , [official documentation](https://cadenceworkflow.io/docs/get-started/#what-s-next)
   and [Cadence community spotlight](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/)
-* [A Letter to Cadence/Temporal, and Workflow Tech Community](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
-* [iWF vs Cadence/Temporal](https://medium.com/@qlong/iwf-vs-cadence-temporal-1e11b35960fe)
-* [iWF vs other general purposed workflow Engines](https://medium.com/@qlong/iwf-vs-other-general-purposed-workflow-engines-f8f3e3d8993d)
-* [Cadence® iWF](https://www.instaclustr.com/blog/cadence-iwf/?utm_content=1669999382&utm_medium=linkedin&utm_source=organicsocial)
-
