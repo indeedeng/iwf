@@ -34,13 +34,13 @@ User application creates ObjectWorkflow by implementing the Workflow interface, 
 [Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java).
 An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
-| Name             |                                                                 Description                                                                  | 
-|:------------------|:-------------------------------------------------------------------------------------------------------------------------------------------- | 
-| Data Attribute   |                                                      Persistence field to storing data                                                       | 
-| Search Attribute |                                                         "Searchable data attribute"                                                          | 
-| Signal Channel   |                                       Asynchronous message queue for the workflow object for external                                        |
-| Internal Channel |                                              An internal message queue for workflow states/RPC                                               |
-| Workflow State   |           A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute           |
+| Name             | Description                                                                                                                                  | 
+|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------| 
+| Data Attribute   | Persistence field to storing data                                                                                                            | 
+| Search Attribute | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch           | 
+| Signal Channel   | Asynchronous message queue for the workflow object for external                                                                              |
+| Internal Channel | An internal message queue for workflow states/RPC                                                                                            |
+| Workflow State   | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute                     |
 | RPC              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution |
 
 You can use a diagram to outline a workflow definition like this:
@@ -56,6 +56,9 @@ Logically, this workflow definition will have a persistence schema like below:
 | ...                  | ...           |      ...      |         ... |         ... |
 
 And the schema just defined and maintained in your code along with other business logic.
+Moreover, the search attribute works like infinite indexes in traditional database. You 
+only need to specify which attributes should be indexed, without worrying about things in 
+a traditional database like the number of indexes, and the order of the fields in an index. 
 
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:
@@ -267,7 +270,8 @@ The iWF server provides the APIs. Internally, this API service communicates with
 
 In addition to hosting the iWF API service, the iWF server includes Cadence/Temporal workers that
 host [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
-This interpreter workflow interprets any iWF workflows into the Cadence/Temporal workflow. 
+This workflow implements all the core features as described above, and also things like "Auto ContinueAsNew" to let you use 
+iWF without any scaling limitation. 
 
 ![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
 
