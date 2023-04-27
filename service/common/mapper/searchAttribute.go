@@ -62,7 +62,7 @@ func MapCadenceToIwfSearchAttributes(searchAttributes *shared.SearchAttributes, 
 		if err != nil {
 			return nil, err
 		}
-		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, true)
+		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, true, "2006-01-02T15:04:05-07:00")
 		if err != nil {
 			return nil, err
 		}
@@ -94,7 +94,7 @@ func MapTemporalToIwfSearchAttributes(searchAttributes *common.SearchAttributes,
 		}
 		// TODO we should also call UseNumber here for JSON decoder for Temporal
 		// see https://github.com/temporalio/sdk-go/issues/942
-		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, false)
+		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, false, "2006-01-02T15:04:05Z")
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +104,7 @@ func MapTemporalToIwfSearchAttributes(searchAttributes *common.SearchAttributes,
 	return result, nil
 }
 
-func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueType, object interface{}, useNumber bool) (*iwfidl.SearchAttribute, error) {
+func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueType, object interface{}, useNumber bool, backupServiceDatetimeFormat string) (*iwfidl.SearchAttribute, error) {
 	var strVal string
 	var intVal int64
 	var floatVal float64
@@ -122,14 +122,16 @@ func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueTy
 		if !ok {
 			return nil, fmt.Errorf("invalid datetime value %v", object)
 		}
-		// for DATETIME it will be like 2022-12-27T20:00:24.338155843Z ???
-		serviceFormat := "2006-01-02T15:04:05Z"
-		t, err := time.Parse(serviceFormat, strVal)
-		if err != nil {
-			return nil, err
+		t, err := time.Parse(timeparser.DateTimeFormat, strVal)
+		if err == nil {
+			rv.StringValue = ptr.Any(t.Format(timeparser.DateTimeFormat))
+		} else {
+			t, err = time.Parse(backupServiceDatetimeFormat, strVal)
+			if err != nil {
+				return nil, err
+			}
+			rv.StringValue = ptr.Any(t.Format(timeparser.DateTimeFormat))
 		}
-		rv.StringValue = ptr.Any(t.Format(timeparser.DateTimeFormat))
-		
 	case iwfidl.KEYWORD, iwfidl.TEXT:
 		strVal, ok = object.(string)
 		rv.StringValue = &strVal

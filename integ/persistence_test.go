@@ -137,6 +137,10 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 				Key:       iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
 				ValueType: ptr.Any(iwfidl.KEYWORD),
 			},
+			{
+				Key:       iwfidl.PtrString("CustomDatetimeField"),
+				ValueType: ptr.Any(iwfidl.DATETIME),
+			},
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
@@ -215,7 +219,9 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 		BoolValue: ptr.Any(false),
 	}
 
-	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeKeyword}, searchResult1.GetSearchAttributes())
+	assertions.Equal([]iwfidl.SearchAttribute{
+		expectedSearchAttributeKeyword, expectedDatetimeSearchAttribute,
+	}, searchResult1.GetSearchAttributes())
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
 
 	sasFromQuery := []iwfidl.SearchAttribute{}
