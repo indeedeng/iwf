@@ -60,16 +60,26 @@ Moreover, the search attribute works like infinite indexes in traditional databa
 only need to specify which attributes should be indexed, without worrying about things in 
 a traditional database like the number of indexes, and the order of the fields in an index. 
 
+These are all the concepts that you need to build a super complicated workflow. 
+See [an example](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement) for how it looks like!
+
+Below are the explanation of what the concepts mean. They are powrful, also extremely simple and straightforword to use (the philosophy of iWF). 
+
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:
 
 **[ waitUntil ] → execute**
 
+The `waitUntil` API can returns some commands to wait for. When the commands are completed, the `execute` API will be invoked.
+The two APIs have access to read/write the persistence defined in the workflow.
+
 The full detailed execution flow is like this:
 
-![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234427642-0a9e9332-0587-44f5-a71d-175ebb03c170.png)
+![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234921554-587d8ad4-84f5-4987-b838-959869293465.png)
 
-The execute API will return some StateDecision:
+The `waitUntil` API is optional. If not defined, then `execute` API will be invoked instead when the state started.
+
+The execute API will return a StateDecision:
 * Single next state 
   * Go to to different state
   * Go to the same state as a loop
@@ -80,17 +90,15 @@ The execute API will return some StateDecision:
 * Force complete -- Stop the workflow immediately
 * Force fail  -- Stop the workflow immediately with failure
 
-With decisions, a "complex" workflow definitions can have a flow like this:
+With decisions, the workflow definitions can have flows like these:
 
-![decision flow1](https://user-images.githubusercontent.com/4523955/234428066-629453a6-e385-47cf-9408-835f5aaf4b3a.png)
+![decision flow1](https://user-images.githubusercontent.com/4523955/234919901-f327dfb6-5b38-4440-a2eb-5d1c832b694e.png)
 
-or
+or 
 
-![decision flow2](https://user-images.githubusercontent.com/4523955/234428082-649be7f4-a699-406c-91cc-d8d25a41ae60.png)
+![decision flow2](https://user-images.githubusercontent.com/4523955/234919896-30db8628-daeb-4f1d-bd2b-7bf826989c75.png)
 
-If combining with some commands, it can be like this:
-
-![decision flow3](https://user-images.githubusercontent.com/4523955/234428326-a697cc35-31d6-4b94-9d4c-fbf65474ecf6.png)
+or even more complicated as needed.
 
 
 ### Commands for WorkflowState's WaitUntil API
@@ -113,15 +121,57 @@ The waitUntil API can return multiple commands along with a `CommandWaitingType`
 
 ## RPC
 
-In addition to read/write persistence fields, a RPC can **trigger new state executions, and publish message to InternalChannel, all atomically.**
+RPC stands for "Remote Procedure Call". It's invoked by client, executed in workflow worker, and then respond back the results to client. 
 
+RPC provides a simple and powerful mechansim to interact with external systems. With RPCs defined along with persistence, an ObjectWorkflow 
+works like an durable object that provide methods to execute business logic. You can even uses iWF to implement a typical CRUD application like a 
+blog post, **the pseudo code** looks like this:
 
-`RPC` triggering state executions  is an important pattern to ensure consistency across dependencies for critical business – this 
-solves a very common problem in many existing distributed systems, almost everywhere.
+```java
+class BlogPost implements ObjectWorkflow{
+    DataAttribute String title;
+    DataAttribute String authorName;
+    DataAttribute String body;
 
-![flow with RPC](https://user-images.githubusercontent.com/4523955/234428514-0dfaba96-91c6-4aa2-9fbb-f3e1904f3c24.png)
+    @RPC 
+    void updateTitle(String title){
+         this.title = title
+    } 
+    
+    @RPC 
+    void updateBody(String body){
+         this.body = body
+    }     
+    
+    ...
+    ... 
+    
+    @RPC 
+    BlobPost get(){
+         return new BlogPost(title, authorName, body);
+    } 
+}
+
+```
+This is just pseudo code. The real code will look similar depends on which SDK to use. 
+
+See [this example of implementing an CRUD application](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/jobpost), with more capabilities like searching and background execution, just ~100 lines of code. 
+
+### Atomicity of RPC APIs
+
+It's important to note that in addition to read/write persistence fields, a RPC can **trigger new state executions, and publish message to InternalChannel, all atomically.**
+
+Atomically sending internal channel, or triggering state executions is an important pattern to ensure consistency across dependencies for critical business – this 
+solves a very common problem in many existing distributed system applications. Because most RPCs (like REST/gRPC/GraphQL) don't provide a way to invoke 
+background execution when updating persistence. People sometimes have to use complicated design to acheive this. 
+
+**But in iWF, it's all builtin, and user application just needs a few lines of code!** 
+
+![flow with RPC](https://user-images.githubusercontent.com/4523955/234930263-40b98ca7-4401-44fa-af8a-32d5ae075438.png)
 
 ### Signal Channel vs RPC
+
+There are two major ways for external clients to interact with workflows: Signal and RPC. So what are the difference? 
 
 They are completely different:
 * Signal is sent to iWF service without waiting for response of the processing
@@ -129,9 +179,11 @@ They are completely different:
 * Signal will be held in a signal channel until a workflow state consumes it
 * RPC will be processed by worker immediately
 
-![signals vs rpc](https://user-images.githubusercontent.com/4523955/234428638-a0075124-1992-4d54-a15b-69a037b4f8fa.png)
+![signals vs rpc](https://user-images.githubusercontent.com/4523955/234932674-b0d062b2-e5dd-4dbe-93b5-1b9863acc5e0.png)
 
-| vs             |        Availability        |                                        Latency |                                    Workflow Requirement |
+So choose based on the situations/requirements
+
+|                |        Availability        |                                        Latency |                                    Workflow Requirement |
 |----------------|:-------------------------- |:----------------------------------------------- |:-------------------------------------------------------- |
 | Signal Channel |            High            |                                            Low |                     Requires a WorkflowState to process |
 | RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker |                               No WorkflowState required |
@@ -229,13 +281,13 @@ all attempts including retries. It will be capped to the minimum if both are pro
 
 #### Persistence loading policy
 
-When a state API loads DataObjects/SearchAttributes, by default it will load everything which could cause size limit
+When a state API loads DataAttributes/SearchAttributes, by default it will load everything which could cause size limit
 error
 for Cadence/Temporal activity input/output limit(2MB by default). User can use other loading
 policy `LOAD_PARTIAL_WITHOUT_LOCKING`
-to specify certain DataObjects/SearchAttributes only to load for this WorkflowState.
+to specify certain DataAttributes/SearchAttributes only to load for this WorkflowState.
 
-`WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataObject/SearchAttribute, they can be
+`WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataAttribute/SearchAttribute, they can be
 done in parallel without locking.
 
 #### WaitUntil API failure policy
@@ -244,8 +296,7 @@ By default, the workflow execution will fail when API max out the retry attempts
 workflow want to ignore the errors.
 
 Using `PROCEED_ON_API_FAILURE` for `WaitUntilApiFailurePolicy` will let workflow continue to execute decide
-API when the API fails with maxing out all the retry attempts (therefore, you should override the default infinite
-retry attempts to a different number).
+API when the API fails with maxing out all the retry attempts.
 
 Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
 exception/error.
@@ -254,7 +305,7 @@ exception/error.
 
 Though iWF can be used for a very wide range of use case even just CRUD, iWF is NOT for everything. It is not suitable for use cases like:
 
-* High performance transaction( within 10ms)
+* High performance transaction( e.g. within 10ms)
 * High throughput for a single object(like a single record in database) for hot partition issue
 * Join operation across different workflows
 * Transaction for operation across multiple workflows
@@ -273,7 +324,7 @@ host [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/servic
 This workflow implements all the core features as described above, and also things like "Auto ContinueAsNew" to let you use 
 iWF without any scaling limitation. 
 
-![architecture diagram](https://user-images.githubusercontent.com/4523955/207514928-56fea636-c711-4f20-9e90-94ddd1c9844d.png)
+![architecture diagram](https://user-images.githubusercontent.com/4523955/234935630-e69c648e-7714-4672-beb2-d9867bedf940.png)
 
 # How to use
 
@@ -317,7 +368,10 @@ the version tag.
 
 When something goes wrong in your applications, here are the tips:
 
-* Use query handlers like (`DumpAllInternal` or `GetCurrentTimerInfos`) in Cadence/Temporal WebUI to quickly understand
+* All the input/output to your workflow are stored in the activity input/output of history event. The input is
+  in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having
+  errors.
+* Use query handlers like (`GetDataObjects` or `GetCurrentTimerInfos`) in Cadence/Temporal WebUI to quickly understand
   the current status of the workflows.
     * DumpAllInternal will return all the internal status or the pending states
     * GetCurrentTimerInfos will return all the timers of the pending states
@@ -326,9 +380,7 @@ When something goes wrong in your applications, here are the tips:
   .
 * If you return the full stacktrace in response body, the pending activity view will show it to you! Then use
   Cadence/Temporal WebUI to debug your application.
-* All the input/output to your workflow are stored in the activity input/output of history event. The input is
-  in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having
-  errors.
+
 
 ## Operation
 
