@@ -117,7 +117,20 @@ func mapToIwfSearchAttribute(key string, valueType iwfidl.SearchAttributeValueTy
 	var ok bool
 	var err error
 	switch valueType {
-	case iwfidl.KEYWORD, iwfidl.DATETIME, iwfidl.TEXT: // for DATETIME it will be like 2022-12-27T20:00:24.338155843Z
+	case iwfidl.DATETIME:
+		strVal, ok = object.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid datetime value %v", object)
+		}
+		// for DATETIME it will be like 2022-12-27T20:00:24.338155843Z ???
+		serviceFormat := "2006-01-02T15:04:05Z"
+		t, err := time.Parse(serviceFormat, strVal)
+		if err != nil {
+			return nil, err
+		}
+		rv.StringValue = ptr.Any(t.Format(timeparser.DateTimeFormat))
+		
+	case iwfidl.KEYWORD, iwfidl.TEXT:
 		strVal, ok = object.(string)
 		rv.StringValue = &strVal
 	case iwfidl.INT:
