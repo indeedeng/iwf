@@ -42,7 +42,6 @@ services:
     networks:
       - testing-network
   redis:
-    container_name: temporal-redis
     image: redis:${REDIS_VERSION}
     networks:
       - testing-network
