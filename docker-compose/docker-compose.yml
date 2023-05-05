@@ -90,7 +90,7 @@ services:
       - temporal
   redis:
     container_name: temporal-redis-iwf
-    image: redis:6.0.9
+    image: redis:${REDIS_VERSION}
     networks:
       - temporal-network
     ports:

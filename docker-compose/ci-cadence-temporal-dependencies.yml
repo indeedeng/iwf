@@ -27,6 +27,13 @@ services:
       - testing-network
     expose:
       - 5432
+  redis:
+    container_name: temporal-redis
+    image: redis:${REDIS_VERSION}
+    networks:
+      - testing-network
+    expose:
+      - 6379
   temporal:
     container_name: temporal
     depends_on:
