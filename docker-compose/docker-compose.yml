@@ -89,7 +89,7 @@ services:
     depends_on:
       - temporal
   redis:
-    container_name: temporal-redis-iwf
+    container_name: redis-iwf
     image: redis:${REDIS_VERSION}
     networks:
       - temporal-network
