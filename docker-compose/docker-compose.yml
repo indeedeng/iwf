@@ -88,6 +88,13 @@ services:
       - 8801:8801
     depends_on:
       - temporal
+  redis:
+    container_name: redis-iwf
+    image: redis:${REDIS_VERSION}
+    networks:
+      - temporal-network
+    ports:
+      - 6379:6379
 networks:
   temporal-network:
     driver: bridge
