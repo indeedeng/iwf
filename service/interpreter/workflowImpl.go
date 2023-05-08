@@ -415,8 +415,8 @@ func executeState(
 				WorkflowType:     basicInfo.IwfWorkflowType,
 				WorkflowStateId:  state.StateId,
 				StateInput:       state.StateInput,
-				SearchAttributes: persistenceManager.LoadSearchAttributes(saLoadingPolicy),
-				DataObjects:      persistenceManager.LoadDataObjects(doLoadingPolicy),
+				SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
+				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			},
 		}).Get(ctx, &startResponse)
 
@@ -645,8 +645,8 @@ func executeStateDecide(
 			WorkflowStateId:  state.StateId,
 			CommandResults:   commandRes,
 			StateLocals:      stateExecutionLocal,
-			SearchAttributes: persistenceManager.LoadSearchAttributes(saLoadingPolicy),
-			DataObjects:      persistenceManager.LoadDataObjects(doLoadingPolicy),
+			SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
+			DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)
