@@ -82,7 +82,6 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedSearchAttributeKeys, loadingPolicy.GetLockingKeys())
-			defer am.unlockForKeys(am.lockedSearchAttributeKeys, loadingPolicy.GetLockingKeys())
 		}
 	}
 
@@ -114,7 +113,6 @@ func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy 
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
-			defer am.unlockForKeys(am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
 		}
 	}
 
@@ -187,8 +185,18 @@ func (am *PersistenceManager) awaitAndLockForKeys(ctx UnifiedContext, lockedKeys
 	}
 }
 
-func (am *PersistenceManager) unlockForKeys(lockedKeys map[string]bool, keysToUnlock []string) {
+func (am *PersistenceManager) unlockKeys(lockedKeys map[string]bool, keysToUnlock []string) {
 	for _, k := range keysToUnlock {
 		delete(lockedKeys, k)
+	}
+}
+
+func (am *PersistenceManager) UnlockPersistence(saPolicy *iwfidl.PersistenceLoadingPolicy, daPolicy *iwfidl.PersistenceLoadingPolicy) {
+	if saPolicy != nil && saPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		am.unlockKeys(am.lockedSearchAttributeKeys, saPolicy.GetLockingKeys())
+	}
+
+	if daPolicy != nil && daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		am.unlockKeys(am.lockedDataObjectKeys, daPolicy.GetLockingKeys())
 	}
 }

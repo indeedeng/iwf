@@ -419,7 +419,7 @@ func executeState(
 				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			},
 		}).Get(ctx, &startResponse)
-
+		persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 		if errStartApi != nil && !shouldProceedOnStartApiError(state) {
 			return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
 		}
@@ -650,6 +650,7 @@ func executeStateDecide(
 			StateInput:       state.StateInput,
 		},
 	}).Get(ctx, &decideResponse)
+	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
 	}
