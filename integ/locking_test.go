@@ -104,4 +104,43 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
 	assertions.Equal(10, len(resp2.GetResults()))
+
+	reqSearch := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
+	searchResult2, httpResp, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
+		WorkflowId: wfId,
+		Keys: []iwfidl.SearchAttributeKeyAndType{
+			{
+				Key:       iwfidl.PtrString(locking.TestSearchAttributeIntKey),
+				ValueType: ptr.Any(iwfidl.INT),
+			},
+		},
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	expectedSearchAttributeInt := iwfidl.SearchAttribute{
+		Key:          iwfidl.PtrString(locking.TestSearchAttributeIntKey),
+		ValueType:    ptr.Any(iwfidl.INT),
+		IntegerValue: iwfidl.PtrInt64(10),
+	}
+	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
+
+	reqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
+	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
+		WorkflowId: wfId,
+		Keys: []string{
+			locking.TestDataObjectKey1,
+		},
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	expected1 := []iwfidl.KeyValue{
+		{
+			Key: iwfidl.PtrString(locking.TestDataObjectKey1),
+			Value: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString("10"),
+			},
+		},
+	}
+	assertions.ElementsMatch(expected1, queryResult1.GetObjects())
 }
