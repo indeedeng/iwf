@@ -30,7 +30,6 @@ func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwf
 	}
 }
 
-
 func RebuildPersistenceManager(provider WorkflowProvider,
 	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
 ) *PersistenceManager {
@@ -47,7 +46,7 @@ func RebuildPersistenceManager(provider WorkflowProvider,
 		searchAttributes: searchAttributes,
 		provider:         provider,
 
-		// locks will not be carried over during continueAsNew 
+		// locks will not be carried over during continueAsNew
 		lockedDataObjectKeys:      make(map[string]bool),
 		lockedSearchAttributeKeys: make(map[string]bool),
 	}
