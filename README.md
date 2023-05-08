@@ -281,14 +281,15 @@ all attempts including retries. It will be capped to the minimum if both are pro
 
 #### Persistence loading policy
 
-When a state API loads DataAttributes/SearchAttributes, by default it will load everything which could cause size limit
-error
-for Cadence/Temporal activity input/output limit(2MB by default). User can use other loading
-policy `LOAD_PARTIAL_WITHOUT_LOCKING`
-to specify certain DataAttributes/SearchAttributes only to load for this WorkflowState.
+When a workflowState/RPC API loads DataAttributes/SearchAttributes, by default it will use `LOAD_ALL_WITOUT_LOCKING` to load everything.
 
-`WITHOUT_LOCKING` here means if multiple StateExecutions try to upsert the same DataAttribute/SearchAttribute, they can be
+For WorkflowState, there is a 2MB limit by default to load data. User can use another loading policy `LOAD_PARTIAL_WITHOUT_LOCKING`
+to specify certain DataAttributes/SearchAttributes only to load.
+
+`WITHOUT_LOCKING` here means if multiple StateExecutions/RPC try to upsert the same DataAttribute/SearchAttribute, they can be
 done in parallel without locking.
+
+If racing conditions could be a problem, using`PARTIAL_WITH_EXCLUSIVE_LOCK` allows specifying some keys to be locked during the execution.
 
 #### WaitUntil API failure policy
 
