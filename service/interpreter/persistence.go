@@ -10,6 +10,9 @@ type PersistenceManager struct {
 	dataObjects      map[string]iwfidl.KeyValue
 	searchAttributes map[string]iwfidl.SearchAttribute
 	provider         WorkflowProvider
+
+	lockedDataObjectKeys      map[string]bool
+	lockedSearchAttributeKeys map[string]bool
 }
 
 func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute) *PersistenceManager {
@@ -21,6 +24,9 @@ func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwf
 		dataObjects:      make(map[string]iwfidl.KeyValue),
 		searchAttributes: searchAttributes,
 		provider:         provider,
+
+		lockedDataObjectKeys:      make(map[string]bool),
+		lockedSearchAttributeKeys: make(map[string]bool),
 	}
 }
 
@@ -39,6 +45,10 @@ func RebuildPersistenceManager(provider WorkflowProvider,
 		dataObjects:      dataObjects,
 		searchAttributes: searchAttributes,
 		provider:         provider,
+
+		// locks will not be carried over during continueAsNew
+		lockedDataObjectKeys:      make(map[string]bool),
+		lockedSearchAttributeKeys: make(map[string]bool),
 	}
 }
 
@@ -62,16 +72,21 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 	}
 }
 
-func (am *PersistenceManager) LoadSearchAttributes(loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.SearchAttribute {
+func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.SearchAttribute {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
 		loadingType = loadingPolicy.GetPersistenceLoadingType()
 		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
+
+		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+			am.awaitAndLockForKeys(ctx, am.lockedSearchAttributeKeys, loadingPolicy.GetLockingKeys())
+		}
 	}
+
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllSearchAttributes()
-	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING {
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		var res []iwfidl.SearchAttribute
 		keyMap := map[string]bool{}
 		for _, k := range partialLoadingKeys {
@@ -88,17 +103,21 @@ func (am *PersistenceManager) LoadSearchAttributes(loadingPolicy *iwfidl.Persist
 	}
 }
 
-func (am *PersistenceManager) LoadDataObjects(loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.KeyValue {
+func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.KeyValue {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
 		loadingType = loadingPolicy.GetPersistenceLoadingType()
 		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
+
+		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+			am.awaitAndLockForKeys(ctx, am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
+		}
 	}
 
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllDataObjects()
-	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING {
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		res := am.GetDataObjectsByKey(service.GetDataObjectsQueryRequest{
 			Keys: partialLoadingKeys,
 		})
@@ -144,4 +163,39 @@ func (am *PersistenceManager) ProcessUpsertDataObject(attributes []iwfidl.KeyVal
 		am.dataObjects[attr.GetKey()] = attr
 	}
 	return nil
+}
+
+func (am *PersistenceManager) awaitAndLockForKeys(ctx UnifiedContext, lockedKeys map[string]bool, keysToLock []string) {
+	// wait until all keys are not locked
+	err := am.provider.Await(ctx, func() bool {
+		for _, k := range keysToLock {
+			if lockedKeys[k] {
+				return false
+			}
+		}
+		return true
+	})
+	if err != nil {
+		return
+	}
+	// then lock the keys
+	for _, k := range keysToLock {
+		lockedKeys[k] = true
+	}
+}
+
+func (am *PersistenceManager) unlockKeys(lockedKeys map[string]bool, keysToUnlock []string) {
+	for _, k := range keysToUnlock {
+		delete(lockedKeys, k)
+	}
+}
+
+func (am *PersistenceManager) UnlockPersistence(saPolicy *iwfidl.PersistenceLoadingPolicy, daPolicy *iwfidl.PersistenceLoadingPolicy) {
+	if saPolicy != nil && saPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		am.unlockKeys(am.lockedSearchAttributeKeys, saPolicy.GetLockingKeys())
+	}
+
+	if daPolicy != nil && daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		am.unlockKeys(am.lockedDataObjectKeys, daPolicy.GetLockingKeys())
+	}
 }

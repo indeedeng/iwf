@@ -21,6 +21,7 @@ var _ MappedNullable = &PersistenceLoadingPolicy{}
 type PersistenceLoadingPolicy struct {
 	PersistenceLoadingType *PersistenceLoadingType `json:"persistenceLoadingType,omitempty"`
 	PartialLoadingKeys     []string                `json:"partialLoadingKeys,omitempty"`
+	LockingKeys            []string                `json:"lockingKeys,omitempty"`
 }
 
 // NewPersistenceLoadingPolicy instantiates a new PersistenceLoadingPolicy object
@@ -104,6 +105,38 @@ func (o *PersistenceLoadingPolicy) SetPartialLoadingKeys(v []string) {
 	o.PartialLoadingKeys = v
 }
 
+// GetLockingKeys returns the LockingKeys field value if set, zero value otherwise.
+func (o *PersistenceLoadingPolicy) GetLockingKeys() []string {
+	if o == nil || IsNil(o.LockingKeys) {
+		var ret []string
+		return ret
+	}
+	return o.LockingKeys
+}
+
+// GetLockingKeysOk returns a tuple with the LockingKeys field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PersistenceLoadingPolicy) GetLockingKeysOk() ([]string, bool) {
+	if o == nil || IsNil(o.LockingKeys) {
+		return nil, false
+	}
+	return o.LockingKeys, true
+}
+
+// HasLockingKeys returns a boolean if a field has been set.
+func (o *PersistenceLoadingPolicy) HasLockingKeys() bool {
+	if o != nil && !IsNil(o.LockingKeys) {
+		return true
+	}
+
+	return false
+}
+
+// SetLockingKeys gets a reference to the given []string and assigns it to the LockingKeys field.
+func (o *PersistenceLoadingPolicy) SetLockingKeys(v []string) {
+	o.LockingKeys = v
+}
+
 func (o PersistenceLoadingPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -119,6 +152,9 @@ func (o PersistenceLoadingPolicy) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.PartialLoadingKeys) {
 		toSerialize["partialLoadingKeys"] = o.PartialLoadingKeys
+	}
+	if !IsNil(o.LockingKeys) {
+		toSerialize["lockingKeys"] = o.LockingKeys
 	}
 	return toSerialize, nil
 }

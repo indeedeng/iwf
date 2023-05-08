@@ -20,14 +20,16 @@ type PersistenceLoadingType string
 
 // List of PersistenceLoadingType
 const (
-	ALL_WITHOUT_LOCKING     PersistenceLoadingType = "LOAD_ALL_WITHOUT_LOCKING"
-	PARTIAL_WITHOUT_LOCKING PersistenceLoadingType = "LOAD_PARTIAL_WITHOUT_LOCKING"
+	ALL_WITHOUT_LOCKING         PersistenceLoadingType = "LOAD_ALL_WITHOUT_LOCKING"
+	PARTIAL_WITHOUT_LOCKING     PersistenceLoadingType = "LOAD_PARTIAL_WITHOUT_LOCKING"
+	PARTIAL_WITH_EXCLUSIVE_LOCK PersistenceLoadingType = "LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK"
 )
 
 // All allowed values of PersistenceLoadingType enum
 var AllowedPersistenceLoadingTypeEnumValues = []PersistenceLoadingType{
 	"LOAD_ALL_WITHOUT_LOCKING",
 	"LOAD_PARTIAL_WITHOUT_LOCKING",
+	"LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK",
 }
 
 func (v *PersistenceLoadingType) UnmarshalJSON(src []byte) error {

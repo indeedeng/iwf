@@ -36,8 +36,8 @@ func SetQueryHandlers(ctx UnifiedContext, provider WorkflowProvider, persistence
 		info := provider.GetWorkflowInfo(ctx) // TODO use firstRunId instead
 
 		return service.PrepareRpcQueryResponse{
-			DataObjects:              persistenceManager.LoadDataObjects(req.DataObjectsLoadingPolicy),
-			SearchAttributes:         persistenceManager.LoadSearchAttributes(req.SearchAttributesLoadingPolicy),
+			DataObjects:              persistenceManager.LoadDataObjects(ctx, req.DataObjectsLoadingPolicy),
+			SearchAttributes:         persistenceManager.LoadSearchAttributes(ctx, req.SearchAttributesLoadingPolicy),
 			WorkflowRunId:            info.WorkflowExecution.RunID,
 			WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
 			IwfWorkflowType:          basicInfo.IwfWorkflowType,
