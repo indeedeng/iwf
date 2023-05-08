@@ -311,6 +311,10 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.WorkflowRpcRequest) (wresp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
+	if err := checkPersistenceLoadingPolicy(req); err != nil {
+		return nil, s.handleError(err)
+	}
+
 	// query the workflow
 	var queryResp service.PrepareRpcQueryResponse
 	err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
@@ -381,6 +385,27 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	}
 
 	return &iwfidl.WorkflowRpcResponse{Output: resp.Output}, nil
+}
+
+func checkPersistenceLoadingPolicy(req iwfidl.WorkflowRpcRequest) error {
+	if req.SearchAttributesLoadingPolicy != nil {
+		if err := doCheckPersistenceLoadingPolicy(req.SearchAttributesLoadingPolicy); err != nil {
+			return err
+		}
+	}
+	if req.DataAttributesLoadingPolicy != nil {
+		if err := doCheckPersistenceLoadingPolicy(req.DataAttributesLoadingPolicy); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func doCheckPersistenceLoadingPolicy(policy *iwfidl.PersistenceLoadingPolicy) error {
+	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		return fmt.Errorf("PARTIAL_WITH_EXCLUSIVE_LOCK is not supported in RPC yet")
+	}
+	return nil
 }
 
 func checkHttpError(err error, httpResp *http.Response) bool {
