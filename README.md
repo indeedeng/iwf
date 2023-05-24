@@ -19,10 +19,10 @@ Related projects:
 
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk)
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
-* [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk)
-* [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples)
-* WIP [iWF Python SDK](https://github.com/iworkflowio/iwf-golang-sdk)
-* WIP [iWF TypeScript SDK](https://github.com/iworkflowio/iwf-ts-sdk)
+* [iWF Golang SDK](https://github.com/indeedeng/iwf-golang-sdk)
+* [iWF Golang Samples](https://github.com/indeedeng/iwf-golang-samples)
+* WIP [iWF Python SDK](https://github.com/indeedeng/iwf-python-sdk)
+* WIP [iWF TypeScript SDK](https://github.com/indeedeng/iwf-ts-sdk)
 # What is iWF
 
 
