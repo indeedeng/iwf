@@ -88,6 +88,8 @@ services:
       - 8801:8801
     depends_on:
       - temporal
+    extra_hosts:
+      - "host.docker.internal:host-gateway" 
   redis:
     container_name: redis-iwf
     image: redis:${REDIS_VERSION}

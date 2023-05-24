@@ -9,9 +9,9 @@
 
 **iWF will make you a 10x developer!**
 
-iWF is an all-in-one platform for developing long-running business processes. It offers a convenient abstraction for durable timers, 
-background execution with backoff retry, persistence, indexing, message queues, RPC, and more. You will build reliable/scalable backend applications
-much faster than ever. 
+iWF is a platform for developing resilient, fault-tolerant, scalable long-running applications. 
+It offers a convenient abstraction for durable timers, background execution with backoff retry, 
+persistence, indexing, message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
 
 iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
 
@@ -19,33 +19,50 @@ Related projects:
 
 * [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk)
 * [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
-* [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk) (V2 is WIP)
+* [iWF Golang SDK](https://github.com/iworkflowio/iwf-golang-sdk)
 * [iWF Golang Samples](https://github.com/iworkflowio/iwf-golang-samples)
-
+* WIP [iWF Python SDK](https://github.com/iworkflowio/iwf-golang-sdk)
+* WIP [iWF TypeScript SDK](https://github.com/iworkflowio/iwf-ts-sdk)
 # What is iWF
 
 
 ## Basic Concepts
 
 
-The top level concept is **`ObjectWorkflow`** -- anything can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
+The top level concept is **`ObjectWorkflow`** -- nearly any "object" can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
 
 User application creates ObjectWorkflow by implementing the Workflow interface, e.g. in
-[Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java).
+[Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java)
+or [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go).
 An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
-| Name             | Description                                                                                                                                  | 
-|:-----------------|:---------------------------------------------------------------------------------------------------------------------------------------------| 
-| Data Attribute   | Persistence field to storing data                                                                                                            | 
-| Search Attribute | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch           | 
-| Signal Channel   | Asynchronous message queue for the workflow object for external                                                                              |
-| Internal Channel | An internal message queue for workflow states/RPC                                                                                            |
-| Workflow State   | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute                     |
-| RPC              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution |
+| Name             | Description                                                                                                                                          | 
+|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------| 
+| Data Attribute   | Persistence field to storing data                                                                                                                    | 
+| Search Attribute | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                   | 
+| Signal Channel   | Asynchronous message queue for the workflow object to receive message from external                                                                  |
+| Internal Channel | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                       |
+| Workflow State   | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute with default infinite retry |
+| RPC              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution         |
 
-You can use a diagram to outline a workflow definition like this:
+A workflow definition can be outlined like this:
 
 ![Example workflow diagram](https://user-images.githubusercontent.com/4523955/234424825-ff3673c0-af23-4eb7-887d-b1f421f3aaa4.png)
+
+These are all the concepts that you need to build a super complicated workflow.
+See this engagement workflow example in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement)
+or [Golang](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/engagement)
+for how it looks like!
+
+Below are the detailed explanation of the concepts. 
+They are powerful, also extremely simple to learn and use (as the philosophy of iWF).
+
+## Persistence
+Both data and search attributes are defined as "persistence schema". 
+The schema just defined and maintained in the code along with other business logic.
+Search attribute works like infinite indexes in traditional database. You
+only need to specify which attributes should be indexed, without worrying about things in
+a traditional database like the number of indexes, and the order of the fields in an index.
 
 Logically, this workflow definition will have a persistence schema like below:
 
@@ -55,15 +72,6 @@ Logically, this workflow definition will have a persistence schema like below:
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
-And the schema just defined and maintained in your code along with other business logic.
-Moreover, the search attribute works like infinite indexes in traditional database. You 
-only need to specify which attributes should be indexed, without worrying about things in 
-a traditional database like the number of indexes, and the order of the fields in an index. 
-
-These are all the concepts that you need to build a super complicated workflow. 
-See [an example](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement) for how it looks like!
-
-Below are the explanation of what the concepts mean. They are powrful, also extremely simple and straightforword to use (the philosophy of iWF). 
 
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:
@@ -78,6 +86,8 @@ The full detailed execution flow is like this:
 ![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234921554-587d8ad4-84f5-4987-b838-959869293465.png)
 
 The `waitUntil` API is optional. If not defined, then `execute` API will be invoked instead when the state started.
+
+Note: the two APIs are invoked by iWF service with infinite backoff retry by default. See WorkflowStateOptions section for customization.  
 
 The execute API will return a StateDecision:
 * Single next state 
@@ -262,9 +272,8 @@ Similarly, users can customize the WorkflowState
 
 #### WorkflowState WaitUntil/Execute API timeout and retry policy
 
-Users can customize the API timeout and retry policy.
-
-By default, the API timeout is 30s with infinite backoff retry:
+By default, the API timeout is 30s with infinite backoff retry. 
+Users can customize the API timeout and retry policy:
 
 - InitialIntervalSeconds: 1
 - MaxInternalSeconds:100
@@ -314,14 +323,14 @@ Though iWF can be used for a very wide range of use case even just CRUD, iWF is 
 
 # Architecture
 
-An iWF application is composed of several iWF workflow workers. These workers host REST APIs for server to call. 
+An iWF application is composed of several iWF workflow workers. These workers host REST APIs as "worker APIs" for server to call. 
 An application also perform actions on workflow executions, such as starting, stopping, signaling, and retrieving results 
-by calling iWF service APIs.
+by calling iWF service APIs as "service APIs".
 
-The iWF server provides the APIs. Internally, this API service communicates with the Cadence/Temporal service as its backend.
+The service APIs are provided by the "API service" in iWF server. Internally, this API service communicates with the Cadence/Temporal service as its backend.
 
-In addition to hosting the iWF API service, the iWF server includes Cadence/Temporal workers that
-host [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
+In addition, the iWF server also runs the Cadence/Temporal workers as "worker service". The worker service
+hosts [an interpreter workflow](https://github.com/indeedeng/iwf/blob/main/service/interpreter/workflowImpl.go).
 This workflow implements all the core features as described above, and also things like "Auto ContinueAsNew" to let you use 
 iWF without any scaling limitation. 
 
