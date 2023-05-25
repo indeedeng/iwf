@@ -19,9 +19,10 @@ var _ MappedNullable = &WorkflowGetDataObjectsRequest{}
 
 // WorkflowGetDataObjectsRequest struct for WorkflowGetDataObjectsRequest
 type WorkflowGetDataObjectsRequest struct {
-	WorkflowId    string   `json:"workflowId"`
-	WorkflowRunId *string  `json:"workflowRunId,omitempty"`
-	Keys          []string `json:"keys,omitempty"`
+	WorkflowId          string   `json:"workflowId"`
+	WorkflowRunId       *string  `json:"workflowRunId,omitempty"`
+	Keys                []string `json:"keys,omitempty"`
+	CachedAttributeKeys []string `json:"cachedAttributeKeys,omitempty"`
 }
 
 // NewWorkflowGetDataObjectsRequest instantiates a new WorkflowGetDataObjectsRequest object
@@ -130,6 +131,38 @@ func (o *WorkflowGetDataObjectsRequest) SetKeys(v []string) {
 	o.Keys = v
 }
 
+// GetCachedAttributeKeys returns the CachedAttributeKeys field value if set, zero value otherwise.
+func (o *WorkflowGetDataObjectsRequest) GetCachedAttributeKeys() []string {
+	if o == nil || IsNil(o.CachedAttributeKeys) {
+		var ret []string
+		return ret
+	}
+	return o.CachedAttributeKeys
+}
+
+// GetCachedAttributeKeysOk returns a tuple with the CachedAttributeKeys field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetDataObjectsRequest) GetCachedAttributeKeysOk() ([]string, bool) {
+	if o == nil || IsNil(o.CachedAttributeKeys) {
+		return nil, false
+	}
+	return o.CachedAttributeKeys, true
+}
+
+// HasCachedAttributeKeys returns a boolean if a field has been set.
+func (o *WorkflowGetDataObjectsRequest) HasCachedAttributeKeys() bool {
+	if o != nil && !IsNil(o.CachedAttributeKeys) {
+		return true
+	}
+
+	return false
+}
+
+// SetCachedAttributeKeys gets a reference to the given []string and assigns it to the CachedAttributeKeys field.
+func (o *WorkflowGetDataObjectsRequest) SetCachedAttributeKeys(v []string) {
+	o.CachedAttributeKeys = v
+}
+
 func (o WorkflowGetDataObjectsRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -146,6 +179,9 @@ func (o WorkflowGetDataObjectsRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Keys) {
 		toSerialize["keys"] = o.Keys
+	}
+	if !IsNil(o.CachedAttributeKeys) {
+		toSerialize["cachedAttributeKeys"] = o.CachedAttributeKeys
 	}
 	return toSerialize, nil
 }

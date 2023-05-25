@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **DataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**CachedDataAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **StateLocals** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandResults** | Pointer to [**CommandResults**](CommandResults.md) |  | [optional] 
 
@@ -166,6 +167,31 @@ SetDataObjects sets DataObjects field to given value.
 `func (o *WorkflowStateDecideRequest) HasDataObjects() bool`
 
 HasDataObjects returns a boolean if a field has been set.
+
+### GetCachedDataAttributes
+
+`func (o *WorkflowStateDecideRequest) GetCachedDataAttributes() []KeyValue`
+
+GetCachedDataAttributes returns the CachedDataAttributes field if non-nil, zero value otherwise.
+
+### GetCachedDataAttributesOk
+
+`func (o *WorkflowStateDecideRequest) GetCachedDataAttributesOk() (*[]KeyValue, bool)`
+
+GetCachedDataAttributesOk returns a tuple with the CachedDataAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCachedDataAttributes
+
+`func (o *WorkflowStateDecideRequest) SetCachedDataAttributes(v []KeyValue)`
+
+SetCachedDataAttributes sets CachedDataAttributes field to given value.
+
+### HasCachedDataAttributes
+
+`func (o *WorkflowStateDecideRequest) HasCachedDataAttributes() bool`
+
+HasCachedDataAttributes returns a boolean if a field has been set.
 
 ### GetStateLocals
 

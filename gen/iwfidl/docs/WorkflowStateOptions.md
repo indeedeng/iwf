@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataObjectsLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**CachedDataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **CommandCarryOverPolicy** | Pointer to [**CommandCarryOverPolicy**](CommandCarryOverPolicy.md) |  | [optional] 
 **StartApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **DecideApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
@@ -89,6 +90,31 @@ SetDataObjectsLoadingPolicy sets DataObjectsLoadingPolicy field to given value.
 `func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool`
 
 HasDataObjectsLoadingPolicy returns a boolean if a field has been set.
+
+### GetCachedDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) GetCachedDataAttributesLoadingPolicy() PersistenceLoadingPolicy`
+
+GetCachedDataAttributesLoadingPolicy returns the CachedDataAttributesLoadingPolicy field if non-nil, zero value otherwise.
+
+### GetCachedDataAttributesLoadingPolicyOk
+
+`func (o *WorkflowStateOptions) GetCachedDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
+
+GetCachedDataAttributesLoadingPolicyOk returns a tuple with the CachedDataAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCachedDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) SetCachedDataAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
+
+SetCachedDataAttributesLoadingPolicy sets CachedDataAttributesLoadingPolicy field to given value.
+
+### HasCachedDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) HasCachedDataAttributesLoadingPolicy() bool`
+
+HasCachedDataAttributesLoadingPolicy returns a boolean if a field has been set.
 
 ### GetCommandCarryOverPolicy
 

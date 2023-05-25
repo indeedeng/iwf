@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **Input** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**CachedDataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **TimeoutSeconds** | Pointer to **int32** |  | [optional] 
 
 ## Methods
@@ -170,6 +171,31 @@ SetDataAttributesLoadingPolicy sets DataAttributesLoadingPolicy field to given v
 `func (o *WorkflowRpcRequest) HasDataAttributesLoadingPolicy() bool`
 
 HasDataAttributesLoadingPolicy returns a boolean if a field has been set.
+
+### GetCachedDataAttributesLoadingPolicy
+
+`func (o *WorkflowRpcRequest) GetCachedDataAttributesLoadingPolicy() PersistenceLoadingPolicy`
+
+GetCachedDataAttributesLoadingPolicy returns the CachedDataAttributesLoadingPolicy field if non-nil, zero value otherwise.
+
+### GetCachedDataAttributesLoadingPolicyOk
+
+`func (o *WorkflowRpcRequest) GetCachedDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
+
+GetCachedDataAttributesLoadingPolicyOk returns a tuple with the CachedDataAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCachedDataAttributesLoadingPolicy
+
+`func (o *WorkflowRpcRequest) SetCachedDataAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
+
+SetCachedDataAttributesLoadingPolicy sets CachedDataAttributesLoadingPolicy field to given value.
+
+### HasCachedDataAttributesLoadingPolicy
+
+`func (o *WorkflowRpcRequest) HasCachedDataAttributesLoadingPolicy() bool`
+
+HasCachedDataAttributesLoadingPolicy returns a boolean if a field has been set.
 
 ### GetTimeoutSeconds
 

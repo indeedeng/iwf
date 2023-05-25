@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **Keys** | Pointer to **[]string** |  | [optional] 
+**CachedAttributeKeys** | Pointer to **[]string** |  | [optional] 
 
 ## Methods
 
@@ -96,6 +97,31 @@ SetKeys sets Keys field to given value.
 `func (o *WorkflowGetDataObjectsRequest) HasKeys() bool`
 
 HasKeys returns a boolean if a field has been set.
+
+### GetCachedAttributeKeys
+
+`func (o *WorkflowGetDataObjectsRequest) GetCachedAttributeKeys() []string`
+
+GetCachedAttributeKeys returns the CachedAttributeKeys field if non-nil, zero value otherwise.
+
+### GetCachedAttributeKeysOk
+
+`func (o *WorkflowGetDataObjectsRequest) GetCachedAttributeKeysOk() (*[]string, bool)`
+
+GetCachedAttributeKeysOk returns a tuple with the CachedAttributeKeys field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCachedAttributeKeys
+
+`func (o *WorkflowGetDataObjectsRequest) SetCachedAttributeKeys(v []string)`
+
+SetCachedAttributeKeys sets CachedAttributeKeys field to given value.
+
+### HasCachedAttributeKeys
+
+`func (o *WorkflowGetDataObjectsRequest) HasCachedAttributeKeys() bool`
+
+HasCachedAttributeKeys returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

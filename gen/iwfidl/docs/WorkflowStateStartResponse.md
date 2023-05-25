@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertDataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**UpsertCachedDataAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
 **UpsertStateLocals** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **RecordEvents** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
@@ -79,6 +80,31 @@ SetUpsertDataObjects sets UpsertDataObjects field to given value.
 `func (o *WorkflowStateStartResponse) HasUpsertDataObjects() bool`
 
 HasUpsertDataObjects returns a boolean if a field has been set.
+
+### GetUpsertCachedDataAttributes
+
+`func (o *WorkflowStateStartResponse) GetUpsertCachedDataAttributes() []KeyValue`
+
+GetUpsertCachedDataAttributes returns the UpsertCachedDataAttributes field if non-nil, zero value otherwise.
+
+### GetUpsertCachedDataAttributesOk
+
+`func (o *WorkflowStateStartResponse) GetUpsertCachedDataAttributesOk() (*[]KeyValue, bool)`
+
+GetUpsertCachedDataAttributesOk returns a tuple with the UpsertCachedDataAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUpsertCachedDataAttributes
+
+`func (o *WorkflowStateStartResponse) SetUpsertCachedDataAttributes(v []KeyValue)`
+
+SetUpsertCachedDataAttributes sets UpsertCachedDataAttributes field to given value.
+
+### HasUpsertCachedDataAttributes
+
+`func (o *WorkflowStateStartResponse) HasUpsertCachedDataAttributes() bool`
+
+HasUpsertCachedDataAttributes returns a boolean if a field has been set.
 
 ### GetCommandRequest
 
