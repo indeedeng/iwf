@@ -82,6 +82,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 *DefaultApi* | [**ApiV1WorkflowInternalDumpPost**](docs/DefaultApi.md#apiv1workflowinternaldumppost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
+*DefaultApi* | [**ApiV1WorkflowPersistenceGetPost**](docs/DefaultApi.md#apiv1workflowpersistencegetpost) | **Post** /api/v1/workflow/persistence/get | get workflow data objects
 *DefaultApi* | [**ApiV1WorkflowResetPost**](docs/DefaultApi.md#apiv1workflowresetpost) | **Post** /api/v1/workflow/reset | reset a workflow
 *DefaultApi* | [**ApiV1WorkflowRpcPost**](docs/DefaultApi.md#apiv1workflowrpcpost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
 *DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
@@ -138,6 +139,8 @@ Class | Method | HTTP request | Description
  - [WorkflowErrorType](docs/WorkflowErrorType.md)
  - [WorkflowGetDataObjectsRequest](docs/WorkflowGetDataObjectsRequest.md)
  - [WorkflowGetDataObjectsResponse](docs/WorkflowGetDataObjectsResponse.md)
+ - [WorkflowGetPersistenceDataRequest](docs/WorkflowGetPersistenceDataRequest.md)
+ - [WorkflowGetPersistenceDataResponse](docs/WorkflowGetPersistenceDataResponse.md)
  - [WorkflowGetRequest](docs/WorkflowGetRequest.md)
  - [WorkflowGetResponse](docs/WorkflowGetResponse.md)
  - [WorkflowGetSearchAttributesRequest](docs/WorkflowGetSearchAttributesRequest.md)

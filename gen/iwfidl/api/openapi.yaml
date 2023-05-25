@@ -108,6 +108,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: get workflow search attributes
+  /api/v1/workflow/persistence/get:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowGetPersistenceDataRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowGetPersistenceDataResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: get workflow data objects
   /api/v1/workflow/get:
     post:
       requestBody:
@@ -977,6 +998,94 @@ components:
           - stringArrayValue
           key: key
       properties:
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
+      type: object
+    WorkflowGetPersistenceDataRequest:
+      example:
+        cachedDataAttributes:
+        - cachedDataAttributes
+        - cachedDataAttributes
+        searchAttributes:
+        - valueType: null
+          key: key
+        - valueType: null
+          key: key
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+        dataAttributes:
+        - dataAttributes
+        - dataAttributes
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        dataAttributes:
+          items:
+            type: string
+          type: array
+        cachedDataAttributes:
+          items:
+            type: string
+          type: array
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttributeKeyAndType'
+          type: array
+      required:
+      - workflowId
+      type: object
+    WorkflowGetPersistenceDataResponse:
+      example:
+        cachedDataAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        searchAttributes:
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        dataAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+      properties:
+        dataAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+        cachedDataAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
         searchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'

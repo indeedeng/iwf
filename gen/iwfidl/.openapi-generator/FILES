@@ -48,6 +48,8 @@ docs/WorkflowDumpResponse.md
 docs/WorkflowErrorType.md
 docs/WorkflowGetDataObjectsRequest.md
 docs/WorkflowGetDataObjectsResponse.md
+docs/WorkflowGetPersistenceDataRequest.md
+docs/WorkflowGetPersistenceDataResponse.md
 docs/WorkflowGetRequest.md
 docs/WorkflowGetResponse.md
 docs/WorkflowGetSearchAttributesRequest.md
@@ -121,6 +123,8 @@ model_workflow_dump_response.go
 model_workflow_error_type.go
 model_workflow_get_data_objects_request.go
 model_workflow_get_data_objects_response.go
+model_workflow_get_persistence_data_request.go
+model_workflow_get_persistence_data_response.go
 model_workflow_get_request.go
 model_workflow_get_response.go
 model_workflow_get_search_attributes_request.go
