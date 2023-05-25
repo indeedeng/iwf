@@ -188,6 +188,46 @@ func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(ctx context.Context, 
 	}, nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowGetPersistenceDataPost(ctx context.Context, req iwfidl.WorkflowGetPersistenceDataRequest) (wresp *iwfidl.WorkflowGetPersistenceDataResponse, retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	var queryResult1 service.GetDataObjectsQueryResponse
+
+	if len(req.DataAttributes) > 0 {
+		// copied from ApiV1WorkflowGetQueryAttributesPost, may refactor for cleaner
+		err := s.client.QueryWorkflow(ctx, &queryResult1,
+			req.GetWorkflowId(), req.GetWorkflowRunId(), service.GetDataObjectsWorkflowQueryType,
+			service.GetDataObjectsQueryRequest{
+				Keys: req.DataAttributes,
+			})
+
+		if err != nil {
+			return nil, s.handleError(err)
+		}
+	}
+
+	var searchAttributes []iwfidl.SearchAttribute
+	if len(req.SearchAttributes) > 0 {
+		// copied from ApiV1WorkflowGetSearchAttributesPost, may refactor for cleaner
+		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), req.SearchAttributes)
+		if err != nil {
+			return nil, s.handleError(err)
+		}
+
+		for _, v := range req.SearchAttributes {
+			searchAttribute, exist := response.SearchAttributes[*v.Key]
+			if exist {
+				searchAttributes = append(searchAttributes, searchAttribute)
+			}
+		}
+	}
+
+	return &iwfidl.WorkflowGetPersistenceDataResponse{
+		DataAttributes:   queryResult1.DataObjects,
+		SearchAttributes: searchAttributes,
+	}, nil
+}
+
 func (s *serviceImpl) ApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest) (wresp *iwfidl.WorkflowGetResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 

@@ -14,8 +14,13 @@ type ApiService interface {
 	ApiV1WorkflowSignalPost(ctx context.Context, request iwfidl.WorkflowSignalRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowStopPost(ctx context.Context, request iwfidl.WorkflowStopRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowConfigUpdate(ctx context.Context, request iwfidl.WorkflowConfigUpdateRequest) *errors.ErrorAndStatus
+	// ApiV1WorkflowGetQueryAttributesPost is Deprecated
+	// use ApiV1WorkflowGetPersistenceDataPost instead
 	ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, request iwfidl.WorkflowGetDataObjectsRequest) (*iwfidl.WorkflowGetDataObjectsResponse, *errors.ErrorAndStatus)
+	// ApiV1WorkflowGetSearchAttributesPost is Deprecated
+	// use ApiV1WorkflowGetPersistenceDataPost instead
 	ApiV1WorkflowGetSearchAttributesPost(ctx context.Context, request iwfidl.WorkflowGetSearchAttributesRequest) (*iwfidl.WorkflowGetSearchAttributesResponse, *errors.ErrorAndStatus)
+	ApiV1WorkflowGetPersistenceDataPost(ctx context.Context, request iwfidl.WorkflowGetPersistenceDataRequest) (*iwfidl.WorkflowGetPersistenceDataResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowGetPost(ctx context.Context, request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowGetWithWaitPost(ctx context.Context, request iwfidl.WorkflowGetRequest) (*iwfidl.WorkflowGetResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowSearchPost(ctx context.Context, request iwfidl.WorkflowSearchRequest) (*iwfidl.WorkflowSearchResponse, *errors.ErrorAndStatus)
