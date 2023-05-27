@@ -177,7 +177,7 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 }
 
 func (h *handler) apiV1WorkflowGetPersistenceData(c *gin.Context) {
-	var req iwfidl.WorkflowGetDataObjectsRequest
+	var req iwfidl.WorkflowGetPersistenceDataRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		invalidRequestSchema(c)
 		return

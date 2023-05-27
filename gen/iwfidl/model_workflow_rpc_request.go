@@ -19,14 +19,15 @@ var _ MappedNullable = &WorkflowRpcRequest{}
 
 // WorkflowRpcRequest struct for WorkflowRpcRequest
 type WorkflowRpcRequest struct {
-	WorkflowId                        string                    `json:"workflowId"`
-	WorkflowRunId                     *string                   `json:"workflowRunId,omitempty"`
-	RpcName                           string                    `json:"rpcName"`
-	Input                             *EncodedObject            `json:"input,omitempty"`
-	SearchAttributesLoadingPolicy     *PersistenceLoadingPolicy `json:"searchAttributesLoadingPolicy,omitempty"`
-	DataAttributesLoadingPolicy       *PersistenceLoadingPolicy `json:"dataAttributesLoadingPolicy,omitempty"`
-	CachedDataAttributesLoadingPolicy *PersistenceLoadingPolicy `json:"cachedDataAttributesLoadingPolicy,omitempty"`
-	TimeoutSeconds                    *int32                    `json:"timeoutSeconds,omitempty"`
+	WorkflowId                        string                      `json:"workflowId"`
+	WorkflowRunId                     *string                     `json:"workflowRunId,omitempty"`
+	RpcName                           string                      `json:"rpcName"`
+	Input                             *EncodedObject              `json:"input,omitempty"`
+	SearchAttributesLoadingPolicy     *PersistenceLoadingPolicy   `json:"searchAttributesLoadingPolicy,omitempty"`
+	DataAttributesLoadingPolicy       *PersistenceLoadingPolicy   `json:"dataAttributesLoadingPolicy,omitempty"`
+	CachedDataAttributesLoadingPolicy *PersistenceLoadingPolicy   `json:"cachedDataAttributesLoadingPolicy,omitempty"`
+	SearchAttributes                  []SearchAttributeKeyAndType `json:"searchAttributes,omitempty"`
+	TimeoutSeconds                    *int32                      `json:"timeoutSeconds,omitempty"`
 }
 
 // NewWorkflowRpcRequest instantiates a new WorkflowRpcRequest object
@@ -256,6 +257,38 @@ func (o *WorkflowRpcRequest) SetCachedDataAttributesLoadingPolicy(v PersistenceL
 	o.CachedDataAttributesLoadingPolicy = &v
 }
 
+// GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
+func (o *WorkflowRpcRequest) GetSearchAttributes() []SearchAttributeKeyAndType {
+	if o == nil || IsNil(o.SearchAttributes) {
+		var ret []SearchAttributeKeyAndType
+		return ret
+	}
+	return o.SearchAttributes
+}
+
+// GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowRpcRequest) GetSearchAttributesOk() ([]SearchAttributeKeyAndType, bool) {
+	if o == nil || IsNil(o.SearchAttributes) {
+		return nil, false
+	}
+	return o.SearchAttributes, true
+}
+
+// HasSearchAttributes returns a boolean if a field has been set.
+func (o *WorkflowRpcRequest) HasSearchAttributes() bool {
+	if o != nil && !IsNil(o.SearchAttributes) {
+		return true
+	}
+
+	return false
+}
+
+// SetSearchAttributes gets a reference to the given []SearchAttributeKeyAndType and assigns it to the SearchAttributes field.
+func (o *WorkflowRpcRequest) SetSearchAttributes(v []SearchAttributeKeyAndType) {
+	o.SearchAttributes = v
+}
+
 // GetTimeoutSeconds returns the TimeoutSeconds field value if set, zero value otherwise.
 func (o *WorkflowRpcRequest) GetTimeoutSeconds() int32 {
 	if o == nil || IsNil(o.TimeoutSeconds) {
@@ -314,6 +347,9 @@ func (o WorkflowRpcRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.CachedDataAttributesLoadingPolicy) {
 		toSerialize["cachedDataAttributesLoadingPolicy"] = o.CachedDataAttributesLoadingPolicy
+	}
+	if !IsNil(o.SearchAttributes) {
+		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
 	if !IsNil(o.TimeoutSeconds) {
 		toSerialize["timeoutSeconds"] = o.TimeoutSeconds

@@ -77,4 +77,5 @@ type DescribeWorkflowExecutionResponse struct {
 	Status           iwfidl.WorkflowStatus
 	RunId            string
 	SearchAttributes map[string]iwfidl.SearchAttribute
+	Memos            map[string]iwfidl.EncodedObject
 }

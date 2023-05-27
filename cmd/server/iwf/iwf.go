@@ -122,7 +122,7 @@ func start(c *cli.Context) {
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter())
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter(), false)
 
 		for _, svcName := range services {
 			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger)

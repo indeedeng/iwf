@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **CachedDataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**SearchAttributes** | Pointer to [**[]SearchAttributeKeyAndType**](SearchAttributeKeyAndType.md) |  | [optional] 
 **TimeoutSeconds** | Pointer to **int32** |  | [optional] 
 
 ## Methods
@@ -196,6 +197,31 @@ SetCachedDataAttributesLoadingPolicy sets CachedDataAttributesLoadingPolicy fiel
 `func (o *WorkflowRpcRequest) HasCachedDataAttributesLoadingPolicy() bool`
 
 HasCachedDataAttributesLoadingPolicy returns a boolean if a field has been set.
+
+### GetSearchAttributes
+
+`func (o *WorkflowRpcRequest) GetSearchAttributes() []SearchAttributeKeyAndType`
+
+GetSearchAttributes returns the SearchAttributes field if non-nil, zero value otherwise.
+
+### GetSearchAttributesOk
+
+`func (o *WorkflowRpcRequest) GetSearchAttributesOk() (*[]SearchAttributeKeyAndType, bool)`
+
+GetSearchAttributesOk returns a tuple with the SearchAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSearchAttributes
+
+`func (o *WorkflowRpcRequest) SetSearchAttributes(v []SearchAttributeKeyAndType)`
+
+SetSearchAttributes sets SearchAttributes field to given value.
+
+### HasSearchAttributes
+
+`func (o *WorkflowRpcRequest) HasSearchAttributes() bool`
+
+HasSearchAttributes returns a boolean if a field has been set.
 
 ### GetTimeoutSeconds
 

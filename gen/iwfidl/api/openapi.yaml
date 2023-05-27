@@ -676,6 +676,7 @@ components:
       - LOAD_ALL_WITHOUT_LOCKING
       - LOAD_PARTIAL_WITHOUT_LOCKING
       - LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
+      - LOAD_NONE_PERSISTENCE
       type: string
     CommandCarryOverPolicy:
       example:
@@ -1376,6 +1377,11 @@ components:
           - partialLoadingKeys
           persistenceLoadingType: null
         timeoutSeconds: 0
+        searchAttributes:
+        - valueType: null
+          key: key
+        - valueType: null
+          key: key
         workflowRunId: workflowRunId
         rpcName: rpcName
         workflowId: workflowId
@@ -1402,6 +1408,10 @@ components:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
         cachedDataAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttributeKeyAndType'
+          type: array
         timeoutSeconds:
           type: integer
       required:

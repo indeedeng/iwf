@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/api"
@@ -12,6 +11,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
+	commonpb "go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/workflowservice/v1"
@@ -21,9 +21,31 @@ import (
 )
 
 type temporalClient struct {
-	tClient       client.Client
-	namespace     string
-	dataConverter converter.DataConverter
+	tClient        client.Client
+	namespace      string
+	dataConverter  converter.DataConverter
+	memoEncryption bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
+}
+
+func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool) api.UnifiedClient {
+	return &temporalClient{
+		tClient:        tClient,
+		namespace:      namespace,
+		dataConverter:  dataConverter,
+		memoEncryption: memoEncryption,
+	}
+}
+
+func (t *temporalClient) Close() {
+	t.tClient.Close()
+}
+
+func (t *temporalClient) encryptMemo(obj iwfidl.EncodedObject) (*commonpb.Payload, error) {
+	return t.dataConverter.ToPayload(obj)
+}
+
+func (t *temporalClient) decryptMemo(payload *commonpb.Payload, valuePtr interface{}) error {
+	return t.dataConverter.FromPayload(payload, valuePtr)
 }
 
 func (t *temporalClient) IsWorkflowAlreadyStartedError(err error) bool {
@@ -54,18 +76,6 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 		return applicationError.Details(detailsPtr)
 	}
 	return fmt.Errorf("application error doesn't have details. Critical code bug")
-}
-
-func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter) api.UnifiedClient {
-	return &temporalClient{
-		tClient:       tClient,
-		namespace:     namespace,
-		dataConverter: dataConverter,
-	}
-}
-
-func (t *temporalClient) Close() {
-	t.tClient.Close()
 }
 
 func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
@@ -166,11 +176,47 @@ func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflow
 		return nil, err
 	}
 
+	memo, err := t.getMemo(resp.GetWorkflowExecutionInfo().GetMemo())
+
 	return &api.DescribeWorkflowExecutionResponse{
 		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
 		Status:           status,
 		SearchAttributes: searchAttributes,
-	}, nil
+		Memos:            memo,
+	}, err
+}
+
+func (t *temporalClient) getMemo(memo *common.Memo) (map[string]iwfidl.EncodedObject, error) {
+	if memo == nil || len(memo.GetFields()) == 0 {
+		return nil, nil
+	}
+
+	out := map[string]iwfidl.EncodedObject{}
+	for k, payload := range memo.GetFields() {
+
+		if t.memoEncryption {
+			var encryptedPayload commonpb.Payload
+			err := converter.GetDefaultDataConverter().FromPayload(payload, &encryptedPayload)
+			if err != nil {
+				return nil, err
+			}
+
+			var value iwfidl.EncodedObject
+			err = t.decryptMemo(&encryptedPayload, &value)
+			if err != nil {
+				return nil, err
+			}
+			out[k] = value
+		} else {
+			var value iwfidl.EncodedObject
+			err := converter.GetDefaultDataConverter().FromPayload(payload, &value)
+			if err != nil {
+				return nil, err
+			}
+			out[k] = value
+		}
+	}
+	return out, nil
 }
 
 func mapToTemporalWorkflowIdReusePolicy(workflowIdReusePolicy iwfidl.WorkflowIDReusePolicy) (*enums.WorkflowIdReusePolicy, error) {

@@ -60,12 +60,14 @@ type (
 	}
 
 	PrepareRpcQueryRequest struct {
-		DataObjectsLoadingPolicy      *iwfidl.PersistenceLoadingPolicy
-		SearchAttributesLoadingPolicy *iwfidl.PersistenceLoadingPolicy
+		DataObjectsLoadingPolicy       *iwfidl.PersistenceLoadingPolicy
+		CachedDataObjectsLoadingPolicy *iwfidl.PersistenceLoadingPolicy
+		SearchAttributesLoadingPolicy  *iwfidl.PersistenceLoadingPolicy
 	}
 
 	PrepareRpcQueryResponse struct {
 		DataObjects              []iwfidl.KeyValue
+		CachedDataObjects        []iwfidl.KeyValue
 		SearchAttributes         []iwfidl.SearchAttribute
 		WorkflowRunId            string
 		WorkflowStartedTimestamp int64
