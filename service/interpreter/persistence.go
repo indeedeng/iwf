@@ -165,12 +165,16 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(ctx UnifiedContext, a
 	return am.provider.UpsertSearchAttributes(ctx, attrsToUpsert)
 }
 
-func (am *PersistenceManager) ProcessUpsertDataObject(attributes []iwfidl.KeyValue) error {
+func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attributes []iwfidl.KeyValue) error {
 	for _, attr := range attributes {
 		am.dataObjects[attr.GetKey()] = attr
 	}
 	if am.useMemo {
-		
+		memo := map[string]iwfidl.EncodedObject{}
+		for _, att := range attributes {
+			memo[att.GetKey()] = att.GetValue()
+		}
+		return am.provider.UpsertMemo(ctx, memo)
 	}
 	return nil
 }

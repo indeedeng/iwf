@@ -428,7 +428,7 @@ func executeState(
 		if err != nil {
 			return nil, service.FailureStateExecutionStatus, err
 		}
-		err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
+		err = persistenceManager.ProcessUpsertDataObject(ctx, startResponse.GetUpsertDataObjects())
 		if err != nil {
 			return nil, service.FailureStateExecutionStatus, err
 		}
@@ -659,7 +659,7 @@ func executeStateDecide(
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
 	}
-	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(ctx, decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
 	}

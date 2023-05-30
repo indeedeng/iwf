@@ -126,7 +126,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 			}
 			if received {
 				continueAsNewCounter.IncSignalsReceived()
-				_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
+				_ = sr.persistenceManager.ProcessUpsertDataObject(ctx, val.UpsertDataObjects)
 				_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 				sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
 				if val.StateDecision != nil {
@@ -269,7 +269,7 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 						val := service.ExecuteRpcSignalRequest{}
 						ok := ch.ReceiveAsync(&val)
 						if ok {
-							_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
+							_ = sr.persistenceManager.ProcessUpsertDataObject(ctx, val.UpsertDataObjects)
 							_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 							sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
 							if val.StateDecision != nil {

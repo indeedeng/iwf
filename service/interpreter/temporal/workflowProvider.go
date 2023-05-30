@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"errors"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
@@ -53,7 +54,7 @@ func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
 }
 
-func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo map[string]interface{}) error {
+func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo map[string]iwfidl.EncodedObject) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
@@ -70,9 +71,11 @@ func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo ma
 			memo[k] = pl
 		}
 	} else {
-		memo = rawMemo
+		for k, v := range rawMemo {
+			memo[k] = v
+		}
 	}
-	
+
 	return workflow.UpsertMemo(wfCtx, memo)
 }
 
