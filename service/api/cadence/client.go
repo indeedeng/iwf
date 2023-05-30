@@ -74,7 +74,7 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 	if len(options.Memo) > 0 {
 		return "", fmt.Errorf("using Memo is not supported with Cadence")
 	}
-	
+
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
