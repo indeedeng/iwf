@@ -59,27 +59,35 @@ func doStartWorkflowWorker(handler common.WorkflowHandler, router *gin.Engine) (
 	return func() { wfServer.Close() }
 }
 
+type IwfServiceTestConfig struct {
+	BackendType    service.BackendType
+	UseMemo        bool
+	MemoEncryption bool
+}
+
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
-	_, cf := doStartIwfServiceWithClient(backendType)
+	_, cf := startIwfServiceWithClient(backendType)
 	return cf
 }
 
-func doStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
-	if backendType == service.BackendTypeTemporal {
-		if integTemporalUclientCached == nil {
-			return doOnceStartIwfServiceWithClient(backendType)
-		}
-		return integTemporalUclientCached, func() {}
-	}
+func startIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
+	return doOnceStartIwfServiceWithClient(backendType)
 
-	if integCadenceUclientCached == nil {
-		return doOnceStartIwfServiceWithClient(backendType)
-	}
-	return integCadenceUclientCached, func() {}
+	//if backendType == service.BackendTypeTemporal {
+	//if integTemporalUclientCached == nil {
+	//	return doOnceStartIwfServiceWithClient(backendType)
+	//}
+	//return integTemporalUclientCached, func() {}
+	//}
+	//if integCadenceUclientCached == nil {
+	//	return doOnceStartIwfServiceWithClient(backendType)
+	//}
+	//return integCadenceUclientCached, func() {}
 }
 
-var integCadenceUclientCached api.UnifiedClient
-var integTemporalUclientCached api.UnifiedClient
+// disable caching for now as it makes it difficult to test memo
+//var integCadenceUclientCached api.UnifiedClient
+//var integTemporalUclientCached api.UnifiedClient
 
 func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
 	if backendType == service.BackendTypeTemporal {

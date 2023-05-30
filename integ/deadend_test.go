@@ -58,7 +58,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
 	defer closeFunc1()
 
-	_, closeFunc2 := doStartIwfServiceWithClient(backendType)
+	_, closeFunc2 := startIwfServiceWithClient(backendType)
 	defer closeFunc2()
 
 	// create client

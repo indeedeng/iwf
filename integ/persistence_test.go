@@ -62,7 +62,7 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	uclient, closeFunc2 := doStartIwfServiceWithClient(backendType)
+	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
 	defer closeFunc2()
 
 	// start a workflow

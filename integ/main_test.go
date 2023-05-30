@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
-	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/sdk/client"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
@@ -84,27 +83,28 @@ func TestMain(m *testing.M) {
 		closeFunc()
 	}
 
-	var integCadenceUclientCloseFunc, integTemporalUclientCloseFunc func()
-	if !(*cadenceIntegTest && *temporalIntegTest) {
-		// hack for ci test to save the performance
-		// only start connection once
-		// TODO need to do this for outside of ci as well
-		if *cadenceIntegTest {
-			integCadenceUclientCached, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
-			defer func() {
-				fmt.Println("shutdown cadence client and iwf server")
-				integCadenceUclientCloseFunc()
-			}()
-			fmt.Println("cached cadence client and iwf server")
-		} else {
-			integTemporalUclientCached, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
-			defer func() {
-				fmt.Println("shutdown temporal client and iwf server")
-				integTemporalUclientCloseFunc()
-			}()
-			fmt.Println("cached temporal client and iwf server")
-		}
-	}
+	// disable caching for now as it makes it difficult to test memo
+	//var integCadenceUclientCloseFunc, integTemporalUclientCloseFunc func()
+	//if !(*cadenceIntegTest && *temporalIntegTest) {
+	//	// hack for ci test to save the performance
+	//	// only start connection once
+	//	// TODO need to do this for outside of ci as well
+	//	if *cadenceIntegTest {
+	//		integCadenceUclientCached, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
+	//		defer func() {
+	//			fmt.Println("shutdown cadence client and iwf server")
+	//			integCadenceUclientCloseFunc()
+	//		}()
+	//		fmt.Println("cached cadence client and iwf server")
+	//	} else {
+	//		integTemporalUclientCached, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
+	//		defer func() {
+	//			fmt.Println("shutdown temporal client and iwf server")
+	//			integTemporalUclientCloseFunc()
+	//		}()
+	//		fmt.Println("cached temporal client and iwf server")
+	//	}
+	//}
 
 	code := m.Run()
 	fmt.Println("finished running integ test with status code", code)
