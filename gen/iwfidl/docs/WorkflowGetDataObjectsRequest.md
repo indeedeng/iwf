@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **WorkflowId** | **string** |  | 
 **WorkflowRunId** | Pointer to **string** |  | [optional] 
 **Keys** | Pointer to **[]string** |  | [optional] 
-**CachedAttributeKeys** | Pointer to **[]string** |  | [optional] 
+**UseMemoForDataAttributes** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -98,30 +98,30 @@ SetKeys sets Keys field to given value.
 
 HasKeys returns a boolean if a field has been set.
 
-### GetCachedAttributeKeys
+### GetUseMemoForDataAttributes
 
-`func (o *WorkflowGetDataObjectsRequest) GetCachedAttributeKeys() []string`
+`func (o *WorkflowGetDataObjectsRequest) GetUseMemoForDataAttributes() bool`
 
-GetCachedAttributeKeys returns the CachedAttributeKeys field if non-nil, zero value otherwise.
+GetUseMemoForDataAttributes returns the UseMemoForDataAttributes field if non-nil, zero value otherwise.
 
-### GetCachedAttributeKeysOk
+### GetUseMemoForDataAttributesOk
 
-`func (o *WorkflowGetDataObjectsRequest) GetCachedAttributeKeysOk() (*[]string, bool)`
+`func (o *WorkflowGetDataObjectsRequest) GetUseMemoForDataAttributesOk() (*bool, bool)`
 
-GetCachedAttributeKeysOk returns a tuple with the CachedAttributeKeys field if it's non-nil, zero value otherwise
+GetUseMemoForDataAttributesOk returns a tuple with the UseMemoForDataAttributes field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetCachedAttributeKeys
+### SetUseMemoForDataAttributes
 
-`func (o *WorkflowGetDataObjectsRequest) SetCachedAttributeKeys(v []string)`
+`func (o *WorkflowGetDataObjectsRequest) SetUseMemoForDataAttributes(v bool)`
 
-SetCachedAttributeKeys sets CachedAttributeKeys field to given value.
+SetUseMemoForDataAttributes sets UseMemoForDataAttributes field to given value.
 
-### HasCachedAttributeKeys
+### HasUseMemoForDataAttributes
 
-`func (o *WorkflowGetDataObjectsRequest) HasCachedAttributeKeys() bool`
+`func (o *WorkflowGetDataObjectsRequest) HasUseMemoForDataAttributes() bool`
 
-HasCachedAttributeKeys returns a boolean if a field has been set.
+HasUseMemoForDataAttributes returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

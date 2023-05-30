@@ -23,7 +23,6 @@ type WorkflowWorkerRpcResponse struct {
 	StateDecision              *StateDecision                `json:"stateDecision,omitempty"`
 	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
 	UpsertDataAttributes       []KeyValue                    `json:"upsertDataAttributes,omitempty"`
-	UpsertCachedDataAttributes []KeyValue                    `json:"upsertCachedDataAttributes,omitempty"`
 	RecordEvents               []KeyValue                    `json:"recordEvents,omitempty"`
 	UpsertStateLocals          []KeyValue                    `json:"upsertStateLocals,omitempty"`
 	PublishToInterStateChannel []InterStateChannelPublishing `json:"publishToInterStateChannel,omitempty"`
@@ -174,38 +173,6 @@ func (o *WorkflowWorkerRpcResponse) SetUpsertDataAttributes(v []KeyValue) {
 	o.UpsertDataAttributes = v
 }
 
-// GetUpsertCachedDataAttributes returns the UpsertCachedDataAttributes field value if set, zero value otherwise.
-func (o *WorkflowWorkerRpcResponse) GetUpsertCachedDataAttributes() []KeyValue {
-	if o == nil || IsNil(o.UpsertCachedDataAttributes) {
-		var ret []KeyValue
-		return ret
-	}
-	return o.UpsertCachedDataAttributes
-}
-
-// GetUpsertCachedDataAttributesOk returns a tuple with the UpsertCachedDataAttributes field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowWorkerRpcResponse) GetUpsertCachedDataAttributesOk() ([]KeyValue, bool) {
-	if o == nil || IsNil(o.UpsertCachedDataAttributes) {
-		return nil, false
-	}
-	return o.UpsertCachedDataAttributes, true
-}
-
-// HasUpsertCachedDataAttributes returns a boolean if a field has been set.
-func (o *WorkflowWorkerRpcResponse) HasUpsertCachedDataAttributes() bool {
-	if o != nil && !IsNil(o.UpsertCachedDataAttributes) {
-		return true
-	}
-
-	return false
-}
-
-// SetUpsertCachedDataAttributes gets a reference to the given []KeyValue and assigns it to the UpsertCachedDataAttributes field.
-func (o *WorkflowWorkerRpcResponse) SetUpsertCachedDataAttributes(v []KeyValue) {
-	o.UpsertCachedDataAttributes = v
-}
-
 // GetRecordEvents returns the RecordEvents field value if set, zero value otherwise.
 func (o *WorkflowWorkerRpcResponse) GetRecordEvents() []KeyValue {
 	if o == nil || IsNil(o.RecordEvents) {
@@ -323,9 +290,6 @@ func (o WorkflowWorkerRpcResponse) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UpsertDataAttributes) {
 		toSerialize["upsertDataAttributes"] = o.UpsertDataAttributes
-	}
-	if !IsNil(o.UpsertCachedDataAttributes) {
-		toSerialize["upsertCachedDataAttributes"] = o.UpsertCachedDataAttributes
 	}
 	if !IsNil(o.RecordEvents) {
 		toSerialize["recordEvents"] = o.RecordEvents

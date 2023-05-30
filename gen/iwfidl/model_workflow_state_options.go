@@ -19,23 +19,22 @@ var _ MappedNullable = &WorkflowStateOptions{}
 
 // WorkflowStateOptions struct for WorkflowStateOptions
 type WorkflowStateOptions struct {
-	SearchAttributesLoadingPolicy     *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
-	DataObjectsLoadingPolicy          *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
-	CachedDataAttributesLoadingPolicy *PersistenceLoadingPolicy  `json:"cachedDataAttributesLoadingPolicy,omitempty"`
-	CommandCarryOverPolicy            *CommandCarryOverPolicy    `json:"commandCarryOverPolicy,omitempty"`
-	StartApiTimeoutSeconds            *int32                     `json:"startApiTimeoutSeconds,omitempty"`
-	DecideApiTimeoutSeconds           *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
-	StartApiRetryPolicy               *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
-	DecideApiRetryPolicy              *RetryPolicy               `json:"decideApiRetryPolicy,omitempty"`
-	StartApiFailurePolicy             *StartApiFailurePolicy     `json:"startApiFailurePolicy,omitempty"`
-	SkipStartApi                      *bool                      `json:"skipStartApi,omitempty"`
-	WaitUntilApiTimeoutSeconds        *int32                     `json:"waitUntilApiTimeoutSeconds,omitempty"`
-	ExecuteApiTimeoutSeconds          *int32                     `json:"executeApiTimeoutSeconds,omitempty"`
-	WaitUntilApiRetryPolicy           *RetryPolicy               `json:"waitUntilApiRetryPolicy,omitempty"`
-	ExecuteApiRetryPolicy             *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
-	WaitUntilApiFailurePolicy         *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
-	SkipWaitUntil                     *bool                      `json:"skipWaitUntil,omitempty"`
-	DataAttributesLoadingPolicy       *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
+	SearchAttributesLoadingPolicy *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
+	DataObjectsLoadingPolicy      *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
+	CommandCarryOverPolicy        *CommandCarryOverPolicy    `json:"commandCarryOverPolicy,omitempty"`
+	StartApiTimeoutSeconds        *int32                     `json:"startApiTimeoutSeconds,omitempty"`
+	DecideApiTimeoutSeconds       *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
+	StartApiRetryPolicy           *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
+	DecideApiRetryPolicy          *RetryPolicy               `json:"decideApiRetryPolicy,omitempty"`
+	StartApiFailurePolicy         *StartApiFailurePolicy     `json:"startApiFailurePolicy,omitempty"`
+	SkipStartApi                  *bool                      `json:"skipStartApi,omitempty"`
+	WaitUntilApiTimeoutSeconds    *int32                     `json:"waitUntilApiTimeoutSeconds,omitempty"`
+	ExecuteApiTimeoutSeconds      *int32                     `json:"executeApiTimeoutSeconds,omitempty"`
+	WaitUntilApiRetryPolicy       *RetryPolicy               `json:"waitUntilApiRetryPolicy,omitempty"`
+	ExecuteApiRetryPolicy         *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
+	WaitUntilApiFailurePolicy     *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
+	SkipWaitUntil                 *bool                      `json:"skipWaitUntil,omitempty"`
+	DataAttributesLoadingPolicy   *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -117,38 +116,6 @@ func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool {
 // SetDataObjectsLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the DataObjectsLoadingPolicy field.
 func (o *WorkflowStateOptions) SetDataObjectsLoadingPolicy(v PersistenceLoadingPolicy) {
 	o.DataObjectsLoadingPolicy = &v
-}
-
-// GetCachedDataAttributesLoadingPolicy returns the CachedDataAttributesLoadingPolicy field value if set, zero value otherwise.
-func (o *WorkflowStateOptions) GetCachedDataAttributesLoadingPolicy() PersistenceLoadingPolicy {
-	if o == nil || IsNil(o.CachedDataAttributesLoadingPolicy) {
-		var ret PersistenceLoadingPolicy
-		return ret
-	}
-	return *o.CachedDataAttributesLoadingPolicy
-}
-
-// GetCachedDataAttributesLoadingPolicyOk returns a tuple with the CachedDataAttributesLoadingPolicy field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowStateOptions) GetCachedDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
-	if o == nil || IsNil(o.CachedDataAttributesLoadingPolicy) {
-		return nil, false
-	}
-	return o.CachedDataAttributesLoadingPolicy, true
-}
-
-// HasCachedDataAttributesLoadingPolicy returns a boolean if a field has been set.
-func (o *WorkflowStateOptions) HasCachedDataAttributesLoadingPolicy() bool {
-	if o != nil && !IsNil(o.CachedDataAttributesLoadingPolicy) {
-		return true
-	}
-
-	return false
-}
-
-// SetCachedDataAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the CachedDataAttributesLoadingPolicy field.
-func (o *WorkflowStateOptions) SetCachedDataAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
-	o.CachedDataAttributesLoadingPolicy = &v
 }
 
 // GetCommandCarryOverPolicy returns the CommandCarryOverPolicy field value if set, zero value otherwise.
@@ -614,9 +581,6 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataObjectsLoadingPolicy) {
 		toSerialize["dataObjectsLoadingPolicy"] = o.DataObjectsLoadingPolicy
-	}
-	if !IsNil(o.CachedDataAttributesLoadingPolicy) {
-		toSerialize["cachedDataAttributesLoadingPolicy"] = o.CachedDataAttributesLoadingPolicy
 	}
 	if !IsNil(o.CommandCarryOverPolicy) {
 		toSerialize["commandCarryOverPolicy"] = o.CommandCarryOverPolicy

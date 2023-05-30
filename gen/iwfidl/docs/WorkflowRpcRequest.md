@@ -10,9 +10,8 @@ Name | Type | Description | Notes
 **Input** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
-**CachedDataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
-**SearchAttributes** | Pointer to [**[]SearchAttributeKeyAndType**](SearchAttributeKeyAndType.md) |  | [optional] 
 **TimeoutSeconds** | Pointer to **int32** |  | [optional] 
+**UseMemoForDataAttributes** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -173,56 +172,6 @@ SetDataAttributesLoadingPolicy sets DataAttributesLoadingPolicy field to given v
 
 HasDataAttributesLoadingPolicy returns a boolean if a field has been set.
 
-### GetCachedDataAttributesLoadingPolicy
-
-`func (o *WorkflowRpcRequest) GetCachedDataAttributesLoadingPolicy() PersistenceLoadingPolicy`
-
-GetCachedDataAttributesLoadingPolicy returns the CachedDataAttributesLoadingPolicy field if non-nil, zero value otherwise.
-
-### GetCachedDataAttributesLoadingPolicyOk
-
-`func (o *WorkflowRpcRequest) GetCachedDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
-
-GetCachedDataAttributesLoadingPolicyOk returns a tuple with the CachedDataAttributesLoadingPolicy field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetCachedDataAttributesLoadingPolicy
-
-`func (o *WorkflowRpcRequest) SetCachedDataAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
-
-SetCachedDataAttributesLoadingPolicy sets CachedDataAttributesLoadingPolicy field to given value.
-
-### HasCachedDataAttributesLoadingPolicy
-
-`func (o *WorkflowRpcRequest) HasCachedDataAttributesLoadingPolicy() bool`
-
-HasCachedDataAttributesLoadingPolicy returns a boolean if a field has been set.
-
-### GetSearchAttributes
-
-`func (o *WorkflowRpcRequest) GetSearchAttributes() []SearchAttributeKeyAndType`
-
-GetSearchAttributes returns the SearchAttributes field if non-nil, zero value otherwise.
-
-### GetSearchAttributesOk
-
-`func (o *WorkflowRpcRequest) GetSearchAttributesOk() (*[]SearchAttributeKeyAndType, bool)`
-
-GetSearchAttributesOk returns a tuple with the SearchAttributes field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetSearchAttributes
-
-`func (o *WorkflowRpcRequest) SetSearchAttributes(v []SearchAttributeKeyAndType)`
-
-SetSearchAttributes sets SearchAttributes field to given value.
-
-### HasSearchAttributes
-
-`func (o *WorkflowRpcRequest) HasSearchAttributes() bool`
-
-HasSearchAttributes returns a boolean if a field has been set.
-
 ### GetTimeoutSeconds
 
 `func (o *WorkflowRpcRequest) GetTimeoutSeconds() int32`
@@ -247,6 +196,31 @@ SetTimeoutSeconds sets TimeoutSeconds field to given value.
 `func (o *WorkflowRpcRequest) HasTimeoutSeconds() bool`
 
 HasTimeoutSeconds returns a boolean if a field has been set.
+
+### GetUseMemoForDataAttributes
+
+`func (o *WorkflowRpcRequest) GetUseMemoForDataAttributes() bool`
+
+GetUseMemoForDataAttributes returns the UseMemoForDataAttributes field if non-nil, zero value otherwise.
+
+### GetUseMemoForDataAttributesOk
+
+`func (o *WorkflowRpcRequest) GetUseMemoForDataAttributesOk() (*bool, bool)`
+
+GetUseMemoForDataAttributesOk returns a tuple with the UseMemoForDataAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUseMemoForDataAttributes
+
+`func (o *WorkflowRpcRequest) SetUseMemoForDataAttributes(v bool)`
+
+SetUseMemoForDataAttributes sets UseMemoForDataAttributes field to given value.
+
+### HasUseMemoForDataAttributes
+
+`func (o *WorkflowRpcRequest) HasUseMemoForDataAttributes() bool`
+
+HasUseMemoForDataAttributes returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

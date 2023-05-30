@@ -19,8 +19,7 @@ var _ MappedNullable = &WorkflowGetDataObjectsResponse{}
 
 // WorkflowGetDataObjectsResponse struct for WorkflowGetDataObjectsResponse
 type WorkflowGetDataObjectsResponse struct {
-	Objects              []KeyValue `json:"objects,omitempty"`
-	CachedDataAttributes []KeyValue `json:"cachedDataAttributes,omitempty"`
+	Objects []KeyValue `json:"objects,omitempty"`
 }
 
 // NewWorkflowGetDataObjectsResponse instantiates a new WorkflowGetDataObjectsResponse object
@@ -72,38 +71,6 @@ func (o *WorkflowGetDataObjectsResponse) SetObjects(v []KeyValue) {
 	o.Objects = v
 }
 
-// GetCachedDataAttributes returns the CachedDataAttributes field value if set, zero value otherwise.
-func (o *WorkflowGetDataObjectsResponse) GetCachedDataAttributes() []KeyValue {
-	if o == nil || IsNil(o.CachedDataAttributes) {
-		var ret []KeyValue
-		return ret
-	}
-	return o.CachedDataAttributes
-}
-
-// GetCachedDataAttributesOk returns a tuple with the CachedDataAttributes field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowGetDataObjectsResponse) GetCachedDataAttributesOk() ([]KeyValue, bool) {
-	if o == nil || IsNil(o.CachedDataAttributes) {
-		return nil, false
-	}
-	return o.CachedDataAttributes, true
-}
-
-// HasCachedDataAttributes returns a boolean if a field has been set.
-func (o *WorkflowGetDataObjectsResponse) HasCachedDataAttributes() bool {
-	if o != nil && !IsNil(o.CachedDataAttributes) {
-		return true
-	}
-
-	return false
-}
-
-// SetCachedDataAttributes gets a reference to the given []KeyValue and assigns it to the CachedDataAttributes field.
-func (o *WorkflowGetDataObjectsResponse) SetCachedDataAttributes(v []KeyValue) {
-	o.CachedDataAttributes = v
-}
-
 func (o WorkflowGetDataObjectsResponse) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -116,9 +83,6 @@ func (o WorkflowGetDataObjectsResponse) ToMap() (map[string]interface{}, error) 
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Objects) {
 		toSerialize["objects"] = o.Objects
-	}
-	if !IsNil(o.CachedDataAttributes) {
-		toSerialize["cachedDataAttributes"] = o.CachedDataAttributes
 	}
 	return toSerialize, nil
 }

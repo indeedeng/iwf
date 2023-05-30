@@ -8,7 +8,6 @@ Name | Type | Description | Notes
 **StateDecision** | Pointer to [**StateDecision**](StateDecision.md) |  | [optional] 
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertDataAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
-**UpsertCachedDataAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **RecordEvents** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **UpsertStateLocals** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **PublishToInterStateChannel** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
@@ -131,31 +130,6 @@ SetUpsertDataAttributes sets UpsertDataAttributes field to given value.
 `func (o *WorkflowWorkerRpcResponse) HasUpsertDataAttributes() bool`
 
 HasUpsertDataAttributes returns a boolean if a field has been set.
-
-### GetUpsertCachedDataAttributes
-
-`func (o *WorkflowWorkerRpcResponse) GetUpsertCachedDataAttributes() []KeyValue`
-
-GetUpsertCachedDataAttributes returns the UpsertCachedDataAttributes field if non-nil, zero value otherwise.
-
-### GetUpsertCachedDataAttributesOk
-
-`func (o *WorkflowWorkerRpcResponse) GetUpsertCachedDataAttributesOk() (*[]KeyValue, bool)`
-
-GetUpsertCachedDataAttributesOk returns a tuple with the UpsertCachedDataAttributes field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetUpsertCachedDataAttributes
-
-`func (o *WorkflowWorkerRpcResponse) SetUpsertCachedDataAttributes(v []KeyValue)`
-
-SetUpsertCachedDataAttributes sets UpsertCachedDataAttributes field to given value.
-
-### HasUpsertCachedDataAttributes
-
-`func (o *WorkflowWorkerRpcResponse) HasUpsertCachedDataAttributes() bool`
-
-HasUpsertCachedDataAttributes returns a boolean if a field has been set.
 
 ### GetRecordEvents
 

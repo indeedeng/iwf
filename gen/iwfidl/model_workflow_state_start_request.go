@@ -19,13 +19,12 @@ var _ MappedNullable = &WorkflowStateStartRequest{}
 
 // WorkflowStateStartRequest struct for WorkflowStateStartRequest
 type WorkflowStateStartRequest struct {
-	Context              Context           `json:"context"`
-	WorkflowType         string            `json:"workflowType"`
-	WorkflowStateId      string            `json:"workflowStateId"`
-	StateInput           *EncodedObject    `json:"stateInput,omitempty"`
-	SearchAttributes     []SearchAttribute `json:"searchAttributes,omitempty"`
-	DataObjects          []KeyValue        `json:"dataObjects,omitempty"`
-	CachedDataAttributes []KeyValue        `json:"cachedDataAttributes,omitempty"`
+	Context          Context           `json:"context"`
+	WorkflowType     string            `json:"workflowType"`
+	WorkflowStateId  string            `json:"workflowStateId"`
+	StateInput       *EncodedObject    `json:"stateInput,omitempty"`
+	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
+	DataObjects      []KeyValue        `json:"dataObjects,omitempty"`
 }
 
 // NewWorkflowStateStartRequest instantiates a new WorkflowStateStartRequest object
@@ -216,38 +215,6 @@ func (o *WorkflowStateStartRequest) SetDataObjects(v []KeyValue) {
 	o.DataObjects = v
 }
 
-// GetCachedDataAttributes returns the CachedDataAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartRequest) GetCachedDataAttributes() []KeyValue {
-	if o == nil || IsNil(o.CachedDataAttributes) {
-		var ret []KeyValue
-		return ret
-	}
-	return o.CachedDataAttributes
-}
-
-// GetCachedDataAttributesOk returns a tuple with the CachedDataAttributes field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowStateStartRequest) GetCachedDataAttributesOk() ([]KeyValue, bool) {
-	if o == nil || IsNil(o.CachedDataAttributes) {
-		return nil, false
-	}
-	return o.CachedDataAttributes, true
-}
-
-// HasCachedDataAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateStartRequest) HasCachedDataAttributes() bool {
-	if o != nil && !IsNil(o.CachedDataAttributes) {
-		return true
-	}
-
-	return false
-}
-
-// SetCachedDataAttributes gets a reference to the given []KeyValue and assigns it to the CachedDataAttributes field.
-func (o *WorkflowStateStartRequest) SetCachedDataAttributes(v []KeyValue) {
-	o.CachedDataAttributes = v
-}
-
 func (o WorkflowStateStartRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -269,9 +236,6 @@ func (o WorkflowStateStartRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataObjects) {
 		toSerialize["dataObjects"] = o.DataObjects
-	}
-	if !IsNil(o.CachedDataAttributes) {
-		toSerialize["cachedDataAttributes"] = o.CachedDataAttributes
 	}
 	return toSerialize, nil
 }

@@ -21,7 +21,6 @@ var _ MappedNullable = &WorkflowStateStartResponse{}
 type WorkflowStateStartResponse struct {
 	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
 	UpsertDataObjects          []KeyValue                    `json:"upsertDataObjects,omitempty"`
-	UpsertCachedDataAttributes []KeyValue                    `json:"upsertCachedDataAttributes,omitempty"`
 	CommandRequest             *CommandRequest               `json:"commandRequest,omitempty"`
 	UpsertStateLocals          []KeyValue                    `json:"upsertStateLocals,omitempty"`
 	RecordEvents               []KeyValue                    `json:"recordEvents,omitempty"`
@@ -107,38 +106,6 @@ func (o *WorkflowStateStartResponse) HasUpsertDataObjects() bool {
 // SetUpsertDataObjects gets a reference to the given []KeyValue and assigns it to the UpsertDataObjects field.
 func (o *WorkflowStateStartResponse) SetUpsertDataObjects(v []KeyValue) {
 	o.UpsertDataObjects = v
-}
-
-// GetUpsertCachedDataAttributes returns the UpsertCachedDataAttributes field value if set, zero value otherwise.
-func (o *WorkflowStateStartResponse) GetUpsertCachedDataAttributes() []KeyValue {
-	if o == nil || IsNil(o.UpsertCachedDataAttributes) {
-		var ret []KeyValue
-		return ret
-	}
-	return o.UpsertCachedDataAttributes
-}
-
-// GetUpsertCachedDataAttributesOk returns a tuple with the UpsertCachedDataAttributes field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowStateStartResponse) GetUpsertCachedDataAttributesOk() ([]KeyValue, bool) {
-	if o == nil || IsNil(o.UpsertCachedDataAttributes) {
-		return nil, false
-	}
-	return o.UpsertCachedDataAttributes, true
-}
-
-// HasUpsertCachedDataAttributes returns a boolean if a field has been set.
-func (o *WorkflowStateStartResponse) HasUpsertCachedDataAttributes() bool {
-	if o != nil && !IsNil(o.UpsertCachedDataAttributes) {
-		return true
-	}
-
-	return false
-}
-
-// SetUpsertCachedDataAttributes gets a reference to the given []KeyValue and assigns it to the UpsertCachedDataAttributes field.
-func (o *WorkflowStateStartResponse) SetUpsertCachedDataAttributes(v []KeyValue) {
-	o.UpsertCachedDataAttributes = v
 }
 
 // GetCommandRequest returns the CommandRequest field value if set, zero value otherwise.
@@ -284,9 +251,6 @@ func (o WorkflowStateStartResponse) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UpsertDataObjects) {
 		toSerialize["upsertDataObjects"] = o.UpsertDataObjects
-	}
-	if !IsNil(o.UpsertCachedDataAttributes) {
-		toSerialize["upsertCachedDataAttributes"] = o.UpsertCachedDataAttributes
 	}
 	if !IsNil(o.CommandRequest) {
 		toSerialize["commandRequest"] = o.CommandRequest

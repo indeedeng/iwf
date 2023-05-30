@@ -108,27 +108,6 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: get workflow search attributes
-  /api/v1/workflow/persistence/get:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WorkflowGetPersistenceDataRequest'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkflowGetPersistenceDataResponse'
-          description: successful operation
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-          description: Invalid input
-      summary: get workflow data objects
   /api/v1/workflow/get:
     post:
       requestBody:
@@ -494,14 +473,6 @@ components:
           - partialLoadingKeys
           persistenceLoadingType: null
         executeApiTimeoutSeconds: 2
-        cachedDataAttributesLoadingPolicy:
-          lockingKeys:
-          - lockingKeys
-          - lockingKeys
-          partialLoadingKeys:
-          - partialLoadingKeys
-          - partialLoadingKeys
-          persistenceLoadingType: null
         startApiRetryPolicy:
           maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
@@ -556,8 +527,6 @@ components:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
         dataObjectsLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
-        cachedDataAttributesLoadingPolicy:
-          $ref: '#/components/schemas/PersistenceLoadingPolicy'
         commandCarryOverPolicy:
           $ref: '#/components/schemas/CommandCarryOverPolicy'
         startApiTimeoutSeconds:
@@ -598,6 +567,7 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 7
           continueAsNewPageSizeInBytes: 1
+          useMemoForDataAttributes: true
         idReusePolicy: null
         searchAttributes:
         - stringValue: stringValue
@@ -676,7 +646,6 @@ components:
       - LOAD_ALL_WITHOUT_LOCKING
       - LOAD_PARTIAL_WITHOUT_LOCKING
       - LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK
-      - LOAD_NONE_PERSISTENCE
       type: string
     CommandCarryOverPolicy:
       example:
@@ -730,14 +699,6 @@ components:
             - partialLoadingKeys
             persistenceLoadingType: null
           executeApiTimeoutSeconds: 2
-          cachedDataAttributesLoadingPolicy:
-            lockingKeys:
-            - lockingKeys
-            - lockingKeys
-            partialLoadingKeys:
-            - partialLoadingKeys
-            - partialLoadingKeys
-            persistenceLoadingType: null
           startApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -798,6 +759,7 @@ components:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 7
             continueAsNewPageSizeInBytes: 1
+            useMemoForDataAttributes: true
           idReusePolicy: null
           searchAttributes:
           - stringValue: stringValue
@@ -902,12 +864,10 @@ components:
       type: string
     WorkflowGetDataObjectsRequest:
       example:
-        cachedAttributeKeys:
-        - cachedAttributeKeys
-        - cachedAttributeKeys
         keys:
         - keys
         - keys
+        useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -919,10 +879,8 @@ components:
           items:
             type: string
           type: array
-        cachedAttributeKeys:
-          items:
-            type: string
-          type: array
+        useMemoForDataAttributes:
+          type: boolean
       required:
       - workflowId
       type: object
@@ -937,21 +895,8 @@ components:
             data: data
             encoding: encoding
           key: key
-        cachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
       properties:
         objects:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-        cachedDataAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
@@ -999,94 +944,6 @@ components:
           - stringArrayValue
           key: key
       properties:
-        searchAttributes:
-          items:
-            $ref: '#/components/schemas/SearchAttribute'
-          type: array
-      type: object
-    WorkflowGetPersistenceDataRequest:
-      example:
-        cachedDataAttributes:
-        - cachedDataAttributes
-        - cachedDataAttributes
-        searchAttributes:
-        - valueType: null
-          key: key
-        - valueType: null
-          key: key
-        workflowRunId: workflowRunId
-        workflowId: workflowId
-        dataAttributes:
-        - dataAttributes
-        - dataAttributes
-      properties:
-        workflowId:
-          type: string
-        workflowRunId:
-          type: string
-        dataAttributes:
-          items:
-            type: string
-          type: array
-        cachedDataAttributes:
-          items:
-            type: string
-          type: array
-        searchAttributes:
-          items:
-            $ref: '#/components/schemas/SearchAttributeKeyAndType'
-          type: array
-      required:
-      - workflowId
-      type: object
-    WorkflowGetPersistenceDataResponse:
-      example:
-        cachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        searchAttributes:
-        - stringValue: stringValue
-          valueType: null
-          integerValue: 1
-          boolValue: true
-          doubleValue: 6.84685269835264
-          stringArrayValue:
-          - stringArrayValue
-          - stringArrayValue
-          key: key
-        - stringValue: stringValue
-          valueType: null
-          integerValue: 1
-          boolValue: true
-          doubleValue: 6.84685269835264
-          stringArrayValue:
-          - stringArrayValue
-          - stringArrayValue
-          key: key
-        dataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-      properties:
-        dataAttributes:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-        cachedDataAttributes:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
         searchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
@@ -1314,6 +1171,70 @@ components:
       - jsonData
       - totalPages
       type: object
+    WorkflowStateStartRequest:
+      example:
+        dataObjects:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        workflowStateId: workflowStateId
+        context:
+          firstAttemptTimestamp: 6
+          workflowStartedTimestamp: 0
+          workflowRunId: workflowRunId
+          attempt: 1
+          workflowId: workflowId
+          stateExecutionId: stateExecutionId
+        workflowType: workflowType
+        searchAttributes:
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 1
+          boolValue: true
+          doubleValue: 6.84685269835264
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        stateInput:
+          data: data
+          encoding: encoding
+      properties:
+        context:
+          $ref: '#/components/schemas/Context'
+        workflowType:
+          type: string
+        workflowStateId:
+          type: string
+        stateInput:
+          $ref: '#/components/schemas/EncodedObject'
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
+        dataObjects:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      required:
+      - context
+      - workflowStateId
+      - workflowType
+      type: object
     WorkflowSkipTimerRequest:
       example:
         timerCommandIndex: 0
@@ -1342,6 +1263,7 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 7
           continueAsNewPageSizeInBytes: 1
+          useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -1368,20 +1290,8 @@ components:
           - partialLoadingKeys
           - partialLoadingKeys
           persistenceLoadingType: null
-        cachedDataAttributesLoadingPolicy:
-          lockingKeys:
-          - lockingKeys
-          - lockingKeys
-          partialLoadingKeys:
-          - partialLoadingKeys
-          - partialLoadingKeys
-          persistenceLoadingType: null
         timeoutSeconds: 0
-        searchAttributes:
-        - valueType: null
-          key: key
-        - valueType: null
-          key: key
+        useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         rpcName: rpcName
         workflowId: workflowId
@@ -1406,14 +1316,10 @@ components:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
         dataAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
-        cachedDataAttributesLoadingPolicy:
-          $ref: '#/components/schemas/PersistenceLoadingPolicy'
-        searchAttributes:
-          items:
-            $ref: '#/components/schemas/SearchAttributeKeyAndType'
-          type: array
         timeoutSeconds:
           type: integer
+        useMemoForDataAttributes:
+          type: boolean
       required:
       - rpcName
       - workflowId
@@ -1459,15 +1365,6 @@ components:
           - stringArrayValue
           - stringArrayValue
           key: key
-        cachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
         rpcName: rpcName
         dataAttributes:
         - value:
@@ -1492,10 +1389,6 @@ components:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
         dataAttributes:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-        cachedDataAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
@@ -1550,14 +1443,6 @@ components:
                 - partialLoadingKeys
                 persistenceLoadingType: null
               executeApiTimeoutSeconds: 2
-              cachedDataAttributesLoadingPolicy:
-                lockingKeys:
-                - lockingKeys
-                - lockingKeys
-                partialLoadingKeys:
-                - partialLoadingKeys
-                - partialLoadingKeys
-                persistenceLoadingType: null
               startApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1621,14 +1506,6 @@ components:
                 - partialLoadingKeys
                 persistenceLoadingType: null
               executeApiTimeoutSeconds: 2
-              cachedDataAttributesLoadingPolicy:
-                lockingKeys:
-                - lockingKeys
-                - lockingKeys
-                partialLoadingKeys:
-                - partialLoadingKeys
-                - partialLoadingKeys
-                persistenceLoadingType: null
               startApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1681,15 +1558,6 @@ components:
             stateInput:
               data: data
               encoding: encoding
-        upsertCachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
         upsertDataAttributes:
         - value:
             data: data
@@ -1730,10 +1598,6 @@ components:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
-        upsertCachedDataAttributes:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
         recordEvents:
           items:
             $ref: '#/components/schemas/KeyValue'
@@ -1746,83 +1610,6 @@ components:
           items:
             $ref: '#/components/schemas/InterStateChannelPublishing'
           type: array
-      type: object
-    WorkflowStateStartRequest:
-      example:
-        dataObjects:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        workflowStateId: workflowStateId
-        context:
-          firstAttemptTimestamp: 6
-          workflowStartedTimestamp: 0
-          workflowRunId: workflowRunId
-          attempt: 1
-          workflowId: workflowId
-          stateExecutionId: stateExecutionId
-        workflowType: workflowType
-        searchAttributes:
-        - stringValue: stringValue
-          valueType: null
-          integerValue: 1
-          boolValue: true
-          doubleValue: 6.84685269835264
-          stringArrayValue:
-          - stringArrayValue
-          - stringArrayValue
-          key: key
-        - stringValue: stringValue
-          valueType: null
-          integerValue: 1
-          boolValue: true
-          doubleValue: 6.84685269835264
-          stringArrayValue:
-          - stringArrayValue
-          - stringArrayValue
-          key: key
-        cachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        stateInput:
-          data: data
-          encoding: encoding
-      properties:
-        context:
-          $ref: '#/components/schemas/Context'
-        workflowType:
-          type: string
-        workflowStateId:
-          type: string
-        stateInput:
-          $ref: '#/components/schemas/EncodedObject'
-        searchAttributes:
-          items:
-            $ref: '#/components/schemas/SearchAttribute'
-          type: array
-        dataObjects:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-        cachedDataAttributes:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-      required:
-      - context
-      - workflowStateId
-      - workflowType
       type: object
     WorkflowStateStartResponse:
       example:
@@ -1846,15 +1633,6 @@ components:
           - stringArrayValue
           key: key
         recordEvents:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        upsertCachedDataAttributes:
         - value:
             data: data
             encoding: encoding
@@ -1921,10 +1699,6 @@ components:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
         upsertDataObjects:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-        upsertCachedDataAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
@@ -2015,15 +1789,6 @@ components:
           - stringArrayValue
           - stringArrayValue
           key: key
-        CachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
         DataObjects:
         - value:
             data: data
@@ -2050,10 +1815,6 @@ components:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
         DataObjects:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
-        CachedDataAttributes:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
@@ -2111,14 +1872,6 @@ components:
                 - partialLoadingKeys
                 persistenceLoadingType: null
               executeApiTimeoutSeconds: 2
-              cachedDataAttributesLoadingPolicy:
-                lockingKeys:
-                - lockingKeys
-                - lockingKeys
-                partialLoadingKeys:
-                - partialLoadingKeys
-                - partialLoadingKeys
-                persistenceLoadingType: null
               startApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2182,14 +1935,6 @@ components:
                 - partialLoadingKeys
                 persistenceLoadingType: null
               executeApiTimeoutSeconds: 2
-              cachedDataAttributesLoadingPolicy:
-                lockingKeys:
-                - lockingKeys
-                - lockingKeys
-                partialLoadingKeys:
-                - partialLoadingKeys
-                - partialLoadingKeys
-                persistenceLoadingType: null
               startApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2242,15 +1987,6 @@ components:
             stateInput:
               data: data
               encoding: encoding
-        upsertCachedDataAttributes:
-        - value:
-            data: data
-            encoding: encoding
-          key: key
-        - value:
-            data: data
-            encoding: encoding
-          key: key
         publishToInterStateChannel:
         - channelName: channelName
           value:
@@ -2289,10 +2025,6 @@ components:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
-        upsertCachedDataAttributes:
-          items:
-            $ref: '#/components/schemas/KeyValue'
-          type: array
         recordEvents:
           items:
             $ref: '#/components/schemas/KeyValue'
@@ -2320,14 +2052,6 @@ components:
               - partialLoadingKeys
               persistenceLoadingType: null
             executeApiTimeoutSeconds: 2
-            cachedDataAttributesLoadingPolicy:
-              lockingKeys:
-              - lockingKeys
-              - lockingKeys
-              partialLoadingKeys:
-              - partialLoadingKeys
-              - partialLoadingKeys
-              persistenceLoadingType: null
             startApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2391,14 +2115,6 @@ components:
               - partialLoadingKeys
               persistenceLoadingType: null
             executeApiTimeoutSeconds: 2
-            cachedDataAttributesLoadingPolicy:
-              lockingKeys:
-              - lockingKeys
-              - lockingKeys
-              partialLoadingKeys:
-              - partialLoadingKeys
-              - partialLoadingKeys
-              persistenceLoadingType: null
             startApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2470,14 +2186,6 @@ components:
             - partialLoadingKeys
             persistenceLoadingType: null
           executeApiTimeoutSeconds: 2
-          cachedDataAttributesLoadingPolicy:
-            lockingKeys:
-            - lockingKeys
-            - lockingKeys
-            partialLoadingKeys:
-            - partialLoadingKeys
-            - partialLoadingKeys
-            persistenceLoadingType: null
           startApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -2787,6 +2495,7 @@ components:
         disableSystemSearchAttribute: true
         continueAsNewThreshold: 7
         continueAsNewPageSizeInBytes: 1
+        useMemoForDataAttributes: true
       properties:
         disableSystemSearchAttribute:
           type: boolean
@@ -2794,6 +2503,8 @@ components:
           type: integer
         continueAsNewPageSizeInBytes:
           type: integer
+        useMemoForDataAttributes:
+          type: boolean
       type: object
     Context:
       example:

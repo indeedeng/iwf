@@ -19,13 +19,12 @@ var _ MappedNullable = &WorkflowWorkerRpcRequest{}
 
 // WorkflowWorkerRpcRequest struct for WorkflowWorkerRpcRequest
 type WorkflowWorkerRpcRequest struct {
-	Context              Context           `json:"context"`
-	WorkflowType         string            `json:"workflowType"`
-	RpcName              string            `json:"rpcName"`
-	Input                *EncodedObject    `json:"input,omitempty"`
-	SearchAttributes     []SearchAttribute `json:"searchAttributes,omitempty"`
-	DataAttributes       []KeyValue        `json:"dataAttributes,omitempty"`
-	CachedDataAttributes []KeyValue        `json:"cachedDataAttributes,omitempty"`
+	Context          Context           `json:"context"`
+	WorkflowType     string            `json:"workflowType"`
+	RpcName          string            `json:"rpcName"`
+	Input            *EncodedObject    `json:"input,omitempty"`
+	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
+	DataAttributes   []KeyValue        `json:"dataAttributes,omitempty"`
 }
 
 // NewWorkflowWorkerRpcRequest instantiates a new WorkflowWorkerRpcRequest object
@@ -216,38 +215,6 @@ func (o *WorkflowWorkerRpcRequest) SetDataAttributes(v []KeyValue) {
 	o.DataAttributes = v
 }
 
-// GetCachedDataAttributes returns the CachedDataAttributes field value if set, zero value otherwise.
-func (o *WorkflowWorkerRpcRequest) GetCachedDataAttributes() []KeyValue {
-	if o == nil || IsNil(o.CachedDataAttributes) {
-		var ret []KeyValue
-		return ret
-	}
-	return o.CachedDataAttributes
-}
-
-// GetCachedDataAttributesOk returns a tuple with the CachedDataAttributes field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowWorkerRpcRequest) GetCachedDataAttributesOk() ([]KeyValue, bool) {
-	if o == nil || IsNil(o.CachedDataAttributes) {
-		return nil, false
-	}
-	return o.CachedDataAttributes, true
-}
-
-// HasCachedDataAttributes returns a boolean if a field has been set.
-func (o *WorkflowWorkerRpcRequest) HasCachedDataAttributes() bool {
-	if o != nil && !IsNil(o.CachedDataAttributes) {
-		return true
-	}
-
-	return false
-}
-
-// SetCachedDataAttributes gets a reference to the given []KeyValue and assigns it to the CachedDataAttributes field.
-func (o *WorkflowWorkerRpcRequest) SetCachedDataAttributes(v []KeyValue) {
-	o.CachedDataAttributes = v
-}
-
 func (o WorkflowWorkerRpcRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -269,9 +236,6 @@ func (o WorkflowWorkerRpcRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataAttributes) {
 		toSerialize["dataAttributes"] = o.DataAttributes
-	}
-	if !IsNil(o.CachedDataAttributes) {
-		toSerialize["cachedDataAttributes"] = o.CachedDataAttributes
 	}
 	return toSerialize, nil
 }
