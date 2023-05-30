@@ -21,7 +21,17 @@ func TestPersistenceWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, nil)
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, false, false, nil)
+		smallWaitForFastTest()
+	}
+}
+
+func TestPersistenceWorkflowTemporalWithMemo(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, false, nil)
 		smallWaitForFastTest()
 	}
 }
@@ -31,7 +41,7 @@ func TestPersistenceWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, false, false, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
@@ -41,7 +51,7 @@ func TestPersistenceWorkflowCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeCadence, nil)
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence, false, false, nil)
 		smallWaitForFastTest()
 	}
 }
@@ -51,18 +61,21 @@ func TestPersistenceWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence, false, false, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
 
-func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, useMemo, memoEncryption bool, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	wfHandler := persistence.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
+	uclient, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
+		BackendType:    backendType,
+		MemoEncryption: memoEncryption,
+	})
 	defer closeFunc2()
 
 	// start a workflow
@@ -102,7 +115,8 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, co
 			SearchAttributes: []iwfidl.SearchAttribute{
 				expectedDatetimeSearchAttribute,
 			},
-			WorkflowConfigOverride: config,
+			WorkflowConfigOverride:   config,
+			UseMemoForDataAttributes: ptr.Any(useMemo),
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()

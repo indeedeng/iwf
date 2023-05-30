@@ -61,7 +61,6 @@ func doStartWorkflowWorker(handler common.WorkflowHandler, router *gin.Engine) (
 
 type IwfServiceTestConfig struct {
 	BackendType    service.BackendType
-	UseMemo        bool
 	MemoEncryption bool
 }
 
@@ -70,17 +69,21 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 	return cf
 }
 
+func startIwfServiceByConfig(config IwfServiceTestConfig) (uclient api.UnifiedClient, closeFunc func()) {
+	return doStartIwfServiceWithClient(config)
+}
+
 func startIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
-	return doOnceStartIwfServiceWithClient(backendType)
+	return doStartIwfServiceWithClient(IwfServiceTestConfig{BackendType: backendType})
 
 	//if backendType == service.BackendTypeTemporal {
 	//if integTemporalUclientCached == nil {
-	//	return doOnceStartIwfServiceWithClient(backendType)
+	//	return doStartIwfServiceWithClient(backendType)
 	//}
 	//return integTemporalUclientCached, func() {}
 	//}
 	//if integCadenceUclientCached == nil {
-	//	return doOnceStartIwfServiceWithClient(backendType)
+	//	return doStartIwfServiceWithClient(backendType)
 	//}
 	//return integCadenceUclientCached, func() {}
 }
@@ -89,14 +92,14 @@ func startIwfServiceWithClient(backendType service.BackendType) (uclient api.Uni
 //var integCadenceUclientCached api.UnifiedClient
 //var integTemporalUclientCached api.UnifiedClient
 
-func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
-	if backendType == service.BackendTypeTemporal {
+func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.UnifiedClient, closeFunc func()) {
+	if config.BackendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
 		logger, err := loggerimpl.NewDevelopment()
 		if err != nil {
 			panic(err)
 		}
-		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter(), false) // TODO pass true and test encryption
+		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter(), config.MemoEncryption) // TODO set correct data converter for memo encryption
 		iwfService := api.NewService(testConfig, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
@@ -109,13 +112,13 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue, converter.GetDefaultDataConverter())
+		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue, converter.GetDefaultDataConverter()) // TODO set correct data converter for memo encryption
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()
 			interpreter.Close()
 		}
-	} else if backendType == service.BackendTypeCadence {
+	} else if config.BackendType == service.BackendTypeCadence {
 		serviceClient, closeFunc, err := iwf.BuildCadenceServiceClient(iwf.DefaultCadenceHostPort)
 		if err != nil {
 			log.Fatalf("cannot connnect to Cadence %v", err)
@@ -147,7 +150,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 			interpreter.Close()
 		}
 	} else {
-		panic("not supported backend type " + backendType)
+		panic("not supported backend type " + config.BackendType)
 	}
 }
 

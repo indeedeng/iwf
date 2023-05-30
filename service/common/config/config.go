@@ -35,6 +35,7 @@ type (
 		DefaultWorkflowConfig     iwfidl.WorkflowConfig     `json:"defaultWorkflowConfig"`
 		InterpreterActivityConfig InterpreterActivityConfig `yaml:"interpreterActivityConfig"`
 		VerboseDebug              bool
+		FailAtMemoIncompatibility bool
 	}
 
 	TemporalConfig struct {

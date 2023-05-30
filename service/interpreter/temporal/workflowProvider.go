@@ -60,7 +60,7 @@ func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo ma
 		panic("cannot convert to temporal workflow context")
 	}
 
-	var memo map[string]interface{}
+	memo := map[string]interface{}{}
 	if w.memoEncryption {
 		for k, v := range rawMemo {
 

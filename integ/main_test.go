@@ -90,14 +90,14 @@ func TestMain(m *testing.M) {
 	//	// only start connection once
 	//	// TODO need to do this for outside of ci as well
 	//	if *cadenceIntegTest {
-	//		integCadenceUclientCached, integCadenceUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeCadence)
+	//		integCadenceUclientCached, integCadenceUclientCloseFunc = doStartIwfServiceWithClient(service.BackendTypeCadence)
 	//		defer func() {
 	//			fmt.Println("shutdown cadence client and iwf server")
 	//			integCadenceUclientCloseFunc()
 	//		}()
 	//		fmt.Println("cached cadence client and iwf server")
 	//	} else {
-	//		integTemporalUclientCached, integTemporalUclientCloseFunc = doOnceStartIwfServiceWithClient(service.BackendTypeTemporal)
+	//		integTemporalUclientCached, integTemporalUclientCloseFunc = doStartIwfServiceWithClient(service.BackendTypeTemporal)
 	//		defer func() {
 	//			fmt.Println("shutdown temporal client and iwf server")
 	//			integTemporalUclientCloseFunc()

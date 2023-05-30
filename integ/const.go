@@ -12,6 +12,7 @@ var testConfig = config.Config{
 		Port: 9715,
 	},
 	Interpreter: config.Interpreter{
-		VerboseDebug: false,
+		VerboseDebug:              false,
+		FailAtMemoIncompatibility: true,
 	},
 }

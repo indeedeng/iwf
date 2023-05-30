@@ -367,7 +367,10 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			queryToPrepare = false
 		} else {
 			// this means that we cannot use memo to continue, need to fall back to use query
-			s.logger.Warn("workflow attempt to use memo but isn't started with it", tag.WorkflowID(req.WorkflowId))
+			s.logger.Warn("workflow attempt to use memo but probably isn't started with it", tag.WorkflowID(req.WorkflowId))
+			if s.config.Interpreter.FailAtMemoIncompatibility {
+				return nil, s.handleError(fmt.Errorf("memo is not set correctly to use"))
+			}
 		}
 		workerUrl := workerUrlMemoObj.GetData()
 
