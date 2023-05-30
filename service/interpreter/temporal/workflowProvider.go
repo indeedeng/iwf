@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 	"time"
@@ -13,11 +14,13 @@ import (
 type workflowProvider struct {
 	threadCount        int
 	pendingThreadNames map[string]int
+	memoEncryption     bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
 }
 
-func newTemporalWorkflowProvider() interpreter.WorkflowProvider {
+func newTemporalWorkflowProvider(memoEncryption bool) interpreter.WorkflowProvider {
 	return &workflowProvider{
 		pendingThreadNames: map[string]int{},
+		memoEncryption:     memoEncryption,
 	}
 }
 
@@ -48,6 +51,29 @@ func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext
 		panic("cannot convert to temporal workflow context")
 	}
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
+}
+
+func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo map[string]interface{}) error {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+
+	var memo map[string]interface{}
+	if w.memoEncryption {
+		for k, v := range rawMemo {
+
+			pl, err := env.GetTemporalDataConverter().ToPayload(v)
+			if err != nil {
+				return err
+			}
+			memo[k] = pl
+		}
+	} else {
+		memo = rawMemo
+	}
+	
+	return workflow.UpsertMemo(wfCtx, memo)
 }
 
 func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Duration) interpreter.Future {

@@ -3,6 +3,7 @@ package cadence
 import (
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
 	"log"
@@ -17,7 +18,7 @@ type InterpreterWorker struct {
 }
 
 func NewInterpreterWorker(config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func()) *InterpreterWorker {
-	interpreter.SetSharedConfig(config)
+	env.SetSharedEnv(config, nil)
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,
@@ -32,7 +33,7 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	config := interpreter.GetSharedConfig()
+	config := env.GetSharedConfig()
 	options := worker.Options{
 		MaxConcurrentActivityTaskPollers: 10,
 		MaxConcurrentDecisionTaskPollers: 10,

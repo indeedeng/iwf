@@ -88,7 +88,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 		if err != nil {
 			panic(err)
 		}
-		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter())
+		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter(), false) // TODO pass true and test encryption
 		iwfService := api.NewService(testConfig, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
@@ -101,7 +101,7 @@ func doOnceStartIwfServiceWithClient(backendType service.BackendType) (uclient a
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue)
+		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue, converter.GetDefaultDataConverter())
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()

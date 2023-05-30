@@ -82,6 +82,7 @@ type WorkflowProvider interface {
 	IsApplicationError(err error) bool
 	GetWorkflowInfo(ctx UnifiedContext) WorkflowInfo
 	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
+	UpsertMemo(ctx UnifiedContext, memo map[string]interface{}) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
 	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
