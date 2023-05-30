@@ -19,7 +19,6 @@ const WorkflowStopApiPath = "/api/v1/workflow/stop"
 const WorkflowInternalDumpApiPath = "/api/v1/workflow/internal/dump"
 const WorkflowConfigUpdateApiPath = "/api/v1/workflow/config/update"
 const WorkflowRpcApiPath = "/api/v1/workflow/rpc"
-const WorkflowPersistenceDataGetPath = "/api/v1/workflow/persistence/get"
 
 // NewService returns a new router.
 func NewService(config config.Config, client UnifiedClient, logger log.Logger) *gin.Engine {
@@ -41,7 +40,6 @@ func NewService(config config.Config, client UnifiedClient, logger log.Logger) *
 	router.POST(WorkflowInternalDumpApiPath, handler.apiV1WorkflowInternalDump)
 	router.POST(WorkflowConfigUpdateApiPath, handler.apiV1WorkflowConfigUpdate)
 	router.POST(WorkflowRpcApiPath, handler.apiV1WorkflowRpc)
-	router.POST(WorkflowPersistenceDataGetPath, handler.apiV1WorkflowGetPersistenceData)
 
 	return router
 }

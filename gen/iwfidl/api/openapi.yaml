@@ -567,7 +567,6 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 7
           continueAsNewPageSizeInBytes: 1
-          useMemoForDataAttributes: true
         idReusePolicy: null
         searchAttributes:
         - stringValue: stringValue
@@ -589,6 +588,7 @@ components:
           - stringArrayValue
           key: key
         workflowIDReusePolicy: null
+        useMemoForDataAttributes: true
         cronSchedule: cronSchedule
       properties:
         workflowIDReusePolicy:
@@ -605,6 +605,8 @@ components:
           $ref: '#/components/schemas/WorkflowConfig'
         idReusePolicy:
           $ref: '#/components/schemas/IDReusePolicy'
+        useMemoForDataAttributes:
+          type: boolean
       type: object
     WorkflowIDReusePolicy:
       enum:
@@ -759,7 +761,6 @@ components:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 7
             continueAsNewPageSizeInBytes: 1
-            useMemoForDataAttributes: true
           idReusePolicy: null
           searchAttributes:
           - stringValue: stringValue
@@ -781,6 +782,7 @@ components:
             - stringArrayValue
             key: key
           workflowIDReusePolicy: null
+          useMemoForDataAttributes: true
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
@@ -1263,7 +1265,6 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 7
           continueAsNewPageSizeInBytes: 1
-          useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -1291,6 +1292,11 @@ components:
           - partialLoadingKeys
           persistenceLoadingType: null
         timeoutSeconds: 0
+        searchAttributes:
+        - valueType: null
+          key: key
+        - valueType: null
+          key: key
         useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         rpcName: rpcName
@@ -1320,6 +1326,10 @@ components:
           type: integer
         useMemoForDataAttributes:
           type: boolean
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttributeKeyAndType'
+          type: array
       required:
       - rpcName
       - workflowId
@@ -2495,7 +2505,6 @@ components:
         disableSystemSearchAttribute: true
         continueAsNewThreshold: 7
         continueAsNewPageSizeInBytes: 1
-        useMemoForDataAttributes: true
       properties:
         disableSystemSearchAttribute:
           type: boolean
@@ -2503,8 +2512,6 @@ components:
           type: integer
         continueAsNewPageSizeInBytes:
           type: integer
-        useMemoForDataAttributes:
-          type: boolean
       type: object
     Context:
       example:

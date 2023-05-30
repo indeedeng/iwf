@@ -146,7 +146,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 				unhandledSigs := provider.GetUnhandledSignalNames(ctx)
 
 				for _, sigName := range unhandledSigs {
-					if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
+					if strings.HasPrefix(sigName, service.IwfSystemConstPrefix) {
 						// skip this because it will be processed in a different thread
 						if !service.ValidIwfSystemSignalNames[sigName] {
 							provider.GetLogger(ctx).Error("found an invalid system signal", sigName)
@@ -225,7 +225,7 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 	}
 
 	for _, sigName := range unhandledSigs {
-		if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
+		if strings.HasPrefix(sigName, service.IwfSystemConstPrefix) {
 			if service.ValidIwfSystemSignalNames[sigName] {
 
 				sr.provider.GetLogger(ctx).Info("found a valid system signal before continueAsNew to carry over", sigName)

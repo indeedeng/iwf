@@ -7,7 +7,6 @@ Name | Type | Description | Notes
 **DisableSystemSearchAttribute** | Pointer to **bool** |  | [optional] 
 **ContinueAsNewThreshold** | Pointer to **int32** |  | [optional] 
 **ContinueAsNewPageSizeInBytes** | Pointer to **int32** |  | [optional] 
-**UseMemoForDataAttributes** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -102,31 +101,6 @@ SetContinueAsNewPageSizeInBytes sets ContinueAsNewPageSizeInBytes field to given
 `func (o *WorkflowConfig) HasContinueAsNewPageSizeInBytes() bool`
 
 HasContinueAsNewPageSizeInBytes returns a boolean if a field has been set.
-
-### GetUseMemoForDataAttributes
-
-`func (o *WorkflowConfig) GetUseMemoForDataAttributes() bool`
-
-GetUseMemoForDataAttributes returns the UseMemoForDataAttributes field if non-nil, zero value otherwise.
-
-### GetUseMemoForDataAttributesOk
-
-`func (o *WorkflowConfig) GetUseMemoForDataAttributesOk() (*bool, bool)`
-
-GetUseMemoForDataAttributesOk returns a tuple with the UseMemoForDataAttributes field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetUseMemoForDataAttributes
-
-`func (o *WorkflowConfig) SetUseMemoForDataAttributes(v bool)`
-
-SetUseMemoForDataAttributes sets UseMemoForDataAttributes field to given value.
-
-### HasUseMemoForDataAttributes
-
-`func (o *WorkflowConfig) HasUseMemoForDataAttributes() bool`
-
-HasUseMemoForDataAttributes returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

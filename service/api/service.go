@@ -55,6 +55,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	var initSAs []iwfidl.SearchAttribute
 	workflowConfig := s.config.Interpreter.DefaultWorkflowConfig
 
+	useMemo := false
 	if req.WorkflowStartOptions != nil {
 		startOptions := req.WorkflowStartOptions
 		workflowOptions.WorkflowIDReusePolicy = compatibility.GetWorkflowIdReusePolicy(*startOptions)
@@ -70,17 +71,27 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
+		if startOptions.GetUseMemoForDataAttributes() {
+			workflowOptions.Memo = map[string]interface{}{
+				service.WorkerUrlMemoKey: iwfidl.EncodedObject{
+					Data: iwfidl.PtrString(req.IwfWorkerUrl), // this is hack to ensure all memos are with the same type
+				},
+			}
+			useMemo = true
+		}
 	}
 
 	input := service.InterpreterWorkflowInput{
-		IwfWorkflowType:      req.GetIwfWorkflowType(),
-		IwfWorkerUrl:         req.GetIwfWorkerUrl(),
-		StartStateId:         req.StartStateId,
-		StateInput:           req.GetStateInput(),
-		StateOptions:         req.GetStateOptions(),
-		InitSearchAttributes: initSAs,
-		Config:               workflowConfig,
+		IwfWorkflowType:          req.GetIwfWorkflowType(),
+		IwfWorkerUrl:             req.GetIwfWorkerUrl(),
+		StartStateId:             req.StartStateId,
+		StateInput:               req.GetStateInput(),
+		StateOptions:             req.GetStateOptions(),
+		InitSearchAttributes:     initSAs,
+		Config:                   workflowConfig,
+		UseMemoForDataAttributes: useMemo,
 	}
+
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
 		return nil, s.handleError(err)
@@ -186,69 +197,6 @@ func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(ctx context.Context, 
 	return &iwfidl.WorkflowGetSearchAttributesResponse{
 		SearchAttributes: searchAttributes,
 	}, nil
-}
-
-func (s *serviceImpl) ApiV1WorkflowGetPersistenceDataPost(ctx context.Context, req iwfidl.WorkflowGetPersistenceDataRequest) (wresp *iwfidl.WorkflowGetPersistenceDataResponse, retError *errors.ErrorAndStatus) {
-	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
-
-	var saKeys []string
-	for _, sakt := range req.SearchAttributes {
-		saKeys = append(saKeys, sakt.GetKey())
-	}
-
-	if len(req.DataAttributes) > 0 {
-		// only load data attributes by query API when needed, because query API is expensive
-		var queryResp service.PrepareRpcQueryResponse
-		err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
-			DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PARTIAL_WITHOUT_LOCKING.Ptr(),
-				PartialLoadingKeys:     req.DataAttributes,
-			},
-			CachedDataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PARTIAL_WITHOUT_LOCKING.Ptr(),
-				PartialLoadingKeys:     req.CachedDataAttributes,
-			},
-			SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PARTIAL_WITHOUT_LOCKING.Ptr(),
-				PartialLoadingKeys:     saKeys,
-			},
-		})
-		return &iwfidl.WorkflowGetPersistenceDataResponse{
-			DataAttributes:       queryResp.DataObjects,
-			CachedDataAttributes: queryResp.CachedDataObjects,
-			SearchAttributes:     queryResp.SearchAttributes,
-		}, s.handleError(err)
-	} else {
-		var searchAttributes []iwfidl.SearchAttribute
-		var cachedAttributes []iwfidl.KeyValue
-
-		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), req.SearchAttributes)
-		if err != nil {
-			return nil, s.handleError(err)
-		}
-
-		for _, sa := range req.SearchAttributes {
-			searchAttribute, exist := response.SearchAttributes[sa.GetKey()]
-			if exist {
-				searchAttributes = append(searchAttributes, searchAttribute)
-			}
-		}
-
-		for _, key := range req.CachedDataAttributes {
-			obj, exist := response.Memos[key]
-			if exist {
-				cachedAttributes = append(cachedAttributes, iwfidl.KeyValue{
-					Key:   iwfidl.PtrString(key),
-					Value: &obj,
-				})
-			}
-		}
-
-		return &iwfidl.WorkflowGetPersistenceDataResponse{
-			CachedDataAttributes: cachedAttributes,
-			SearchAttributes:     searchAttributes,
-		}, nil
-	}
 }
 
 func (s *serviceImpl) ApiV1WorkflowGetPost(ctx context.Context, req iwfidl.WorkflowGetRequest) (wresp *iwfidl.WorkflowGetResponse, retError *errors.ErrorAndStatus) {
@@ -378,26 +326,18 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		return nil, s.handleError(err)
 	}
 
-	// query the workflow
 	var queryResp service.PrepareRpcQueryResponse
-	policy := req.GetDataAttributesLoadingPolicy()
-	if req.HasDataAttributesLoadingPolicy() && policy.GetPersistenceLoadingType() != iwfidl.NONE_PERSISTENCE {
-		// use query to load, this is expensive. So it tries to avoid if possible
-		err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
-			DataObjectsLoadingPolicy:       req.DataAttributesLoadingPolicy,
-			CachedDataObjectsLoadingPolicy: req.CachedDataAttributesLoadingPolicy,
-			SearchAttributesLoadingPolicy:  req.SearchAttributesLoadingPolicy,
-		})
-		if err != nil {
-			return nil, s.handleError(err)
-		}
-	} else {
-		cachedDaPolicy := req.CachedDataAttributesLoadingPolicy
-
+	queryToPrepare := true
+	if req.HasDataAttributesLoadingPolicy() {
 		var searchAttributes []iwfidl.SearchAttribute
-		var cachedAttributes []iwfidl.KeyValue
+		var dataAttributes []iwfidl.KeyValue
 
-		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), req.SearchAttributes)
+		requestedSAs := req.SearchAttributes
+		requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
+			Key:       ptr.Any(service.SearchAttributeIwfWorkflowType),
+			ValueType: iwfidl.KEYWORD.Ptr(),
+		})
+		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), requestedSAs)
 		if err != nil {
 			return nil, s.handleError(err)
 		}
@@ -409,21 +349,47 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			}
 		}
 
-		if cachedDaPolicy != nil {
-			for _, key := range cachedDaPolicy.PartialLoadingKeys {
-				obj, exist := response.Memos[key]
-				if exist {
-					cachedAttributes = append(cachedAttributes, iwfidl.KeyValue{
-						Key:   iwfidl.PtrString(key),
-						Value: &obj,
-					})
-				}
+		for k, v := range response.Memos {
+			if k == service.WorkerUrlMemoKey {
+				continue
 			}
-		}
-		queryResp = service.PrepareRpcQueryResponse{
-			// TODO ????
+			dataAttributes = append(dataAttributes, iwfidl.KeyValue{
+				Key:   iwfidl.PtrString(k),
+				Value: &v,
+			})
 		}
 
+		attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
+		workflowType := attribute.GetStringValue()
+		workerUrlMemoObj, ok := response.Memos[service.WorkerUrlMemoKey]
+		if ok {
+			// using memo is enough
+			queryToPrepare = false
+		} else {
+			// this means that we cannot use memo to continue, need to fall back to use query
+			s.logger.Warn("workflow attempt to use memo but isn't started with it", tag.WorkflowID(req.WorkflowId))
+		}
+		workerUrl := workerUrlMemoObj.GetData()
+
+		queryResp = service.PrepareRpcQueryResponse{
+			DataObjects:              dataAttributes,
+			SearchAttributes:         searchAttributes,
+			WorkflowStartedTimestamp: response.WorkflowStartedTimestamp,
+			WorkflowRunId:            response.RunId,
+			IwfWorkflowType:          workflowType,
+			IwfWorkerUrl:             workerUrl,
+		}
+	}
+
+	if queryToPrepare {
+		// use query to load, this is expensive. So it tries to avoid if possible
+		err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
+			DataObjectsLoadingPolicy:      req.DataAttributesLoadingPolicy,
+			SearchAttributesLoadingPolicy: req.SearchAttributesLoadingPolicy,
+		})
+		if err != nil {
+			return nil, s.handleError(err)
+		}
 	}
 
 	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(queryResp.IwfWorkerUrl)
@@ -448,12 +414,11 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			WorkflowRunId:            queryResp.WorkflowRunId,
 			WorkflowStartedTimestamp: queryResp.WorkflowStartedTimestamp,
 		},
-		WorkflowType:         queryResp.IwfWorkflowType,
-		RpcName:              req.RpcName,
-		Input:                req.Input,
-		CachedDataAttributes: queryResp.CachedDataObjects,
-		SearchAttributes:     queryResp.SearchAttributes,
-		DataAttributes:       queryResp.DataObjects,
+		WorkflowType:     queryResp.IwfWorkflowType,
+		RpcName:          req.RpcName,
+		Input:            req.Input,
+		SearchAttributes: queryResp.SearchAttributes,
+		DataAttributes:   queryResp.DataObjects,
 	}
 	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
 	if checkHttpError(err, httpResp) {
@@ -497,11 +462,6 @@ func checkPersistenceLoadingPolicy(req iwfidl.WorkflowRpcRequest) error {
 	}
 	if req.DataAttributesLoadingPolicy != nil {
 		if err := doCheckPersistenceLoadingPolicy(req.DataAttributesLoadingPolicy); err != nil {
-			return err
-		}
-	}
-	if req.CachedDataAttributesLoadingPolicy != nil {
-		if err := doCheckPersistenceLoadingPolicy(req.CachedDataAttributesLoadingPolicy); err != nil {
 			return err
 		}
 	}

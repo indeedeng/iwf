@@ -176,23 +176,6 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	return
 }
 
-func (h *handler) apiV1WorkflowGetPersistenceData(c *gin.Context) {
-	var req iwfidl.WorkflowGetPersistenceDataRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		invalidRequestSchema(c)
-		return
-	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
-
-	resp, errResp := h.svc.ApiV1WorkflowGetPersistenceDataPost(c.Request.Context(), req)
-	if errResp != nil {
-		h.processError(c, errResp)
-		return
-	}
-	c.JSON(http.StatusOK, resp)
-	return
-}
-
 func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 	var req iwfidl.WorkflowGetSearchAttributesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

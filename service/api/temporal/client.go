@@ -40,14 +40,6 @@ func (t *temporalClient) Close() {
 	t.tClient.Close()
 }
 
-func (t *temporalClient) encryptMemo(obj iwfidl.EncodedObject) (*commonpb.Payload, error) {
-	return t.dataConverter.ToPayload(obj)
-}
-
-func (t *temporalClient) decryptMemo(payload *commonpb.Payload, valuePtr interface{}) error {
-	return t.dataConverter.FromPayload(payload, valuePtr)
-}
-
 func (t *temporalClient) IsWorkflowAlreadyStartedError(err error) bool {
 	return realtemporal.IsWorkflowExecutionAlreadyStartedError(err)
 }
@@ -79,11 +71,17 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 }
 
 func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+	memo, err := t.encryptMemoIfNeeded(options.Memo)
+	if err != nil {
+		return "", err
+	}
+
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                                       options.ID,
 		TaskQueue:                                options.TaskQueue,
 		WorkflowExecutionTimeout:                 options.WorkflowExecutionTimeout,
 		SearchAttributes:                         options.SearchAttributes,
+		Memo:                                     memo,
 		WorkflowExecutionErrorWhenAlreadyStarted: true,
 	}
 
@@ -176,17 +174,35 @@ func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflow
 		return nil, err
 	}
 
-	memo, err := t.getMemo(resp.GetWorkflowExecutionInfo().GetMemo())
+	memo, err := t.getMemoAndDecryptIfNeeded(resp.GetWorkflowExecutionInfo().GetMemo())
 
 	return &api.DescribeWorkflowExecutionResponse{
-		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
-		Status:           status,
-		SearchAttributes: searchAttributes,
-		Memos:            memo,
+		RunId:                    resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		Status:                   status,
+		SearchAttributes:         searchAttributes,
+		Memos:                    memo,
+		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().Unix(),
 	}, err
 }
 
-func (t *temporalClient) getMemo(memo *common.Memo) (map[string]iwfidl.EncodedObject, error) {
+func (t *temporalClient) encryptMemoIfNeeded(rawMemo map[string]interface{}) (map[string]interface{}, error) {
+	if !t.memoEncryption || rawMemo == nil {
+		return rawMemo, nil
+	}
+
+	out := map[string]interface{}{}
+	for k, v := range rawMemo {
+
+		pl, err := t.dataConverter.ToPayload(v)
+		if err != nil {
+			return nil, err
+		}
+		out[k] = pl
+	}
+	return out, nil
+}
+
+func (t *temporalClient) getMemoAndDecryptIfNeeded(memo *common.Memo) (map[string]iwfidl.EncodedObject, error) {
 	if memo == nil || len(memo.GetFields()) == 0 {
 		return nil, nil
 	}
@@ -202,7 +218,7 @@ func (t *temporalClient) getMemo(memo *common.Memo) (map[string]iwfidl.EncodedOb
 			}
 
 			var value iwfidl.EncodedObject
-			err = t.decryptMemo(&encryptedPayload, &value)
+			err = t.dataConverter.FromPayload(&encryptedPayload, &value)
 			if err != nil {
 				return nil, err
 			}

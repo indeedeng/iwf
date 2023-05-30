@@ -18,6 +18,8 @@ type (
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
+		UseMemoForDataAttributes bool `json:"useMemoForDataAttributes"`
+
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
 		// IsResumeFromContinueAsNew indicate this is input for continueAsNew
@@ -67,7 +69,6 @@ type (
 
 	PrepareRpcQueryResponse struct {
 		DataObjects              []iwfidl.KeyValue
-		CachedDataObjects        []iwfidl.KeyValue
 		SearchAttributes         []iwfidl.SearchAttribute
 		WorkflowRunId            string
 		WorkflowStartedTimestamp int64

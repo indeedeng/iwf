@@ -22,7 +22,6 @@ type WorkflowConfig struct {
 	DisableSystemSearchAttribute *bool  `json:"disableSystemSearchAttribute,omitempty"`
 	ContinueAsNewThreshold       *int32 `json:"continueAsNewThreshold,omitempty"`
 	ContinueAsNewPageSizeInBytes *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
-	UseMemoForDataAttributes     *bool  `json:"useMemoForDataAttributes,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -138,38 +137,6 @@ func (o *WorkflowConfig) SetContinueAsNewPageSizeInBytes(v int32) {
 	o.ContinueAsNewPageSizeInBytes = &v
 }
 
-// GetUseMemoForDataAttributes returns the UseMemoForDataAttributes field value if set, zero value otherwise.
-func (o *WorkflowConfig) GetUseMemoForDataAttributes() bool {
-	if o == nil || IsNil(o.UseMemoForDataAttributes) {
-		var ret bool
-		return ret
-	}
-	return *o.UseMemoForDataAttributes
-}
-
-// GetUseMemoForDataAttributesOk returns a tuple with the UseMemoForDataAttributes field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowConfig) GetUseMemoForDataAttributesOk() (*bool, bool) {
-	if o == nil || IsNil(o.UseMemoForDataAttributes) {
-		return nil, false
-	}
-	return o.UseMemoForDataAttributes, true
-}
-
-// HasUseMemoForDataAttributes returns a boolean if a field has been set.
-func (o *WorkflowConfig) HasUseMemoForDataAttributes() bool {
-	if o != nil && !IsNil(o.UseMemoForDataAttributes) {
-		return true
-	}
-
-	return false
-}
-
-// SetUseMemoForDataAttributes gets a reference to the given bool and assigns it to the UseMemoForDataAttributes field.
-func (o *WorkflowConfig) SetUseMemoForDataAttributes(v bool) {
-	o.UseMemoForDataAttributes = &v
-}
-
 func (o WorkflowConfig) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -188,9 +155,6 @@ func (o WorkflowConfig) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ContinueAsNewPageSizeInBytes) {
 		toSerialize["continueAsNewPageSizeInBytes"] = o.ContinueAsNewPageSizeInBytes
-	}
-	if !IsNil(o.UseMemoForDataAttributes) {
-		toSerialize["useMemoForDataAttributes"] = o.UseMemoForDataAttributes
 	}
 	return toSerialize, nil
 }
