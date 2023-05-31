@@ -59,7 +59,10 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(backendType)
+	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
+		BackendType:                      backendType,
+		DisableFailAtMemoIncompatibility: true,
+	})
 	defer closeFunc2()
 
 	// start a workflow
@@ -125,11 +128,17 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
 
 	reqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
+	// force to test compatibility of memo
+	useMemo := false
+	if backendType == service.BackendTypeTemporal {
+		useMemo = true
+	}
 	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
 			locking.TestDataObjectKey1,
 		},
+		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

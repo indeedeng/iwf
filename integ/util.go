@@ -60,8 +60,9 @@ func doStartWorkflowWorker(handler common.WorkflowHandler, router *gin.Engine) (
 }
 
 type IwfServiceTestConfig struct {
-	BackendType    service.BackendType
-	MemoEncryption bool
+	BackendType                      service.BackendType
+	MemoEncryption                   bool
+	DisableFailAtMemoIncompatibility bool // default to false so that we will fail at test
 }
 
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
@@ -93,6 +94,7 @@ func startIwfServiceWithClient(backendType service.BackendType) (uclient api.Uni
 //var integTemporalUclientCached api.UnifiedClient
 
 func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.UnifiedClient, closeFunc func()) {
+	failAtMemoIncompatibility := !config.DisableFailAtMemoIncompatibility
 	if config.BackendType == service.BackendTypeTemporal {
 		temporalClient := createTemporalClient()
 		logger, err := loggerimpl.NewDevelopment()
@@ -100,7 +102,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 			panic(err)
 		}
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter(), config.MemoEncryption) // TODO set correct data converter for memo encryption
-		iwfService := api.NewService(testConfig, uclient, logger)
+		iwfService := api.NewService(createTestConfig(failAtMemoIncompatibility), uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -112,7 +114,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue, nil) // TODO set correct data converter for memo encryption
+		interpreter := temporal.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), temporalClient, service.TaskQueue, config.MemoEncryption, converter.GetDefaultDataConverter()) // TODO set correct data converter for memo encryption
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()
@@ -131,7 +133,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 			panic(err)
 		}
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
-		iwfService := api.NewService(testConfig, uclient, logger)
+		iwfService := api.NewService(createTestConfig(failAtMemoIncompatibility), uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -143,7 +145,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(testConfig, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()

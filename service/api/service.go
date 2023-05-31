@@ -417,7 +417,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			}
 			dataAttributes = append(dataAttributes, iwfidl.KeyValue{
 				Key:   iwfidl.PtrString(k),
-				Value: &v,
+				Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
 			})
 		}
 
