@@ -73,9 +73,12 @@ Logically, this workflow definition will have a persistence schema like below:
 | ...                  | ...           |      ...      |         ... |         ... |
 
 ### Use memo for data attributes 
-By default, data attributes are not optimized for high frequent reads on a single workflow execution. 
-You can enable the feature "useMemoForDataAttributes". This is currently only supported if the backend is Temporal, 
-because Cadence doesn't support mutable memo.  
+By default, data attributes is implemented with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
+which is not optimized for very high volume reads on a single workflow execution(like 100 rps), because it could cause
+too many replay with history, especially when workflows are closed.
+
+However, you can enable the feature "useMemoForDataAttributes". This is currently only supported if the backend is Temporal, 
+because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729).  
 
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:

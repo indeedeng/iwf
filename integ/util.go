@@ -101,7 +101,11 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		if err != nil {
 			panic(err)
 		}
-		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, converter.GetDefaultDataConverter(), config.MemoEncryption) // TODO set correct data converter for memo encryption
+		dataConverter := converter.GetDefaultDataConverter()
+		if config.MemoEncryption {
+			dataConverter = encryptionDataConverter
+		}
+		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption)
 		iwfService := api.NewService(createTestConfig(failAtMemoIncompatibility), uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
@@ -114,7 +118,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), temporalClient, service.TaskQueue, config.MemoEncryption, converter.GetDefaultDataConverter()) // TODO set correct data converter for memo encryption
+		interpreter := temporal.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter)
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()
