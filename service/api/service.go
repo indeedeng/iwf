@@ -405,6 +405,9 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		}
 
 		for _, sa := range requestedSAs {
+			if sa.GetKey() == service.SearchAttributeIwfWorkflowType {
+				continue
+			}
 			searchAttribute, exist := response.SearchAttributes[sa.GetKey()]
 			if exist {
 				searchAttributes = append(searchAttributes, searchAttribute)

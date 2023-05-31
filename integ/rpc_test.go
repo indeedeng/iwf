@@ -19,17 +19,7 @@ func TestRpcWorkflowTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeTemporal, nil)
-		smallWaitForFastTest()
-	}
-}
-
-func TestRpcWorkflowCadence(t *testing.T) {
-	if !*cadenceIntegTest {
-		t.Skip()
-	}
-	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeCadence, nil)
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, false, false, nil)
 		smallWaitForFastTest()
 	}
 }
@@ -39,7 +29,37 @@ func TestRpcWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, false, false, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestRpcWorkflowTemporalWithMemo(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, false, nil)
+		smallWaitForFastTest()
+	}
+}
+
+func TestRpcWorkflowTemporalContinueAsNewWithMemo(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestRpcWorkflowCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestRpcWorkflow(t, service.BackendTypeCadence, false, false, nil)
 		smallWaitForFastTest()
 	}
 }
@@ -49,19 +69,22 @@ func TestRpcWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestRpcWorkflow(t, service.BackendTypeCadence, false, false, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
 
-func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, useMemo, memoEncryption bool, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()
 	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(backendType)
+	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
+		BackendType:    backendType,
+		MemoEncryption: memoEncryption,
+	})
 	defer closeFunc2()
 
 	// create client
@@ -83,11 +106,26 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(rpc.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
-			WorkflowConfigOverride: config,
+			WorkflowConfigOverride:   config,
+			UseMemoForDataAttributes: ptr.Any(useMemo),
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
+	allSearchAttributes := []iwfidl.SearchAttributeKeyAndType{
+		{
+			Key:       iwfidl.PtrString(rpc.TestSearchAttributeKeywordKey),
+			ValueType: iwfidl.KEYWORD.Ptr(),
+		},
+		{
+			Key:       iwfidl.PtrString(rpc.TestSearchAttributeIntKey),
+			ValueType: iwfidl.INT.Ptr(),
+		},
+		{
+			Key:       iwfidl.PtrString(rpc.TestSearchAttributeBoolKey),
+			ValueType: iwfidl.BOOL.Ptr(),
+		},
+	}
 	time.Sleep(time.Second * 1)
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	rpcRespReadOnly, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
@@ -100,7 +138,9 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 				rpc.TestSearchAttributeIntKey,
 			},
 		},
-		TimeoutSeconds: iwfidl.PtrInt32(2),
+		TimeoutSeconds:           iwfidl.PtrInt32(2),
+		UseMemoForDataAttributes: ptr.Any(useMemo),
+		SearchAttributes:         allSearchAttributes,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
@@ -115,7 +155,9 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 				rpc.TestSearchAttributeIntKey,
 			},
 		},
-		TimeoutSeconds: iwfidl.PtrInt32(2),
+		TimeoutSeconds:           iwfidl.PtrInt32(2),
+		UseMemoForDataAttributes: ptr.Any(useMemo),
+		SearchAttributes:         allSearchAttributes,
 	}).Execute()
 	assertions.NotNil(err)
 	assertions.Equalf(service.HttpStatusCodeWorkerApiError, httpResp.StatusCode, "http code")
@@ -142,7 +184,9 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, config *iw
 				rpc.TestSearchAttributeIntKey,
 			},
 		},
-		TimeoutSeconds: iwfidl.PtrInt32(2),
+		TimeoutSeconds:           iwfidl.PtrInt32(2),
+		UseMemoForDataAttributes: ptr.Any(useMemo),
+		SearchAttributes:         allSearchAttributes,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
