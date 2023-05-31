@@ -166,10 +166,13 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(ctx UnifiedContext, a
 }
 
 func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attributes []iwfidl.KeyValue) error {
+	if len(attributes) == 0 {
+		return nil
+	}
 	for _, attr := range attributes {
 		am.dataObjects[attr.GetKey()] = attr
 	}
-	if am.useMemo && len(attributes) > 0 {
+	if am.useMemo {
 		memo := map[string]iwfidl.EncodedObject{}
 		for _, att := range attributes {
 			memo[att.GetKey()] = att.GetValue()
