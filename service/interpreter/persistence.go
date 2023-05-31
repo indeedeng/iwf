@@ -13,9 +13,11 @@ type PersistenceManager struct {
 
 	lockedDataObjectKeys      map[string]bool
 	lockedSearchAttributeKeys map[string]bool
+
+	useMemo bool
 }
 
-func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute) *PersistenceManager {
+func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute, useMemo bool) *PersistenceManager {
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
 	for _, sa := range initSearchAttributes {
 		searchAttributes[sa.GetKey()] = sa
@@ -27,11 +29,14 @@ func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwf
 
 		lockedDataObjectKeys:      make(map[string]bool),
 		lockedSearchAttributeKeys: make(map[string]bool),
+
+		useMemo: useMemo,
 	}
 }
 
 func RebuildPersistenceManager(provider WorkflowProvider,
 	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
+	useMemo bool,
 ) *PersistenceManager {
 	dataObjects := make(map[string]iwfidl.KeyValue)
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
@@ -49,6 +54,8 @@ func RebuildPersistenceManager(provider WorkflowProvider,
 		// locks will not be carried over during continueAsNew
 		lockedDataObjectKeys:      make(map[string]bool),
 		lockedSearchAttributeKeys: make(map[string]bool),
+
+		useMemo: useMemo,
 	}
 }
 
@@ -158,9 +165,19 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(ctx UnifiedContext, a
 	return am.provider.UpsertSearchAttributes(ctx, attrsToUpsert)
 }
 
-func (am *PersistenceManager) ProcessUpsertDataObject(attributes []iwfidl.KeyValue) error {
+func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attributes []iwfidl.KeyValue) error {
+	if len(attributes) == 0 {
+		return nil
+	}
 	for _, attr := range attributes {
 		am.dataObjects[attr.GetKey()] = attr
+	}
+	if am.useMemo {
+		memo := map[string]iwfidl.EncodedObject{}
+		for _, att := range attributes {
+			memo[att.GetKey()] = att.GetValue()
+		}
+		return am.provider.UpsertMemo(ctx, memo)
 	}
 	return nil
 }

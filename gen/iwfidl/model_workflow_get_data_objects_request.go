@@ -19,9 +19,10 @@ var _ MappedNullable = &WorkflowGetDataObjectsRequest{}
 
 // WorkflowGetDataObjectsRequest struct for WorkflowGetDataObjectsRequest
 type WorkflowGetDataObjectsRequest struct {
-	WorkflowId    string   `json:"workflowId"`
-	WorkflowRunId *string  `json:"workflowRunId,omitempty"`
-	Keys          []string `json:"keys,omitempty"`
+	WorkflowId               string   `json:"workflowId"`
+	WorkflowRunId            *string  `json:"workflowRunId,omitempty"`
+	Keys                     []string `json:"keys,omitempty"`
+	UseMemoForDataAttributes *bool    `json:"useMemoForDataAttributes,omitempty"`
 }
 
 // NewWorkflowGetDataObjectsRequest instantiates a new WorkflowGetDataObjectsRequest object
@@ -130,6 +131,38 @@ func (o *WorkflowGetDataObjectsRequest) SetKeys(v []string) {
 	o.Keys = v
 }
 
+// GetUseMemoForDataAttributes returns the UseMemoForDataAttributes field value if set, zero value otherwise.
+func (o *WorkflowGetDataObjectsRequest) GetUseMemoForDataAttributes() bool {
+	if o == nil || IsNil(o.UseMemoForDataAttributes) {
+		var ret bool
+		return ret
+	}
+	return *o.UseMemoForDataAttributes
+}
+
+// GetUseMemoForDataAttributesOk returns a tuple with the UseMemoForDataAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetDataObjectsRequest) GetUseMemoForDataAttributesOk() (*bool, bool) {
+	if o == nil || IsNil(o.UseMemoForDataAttributes) {
+		return nil, false
+	}
+	return o.UseMemoForDataAttributes, true
+}
+
+// HasUseMemoForDataAttributes returns a boolean if a field has been set.
+func (o *WorkflowGetDataObjectsRequest) HasUseMemoForDataAttributes() bool {
+	if o != nil && !IsNil(o.UseMemoForDataAttributes) {
+		return true
+	}
+
+	return false
+}
+
+// SetUseMemoForDataAttributes gets a reference to the given bool and assigns it to the UseMemoForDataAttributes field.
+func (o *WorkflowGetDataObjectsRequest) SetUseMemoForDataAttributes(v bool) {
+	o.UseMemoForDataAttributes = &v
+}
+
 func (o WorkflowGetDataObjectsRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -146,6 +179,9 @@ func (o WorkflowGetDataObjectsRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Keys) {
 		toSerialize["keys"] = o.Keys
+	}
+	if !IsNil(o.UseMemoForDataAttributes) {
+		toSerialize["useMemoForDataAttributes"] = o.UseMemoForDataAttributes
 	}
 	return toSerialize, nil
 }

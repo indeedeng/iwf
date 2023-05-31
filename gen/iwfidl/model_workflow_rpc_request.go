@@ -19,13 +19,15 @@ var _ MappedNullable = &WorkflowRpcRequest{}
 
 // WorkflowRpcRequest struct for WorkflowRpcRequest
 type WorkflowRpcRequest struct {
-	WorkflowId                    string                    `json:"workflowId"`
-	WorkflowRunId                 *string                   `json:"workflowRunId,omitempty"`
-	RpcName                       string                    `json:"rpcName"`
-	Input                         *EncodedObject            `json:"input,omitempty"`
-	SearchAttributesLoadingPolicy *PersistenceLoadingPolicy `json:"searchAttributesLoadingPolicy,omitempty"`
-	DataAttributesLoadingPolicy   *PersistenceLoadingPolicy `json:"dataAttributesLoadingPolicy,omitempty"`
-	TimeoutSeconds                *int32                    `json:"timeoutSeconds,omitempty"`
+	WorkflowId                    string                      `json:"workflowId"`
+	WorkflowRunId                 *string                     `json:"workflowRunId,omitempty"`
+	RpcName                       string                      `json:"rpcName"`
+	Input                         *EncodedObject              `json:"input,omitempty"`
+	SearchAttributesLoadingPolicy *PersistenceLoadingPolicy   `json:"searchAttributesLoadingPolicy,omitempty"`
+	DataAttributesLoadingPolicy   *PersistenceLoadingPolicy   `json:"dataAttributesLoadingPolicy,omitempty"`
+	TimeoutSeconds                *int32                      `json:"timeoutSeconds,omitempty"`
+	UseMemoForDataAttributes      *bool                       `json:"useMemoForDataAttributes,omitempty"`
+	SearchAttributes              []SearchAttributeKeyAndType `json:"searchAttributes,omitempty"`
 }
 
 // NewWorkflowRpcRequest instantiates a new WorkflowRpcRequest object
@@ -255,6 +257,70 @@ func (o *WorkflowRpcRequest) SetTimeoutSeconds(v int32) {
 	o.TimeoutSeconds = &v
 }
 
+// GetUseMemoForDataAttributes returns the UseMemoForDataAttributes field value if set, zero value otherwise.
+func (o *WorkflowRpcRequest) GetUseMemoForDataAttributes() bool {
+	if o == nil || IsNil(o.UseMemoForDataAttributes) {
+		var ret bool
+		return ret
+	}
+	return *o.UseMemoForDataAttributes
+}
+
+// GetUseMemoForDataAttributesOk returns a tuple with the UseMemoForDataAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowRpcRequest) GetUseMemoForDataAttributesOk() (*bool, bool) {
+	if o == nil || IsNil(o.UseMemoForDataAttributes) {
+		return nil, false
+	}
+	return o.UseMemoForDataAttributes, true
+}
+
+// HasUseMemoForDataAttributes returns a boolean if a field has been set.
+func (o *WorkflowRpcRequest) HasUseMemoForDataAttributes() bool {
+	if o != nil && !IsNil(o.UseMemoForDataAttributes) {
+		return true
+	}
+
+	return false
+}
+
+// SetUseMemoForDataAttributes gets a reference to the given bool and assigns it to the UseMemoForDataAttributes field.
+func (o *WorkflowRpcRequest) SetUseMemoForDataAttributes(v bool) {
+	o.UseMemoForDataAttributes = &v
+}
+
+// GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
+func (o *WorkflowRpcRequest) GetSearchAttributes() []SearchAttributeKeyAndType {
+	if o == nil || IsNil(o.SearchAttributes) {
+		var ret []SearchAttributeKeyAndType
+		return ret
+	}
+	return o.SearchAttributes
+}
+
+// GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowRpcRequest) GetSearchAttributesOk() ([]SearchAttributeKeyAndType, bool) {
+	if o == nil || IsNil(o.SearchAttributes) {
+		return nil, false
+	}
+	return o.SearchAttributes, true
+}
+
+// HasSearchAttributes returns a boolean if a field has been set.
+func (o *WorkflowRpcRequest) HasSearchAttributes() bool {
+	if o != nil && !IsNil(o.SearchAttributes) {
+		return true
+	}
+
+	return false
+}
+
+// SetSearchAttributes gets a reference to the given []SearchAttributeKeyAndType and assigns it to the SearchAttributes field.
+func (o *WorkflowRpcRequest) SetSearchAttributes(v []SearchAttributeKeyAndType) {
+	o.SearchAttributes = v
+}
+
 func (o WorkflowRpcRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -281,6 +347,12 @@ func (o WorkflowRpcRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.TimeoutSeconds) {
 		toSerialize["timeoutSeconds"] = o.TimeoutSeconds
+	}
+	if !IsNil(o.UseMemoForDataAttributes) {
+		toSerialize["useMemoForDataAttributes"] = o.UseMemoForDataAttributes
+	}
+	if !IsNil(o.SearchAttributes) {
+		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
 	return toSerialize, nil
 }

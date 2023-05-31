@@ -3,7 +3,9 @@ package temporal
 import (
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/client"
+	"go.temporal.io/sdk/converter"
 	"go.temporal.io/sdk/worker"
 	"log"
 )
@@ -14,8 +16,9 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string) *InterpreterWorker {
-	interpreter.SetSharedConfig(config)
+func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool, memoEncryptionConverter converter.DataConverter) *InterpreterWorker {
+	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter)
+
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
 		taskQueue:      taskQueue,
@@ -28,7 +31,7 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	config := interpreter.GetSharedConfig()
+	config := env.GetSharedConfig()
 	options := worker.Options{
 		MaxConcurrentActivityTaskPollers: 10,
 		// TODO: this cannot be too small otherwise the persistence_test for continueAsNew will fail, probably a bug in Temporal goSDK.

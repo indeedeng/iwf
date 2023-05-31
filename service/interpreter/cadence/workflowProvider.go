@@ -1,6 +1,8 @@
 package cadence
 
 import (
+	"fmt"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
@@ -47,6 +49,10 @@ func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext
 		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
+}
+
+func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, memo map[string]iwfidl.EncodedObject) error {
+	return fmt.Errorf("upsert memo is not supported in Cadence")
 }
 
 func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Duration) interpreter.Future {

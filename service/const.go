@@ -30,11 +30,14 @@ const (
 	BackendTypeCadence  BackendType = "cadence"
 	BackendTypeTemporal BackendType = "temporal"
 
-	IwfSystemSignalPrefix         = "__IwfSystem_"
-	SkipTimerSignalChannelName    = IwfSystemSignalPrefix + "SkipTimerChannel"
-	FailWorkflowSignalChannelName = IwfSystemSignalPrefix + "FailWorkflowChannel"
-	UpdateConfigSignalChannelName = IwfSystemSignalPrefix + "UpdateWorkflowConfig"
-	ExecuteRpcSignalChannelName   = IwfSystemSignalPrefix + "ExecuteRpc"
+	IwfSystemConstPrefix = "__IwfSystem_"
+
+	SkipTimerSignalChannelName    = IwfSystemConstPrefix + "SkipTimerChannel"
+	FailWorkflowSignalChannelName = IwfSystemConstPrefix + "FailWorkflowChannel"
+	UpdateConfigSignalChannelName = IwfSystemConstPrefix + "UpdateWorkflowConfig"
+	ExecuteRpcSignalChannelName   = IwfSystemConstPrefix + "ExecuteRpc"
+
+	WorkerUrlMemoKey = IwfSystemConstPrefix + "WorkerUrl"
 )
 
 var ValidIwfSystemSignalNames = map[string]bool{

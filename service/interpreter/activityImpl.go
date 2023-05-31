@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"io/ioutil"
 	"net/http"
 )
@@ -152,7 +153,7 @@ func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, 
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternal", "input", req)
 
-	apiAddress := config.GetApiServiceAddressWithDefault(GetSharedConfig())
+	apiAddress := config.GetApiServiceAddressWithDefault(env.GetSharedConfig())
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{

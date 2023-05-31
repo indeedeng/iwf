@@ -126,7 +126,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 			}
 			if received {
 				continueAsNewCounter.IncSignalsReceived()
-				_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
+				_ = sr.persistenceManager.ProcessUpsertDataObject(ctx, val.UpsertDataObjects)
 				_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 				sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
 				if val.StateDecision != nil {
@@ -146,7 +146,7 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 				unhandledSigs := provider.GetUnhandledSignalNames(ctx)
 
 				for _, sigName := range unhandledSigs {
-					if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
+					if strings.HasPrefix(sigName, service.IwfSystemConstPrefix) {
 						// skip this because it will be processed in a different thread
 						if !service.ValidIwfSystemSignalNames[sigName] {
 							provider.GetLogger(ctx).Error("found an invalid system signal", sigName)
@@ -225,7 +225,7 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 	}
 
 	for _, sigName := range unhandledSigs {
-		if strings.HasPrefix(sigName, service.IwfSystemSignalPrefix) {
+		if strings.HasPrefix(sigName, service.IwfSystemConstPrefix) {
 			if service.ValidIwfSystemSignalNames[sigName] {
 
 				sr.provider.GetLogger(ctx).Info("found a valid system signal before continueAsNew to carry over", sigName)
@@ -269,7 +269,7 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 						val := service.ExecuteRpcSignalRequest{}
 						ok := ch.ReceiveAsync(&val)
 						if ok {
-							_ = sr.persistenceManager.ProcessUpsertDataObject(val.UpsertDataObjects)
+							_ = sr.persistenceManager.ProcessUpsertDataObject(ctx, val.UpsertDataObjects)
 							_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 							sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
 							if val.StateDecision != nil {

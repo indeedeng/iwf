@@ -18,6 +18,8 @@ type (
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
+		UseMemoForDataAttributes bool `json:"useMemoForDataAttributes"`
+
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
 		// IsResumeFromContinueAsNew indicate this is input for continueAsNew
@@ -60,8 +62,9 @@ type (
 	}
 
 	PrepareRpcQueryRequest struct {
-		DataObjectsLoadingPolicy      *iwfidl.PersistenceLoadingPolicy
-		SearchAttributesLoadingPolicy *iwfidl.PersistenceLoadingPolicy
+		DataObjectsLoadingPolicy       *iwfidl.PersistenceLoadingPolicy
+		CachedDataObjectsLoadingPolicy *iwfidl.PersistenceLoadingPolicy
+		SearchAttributesLoadingPolicy  *iwfidl.PersistenceLoadingPolicy
 	}
 
 	PrepareRpcQueryResponse struct {

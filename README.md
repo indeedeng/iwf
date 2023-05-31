@@ -72,6 +72,13 @@ Logically, this workflow definition will have a persistence schema like below:
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
+### Use memo for data attributes 
+By default, data attributes is implemented with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
+which is not optimized for very high volume reads on a single workflow execution(like 100 rps), because it could cause
+too many replay with history, especially when workflows are closed.
+
+However, you can enable the feature "useMemoForDataAttributes". This is currently only supported if the backend is Temporal, 
+because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729).  
 
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:
@@ -316,7 +323,8 @@ exception/error.
 Though iWF can be used for a very wide range of use case even just CRUD, iWF is NOT for everything. It is not suitable for use cases like:
 
 * High performance transaction( e.g. within 10ms)
-* High throughput for a single object(like a single record in database) for hot partition issue
+* High frequent writes on a single workflow execution(like a single record in database) for hot partition issue
+  * High frequent reads on a single workflow execution is okay if using memo for data attributes
 * Join operation across different workflows
 * Transaction for operation across multiple workflows
 

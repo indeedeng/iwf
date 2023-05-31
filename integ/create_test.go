@@ -58,7 +58,7 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
 	defer closeFunc1()
 
-	uclient, closeFunc2 := doStartIwfServiceWithClient(backendType)
+	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
 	defer closeFunc2()
 
 	// create client

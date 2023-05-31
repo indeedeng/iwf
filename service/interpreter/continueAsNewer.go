@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"strings"
 	"time"
 )
@@ -49,7 +50,7 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 			MaximumIntervalSeconds: iwfidl.PtrInt32(5),
 		},
 	}
-	config := GetSharedConfig()
+	config := env.GetSharedConfig()
 	if config.Interpreter.InterpreterActivityConfig.DumpWorkflowInternalActivityConfig != nil {
 		activityConfig := config.Interpreter.InterpreterActivityConfig.DumpWorkflowInternalActivityConfig
 		activityOptions.StartToCloseTimeout = activityConfig.StartToCloseTimeout

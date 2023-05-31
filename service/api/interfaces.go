@@ -55,6 +55,7 @@ type StartWorkflowOptions struct {
 	CronSchedule             *string
 	RetryPolicy              *iwfidl.WorkflowRetryPolicy
 	SearchAttributes         map[string]interface{}
+	Memo                     map[string]interface{}
 }
 
 type ListWorkflowExecutionsRequest struct {
@@ -69,7 +70,9 @@ type ListWorkflowExecutionsResponse struct {
 }
 
 type DescribeWorkflowExecutionResponse struct {
-	Status           iwfidl.WorkflowStatus
-	RunId            string
-	SearchAttributes map[string]iwfidl.SearchAttribute
+	Status                   iwfidl.WorkflowStatus
+	RunId                    string
+	SearchAttributes         map[string]iwfidl.SearchAttribute
+	Memos                    map[string]iwfidl.EncodedObject
+	WorkflowStartedTimestamp int64
 }

@@ -2,9 +2,11 @@ package temporal
 
 import (
 	"errors"
+	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
 	"time"
@@ -48,6 +50,31 @@ func (w *workflowProvider) UpsertSearchAttributes(ctx interpreter.UnifiedContext
 		panic("cannot convert to temporal workflow context")
 	}
 	return workflow.UpsertSearchAttributes(wfCtx, attributes)
+}
+
+func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo map[string]iwfidl.EncodedObject) error {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+
+	memo := map[string]interface{}{}
+	dataConverter, shouldEncrypt := env.CheckAndGetTemporalMemoEncryptionDataConverter()
+	if shouldEncrypt {
+		for k, v := range rawMemo {
+			pl, err := dataConverter.ToPayload(v)
+			if err != nil {
+				return err
+			}
+			memo[k] = pl
+		}
+	} else {
+		for k, v := range rawMemo {
+			memo[k] = v
+		}
+	}
+
+	return workflow.UpsertMemo(wfCtx, memo)
 }
 
 func (w *workflowProvider) NewTimer(ctx interpreter.UnifiedContext, d time.Duration) interpreter.Future {

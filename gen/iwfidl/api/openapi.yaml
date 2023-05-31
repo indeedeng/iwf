@@ -213,6 +213,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
+        "420":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: RPC execution error
       summary: execute an RPC of a workflow
   /api/v1/workflow/timer/skip:
     post:
@@ -582,6 +588,7 @@ components:
           - stringArrayValue
           key: key
         workflowIDReusePolicy: null
+        useMemoForDataAttributes: true
         cronSchedule: cronSchedule
       properties:
         workflowIDReusePolicy:
@@ -598,6 +605,8 @@ components:
           $ref: '#/components/schemas/WorkflowConfig'
         idReusePolicy:
           $ref: '#/components/schemas/IDReusePolicy'
+        useMemoForDataAttributes:
+          type: boolean
       type: object
     WorkflowIDReusePolicy:
       enum:
@@ -773,6 +782,7 @@ components:
             - stringArrayValue
             key: key
           workflowIDReusePolicy: null
+          useMemoForDataAttributes: true
           cronSchedule: cronSchedule
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
@@ -859,6 +869,7 @@ components:
         keys:
         - keys
         - keys
+        useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -870,6 +881,8 @@ components:
           items:
             type: string
           type: array
+        useMemoForDataAttributes:
+          type: boolean
       required:
       - workflowId
       type: object
@@ -1279,6 +1292,12 @@ components:
           - partialLoadingKeys
           persistenceLoadingType: null
         timeoutSeconds: 0
+        searchAttributes:
+        - valueType: null
+          key: key
+        - valueType: null
+          key: key
+        useMemoForDataAttributes: true
         workflowRunId: workflowRunId
         rpcName: rpcName
         workflowId: workflowId
@@ -1305,6 +1324,12 @@ components:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
         timeoutSeconds:
           type: integer
+        useMemoForDataAttributes:
+          type: boolean
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttributeKeyAndType'
+          type: array
       required:
       - rpcName
       - workflowId

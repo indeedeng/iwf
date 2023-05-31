@@ -58,7 +58,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 
 		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
-		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes)
+		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
@@ -71,7 +71,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	} else {
 		interStateChannel = NewInterStateChannel()
 		stateRequestQueue = NewStateRequestQueue()
-		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes)
+		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
@@ -428,7 +428,7 @@ func executeState(
 		if err != nil {
 			return nil, service.FailureStateExecutionStatus, err
 		}
-		err = persistenceManager.ProcessUpsertDataObject(startResponse.GetUpsertDataObjects())
+		err = persistenceManager.ProcessUpsertDataObject(ctx, startResponse.GetUpsertDataObjects())
 		if err != nil {
 			return nil, service.FailureStateExecutionStatus, err
 		}
@@ -659,7 +659,7 @@ func executeStateDecide(
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
 	}
-	err = persistenceManager.ProcessUpsertDataObject(decideResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataObject(ctx, decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
 	}
