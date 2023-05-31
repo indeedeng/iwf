@@ -144,11 +144,13 @@ func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, us
 		Keys: []string{
 			persistence.TestDataObjectKey,
 		},
+		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
 	queryResult2, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
-		WorkflowId: wfId,
+		WorkflowId:               wfId,
+		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 

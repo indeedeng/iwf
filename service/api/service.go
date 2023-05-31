@@ -188,7 +188,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, r
 			}
 			dataAttributes = append(dataAttributes, iwfidl.KeyValue{
 				Key:   iwfidl.PtrString(k),
-				Value: &v,
+				Value: ptr.Any(v),
 			})
 		}
 
