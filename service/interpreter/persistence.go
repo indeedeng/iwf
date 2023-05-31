@@ -169,7 +169,7 @@ func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attrib
 	for _, attr := range attributes {
 		am.dataObjects[attr.GetKey()] = attr
 	}
-	if am.useMemo {
+	if am.useMemo && len(attributes) > 0 {
 		memo := map[string]iwfidl.EncodedObject{}
 		for _, att := range attributes {
 			memo[att.GetKey()] = att.GetValue()

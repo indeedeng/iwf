@@ -112,7 +112,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue, converter.GetDefaultDataConverter()) // TODO set correct data converter for memo encryption
+		interpreter := temporal.NewInterpreterWorker(testConfig, temporalClient, service.TaskQueue, nil) // TODO set correct data converter for memo encryption
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()

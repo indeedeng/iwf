@@ -16,8 +16,8 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, dataConverter converter.DataConverter) *InterpreterWorker {
-	env.SetSharedEnv(config, dataConverter)
+func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryptionConverter converter.DataConverter) *InterpreterWorker {
+	env.SetSharedEnv(config, memoEncryptionConverter)
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
 		taskQueue:      taskQueue,

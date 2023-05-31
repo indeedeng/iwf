@@ -165,7 +165,7 @@ func launchTemporalService(svcName string, config config.Config, unifiedClient a
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, converter.GetDefaultDataConverter())
+		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, nil)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)

@@ -13,15 +13,16 @@ var sharedConfig config.Config
 
 var temporalDataConverter converter.DataConverter
 
-func SetSharedEnv(config config.Config, dataConverter converter.DataConverter) {
+func SetSharedEnv(config config.Config, temporalMemoEncryptionDataConverter converter.DataConverter) {
 	sharedConfig = config
-	temporalDataConverter = dataConverter
+	temporalDataConverter = temporalMemoEncryptionDataConverter
 }
 
 func GetSharedConfig() config.Config {
 	return sharedConfig
 }
 
-func GetTemporalDataConverter() converter.DataConverter {
-	return temporalDataConverter
+func CheckAndGetTemporalMemoEncryptionDataConverter() (converter.DataConverter, bool) {
+	exists := temporalDataConverter != nil
+	return temporalDataConverter, exists
 }

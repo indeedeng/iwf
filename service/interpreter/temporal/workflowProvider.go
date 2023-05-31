@@ -15,13 +15,11 @@ import (
 type workflowProvider struct {
 	threadCount        int
 	pendingThreadNames map[string]int
-	memoEncryption     bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
 }
 
-func newTemporalWorkflowProvider(memoEncryption bool) interpreter.WorkflowProvider {
+func newTemporalWorkflowProvider() interpreter.WorkflowProvider {
 	return &workflowProvider{
 		pendingThreadNames: map[string]int{},
-		memoEncryption:     memoEncryption,
 	}
 }
 
@@ -61,10 +59,10 @@ func (w *workflowProvider) UpsertMemo(ctx interpreter.UnifiedContext, rawMemo ma
 	}
 
 	memo := map[string]interface{}{}
-	if w.memoEncryption {
+	dataConverter, shouldEncrypt := env.CheckAndGetTemporalMemoEncryptionDataConverter()
+	if shouldEncrypt {
 		for k, v := range rawMemo {
-
-			pl, err := env.GetTemporalDataConverter().ToPayload(v)
+			pl, err := dataConverter.ToPayload(v)
 			if err != nil {
 				return err
 			}
