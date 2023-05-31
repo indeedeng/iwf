@@ -46,6 +46,16 @@ func TestPersistenceWorkflowTemporalContinueAsNew(t *testing.T) {
 	}
 }
 
+func TestPersistenceWorkflowTemporalContinueAsNewWithMemo(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
 func TestPersistenceWorkflowCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
