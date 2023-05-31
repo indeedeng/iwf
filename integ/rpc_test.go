@@ -44,12 +44,32 @@ func TestRpcWorkflowTemporalWithMemo(t *testing.T) {
 	}
 }
 
+func TestRpcWorkflowTemporalWithMemoAndEncryption(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, true, nil)
+		smallWaitForFastTest()
+	}
+}
+
 func TestRpcWorkflowTemporalContinueAsNewWithMemo(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestRpcWorkflowTemporalContinueAsNewWithMemoAndEncryption(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, true, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }

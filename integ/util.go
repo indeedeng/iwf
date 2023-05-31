@@ -22,10 +22,11 @@ import (
 
 const testNamespace = "default"
 
-func createTemporalClient() client.Client {
+func createTemporalClient(dataConverter converter.DataConverter) client.Client {
 	temporalClient, err := client.Dial(client.Options{
-		HostPort:  *temporalHostPort,
-		Namespace: testNamespace,
+		HostPort:      *temporalHostPort,
+		Namespace:     testNamespace,
+		DataConverter: dataConverter,
 	})
 	if err != nil {
 		log.Fatalf("unable to connect to Temporal %v", err)
@@ -96,14 +97,15 @@ func startIwfServiceWithClient(backendType service.BackendType) (uclient api.Uni
 func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.UnifiedClient, closeFunc func()) {
 	failAtMemoIncompatibility := !config.DisableFailAtMemoIncompatibility
 	if config.BackendType == service.BackendTypeTemporal {
-		temporalClient := createTemporalClient()
-		logger, err := loggerimpl.NewDevelopment()
-		if err != nil {
-			panic(err)
-		}
 		dataConverter := converter.GetDefaultDataConverter()
 		if config.MemoEncryption {
 			dataConverter = encryptionDataConverter
+		}
+
+		temporalClient := createTemporalClient(dataConverter)
+		logger, err := loggerimpl.NewDevelopment()
+		if err != nil {
+			panic(err)
 		}
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption)
 		iwfService := api.NewService(createTestConfig(failAtMemoIncompatibility), uclient, logger)

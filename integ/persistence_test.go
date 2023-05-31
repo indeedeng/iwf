@@ -36,6 +36,16 @@ func TestPersistenceWorkflowTemporalWithMemo(t *testing.T) {
 	}
 }
 
+func TestPersistenceWorkflowTemporalWithMemoAndEncryption(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, true, nil)
+		smallWaitForFastTest()
+	}
+}
+
 func TestPersistenceWorkflowTemporalContinueAsNew(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
@@ -52,6 +62,16 @@ func TestPersistenceWorkflowTemporalContinueAsNewWithMemo(t *testing.T) {
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestPersistenceWorkflowTemporalContinueAsNewWithMemoAndEncryption(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, true, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
