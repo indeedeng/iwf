@@ -41,12 +41,6 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     networks:
       - testing-network
-  redis:
-    image: redis:${REDIS_VERSION}
-    networks:
-      - testing-network
-    expose:
-      - 6379
   cadence:
     image: ubercadence/server:0.24.0-auto-setup
     ports:
