@@ -331,7 +331,8 @@ Though iWF can be used for a very wide range of use case even just CRUD, iWF is 
 
 # Architecture
 
-An iWF application is composed of several iWF workflow workers. These workers host REST APIs as "worker APIs" for server to call. 
+An iWF application is composed of several iWF workflow workers. These workers host REST APIs as "worker APIs" for server to call. This callback pattern similar to AWS Step Functions invoking Lambdas, if you are familiar with.
+
 An application also perform actions on workflow executions, such as starting, stopping, signaling, and retrieving results 
 by calling iWF service APIs as "service APIs".
 
