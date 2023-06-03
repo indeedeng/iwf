@@ -11,7 +11,7 @@
 
 iWF is a platform for developing resilient, fault-tolerant, scalable long-running applications. 
 It offers a convenient abstraction for durable timers, background execution with backoff retry, 
-persistence, indexing, message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
+persistence, caching, indexing, message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
 
 iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
 
@@ -72,13 +72,17 @@ Logically, this workflow definition will have a persistence schema like below:
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
-### Use memo for data attributes 
+### Caching data attributes 
 By default, data attributes is implemented with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
 which is not optimized for very high volume reads on a single workflow execution(like 100 rps), because it could cause
 too many replay with history, especially when workflows are closed.
 
-However, you can enable the feature "useMemoForDataAttributes". This is currently only supported if the backend is Temporal, 
-because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729).  
+However, you can enable the feature "CachingDataAttributesByMemo" to support high volume read in RPC. 
+
+NOTES:
+* This is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
+* The read after write will become eventual consistent, unless set bypassCachingForStrongConsistency=true in RPC
+* This is for improving read only. High volume writes on a single workflow are still not supported. Users must ensure writes are distributed across different workflow executions to avoid hot partitions. 
 
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:
