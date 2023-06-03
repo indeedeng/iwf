@@ -72,17 +72,17 @@ Logically, this workflow definition will have a persistence schema like below:
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
-### Caching data attributes 
-By default, data attributes is implemented with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
-which is not optimized for very high volume reads on a single workflow execution(like 100 rps), because it could cause
+### Caching 
+By default, RPC will load data/search attributes with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
+which is not optimized for very high volume requests on a single workflow execution(like 100 rps), because it could cause
 too many replay with history, especially when workflows are closed.
 
-However, you can enable the feature "CachingDataAttributesByMemo" to support high volume read in RPC. 
+However, you can enable the feature "CachingPersistenceByMemo" to support high volume read in readonly-RPC. 
 
 NOTES:
-* This is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
-* The read after write will become eventual consistent, unless set bypassCachingForStrongConsistency=true in RPC
-* This is for improving read only. High volume writes on a single workflow are still not supported. Users must ensure writes are distributed across different workflow executions to avoid hot partitions. 
+* The read after write will become eventual consistent, unless set bypassCachingForStrongConsistency=true in RPC options
+* Caching is only useful for read-only RPC(no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
+* This feature is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
 
 ## Workflow State
 A workflow state is like “a small workflow” of 1~2 steps:
