@@ -11,7 +11,7 @@
 
 iWF is a platform for developing resilient, fault-tolerant, scalable long-running applications. 
 It offers a convenient abstraction for durable timers, background execution with backoff retry, 
-persistence, caching, indexing, message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
+customized persisted data(with optional caching, indexing), message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
 
 iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
 
