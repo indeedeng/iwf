@@ -36,14 +36,14 @@ User application creates ObjectWorkflow by implementing the Workflow interface, 
 or [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go).
 An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
 
-| Name             | Description                                                                                                                                          | 
-|:-----------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------| 
-| Data Attribute   | Persistence field to storing data                                                                                                                    | 
-| Search Attribute | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                   | 
-| Signal Channel   | Asynchronous message queue for the workflow object to receive message from external                                                                  |
-| Internal Channel | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                       |
-| Workflow State   | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute with default infinite retry |
-| RPC              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution         |
+| Name                                                                     | Description                                                                                                                                          | 
+|:-------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------| 
+| [Data Attribute](#persistence)                                           | Persistence field to storing data                                                                                                                    | 
+| [Search Attribute](#persistence)                                         | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                   |
+| [Workflow State](#workflow-state)                                        | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute with default infinite retry |
+| [RPC](#rpc)                                                              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution         |
+| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive message from external                                                                  |
+| [Internal Channel](#internalchannel-synchronization-for-multi-threading) | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                       |
 
 A workflow definition can be outlined like this:
 
@@ -58,13 +58,17 @@ Below are the detailed explanation of the concepts.
 They are powerful, also extremely simple to learn and use (as the philosophy of iWF).
 
 ## Persistence
-Both data and search attributes are defined as "persistence schema". 
+
+iWF let you store customized data as a database during the workflow execution. This eliminates the needs of depending on a database to implement your workflow.
+
+The data are stored as data attributes and search attributes. Both are defined as "persistence schema". 
 The schema just defined and maintained in the code along with other business logic.
+
 Search attribute works like infinite indexes in traditional database. You
 only need to specify which attributes should be indexed, without worrying about things in
 a traditional database like the number of indexes, and the order of the fields in an index.
 
-Logically, this workflow definition will have a persistence schema like below:
+Logically, the above workflow definition example will have a persistence schema like below:
 
 | Workflow Execution   | Search Attr A | Search Attr B | Data Attr C | Data Attr D |
 |----------------------|---------------|:-------------:|------------:|------------:|
@@ -72,20 +76,29 @@ Logically, this workflow definition will have a persistence schema like below:
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
+With Search attributes, you can write [customized SQL-like query to find out any workflow executions](https://docs.temporal.io/visibility#search-attribute), just like using a database query.
+
+Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data will be deleted after the retention period.  
+
 ### Caching 
 By default, RPC will load data/search attributes with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
 which is not optimized for very high volume requests on a single workflow execution(like 100 rps), because it could cause
 too many replay with history, especially when workflows are closed.
 
-However, you can enable the feature "CachingPersistenceByMemo" to support high volume read in readonly-RPC. 
+You can enable the caching to support those high volume requests.  
 
 NOTES:
 * The read after write will become eventual consistent, unless set bypassCachingForStrongConsistency=true in RPC options
-* Caching is only useful for read-only RPC(no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
+* Caching will be more useful for read-only RPC(no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
+  * A read-only RPC can still invoke any other RPCs(like calling other microservices, or DB operation) in the RPC implementation
+* It will cost extra event in history (upsertMemo operation for WorkflowPropertiesModified event) for updating the persisted data attributes
 * This feature is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
 
 ## Workflow State
-A workflow state is like “a small workflow” of 1~2 steps:
+WorkflowState is to implement the asynchronous process as "workflow".  
+It will be running in the background, with default infinite backoff retry. 
+ 
+A WorkflowState is like “a small workflow” of 1~2 steps:
 
 **[ waitUntil ] → execute**
 
@@ -140,43 +153,63 @@ The waitUntil API can return multiple commands along with a `CommandWaitingType`
 * `AnyCommandCombinationCompleted`: This option waits for any combination of the commands in a specified list to be
   completed.
 
+### InternalChannel: synchronization for multi threading
+When there are multiple threads of workflow states running in parallel, you may want to let them wait on each other to ensure some ordering.
+
+For example, WorkflowState 1,2,3 needs to be complete before workflow state 4. 
+
+In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages in "waitUntil" API.
+And then WorkflowState 1,2,3 will be publishing one message for each when completing.  
+
 ## RPC
 
-RPC stands for "Remote Procedure Call". It's invoked by client, executed in workflow worker, and then respond back the results to client. 
+RPC stands for "Remote Procedure Call". It's for external system to interact with the workflow execution.
 
-RPC provides a simple and powerful mechansim to interact with external systems. With RPCs defined along with persistence, an ObjectWorkflow 
-works like an durable object that provide methods to execute business logic. You can even uses iWF to implement a typical CRUD application like a 
-blog post, **the pseudo code** looks like this:
+It's invoked by client, executed in workflow worker, and then respond back the results to client. 
+
+RPC can have access to not only persistence read/write API, but also interact with WorkflowStates using InternalChannel, 
+or trigger a new WorkflowState execution in a new thread.   
+
+As an example, you can even uses iWF to implement a [job post system](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/jobpost), 
+which is much more powerful than a typical CRUD application on database:
 
 ```java
-class BlogPost implements ObjectWorkflow{
+class JobPost implements ObjectWorkflow{
     DataAttribute String title;
     DataAttribute String authorName;
     DataAttribute String body;
 
-    @RPC 
-    void updateTitle(String title){
-         this.title = title
-    } 
+    @RPC
+    public void update(Context context, JobInfo input, Persistence persistence, Communication communication) {
+        persistence.setSearchAttributeText(SA_KEY_TITLE, input.getTitle());
+        persistence.setSearchAttributeText(SA_KEY_JOB_DESCRIPTION, input.getDescription());
+
+        persistence.setSearchAttributeInt64(SA_KEY_LAST_UPDATE_TIMESTAMP, System.currentTimeMillis());
+
+        if (input.getNotes().isPresent()) {
+            persistence.setDataAttribute(DA_KEY_NOTES, input.getNotes().get());
+        }
+        communication.triggerStateMovements(
+                StateMovement.create(ExternalUpdateState.class)
+        );
+    }
     
-    @RPC 
-    void updateBody(String body){
-         this.body = body
-    }     
-    
-    ...
-    ... 
-    
-    @RPC 
-    BlobPost get(){
-         return new BlogPost(title, authorName, body);
-    } 
+    @RPC
+    public JobInfo get(Context context, Persistence persistence, Communication communication) {
+        String title = persistence.getSearchAttributeText(SA_KEY_TITLE);
+        String description = persistence.getSearchAttributeText(SA_KEY_JOB_DESCRIPTION);
+        String notes = persistence.getDataAttribute(DA_KEY_NOTES, String.class);
+
+        return ImmutableJobInfo.builder()
+                .title(title)
+                .description(description)
+                .notes(Optional.ofNullable(notes))
+                .build();
+    }
 }
 
 ```
-This is just pseudo code. The real code will look similar depends on which SDK to use. 
 
-See [this example of implementing an CRUD application](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/jobpost), with more capabilities like searching and background execution, just ~100 lines of code. 
 
 ### Atomicity of RPC APIs
 
@@ -204,10 +237,10 @@ They are completely different:
 
 So choose based on the situations/requirements
 
-|                |        Availability        |                                        Latency |                                    Workflow Requirement |
-|----------------|:-------------------------- |:----------------------------------------------- |:-------------------------------------------------------- |
-| Signal Channel |            High            |                                            Low |                     Requires a WorkflowState to process |
-| RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker |                               No WorkflowState required |
+|                |        Availability        |                                        Latency | Workflow Requirement                                     |
+|----------------|:-------------------------- |:----------------------------------------------- |:---------------------------------------------------------|
+| Signal Channel |            High            |                                            Low | Requires a WorkflowState to process                      |
+| RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker | No WorkflowState required                                |
 
 ## Advanced Customization
 
@@ -310,6 +343,9 @@ to specify certain DataAttributes/SearchAttributes only to load.
 done in parallel without locking.
 
 If racing conditions could be a problem, using`PARTIAL_WITH_EXCLUSIVE_LOCK` allows specifying some keys to be locked during the execution.
+
+However, `PARTIAL_WITH_EXCLUSIVE_LOCK` is not supported in RPC yet. The feature is WIP with waiting for the Temporal "update" being production ready.
+As a workaround, RPC can kick off a WorkflowState to update the persistence data using the locking policy.
 
 #### WaitUntil API failure policy
 
