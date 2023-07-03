@@ -19,7 +19,8 @@ var _ MappedNullable = &StateDecision{}
 
 // StateDecision struct for StateDecision
 type StateDecision struct {
-	NextStates []StateMovement `json:"nextStates,omitempty"`
+	NextStates       []StateMovement           `json:"nextStates,omitempty"`
+	ConditionalClose *WorkflowConditionalClose `json:"conditionalClose,omitempty"`
 }
 
 // NewStateDecision instantiates a new StateDecision object
@@ -71,6 +72,38 @@ func (o *StateDecision) SetNextStates(v []StateMovement) {
 	o.NextStates = v
 }
 
+// GetConditionalClose returns the ConditionalClose field value if set, zero value otherwise.
+func (o *StateDecision) GetConditionalClose() WorkflowConditionalClose {
+	if o == nil || IsNil(o.ConditionalClose) {
+		var ret WorkflowConditionalClose
+		return ret
+	}
+	return *o.ConditionalClose
+}
+
+// GetConditionalCloseOk returns a tuple with the ConditionalClose field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *StateDecision) GetConditionalCloseOk() (*WorkflowConditionalClose, bool) {
+	if o == nil || IsNil(o.ConditionalClose) {
+		return nil, false
+	}
+	return o.ConditionalClose, true
+}
+
+// HasConditionalClose returns a boolean if a field has been set.
+func (o *StateDecision) HasConditionalClose() bool {
+	if o != nil && !IsNil(o.ConditionalClose) {
+		return true
+	}
+
+	return false
+}
+
+// SetConditionalClose gets a reference to the given WorkflowConditionalClose and assigns it to the ConditionalClose field.
+func (o *StateDecision) SetConditionalClose(v WorkflowConditionalClose) {
+	o.ConditionalClose = &v
+}
+
 func (o StateDecision) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -83,6 +116,9 @@ func (o StateDecision) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.NextStates) {
 		toSerialize["nextStates"] = o.NextStates
+	}
+	if !IsNil(o.ConditionalClose) {
+		toSerialize["conditionalClose"] = o.ConditionalClose
 	}
 	return toSerialize, nil
 }
