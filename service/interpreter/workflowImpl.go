@@ -170,7 +170,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 					if stateExecStatus == service.CompletedStateExecutionStatus {
 						// NOTE: decision is only available on this CompletedStateExecutionStatus
 
-						canGoNext, gracefulComplete, forceComplete, forceFail, output, err := checkClosingWorkflow(provider, decision, state.GetStateId(), stateExeId)
+						canGoNext, gracefulComplete, forceComplete, forceFail, output, err :=
+							checkClosingWorkflow(ctx, provider, decision, state.GetStateId(), stateExeId, interStateChannel, signalReceiver)
 						if err != nil {
 							errToFailWf = err
 							// no return so that it can fall through to call MarkStateExecutionCompleted
@@ -275,8 +276,47 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 }
 
 func checkClosingWorkflow(
-	provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
+	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
+	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
+	if decision.HasConditionalClose() {
+		conditionClose := decision.ConditionalClose
+		if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY {
+			// trigger a signal draining so that all the signal/internal channel messages are processed
+			// TODO https://github.com/indeedeng/iwf/issues/289
+			// https://github.com/indeedeng/iwf/issues/290
+			// if a messages from internal channel is published via State execution,
+			// we don't do any draining here yet, so the conditional completion could still lose the messages
+			// to workaround, user code will have to use persistence locking
+			signalReceiver.DrainAllUnreceivedSignals(ctx)
+
+			if !internalChannel.HasData(conditionClose.GetChannelName()) {
+				// condition is met, force complete the workflow
+				forceComplete = true
+				completeOutput = &iwfidl.StateCompletionOutput{
+					CompletedStateId:          currentStateId,
+					CompletedStateExecutionId: currentStateExeId,
+					CompletedStateOutput:      conditionClose.CloseInput,
+				}
+				return
+			} else {
+				for _, st := range decision.GetNextStates() {
+					if service.ValidClosingWorkflowStateId[st.GetStateId()] {
+						err = createUserWorkflowError(provider, "invalid ConditionUnmetDecision with stateId: "+st.GetStateId())
+						return
+					}
+				}
+
+				canGoNext = true
+				return
+			}
+		} else {
+			msg := "invalid state decisions. Unsupported ConditionalCloseType " + string(conditionClose.GetConditionalCloseType())
+			err = createUserWorkflowError(provider, msg)
+			return
+		}
+	}
+
 	canGoNext = true
 	systemStateId := false
 	for _, movement := range decision.GetNextStates() {
@@ -323,10 +363,7 @@ func checkClosingWorkflow(
 	}
 	if systemStateId && len(decision.NextStates) > 1 {
 		// Illegal decision
-		err = provider.NewApplicationError(
-			string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
-			"invalid state decisions. Closing workflow decision cannot be combined with other state decisions",
-		)
+		err = createUserWorkflowError(provider, "invalid state decisions. Closing workflow decision cannot be combined with other state decisions")
 		return
 	}
 	return
@@ -693,4 +730,11 @@ func convertStateApiActivityError(provider WorkflowProvider, err error) error {
 
 func getCommandThreadName(prefix string, stateExecId, cmdId string, idx int) string {
 	return fmt.Sprintf("%v-%v-%v-%v", prefix, stateExecId, cmdId, idx)
+}
+
+func createUserWorkflowError(provider WorkflowProvider, message string) error {
+	return provider.NewApplicationError(
+		string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
+		message,
+	)
 }

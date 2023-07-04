@@ -131,6 +131,8 @@ Class | Method | HTTP request | Description
  - [TimerStatus](docs/TimerStatus.md)
  - [WaitUntilApiFailurePolicy](docs/WaitUntilApiFailurePolicy.md)
  - [WorkerErrorResponse](docs/WorkerErrorResponse.md)
+ - [WorkflowConditionalClose](docs/WorkflowConditionalClose.md)
+ - [WorkflowConditionalCloseType](docs/WorkflowConditionalCloseType.md)
  - [WorkflowConfig](docs/WorkflowConfig.md)
  - [WorkflowConfigUpdateRequest](docs/WorkflowConfigUpdateRequest.md)
  - [WorkflowDumpRequest](docs/WorkflowDumpRequest.md)

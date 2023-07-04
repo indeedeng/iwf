@@ -41,6 +41,8 @@ docs/TimerResult.md
 docs/TimerStatus.md
 docs/WaitUntilApiFailurePolicy.md
 docs/WorkerErrorResponse.md
+docs/WorkflowConditionalClose.md
+docs/WorkflowConditionalCloseType.md
 docs/WorkflowConfig.md
 docs/WorkflowConfigUpdateRequest.md
 docs/WorkflowDumpRequest.md
@@ -114,6 +116,8 @@ model_timer_result.go
 model_timer_status.go
 model_wait_until_api_failure_policy.go
 model_worker_error_response.go
+model_workflow_conditional_close.go
+model_workflow_conditional_close_type.go
 model_workflow_config.go
 model_workflow_config_update_request.go
 model_workflow_dump_request.go

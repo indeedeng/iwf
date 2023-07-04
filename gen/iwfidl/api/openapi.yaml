@@ -1568,6 +1568,12 @@ components:
             stateInput:
               data: data
               encoding: encoding
+          conditionalClose:
+            closeInput:
+              data: data
+              encoding: encoding
+            channelName: channelName
+            conditionalCloseType: null
         upsertDataAttributes:
         - value:
             data: data
@@ -1997,6 +2003,12 @@ components:
             stateInput:
               data: data
               encoding: encoding
+          conditionalClose:
+            closeInput:
+              data: data
+              encoding: encoding
+            channelName: channelName
+            conditionalCloseType: null
         publishToInterStateChannel:
         - channelName: channelName
           value:
@@ -2177,12 +2189,41 @@ components:
           stateInput:
             data: data
             encoding: encoding
+        conditionalClose:
+          closeInput:
+            data: data
+            encoding: encoding
+          channelName: channelName
+          conditionalCloseType: null
       properties:
         nextStates:
           items:
             $ref: '#/components/schemas/StateMovement'
           type: array
+        conditionalClose:
+          $ref: '#/components/schemas/WorkflowConditionalClose'
       type: object
+    WorkflowConditionalClose:
+      example:
+        closeInput:
+          data: data
+          encoding: encoding
+        channelName: channelName
+        conditionalCloseType: null
+      properties:
+        conditionalCloseType:
+          $ref: '#/components/schemas/WorkflowConditionalCloseType'
+        channelName:
+          type: string
+        closeInput:
+          $ref: '#/components/schemas/EncodedObject'
+      type: object
+    WorkflowConditionalCloseType:
+      enum:
+      - FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY
+      - FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY
+      - GRACEFUL_COMPLETE_ON_ALL_CHANNELS_EMPTY
+      type: string
     StateMovement:
       example:
         stateId: stateId
