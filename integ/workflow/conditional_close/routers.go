@@ -96,8 +96,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 
-			// wait for a second so that the channel can have a new message
-			time.Sleep(time.Second * 1)
+			context := req.GetContext()
+			if context.GetStateExecutionId() == "S1-1" {
+				// wait for 2 seconds so that the channel can have a new message
+				time.Sleep(time.Second * 2)
+			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{

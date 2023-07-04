@@ -86,10 +86,14 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	// invoke RPCs to send 3 messages to the internal channel
+	// invoke RPC to send 1 messages to the internal channel to unblock the waitUntil
+	// then send another two messages
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	for i := 0; i < 3; i++ {
-		time.Sleep(time.Second * 2)
+		if i != 0 {
+			// wait for a second so that the workflow is in execute state
+			time.Sleep(time.Second)
+		}
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
 			RpcName:    conditionalClose.RpcPublishInternalChannel,
