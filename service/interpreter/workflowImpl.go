@@ -283,7 +283,9 @@ func checkClosingWorkflow(
 		conditionClose := decision.ConditionalClose
 		if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY {
 			// trigger a signal draining so that all the signal/internal channel messages are processed
-			// TODO if a messages from internal channel is published via State execution,
+			// TODO https://github.com/indeedeng/iwf/issues/289
+			// https://github.com/indeedeng/iwf/issues/290
+			// if a messages from internal channel is published via State execution,
 			// we don't do any draining here yet, so the conditional completion could still lose the messages
 			// to workaround, user code will have to use persistence locking
 			signalReceiver.DrainAllUnreceivedSignals(ctx)
