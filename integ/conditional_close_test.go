@@ -86,6 +86,8 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
+	// wait for a second so that query handler is ready for executing PRC
+	time.Sleep(time.Second)
 	// invoke RPC to send 1 messages to the internal channel to unblock the waitUntil
 	// then send another two messages
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())

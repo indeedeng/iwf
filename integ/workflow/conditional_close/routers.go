@@ -98,8 +98,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 			context := req.GetContext()
 			if context.GetStateExecutionId() == "S1-1" {
-				// wait for 2 seconds so that the channel can have a new message
-				time.Sleep(time.Second * 2)
+				// wait for 3 seconds so that the channel can have a new message
+				time.Sleep(time.Second * 3)
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
