@@ -20,12 +20,16 @@ type WorkflowConditionalCloseType string
 
 // List of WorkflowConditionalCloseType
 const (
-	FORCE_COMPLETE_ON_EMPTY_INTERNAL_CHANNEL WorkflowConditionalCloseType = "FORCE_COMPLETE_ON_EMPTY_INTERNAL_CHANNEL"
+	FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY WorkflowConditionalCloseType = "FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY"
+	FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY   WorkflowConditionalCloseType = "FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY"
+	GRACEFUL_COMPLETE_ON_ALL_CHANNELS_EMPTY  WorkflowConditionalCloseType = "GRACEFUL_COMPLETE_ON_ALL_CHANNELS_EMPTY"
 )
 
 // All allowed values of WorkflowConditionalCloseType enum
 var AllowedWorkflowConditionalCloseTypeEnumValues = []WorkflowConditionalCloseType{
-	"FORCE_COMPLETE_ON_EMPTY_INTERNAL_CHANNEL",
+	"FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY",
+	"FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY",
+	"GRACEFUL_COMPLETE_ON_ALL_CHANNELS_EMPTY",
 }
 
 func (v *WorkflowConditionalCloseType) UnmarshalJSON(src []byte) error {

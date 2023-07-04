@@ -5,9 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ConditionalCloseType** | Pointer to [**WorkflowConditionalCloseType**](WorkflowConditionalCloseType.md) |  | [optional] 
-**InternalChannelName** | Pointer to **string** |  | [optional] 
+**ChannelName** | Pointer to **string** |  | [optional] 
 **CloseInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
-**ConditionUnmetDecision** | Pointer to [**[]StateMovement**](StateMovement.md) |  | [optional] 
 
 ## Methods
 
@@ -53,30 +52,30 @@ SetConditionalCloseType sets ConditionalCloseType field to given value.
 
 HasConditionalCloseType returns a boolean if a field has been set.
 
-### GetInternalChannelName
+### GetChannelName
 
-`func (o *WorkflowConditionalClose) GetInternalChannelName() string`
+`func (o *WorkflowConditionalClose) GetChannelName() string`
 
-GetInternalChannelName returns the InternalChannelName field if non-nil, zero value otherwise.
+GetChannelName returns the ChannelName field if non-nil, zero value otherwise.
 
-### GetInternalChannelNameOk
+### GetChannelNameOk
 
-`func (o *WorkflowConditionalClose) GetInternalChannelNameOk() (*string, bool)`
+`func (o *WorkflowConditionalClose) GetChannelNameOk() (*string, bool)`
 
-GetInternalChannelNameOk returns a tuple with the InternalChannelName field if it's non-nil, zero value otherwise
+GetChannelNameOk returns a tuple with the ChannelName field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetInternalChannelName
+### SetChannelName
 
-`func (o *WorkflowConditionalClose) SetInternalChannelName(v string)`
+`func (o *WorkflowConditionalClose) SetChannelName(v string)`
 
-SetInternalChannelName sets InternalChannelName field to given value.
+SetChannelName sets ChannelName field to given value.
 
-### HasInternalChannelName
+### HasChannelName
 
-`func (o *WorkflowConditionalClose) HasInternalChannelName() bool`
+`func (o *WorkflowConditionalClose) HasChannelName() bool`
 
-HasInternalChannelName returns a boolean if a field has been set.
+HasChannelName returns a boolean if a field has been set.
 
 ### GetCloseInput
 
@@ -102,31 +101,6 @@ SetCloseInput sets CloseInput field to given value.
 `func (o *WorkflowConditionalClose) HasCloseInput() bool`
 
 HasCloseInput returns a boolean if a field has been set.
-
-### GetConditionUnmetDecision
-
-`func (o *WorkflowConditionalClose) GetConditionUnmetDecision() []StateMovement`
-
-GetConditionUnmetDecision returns the ConditionUnmetDecision field if non-nil, zero value otherwise.
-
-### GetConditionUnmetDecisionOk
-
-`func (o *WorkflowConditionalClose) GetConditionUnmetDecisionOk() (*[]StateMovement, bool)`
-
-GetConditionUnmetDecisionOk returns a tuple with the ConditionUnmetDecision field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetConditionUnmetDecision
-
-`func (o *WorkflowConditionalClose) SetConditionUnmetDecision(v []StateMovement)`
-
-SetConditionUnmetDecision sets ConditionUnmetDecision field to given value.
-
-### HasConditionUnmetDecision
-
-`func (o *WorkflowConditionalClose) HasConditionUnmetDecision() bool`
-
-HasConditionUnmetDecision returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

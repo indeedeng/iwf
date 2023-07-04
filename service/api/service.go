@@ -493,6 +493,9 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		return nil, s.handleWorkerRpcApiError(err, httpResp)
 	}
 	decision := resp.GetStateDecision()
+	if decision.HasConditionalClose() {
+		return nil, s.handleError(fmt.Errorf("closing workflow in RPC is not supported yet"))
+	}
 	for _, st := range decision.GetNextStates() {
 		if service.ValidClosingWorkflowStateId[st.GetStateId()] {
 			// TODO this need more work in workflow to support

@@ -19,10 +19,9 @@ var _ MappedNullable = &WorkflowConditionalClose{}
 
 // WorkflowConditionalClose struct for WorkflowConditionalClose
 type WorkflowConditionalClose struct {
-	ConditionalCloseType   *WorkflowConditionalCloseType `json:"conditionalCloseType,omitempty"`
-	InternalChannelName    *string                       `json:"internalChannelName,omitempty"`
-	CloseInput             *EncodedObject                `json:"closeInput,omitempty"`
-	ConditionUnmetDecision []StateMovement               `json:"conditionUnmetDecision,omitempty"`
+	ConditionalCloseType *WorkflowConditionalCloseType `json:"conditionalCloseType,omitempty"`
+	ChannelName          *string                       `json:"channelName,omitempty"`
+	CloseInput           *EncodedObject                `json:"closeInput,omitempty"`
 }
 
 // NewWorkflowConditionalClose instantiates a new WorkflowConditionalClose object
@@ -74,36 +73,36 @@ func (o *WorkflowConditionalClose) SetConditionalCloseType(v WorkflowConditional
 	o.ConditionalCloseType = &v
 }
 
-// GetInternalChannelName returns the InternalChannelName field value if set, zero value otherwise.
-func (o *WorkflowConditionalClose) GetInternalChannelName() string {
-	if o == nil || IsNil(o.InternalChannelName) {
+// GetChannelName returns the ChannelName field value if set, zero value otherwise.
+func (o *WorkflowConditionalClose) GetChannelName() string {
+	if o == nil || IsNil(o.ChannelName) {
 		var ret string
 		return ret
 	}
-	return *o.InternalChannelName
+	return *o.ChannelName
 }
 
-// GetInternalChannelNameOk returns a tuple with the InternalChannelName field value if set, nil otherwise
+// GetChannelNameOk returns a tuple with the ChannelName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowConditionalClose) GetInternalChannelNameOk() (*string, bool) {
-	if o == nil || IsNil(o.InternalChannelName) {
+func (o *WorkflowConditionalClose) GetChannelNameOk() (*string, bool) {
+	if o == nil || IsNil(o.ChannelName) {
 		return nil, false
 	}
-	return o.InternalChannelName, true
+	return o.ChannelName, true
 }
 
-// HasInternalChannelName returns a boolean if a field has been set.
-func (o *WorkflowConditionalClose) HasInternalChannelName() bool {
-	if o != nil && !IsNil(o.InternalChannelName) {
+// HasChannelName returns a boolean if a field has been set.
+func (o *WorkflowConditionalClose) HasChannelName() bool {
+	if o != nil && !IsNil(o.ChannelName) {
 		return true
 	}
 
 	return false
 }
 
-// SetInternalChannelName gets a reference to the given string and assigns it to the InternalChannelName field.
-func (o *WorkflowConditionalClose) SetInternalChannelName(v string) {
-	o.InternalChannelName = &v
+// SetChannelName gets a reference to the given string and assigns it to the ChannelName field.
+func (o *WorkflowConditionalClose) SetChannelName(v string) {
+	o.ChannelName = &v
 }
 
 // GetCloseInput returns the CloseInput field value if set, zero value otherwise.
@@ -138,38 +137,6 @@ func (o *WorkflowConditionalClose) SetCloseInput(v EncodedObject) {
 	o.CloseInput = &v
 }
 
-// GetConditionUnmetDecision returns the ConditionUnmetDecision field value if set, zero value otherwise.
-func (o *WorkflowConditionalClose) GetConditionUnmetDecision() []StateMovement {
-	if o == nil || IsNil(o.ConditionUnmetDecision) {
-		var ret []StateMovement
-		return ret
-	}
-	return o.ConditionUnmetDecision
-}
-
-// GetConditionUnmetDecisionOk returns a tuple with the ConditionUnmetDecision field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowConditionalClose) GetConditionUnmetDecisionOk() ([]StateMovement, bool) {
-	if o == nil || IsNil(o.ConditionUnmetDecision) {
-		return nil, false
-	}
-	return o.ConditionUnmetDecision, true
-}
-
-// HasConditionUnmetDecision returns a boolean if a field has been set.
-func (o *WorkflowConditionalClose) HasConditionUnmetDecision() bool {
-	if o != nil && !IsNil(o.ConditionUnmetDecision) {
-		return true
-	}
-
-	return false
-}
-
-// SetConditionUnmetDecision gets a reference to the given []StateMovement and assigns it to the ConditionUnmetDecision field.
-func (o *WorkflowConditionalClose) SetConditionUnmetDecision(v []StateMovement) {
-	o.ConditionUnmetDecision = v
-}
-
 func (o WorkflowConditionalClose) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -183,14 +150,11 @@ func (o WorkflowConditionalClose) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.ConditionalCloseType) {
 		toSerialize["conditionalCloseType"] = o.ConditionalCloseType
 	}
-	if !IsNil(o.InternalChannelName) {
-		toSerialize["internalChannelName"] = o.InternalChannelName
+	if !IsNil(o.ChannelName) {
+		toSerialize["channelName"] = o.ChannelName
 	}
 	if !IsNil(o.CloseInput) {
 		toSerialize["closeInput"] = o.CloseInput
-	}
-	if !IsNil(o.ConditionUnmetDecision) {
-		toSerialize["conditionUnmetDecision"] = o.ConditionUnmetDecision
 	}
 	return toSerialize, nil
 }
