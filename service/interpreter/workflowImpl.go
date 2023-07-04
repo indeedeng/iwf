@@ -279,15 +279,7 @@ func checkClosingWorkflow(
 	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
 	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
-	if decision.ConditionalClose != nil {
-		if decision.HasNextStates() {
-			err = provider.NewApplicationError(
-				string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
-				"invalid state decisions. ConditionalClose cannot be used with regular state movements ",
-			)
-			return
-		}
-
+	if decision.HasConditionalClose() {
 		conditionClose := decision.ConditionalClose
 		if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY {
 			// trigger a signal draining so that all the signal/internal channel messages are processed
