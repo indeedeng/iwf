@@ -43,12 +43,12 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		return
 	}
 	log.Println("received workflow worker rpc request, ", req)
-	h.invokeHistory["ApiV1WorkflowWorkerRpc"]++
+	h.invokeHistory[req.RpcName]++
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
 			{
-				ChannelName: RpcPublishInternalChannel,
+				ChannelName: InternalChannelName,
 			},
 		},
 	})

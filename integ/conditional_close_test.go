@@ -90,15 +90,15 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 	// then send another two messages
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	for i := 0; i < 3; i++ {
-		if i != 0 {
-			// wait for a second so that the workflow is in execute state
-			time.Sleep(time.Second)
-		}
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
 			RpcName:    conditionalClose.RpcPublishInternalChannel,
 		}).Execute()
 		panicAtHttpError(err, httpResp)
+		if i == 0 {
+			// wait for a second so that the workflow is in execute state
+			time.Sleep(time.Second)
+		}
 	}
 
 	// wait for the workflow
@@ -110,9 +110,9 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
-		"S1_start":               3,
-		"S1_decide":              3,
-		"ApiV1WorkflowWorkerRpc": 3,
+		"S1_start":  3,
+		"S1_decide": 3,
+		conditionalClose.RpcPublishInternalChannel: 3,
 	}, history, "rpc test fail, %v", history)
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
