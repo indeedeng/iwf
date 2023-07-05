@@ -75,7 +75,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				},
 				CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
 			}
-			if req.HasStateInput() {
+			input := req.GetStateInput()
+			if input.GetData() == "use-signal-channel" {
 				// use signal
 				cmdReq = &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
@@ -119,7 +120,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				ChannelName:          iwfidl.PtrString(TestChannelName),
 				CloseInput:           &TestInput,
 			}
-			if req.HasStateInput() {
+			input := req.GetStateInput()
+			if input.GetData() == "use-signal-channel" {
 				// use signal
 				conditionalClose = &iwfidl.WorkflowConditionalClose{
 					ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY.Ptr(),

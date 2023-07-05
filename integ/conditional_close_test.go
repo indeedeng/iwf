@@ -94,7 +94,9 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(t *testing.T, backendT
 		},
 	}
 	if useSignalChannel {
-		startReq.StateInput = &iwfidl.EncodedObject{} // this will tell the workflow to use signal
+		startReq.StateInput = &iwfidl.EncodedObject{
+			Data: iwfidl.PtrString("use-signal-channel"),
+		} // this will tell the workflow to use signal
 	}
 
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
