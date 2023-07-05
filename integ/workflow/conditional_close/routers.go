@@ -67,15 +67,27 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
 
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+			cmdReq := &iwfidl.CommandRequest{
+				InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+					{
+						ChannelName: TestChannelName,
+					},
+				},
+				CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
+			}
+			if req.HasStateInput() {
+				// use signal
+				cmdReq = &iwfidl.CommandRequest{
+					SignalCommands: []iwfidl.SignalCommand{
 						{
-							ChannelName: TestChannelName,
+							SignalChannelName: TestChannelName,
 						},
 					},
 					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
-				},
+				}
+			}
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: cmdReq,
 			})
 			return
 		}
@@ -102,6 +114,20 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				time.Sleep(time.Second * 3)
 			}
 
+			conditionalClose := &iwfidl.WorkflowConditionalClose{
+				ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY.Ptr(),
+				ChannelName:          iwfidl.PtrString(TestChannelName),
+				CloseInput:           &TestInput,
+			}
+			if req.HasStateInput() {
+				// use signal
+				conditionalClose = &iwfidl.WorkflowConditionalClose{
+					ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY.Ptr(),
+					ChannelName:          iwfidl.PtrString(TestChannelName),
+					CloseInput:           &TestInput,
+				}
+			}
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -109,11 +135,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 							StateId: State1,
 						},
 					},
-					ConditionalClose: &iwfidl.WorkflowConditionalClose{
-						ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY.Ptr(),
-						ChannelName:          iwfidl.PtrString(TestChannelName),
-						CloseInput:           &TestInput,
-					},
+					ConditionalClose: conditionalClose,
 				},
 			})
 			return
