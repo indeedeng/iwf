@@ -14,7 +14,7 @@ const (
 	WorkflowType              = "conditional_close"
 	RpcPublishInternalChannel = "publish_internal_channel"
 
-	InternalChannelName = "test-channel-name"
+	TestChannelName = "test-channel-name"
 
 	State1 = "S1"
 )
@@ -48,7 +48,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
 			{
-				ChannelName: InternalChannelName,
+				ChannelName: TestChannelName,
 			},
 		},
 	})
@@ -71,7 +71,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
-							ChannelName: InternalChannelName,
+							ChannelName: TestChannelName,
 						},
 					},
 					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
@@ -111,7 +111,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					},
 					ConditionalClose: &iwfidl.WorkflowConditionalClose{
 						ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY.Ptr(),
-						ChannelName:          iwfidl.PtrString(InternalChannelName),
+						ChannelName:          iwfidl.PtrString(TestChannelName),
 						CloseInput:           &TestInput,
 					},
 				},
