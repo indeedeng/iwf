@@ -12,31 +12,27 @@ import (
 	"time"
 )
 
-func TestWorkflowTimeoutTemporal(t *testing.T) {
+func TestWorkflowGetWithWaitTimeoutTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowTimeout(t, service.BackendTypeTemporal, nil)
-		smallWaitForFastTest()
-		doTestWorkflowTimeout(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestWorkflowWithWaitTimeout(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
 	}
 }
 
-func TestWorkflowTimeoutadence(t *testing.T) {
+func TestWorkflowWithWaitTimeoutCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWorkflowTimeout(t, service.BackendTypeCadence, nil)
-		smallWaitForFastTest()
-		doTestWorkflowTimeout(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestWorkflowWithWaitTimeout(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
 	}
 }
 
-func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestWorkflowWithWaitTimeout(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -53,12 +49,12 @@ func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType, config
 			},
 		},
 	})
-	wfId := "wf-timeout-test" + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := "wf-wait-timeout-test" + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        signal.WorkflowType,
-		WorkflowTimeoutSeconds: 1,
+		WorkflowTimeoutSeconds: 15,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(signal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
@@ -69,17 +65,21 @@ func doTestWorkflowTimeout(t *testing.T, backendType service.BackendType, config
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	startTimeUnix := time.Now().Unix()
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
+	elapsedSeconds := time.Now().Unix() - startTimeUnix
+
 	panicAtHttpError(err, httpResp)
 
 	assertions := assert.New(t)
-
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
-		WorkflowStatus: iwfidl.TIMEOUT,
+		WorkflowStatus: iwfidl.RUNNING,
 		ErrorType:      nil,
-		ErrorMessage:   nil,
+		ErrorMessage:   ptr.Any("workflow is still running, waiting has exceeded timeout limit"),
 	}, resp, "response not expected")
+
+	assertions.True(elapsedSeconds >= 5 && elapsedSeconds <= 12, "actual value is ", elapsedSeconds)
 }
