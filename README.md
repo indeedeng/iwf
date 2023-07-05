@@ -11,7 +11,7 @@
 
 iWF is a platform for developing resilient, fault-tolerant, scalable long-running applications. 
 It offers a convenient abstraction for durable timers, background execution with backoff retry, 
-customized persisted data(with optional caching, indexing), message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
+customized persisted data (with optional caching, and indexing), message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
 
 iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
 
@@ -29,46 +29,46 @@ Related projects:
 ## Basic Concepts
 
 
-The top level concept is **`ObjectWorkflow`** -- nearly any "object" can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
+The top-level concept is **`ObjectWorkflow`** -- nearly any "object" can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
 
-User application creates ObjectWorkflow by implementing the Workflow interface, e.g. in
+A user application creates an ObjectWorkflow by implementing the Workflow interface, in one of the supported languages e.g.
 [Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java)
 or [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go).
-An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
+An implementation of the interface is referred to as a `WorkflowDefinition` and consists of the components shown below:
 
 | Name                                                                     | Description                                                                                                                                          | 
 |:-------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------| 
 | [Data Attribute](#persistence)                                           | Persistence field to storing data                                                                                                                    | 
 | [Search Attribute](#persistence)                                         | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                   |
 | [Workflow State](#workflow-state)                                        | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute with default infinite retry |
-| [RPC](#rpc)                                                              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution         |
-| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive message from external                                                                  |
+| [RPC](#rpc)                                                              | Remote procedure call. Invoked by a client, executed in worker, and can interact with data/search attributes, internal channel, and state execution         |
+| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive messages from external sources                                                                  |
 | [Internal Channel](#internalchannel-synchronization-for-multi-threading) | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                       |
 
-A workflow definition can be outlined like this:
+A workflow definition can be visualized like this:
 
 ![Example workflow diagram](https://user-images.githubusercontent.com/4523955/234424825-ff3673c0-af23-4eb7-887d-b1f421f3aaa4.png)
 
 These are all the concepts that you need to build a super complicated workflow.
 See this engagement workflow example in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement)
 or [Golang](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/engagement)
-for how it looks like!
+for how it looks in practice!
 
-Below are the detailed explanation of the concepts. 
-They are powerful, also extremely simple to learn and use (as the philosophy of iWF).
+Below are detailed explanations of the concepts. 
+These concepts are powerful, and also extremely simple to learn and use (as is the philosophy of iWF).
 
 ## Persistence
 
-iWF let you store customized data as a database during the workflow execution. This eliminates the needs of depending on a database to implement your workflow.
+iWF let you store customized data as a database during the workflow execution. This eliminates the need to depend on a database to implement your workflow.
 
-The data are stored as data attributes and search attributes. Both are defined as "persistence schema". 
-The schema just defined and maintained in the code along with other business logic.
+Your data are stored as Data Attributes and Search Attributes. Together both define the "persistence schema". 
+The schema is defined and maintained in the code along with other business logic.
 
-Search attribute works like infinite indexes in traditional database. You
-only need to specify which attributes should be indexed, without worrying about things in
-a traditional database like the number of indexes, and the order of the fields in an index.
+Search Attributes work like infinite indexes in a traditional database. You
+only need to specify which attributes should be indexed, without worrying about complications you might be used to in
+a traditional database like the number of shards, and the order of the fields in an index.
 
-Logically, the above workflow definition example will have a persistence schema like below:
+Logically, the workflow definition displayed in the example workflow diagram will have a persistence schema as follows:
 
 | Workflow Execution   | Search Attr A | Search Attr B | Data Attr C | Data Attr D |
 |----------------------|---------------|:-------------:|------------:|------------:|
@@ -76,9 +76,9 @@ Logically, the above workflow definition example will have a persistence schema 
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
-With Search attributes, you can write [customized SQL-like query to find out any workflow executions](https://docs.temporal.io/visibility#search-attribute), just like using a database query.
+With Search attributes, you can write [customized SQL-like queries to find any workflow execution(s)](https://docs.temporal.io/visibility#search-attribute), just like using a database query.
 
-Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data will be deleted after the retention period.  
+Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data retained in your persistence schema will be deleted once the configured retention period elapses.  
 
 ### Caching 
 By default, RPC will load data/search attributes with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
