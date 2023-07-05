@@ -14,7 +14,7 @@ const (
 	WorkflowType              = "conditional_close"
 	RpcPublishInternalChannel = "publish_internal_channel"
 
-	InternalChannelName = "test-channel-name"
+	TestChannelName = "test-channel-name"
 
 	State1 = "S1"
 )
@@ -48,7 +48,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
 			{
-				ChannelName: InternalChannelName,
+				ChannelName: TestChannelName,
 			},
 		},
 	})
@@ -67,15 +67,28 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
 
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+			cmdReq := &iwfidl.CommandRequest{
+				InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+					{
+						ChannelName: TestChannelName,
+					},
+				},
+				CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
+			}
+			input := req.GetStateInput()
+			if input.GetData() == "use-signal-channel" {
+				// use signal
+				cmdReq = &iwfidl.CommandRequest{
+					SignalCommands: []iwfidl.SignalCommand{
 						{
-							ChannelName: InternalChannelName,
+							SignalChannelName: TestChannelName,
 						},
 					},
 					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
-				},
+				}
+			}
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: cmdReq,
 			})
 			return
 		}
@@ -102,18 +115,30 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				time.Sleep(time.Second * 3)
 			}
 
+			conditionalClose := &iwfidl.WorkflowConditionalClose{
+				ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY.Ptr(),
+				ChannelName:          iwfidl.PtrString(TestChannelName),
+				CloseInput:           &TestInput,
+			}
+			input := req.GetStateInput()
+			if input.GetData() == "use-signal-channel" {
+				// use signal
+				conditionalClose = &iwfidl.WorkflowConditionalClose{
+					ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY.Ptr(),
+					ChannelName:          iwfidl.PtrString(TestChannelName),
+					CloseInput:           &TestInput,
+				}
+			}
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: State1,
+							StateId:    State1,
+							StateInput: req.StateInput,
 						},
 					},
-					ConditionalClose: &iwfidl.WorkflowConditionalClose{
-						ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY.Ptr(),
-						ChannelName:          iwfidl.PtrString(InternalChannelName),
-						CloseInput:           &TestInput,
-					},
+					ConditionalClose: conditionalClose,
 				},
 			})
 			return

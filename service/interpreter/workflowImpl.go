@@ -281,7 +281,8 @@ func checkClosingWorkflow(
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	if decision.HasConditionalClose() {
 		conditionClose := decision.ConditionalClose
-		if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY {
+		if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY ||
+			conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY {
 			// trigger a signal draining so that all the signal/internal channel messages are processed
 			// TODO https://github.com/indeedeng/iwf/issues/289
 			// https://github.com/indeedeng/iwf/issues/290
@@ -290,7 +291,17 @@ func checkClosingWorkflow(
 			// to workaround, user code will have to use persistence locking
 			signalReceiver.DrainAllUnreceivedSignals(ctx)
 
-			if !internalChannel.HasData(conditionClose.GetChannelName()) {
+			conditionMet := false
+			if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY &&
+				!internalChannel.HasData(conditionClose.GetChannelName()) {
+				conditionMet = true
+			}
+			if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY &&
+				!signalReceiver.HasSignal(conditionClose.GetChannelName()) {
+				conditionMet = true
+			}
+
+			if conditionMet {
 				// condition is met, force complete the workflow
 				forceComplete = true
 				completeOutput = &iwfidl.StateCompletionOutput{
