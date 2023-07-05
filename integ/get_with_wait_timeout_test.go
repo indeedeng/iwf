@@ -2,11 +2,13 @@ package integ
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/signal"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"strconv"
 	"testing"
 	"time"
@@ -33,6 +35,8 @@ func TestWorkflowWithWaitTimeoutCadence(t *testing.T) {
 }
 
 func doTestWorkflowWithWaitTimeout(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+	assertions := assert.New(t)
+
 	// start test workflow server
 	wfHandler := signal.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -51,7 +55,7 @@ func doTestWorkflowWithWaitTimeout(t *testing.T, backendType service.BackendType
 	})
 	wfId := "wf-wait-timeout-test" + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
-	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        signal.WorkflowType,
 		WorkflowTimeoutSeconds: 15,
@@ -66,20 +70,21 @@ func doTestWorkflowWithWaitTimeout(t *testing.T, backendType service.BackendType
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	startTimeUnix := time.Now().Unix()
-	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	elapsedSeconds := time.Now().Unix() - startTimeUnix
 
-	panicAtHttpError(err, httpResp)
+	assertions.NotNil(err)
+	assertions.Equalf(service.HttpStatusCodeSpecial4xxError, httpResp.StatusCode, "http code")
+	var errResp iwfidl.ErrorResponse
+	body, err := ioutil.ReadAll(httpResp.Body)
+	assertions.Nil(err)
+	err = json.Unmarshal(body, &errResp)
+	assertions.Equalf(iwfidl.ErrorResponse{
+		Detail:    ptr.Any("workflow is still running, waiting has exceeded timeout limit"),
+		SubStatus: iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS.Ptr(),
+	}, errResp, "body")
 
-	assertions := assert.New(t)
-	assertions.Equalf(&iwfidl.WorkflowGetResponse{
-		WorkflowRunId:  startResp.GetWorkflowRunId(),
-		WorkflowStatus: iwfidl.RUNNING,
-		ErrorType:      nil,
-		ErrorMessage:   ptr.Any("workflow is still running, waiting has exceeded timeout limit"),
-	}, resp, "response not expected")
-
-	assertions.True(elapsedSeconds >= 5 && elapsedSeconds <= 12, "actual value is ", elapsedSeconds)
+	assertions.True(elapsedSeconds >= 5 && elapsedSeconds <= 12, "expect to poll for ~8 seconds, actual value is ", elapsedSeconds)
 }

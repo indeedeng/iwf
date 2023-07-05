@@ -328,11 +328,10 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 
 	if s.client.IsDeadLineExceededError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit
-		return &iwfidl.WorkflowGetResponse{
-			WorkflowRunId:  descResp.RunId,
-			WorkflowStatus: iwfidl.RUNNING,
-			ErrorMessage:   ptr.Any("workflow is still running, waiting has exceeded timeout limit"),
-		}, nil
+		return nil, errors.NewErrorAndStatus(
+			service.HttpStatusCodeSpecial4xxError,
+			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
+			"workflow is still running, waiting has exceeded timeout limit")
 	}
 
 	var outputsToReturnWf []iwfidl.StateCompletionOutput
@@ -710,7 +709,7 @@ func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response
 	}
 
 	return errors.NewErrorAndStatusWithWorkerError(
-		service.HttpStatusCodeWorkerApiError,
+		service.HttpStatusCodeSpecial4xxError,
 		iwfidl.WORKER_API_ERROR,
 		detailedMessage,
 		workerError.GetDetail(),
