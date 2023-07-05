@@ -53,6 +53,11 @@ func TestConditionalForceCompleteOnInternalChannelEmptyWorkflowCadenceContinueAs
 }
 
 func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+	doTestConditionalForceCompleteOnChannelEmptyWorkflow(t, backendType, config, false)
+	doTestConditionalForceCompleteOnChannelEmptyWorkflow(t, backendType, config, true)
+}
+
+func doTestConditionalForceCompleteOnChannelEmptyWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig, useSignalChannel bool) {
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := conditionalClose.NewHandler()
@@ -72,9 +77,13 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 	})
 
 	// start a workflow
-	wfId := conditionalClose.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
+	channelType := "_internal_channel_"
+	if useSignalChannel {
+		channelType = "_signal_channel_"
+	}
+	wfId := conditionalClose.WorkflowType + channelType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
-	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	startReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        conditionalClose.WorkflowType,
 		WorkflowTimeoutSeconds: 20,
@@ -83,7 +92,12 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
-	}).Execute()
+	}
+	if useSignalChannel {
+		startReq.StateInput = &iwfidl.EncodedObject{} // this will tell the workflow to use signal
+	}
+
+	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	panicAtHttpError(err, httpResp)
 
 	// wait for a second so that query handler is ready for executing PRC
@@ -91,11 +105,20 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 	// invoke RPC to send 1 messages to the internal channel to unblock the waitUntil
 	// then send another two messages
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+	reqSignal := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 	for i := 0; i < 3; i++ {
-		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
-			WorkflowId: wfId,
-			RpcName:    conditionalClose.RpcPublishInternalChannel,
-		}).Execute()
+		if useSignalChannel {
+			httpResp, err = reqSignal.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+				WorkflowId:        wfId,
+				SignalChannelName: conditionalClose.TestChannelName,
+			}).Execute()
+		} else {
+			_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+				WorkflowId: wfId,
+				RpcName:    conditionalClose.RpcPublishInternalChannel,
+			}).Execute()
+		}
+
 		panicAtHttpError(err, httpResp)
 		if i == 0 {
 			// wait for a second so that the workflow is in execute state
@@ -111,11 +134,15 @@ func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, 
 	panicAtHttpError(err, httpResp)
 
 	history, _ := wfHandler.GetTestResult()
-	assertions.Equalf(map[string]int64{
+
+	expectMap := map[string]int64{
 		"S1_start":  3,
 		"S1_decide": 3,
-		conditionalClose.RpcPublishInternalChannel: 3,
-	}, history, "rpc test fail, %v", history)
+	}
+	if !useSignalChannel {
+		expectMap[conditionalClose.RpcPublishInternalChannel] = 3
+	}
+	assertions.Equalf(expectMap, history, "rpc test fail, %v", history)
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
 	assertions.Equal(1, len(resp2.GetResults()))

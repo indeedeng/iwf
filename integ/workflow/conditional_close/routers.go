@@ -132,7 +132,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: State1,
+							StateId:    State1,
+							StateInput: req.StateInput,
 						},
 					},
 					ConditionalClose: conditionalClose,
