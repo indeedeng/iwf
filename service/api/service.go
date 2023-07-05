@@ -326,7 +326,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 		}, nil
 	}
 
-	if s.client.IsDeadLineExceededError(getErr) {
+	if s.client.IsRequestTimeoutError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit
 		return nil, errors.NewErrorAndStatus(
 			service.HttpStatusCodeSpecial4xxError,

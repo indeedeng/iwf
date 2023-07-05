@@ -49,8 +49,12 @@ func (t *temporalClient) IsNotFoundError(err error) bool {
 	return ok
 }
 
-func (t *temporalClient) IsDeadLineExceededError(err error) bool {
+func (t *temporalClient) IsRequestTimeoutError(err error) bool {
 	_, ok := err.(*serviceerror.DeadlineExceeded)
+	if ok {
+		return ok
+	}
+	_, ok = err.(*serviceerror.Canceled)
 	return ok
 }
 

@@ -38,7 +38,7 @@ func (t *cadenceClient) IsNotFoundError(err error) bool {
 	return ok
 }
 
-func (t *cadenceClient) IsDeadLineExceededError(err error) bool {
+func (t *cadenceClient) IsRequestTimeoutError(err error) bool {
 	return errors.Is(err, context.DeadlineExceeded)
 }
 
