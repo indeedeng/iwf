@@ -15,7 +15,7 @@ WORKDIR /iwf/
 RUN rm -rf iwf-server  \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    netcat \
+    netcat-traditional \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* && \
     make bins && \
