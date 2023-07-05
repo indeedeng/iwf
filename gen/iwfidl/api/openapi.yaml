@@ -686,7 +686,6 @@ components:
       - WORKFLOW_ALREADY_STARTED_SUB_STATUS
       - WORKFLOW_NOT_EXISTS_SUB_STATUS
       - WORKER_API_ERROR
-      - LONG_POLL_TIME_OUT_SUB_STATUS
       type: string
     WorkflowStartRequest:
       example:
