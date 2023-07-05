@@ -24,6 +24,7 @@ const (
 	WORKFLOW_ALREADY_STARTED_SUB_STATUS ErrorSubStatus = "WORKFLOW_ALREADY_STARTED_SUB_STATUS"
 	WORKFLOW_NOT_EXISTS_SUB_STATUS      ErrorSubStatus = "WORKFLOW_NOT_EXISTS_SUB_STATUS"
 	WORKER_API_ERROR                    ErrorSubStatus = "WORKER_API_ERROR"
+	LONG_POLL_TIME_OUT_SUB_STATUS       ErrorSubStatus = "LONG_POLL_TIME_OUT_SUB_STATUS"
 )
 
 // All allowed values of ErrorSubStatus enum
@@ -32,6 +33,7 @@ var AllowedErrorSubStatusEnumValues = []ErrorSubStatus{
 	"WORKFLOW_ALREADY_STARTED_SUB_STATUS",
 	"WORKFLOW_NOT_EXISTS_SUB_STATUS",
 	"WORKER_API_ERROR",
+	"LONG_POLL_TIME_OUT_SUB_STATUS",
 }
 
 func (v *ErrorSubStatus) UnmarshalJSON(src []byte) error {
