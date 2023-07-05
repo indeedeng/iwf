@@ -149,6 +149,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
+        "420":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: wait has exceeded timeout
       summary: "get a workflow's status and results(if completed & requested), wait\
         \ if the workflow is still running"
   /api/v1/workflow/search:
@@ -686,6 +692,7 @@ components:
       - WORKFLOW_ALREADY_STARTED_SUB_STATUS
       - WORKFLOW_NOT_EXISTS_SUB_STATUS
       - WORKER_API_ERROR
+      - LONG_POLL_TIME_OUT_SUB_STATUS
       type: string
     WorkflowStartRequest:
       example:

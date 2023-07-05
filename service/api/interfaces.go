@@ -45,6 +45,7 @@ type errorHandler interface {
 	GetApplicationErrorDetails(err error, detailsPtr interface{}) error
 	IsWorkflowAlreadyStartedError(error) bool
 	IsNotFoundError(error) bool
+	IsDeadLineExceededError(error) bool
 }
 
 type StartWorkflowOptions struct {

@@ -10,7 +10,8 @@ const testIwfServerPort = "9715"
 func createTestConfig(failAtMemoCompatibility bool) config.Config {
 	return config.Config{
 		Api: config.ApiConfig{
-			Port: 9715,
+			Port:           9715,
+			MaxWaitSeconds: 10,
 		},
 		Interpreter: config.Interpreter{
 			VerboseDebug:              false,

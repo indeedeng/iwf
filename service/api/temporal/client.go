@@ -49,6 +49,11 @@ func (t *temporalClient) IsNotFoundError(err error) bool {
 	return ok
 }
 
+func (t *temporalClient) IsDeadLineExceededError(err error) bool {
+	_, ok := err.(*serviceerror.DeadlineExceeded)
+	return ok
+}
+
 func (t *temporalClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {
 	var applicationError *realtemporal.ApplicationError
 	isAppErr := errors.As(err, &applicationError)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/pkg/errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -35,6 +36,10 @@ func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
 func (t *cadenceClient) IsNotFoundError(err error) bool {
 	_, ok := err.(*shared.EntityNotExistsError)
 	return ok
+}
+
+func (t *cadenceClient) IsDeadLineExceededError(err error) bool {
+	return errors.Is(err, context.DeadlineExceeded)
 }
 
 func (t *cadenceClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {

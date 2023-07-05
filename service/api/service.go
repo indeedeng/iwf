@@ -24,6 +24,11 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
+const (
+	defaultMaxWaitSeconds = 60
+	waitBufferSeconds     = 2
+)
+
 type serviceImpl struct {
 	client    UnifiedClient
 	taskQueue string
@@ -42,6 +47,30 @@ func NewApiService(config config.Config, client UnifiedClient, taskQueue string,
 		logger:    logger,
 		config:    config,
 	}, nil
+}
+
+func (s *serviceImpl) trimContextForBlockingWait(parent context.Context) (context.Context, context.CancelFunc) {
+	maxWaitSeconds := s.config.Api.MaxWaitSeconds
+	if maxWaitSeconds == 0 {
+		maxWaitSeconds = defaultMaxWaitSeconds
+	}
+
+	ddl, ok := parent.Deadline()
+
+	var newDdlUnix int64
+	maxDdlUnix := time.Now().Unix() + maxWaitSeconds
+	if ok {
+		ddlUnix := ddl.Unix()
+		if ddlUnix < maxDdlUnix {
+			newDdlUnix = ddlUnix - waitBufferSeconds
+		} else {
+			newDdlUnix = maxDdlUnix - waitBufferSeconds
+		}
+	} else {
+		newDdlUnix = maxDdlUnix - waitBufferSeconds
+	}
+	newDdl := time.Unix(newDdlUnix, 0)
+	return context.WithDeadline(parent, newDdl)
 }
 
 func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.WorkflowStartRequest) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
@@ -281,69 +310,91 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			}
 		}
 	} else {
-		getErr = s.client.GetWorkflowResult(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
+		subCtx, cancFunc := s.trimContextForBlockingWait(ctx)
+		defer cancFunc()
+		getErr = s.client.GetWorkflowResult(subCtx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 		if getErr == nil {
 			status = iwfidl.COMPLETED
 		}
 	}
 
-	if getErr != nil { // workflow closed at an abnormal state(failed/timeout/terminated/canceled)
-		var outputsToReturnWf []iwfidl.StateCompletionOutput
-		var errMsg string
-		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(getErr)
-		if errType != "" {
-			errTypeEnum := iwfidl.WorkflowErrorType(errType)
-			if errTypeEnum == iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE {
-				err = s.client.GetApplicationErrorDetails(getErr, &outputsToReturnWf)
-				if err != nil {
-					return nil, s.handleError(err)
-				}
-			} else {
-				err = s.client.GetApplicationErrorDetails(getErr, &errMsg)
-				if err != nil {
-					return nil, s.handleError(err)
-				}
-			}
+	if getErr == nil {
+		return &iwfidl.WorkflowGetResponse{
+			WorkflowRunId:  descResp.RunId,
+			WorkflowStatus: status,
+			Results:        output.StateCompletionOutputs,
+		}, nil
+	}
 
-			var errMsgPtr *string
-			if errMsg != "" {
-				errMsgPtr = iwfidl.PtrString(errMsg)
-			}
-			return &iwfidl.WorkflowGetResponse{
-				WorkflowRunId:  descResp.RunId,
-				WorkflowStatus: iwfidl.FAILED,
-				ErrorType:      ptr.Any(errTypeEnum),
-				ErrorMessage:   errMsgPtr,
-				Results:        outputsToReturnWf,
-			}, nil
-		} else {
-			// it could be timeout/terminated/canceled/etc. We need to describe again to get the final status
-			descResp, err = s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
+	if s.client.IsDeadLineExceededError(getErr) {
+		// the workflow is still running, but the wait has exceeded limit
+		return nil, errors.NewErrorAndStatus(
+			service.HttpStatusCodeSpecial4xxError,
+			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
+			"workflow is still running, waiting has exceeded timeout limit")
+	}
+
+	var outputsToReturnWf []iwfidl.StateCompletionOutput
+	var errMsg string
+	errType := s.client.GetApplicationErrorTypeIfIsApplicationError(getErr)
+	if errType != "" {
+		// workflow failed by interpreter decision, or by user workflow state decision
+		errTypeEnum := iwfidl.WorkflowErrorType(errType)
+		if errTypeEnum == iwfidl.STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE {
+			err = s.client.GetApplicationErrorDetails(getErr, &outputsToReturnWf)
 			if err != nil {
 				return nil, s.handleError(err)
 			}
-			errMsg = ""
-			if descResp.Status == iwfidl.FAILED {
-				errMsg = "unknown workflow failure from interpreter implementation"
-				s.logger.Error(errMsg, tag.WorkflowID(req.GetWorkflowId()), tag.WorkflowRunID(descResp.RunId))
+		} else {
+			err = s.client.GetApplicationErrorDetails(getErr, &errMsg)
+			if err != nil {
+				return nil, s.handleError(err)
 			}
-			var errMsgPtr *string
-			if errMsg != "" {
-				errMsgPtr = iwfidl.PtrString(errMsg)
-			}
-			return &iwfidl.WorkflowGetResponse{
-				WorkflowRunId:  descResp.RunId,
-				WorkflowStatus: descResp.Status,
-				ErrorMessage:   errMsgPtr,
-			}, nil
 		}
+
+		var errMsgPtr *string
+		if errMsg != "" {
+			errMsgPtr = iwfidl.PtrString(errMsg)
+		}
+		return &iwfidl.WorkflowGetResponse{
+			WorkflowRunId:  descResp.RunId,
+			WorkflowStatus: iwfidl.FAILED,
+			ErrorType:      ptr.Any(errTypeEnum),
+			ErrorMessage:   errMsgPtr,
+			Results:        outputsToReturnWf,
+		}, nil
+	} else {
+		// it could be timeout/terminated/canceled/etc. We need to describe again to get the final status
+		descResp, err = s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
+		if err != nil {
+			return nil, s.handleError(err)
+		}
+		errMsg = ""
+		if descResp.Status == iwfidl.RUNNING || descResp.Status == iwfidl.CONTINUED_AS_NEW || descResp.Status == iwfidl.COMPLETED {
+			errMsg = "impossible/very rare status, maybe caused by racing conditions"
+			s.logger.Error(errMsg, tag.WorkflowID(req.GetWorkflowId()), tag.WorkflowRunID(descResp.RunId))
+			// we cannot return these status, which will be a wrong results
+			// TODO: maybe return 4xx
+			return nil, s.handleError(fmt.Errorf(errMsg))
+		}
+
+		if descResp.Status == iwfidl.FAILED {
+			errMsg = "unknown workflow failure from interpreter implementation"
+			s.logger.Error(errMsg, tag.WorkflowID(req.GetWorkflowId()), tag.WorkflowRunID(descResp.RunId))
+		}
+
+		var errMsgPtr *string
+		if errMsg != "" {
+			errMsgPtr = ptr.Any(errMsg)
+		}
+
+		return &iwfidl.WorkflowGetResponse{
+			WorkflowRunId:  descResp.RunId,
+			WorkflowStatus: descResp.Status,
+			ErrorMessage:   errMsgPtr,
+		}, nil
 	}
 
-	return &iwfidl.WorkflowGetResponse{
-		WorkflowRunId:  descResp.RunId,
-		WorkflowStatus: status,
-		Results:        output.StateCompletionOutputs,
-	}, nil
 }
 
 func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.WorkflowSearchRequest) (wresp *iwfidl.WorkflowSearchResponse, retError *errors.ErrorAndStatus) {
@@ -658,7 +709,7 @@ func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response
 	}
 
 	return errors.NewErrorAndStatusWithWorkerError(
-		service.HttpStatusCodeWorkerApiError,
+		service.HttpStatusCodeSpecial4xxError,
 		iwfidl.WORKER_API_ERROR,
 		detailedMessage,
 		workerError.GetDetail(),

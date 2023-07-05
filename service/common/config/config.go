@@ -24,7 +24,8 @@ type (
 
 	ApiConfig struct {
 		// Port is the port on which the API service will bind to
-		Port int `yaml:"port"`
+		Port           int   `yaml:"port"`
+		MaxWaitSeconds int64 `yaml:"maxWaitSeconds"`
 	}
 
 	Interpreter struct {
