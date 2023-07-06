@@ -160,15 +160,14 @@ WorkflowState 1,2,3 will each publish a message when completing. This ensures pr
 
 ## RPC
 
-RPC stands for "Remote Procedure Call". Allows external systems to interact with the workflow execution.
+RPC stands for "Remote Procedure Call". RPCs allow external systems to interact with the workflow execution.
 
-It's invoked by client, executed in workflow worker, and then respond back the results to client. 
+RPCs are invoked by a client, executed in workflow worker, and return results to the invoking client. 
 
-RPC can have access to not only persistence read/write API, but also interact with WorkflowStates using InternalChannel, 
-or trigger a new WorkflowState execution in a new thread.   
+RPCs have access to the persistence schema and may also interact with WorkflowStates using InternalChannel. They can also trigger a new WorkflowState execution in a new thread.   
 
-As an example, you can even uses iWF to implement a [job post system](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/jobpost), 
-which is much more powerful than a typical CRUD application on database:
+As an example, you can use iWF to implement a [job post system](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/jobpost), 
+which is much more powerful than a typical CRUD application backed by a traditional database:
 
 ```java
 class JobPost implements ObjectWorkflow{
@@ -210,59 +209,59 @@ class JobPost implements ObjectWorkflow{
 
 ### Atomicity of RPC APIs
 
-It's important to note that in addition to read/write persistence fields, a RPC can **trigger new state executions, and publish message to InternalChannel, all atomically.**
+It is important to note that in addition to reading and writing persistence fields, a RPC can **trigger new state executions, and publish messages to InternalChannel, all atomically.**
 
-Atomically sending internal channel, or triggering state executions is an important pattern to ensure consistency across dependencies for critical business – this 
-solves a very common problem in many existing distributed system applications. Because most RPCs (like REST/gRPC/GraphQL) don't provide a way to invoke 
-background execution when updating persistence. People sometimes have to use complicated design to acheive this. 
+Atomically interacting with the internal channel, or triggering state executions is an important pattern to ensure consistency across dependencies – this 
+solves a very common problem in many existing distributed system applications. This makes business-critical reliability achievable easily. 
+Most other RPC mechanisms (like REST/gRPC/GraphQL) do not provide a way to invoke background execution when updating persistence. Developers are therefore forced to use complicated designs to implement this functionality themselves. 
 
-**But in iWF, it's all builtin, and user application just needs a few lines of code!** 
+**But in iWF, it's all built-in, and the user application just needs a few lines of code!** 
 
 ![flow with RPC](https://user-images.githubusercontent.com/4523955/234930263-40b98ca7-4401-44fa-af8a-32d5ae075438.png)
 
 ### Signal Channel vs RPC
 
-There are two major ways for external clients to interact with workflows: Signal and RPC. So what are the difference? 
+There are two major ways for external clients to interact with workflows: Signal and RPC. So what are the differences? 
 
 They are completely different:
-* Signal is sent to iWF service without waiting for response of the processing
-* RPC will wait for worker to process the RPC request synchronously
+* Signal is sent to iWF service without waiting for a response
+* RPC will wait for a worker to process the RPC request synchronously
 * Signal will be held in a signal channel until a workflow state consumes it
-* RPC will be processed by worker immediately
+* RPC will be processed by a worker immediately
 
 ![signals vs rpc](https://user-images.githubusercontent.com/4523955/234932674-b0d062b2-e5dd-4dbe-93b5-1b9863acc5e0.png)
 
 So choose based on the situations/requirements
 
-|                |        Availability        |                                        Latency | Workflow Requirement                                     |
+|                |        Availability        |                                        Latency | Workflow Requirement                                      |
 |----------------|:-------------------------- |:----------------------------------------------- |:---------------------------------------------------------|
-| Signal Channel |            High            |                                            Low | Requires a WorkflowState to process                      |
-| RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker | No WorkflowState required                                |
+| Signal Channel |            High            |                                            Low | Requires a WorkflowState to process                       |
+| RPC            | Depends on workflow worker | Higher than signal, depends on workflow worker | No WorkflowState required                                 |
 
 ## Advanced Customization
 
 ### WorkflowOptions
 
-iWF let you deeply customize the workflow behaviors with the below options.
+iWF lets you deeply customize your workflow behavior with the following options.
 
 #### IdReusePolicy for WorkflowId
 
-At any given time, there can be only one WorkflowExecution running for a specific workflowId.
-A new WorkflowExecution can be initiated using the same workflowId by setting the appropriate `IdReusePolicy` in
+At any given time, there can be only one WorkflowExecution running for a specific `WorkflowId`.
+A new WorkflowExecution can be initiated using the same `WorkflowId` by setting the appropriate `IdReusePolicy` in
 WorkflowOptions.
 
 * `ALLOW_IF_NO_RUNNING` 
-    * Allow starting workflow if there is no execution running with the workflowId
+    * Allow starting workflow if there is no execution running with the `WorkflowId`
     * This is the **default policy** if not specified in WorkflowOptions
 * `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY`
-    * Allow starting workflow if a previous Workflow Execution with the same Workflow Id does not have a Completed
+    * Allow starting workflow if a previous Workflow Execution with the same `WorkflowId` does not have a Completed
       status.
       Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated or Cancelled workflow
       execution.
 * `DISALLOW_REUSE` 
-    * Not allow to start a new workflow execution with the same workflowId.
+    * Do not allow starting a new workflow execution with the same `WorkflowId`.
 * `ALLOW_TERMINATE_IF_RUNNING`
-    * Always allow starting workflow no matter what -- iWF server will terminate the current running one if it exists.
+    * Always allow starting workflow no matter what -- If the `WorkflowId` is already in use the iWF server will terminate the current workflow to run the new one.
 
 #### CRON Schedule
 
@@ -275,7 +274,7 @@ iWF allows you to start a workflow with a fixed cron schedule like below
 // or timed out, the workflow will be retried based on the retry policy. While the workflow is retrying, it won't
 // schedule its next run. If the next schedule is due while the workflow is running (or retrying), then it will skip
 that
-// schedule. Cron workflow will not stop until it is terminated or cancelled (by returning cadence.CanceledError).
+// schedule. Cron workflow will not stop until it is terminated or canceled (by returning cadence.CanceledError).
 // The cron spec is as follows:
 // ┌───────────── minute (0 - 59)
 // │ ┌───────────── hour (0 - 23)
