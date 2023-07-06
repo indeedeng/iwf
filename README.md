@@ -95,36 +95,36 @@ Note:
 * Caching is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
 
 ## Workflow State
-WorkflowState is to implement the asynchronous process as "workflow".  
-It will be running in the background, with default infinite backoff retry. 
+WorkflowState is how you implement your asynchronous process as a "workflow".  
+It will run in the background, with infinite backoff retry by default. 
  
-A WorkflowState is like “a small workflow” of 1~2 steps:
+A WorkflowState is itself like “a small workflow” of 1 or 2 steps:
 
-**[ waitUntil ] → execute**
+**[ `waitUntil` ] → `execute`**
 
-The `waitUntil` API can returns some commands to wait for. When the commands are completed, the `execute` API will be invoked.
-The two APIs have access to read/write the persistence defined in the workflow.
+The `waitUntil` API returns "commands" to wait for. When the commands are completed, the `execute` API will be invoked.
+Both the `waitUntil` and `execute` APIs have access to read/write the persistence schema defined in the workflow.
 
-The full detailed execution flow is like this:
+The full execution flow looks like this:
 
 ![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234921554-587d8ad4-84f5-4987-b838-959869293465.png)
 
-The `waitUntil` API is optional. If not defined, then `execute` API will be invoked instead when the state started.
+The `waitUntil` API is optional. If not defined, then the `execute` API will be invoked immediately when the Workflow State is started.
 
-Note: the two APIs are invoked by iWF service with infinite backoff retry by default. See WorkflowStateOptions section for customization.  
+Note: the `waitUntil` and `execute` APIs are invoked by the iWF service with infinite backoff retry by default. See the [WorkflowStateOptions](#WorkflowStateOptions) section for customization.  
 
 The execute API will return a StateDecision:
-* Single next state 
-  * Go to to different state
-  * Go to the same state as a loop
-  * Go the the previous state as a loop
-* Multiple next states, executing as multi threads in parallel
+* For a single next state a decision can 
+  * Go to a different state
+  * Go to the same state, i.e. a loop
+  * Go to the previous state, i.e. a loop
 * Dead end -- Just stop the thread
 * Graceful complete -- Stop the thread, and also will stop the workflow when all other threads are stopped
 * Force complete -- Stop the workflow immediately
 * Force fail  -- Stop the workflow immediately with failure
+* For multiple next states, these are executed in parallel as multiple threads
 
-With decisions, the workflow definitions can have flows like these:
+With StateDecisions, the workflow definitions can have flows like these:
 
 ![decision flow1](https://user-images.githubusercontent.com/4523955/234919901-f327dfb6-5b38-4440-a2eb-5d1c832b694e.png)
 
@@ -132,19 +132,19 @@ or
 
 ![decision flow2](https://user-images.githubusercontent.com/4523955/234919896-30db8628-daeb-4f1d-bd2b-7bf826989c75.png)
 
-or even more complicated as needed.
+or as complicated as needed!
 
 
 ### Commands for WorkflowState's WaitUntil API
 
 iWF provides three types of commands:
 
-* `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External application can use
+* `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External applications can use
   SignalWorkflow API to signal a workflow.
 * `TimerCommand`: will wait for a **durable timer** to fire.
 * `InternalChannelCommand`: will wait for a message from InternalChannel.
 
-The waitUntil API can return multiple commands along with a `CommandWaitingType`:
+The `waitUntil` API can return multiple commands along with a `CommandWaitingType`:
 
 * `AllCommandCompleted`: This option waits for all commands to be completed.
 
