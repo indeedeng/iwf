@@ -36,14 +36,14 @@ A user application creates an ObjectWorkflow by implementing the Workflow interf
 or [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go).
 An implementation of the interface is referred to as a `WorkflowDefinition` and consists of the components shown below:
 
-| Name                                                                     | Description                                                                                                                                          | 
-|:-------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------| 
-| [Data Attribute](#persistence)                                           | Persistence field to storing data                                                                                                                    | 
-| [Search Attribute](#persistence)                                         | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                   |
-| [Workflow State](#workflow-state)                                        | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute with default infinite retry |
-| [RPC](#rpc)                                                              | Remote procedure call. Invoked by a client, executed in worker, and can interact with data/search attributes, internal channel, and state execution         |
-| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive messages from external sources                                                                  |
-| [Internal Channel](#internalchannel-synchronization-for-multi-threading) | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                       |
+| Name                                                                     | Description                                                                                                                                               | 
+|:-------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| [Data Attribute](#persistence)                                           | Persistence field to storing data                                                                                                                         | 
+| [Search Attribute](#persistence)                                         | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                        |
+| [Workflow State](#workflow-state)                                        | A background execution unit. State is super powerful like a small workflow of two steps: *waitUntil* (optional) and *execute* with default infinite retry |
+| [RPC](#rpc)                                                              | Remote procedure call. Invoked by a client, executed in worker, and can interact with data/search attributes, internal channel, and state execution       |
+| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive messages from external sources                                                              |
+| [Internal Channel](#internalchannel-synchronization-for-multi-threading) | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                            |
 
 A workflow definition can be visualized like this:
 
@@ -62,7 +62,7 @@ These concepts are powerful, and also extremely simple to learn and use (as is t
 iWF let you store customized data as a database during the workflow execution. This eliminates the need to depend on a database to implement your workflow.
 
 Your data are stored as Data Attributes and Search Attributes. Together both define the "persistence schema". 
-The schema is defined and maintained in the code along with other business logic.
+The persistence schema is defined and maintained in the code along with other business logic.
 
 Search Attributes work like infinite indexes in a traditional database. You
 only need to specify which attributes should be indexed, without worrying about complications you might be used to in
@@ -81,18 +81,18 @@ With Search attributes, you can write [customized SQL-like queries to find any w
 Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data retained in your persistence schema will be deleted once the configured retention period elapses.  
 
 ### Caching 
-By default, RPC will load data/search attributes with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
-which is not optimized for very high volume requests on a single workflow execution(like 100 rps), because it could cause
-too many replay with history, especially when workflows are closed.
+By default, remote procedure calls (RPCs) will load data/search attributes with the Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
+which is not optimized for very high request volume (~>100 requests per second) on a single workflow execution. Such request volumes could cause
+too many history replays, especially when workflows are closed. This could in turn produce undesirable latency and load.
 
-You can enable the caching to support those high volume requests.  
+You can enable **caching** to support those high-volume requests.  
 
-NOTES:
-* The read after write will become eventual consistent, unless set bypassCachingForStrongConsistency=true in RPC options
-* Caching will be more useful for read-only RPC(no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
-  * A read-only RPC can still invoke any other RPCs(like calling other microservices, or DB operation) in the RPC implementation
-* It will cost extra event in history (upsertMemo operation for WorkflowPropertiesModified event) for updating the persisted data attributes
-* This feature is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
+Note:
+* With caching enabled read-after-write access will become *eventually consistent*, unless `bypassCachingForStrongConsistency=true` is set in RPC options
+* Caching will introduce an extra event in history (upsertMemo operation for WorkflowPropertiesModified event) for updating the persisted data attributes
+* Caching will be more useful for read-only RPC (no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
+  * A read-only RPC can still invoke any other RPCs (like calling other microservices, or DB operation) in the RPC implementation
+* Caching is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
 
 ## Workflow State
 WorkflowState is to implement the asynchronous process as "workflow".  
