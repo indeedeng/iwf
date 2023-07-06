@@ -11,7 +11,7 @@
 
 iWF is a platform for developing resilient, fault-tolerant, scalable long-running applications. 
 It offers a convenient abstraction for durable timers, background execution with backoff retry, 
-customized persisted data(with optional caching, indexing), message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
+customized persisted data (with optional caching, and indexing), message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
 
 iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
 
@@ -29,46 +29,46 @@ Related projects:
 ## Basic Concepts
 
 
-The top level concept is **`ObjectWorkflow`** -- nearly any "object" can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
+The top-level concept is **`ObjectWorkflow`** -- nearly any "object" can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
 
-User application creates ObjectWorkflow by implementing the Workflow interface, e.g. in
+A user application creates an ObjectWorkflow by implementing the Workflow interface, in one of the supported languages e.g.
 [Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java)
 or [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go).
-An implementation of the interface is referred to as a `WorkflowDefinition`, consisting below components:
+An implementation of the interface is referred to as a `WorkflowDefinition` and consists of the components shown below:
 
-| Name                                                                     | Description                                                                                                                                          | 
-|:-------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------| 
-| [Data Attribute](#persistence)                                           | Persistence field to storing data                                                                                                                    | 
-| [Search Attribute](#persistence)                                         | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                   |
-| [Workflow State](#workflow-state)                                        | A background execution unit. State is super powerful like a small workflow of two steps: waitUntil(optional) and execute with default infinite retry |
-| [RPC](#rpc)                                                              | Remote procedure call. Invoked by client, executed in worker, and interact with data/search attributes, internal channel and state execution         |
-| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive message from external                                                                  |
-| [Internal Channel](#internalchannel-synchronization-for-multi-threading) | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                       |
+| Name                                                                     | Description                                                                                                                                               | 
+|:-------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| [Data Attribute](#persistence)                                           | Persistence field to storing data                                                                                                                         | 
+| [Search Attribute](#persistence)                                         | "Searchable data attribute" -- attribute data is persisted and also indexed in search engine backed by ElasticSearch or OpenSearch                        |
+| [Workflow State](#workflow-state)                                        | A background execution unit. State is super powerful like a small workflow of two steps: *waitUntil* (optional) and *execute* with default infinite retry |
+| [RPC](#rpc)                                                              | Remote procedure call. Invoked by a client, executed in worker, and can interact with data/search attributes, internal channel, and state execution       |
+| [Signal Channel](#signal-channel-vs-rpc)                                 | Asynchronous message queue for the workflow object to receive messages from external sources                                                              |
+| [Internal Channel](#internalchannel-synchronization-for-multi-threading) | "Internal Signal Channel" -- An internal message queue for workflow states/RPC                                                                            |
 
-A workflow definition can be outlined like this:
+A workflow definition can be visualized like this:
 
 ![Example workflow diagram](https://user-images.githubusercontent.com/4523955/234424825-ff3673c0-af23-4eb7-887d-b1f421f3aaa4.png)
 
 These are all the concepts that you need to build a super complicated workflow.
 See this engagement workflow example in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement)
 or [Golang](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/engagement)
-for how it looks like!
+for how it looks in practice!
 
-Below are the detailed explanation of the concepts. 
-They are powerful, also extremely simple to learn and use (as the philosophy of iWF).
+Below are detailed explanations of the concepts. 
+These concepts are powerful, and also extremely simple to learn and use (as is the philosophy of iWF).
 
 ## Persistence
 
-iWF let you store customized data as a database during the workflow execution. This eliminates the needs of depending on a database to implement your workflow.
+iWF let you store customized data as a database during the workflow execution. This eliminates the need to depend on a database to implement your workflow.
 
-The data are stored as data attributes and search attributes. Both are defined as "persistence schema". 
-The schema just defined and maintained in the code along with other business logic.
+Your data are stored as Data Attributes and Search Attributes. Together both define the "persistence schema". 
+The persistence schema is defined and maintained in the code along with other business logic.
 
-Search attribute works like infinite indexes in traditional database. You
-only need to specify which attributes should be indexed, without worrying about things in
-a traditional database like the number of indexes, and the order of the fields in an index.
+Search Attributes work like infinite indexes in a traditional database. You
+only need to specify which attributes should be indexed, without worrying about complications you might be used to in
+a traditional database like the number of shards, and the order of the fields in an index.
 
-Logically, the above workflow definition example will have a persistence schema like below:
+Logically, the workflow definition displayed in the example workflow diagram will have a persistence schema as follows:
 
 | Workflow Execution   | Search Attr A | Search Attr B | Data Attr C | Data Attr D |
 |----------------------|---------------|:-------------:|------------:|------------:|
@@ -76,55 +76,55 @@ Logically, the above workflow definition example will have a persistence schema 
 | Workflow Execution 2 | val 5         |     val 6     |       val 7 |       val 8 |
 | ...                  | ...           |      ...      |         ... |         ... |
 
-With Search attributes, you can write [customized SQL-like query to find out any workflow executions](https://docs.temporal.io/visibility#search-attribute), just like using a database query.
+With Search attributes, you can write [customized SQL-like queries to find any workflow execution(s)](https://docs.temporal.io/visibility#search-attribute), just like using a database query.
 
-Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data will be deleted after the retention period.  
+Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data retained in your persistence schema will be deleted once the configured retention period elapses.  
 
 ### Caching 
-By default, RPC will load data/search attributes with Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
-which is not optimized for very high volume requests on a single workflow execution(like 100 rps), because it could cause
-too many replay with history, especially when workflows are closed.
+By default, remote procedure calls (RPCs) will load data/search attributes with the Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
+which is not optimized for very high request volume (~>100 requests per second) on a single workflow execution. Such request volumes could cause
+too many history replays, especially when workflows are closed. This could in turn produce undesirable latency and load.
 
-You can enable the caching to support those high volume requests.  
+You can enable **caching** to support those high-volume requests.  
 
-NOTES:
-* The read after write will become eventual consistent, unless set bypassCachingForStrongConsistency=true in RPC options
-* Caching will be more useful for read-only RPC(no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
-  * A read-only RPC can still invoke any other RPCs(like calling other microservices, or DB operation) in the RPC implementation
-* It will cost extra event in history (upsertMemo operation for WorkflowPropertiesModified event) for updating the persisted data attributes
-* This feature is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
+Note:
+* With caching enabled read-after-write access will become *eventually consistent*, unless `bypassCachingForStrongConsistency=true` is set in RPC options
+* Caching will introduce an extra event in history (upsertMemo operation for WorkflowPropertiesModified event) for updating the persisted data attributes
+* Caching will be more useful for read-only RPC (no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
+  * A read-only RPC can still invoke any other RPCs (like calling other microservices, or DB operation) in the RPC implementation
+* Caching is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
 
 ## Workflow State
-WorkflowState is to implement the asynchronous process as "workflow".  
-It will be running in the background, with default infinite backoff retry. 
+WorkflowState is how you implement your asynchronous process as a "workflow".  
+It will run in the background, with infinite backoff retry by default. 
  
-A WorkflowState is like “a small workflow” of 1~2 steps:
+A WorkflowState is itself like “a small workflow” of 1 or 2 steps:
 
-**[ waitUntil ] → execute**
+**[ `waitUntil` ] → `execute`**
 
-The `waitUntil` API can returns some commands to wait for. When the commands are completed, the `execute` API will be invoked.
-The two APIs have access to read/write the persistence defined in the workflow.
+The `waitUntil` API returns "commands" to wait for. When the commands are completed, the `execute` API will be invoked.
+Both the `waitUntil` and `execute` APIs have access to read/write the persistence schema defined in the workflow.
 
-The full detailed execution flow is like this:
+The full execution flow looks like this:
 
 ![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234921554-587d8ad4-84f5-4987-b838-959869293465.png)
 
-The `waitUntil` API is optional. If not defined, then `execute` API will be invoked instead when the state started.
+The `waitUntil` API is optional. If not defined, then the `execute` API will be invoked immediately when the Workflow State is started.
 
-Note: the two APIs are invoked by iWF service with infinite backoff retry by default. See WorkflowStateOptions section for customization.  
+Note: the `waitUntil` and `execute` APIs are invoked by the iWF service with infinite backoff retry by default. See the [WorkflowStateOptions](#WorkflowStateOptions) section for customization.  
 
 The execute API will return a StateDecision:
-* Single next state 
-  * Go to to different state
-  * Go to the same state as a loop
-  * Go the the previous state as a loop
-* Multiple next states, executing as multi threads in parallel
+* For a single next state a decision can 
+  * Go to a different state
+  * Go to the same state, i.e. a loop
+  * Go to the previous state, i.e. a loop
 * Dead end -- Just stop the thread
 * Graceful complete -- Stop the thread, and also will stop the workflow when all other threads are stopped
 * Force complete -- Stop the workflow immediately
 * Force fail  -- Stop the workflow immediately with failure
+* For multiple next states, these are executed in parallel as multiple threads
 
-With decisions, the workflow definitions can have flows like these:
+With StateDecisions, the workflow definitions can have flows like these:
 
 ![decision flow1](https://user-images.githubusercontent.com/4523955/234919901-f327dfb6-5b38-4440-a2eb-5d1c832b694e.png)
 
@@ -132,38 +132,35 @@ or
 
 ![decision flow2](https://user-images.githubusercontent.com/4523955/234919896-30db8628-daeb-4f1d-bd2b-7bf826989c75.png)
 
-or even more complicated as needed.
+or as complex as needed for any use case!
 
 
 ### Commands for WorkflowState's WaitUntil API
 
 iWF provides three types of commands:
 
-* `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External application can use
+* `SignalCommand` -- Wait for a signal to be published to the workflow signal channel. External applications can use
   SignalWorkflow API to signal a workflow.
-* `TimerCommand`: will wait for a **durable timer** to fire.
-* `InternalChannelCommand`: will wait for a message from InternalChannel.
+* `TimerCommand` -- Wait for a **durable timer** to fire.
+* `InternalChannelCommand` -- Wait for a message from InternalChannel.
 
-The waitUntil API can return multiple commands along with a `CommandWaitingType`:
+The `waitUntil` API can return multiple commands along with a `CommandWaitingType`:
 
-* `AllCommandCompleted`: This option waits for all commands to be completed.
+* `AllCommandCompleted` -- Wait for all commands to be completed.
+* `AnyCommandCompleted` -- Wait for any of the commands to be completed.
+* `AnyCommandCombinationCompleted` -- Wait for any combination of the commands in a specified list to be completed.
 
-* `AnyCommandCompleted`: This option waits for any of the commands to be completed.
+### InternalChannel: synchronization for multi-threading
+When there are multiple threads of workflow states running in parallel, you may want to have them wait on each other to ensure some particular ordering.
 
-* `AnyCommandCombinationCompleted`: This option waits for any combination of the commands in a specified list to be
-  completed.
+For example, in your problem space, WorkflowStates 1,2,3 need to be completed before WorkflowState 4. 
 
-### InternalChannel: synchronization for multi threading
-When there are multiple threads of workflow states running in parallel, you may want to let them wait on each other to ensure some ordering.
-
-For example, WorkflowState 1,2,3 needs to be complete before workflow state 4. 
-
-In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages in "waitUntil" API.
-And then WorkflowState 1,2,3 will be publishing one message for each when completing.  
+In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages via the `waitUntil` API. 
+WorkflowState 1,2,3 will each publish a message when completing. This ensures propper ordering.  
 
 ## RPC
 
-RPC stands for "Remote Procedure Call". It's for external system to interact with the workflow execution.
+RPC stands for "Remote Procedure Call". Allows external systems to interact with the workflow execution.
 
 It's invoked by client, executed in workflow worker, and then respond back the results to client. 
 
