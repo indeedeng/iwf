@@ -132,38 +132,35 @@ or
 
 ![decision flow2](https://user-images.githubusercontent.com/4523955/234919896-30db8628-daeb-4f1d-bd2b-7bf826989c75.png)
 
-or as complicated as needed!
+or as complex as needed for any use case!
 
 
 ### Commands for WorkflowState's WaitUntil API
 
 iWF provides three types of commands:
 
-* `SignalCommand`: will wait for a signal to be published to the workflow signal channel. External applications can use
+* `SignalCommand` -- Wait for a signal to be published to the workflow signal channel. External applications can use
   SignalWorkflow API to signal a workflow.
-* `TimerCommand`: will wait for a **durable timer** to fire.
-* `InternalChannelCommand`: will wait for a message from InternalChannel.
+* `TimerCommand` -- Wait for a **durable timer** to fire.
+* `InternalChannelCommand` -- Wait for a message from InternalChannel.
 
 The `waitUntil` API can return multiple commands along with a `CommandWaitingType`:
 
-* `AllCommandCompleted`: This option waits for all commands to be completed.
+* `AllCommandCompleted` -- Wait for all commands to be completed.
+* `AnyCommandCompleted` -- Wait for any of the commands to be completed.
+* `AnyCommandCombinationCompleted` -- Wait for any combination of the commands in a specified list to be completed.
 
-* `AnyCommandCompleted`: This option waits for any of the commands to be completed.
+### InternalChannel: synchronization for multi-threading
+When there are multiple threads of workflow states running in parallel, you may want to have them wait on each other to ensure some particular ordering.
 
-* `AnyCommandCombinationCompleted`: This option waits for any combination of the commands in a specified list to be
-  completed.
+For example, in your problem space, WorkflowStates 1,2,3 need to be completed before WorkflowState 4. 
 
-### InternalChannel: synchronization for multi threading
-When there are multiple threads of workflow states running in parallel, you may want to let them wait on each other to ensure some ordering.
-
-For example, WorkflowState 1,2,3 needs to be complete before workflow state 4. 
-
-In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages in "waitUntil" API.
-And then WorkflowState 1,2,3 will be publishing one message for each when completing.  
+In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages via the `waitUntil` API. 
+WorkflowState 1,2,3 will each publish a message when completing. This ensures propper ordering.  
 
 ## RPC
 
-RPC stands for "Remote Procedure Call". It's for external system to interact with the workflow execution.
+RPC stands for "Remote Procedure Call". Allows external systems to interact with the workflow execution.
 
 It's invoked by client, executed in workflow worker, and then respond back the results to client. 
 
