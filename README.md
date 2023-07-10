@@ -91,7 +91,7 @@ Note:
 * With caching enabled read-after-write access will become *eventually consistent*, unless `bypassCachingForStrongConsistency=true` is set in RPC options
 * Caching will introduce an extra event in history (upsertMemo operation for WorkflowPropertiesModified event) for updating the persisted data attributes
 * Caching will be more useful for read-only RPC (no persistence.SetXXX API or communication API calls in RPC implementation) or GetDataAttributes API.
-  * A read-only RPC can still invoke any other RPCs (like calling other microservices, or DB operation) in the RPC implementation
+  * A read-only RPC can still invoke any other RPCs (like calling other microservices, or DB operations) in the RPC implementation
 * Caching is currently only supported if the backend is Temporal, because [Cadence doesn't support mutable memo](https://github.com/uber/cadence/issues/3729)
 
 ## Workflow State
@@ -156,7 +156,7 @@ When there are multiple threads of workflow states running in parallel, you may 
 For example, in your problem space, WorkflowStates 1,2,3 need to be completed before WorkflowState 4. 
 
 In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages via the `waitUntil` API. 
-WorkflowState 1,2,3 will each publish a message when completing. This ensures propper ordering.  
+WorkflowState 1,2,3 will each publish a message when completing. This ensures proper ordering.  
 
 ## RPC
 
@@ -256,7 +256,7 @@ WorkflowOptions.
 * `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY`
     * Allow starting workflow if a previous Workflow Execution with the same `WorkflowId` does not have a Completed
       status.
-      Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated or Cancelled workflow
+      Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated, or Cancelled workflow
       execution.
 * `DISALLOW_REUSE` 
     * Do not allow starting a new workflow execution with the same `WorkflowId`.
@@ -274,7 +274,7 @@ iWF allows you to start a workflow with a fixed cron schedule like below
 // or timed out, the workflow will be retried based on the retry policy. While the workflow is retrying, it won't
 // schedule its next run. If the next schedule is due while the workflow is running (or retrying), then it will skip
 that
-// schedule. Cron workflow will not stop until it is terminated or canceled (by returning cadence.CanceledError).
+// schedule. Cron workflow will not stop until it is terminated
 // The cron spec is as follows:
 // ┌───────────── minute (0 - 59)
 // │ ┌───────────── hour (0 - 23)
@@ -291,24 +291,26 @@ NOTE:
 * iWF also
   supports [more advanced cron expressions](https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format)
 * The [crontab guru](https://crontab.guru/) site is useful for testing your cron expressions.
-* To cancel a cron schedule, use terminate of cancel type to stop the workflow execution.
+* To cancel a cron scheduled run, use the stop workflow API (see WorkflowStopRequest.md)
 * By default, there is no cron schedule.
 
-#### RetryPolicy for workflow
+#### RetryPolicy for Workflow
 
-Workflow execution can have a backoff retry policy which will retry on failed or timeout.
+Workflows can have a backoff retry policy which will retry on failure or timeout.
 
 By default, there is no retry policy.
 
+Note: this is distinct from the retry policy for WorkflowState which is detailed below. 
+
 #### Initial Search Attributes
 
-Client can specify some initial search attributes when starting the workflow.
+The client can specify some initial search attributes when starting the workflow.
 
-By default, there is no initial search attributes.
+By default, there are no initial search attributes.
 
 ### WorkflowStateOptions
 
-Similarly, users can customize the WorkflowState
+Similarly, clients can customize the WorkflowState
 
 #### WorkflowState WaitUntil/Execute API timeout and retry policy
 
