@@ -13,14 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBasicWorkflowTemporal(t *testing.T) {
+func TestStartWorkflowNoOptionsTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	doTestStartWorkflowWithoutStartOptions(t, service.BackendTypeTemporal)
 }
 
-func TestBasicWorkflowCadence(t *testing.T) {
+func TestStartWorkflowNoOptionsCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
