@@ -44,6 +44,50 @@ func TestBasicWorkflowCadence(t *testing.T) {
 	}
 }
 
+func TestStartWorkflowWithoutStartOptions(t *testing.T) {
+	wfHandler := basic.NewHandler()
+	closeFunc1 := startWorkflowWorker(wfHandler)
+	defer closeFunc1()
+
+	client, closeFunc2 := startIwfServiceWithClient(service.BackendTypeTemporal)
+	defer closeFunc2()
+
+	// start a workflow
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: "http://localhost:" + testIwfServerPort,
+			},
+		},
+	})
+	wfId := "TestStartWorkflowWithoutStartOptions" + strconv.Itoa(int(time.Now().UnixNano()))
+	wfInput := &iwfidl.EncodedObject{
+		Encoding: iwfidl.PtrString("json"),
+		Data:     iwfidl.PtrString("test data"),
+	}
+	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
+	startReq := iwfidl.WorkflowStartRequest{
+		WorkflowId:             wfId,
+		IwfWorkflowType:        basic.WorkflowType,
+		WorkflowTimeoutSeconds: 100,
+		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
+		StartStateId:           ptr.Any(basic.State1),
+		StateInput:             wfInput,
+	}
+	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
+	panicAtHttpError(err, httpResp)
+
+	requestedSAs := []iwfidl.SearchAttributeKeyAndType{
+		{
+			Key:       ptr.Any(service.SearchAttributeIwfWorkflowType),
+			ValueType: iwfidl.KEYWORD.Ptr(),
+		},
+	}
+	response, err := client.DescribeWorkflowExecution(context.Background(), wfId, "", requestedSAs)
+	assertions := assert.New(t)
+	assertions.Equal(basic.WorkflowType, response.SearchAttributes[service.SearchAttributeIwfWorkflowType])
+}
+
 func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := basic.NewHandler()
