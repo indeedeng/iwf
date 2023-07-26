@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
+	"github.com/indeedeng/iwf/service/common/utils"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -80,9 +81,12 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		ID:                       req.GetWorkflowId(),
 		TaskQueue:                s.taskQueue,
 		WorkflowExecutionTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
+		SearchAttributes: map[string]interface{}{
+			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
+		},
 	}
 
-	var initSAs []iwfidl.SearchAttribute
+	var initCustomSAs []iwfidl.SearchAttribute
 	workflowConfig := s.config.Interpreter.DefaultWorkflowConfig
 
 	useMemo := false
@@ -92,12 +96,13 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		workflowOptions.CronSchedule = startOptions.CronSchedule
 		workflowOptions.RetryPolicy = startOptions.RetryPolicy
 		var err error
-		workflowOptions.SearchAttributes, err = mapper.MapToInternalSearchAttributes(startOptions.SearchAttributes)
+		initialCustomSAInternal, err := mapper.MapToInternalSearchAttributes(startOptions.SearchAttributes)
 		if err != nil {
 			return nil, s.handleError(err)
 		}
-		workflowOptions.SearchAttributes[service.SearchAttributeIwfWorkflowType] = req.IwfWorkflowType
-		initSAs = startOptions.SearchAttributes
+		workflowOptions.SearchAttributes = utils.MergeMap(initialCustomSAInternal, workflowOptions.SearchAttributes)
+
+		initCustomSAs = startOptions.SearchAttributes
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
@@ -117,7 +122,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 		StartStateId:             req.StartStateId,
 		StateInput:               req.GetStateInput(),
 		StateOptions:             req.GetStateOptions(),
-		InitSearchAttributes:     initSAs,
+		InitSearchAttributes:     initCustomSAs,
 		Config:                   workflowConfig,
 		UseMemoForDataAttributes: useMemo,
 	}
