@@ -85,7 +85,8 @@ func TestStartWorkflowWithoutStartOptions(t *testing.T) {
 	}
 	response, err := client.DescribeWorkflowExecution(context.Background(), wfId, "", requestedSAs)
 	assertions := assert.New(t)
-	assertions.Equal(basic.WorkflowType, response.SearchAttributes[service.SearchAttributeIwfWorkflowType])
+	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
+	assertions.Equal(basic.WorkflowType, attribute.GetStringValue())
 }
 
 func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
