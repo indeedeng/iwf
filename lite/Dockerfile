@@ -13,8 +13,7 @@ RUN curl -sSf https://temporal.download/cli.sh | sh
 
 RUN rm -rf iwf-server && \
     make bins && \
-    chmod +x /iwf/script/start-server.sh && \
     chmod +x /iwf/lite/start-lite-server.sh
 
-EXPOSE  8801 7933 8233
+EXPOSE  8801 7233 8233
 CMD ["/iwf/lite/start-lite-server.sh"]

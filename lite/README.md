@@ -5,9 +5,10 @@ An all-in-one image for iWF server.
 
 IWF service: http://localhost:8801/
 WebUI: http://localhost:8233/
+Temporal service: localhost:7233
 ## How to use
 ```shell
-docker run -p 8801:8801 -p 7933:7933 -p 8233:8233 -e AUTO_FIX_WORKER_URL=host.docker.internal --add-host host.docker.internal:host-gateway -it iworkflowio/iwf-server-lite:latest
+docker run -p 8801:8801 -p 7233:7233 -p 8233:8233 -e AUTO_FIX_WORKER_URL=host.docker.internal --add-host host.docker.internal:host-gateway -it iworkflowio/iwf-server-lite:latest
 ```
 
 ## How to build
