@@ -68,7 +68,7 @@ The solution with iWF:
 * All in one single dependency
 * WorkflowAsCode
 * Natural to represent business
-* Builtin support/operation tooling
+* Builtin & rich support for operation tooling
 
 ```java
 public class OrchestrationWorkflow implements ObjectWorkflow {
