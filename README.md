@@ -254,7 +254,7 @@ WorkflowOptions.
 * `ALLOW_IF_NO_RUNNING` 
     * Allow starting workflow if there is no execution running with the workflowId
     * This is the **default policy** if not specified in WorkflowOptions
-* `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY`
+* `ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY`
     * Allow starting workflow if a previous Workflow Execution with the same Workflow Id does not have a Completed
       status.
       Use this policy when there is a need to re-execute a Failed, Timed Out, Terminated or Cancelled workflow
@@ -349,11 +349,10 @@ As a workaround, RPC can kick off a WorkflowState to update the persistence data
 By default, the workflow execution will fail when API max out the retry attempts. In some cases that
 workflow want to ignore the errors.
 
-Using `PROCEED_ON_API_FAILURE` for `WaitUntilApiFailurePolicy` will let workflow continue to execute decide
+Using `PROCEED_ON_API_FAILURE` for `WaitUntilApiFailurePolicy` will let workflow continue to invoke `execute`
 API when the API fails with maxing out all the retry attempts.
 
-Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the
-exception/error.
+Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the exception/error.
 
 ## Limitation
 
