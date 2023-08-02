@@ -25,6 +25,153 @@ Related projects:
 * WIP [iWF TypeScript SDK](https://github.com/indeedeng/iwf-ts-sdk)
 # What is iWF
 
+## Example: microservice orchestration
+
+### Problem
+![1](https://github.com/indeedeng/iwf/assets/4523955/e0c7001e-2c8f-4a93-92d7-37e50a248c26)
+
+As above diagram, you want to:
+* Orchestrate 4 APIs as a workflow
+* Each API needs backoff retry
+* The data from topic 1 needs to be passed through
+* API2 and API3+4 need to be in different parallel threads
+* Need to wait for a signal from topic 2 for a day before calling API3
+* If not ready after a day, call API4
+
+This is a very abstracted example. It could be applied into any real-world scenario like refund process:
+* API1: create a refund request object in DB
+* API2: notify different users refund is created
+* topic2: wait for approval
+* API3: process refund after approval
+* API4: notify timeout and expired
+
+### Some existing solutions
+
+With some other existing technologies, you solve it using message queue(like SQS which has timer) + Database like below:
+![2](https://github.com/indeedeng/iwf/assets/4523955/babfca50-c605-4fae-b146-18d2aad79c6e)
+
+* Using visibility timeout for backoff retry
+  * Need to re-enqueue the message for larger backoff
+* Using visibility timeout for durable timer
+  * Need to re-enqueue the message for once to have 24 hours timer
+* Need to create one topic for every step
+* Need additional storage for processing ready signal
+* Only go to 3 or 4 if both conditions are met
+* Also need DLQ and build tooling around
+
+It's complicated and hard to maintain and extend.   
+
+### iWF solution
+![3](https://github.com/indeedeng/iwf/assets/4523955/3428523e-c3d9-4fd6-8d10-c19b91ac7ecd)
+
+The solution with iWF:
+* All in one single dependency
+* WorkflowAsCode
+* Natural to represent business
+* Builtin support/operation tooling
+
+```java
+public class OrchestrationWorkflow implements ObjectWorkflow {
+
+    public static final String DA_DATA1 = "SomeData";
+    public static final String READY_SIGNAL = "Ready";
+
+    private List<StateDef> stateDefs;
+
+    public OrchestrationWorkflow() {
+        this.stateDefs = Arrays.asList(
+                StateDef.startingState(new State1()),
+                StateDef.nonStartingState(new State2()),
+                StateDef.nonStartingState(new State3()),
+                StateDef.nonStartingState(new State4())
+        );
+    }
+
+    @Override
+    public List<StateDef> getWorkflowStates() {
+        return stateDefs;
+    }
+
+    @Override
+    public List<PersistenceFieldDef> getPersistenceSchema() {
+        return Arrays.asList(
+                DataAttributeDef.create(String.class, DA_DATA1)
+        );
+    }
+}
+
+class State1 implements WorkflowState<String> {
+
+    @Override
+    public Class<String> getInputType() {
+        return String.class;
+    }
+
+    @Override
+    public StateDecision execute(final Context context, final String input, final CommandResults commandResults, Persistence persistence, final Communication communication) {
+        persistence.setDataAttribute(DA_DATA1, input);
+        System.out.println("call API1 with backoff retry in this method..");
+        return StateDecision.multiNextStates(State2.class, State3.class);
+    }
+}
+
+class State2 implements WorkflowState<Void> {
+
+    @Override
+    public Class<Void> getInputType() {
+        return Void.class;
+    }
+
+    @Override
+    public StateDecision execute(final Context context, final Void input, final CommandResults commandResults, Persistence persistence, final Communication communication) {
+        String someData = persistence.getDataAttribute(DA_DATA1, String.class);
+        System.out.println("call API2 with backoff retry in this method..");
+        return StateDecision.deadEnd();
+    }
+}
+
+class State3 implements WorkflowState<Void> {
+
+    @Override
+    public Class<Void> getInputType() {
+        return Void.class;
+    }
+
+    @Override
+    public CommandRequest waitUntil(final Context context, final Void input, final Persistence persistence, final Communication communication) {
+        return CommandRequest.forAnyCommandCompleted(
+                TimerCommand.createByDuration(Duration.ofHours(24)),
+                SignalCommand.create(READY_SIGNAL)
+        );
+    }
+
+    @Override
+    public StateDecision execute(final Context context, final Void input, final CommandResults commandResults, final Persistence persistence, final Communication communication) {
+        if (commandResults.getAllTimerCommandResults().get(0).getTimerStatus() == TimerStatus.FIRED) {
+            return StateDecision.singleNextState(State4.class);
+        }
+        
+        String someData = persistence.getDataAttribute(DA_DATA1, String.class);
+        System.out.println("call API3 with backoff retry in this method..");
+        return StateDecision.gracefulCompleteWorkflow();
+    }
+}
+
+class State4 implements WorkflowState<Void> {
+
+    @Override
+    public Class<Void> getInputType() {
+        return Void.class;
+    }
+
+    @Override
+    public StateDecision execute(final Context context, final Void input, final CommandResults commandResults, Persistence persistence, final Communication communication) {
+        String someData = persistence.getDataAttribute(DA_DATA1, String.class);
+        System.out.println("call API4 with backoff retry in this method..");
+        return StateDecision.gracefulCompleteWorkflow();
+    }
+}
+```
 
 ## Basic Concepts
 
@@ -79,6 +226,9 @@ Logically, the workflow definition displayed in the example workflow diagram wil
 With Search attributes, you can write [customized SQL-like queries to find any workflow execution(s)](https://docs.temporal.io/visibility#search-attribute), just like using a database query.
 
 Note that after workflows are closed(completed, timeout, terminated, canceled, failed), all the data retained in your persistence schema will be deleted once the configured retention period elapses.  
+
+The iWF persistence is mainly for storing the workflow intermediate states/data. 
+**It is important to not abuse iWF persistence for things like permanent storage, or for tracking/analytics purpose.**  
 
 ### Caching 
 By default, remote procedure calls (RPCs) will load data/search attributes with the Cadence/Temporal [query API](https://docs.temporal.io/workflows#query), 
@@ -165,48 +315,7 @@ RPC stands for "Remote Procedure Call". Allows external systems to interact with
 It's invoked by client, executed in workflow worker, and then respond back the results to client. 
 
 RPC can have access to not only persistence read/write API, but also interact with WorkflowStates using InternalChannel, 
-or trigger a new WorkflowState execution in a new thread.   
-
-As an example, you can even uses iWF to implement a [job post system](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/jobpost), 
-which is much more powerful than a typical CRUD application on database:
-
-```java
-class JobPost implements ObjectWorkflow{
-    DataAttribute String title;
-    DataAttribute String authorName;
-    DataAttribute String body;
-
-    @RPC
-    public void update(Context context, JobInfo input, Persistence persistence, Communication communication) {
-        persistence.setSearchAttributeText(SA_KEY_TITLE, input.getTitle());
-        persistence.setSearchAttributeText(SA_KEY_JOB_DESCRIPTION, input.getDescription());
-
-        persistence.setSearchAttributeInt64(SA_KEY_LAST_UPDATE_TIMESTAMP, System.currentTimeMillis());
-
-        if (input.getNotes().isPresent()) {
-            persistence.setDataAttribute(DA_KEY_NOTES, input.getNotes().get());
-        }
-        communication.triggerStateMovements(
-                StateMovement.create(ExternalUpdateState.class)
-        );
-    }
-    
-    @RPC
-    public JobInfo get(Context context, Persistence persistence, Communication communication) {
-        String title = persistence.getSearchAttributeText(SA_KEY_TITLE);
-        String description = persistence.getSearchAttributeText(SA_KEY_JOB_DESCRIPTION);
-        String notes = persistence.getDataAttribute(DA_KEY_NOTES, String.class);
-
-        return ImmutableJobInfo.builder()
-                .title(title)
-                .description(description)
-                .notes(Optional.ofNullable(notes))
-                .build();
-    }
-}
-
-```
-
+or trigger a new WorkflowState execution in a new thread.
 
 ### Atomicity of RPC APIs
 
@@ -219,6 +328,8 @@ background execution when updating persistence. People sometimes have to use com
 **But in iWF, it's all builtin, and user application just needs a few lines of code!** 
 
 ![flow with RPC](https://user-images.githubusercontent.com/4523955/234930263-40b98ca7-4401-44fa-af8a-32d5ae075438.png)
+
+Note that the read+write locking in RPC is [WIP](https://github.com/indeedeng/iwf/issues/305).
 
 ### Signal Channel vs RPC
 
