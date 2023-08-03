@@ -21,7 +21,6 @@ var _ MappedNullable = &WorkflowStateOptions{}
 type WorkflowStateOptions struct {
 	SearchAttributesLoadingPolicy *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
 	DataObjectsLoadingPolicy      *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
-	CommandCarryOverPolicy        *CommandCarryOverPolicy    `json:"commandCarryOverPolicy,omitempty"`
 	StartApiTimeoutSeconds        *int32                     `json:"startApiTimeoutSeconds,omitempty"`
 	DecideApiTimeoutSeconds       *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
 	StartApiRetryPolicy           *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
@@ -116,38 +115,6 @@ func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool {
 // SetDataObjectsLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the DataObjectsLoadingPolicy field.
 func (o *WorkflowStateOptions) SetDataObjectsLoadingPolicy(v PersistenceLoadingPolicy) {
 	o.DataObjectsLoadingPolicy = &v
-}
-
-// GetCommandCarryOverPolicy returns the CommandCarryOverPolicy field value if set, zero value otherwise.
-func (o *WorkflowStateOptions) GetCommandCarryOverPolicy() CommandCarryOverPolicy {
-	if o == nil || IsNil(o.CommandCarryOverPolicy) {
-		var ret CommandCarryOverPolicy
-		return ret
-	}
-	return *o.CommandCarryOverPolicy
-}
-
-// GetCommandCarryOverPolicyOk returns a tuple with the CommandCarryOverPolicy field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WorkflowStateOptions) GetCommandCarryOverPolicyOk() (*CommandCarryOverPolicy, bool) {
-	if o == nil || IsNil(o.CommandCarryOverPolicy) {
-		return nil, false
-	}
-	return o.CommandCarryOverPolicy, true
-}
-
-// HasCommandCarryOverPolicy returns a boolean if a field has been set.
-func (o *WorkflowStateOptions) HasCommandCarryOverPolicy() bool {
-	if o != nil && !IsNil(o.CommandCarryOverPolicy) {
-		return true
-	}
-
-	return false
-}
-
-// SetCommandCarryOverPolicy gets a reference to the given CommandCarryOverPolicy and assigns it to the CommandCarryOverPolicy field.
-func (o *WorkflowStateOptions) SetCommandCarryOverPolicy(v CommandCarryOverPolicy) {
-	o.CommandCarryOverPolicy = &v
 }
 
 // GetStartApiTimeoutSeconds returns the StartApiTimeoutSeconds field value if set, zero value otherwise.
@@ -581,9 +548,6 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataObjectsLoadingPolicy) {
 		toSerialize["dataObjectsLoadingPolicy"] = o.DataObjectsLoadingPolicy
-	}
-	if !IsNil(o.CommandCarryOverPolicy) {
-		toSerialize["commandCarryOverPolicy"] = o.CommandCarryOverPolicy
 	}
 	if !IsNil(o.StartApiTimeoutSeconds) {
 		toSerialize["startApiTimeoutSeconds"] = o.StartApiTimeoutSeconds

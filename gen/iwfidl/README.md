@@ -98,8 +98,6 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [ChannelRequestStatus](docs/ChannelRequestStatus.md)
- - [CommandCarryOverPolicy](docs/CommandCarryOverPolicy.md)
- - [CommandCarryOverType](docs/CommandCarryOverType.md)
  - [CommandCombination](docs/CommandCombination.md)
  - [CommandRequest](docs/CommandRequest.md)
  - [CommandResults](docs/CommandResults.md)

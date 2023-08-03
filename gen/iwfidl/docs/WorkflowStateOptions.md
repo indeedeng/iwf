@@ -6,7 +6,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataObjectsLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
-**CommandCarryOverPolicy** | Pointer to [**CommandCarryOverPolicy**](CommandCarryOverPolicy.md) |  | [optional] 
 **StartApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **DecideApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **StartApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
@@ -89,31 +88,6 @@ SetDataObjectsLoadingPolicy sets DataObjectsLoadingPolicy field to given value.
 `func (o *WorkflowStateOptions) HasDataObjectsLoadingPolicy() bool`
 
 HasDataObjectsLoadingPolicy returns a boolean if a field has been set.
-
-### GetCommandCarryOverPolicy
-
-`func (o *WorkflowStateOptions) GetCommandCarryOverPolicy() CommandCarryOverPolicy`
-
-GetCommandCarryOverPolicy returns the CommandCarryOverPolicy field if non-nil, zero value otherwise.
-
-### GetCommandCarryOverPolicyOk
-
-`func (o *WorkflowStateOptions) GetCommandCarryOverPolicyOk() (*CommandCarryOverPolicy, bool)`
-
-GetCommandCarryOverPolicyOk returns a tuple with the CommandCarryOverPolicy field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetCommandCarryOverPolicy
-
-`func (o *WorkflowStateOptions) SetCommandCarryOverPolicy(v CommandCarryOverPolicy)`
-
-SetCommandCarryOverPolicy sets CommandCarryOverPolicy field to given value.
-
-### HasCommandCarryOverPolicy
-
-`func (o *WorkflowStateOptions) HasCommandCarryOverPolicy() bool`
-
-HasCommandCarryOverPolicy returns a boolean if a field has been set.
 
 ### GetStartApiTimeoutSeconds
 

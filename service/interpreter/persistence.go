@@ -105,6 +105,8 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 			}
 		}
 		return res
+	} else if loadingType == iwfidl.NONE {
+		return []iwfidl.SearchAttribute{}
 	} else {
 		panic("not supported loading type " + loadingType)
 	}
@@ -129,6 +131,8 @@ func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy 
 			Keys: partialLoadingKeys,
 		})
 		return res.DataObjects
+	} else if loadingType == iwfidl.NONE {
+		return []iwfidl.KeyValue{}
 	} else {
 		panic("not supported loading type " + loadingType)
 	}
