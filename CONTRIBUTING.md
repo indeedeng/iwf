@@ -56,7 +56,11 @@ brew update && brew upgrade openapi-generator
 
 ```
 
-## How to run server or integration test
+# How to run server or integration test
+
+## Prepare Cadence/Temporal environment
+iWF server depends on Cadence or Temporal. You need at least one to be ready for running with iWF .
+Or maybe both just for testing to ensure the code works for both Cadence and Temporal. 
 
 ### Option 1: Run with our docker-compose file (Recommended)
 
@@ -67,20 +71,6 @@ Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
 * Set up customized search attributes for integration test(`persistence_test.go`)
 * Temporal WebUI:  http://localhost:8233/
 * Cadence WebUI:  http://localhost:8088/
-
-:warning: NOTE: You need to wait for up to 60s before you can run tests with Cadence because of
-this [issue](https://github.com/uber/cadence/issues/5076).
-
-Then run the whole integ test suite against Cadence+Temporal service by this command:
-
-`make integTests`
-
-Or run `make temporalIntegTests` if you don't want to wait :/
-
-To run the server, if you are in an IDE, you can run the main function in `./cmd/main.go` with argument `start`.
-
-Alternatively, you could just build the binary by `make bins` and then run `./iwf-server start`
-
 
 ### Option 2: Run with your own Temporal service
 
@@ -101,7 +91,7 @@ Assuming you are using `default` namespace:
   temporal  operator search-attribute  create -name IwfExecutingStateIds -type KeywordList 
 ```
 
-3. For `persistence_test.go` integTests, you need to register below custom search attributes.
+2. For `persistence_test.go` integTests, you need to register below custom search attributes.
 
 ```shell
   temporal  operator search-attribute  create -name CustomKeywordField -type Keyword
@@ -112,16 +102,8 @@ Assuming you are using `default` namespace:
   temporal  operator search-attribute  create -name CustomStringField -type Text
 ```
 
-4. If you run into any issues with Search Attributes registration, use the below command to check the existing Search
+3. If you run into any issues with Search Attributes registration, use the below command to check the existing Search
    attributes:`temporal operator search-attribute list`
-
-Then run the whole integ test suite against Temporal service by this command:
-
-`make temporalIntegTests`
-
-To run the server, if you are in an IDE, you can run the main function in `./cmd/main.go` with argument `start`.
-
-Alternatively, you could just build the binary by `make bins` and then run `./iwf-server start`
 
 ### Option 3: Run with your own Cadence service
 
@@ -151,13 +133,31 @@ you run the test too early, you may see error:  `"IwfWorkflowType is not a valid
    `CustomKeywordField, CustomIntField, CustomBoolField, CustomBoolField, CustomDoubleField, CustomDatetimeField, CustomStringField`
 
 6. If you run into any issues with Search Attributes registration, use the below command to check the existing Search
-   attributes:
-   `cadence cl get-search-attr`
+   attributes:  `cadence cl get-search-attr`
 
-Then run the whole integ test suite against Cadence+Temporal service by this command:
+## Run the server
 
-`make cadenceIntegTests`
+The first step you may want to explore is to run it locally!
 
-To run the server, if you are in an IDE, you can run the main function in `./cmd/main.go` with argument ` --config config/development_cadence.yaml start`.
+To run the server with Temporal
+* If you are in an IDE, you can run the main function in `./cmd/main.go` with argument `start`.
+* Or in terminal `go run cmd/server/main.go start`
+* Or build the binary and run it by `make bins` and then run `./iwf-server start`
 
-Alternatively, you could just build the binary by `make bins` and then run `./iwf-server --config config/development_cadence.yaml start`
+To run with Cadence, make sure you specify the cadence config `--config config/development_cadence.yaml start`:
+* In an IDE, you can run the main function in `./cmd/main.go` with argument ` --config config/development_cadence.yaml start`.
+* Or in terminal `go run cmd/server/main.go --config config/development_cadence.yaml start`
+* Or build the binary and run it by`make bins` and then run `./iwf-server --config config/development_cadence.yaml start`
+
+## Run the integration tests
+For development, you may want to run the test locally for debugging, especially your PR has failed the tests in CI pipeline.
+
+:warning: NOTE: When running with local Cadence, you may need to wait for up to 60s for Search attributes to be ready, because of
+this [issue](https://github.com/uber/cadence/issues/5076).
+
+* To run the whole integ test suite against Cadence+Temporal service by this command `make integTests`
+* To run the whole suite for Temporal only `make temporalIntegTests` 
+* To run the whole suite for Cadence only `make cadenceIntegTests`
+* To run a specify test case or a test file, you can utilize the IDE or `go test` command.
+
+
