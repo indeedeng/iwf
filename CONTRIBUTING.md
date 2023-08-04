@@ -56,7 +56,11 @@ brew update && brew upgrade openapi-generator
 
 ```
 
-## How to run integration test
+# How to run server or integration test
+
+## Prepare Cadence/Temporal environment
+iWF server depends on Cadence or Temporal. You need at least one to be ready for running with iWF .
+Or maybe both just for testing to ensure the code works for both Cadence and Temporal. 
 
 ### Option 1: Run with our docker-compose file (Recommended)
 
@@ -65,61 +69,41 @@ Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
 * Start both Cadence & Temporal as dependencies
 * Set up required system search attributes
 * Set up customized search attributes for integration test(`persistence_test.go`)
-* Temporal WebUI:  http://localhost:8080/
+* Temporal WebUI:  http://localhost:8233/
 * Cadence WebUI:  http://localhost:8088/
-
-NOTE: You need to wait for up to 60s before you can run with Cadence because of
-this [issue](https://github.com/uber/cadence/issues/5076).
-
-Then run the whole integ test suite against Cadence+Temporal service by this command:
-
-`make integTests`
-
-Or run `make temporalIntegTests` if you don't want to wait :/
 
 ### Option 2: Run with your own Temporal service
 
-NOTE: For local testing it's recommended to use [temporal docker-compose](https://github.com/temporalio/docker-compose)
+First of all, you need a Temporal service if you haven't had it:
 
-NOTE: For Temporalite following the [instruction](https://github.com/temporalio/temporalite). If you see
-error `error setting up schema`, try use command `temporalite start --namespace default -f my_test.db` instead to start.
+Option 1 (recommended): use [Temporal CLI](https://github.com/temporalio/cli) -- `temporal server start-dev`
 
-NOTE: Temporal docker compose uses http://localhost:8080/ but Temporalite uses http://localhost:8233/ for WebUI
+Option 2: use [temporal docker-compose](https://github.com/temporalio/docker-compose)
 
-Assuming you already have a Temporal service :
 
-1. Make sure you have a default namespace
+Assuming you are using `default` namespace:
 
-```shell
-tctl --ns default n re
-```
-
-2. Make sure you have registered system search attributes required by iWF server
+1. Make sure you have registered system search attributes required by iWF server
 
 ```shell
-tctl adm cl asa -n IwfWorkflowType -t Keyword
-tctl adm cl asa -n IwfGlobalWorkflowVersion -t Int
-tctl adm cl asa -n IwfExecutingStateIds -t Keyword
-
+  temporal  operator search-attribute  create -name IwfWorkflowType -type Keyword
+  temporal  operator search-attribute  create -name IwfGlobalWorkflowVersion -type Int 
+  temporal  operator search-attribute  create -name IwfExecutingStateIds -type KeywordList 
 ```
 
-3. For `persistence_test.go` integTests, you need to register below custom search attributes.
+2. For `persistence_test.go` integTests, you need to register below custom search attributes.
 
 ```shell
-tctl adm cl asa -n CustomKeywordField -t Keyword
-tctl adm cl asa -n CustomIntField -t Int
-tctl adm cl asa -n CustomBoolField -t Bool
-tctl adm cl asa -n CustomDoubleField -t Double
-tctl adm cl asa -n CustomDatetimeField -t Datetime
-tctl adm cl asa -n CustomStringField -t text
+  temporal  operator search-attribute  create -name CustomKeywordField -type Keyword
+  temporal  operator search-attribute  create -name CustomIntField -type Int
+  temporal  operator search-attribute  create -name CustomBoolField -type Bool
+  temporal  operator search-attribute  create -name CustomDoubleField -type Double
+  temporal  operator search-attribute  create -name CustomDatetimeField -type Datetime
+  temporal  operator search-attribute  create -name CustomStringField -type Text
 ```
 
-4. If you run into any issues with Search Attributes registration, use the below command to check the existing Search
-   attributes:`tctl adm cl get-search-attributes`
-
-Then run the whole integ test suite against Cadence+Temporal service by this command:
-
-`make temporalIntegTests`
+3. If you run into any issues with Search Attributes registration, use the below command to check the existing Search
+   attributes:`temporal operator search-attribute list`
 
 ### Option 3: Run with your own Cadence service
 
@@ -149,9 +133,31 @@ you run the test too early, you may see error:  `"IwfWorkflowType is not a valid
    `CustomKeywordField, CustomIntField, CustomBoolField, CustomBoolField, CustomDoubleField, CustomDatetimeField, CustomStringField`
 
 6. If you run into any issues with Search Attributes registration, use the below command to check the existing Search
-   attributes:
-   `cadence cl get-search-attr`
+   attributes:  `cadence cl get-search-attr`
 
-Then run the whole integ test suite against Cadence+Temporal service by this command:
+## Run the server
 
-`make cadenceIntegTests`
+The first step you may want to explore is to run it locally!
+
+To run the server with Temporal
+* If you are in an IDE, you can run the main function in `./cmd/main.go` with argument `start`.
+* Or in terminal `go run cmd/server/main.go start`
+* Or build the binary and run it by `make bins` and then run `./iwf-server start`
+
+To run with Cadence, make sure you specify the cadence config `--config config/development_cadence.yaml start`:
+* In an IDE, you can run the main function in `./cmd/main.go` with argument ` --config config/development_cadence.yaml start`.
+* Or in terminal `go run cmd/server/main.go --config config/development_cadence.yaml start`
+* Or build the binary and run it by`make bins` and then run `./iwf-server --config config/development_cadence.yaml start`
+
+## Run the integration tests
+For development, you may want to run the test locally for debugging, especially your PR has failed the tests in CI pipeline.
+
+:warning: NOTE: When running with local Cadence, you may need to wait for up to 60s for Search attributes to be ready, because of
+this [issue](https://github.com/uber/cadence/issues/5076).
+
+* To run the whole integ test suite against Cadence+Temporal service by this command `make integTests`
+* To run the whole suite for Temporal only `make temporalIntegTests` 
+* To run the whole suite for Cadence only `make cadenceIntegTests`
+* To run a specify test case or a test file, you can utilize the IDE or `go test` command.
+
+
