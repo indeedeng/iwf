@@ -16,7 +16,7 @@ import (
 func TestPersistenceLoadingPolicy_ALL(t *testing.T) {
 	for _, backendType := range getBackendTypes() {
 		for i := 0; i < *repeatIntegTest; i++ {
-			doTestPersistenceLoadingPolicy(t, backendType, persistence_loading_policy.LoadingTypeAll)
+			doTestPersistenceLoadingPolicy(t, backendType, iwfidl.ALL_WITHOUT_LOCKING)
 			smallWaitForFastTest()
 		}
 	}
@@ -25,7 +25,7 @@ func TestPersistenceLoadingPolicy_ALL(t *testing.T) {
 func TestPersistenceLoadingPolicy_PARTIAL_WITHOUT_LOCK(t *testing.T) {
 	for _, backendType := range getBackendTypes() {
 		for i := 0; i < *repeatIntegTest; i++ {
-			doTestPersistenceLoadingPolicy(t, backendType, persistence_loading_policy.LoadingTypePartialWithoutLock)
+			doTestPersistenceLoadingPolicy(t, backendType, iwfidl.PARTIAL_WITHOUT_LOCKING)
 			smallWaitForFastTest()
 		}
 	}
@@ -34,7 +34,7 @@ func TestPersistenceLoadingPolicy_PARTIAL_WITHOUT_LOCK(t *testing.T) {
 func TestPersistenceLoadingPolicy_PARTIAL_WITH_LOCK(t *testing.T) {
 	for _, backendType := range getBackendTypes() {
 		for i := 0; i < *repeatIntegTest; i++ {
-			doTestPersistenceLoadingPolicy(t, backendType, persistence_loading_policy.LoadingTypePartialWithLock)
+			doTestPersistenceLoadingPolicy(t, backendType, iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK)
 			smallWaitForFastTest()
 		}
 	}
@@ -43,13 +43,13 @@ func TestPersistenceLoadingPolicy_PARTIAL_WITH_LOCK(t *testing.T) {
 func TestPersistenceLoadingPolicyTemporal_NONE(t *testing.T) {
 	for _, backendType := range getBackendTypes() {
 		for i := 0; i < *repeatIntegTest; i++ {
-			doTestPersistenceLoadingPolicy(t, backendType, persistence_loading_policy.LoadingTypeNone)
+			doTestPersistenceLoadingPolicy(t, backendType, iwfidl.NONE)
 			smallWaitForFastTest()
 		}
 	}
 }
 
-func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendType, loadingType string) {
+func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendType, loadingType iwfidl.PersistenceLoadingType) {
 	wfHandler := persistence_loading_policy.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
@@ -64,11 +64,11 @@ func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendTyp
 		},
 	})
 
-	wfId := persistence_loading_policy.WorkflowType + "_" + loadingType + "_" + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := persistence_loading_policy.WorkflowType + "_" + string(loadingType) + "_" + strconv.Itoa(int(time.Now().UnixNano()))
 
 	wfInput := &iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
-		Data:     iwfidl.PtrString(loadingType),
+		Data:     iwfidl.PtrString(string(loadingType)),
 	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
@@ -98,58 +98,44 @@ func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendTyp
 		"S2_decide": 1,
 	}, history, "persistence loading policy test fail, %v", history)
 
-	if loadingType == persistence_loading_policy.LoadingTypeAll {
+	if loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		assertions.Equalf(map[string]interface{}{
 			"sa_state_start_S2_" + persistence.TestSearchAttributeKeywordKey: "test-search-attribute-1",
 			"sa_state_start_S2_" + persistence.TestSearchAttributeTextKey:    "test-search-attribute-2",
-			"sa_state_start_S2_da_1": iwfidl.EncodedObject{
+			"da_state_start_S2_da_1": iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString("test-data-object-value1"),
 			},
-			"sa_state_start_S2_da_2": iwfidl.EncodedObject{
+			"da_state_start_S2_da_2": iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString("test-data-object-value2"),
 			},
 			"sa_state_decide_S2_" + persistence.TestSearchAttributeKeywordKey: "test-search-attribute-1",
 			"sa_state_decide_S2_" + persistence.TestSearchAttributeTextKey:    "test-search-attribute-2",
-			"sa_state_decide_S2_da_1": iwfidl.EncodedObject{
+			"da_state_decide_S2_da_1": iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString("test-data-object-value1"),
 			},
-			"sa_state_decide_S2_da_2": iwfidl.EncodedObject{
+			"da_state_decide_S2_da_2": iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString("test-data-object-value2"),
 			},
 		}, data, "persistence loading policy test fail, %v", data)
-	} else if loadingType == persistence_loading_policy.LoadingTypePartialWithoutLock {
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		assertions.Equalf(map[string]interface{}{
 			"sa_state_start_S2_" + persistence.TestSearchAttributeKeywordKey: "test-search-attribute-1",
-			"sa_state_start_S2_da_1": iwfidl.EncodedObject{
+			"da_state_start_S2_da_1": iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString("test-data-object-value1"),
 			},
 
 			"sa_state_decide_S2_" + persistence.TestSearchAttributeKeywordKey: "test-search-attribute-1",
-			"sa_state_decide_S2_da_1": iwfidl.EncodedObject{
+			"da_state_decide_S2_da_1": iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString("test-data-object-value1"),
 			},
 		}, data, "persistence loading policy test fail, %v", data)
-	} else if loadingType == persistence_loading_policy.LoadingTypePartialWithLock {
-		assertions.Equalf(map[string]interface{}{
-			"sa_state_start_S2_" + persistence.TestSearchAttributeKeywordKey: "test-search-attribute-1",
-			"sa_state_start_S2_da_1": iwfidl.EncodedObject{
-				Encoding: iwfidl.PtrString("json"),
-				Data:     iwfidl.PtrString("test-data-object-value1"),
-			},
-
-			"sa_state_decide_S2_" + persistence.TestSearchAttributeKeywordKey: "test-search-attribute-1",
-			"sa_state_decide_S2_da_1": iwfidl.EncodedObject{
-				Encoding: iwfidl.PtrString("json"),
-				Data:     iwfidl.PtrString("test-data-object-value1"),
-			},
-		}, data, "persistence loading policy test fail, %v", data)
-	} else if loadingType == persistence_loading_policy.LoadingTypeNone {
+	} else if loadingType == iwfidl.NONE {
 		assertions.Equalf(map[string]interface{}{}, data, "persistence loading policy test fail, %v", data)
 	}
 }

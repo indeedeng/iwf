@@ -12,13 +12,9 @@ import (
 )
 
 const (
-	WorkflowType                  = "persistence_loading_policy"
-	State1                        = "S1"
-	State2                        = "S2"
-	LoadingTypeAll                = "all"
-	LoadingTypeNone               = "none"
-	LoadingTypePartialWithoutLock = "partial_without_lock"
-	LoadingTypePartialWithLock    = "partial_with_lock"
+	WorkflowType = "persistence_loading_policy"
+	State1       = "S1"
+	State2       = "S2"
 )
 
 type handler struct {
@@ -124,16 +120,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	}
 
 	// dynamically get the loadingType from input
-	loadingType := iwfidl.ALL_WITHOUT_LOCKING
-
 	loadingTypeFromInput := req.GetStateInput()
-	if loadingTypeFromInput.GetData() == LoadingTypeNone {
-		loadingType = iwfidl.NONE
-	} else if loadingTypeFromInput.GetData() == LoadingTypePartialWithoutLock {
-		loadingType = iwfidl.PARTIAL_WITHOUT_LOCKING
-	} else if loadingTypeFromInput.GetData() == LoadingTypePartialWithLock {
-		loadingType = iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK
-	}
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
@@ -177,7 +165,7 @@ func (h *handler) setInvokeDataWhenStart(req *iwfidl.WorkflowStateStartRequest) 
 		h.invokeData["sa_state_start"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetStringValue()
 	}
 	for _, a := range req.GetDataObjects() {
-		h.invokeData["sa_state_start"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetValue()
+		h.invokeData["da_state_start"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetValue()
 	}
 }
 
@@ -186,6 +174,6 @@ func (h *handler) setInvokeDataWhenDecide(req *iwfidl.WorkflowStateDecideRequest
 		h.invokeData["sa_state_decide"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetStringValue()
 	}
 	for _, a := range req.GetDataObjects() {
-		h.invokeData["sa_state_decide"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetValue()
+		h.invokeData["da_state_decide"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetValue()
 	}
 }
