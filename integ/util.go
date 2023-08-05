@@ -196,3 +196,17 @@ func minimumContinueAsNewConfig() *iwfidl.WorkflowConfig {
 		ContinueAsNewThreshold: iwfidl.PtrInt32(1),
 	}
 }
+
+func getBackendTypes() []service.BackendType {
+	backendTypesToTest := []service.BackendType{}
+
+	if *temporalIntegTest {
+		backendTypesToTest = append(backendTypesToTest, service.BackendTypeTemporal)
+	}
+
+	if *cadenceIntegTest {
+		backendTypesToTest = append(backendTypesToTest, service.BackendTypeCadence)
+	}
+
+	return backendTypesToTest
+}

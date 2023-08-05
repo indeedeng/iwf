@@ -7,8 +7,6 @@ api_default.go
 client.go
 configuration.go
 docs/ChannelRequestStatus.md
-docs/CommandCarryOverPolicy.md
-docs/CommandCarryOverType.md
 docs/CommandCombination.md
 docs/CommandRequest.md
 docs/CommandResults.md
@@ -83,8 +81,6 @@ git_push.sh
 go.mod
 go.sum
 model_channel_request_status.go
-model_command_carry_over_policy.go
-model_command_carry_over_type.go
 model_command_combination.go
 model_command_request.go
 model_command_results.go
