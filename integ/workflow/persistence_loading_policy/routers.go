@@ -9,6 +9,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"reflect"
 )
 
 const (
@@ -19,13 +20,11 @@ const (
 
 type handler struct {
 	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
 }
 
 func NewHandler() common.WorkflowHandler {
 	return &handler{
 		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
 	}
 }
 
@@ -46,7 +45,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
 	if req.GetWorkflowStateId() == State2 {
-		h.setInvokeDataWhenStart(&req)
+		// dynamically get the loadingType from input
+		loadingTypeFromInput := req.GetStateInput()
+		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
+		verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
 	}
 
 	// go straight to decide methods without any commands
@@ -72,8 +75,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 
+	// dynamically get the loadingType from input
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
 	if req.GetWorkflowStateId() == State2 {
-		h.setInvokeDataWhenDecide(&req)
+		verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
 	}
 
 	var upsertSearchAttributes []iwfidl.SearchAttribute
@@ -119,10 +126,6 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		nextStateId = service.GracefulCompletingWorkflowStateId
 	}
 
-	// dynamically get the loadingType from input
-	loadingTypeFromInput := req.GetStateInput()
-	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -148,6 +151,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 							},
 						},
 					},
+					StateInput: &loadingTypeFromInput,
 				},
 			},
 		},
@@ -157,23 +161,73 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	return h.invokeHistory, nil
 }
 
-func (h *handler) setInvokeDataWhenStart(req *iwfidl.WorkflowStateStartRequest) {
-	for _, a := range req.GetSearchAttributes() {
-		h.invokeData["sa_state_start"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetStringValue()
-	}
-	for _, a := range req.GetDataObjects() {
-		h.invokeData["da_state_start"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetValue()
-	}
-}
+func verifyLoadedAttributes(
+	searchAttributes []iwfidl.SearchAttribute,
+	dataAttributes []iwfidl.KeyValue,
+	loadingType iwfidl.PersistenceLoadingType) {
 
-func (h *handler) setInvokeDataWhenDecide(req *iwfidl.WorkflowStateDecideRequest) {
-	for _, a := range req.GetSearchAttributes() {
-		h.invokeData["sa_state_decide"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetStringValue()
+	var expectedSearchAttributes []iwfidl.SearchAttribute
+	var expectedDataAttributes []iwfidl.KeyValue
+
+	if loadingType == iwfidl.ALL_WITHOUT_LOCKING {
+		expectedSearchAttributes = []iwfidl.SearchAttribute{
+			{
+				Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
+				ValueType:   ptr.Any(iwfidl.KEYWORD),
+				StringValue: iwfidl.PtrString("test-search-attribute-1"),
+			},
+			{
+				Key:         iwfidl.PtrString(persistence.TestSearchAttributeTextKey),
+				ValueType:   ptr.Any(iwfidl.TEXT),
+				StringValue: iwfidl.PtrString("test-search-attribute-2"),
+			},
+		}
+		expectedDataAttributes = []iwfidl.KeyValue{
+			{
+				Key: iwfidl.PtrString("da_1"),
+				Value: &iwfidl.EncodedObject{
+					Encoding: iwfidl.PtrString("json"),
+					Data:     iwfidl.PtrString("test-data-object-value1"),
+				},
+			},
+			{
+				Key: iwfidl.PtrString("da_2"),
+				Value: &iwfidl.EncodedObject{
+					Encoding: iwfidl.PtrString("json"),
+					Data:     iwfidl.PtrString("test-data-object-value2"),
+				},
+			},
+		}
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		expectedSearchAttributes = []iwfidl.SearchAttribute{
+			{
+				Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
+				ValueType:   ptr.Any(iwfidl.KEYWORD),
+				StringValue: iwfidl.PtrString("test-search-attribute-1"),
+			},
+		}
+		expectedDataAttributes = []iwfidl.KeyValue{
+			{
+				Key: iwfidl.PtrString("da_1"),
+				Value: &iwfidl.EncodedObject{
+					Encoding: iwfidl.PtrString("json"),
+					Data:     iwfidl.PtrString("test-data-object-value1"),
+				},
+			},
+		}
+	} else if loadingType == iwfidl.NONE {
+		expectedSearchAttributes = []iwfidl.SearchAttribute{}
+		expectedDataAttributes = []iwfidl.KeyValue{}
 	}
-	for _, a := range req.GetDataObjects() {
-		h.invokeData["da_state_decide"+"_"+req.GetWorkflowStateId()+"_"+a.GetKey()] = a.GetValue()
+
+	if !reflect.DeepEqual(expectedSearchAttributes, searchAttributes) {
+		panic("Search attributes should be the same")
+	}
+
+	if !reflect.DeepEqual(expectedDataAttributes, dataAttributes) {
+		panic("Data attributes should be the same")
 	}
 }
