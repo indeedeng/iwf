@@ -60,22 +60,16 @@ func RebuildPersistenceManager(provider WorkflowProvider,
 }
 
 func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjectsQueryRequest) service.GetDataObjectsQueryResponse {
-	all := false
+	var dataAttributes []iwfidl.KeyValue
+
 	if len(request.Keys) == 0 {
-		all = true
+		dataAttributes = am.GetAllDataObjects()
+	} else {
+		dataAttributes = LoadDataAttributes(request.Keys, am.GetAllDataObjects())
 	}
-	var res []iwfidl.KeyValue
-	keyMap := map[string]bool{}
-	for _, k := range request.Keys {
-		keyMap[k] = true
-	}
-	for key, value := range am.dataObjects {
-		if keyMap[key] || all {
-			res = append(res, value)
-		}
-	}
+
 	return service.GetDataObjectsQueryResponse{
-		DataObjects: res,
+		DataObjects: dataAttributes,
 	}
 }
 
@@ -94,17 +88,7 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllSearchAttributes()
 	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
-		var res []iwfidl.SearchAttribute
-		keyMap := map[string]bool{}
-		for _, k := range partialLoadingKeys {
-			keyMap[k] = true
-		}
-		for key, value := range am.searchAttributes {
-			if keyMap[key] {
-				res = append(res, value)
-			}
-		}
-		return res
+		return LoadSearchAttributes(partialLoadingKeys, am.GetAllSearchAttributes())
 	} else if loadingType == iwfidl.NONE {
 		return []iwfidl.SearchAttribute{}
 	} else {
@@ -127,15 +111,54 @@ func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy 
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
 		return am.GetAllDataObjects()
 	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
-		res := am.GetDataObjectsByKey(service.GetDataObjectsQueryRequest{
-			Keys: partialLoadingKeys,
-		})
-		return res.DataObjects
+		return LoadDataAttributes(partialLoadingKeys, am.GetAllDataObjects())
 	} else if loadingType == iwfidl.NONE {
 		return []iwfidl.KeyValue{}
 	} else {
 		panic("not supported loading type " + loadingType)
 	}
+}
+
+func LoadSearchAttributes(loadingKeys []string, allSearchAttributes []iwfidl.SearchAttribute) []iwfidl.SearchAttribute {
+	if len(loadingKeys) == 0 {
+		return []iwfidl.SearchAttribute{}
+	}
+
+	keyMap := map[string]bool{}
+	for _, loadingKey := range loadingKeys {
+		keyMap[loadingKey] = true
+	}
+
+	var results []iwfidl.SearchAttribute
+
+	for _, sa := range allSearchAttributes {
+		if keyMap[sa.GetKey()] {
+			results = append(results, sa)
+		}
+	}
+
+	return results
+}
+
+func LoadDataAttributes(loadingKeys []string, allDataAttributes []iwfidl.KeyValue) []iwfidl.KeyValue {
+	if len(loadingKeys) == 0 {
+		return []iwfidl.KeyValue{}
+	}
+
+	keyMap := map[string]bool{}
+	for _, loadingKey := range loadingKeys {
+		keyMap[loadingKey] = true
+	}
+
+	var results []iwfidl.KeyValue
+
+	for _, da := range allDataAttributes {
+		if keyMap[da.GetKey()] {
+			results = append(results, da)
+		}
+	}
+
+	return results
 }
 
 func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {

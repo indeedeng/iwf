@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/common/utils"
+	"github.com/indeedeng/iwf/service/interpreter"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -432,56 +433,84 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 
 	var queryResp service.PrepareRpcQueryResponse
 	queryToPrepare := true
+
 	if req.GetUseMemoForDataAttributes() {
 		var searchAttributes []iwfidl.SearchAttribute
 		var dataAttributes []iwfidl.KeyValue
 
-		requestedSAs := req.SearchAttributes
+		var requestedSAs []iwfidl.SearchAttributeKeyAndType
+
 		saPolicy := req.GetSearchAttributesLoadingPolicy()
-		if saPolicy.GetPersistenceLoadingType() != iwfidl.ALL_WITHOUT_LOCKING {
+		switch saPolicy.GetPersistenceLoadingType() {
+		case iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK:
+		case iwfidl.PARTIAL_WITHOUT_LOCKING:
 			requestedSAKeys := map[string]bool{}
 			for _, saKey := range saPolicy.PartialLoadingKeys {
 				requestedSAKeys[saKey] = true
 			}
-			requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
 			for _, sa := range req.SearchAttributes {
 				if requestedSAKeys[sa.GetKey()] {
 					requestedSAs = append(requestedSAs, sa)
 				}
 			}
+		case iwfidl.NONE:
+			requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
+		default:
+			requestedSAs = req.SearchAttributes
+		}
+
+		// get loading keys for the search attributes
+		var loadingSAKeys []string
+		for _, requestedSA := range requestedSAs {
+			loadingSAKeys = append(loadingSAKeys, requestedSA.GetKey())
 		}
 
 		requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
 			Key:       ptr.Any(service.SearchAttributeIwfWorkflowType),
 			ValueType: iwfidl.KEYWORD.Ptr(),
 		})
+
 		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), requestedSAs)
 		if err != nil {
 			return nil, s.handleError(err)
 		}
 
-		for _, sa := range requestedSAs {
-			if sa.GetKey() == service.SearchAttributeIwfWorkflowType {
-				continue
-			}
-			searchAttribute, exist := response.SearchAttributes[sa.GetKey()]
-			if exist {
-				searchAttributes = append(searchAttributes, searchAttribute)
-			}
+		// get all search attributes
+		var allSearchAttributes []iwfidl.SearchAttribute
+		for _, sa := range response.SearchAttributes {
+			allSearchAttributes = append(allSearchAttributes, sa)
 		}
 
-		for k, v := range response.Memos {
-			if strings.HasPrefix(k, service.IwfSystemConstPrefix) {
-				continue
+		searchAttributes = interpreter.LoadSearchAttributes(loadingSAKeys, allSearchAttributes)
+
+		daPolicy := req.GetDataAttributesLoadingPolicy()
+		if daPolicy.GetPersistenceLoadingType() == iwfidl.NONE {
+			dataAttributes = []iwfidl.KeyValue{}
+		} else {
+			partialRequestedDAKeys := map[string]bool{}
+			for _, daKey := range daPolicy.PartialLoadingKeys {
+				partialRequestedDAKeys[daKey] = true
 			}
-			dataAttributes = append(dataAttributes, iwfidl.KeyValue{
-				Key:   iwfidl.PtrString(k),
-				Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
-			})
+
+			for k, v := range response.Memos {
+				if strings.HasPrefix(k, service.IwfSystemConstPrefix) {
+					continue
+				}
+
+				if (daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITHOUT_LOCKING) && !partialRequestedDAKeys[k] {
+					continue
+				}
+
+				dataAttributes = append(dataAttributes, iwfidl.KeyValue{
+					Key:   iwfidl.PtrString(k),
+					Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
+				})
+			}
 		}
 
 		attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
 		workflowType := attribute.GetStringValue()
+
 		workerUrlMemoObj, ok := response.Memos[service.WorkerUrlMemoKey]
 		if ok {
 			// using memo is enough
