@@ -96,6 +96,12 @@ func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendTyp
 	}
 
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
+	if rpcUseMemo && backendType == service.BackendTypeCadence {
+		if err == nil {
+			panic("err should not be nil when Memo is not supported with Cadence")
+		}
+		return
+	}
 	panicAtHttpError(err, httpResp)
 
 	time.Sleep(time.Second * 2)

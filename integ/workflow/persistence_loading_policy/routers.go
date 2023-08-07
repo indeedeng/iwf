@@ -9,7 +9,6 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
-	"reflect"
 )
 
 const (
@@ -223,16 +222,37 @@ func verifyLoadedAttributes(
 		expectedDataAttributes = []iwfidl.KeyValue{}
 	}
 
-	if !reflect.DeepEqual(expectedSearchAttributes, searchAttributes) {
+	if !IsSearchAttributeArraysContainTheSameElements(expectedSearchAttributes, searchAttributes) {
 		panic("Search attributes should be the same")
 	}
 
-	if !IsArraysContainTheSameElements(expectedDataAttributes, dataAttributes) {
+	if !IsDataAttributeArraysContainTheSameElements(expectedDataAttributes, dataAttributes) {
 		panic("Data attributes should be the same")
 	}
 }
 
-func IsArraysContainTheSameElements(arr1, arr2 []iwfidl.KeyValue) bool {
+func IsSearchAttributeArraysContainTheSameElements(arr1, arr2 []iwfidl.SearchAttribute) bool {
+	if len(arr1) != len(arr2) {
+		return false
+	}
+
+	frequencyMap := make(map[string]int)
+
+	for _, sa := range arr1 {
+		frequencyMap[sa.GetKey()+sa.GetStringValue()]++
+	}
+
+	for _, sa := range arr2 {
+		if frequencyMap[sa.GetKey()+sa.GetStringValue()] == 0 {
+			return false
+		}
+		frequencyMap[sa.GetKey()+sa.GetStringValue()]--
+	}
+
+	return true
+}
+
+func IsDataAttributeArraysContainTheSameElements(arr1, arr2 []iwfidl.KeyValue) bool {
 	if len(arr1) != len(arr2) {
 		return false
 	}
@@ -240,14 +260,14 @@ func IsArraysContainTheSameElements(arr1, arr2 []iwfidl.KeyValue) bool {
 	frequencyMap := make(map[string]int)
 
 	for _, keyValue := range arr1 {
-		frequencyMap[*(keyValue.Key)+keyValue.Value.GetData()]++
+		frequencyMap[keyValue.GetKey()+keyValue.Value.GetData()]++
 	}
 
 	for _, keyValue := range arr2 {
-		if frequencyMap[*(keyValue.Key)+keyValue.Value.GetData()] == 0 {
+		if frequencyMap[keyValue.GetKey()+keyValue.Value.GetData()] == 0 {
 			return false
 		}
-		frequencyMap[*(keyValue.Key)+keyValue.Value.GetData()]--
+		frequencyMap[keyValue.GetKey()+keyValue.Value.GetData()]--
 	}
 
 	return true

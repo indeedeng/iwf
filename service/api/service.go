@@ -460,9 +460,9 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		}
 
 		// get loading keys for the search attributes
-		var loadingSAKeys []string
+		var saLoadingKeys []string
 		for _, requestedSA := range requestedSAs {
-			loadingSAKeys = append(loadingSAKeys, requestedSA.GetKey())
+			saLoadingKeys = append(saLoadingKeys, requestedSA.GetKey())
 		}
 
 		requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
@@ -481,7 +481,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			allSearchAttributes = append(allSearchAttributes, sa)
 		}
 
-		searchAttributes = interpreter.LoadSearchAttributes(loadingSAKeys, allSearchAttributes)
+		searchAttributes = interpreter.LoadSearchAttributes(saLoadingKeys, allSearchAttributes)
 
 		daPolicy := req.GetDataAttributesLoadingPolicy()
 		if daPolicy.GetPersistenceLoadingType() == iwfidl.NONE {
