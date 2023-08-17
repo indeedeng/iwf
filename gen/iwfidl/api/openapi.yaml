@@ -283,6 +283,16 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: dump internal info of a workflow
+  /info/healthcheck:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthInfo'
+          description: successful operation
+      summary: return health info of the server
   /api/v1/workflowState/start:
     post:
       requestBody:
@@ -658,6 +668,19 @@ components:
           type: string
         errorType:
           type: string
+      type: object
+    HealthInfo:
+      example:
+        duration: 0
+        condition: condition
+        hostname: hostname
+      properties:
+        condition:
+          type: string
+        hostname:
+          type: string
+        duration:
+          type: integer
       type: object
     ErrorResponse:
       properties:

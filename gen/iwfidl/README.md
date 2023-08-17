@@ -93,6 +93,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowStopPost**](docs/DefaultApi.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
 *DefaultApi* | [**ApiV1WorkflowTimerSkipPost**](docs/DefaultApi.md#apiv1workflowtimerskippost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
 *DefaultApi* | [**ApiV1WorkflowWorkerRpcPost**](docs/DefaultApi.md#apiv1workflowworkerrpcpost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
+*DefaultApi* | [**InfoHealthcheckGet**](docs/DefaultApi.md#infohealthcheckget) | **Get** /info/healthcheck | return health info of the server
 
 
 ## Documentation For Models
@@ -107,6 +108,7 @@ Class | Method | HTTP request | Description
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
  - [ErrorSubStatus](docs/ErrorSubStatus.md)
+ - [HealthInfo](docs/HealthInfo.md)
  - [IDReusePolicy](docs/IDReusePolicy.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)
  - [InterStateChannelPublishing](docs/InterStateChannelPublishing.md)
