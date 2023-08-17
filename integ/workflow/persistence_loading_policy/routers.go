@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/persistence"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"reflect"
@@ -223,7 +224,9 @@ func verifyLoadedAttributes(
 		expectedDataAttributes = []iwfidl.KeyValue{}
 	}
 
-	if !reflect.DeepEqual(expectedSearchAttributes, searchAttributes) {
+	// use ElementsMatch so that the order won't be a problem.
+	// Internally the SAs are stored as a map and as a result, Golang return it without ordering guarantee
+	if !assert.ElementsMatch(common.DummyT{}, expectedSearchAttributes, searchAttributes) {
 		panic("Search attributes should be the same")
 	}
 
