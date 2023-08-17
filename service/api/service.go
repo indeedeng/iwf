@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"math"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -681,6 +682,18 @@ func (s *serviceImpl) ApiV1WorkflowDumpPost(ctx context.Context, request iwfidl.
 		TotalPages: totalPages,
 		JsonData:   string(data[start:end]),
 	}, nil
+}
+
+func (s *serviceImpl) ApiInfoHealth(ctx context.Context) *iwfidl.HealthInfo {
+	hostName, err := os.Hostname()
+	if err != nil {
+		hostName = "Hostname Not Available"
+	}
+	return &iwfidl.HealthInfo{
+		Condition: iwfidl.PtrString("OK"),
+		Hostname:  iwfidl.PtrString(hostName),
+		Duration:  iwfidl.PtrInt32(0),
+	}
 }
 
 func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
