@@ -159,6 +159,15 @@ func (h *handler) apiV1WorkflowRpc(c *gin.Context) {
 	return
 }
 
+func (h *handler) infoHealthCheck(c *gin.Context) {
+	h.logger.Debug("received Health check request")
+
+	resp := h.svc.ApiInfoHealth(c.Request.Context())
+	c.JSON(http.StatusOK, resp)
+
+	return
+}
+
 func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	var req iwfidl.WorkflowGetDataObjectsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
