@@ -5,6 +5,8 @@ type (
 )
 
 const (
+	EnvNameDebugMode = "DEBUG_MODE"
+
 	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
 
 	// HttpStatusCodeSpecial4xxError is a special deprecated code for this because I can't find an official one for this case
