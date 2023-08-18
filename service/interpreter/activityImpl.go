@@ -11,6 +11,7 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 // StateStart is Deprecated, will be removed in next release
@@ -39,6 +40,7 @@ func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, inp
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(ctx)
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
+	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
@@ -76,10 +78,18 @@ func StateApiExecute(ctx context.Context, backendType service.BackendType, input
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
+	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 	return resp, nil
+}
+
+func printDebugMsg(logger UnifiedLogger, err error, url string) {
+	debugMode := os.Getenv(service.EnvNameDebugMode)
+	if debugMode != "" {
+		logger.Info("check error at http request", err, url)
+	}
 }
 
 func composeStartApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
