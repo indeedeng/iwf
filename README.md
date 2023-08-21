@@ -13,16 +13,19 @@ iWF is a platform for developing resilient, fault-tolerant, scalable long-runnin
 It offers a convenient abstraction for durable timers, background execution with backoff retry, 
 customized persisted data (with optional caching, and indexing), message queues, RPC, and more. You will build long-running reliable processes faster than ever. 
 
-iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal).
+iWF is built on top of [Cadence](https://github.com/uber/cadence)/[Temporal](https://github.com/temporalio/temporal). Temporal adopted
+as [a framework](https://github.com/temporalio/awesome-temporal). Same for [Cadence](https://github.com/uber/cadence#cadence).
 
 Related projects:
 
-* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk)
-* [iWF Java Samples](https://github.com/indeedeng/iwf-java-samples)
-* [iWF Golang SDK](https://github.com/indeedeng/iwf-golang-sdk)
-* [iWF Golang Samples](https://github.com/indeedeng/iwf-golang-samples)
+* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) and [samples](https://github.com/indeedeng/iwf-java-samples) 
+* [iWF Golang SDK](https://github.com/indeedeng/iwf-golang-sdk) and [samples](https://github.com/indeedeng/iwf-golang-samples)
 * WIP [iWF Python SDK](https://github.com/indeedeng/iwf-python-sdk)
 * WIP [iWF TypeScript SDK](https://github.com/indeedeng/iwf-ts-sdk)
+
+For support or any question, please post in our [Discussion](https://github.com/indeedeng/iwf/discussions), or raise an issue.
+If you are interested in helping this project, check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md) page.
+Below is the basic and comprehensive documentation of iWF. There are some more details in the [wiki pages](https://github.com/indeedeng/iwf/wiki).
 # What is iWF
 
 ## Example: microservice orchestration
@@ -176,11 +179,11 @@ class State4 implements WorkflowState<Void> {
 ## Basic Concepts
 
 
-The top-level concept is **`ObjectWorkflow`** -- nearly any "object" can be an ObjectWorkflow, as long as it's long-lasting, at least a few seconds. 
+The top-level concept is **`ObjectWorkflow`**. 
 
 A user application creates an ObjectWorkflow by implementing the Workflow interface, in one of the supported languages e.g.
 [Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java)
-or [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go).
+, [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go) , [Python](https://github.com/indeedeng/iwf-python-sdk/blob/main/iwf/workflow.py), or [Typescript/JavaScript](https://github.com/indeedeng/iwf-ts-sdk/blob/main/iwf/src/object-workflow.ts).
 An implementation of the interface is referred to as a `WorkflowDefinition` and consists of the components shown below:
 
 | Name                                                                     | Description                                                                                                                                               | 
@@ -492,6 +495,8 @@ iWF without any scaling limitation.
 
 ![architecture diagram](https://user-images.githubusercontent.com/4523955/234935630-e69c648e-7714-4672-beb2-d9867bedf940.png)
 
+See more our in [design wiki](https://github.com/indeedeng/iwf/wiki/iWF-Design).
+
 # How to use
 
 ## Using docker image & docker-compose
@@ -532,37 +537,14 @@ the version tag.
 
 ## Troubleshooting
 
-When something goes wrong in your applications, here are the tips:
-
-* All the input/output to your workflow are stored in the activity input/output of history event. The input is
-  in `ActivityTaskScheduledEvent`, output is in `ActivityTaskCompletedEvent` or in pending activity view if having
-  errors.
-* Use query handlers like (`GetDataObjects` or `GetCurrentTimerInfos`) in Cadence/Temporal WebUI to quickly understand
-  the current status of the workflows.
-    * DumpAllInternal will return all the internal status or the pending states
-    * GetCurrentTimerInfos will return all the timers of the pending states
-* Let your worker service return error stacktrace as the response body to iWF server. E.g.
-  like [this example of Spring Boot using ExceptionHandler](https://github.com/indeedeng/iwf-java-samples/blob/2d500093e2aaecf2d728f78366fee776a73efd29/src/main/java/io/iworkflow/controller/IwfWorkerApiController.java#L51)
-  .
-* If you return the full stacktrace in response body, the pending activity view will show it to you! Then use
-  Cadence/Temporal WebUI to debug your application.
+See our [wiki pages](https://github.com/indeedeng/iwf/wiki/iWF-Application-Operations#troubleshoot--debugging).
 
 
 ## Operation
 
-In additional of using Cadence/Temporal CLI, you can just
-use [some HTTP script like this](./script/http/local/home.http) to operate on workflows to:
-
-* Start a workflow
-* Stop a workflow
-* Reset a workflow
-* Skip a timer
-* etc, any APIs supported by the [iWF server API schema](https://github.com/indeedeng/iwf-idl/blob/main/iwf.yaml)
+See our [wiki pages](https://github.com/indeedeng/iwf/wiki/iWF-Application-Operations).
 
 # Posts & Articles & Reference
 
-* Temporal adopted
-  as [the first community drive DSL framework/abstraction](https://github.com/temporalio/awesome-temporal) of Temporal
-* Cadence adopted in its [README](https://github.com/uber/cadence#cadence)
-  , [official documentation](https://cadenceworkflow.io/docs/get-started/#what-s-next)
-  and [Cadence community spotlight](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/)
+* [Cadence community spotlight](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/)
+* [A story of iWF](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
