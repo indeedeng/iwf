@@ -151,7 +151,7 @@ func (c *ContinueAsNewer) DrainThreads(ctx UnifiedContext) error {
 	// NOTE: consider using AwaitWithTimeout to get an alert when workflow stuck due to a bug in the draining logic for continueAsNew
 
 	errWait := c.provider.Await(ctx, func() bool {
-		return c.allTHreadsDrained(ctx)
+		return c.allThreadsDrained(ctx)
 	})
 	c.provider.GetLogger(ctx).Info("done draining threads for continueAsNew", errWait)
 
@@ -159,7 +159,7 @@ func (c *ContinueAsNewer) DrainThreads(ctx UnifiedContext) error {
 }
 
 // if the DrainAllSignalsAndThreads await is being called more than a few times and cannot get through,
-// there is very likely something wrong in the continueAsNew logic
+// there is likely something wrong in the continueAsNew logic (unless state API is stuck)
 // the key is runId, the value is how many times it has been called in this worker
 // Using this in memory counter sot hat we don't have to use AwaitWithTimeout which will consume a timer
 // TODO add TTL support because we don't have to keep the value in memory forever(likely a few hours or a day is enough)
@@ -168,17 +168,18 @@ var inMemoryContinueAsNewMonitor = make(map[string]time.Time)
 const warnThreshold = time.Second * 5
 const errThreshold = time.Second * 15
 
-func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
+func (c *ContinueAsNewer) allThreadsDrained(ctx UnifiedContext) bool {
+	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
+
 	remainingThreadCount := c.provider.GetThreadCount()
 	if remainingThreadCount == 0 {
+		delete(inMemoryContinueAsNewMonitor, runId)
 		return true
 	}
 
-	// TODO using a flag to control this debugging info
-	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
-
 	c.provider.GetLogger(ctx).Debug("continueAsNew is in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
 
+	// TODO using a flag to control this debugging info
 	initTime, ok := inMemoryContinueAsNewMonitor[runId]
 	if !ok {
 		inMemoryContinueAsNewMonitor[runId] = time.Now()
@@ -188,11 +189,15 @@ func (c *ContinueAsNewer) allTHreadsDrained(ctx UnifiedContext) bool {
 	elapsed := time.Since(initTime)
 
 	if elapsed >= errThreshold {
-		c.provider.GetLogger(ctx).Warn("continueAsNew is VERY LIKELY stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+		c.provider.GetLogger(ctx).Warn(
+			"continueAsNew is likely stuck (unless state API is stuck) in draining remainingThreadCount, attempt, threadNames",
+			remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
 		return false
 	}
 	if elapsed >= warnThreshold {
-		c.provider.GetLogger(ctx).Warn("continueAsNew may be stuck in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+		c.provider.GetLogger(ctx).Warn(
+			"continueAsNew may be stuck (unless state API is stuck) in draining remainingThreadCount, attempt, threadNames",
+			remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
 	}
 	return false
 }
