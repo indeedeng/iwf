@@ -73,6 +73,9 @@ The solution with iWF:
 * Natural to represent business
 * Builtin & rich support for operation tooling
 
+It's so simple & easy to do that the code can be shown here!
+
+See the running code in [Java samples](https://github.com/indeedeng/iwf-java-samples/tree/main#microservice-ochestration) and [Golang samples](https://github.com/indeedeng/iwf-golang-samples#microservice-orchestration). 
 ```java
 public class OrchestrationWorkflow implements ObjectWorkflow {
 
@@ -100,6 +103,21 @@ public class OrchestrationWorkflow implements ObjectWorkflow {
         return Arrays.asList(
                 DataAttributeDef.create(String.class, DA_DATA1)
         );
+    }
+    
+    @Override
+    public List<CommunicationMethodDef> getCommunicationSchema() {
+        return Arrays.asList(
+                SignalChannelDef.create(Void.class, READY_SIGNAL)
+        );
+    }
+
+    // NOTE: this is to demonstrate how you can read/write workflow persistence in RPC
+    @RPC
+    public String swap(Context context, String newData, Persistence persistence, Communication communication) {
+        String oldData = persistence.getDataAttribute(DA_DATA1, String.class);
+        persistence.setDataAttribute(DA_DATA1, newData);
+        return oldData;
     }
 }
 
