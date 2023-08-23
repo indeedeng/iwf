@@ -2,44 +2,44 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/integ/workflow/wf_execute_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStateApiFailAndProceedTemporal(t *testing.T) {
+func TestStateExecuteApiFailAndProceedTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, nil)
+		doTestStateExecuteApiFailAndProceed(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestStateExecuteApiFailAndProceed(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
 
-func TestStateApiFailAndProceedCadence(t *testing.T) {
+func TestStateExecuteApiFailAndProceedCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, nil)
+		doTestStateExecuteApiFailAndProceed(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestStateExecuteApiFailAndProceed(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
 }
 
-func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestStateExecuteApiFailAndProceed(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
-	wfHandler := wf_state_api_fail_and_proceed.NewHandler()
+	wfHandler := wf_execute_api_fail_and_proceed.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
@@ -54,30 +54,24 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 			},
 		},
 	})
-	wfId := wf_state_api_fail_and_proceed.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := wf_execute_api_fail_and_proceed.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 
 	stateOptions := &iwfidl.WorkflowStateOptions{
-		StartApiRetryPolicy: &iwfidl.RetryPolicy{
+		ExecuteApiRetryPolicy: &iwfidl.RetryPolicy{
 			MaximumAttempts: iwfidl.PtrInt32(1),
 		},
-		StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
-	}
-	if config != nil {
-		stateOptions = &iwfidl.WorkflowStateOptions{
-			StartApiRetryPolicy: &iwfidl.RetryPolicy{
-				MaximumAttempts: iwfidl.PtrInt32(1),
-			},
-			WaitUntilApiFailurePolicy: iwfidl.PROCEED_ON_FAILURE.Ptr(),
-		}
+		SkipWaitUntil:                   ptr.Any(true),
+		ExecuteApiFailurePolicy:         iwfidl.PROCEED_TO_CONFIGURED_STATE.Ptr(),
+		ExecuteApiFailureProceedStateId: ptr.Any(wf_execute_api_fail_and_proceed.StateRecover),
 	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        wf_state_api_fail_and_proceed.WorkflowType,
+		IwfWorkflowType:        wf_execute_api_fail_and_proceed.WorkflowType,
 		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           ptr.Any(wf_state_api_fail_and_proceed.State1),
+		StartStateId:           ptr.Any(wf_execute_api_fail_and_proceed.State1),
 		StateOptions:           stateOptions,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
@@ -95,8 +89,8 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)
 	assertions.Equalf(map[string]int64{
-		"S1_start":  1,
-		"S1_decide": 1,
+		"S1_decide":      1,
+		"Recover_decide": 1,
 	}, history, "wf state api fail and proceed test fail, %v", history)
 
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
