@@ -19,23 +19,24 @@ var _ MappedNullable = &WorkflowStateOptions{}
 
 // WorkflowStateOptions struct for WorkflowStateOptions
 type WorkflowStateOptions struct {
-	SearchAttributesLoadingPolicy   *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
-	DataObjectsLoadingPolicy        *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
-	StartApiTimeoutSeconds          *int32                     `json:"startApiTimeoutSeconds,omitempty"`
-	DecideApiTimeoutSeconds         *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
-	StartApiRetryPolicy             *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
-	DecideApiRetryPolicy            *RetryPolicy               `json:"decideApiRetryPolicy,omitempty"`
-	StartApiFailurePolicy           *StartApiFailurePolicy     `json:"startApiFailurePolicy,omitempty"`
-	ExecuteApiFailurePolicy         *ExecuteApiFailurePolicy   `json:"executeApiFailurePolicy,omitempty"`
-	ExecuteApiFailureProceedStateId *string                    `json:"executeApiFailureProceedStateId,omitempty"`
-	SkipStartApi                    *bool                      `json:"skipStartApi,omitempty"`
-	WaitUntilApiTimeoutSeconds      *int32                     `json:"waitUntilApiTimeoutSeconds,omitempty"`
-	ExecuteApiTimeoutSeconds        *int32                     `json:"executeApiTimeoutSeconds,omitempty"`
-	WaitUntilApiRetryPolicy         *RetryPolicy               `json:"waitUntilApiRetryPolicy,omitempty"`
-	ExecuteApiRetryPolicy           *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
-	WaitUntilApiFailurePolicy       *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
-	SkipWaitUntil                   *bool                      `json:"skipWaitUntil,omitempty"`
-	DataAttributesLoadingPolicy     *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
+	SearchAttributesLoadingPolicy        *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
+	DataObjectsLoadingPolicy             *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
+	StartApiTimeoutSeconds               *int32                     `json:"startApiTimeoutSeconds,omitempty"`
+	DecideApiTimeoutSeconds              *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
+	StartApiRetryPolicy                  *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
+	DecideApiRetryPolicy                 *RetryPolicy               `json:"decideApiRetryPolicy,omitempty"`
+	StartApiFailurePolicy                *StartApiFailurePolicy     `json:"startApiFailurePolicy,omitempty"`
+	ExecuteApiFailurePolicy              *ExecuteApiFailurePolicy   `json:"executeApiFailurePolicy,omitempty"`
+	ExecuteApiFailureProceedStateId      *string                    `json:"executeApiFailureProceedStateId,omitempty"`
+	ExecuteApiFailureProceedStateOptions *WorkflowStateOptions      `json:"executeApiFailureProceedStateOptions,omitempty"`
+	SkipStartApi                         *bool                      `json:"skipStartApi,omitempty"`
+	WaitUntilApiTimeoutSeconds           *int32                     `json:"waitUntilApiTimeoutSeconds,omitempty"`
+	ExecuteApiTimeoutSeconds             *int32                     `json:"executeApiTimeoutSeconds,omitempty"`
+	WaitUntilApiRetryPolicy              *RetryPolicy               `json:"waitUntilApiRetryPolicy,omitempty"`
+	ExecuteApiRetryPolicy                *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
+	WaitUntilApiFailurePolicy            *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
+	SkipWaitUntil                        *bool                      `json:"skipWaitUntil,omitempty"`
+	DataAttributesLoadingPolicy          *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -343,6 +344,38 @@ func (o *WorkflowStateOptions) SetExecuteApiFailureProceedStateId(v string) {
 	o.ExecuteApiFailureProceedStateId = &v
 }
 
+// GetExecuteApiFailureProceedStateOptions returns the ExecuteApiFailureProceedStateOptions field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateOptions() WorkflowStateOptions {
+	if o == nil || IsNil(o.ExecuteApiFailureProceedStateOptions) {
+		var ret WorkflowStateOptions
+		return ret
+	}
+	return *o.ExecuteApiFailureProceedStateOptions
+}
+
+// GetExecuteApiFailureProceedStateOptionsOk returns a tuple with the ExecuteApiFailureProceedStateOptions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateOptionsOk() (*WorkflowStateOptions, bool) {
+	if o == nil || IsNil(o.ExecuteApiFailureProceedStateOptions) {
+		return nil, false
+	}
+	return o.ExecuteApiFailureProceedStateOptions, true
+}
+
+// HasExecuteApiFailureProceedStateOptions returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasExecuteApiFailureProceedStateOptions() bool {
+	if o != nil && !IsNil(o.ExecuteApiFailureProceedStateOptions) {
+		return true
+	}
+
+	return false
+}
+
+// SetExecuteApiFailureProceedStateOptions gets a reference to the given WorkflowStateOptions and assigns it to the ExecuteApiFailureProceedStateOptions field.
+func (o *WorkflowStateOptions) SetExecuteApiFailureProceedStateOptions(v WorkflowStateOptions) {
+	o.ExecuteApiFailureProceedStateOptions = &v
+}
+
 // GetSkipStartApi returns the SkipStartApi field value if set, zero value otherwise.
 func (o *WorkflowStateOptions) GetSkipStartApi() bool {
 	if o == nil || IsNil(o.SkipStartApi) {
@@ -635,6 +668,9 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ExecuteApiFailureProceedStateId) {
 		toSerialize["executeApiFailureProceedStateId"] = o.ExecuteApiFailureProceedStateId
+	}
+	if !IsNil(o.ExecuteApiFailureProceedStateOptions) {
+		toSerialize["executeApiFailureProceedStateOptions"] = o.ExecuteApiFailureProceedStateOptions
 	}
 	if !IsNil(o.SkipStartApi) {
 		toSerialize["skipStartApi"] = o.SkipStartApi

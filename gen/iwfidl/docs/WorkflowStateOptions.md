@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **StartApiFailurePolicy** | Pointer to [**StartApiFailurePolicy**](StartApiFailurePolicy.md) |  | [optional] 
 **ExecuteApiFailurePolicy** | Pointer to [**ExecuteApiFailurePolicy**](ExecuteApiFailurePolicy.md) |  | [optional] 
 **ExecuteApiFailureProceedStateId** | Pointer to **string** |  | [optional] 
+**ExecuteApiFailureProceedStateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 **SkipStartApi** | Pointer to **bool** |  | [optional] 
 **WaitUntilApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **ExecuteApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
@@ -265,6 +266,31 @@ SetExecuteApiFailureProceedStateId sets ExecuteApiFailureProceedStateId field to
 `func (o *WorkflowStateOptions) HasExecuteApiFailureProceedStateId() bool`
 
 HasExecuteApiFailureProceedStateId returns a boolean if a field has been set.
+
+### GetExecuteApiFailureProceedStateOptions
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateOptions() WorkflowStateOptions`
+
+GetExecuteApiFailureProceedStateOptions returns the ExecuteApiFailureProceedStateOptions field if non-nil, zero value otherwise.
+
+### GetExecuteApiFailureProceedStateOptionsOk
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateOptionsOk() (*WorkflowStateOptions, bool)`
+
+GetExecuteApiFailureProceedStateOptionsOk returns a tuple with the ExecuteApiFailureProceedStateOptions field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExecuteApiFailureProceedStateOptions
+
+`func (o *WorkflowStateOptions) SetExecuteApiFailureProceedStateOptions(v WorkflowStateOptions)`
+
+SetExecuteApiFailureProceedStateOptions sets ExecuteApiFailureProceedStateOptions field to given value.
+
+### HasExecuteApiFailureProceedStateOptions
+
+`func (o *WorkflowStateOptions) HasExecuteApiFailureProceedStateOptions() bool`
+
+HasExecuteApiFailureProceedStateOptions returns a boolean if a field has been set.
 
 ### GetSkipStartApi
 
