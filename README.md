@@ -487,9 +487,12 @@ API when the API fails with maxing out all the retry attempts.
 For Execute API, you can use `PROCEED_TO_CONFIGURED_STATE` similarly, but it's required to set the `ExecuteApiFailureProceedStateId` to use with it.
 Note that the proceeded state will take the same input from the original failed state.
 
-Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the exception/error.
-
 The failure policies are especially helpful for recovery logic. For example, a workflow state may have errors that you want to eventually do a cleanup/recovery to handle.
+
+#### State/RPC API Context
+There is a context object when invoking RPC or State APIs. It contains information like workflowId, startTime, etc.
+
+For example, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to make some advanced logic.
 
 ## Limitation
 
