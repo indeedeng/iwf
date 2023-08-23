@@ -155,8 +155,9 @@ type (
 type StateExecutionStatus string
 
 const FailureStateExecutionStatus StateExecutionStatus = "Failure"
-const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommands" // this will put the state into a special pending queue for continueAsNew from waiting command
-const CompletedStateExecutionStatus StateExecutionStatus = "Completed"             // this will process as normal
+const WaitingCommandsStateExecutionStatus StateExecutionStatus = "WaitingCommands"   // this will put the state into a special pending queue for continueAsNew from waiting command
+const CompletedStateExecutionStatus StateExecutionStatus = "Completed"               // this will process as normal
+const ExecuteApiFailedAndProceed StateExecutionStatus = "ExecuteApiFailedAndProceed" // this will proceed to a different state
 
 const (
 	TimerPending InternalTimerStatus = "Pending"

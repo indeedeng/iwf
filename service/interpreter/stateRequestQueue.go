@@ -63,3 +63,12 @@ func (srq *StateRequestQueue) AddStateStartRequests(reqs []iwfidl.StateMovement)
 		srq.queue = append(srq.queue, NewStateStartRequest(r))
 	}
 }
+
+func (srq *StateRequestQueue) AddSingleStateStartRequest(stateId string, input *iwfidl.EncodedObject) {
+	srq.queue = append(srq.queue, NewStateStartRequest(
+		iwfidl.StateMovement{
+			StateId:    stateId,
+			StateInput: input,
+		},
+	))
+}
