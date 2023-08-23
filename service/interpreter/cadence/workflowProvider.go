@@ -89,6 +89,11 @@ func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, query
 	return workflow.SetQueryHandler(wfCtx, queryType, handler)
 }
 
+func (w *workflowProvider) SetUpdateHandler(ctx interpreter.UnifiedContext, updateType string, validator, handler interface{}) error {
+	// NOTE: this feature is not available in Cadence
+	return nil
+}
+
 func (w *workflowProvider) ExtendContextWithValue(parent interpreter.UnifiedContext, key string, val interface{}) interpreter.UnifiedContext {
 	wfCtx, ok := parent.GetContext().(workflow.Context)
 	if !ok {

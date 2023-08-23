@@ -84,6 +84,7 @@ type WorkflowProvider interface {
 	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
 	UpsertMemo(ctx UnifiedContext, memo map[string]iwfidl.EncodedObject) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
+	SetUpdateHandler(ctx UnifiedContext, updateType string, validator, handler interface{}) error
 	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	GetThreadCount() int
