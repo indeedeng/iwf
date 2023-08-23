@@ -108,6 +108,7 @@ Class | Method | HTTP request | Description
  - [EncodedObject](docs/EncodedObject.md)
  - [ErrorResponse](docs/ErrorResponse.md)
  - [ErrorSubStatus](docs/ErrorSubStatus.md)
+ - [ExecuteApiFailurePolicy](docs/ExecuteApiFailurePolicy.md)
  - [HealthInfo](docs/HealthInfo.md)
  - [IDReusePolicy](docs/IDReusePolicy.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)

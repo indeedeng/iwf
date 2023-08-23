@@ -468,6 +468,11 @@ components:
         maximumAttempts:
           type: integer
       type: object
+    ExecuteApiFailurePolicy:
+      enum:
+      - FAIL_WORKFLOW_ON_EXECUTE_API_FAILURE
+      - PROCEED_TO_CONFIGURED_STATE
+      type: string
     StartApiFailurePolicy:
       enum:
       - FAIL_WORKFLOW_ON_START_API_FAILURE
@@ -520,8 +525,11 @@ components:
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
           backoffCoefficient: 5.637377
+        executeApiFailureProceedStateId: executeApiFailureProceedStateId
         decideApiTimeoutSeconds: 1
         startApiTimeoutSeconds: 6
+        executeApiFailurePolicy: null
+        executeApiFailureProceedStateOptions: null
         waitUntilApiRetryPolicy:
           maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
@@ -551,6 +559,12 @@ components:
           $ref: '#/components/schemas/RetryPolicy'
         startApiFailurePolicy:
           $ref: '#/components/schemas/StartApiFailurePolicy'
+        executeApiFailurePolicy:
+          $ref: '#/components/schemas/ExecuteApiFailurePolicy'
+        executeApiFailureProceedStateId:
+          type: string
+        executeApiFailureProceedStateOptions:
+          $ref: '#/components/schemas/WorkflowStateOptions'
         skipStartApi:
           type: boolean
         waitUntilApiTimeoutSeconds:
@@ -748,8 +762,11 @@ components:
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637377
+          executeApiFailureProceedStateId: executeApiFailureProceedStateId
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
+          executeApiFailurePolicy: null
+          executeApiFailureProceedStateOptions: null
           waitUntilApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -1498,8 +1515,11 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
+              executeApiFailurePolicy: null
+              executeApiFailureProceedStateOptions: null
               waitUntilApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1559,8 +1579,11 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
+              executeApiFailurePolicy: null
+              executeApiFailureProceedStateOptions: null
               waitUntilApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1929,8 +1952,11 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
+              executeApiFailurePolicy: null
+              executeApiFailureProceedStateOptions: null
               waitUntilApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1990,8 +2016,11 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
               startApiTimeoutSeconds: 6
+              executeApiFailurePolicy: null
+              executeApiFailureProceedStateOptions: null
               waitUntilApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2111,8 +2140,11 @@ components:
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
               backoffCoefficient: 5.637377
+            executeApiFailureProceedStateId: executeApiFailureProceedStateId
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
+            executeApiFailurePolicy: null
+            executeApiFailureProceedStateOptions: null
             waitUntilApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2172,8 +2204,11 @@ components:
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
               backoffCoefficient: 5.637377
+            executeApiFailureProceedStateId: executeApiFailureProceedStateId
             decideApiTimeoutSeconds: 1
             startApiTimeoutSeconds: 6
+            executeApiFailurePolicy: null
+            executeApiFailureProceedStateOptions: null
             waitUntilApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2270,8 +2305,11 @@ components:
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637377
+          executeApiFailureProceedStateId: executeApiFailureProceedStateId
           decideApiTimeoutSeconds: 1
           startApiTimeoutSeconds: 6
+          executeApiFailurePolicy: null
+          executeApiFailureProceedStateOptions: null
           waitUntilApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7

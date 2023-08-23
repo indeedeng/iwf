@@ -11,6 +11,9 @@ Name | Type | Description | Notes
 **StartApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 **DecideApiRetryPolicy** | Pointer to [**RetryPolicy**](RetryPolicy.md) |  | [optional] 
 **StartApiFailurePolicy** | Pointer to [**StartApiFailurePolicy**](StartApiFailurePolicy.md) |  | [optional] 
+**ExecuteApiFailurePolicy** | Pointer to [**ExecuteApiFailurePolicy**](ExecuteApiFailurePolicy.md) |  | [optional] 
+**ExecuteApiFailureProceedStateId** | Pointer to **string** |  | [optional] 
+**ExecuteApiFailureProceedStateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 **SkipStartApi** | Pointer to **bool** |  | [optional] 
 **WaitUntilApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **ExecuteApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
@@ -213,6 +216,81 @@ SetStartApiFailurePolicy sets StartApiFailurePolicy field to given value.
 `func (o *WorkflowStateOptions) HasStartApiFailurePolicy() bool`
 
 HasStartApiFailurePolicy returns a boolean if a field has been set.
+
+### GetExecuteApiFailurePolicy
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailurePolicy() ExecuteApiFailurePolicy`
+
+GetExecuteApiFailurePolicy returns the ExecuteApiFailurePolicy field if non-nil, zero value otherwise.
+
+### GetExecuteApiFailurePolicyOk
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailurePolicyOk() (*ExecuteApiFailurePolicy, bool)`
+
+GetExecuteApiFailurePolicyOk returns a tuple with the ExecuteApiFailurePolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExecuteApiFailurePolicy
+
+`func (o *WorkflowStateOptions) SetExecuteApiFailurePolicy(v ExecuteApiFailurePolicy)`
+
+SetExecuteApiFailurePolicy sets ExecuteApiFailurePolicy field to given value.
+
+### HasExecuteApiFailurePolicy
+
+`func (o *WorkflowStateOptions) HasExecuteApiFailurePolicy() bool`
+
+HasExecuteApiFailurePolicy returns a boolean if a field has been set.
+
+### GetExecuteApiFailureProceedStateId
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateId() string`
+
+GetExecuteApiFailureProceedStateId returns the ExecuteApiFailureProceedStateId field if non-nil, zero value otherwise.
+
+### GetExecuteApiFailureProceedStateIdOk
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateIdOk() (*string, bool)`
+
+GetExecuteApiFailureProceedStateIdOk returns a tuple with the ExecuteApiFailureProceedStateId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExecuteApiFailureProceedStateId
+
+`func (o *WorkflowStateOptions) SetExecuteApiFailureProceedStateId(v string)`
+
+SetExecuteApiFailureProceedStateId sets ExecuteApiFailureProceedStateId field to given value.
+
+### HasExecuteApiFailureProceedStateId
+
+`func (o *WorkflowStateOptions) HasExecuteApiFailureProceedStateId() bool`
+
+HasExecuteApiFailureProceedStateId returns a boolean if a field has been set.
+
+### GetExecuteApiFailureProceedStateOptions
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateOptions() WorkflowStateOptions`
+
+GetExecuteApiFailureProceedStateOptions returns the ExecuteApiFailureProceedStateOptions field if non-nil, zero value otherwise.
+
+### GetExecuteApiFailureProceedStateOptionsOk
+
+`func (o *WorkflowStateOptions) GetExecuteApiFailureProceedStateOptionsOk() (*WorkflowStateOptions, bool)`
+
+GetExecuteApiFailureProceedStateOptionsOk returns a tuple with the ExecuteApiFailureProceedStateOptions field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExecuteApiFailureProceedStateOptions
+
+`func (o *WorkflowStateOptions) SetExecuteApiFailureProceedStateOptions(v WorkflowStateOptions)`
+
+SetExecuteApiFailureProceedStateOptions sets ExecuteApiFailureProceedStateOptions field to given value.
+
+### HasExecuteApiFailureProceedStateOptions
+
+`func (o *WorkflowStateOptions) HasExecuteApiFailureProceedStateOptions() bool`
+
+HasExecuteApiFailureProceedStateOptions returns a boolean if a field has been set.
 
 ### GetSkipStartApi
 

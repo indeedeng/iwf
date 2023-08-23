@@ -476,15 +476,23 @@ If racing conditions could be a problem, using`PARTIAL_WITH_EXCLUSIVE_LOCK` allo
 However, `PARTIAL_WITH_EXCLUSIVE_LOCK` is not supported in RPC yet. The feature is WIP with waiting for the Temporal "update" being production ready.
 As a workaround, RPC can kick off a WorkflowState to update the persistence data using the locking policy.
 
-#### WaitUntil API failure policy
+#### State API failure handling/recovery
 
-By default, the workflow execution will fail when API max out the retry attempts. In some cases that
+By default, the workflow execution will fail when State APIs max out the retry attempts. In some cases that
 workflow want to ignore the errors.
 
-Using `PROCEED_ON_API_FAILURE` for `WaitUntilApiFailurePolicy` will let workflow continue to invoke `execute`
+For WaitUntil API, using `PROCEED_ON_API_FAILURE` for `WaitUntilApiFailurePolicy` will let workflow continue to invoke `execute`
 API when the API fails with maxing out all the retry attempts.
 
-Alternatively, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to decide ignore the exception/error.
+For Execute API, you can use `PROCEED_TO_CONFIGURED_STATE` similarly, but it's required to set the `ExecuteApiFailureProceedStateId` to use with it.
+Note that the proceeded state will take the same input from the original failed state.
+
+The failure policies are especially helpful for recovery logic. For example, a workflow state may have errors that you want to eventually do a cleanup/recovery to handle.
+
+#### State/RPC API Context
+There is a context object when invoking RPC or State APIs. It contains information like workflowId, startTime, etc.
+
+For example, WorkflowState can utilize `attempts` or `firstAttemptTime` from the context to make some advanced logic.
 
 ## Limitation
 

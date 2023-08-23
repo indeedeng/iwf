@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
-	"reflect"
 )
 
 const (
@@ -230,7 +229,7 @@ func verifyLoadedAttributes(
 		panic("Search attributes should be the same")
 	}
 
-	if !reflect.DeepEqual(expectedDataAttributes, dataAttributes) {
+	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
 		panic("Data attributes should be the same")
 	}
 }

@@ -162,6 +162,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						ctx, provider, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
 						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
 					if err != nil {
+						// this is the case where stateExecStatus == FailureStateExecutionStatus
 						errToFailWf = err
 						// state execution fail should fail the workflow, no more processing
 						return
@@ -201,7 +202,16 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						if err != nil {
 							errToFailWf = err
 						}
+					} else if stateExecStatus == service.ExecuteApiFailedAndProceed {
+						options := state.GetStateOptions()
+						stateRequestQueue.AddSingleStateStartRequest(options.GetExecuteApiFailureProceedStateId(), state.StateInput, options.ExecuteApiFailureProceedStateOptions)
+						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
+						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+						if err != nil {
+							errToFailWf = err
+						}
 					}
+					// noop for WaitingCommandsStateExecutionStatus, because it means continueAsNew
 				}) // end of executing one state
 			} // end loop of executing all states from the queue for one iteration
 
@@ -421,13 +431,8 @@ func executeState(
 	completedSignalCmds := map[int]*iwfidl.EncodedObject{}
 	completedInterStateChannelCmds := map[int]*iwfidl.EncodedObject{}
 
-	var state iwfidl.StateMovement
+	state := stateReq.GetStateMovement()
 	isResumeFromContinueAsNew := stateReq.IsResumeRequest()
-	if isResumeFromContinueAsNew {
-		state = stateReq.GetStateResumeRequest().State
-	} else {
-		state = stateReq.GetStateStartRequest()
-	}
 
 	options := state.GetStateOptions()
 	skipStart := compatibility.GetSkipStartApi(&options)
@@ -700,6 +705,9 @@ func executeStateDecide(
 	}).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err != nil {
+		if shouldProceedOnExecuteApiError(state) {
+			return nil, service.ExecuteApiFailedAndProceed, nil
+		}
 		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
 	}
 
@@ -730,6 +738,16 @@ func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {
 	}
 
 	return *policy == iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE
+}
+
+func shouldProceedOnExecuteApiError(state iwfidl.StateMovement) bool {
+	if state.StateOptions == nil {
+		return false
+	}
+
+	options := state.GetStateOptions()
+	return options.GetExecuteApiFailureProceedStateId() != "" &&
+		options.GetExecuteApiFailurePolicy() == iwfidl.PROCEED_TO_CONFIGURED_STATE
 }
 
 func convertStateApiActivityError(provider WorkflowProvider, err error) error {

@@ -2,13 +2,13 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/wf_state_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
 )
@@ -62,7 +62,7 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 		},
 		StartApiFailurePolicy: iwfidl.PROCEED_TO_DECIDE_ON_START_API_FAILURE.Ptr(),
 	}
-	if config != nil {
+	if config != nil { // use this hack to test the compatibility
 		stateOptions = &iwfidl.WorkflowStateOptions{
 			StartApiRetryPolicy: &iwfidl.RetryPolicy{
 				MaximumAttempts: iwfidl.PtrInt32(1),

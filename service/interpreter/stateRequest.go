@@ -36,6 +36,14 @@ func (sq StateRequest) IsResumeRequest() bool {
 	return sq.isResumeRequest
 }
 
+func (sq StateRequest) GetStateMovement() iwfidl.StateMovement {
+	if sq.isResumeRequest {
+		return sq.stateResumeRequest.State
+	} else {
+		return sq.stateStartRequest
+	}
+}
+
 func (sq StateRequest) GetStateId() string {
 	if sq.IsResumeRequest() {
 		return sq.stateResumeRequest.State.StateId
