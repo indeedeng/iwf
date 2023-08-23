@@ -44,16 +44,21 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 	}
+	input := req.StateInput
 	if req.WorkflowStateId == State1 {
-		c.JSON(http.StatusBadRequest, map[string]string{"error": "test-error"})
+		if input.GetData() == InputData && input.GetEncoding() == InputDataEncoding {
+			c.JSON(http.StatusBadRequest, map[string]string{"error": "test-error"})
+		} else {
+			panic("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
+		}
+
 		return
 	}
 	if req.WorkflowStateId == StateRecover {
-		input := req.StateInput
 		if input.GetData() == InputData && input.GetEncoding() == InputDataEncoding {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{})
 		} else {
-			panic("input is not correct")
+			panic("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
 		}
 		return
 	}

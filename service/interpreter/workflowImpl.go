@@ -204,7 +204,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						}
 					} else if stateExecStatus == service.ExecuteApiFailedAndProceed {
 						options := state.GetStateOptions()
-						stateRequestQueue.AddSingleStateStartRequest(options.GetExecuteApiFailureProceedStateId(), state.StateInput)
+						stateRequestQueue.AddSingleStateStartRequest(options.GetExecuteApiFailureProceedStateId(), state.StateInput, options.ExecuteApiFailureProceedStateOptions)
 						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
 						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
 						if err != nil {

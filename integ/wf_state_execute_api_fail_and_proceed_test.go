@@ -63,6 +63,9 @@ func doTestStateExecuteApiFailAndProceed(t *testing.T, backendType service.Backe
 		SkipWaitUntil:                   ptr.Any(true),
 		ExecuteApiFailurePolicy:         iwfidl.PROCEED_TO_CONFIGURED_STATE.Ptr(),
 		ExecuteApiFailureProceedStateId: ptr.Any(wf_execute_api_fail_and_proceed.StateRecover),
+		ExecuteApiFailureProceedStateOptions: &iwfidl.WorkflowStateOptions{
+			SkipWaitUntil: ptr.Any(true),
+		},
 	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
@@ -75,6 +78,10 @@ func doTestStateExecuteApiFailAndProceed(t *testing.T, backendType service.Backe
 		StateOptions:           stateOptions,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
+		},
+		StateInput: &iwfidl.EncodedObject{
+			Data:     ptr.Any(wf_execute_api_fail_and_proceed.InputData),
+			Encoding: ptr.Any(wf_execute_api_fail_and_proceed.InputDataEncoding),
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)

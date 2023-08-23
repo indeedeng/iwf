@@ -64,11 +64,12 @@ func (srq *StateRequestQueue) AddStateStartRequests(reqs []iwfidl.StateMovement)
 	}
 }
 
-func (srq *StateRequestQueue) AddSingleStateStartRequest(stateId string, input *iwfidl.EncodedObject) {
+func (srq *StateRequestQueue) AddSingleStateStartRequest(stateId string, input *iwfidl.EncodedObject, options *iwfidl.WorkflowStateOptions) {
 	srq.queue = append(srq.queue, NewStateStartRequest(
 		iwfidl.StateMovement{
-			StateId:    stateId,
-			StateInput: input,
+			StateId:      stateId,
+			StateInput:   input,
+			StateOptions: options,
 		},
 	))
 }
