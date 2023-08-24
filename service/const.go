@@ -25,6 +25,8 @@ const (
 	DebugDumpQueryType                   = "DebugNewDump"
 	PrepareRpcQueryType                  = "PrepareRpcQueryType"
 
+	ExecuteOptimisticLockingRpcUpdateType = "ExecuteOptimisticLockingRpcUpdate"
+
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
 	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"

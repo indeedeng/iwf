@@ -186,6 +186,20 @@ func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attrib
 	return nil
 }
 
+func (am *PersistenceManager) CheckDataAndSearchAttributesKeysAreUnlocked(dataAttrKeysToCheck, searchAttrKeysToCheck []string) bool {
+	return am.checkKeysAreUnlocked(am.lockedDataObjectKeys, dataAttrKeysToCheck) &&
+		am.checkKeysAreUnlocked(am.lockedSearchAttributeKeys, searchAttrKeysToCheck)
+}
+
+func (am *PersistenceManager) checkKeysAreUnlocked(lockedKeys map[string]bool, keysToCheck []string) bool {
+	for _, k := range keysToCheck {
+		if lockedKeys[k] {
+			return false
+		}
+	}
+	return true
+}
+
 func (am *PersistenceManager) awaitAndLockForKeys(ctx UnifiedContext, lockedKeys map[string]bool, keysToLock []string) {
 	// wait until all keys are not locked
 	err := am.provider.Await(ctx, func() bool {

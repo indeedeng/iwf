@@ -6,9 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/compatibility"
-	"github.com/indeedeng/iwf/service/common/urlautofix"
+	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/utils"
-	"io/ioutil"
 	"math"
 	"net/http"
 	"os"
@@ -24,11 +23,6 @@ import (
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-)
-
-const (
-	defaultMaxWaitSeconds = 60
-	waitBufferSeconds     = 2
 )
 
 type serviceImpl struct {
@@ -49,33 +43,6 @@ func NewApiService(config config.Config, client UnifiedClient, taskQueue string,
 		logger:    logger,
 		config:    config,
 	}, nil
-}
-
-func (s *serviceImpl) trimContextByTimeoutWithCappedDDL(parent context.Context, waitSeconds *int32) (context.Context, context.CancelFunc) {
-	maxWaitSeconds := s.config.Api.MaxWaitSeconds
-	if waitSeconds != nil {
-		maxWaitSeconds = int64(*waitSeconds)
-	}
-	if maxWaitSeconds == 0 {
-		maxWaitSeconds = defaultMaxWaitSeconds
-	}
-
-	ddl, ok := parent.Deadline()
-
-	var newDdlUnix int64
-	maxDdlUnix := time.Now().Unix() + maxWaitSeconds
-	if ok {
-		ddlUnix := ddl.Unix()
-		if ddlUnix < maxDdlUnix {
-			newDdlUnix = ddlUnix - waitBufferSeconds
-		} else {
-			newDdlUnix = maxDdlUnix - waitBufferSeconds
-		}
-	} else {
-		newDdlUnix = maxDdlUnix - waitBufferSeconds
-	}
-	newDdl := time.Unix(newDdlUnix, 0)
-	return context.WithDeadline(parent, newDdl)
 }
 
 func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.WorkflowStartRequest) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
@@ -319,7 +286,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			}
 		}
 	} else {
-		subCtx, cancFunc := s.trimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds)
+		subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds, s.config.Api.MaxWaitSeconds)
 		defer cancFunc()
 		getErr = s.client.GetWorkflowResult(subCtx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 		if getErr == nil {
@@ -430,8 +397,8 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.WorkflowRpcRequest) (wresp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	if err := checkPersistenceLoadingPolicy(req); err != nil {
-		return nil, s.handleError(err)
+	if needLocking(req) {
+		return s.handleRpcBySynchronousUpdate(ctx, req)
 	}
 
 	var rpcPrep *service.PrepareRpcQueryResponse
@@ -454,46 +421,12 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		}
 	}
 
-	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(rpcPrep.IwfWorkerUrl)
-	// invoke worker rpc
-	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		Servers: []iwfidl.ServerConfiguration{
-			{
-				URL: iwfWorkerBaseUrl,
-			},
-		},
-	})
+	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds)
+	if retError != nil {
+		return nil, retError
+	}
 
-	rpcCtx, cancel := s.trimContextByTimeoutWithCappedDDL(ctx, req.TimeoutSeconds)
-	defer cancel()
-	workerReq := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(rpcCtx)
-	workerRequest := iwfidl.WorkflowWorkerRpcRequest{
-		Context: iwfidl.Context{
-			WorkflowId:               req.WorkflowId,
-			WorkflowRunId:            rpcPrep.WorkflowRunId,
-			WorkflowStartedTimestamp: rpcPrep.WorkflowStartedTimestamp,
-		},
-		WorkflowType:     rpcPrep.IwfWorkflowType,
-		RpcName:          req.RpcName,
-		Input:            req.Input,
-		SearchAttributes: rpcPrep.SearchAttributes,
-		DataAttributes:   rpcPrep.DataObjects,
-	}
-	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
-	if checkHttpError(err, httpResp) {
-		return nil, s.handleWorkerRpcApiError(err, httpResp)
-	}
 	decision := resp.GetStateDecision()
-	if decision.HasConditionalClose() {
-		return nil, s.handleError(fmt.Errorf("closing workflow in RPC is not supported yet"))
-	}
-	for _, st := range decision.GetNextStates() {
-		if service.ValidClosingWorkflowStateId[st.GetStateId()] {
-			// TODO this need more work in workflow to support
-			return nil, s.handleError(fmt.Errorf("closing workflow in RPC is not supported yet"))
-		}
-	}
-
 	if len(resp.UpsertDataAttributes)+len(resp.UpsertSearchAttributes)+len(resp.PublishToInterStateChannel)+len(resp.RecordEvents)+len(decision.GetNextStates()) > 0 {
 		// if there is no mutation on the workflow, this RPC is "readonly", then don't send the signal
 
@@ -507,7 +440,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			RecordEvents:                resp.RecordEvents,
 			InterStateChannelPublishing: resp.PublishToInterStateChannel,
 		}
-		err = s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+		err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
 		if err != nil {
 			return nil, s.handleError(err)
 		}
@@ -602,15 +535,13 @@ func needLocking(req iwfidl.WorkflowRpcRequest) bool {
 	return false
 }
 
-func doNeedLocking(policy *iwfidl.PersistenceLoadingPolicy) bool {
-	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
-		return true
-	}
-	return false
+func (s *serviceImpl) handleRpcBySynchronousUpdate(ctx context.Context, req iwfidl.WorkflowRpcRequest) (resp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
+	req.TimeoutSeconds = ptr.Any(utils.TrimRpcTimeoutSeconds(ctx, req))
+	
 }
 
-func checkHttpError(err error, httpResp *http.Response) bool {
-	if err != nil || (httpResp != nil && httpResp.StatusCode != http.StatusOK) {
+func doNeedLocking(policy *iwfidl.PersistenceLoadingPolicy) bool {
+	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		return true
 	}
 	return false
@@ -706,40 +637,6 @@ func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
 	return errors.NewErrorAndStatus(http.StatusBadRequest,
 		iwfidl.UNCATEGORIZED_SUB_STATUS,
 		"invalid request - "+msg)
-}
-
-func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response) *errors.ErrorAndStatus {
-	detailedMessage := err.Error()
-	if err != nil {
-		detailedMessage = err.Error()
-	}
-
-	var originalStatusCode int
-	var workerError iwfidl.WorkerErrorResponse
-	if httpResp != nil {
-		originalStatusCode = httpResp.StatusCode
-		body, err := ioutil.ReadAll(httpResp.Body)
-		if err != nil {
-			detailedMessage = "cannot read body from http response"
-		} else {
-			err := json.Unmarshal(body, &workerError)
-			if err != nil {
-				detailedMessage = "unable to decode worker response body to WorkerErrorResponse: body" + string(body)
-			} else {
-				detailedMessage = fmt.Sprintf("worker API error, status:%v, errorType:%v", originalStatusCode, workerError.GetErrorType())
-			}
-		}
-
-	}
-
-	return errors.NewErrorAndStatusWithWorkerError(
-		service.HttpStatusCodeSpecial4xxError,
-		iwfidl.WORKER_API_ERROR,
-		detailedMessage,
-		workerError.GetDetail(),
-		workerError.GetErrorType(),
-		int32(originalStatusCode),
-	)
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {

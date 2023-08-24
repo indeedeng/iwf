@@ -111,16 +111,24 @@ func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, query
 	return workflow.SetQueryHandler(wfCtx, queryType, handler)
 }
 
-func (w *workflowProvider) SetUpdateHandler(ctx interpreter.UnifiedContext, updateType string, validator, handler interface{}) error {
+func (w *workflowProvider) SetRpcUpdateHandler(ctx interpreter.UnifiedContext, updateType string, validator interpreter.UnifiedRpcValidator, handler interpreter.UnifiedRpcHandler) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
+	v2 := func(ctx workflow.Context, input iwfidl.WorkflowRpcRequest) error {
+		ctx2 := interpreter.NewUnifiedContext(ctx)
+		return validator(ctx2, input)
+	}
+	h2 := func(ctx workflow.Context, input iwfidl.WorkflowRpcRequest) (*interpreter.HandlerOutput, error) {
+		ctx2 := interpreter.NewUnifiedContext(ctx)
+		return handler(ctx2, input)
+	}
 	return workflow.SetUpdateHandlerWithOptions(
 		wfCtx,
 		updateType,
-		handler,
-		workflow.UpdateHandlerOptions{Validator: validator},
+		h2,
+		workflow.UpdateHandlerOptions{Validator: v2},
 	)
 }
 
