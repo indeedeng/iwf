@@ -51,8 +51,11 @@ func NewApiService(config config.Config, client UnifiedClient, taskQueue string,
 	}, nil
 }
 
-func (s *serviceImpl) trimContextForBlockingWait(parent context.Context) (context.Context, context.CancelFunc) {
+func (s *serviceImpl) trimContextByTimeoutWithCappedDDL(parent context.Context, waitSeconds *int32) (context.Context, context.CancelFunc) {
 	maxWaitSeconds := s.config.Api.MaxWaitSeconds
+	if waitSeconds != nil {
+		maxWaitSeconds = int64(*waitSeconds)
+	}
 	if maxWaitSeconds == 0 {
 		maxWaitSeconds = defaultMaxWaitSeconds
 	}
@@ -316,7 +319,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			}
 		}
 	} else {
-		subCtx, cancFunc := s.trimContextForBlockingWait(ctx)
+		subCtx, cancFunc := s.trimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds)
 		defer cancFunc()
 		getErr = s.client.GetWorkflowResult(subCtx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 		if getErr == nil {
@@ -460,12 +463,9 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			},
 		},
 	})
-	rpcCtx := ctx
-	var cancel context.CancelFunc
-	if req.GetTimeoutSeconds() > 0 {
-		rpcCtx, cancel = context.WithTimeout(rpcCtx, time.Duration(req.GetTimeoutSeconds())*time.Second)
-		defer cancel()
-	}
+
+	rpcCtx, cancel := s.trimContextByTimeoutWithCappedDDL(ctx, req.TimeoutSeconds)
+	defer cancel()
 	workerReq := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(rpcCtx)
 	workerRequest := iwfidl.WorkflowWorkerRpcRequest{
 		Context: iwfidl.Context{
