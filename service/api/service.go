@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/utils"
+	"github.com/indeedeng/iwf/service/interpreter"
 	"math"
 	"net/http"
 	"os"
@@ -537,7 +538,12 @@ func needLocking(req iwfidl.WorkflowRpcRequest) bool {
 
 func (s *serviceImpl) handleRpcBySynchronousUpdate(ctx context.Context, req iwfidl.WorkflowRpcRequest) (resp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
 	req.TimeoutSeconds = ptr.Any(utils.TrimRpcTimeoutSeconds(ctx, req))
-	
+	var output interpreter.HandlerOutput
+	err := s.client.SynchronousUpdateWorkflow(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteOptimisticLockingRpcUpdateType, req)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+	return output.RpcOutput, output.StatusError
 }
 
 func doNeedLocking(policy *iwfidl.PersistenceLoadingPolicy) bool {
