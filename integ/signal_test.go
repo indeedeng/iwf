@@ -62,7 +62,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        signal.WorkflowType,
-		WorkflowTimeoutSeconds: 100,
+		WorkflowTimeoutSeconds: 10,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(signal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
