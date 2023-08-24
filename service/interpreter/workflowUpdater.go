@@ -10,6 +10,7 @@ import (
 type WorkflowUpdater struct {
 	persistenceManager   *PersistenceManager
 	provider             WorkflowProvider
+	continueAsNewer      *ContinueAsNewer
 	continueAsNewCounter *ContinueAsNewCounter
 	interStateChannel    *InterStateChannel
 	stateRequestQueue    *StateRequestQueue
@@ -18,10 +19,11 @@ type WorkflowUpdater struct {
 }
 
 func NewWorkflowUpdater(ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue,
-	continueAsNewCounter *ContinueAsNewCounter, interStateChannel *InterStateChannel, basicInfo service.BasicInfo,
+	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, interStateChannel *InterStateChannel, basicInfo service.BasicInfo,
 ) (*WorkflowUpdater, error) {
 	updater := &WorkflowUpdater{
 		persistenceManager:   persistenceManager,
+		continueAsNewer:      continueAsNewer,
 		continueAsNewCounter: continueAsNewCounter,
 		interStateChannel:    interStateChannel,
 		stateRequestQueue:    stateRequestQueue,
@@ -37,6 +39,9 @@ func NewWorkflowUpdater(ctx UnifiedContext, provider WorkflowProvider, persisten
 }
 
 func (u *WorkflowUpdater) handler(ctx UnifiedContext, input iwfidl.WorkflowRpcRequest) (output *HandlerOutput, err error) {
+
+	u.continueAsNewer.IncreaseInflightOperation()
+	defer u.continueAsNewer.DecreaseInflightOperation()
 
 	info := u.provider.GetWorkflowInfo(ctx)
 	rpcPrep := service.PrepareRpcQueryResponse{

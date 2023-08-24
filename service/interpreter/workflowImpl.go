@@ -80,7 +80,7 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
 
-	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewCounter, interStateChannel, basicInfo)
+	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, interStateChannel, basicInfo)
 	if err != nil {
 		return nil, err
 	}
