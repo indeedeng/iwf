@@ -9,7 +9,6 @@ import (
 
 const (
 	defaultMaxApiTimeoutSeconds = 60
-	waitBufferSeconds           = 2
 )
 
 func MergeMap(first map[string]interface{}, second map[string]interface{}) map[string]interface{} {
@@ -48,20 +47,17 @@ func TrimContextByTimeoutWithCappedDDL(parent context.Context, waitSeconds *int3
 		maxWaitSeconds = defaultMaxApiTimeoutSeconds
 	}
 
-	ddl, ok := parent.Deadline()
+	newDdlUnix := time.Now().Unix() + maxWaitSeconds
 
-	var newDdlUnix int64
-	maxDdlUnix := time.Now().Unix() + maxWaitSeconds
+	// then capped by context
+	ddl, ok := parent.Deadline()
 	if ok {
-		ddlUnix := ddl.Unix()
-		if ddlUnix < maxDdlUnix {
-			newDdlUnix = ddlUnix - waitBufferSeconds
-		} else {
-			newDdlUnix = maxDdlUnix - waitBufferSeconds
+		maxDdlUnix := ddl.Unix()
+		if maxDdlUnix < newDdlUnix {
+			newDdlUnix = maxDdlUnix
 		}
-	} else {
-		newDdlUnix = maxDdlUnix - waitBufferSeconds
 	}
+
 	newDdl := time.Unix(newDdlUnix, 0)
 	return context.WithDeadline(parent, newDdl)
 }
