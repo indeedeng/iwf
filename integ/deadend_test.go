@@ -73,10 +73,10 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	// start a workflow
 	wfId := deadend.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
-	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	startResp, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        deadend.WorkflowType,
-		WorkflowTimeoutSeconds: 20,
+		WorkflowTimeoutSeconds: 100,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
@@ -84,13 +84,33 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	// invoke an RPC to trigger the state execution
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+
+	// invoke RPC to trigger write to verify continue as new is happening with no states
 	for i := 0; i < 3; i++ {
 		time.Sleep(time.Second * 2)
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
-			RpcName:    deadend.RPCName,
+			RpcName:    deadend.RPCWriteData,
+		}).Execute()
+		panicAtHttpError(err, httpResp)
+	}
+
+	if config != nil {
+		reqDesc := apiClient.DefaultApi.ApiV1WorkflowGetPost(context.Background())
+		descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+			WorkflowId: wfId,
+		}).Execute()
+		panicAtHttpError(err, httpResp)
+		assertions.True(startResp.GetWorkflowRunId() != descResp.GetWorkflowRunId())
+	}
+	
+	// invoke an RPC to trigger the state execution
+	for i := 0; i < 3; i++ {
+		time.Sleep(time.Second * 2)
+		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+			WorkflowId: wfId,
+			RpcName:    deadend.RPCTriggerState,
 		}).Execute()
 		panicAtHttpError(err, httpResp)
 	}

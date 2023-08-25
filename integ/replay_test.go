@@ -17,6 +17,8 @@ var jsonHistoryFiles = []string{
 	"v3-any-timer-signal-continue-as-new.json",
 	"v3-basic.json",
 	"v3-skip-start.json",
+	"v3-bug-no-state-stuck.json",
+	"v4-continue-as-new-on-no-state.json",
 }
 
 func TestTemporalReplay(t *testing.T) {
