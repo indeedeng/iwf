@@ -96,69 +96,72 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	rpcIncrease := 0
 	rpcLockingFailure := 0
-	for i := 0; i < 25; i++ {
-		allSearchAttributes := []iwfidl.SearchAttributeKeyAndType{
-			{
-				Key:       iwfidl.PtrString(locking.TestSearchAttributeKeywordKey),
-				ValueType: iwfidl.KEYWORD.Ptr(),
-			},
-			{
-				Key:       iwfidl.PtrString(locking.TestSearchAttributeIntKey),
-				ValueType: iwfidl.INT.Ptr(),
-			},
-		}
-		time.Sleep(time.Second * 1)
-		reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
-		rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
-			WorkflowId: wfId,
-			RpcName:    locking.RPCName,
-			Input:      locking.TestValue,
-			SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
-				PartialLoadingKeys: []string{
-					locking.TestSearchAttributeKeywordKey,
-					locking.TestSearchAttributeIntKey,
+	if backendType == service.BackendTypeTemporal {
+		// only test rpc locking with Temporal
+		for i := 0; i < 25; i++ {
+			allSearchAttributes := []iwfidl.SearchAttributeKeyAndType{
+				{
+					Key:       iwfidl.PtrString(locking.TestSearchAttributeKeywordKey),
+					ValueType: iwfidl.KEYWORD.Ptr(),
 				},
-				LockingKeys: []string{
-					locking.TestSearchAttributeIntKey,
+				{
+					Key:       iwfidl.PtrString(locking.TestSearchAttributeIntKey),
+					ValueType: iwfidl.INT.Ptr(),
 				},
-			},
-			DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-				PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
-				PartialLoadingKeys: []string{
-					locking.TestDataObjectKey2,
-					locking.TestDataObjectKey1,
-				},
-				LockingKeys: []string{
-					locking.TestDataObjectKey1,
-				},
-			},
-			TimeoutSeconds:   iwfidl.PtrInt32(2),
-			SearchAttributes: allSearchAttributes,
-		}).Execute()
-		if err != nil || httpResp.StatusCode != 200 {
-			if httpResp.StatusCode == service.HttpStatusCodeSpecial4xxError2 {
-				var errResp iwfidl.ErrorResponse
-				body, err := ioutil.ReadAll(httpResp.Body)
-				assertions.Nil(err)
-				err = json.Unmarshal(body, &errResp)
-				lockingErrorMsg := "requested data or search attributes are being locked by other operations"
-				assertions.Equal(lockingErrorMsg, errResp.GetDetail())
-				assertions.Equal(iwfidl.WORKER_API_ERROR, errResp.GetSubStatus())
-				fmt.Println(lockingErrorMsg)
-				rpcLockingFailure++
-				continue
-			} else {
-				panicAtHttpError(err, httpResp)
 			}
+			time.Sleep(time.Second * 1)
+			reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+			rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+				WorkflowId: wfId,
+				RpcName:    locking.RPCName,
+				Input:      locking.TestValue,
+				SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+					PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
+					PartialLoadingKeys: []string{
+						locking.TestSearchAttributeKeywordKey,
+						locking.TestSearchAttributeIntKey,
+					},
+					LockingKeys: []string{
+						locking.TestSearchAttributeIntKey,
+					},
+				},
+				DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+					PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
+					PartialLoadingKeys: []string{
+						locking.TestDataObjectKey2,
+						locking.TestDataObjectKey1,
+					},
+					LockingKeys: []string{
+						locking.TestDataObjectKey1,
+					},
+				},
+				TimeoutSeconds:   iwfidl.PtrInt32(2),
+				SearchAttributes: allSearchAttributes,
+			}).Execute()
+			if err != nil || httpResp.StatusCode != 200 {
+				if httpResp.StatusCode == service.HttpStatusCodeSpecial4xxError2 {
+					var errResp iwfidl.ErrorResponse
+					body, err := ioutil.ReadAll(httpResp.Body)
+					assertions.Nil(err)
+					err = json.Unmarshal(body, &errResp)
+					lockingErrorMsg := "requested data or search attributes are being locked by other operations"
+					assertions.Equal(lockingErrorMsg, errResp.GetDetail())
+					assertions.Equal(iwfidl.WORKER_API_ERROR, errResp.GetSubStatus())
+					fmt.Println(lockingErrorMsg)
+					rpcLockingFailure++
+					continue
+				} else {
+					panicAtHttpError(err, httpResp)
+				}
+			}
+			fmt.Println("rpc execution succeeded")
+			rpcIncrease++
+			assertions.Equal(rpcResp.Output, locking.TestValue)
 		}
-		fmt.Println("rpc execution succeeded")
-		rpcIncrease++
-		assertions.Equal(rpcResp.Output, locking.TestValue)
+		assertions.True(rpcIncrease > 0)
+		assertions.True(rpcLockingFailure > 0)
+		fmt.Println("rpc results, success, failure:", rpcIncrease, rpcLockingFailure)
 	}
-	assertions.True(rpcIncrease > 0)
-	assertions.True(rpcLockingFailure > 0)
-	fmt.Println("rpc results, success, failure:", rpcIncrease, rpcLockingFailure)
 
 	time.Sleep(time.Second * 1)
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
