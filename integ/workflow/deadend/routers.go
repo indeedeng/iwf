@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	WorkflowType = "deadend"
-	RPCName      = "test-RPCName"
+	WorkflowType    = "deadend"
+	RPCTriggerState = "test-RPCTriggerState"
+	RPCWriteData    = "RPCWriteData"
 
 	State1 = "S1"
 )
@@ -40,21 +41,36 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
 		panic("invalid context in the request")
 	}
-	if req.WorkflowType != WorkflowType ||
-		(req.RpcName != RPCName) {
-		panic("invalid rpc name:" + req.RpcName)
+	if req.WorkflowType != WorkflowType {
+		panic("invalid workflow type")
 	}
 
-	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
-		StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
-			{
-				StateId: State1,
-				StateOptions: &iwfidl.WorkflowStateOptions{
-					SkipStartApi: iwfidl.PtrBool(true),
+	if req.RpcName == RPCTriggerState {
+		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+			StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
+				{
+					StateId: State1,
+					StateOptions: &iwfidl.WorkflowStateOptions{
+						SkipStartApi: iwfidl.PtrBool(true),
+					},
+				},
+			}},
+		})
+	} else if req.RpcName == RPCWriteData {
+		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+			UpsertDataAttributes: []iwfidl.KeyValue{
+				{
+					Key: iwfidl.PtrString("any key"),
+					Value: &iwfidl.EncodedObject{
+						Encoding: iwfidl.PtrString("encoding"),
+						Data:     iwfidl.PtrString("data"),
+					},
 				},
 			},
-		}},
-	})
+		})
+	} else {
+		panic("invalid rpc name:" + req.RpcName)
+	}
 }
 
 // ApiV1WorkflowStateStart - for a workflow
