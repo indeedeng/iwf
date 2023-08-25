@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/compatibility"
-	"github.com/indeedeng/iwf/service/common/urlautofix"
+	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/utils"
-	"io/ioutil"
+	"github.com/indeedeng/iwf/service/interpreter"
 	"math"
 	"net/http"
 	"os"
@@ -24,11 +24,6 @@ import (
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-)
-
-const (
-	defaultMaxWaitSeconds = 60
-	waitBufferSeconds     = 2
 )
 
 type serviceImpl struct {
@@ -49,30 +44,6 @@ func NewApiService(config config.Config, client UnifiedClient, taskQueue string,
 		logger:    logger,
 		config:    config,
 	}, nil
-}
-
-func (s *serviceImpl) trimContextForBlockingWait(parent context.Context) (context.Context, context.CancelFunc) {
-	maxWaitSeconds := s.config.Api.MaxWaitSeconds
-	if maxWaitSeconds == 0 {
-		maxWaitSeconds = defaultMaxWaitSeconds
-	}
-
-	ddl, ok := parent.Deadline()
-
-	var newDdlUnix int64
-	maxDdlUnix := time.Now().Unix() + maxWaitSeconds
-	if ok {
-		ddlUnix := ddl.Unix()
-		if ddlUnix < maxDdlUnix {
-			newDdlUnix = ddlUnix - waitBufferSeconds
-		} else {
-			newDdlUnix = maxDdlUnix - waitBufferSeconds
-		}
-	} else {
-		newDdlUnix = maxDdlUnix - waitBufferSeconds
-	}
-	newDdl := time.Unix(newDdlUnix, 0)
-	return context.WithDeadline(parent, newDdl)
 }
 
 func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.WorkflowStartRequest) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
@@ -316,7 +287,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 			}
 		}
 	} else {
-		subCtx, cancFunc := s.trimContextForBlockingWait(ctx)
+		subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds, s.config.Api.MaxWaitSeconds)
 		defer cancFunc()
 		getErr = s.client.GetWorkflowResult(subCtx, &output, req.GetWorkflowId(), req.GetWorkflowRunId())
 		if getErr == nil {
@@ -335,7 +306,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 	if s.client.IsRequestTimeoutError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit
 		return nil, errors.NewErrorAndStatus(
-			service.HttpStatusCodeSpecial4xxError,
+			service.HttpStatusCodeSpecial4xxError1,
 			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
 			"workflow is still running, waiting has exceeded timeout limit")
 	}
@@ -427,88 +398,22 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.WorkflowRpcRequest) (wresp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	if err := checkPersistenceLoadingPolicy(req); err != nil {
-		return nil, s.handleError(err)
+	if needLocking(req) {
+		return s.handleRpcBySynchronousUpdate(ctx, req)
 	}
 
-	var queryResp service.PrepareRpcQueryResponse
-	queryToPrepare := true
+	var rpcPrep *service.PrepareRpcQueryResponse
 	if req.GetUseMemoForDataAttributes() {
-		var searchAttributes []iwfidl.SearchAttribute
-		var dataAttributes []iwfidl.KeyValue
-
-		requestedSAs := req.SearchAttributes
-		saPolicy := req.GetSearchAttributesLoadingPolicy()
-		if saPolicy.GetPersistenceLoadingType() != iwfidl.ALL_WITHOUT_LOCKING {
-			requestedSAKeys := map[string]bool{}
-			for _, saKey := range saPolicy.PartialLoadingKeys {
-				requestedSAKeys[saKey] = true
-			}
-			requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
-			for _, sa := range req.SearchAttributes {
-				if requestedSAKeys[sa.GetKey()] {
-					requestedSAs = append(requestedSAs, sa)
-				}
-			}
+		rpcPrep, retError = s.tryPrepareRPCbyDescribe(ctx, req)
+		if retError != nil {
+			return nil, retError
 		}
-
-		requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
-			Key:       ptr.Any(service.SearchAttributeIwfWorkflowType),
-			ValueType: iwfidl.KEYWORD.Ptr(),
-		})
-		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), requestedSAs)
-		if err != nil {
-			return nil, s.handleError(err)
-		}
-
-		for _, sa := range requestedSAs {
-			if sa.GetKey() == service.SearchAttributeIwfWorkflowType {
-				continue
-			}
-			searchAttribute, exist := response.SearchAttributes[sa.GetKey()]
-			if exist {
-				searchAttributes = append(searchAttributes, searchAttribute)
-			}
-		}
-
-		for k, v := range response.Memos {
-			if strings.HasPrefix(k, service.IwfSystemConstPrefix) {
-				continue
-			}
-			dataAttributes = append(dataAttributes, iwfidl.KeyValue{
-				Key:   iwfidl.PtrString(k),
-				Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
-			})
-		}
-
-		attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
-		workflowType := attribute.GetStringValue()
-		workerUrlMemoObj, ok := response.Memos[service.WorkerUrlMemoKey]
-		if ok {
-			// using memo is enough
-			queryToPrepare = false
-		} else {
-			// this means that we cannot use memo to continue, need to fall back to use query
-			s.logger.Warn("workflow attempt to use memo but probably isn't started with it", tag.WorkflowID(req.WorkflowId))
-			if s.config.Interpreter.FailAtMemoIncompatibility {
-				return nil, s.handleError(fmt.Errorf("memo is not set correctly to use"))
-			}
-		}
-		workerUrl := workerUrlMemoObj.GetData()
-
-		queryResp = service.PrepareRpcQueryResponse{
-			DataObjects:              dataAttributes,
-			SearchAttributes:         searchAttributes,
-			WorkflowStartedTimestamp: response.WorkflowStartedTimestamp,
-			WorkflowRunId:            response.RunId,
-			IwfWorkflowType:          workflowType,
-			IwfWorkerUrl:             workerUrl,
-		}
+		// Note that rpcPrep could be nil here
 	}
 
-	if queryToPrepare {
+	if rpcPrep == nil {
 		// use query to load, this is expensive. So it tries to avoid if possible
-		err := s.client.QueryWorkflow(ctx, &queryResp, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
+		err := s.client.QueryWorkflow(ctx, &rpcPrep, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
 			DataObjectsLoadingPolicy:      req.DataAttributesLoadingPolicy,
 			SearchAttributesLoadingPolicy: req.SearchAttributesLoadingPolicy,
 		})
@@ -517,49 +422,12 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 		}
 	}
 
-	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(queryResp.IwfWorkerUrl)
-	// invoke worker rpc
-	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		Servers: []iwfidl.ServerConfiguration{
-			{
-				URL: iwfWorkerBaseUrl,
-			},
-		},
-	})
-	rpcCtx := ctx
-	var cancel context.CancelFunc
-	if req.GetTimeoutSeconds() > 0 {
-		rpcCtx, cancel = context.WithTimeout(rpcCtx, time.Duration(req.GetTimeoutSeconds())*time.Second)
-		defer cancel()
-	}
-	workerReq := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(rpcCtx)
-	workerRequest := iwfidl.WorkflowWorkerRpcRequest{
-		Context: iwfidl.Context{
-			WorkflowId:               req.WorkflowId,
-			WorkflowRunId:            queryResp.WorkflowRunId,
-			WorkflowStartedTimestamp: queryResp.WorkflowStartedTimestamp,
-		},
-		WorkflowType:     queryResp.IwfWorkflowType,
-		RpcName:          req.RpcName,
-		Input:            req.Input,
-		SearchAttributes: queryResp.SearchAttributes,
-		DataAttributes:   queryResp.DataObjects,
-	}
-	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
-	if checkHttpError(err, httpResp) {
-		return nil, s.handleWorkerRpcApiError(err, httpResp)
-	}
-	decision := resp.GetStateDecision()
-	if decision.HasConditionalClose() {
-		return nil, s.handleError(fmt.Errorf("closing workflow in RPC is not supported yet"))
-	}
-	for _, st := range decision.GetNextStates() {
-		if service.ValidClosingWorkflowStateId[st.GetStateId()] {
-			// TODO this need more work in workflow to support
-			return nil, s.handleError(fmt.Errorf("closing workflow in RPC is not supported yet"))
-		}
+	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds)
+	if retError != nil {
+		return nil, retError
 	}
 
+	decision := resp.GetStateDecision()
 	if len(resp.UpsertDataAttributes)+len(resp.UpsertSearchAttributes)+len(resp.PublishToInterStateChannel)+len(resp.RecordEvents)+len(decision.GetNextStates()) > 0 {
 		// if there is no mutation on the workflow, this RPC is "readonly", then don't send the signal
 
@@ -573,7 +441,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 			RecordEvents:                resp.RecordEvents,
 			InterStateChannelPublishing: resp.PublishToInterStateChannel,
 		}
-		err = s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+		err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
 		if err != nil {
 			return nil, s.handleError(err)
 		}
@@ -582,29 +450,116 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	return &iwfidl.WorkflowRpcResponse{Output: resp.Output}, nil
 }
 
-func checkPersistenceLoadingPolicy(req iwfidl.WorkflowRpcRequest) error {
+func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.WorkflowRpcRequest) (rpcPrep *service.PrepareRpcQueryResponse, retError *errors.ErrorAndStatus) {
+	var searchAttributes []iwfidl.SearchAttribute
+	var dataAttributes []iwfidl.KeyValue
+
+	requestedSAs := req.SearchAttributes
+	saPolicy := req.GetSearchAttributesLoadingPolicy()
+	if saPolicy.GetPersistenceLoadingType() != iwfidl.ALL_WITHOUT_LOCKING {
+		requestedSAKeys := map[string]bool{}
+		for _, saKey := range saPolicy.PartialLoadingKeys {
+			requestedSAKeys[saKey] = true
+		}
+		requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
+		for _, sa := range req.SearchAttributes {
+			if requestedSAKeys[sa.GetKey()] {
+				requestedSAs = append(requestedSAs, sa)
+			}
+		}
+	}
+
+	requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
+		Key:       ptr.Any(service.SearchAttributeIwfWorkflowType),
+		ValueType: iwfidl.KEYWORD.Ptr(),
+	})
+	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), requestedSAs)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	for _, sa := range requestedSAs {
+		if sa.GetKey() == service.SearchAttributeIwfWorkflowType {
+			continue
+		}
+		searchAttribute, exist := response.SearchAttributes[sa.GetKey()]
+		if exist {
+			searchAttributes = append(searchAttributes, searchAttribute)
+		}
+	}
+
+	for k, v := range response.Memos {
+		if strings.HasPrefix(k, service.IwfSystemConstPrefix) {
+			continue
+		}
+		dataAttributes = append(dataAttributes, iwfidl.KeyValue{
+			Key:   iwfidl.PtrString(k),
+			Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
+		})
+	}
+
+	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
+	workflowType := attribute.GetStringValue()
+	workerUrlMemoObj, ok := response.Memos[service.WorkerUrlMemoKey]
+	if !ok {
+		// this means describe workflow is not enough -- we cannot use memo to continue, need to fall back to use query
+		s.logger.Warn("workflow attempt to use memo but probably isn't started with it", tag.WorkflowID(req.WorkflowId))
+		if s.config.Interpreter.FailAtMemoIncompatibility {
+			return nil, s.handleError(fmt.Errorf("memo is not set correctly to use"))
+		} else {
+			return nil, nil
+		}
+	}
+	workerUrl := workerUrlMemoObj.GetData()
+
+	return &service.PrepareRpcQueryResponse{
+		DataObjects:              dataAttributes,
+		SearchAttributes:         searchAttributes,
+		WorkflowStartedTimestamp: response.WorkflowStartedTimestamp,
+		WorkflowRunId:            response.RunId,
+		IwfWorkflowType:          workflowType,
+		IwfWorkerUrl:             workerUrl,
+	}, nil
+}
+
+func needLocking(req iwfidl.WorkflowRpcRequest) bool {
 	if req.SearchAttributesLoadingPolicy != nil {
-		if err := doCheckPersistenceLoadingPolicy(req.SearchAttributesLoadingPolicy); err != nil {
-			return err
+		if doNeedLocking(req.SearchAttributesLoadingPolicy) {
+			return true
 		}
 	}
 	if req.DataAttributesLoadingPolicy != nil {
-		if err := doCheckPersistenceLoadingPolicy(req.DataAttributesLoadingPolicy); err != nil {
-			return err
+		if doNeedLocking(req.DataAttributesLoadingPolicy) {
+			return true
 		}
 	}
-	return nil
+	return false
 }
 
-func doCheckPersistenceLoadingPolicy(policy *iwfidl.PersistenceLoadingPolicy) error {
-	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
-		return fmt.Errorf("PARTIAL_WITH_EXCLUSIVE_LOCK is not supported in RPC yet")
+func (s *serviceImpl) handleRpcBySynchronousUpdate(ctx context.Context, req iwfidl.WorkflowRpcRequest) (resp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
+	req.TimeoutSeconds = ptr.Any(utils.TrimRpcTimeoutSeconds(ctx, req))
+	var output interpreter.HandlerOutput
+	err := s.client.SynchronousUpdateWorkflow(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteOptimisticLockingRpcUpdateType, req)
+	if err != nil {
+		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(err)
+		if errType != "" {
+			errTypeEnum := iwfidl.WorkflowErrorType(errType)
+			if errTypeEnum == iwfidl.RPC_ACQUIRE_LOCK_FAILURE {
+				var details string
+				err2 := s.client.GetApplicationErrorDetails(err, &details)
+				if err2 != nil {
+					details = err2.Error()
+				}
+				return nil, errors.NewErrorAndStatus(service.HttpStatusCodeSpecial4xxError2, iwfidl.WORKER_API_ERROR, details)
+			}
+		}
+		return nil, s.handleError(err)
 	}
-	return nil
+	return output.RpcOutput, output.StatusError
 }
 
-func checkHttpError(err error, httpResp *http.Response) bool {
-	if err != nil || (httpResp != nil && httpResp.StatusCode != http.StatusOK) {
+func doNeedLocking(policy *iwfidl.PersistenceLoadingPolicy) bool {
+	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		return true
 	}
 	return false
@@ -700,40 +655,6 @@ func makeInvalidRequestError(msg string) *errors.ErrorAndStatus {
 	return errors.NewErrorAndStatus(http.StatusBadRequest,
 		iwfidl.UNCATEGORIZED_SUB_STATUS,
 		"invalid request - "+msg)
-}
-
-func (s *serviceImpl) handleWorkerRpcApiError(err error, httpResp *http.Response) *errors.ErrorAndStatus {
-	detailedMessage := err.Error()
-	if err != nil {
-		detailedMessage = err.Error()
-	}
-
-	var originalStatusCode int
-	var workerError iwfidl.WorkerErrorResponse
-	if httpResp != nil {
-		originalStatusCode = httpResp.StatusCode
-		body, err := ioutil.ReadAll(httpResp.Body)
-		if err != nil {
-			detailedMessage = "cannot read body from http response"
-		} else {
-			err := json.Unmarshal(body, &workerError)
-			if err != nil {
-				detailedMessage = "unable to decode worker response body to WorkerErrorResponse: body" + string(body)
-			} else {
-				detailedMessage = fmt.Sprintf("worker API error, status:%v, errorType:%v", originalStatusCode, workerError.GetErrorType())
-			}
-		}
-
-	}
-
-	return errors.NewErrorAndStatusWithWorkerError(
-		service.HttpStatusCodeSpecial4xxError,
-		iwfidl.WORKER_API_ERROR,
-		detailedMessage,
-		workerError.GetDetail(),
-		workerError.GetErrorType(),
-		int32(originalStatusCode),
-	)
 }
 
 func (s *serviceImpl) handleError(err error) *errors.ErrorAndStatus {

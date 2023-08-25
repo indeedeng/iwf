@@ -9,8 +9,12 @@ const (
 
 	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
 
-	// HttpStatusCodeSpecial4xxError is a special deprecated code for this because I can't find an official one for this case
-	HttpStatusCodeSpecial4xxError = 420
+	// below are special unofficial code for special use case
+
+	// HttpStatusCodeSpecial4xxError1 is for poll timeout, RPC worker execution error
+	HttpStatusCodeSpecial4xxError1 = 420
+	// HttpStatusCodeSpecial4xxError2 is for RPC acquire locking failure
+	HttpStatusCodeSpecial4xxError2 = 450
 
 	TaskQueue = "Interpreter_DEFAULT"
 
@@ -24,6 +28,8 @@ const (
 	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
 	DebugDumpQueryType                   = "DebugNewDump"
 	PrepareRpcQueryType                  = "PrepareRpcQueryType"
+
+	ExecuteOptimisticLockingRpcUpdateType = "ExecuteOptimisticLockingRpcUpdate"
 
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"

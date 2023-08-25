@@ -350,7 +350,10 @@ background execution when updating persistence. People sometimes have to use com
 
 ![flow with RPC](https://user-images.githubusercontent.com/4523955/234930263-40b98ca7-4401-44fa-af8a-32d5ae075438.png)
 
-Note that the read+write locking in RPC is [WIP](https://github.com/indeedeng/iwf/issues/305).
+Note that by default, read and write are atomic separately.
+To ensure the atomicity of the whole RPC for read+write, you should use `PARTIAL_WITH_EXCLUSIVE_LOCK` persistence loading policy for the RPC options.
+The `PARTIAL_WITH_EXCLUSIVE_LOCK` for RPC is only supported by Temporal as backend with enabling synchronous update feature (by `frontend.enableUpdateWorkflowExecution:true` in Dynamic Config).
+See the [wiki](https://github.com/indeedeng/iwf/wiki/What-does-the-atomicity-of-RPC-really-mean%3F) for further details.
 
 ### Signal Channel vs RPC
 
@@ -473,9 +476,8 @@ done in parallel without locking.
 
 If racing conditions could be a problem, using`PARTIAL_WITH_EXCLUSIVE_LOCK` allows specifying some keys to be locked during the execution.
 
-However, `PARTIAL_WITH_EXCLUSIVE_LOCK` is not supported in RPC yet. The feature is WIP with waiting for the Temporal "update" being production ready.
-As a workaround, RPC can kick off a WorkflowState to update the persistence data using the locking policy.
-
+The `PARTIAL_WITH_EXCLUSIVE_LOCK` for RPC is only supported by Temporal as backend with enabling synchronous update feature (by `frontend.enableUpdateWorkflowExecution:true` in Dynamic Config)
+See the [wiki](https://github.com/indeedeng/iwf/wiki/What-does-the-atomicity-of-RPC-really-mean%3F) for further details.
 #### State API failure handling/recovery
 
 By default, the workflow execution will fail when State APIs max out the retry attempts. In some cases that

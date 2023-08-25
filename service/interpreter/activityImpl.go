@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
+	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"io/ioutil"
@@ -45,7 +46,7 @@ func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, inp
 		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
-	if err := checkResp(resp); err != nil {
+	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
 		return nil, composeStartApiRespError(provider, err, resp)
 	}
 
@@ -121,7 +122,7 @@ func composeHttpError(provider ActivityProvider, err error, httpResp *http.Respo
 		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, responseBody, err))
 }
 
-func checkResp(resp *iwfidl.WorkflowStateStartResponse) error {
+func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartResponse) error {
 	if resp == nil || resp.CommandRequest == nil {
 		return nil
 	}
@@ -179,4 +180,20 @@ func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, 
 		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.SERVER_INTERNAL_ERROR_TYPE))
 	}
 	return resp, nil
+}
+
+func InvokeWorkerRpc(
+	ctx context.Context, backendType service.BackendType, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest,
+) (*InvokeRpcActivityOutput, error) {
+	provider := getActivityProviderByType(backendType)
+	logger := provider.GetLogger(ctx)
+	logger.Info("invoke worker RPC by activity", "input", req)
+
+	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
+
+	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds)
+	return &InvokeRpcActivityOutput{
+		RpcOutput:   resp,
+		StatusError: statusErr,
+	}, nil
 }

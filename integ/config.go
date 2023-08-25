@@ -11,7 +11,7 @@ func createTestConfig(failAtMemoCompatibility bool) config.Config {
 	return config.Config{
 		Api: config.ApiConfig{
 			Port:           9715,
-			MaxWaitSeconds: 10,
+			MaxWaitSeconds: 10, // use 10 so that we can test it in the waiting test
 		},
 		Interpreter: config.Interpreter{
 			VerboseDebug:              false,

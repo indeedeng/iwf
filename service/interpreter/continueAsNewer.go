@@ -13,6 +13,7 @@ type ContinueAsNewer struct {
 	provider WorkflowProvider
 
 	StateExecutionToResumeMap map[string]service.StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
+	inflightUpdateOperations  int
 
 	stateRequestQueue     *StateRequestQueue
 	interStateChannel     *InterStateChannel
@@ -158,6 +159,14 @@ func (c *ContinueAsNewer) DrainThreads(ctx UnifiedContext) error {
 	return errWait
 }
 
+func (c *ContinueAsNewer) IncreaseInflightOperation() {
+	c.inflightUpdateOperations++
+}
+
+func (c *ContinueAsNewer) DecreaseInflightOperation() {
+	c.inflightUpdateOperations--
+}
+
 // if the DrainAllSignalsAndThreads await is being called more than a few times and cannot get through,
 // there is likely something wrong in the continueAsNew logic (unless state API is stuck)
 // the key is runId, the value is how many times it has been called in this worker
@@ -172,12 +181,13 @@ func (c *ContinueAsNewer) allThreadsDrained(ctx UnifiedContext) bool {
 	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
 
 	remainingThreadCount := c.provider.GetThreadCount()
-	if remainingThreadCount == 0 {
+	if remainingThreadCount == 0 && c.inflightUpdateOperations == 0 {
 		delete(inMemoryContinueAsNewMonitor, runId)
 		return true
 	}
 
-	c.provider.GetLogger(ctx).Debug("continueAsNew is in draining remainingThreadCount, attempt, threadNames", remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+	c.provider.GetLogger(ctx).Debug("continueAsNew is in draining remainingThreadCount, attempt, threadNames, inflightUpdateOperations",
+		remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames(), c.inflightUpdateOperations)
 
 	// TODO using a flag to control this debugging info
 	initTime, ok := inMemoryContinueAsNewMonitor[runId]
@@ -190,14 +200,14 @@ func (c *ContinueAsNewer) allThreadsDrained(ctx UnifiedContext) bool {
 
 	if elapsed >= errThreshold {
 		c.provider.GetLogger(ctx).Warn(
-			"continueAsNew is likely stuck (unless state API is stuck) in draining remainingThreadCount, attempt, threadNames",
-			remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+			"continueAsNew is likely stuck (unless state API is stuck) in draining remainingThreadCount, attempt, threadNames, inflightUpdateOperations",
+			remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames(), c.inflightUpdateOperations)
 		return false
 	}
 	if elapsed >= warnThreshold {
 		c.provider.GetLogger(ctx).Warn(
-			"continueAsNew may be stuck (unless state API is stuck) in draining remainingThreadCount, attempt, threadNames",
-			remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames())
+			"continueAsNew may be stuck (unless state API is stuck) in draining remainingThreadCount, attempt, threadNames, inflightUpdateOperations",
+			remainingThreadCount, inMemoryContinueAsNewMonitor[runId], c.provider.GetPendingThreadNames(), c.inflightUpdateOperations)
 	}
 	return false
 }

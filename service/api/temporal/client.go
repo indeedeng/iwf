@@ -290,6 +290,14 @@ func (t *temporalClient) GetWorkflowResult(ctx context.Context, valuePtr interfa
 	return run.Get(ctx, valuePtr)
 }
 
+func (t *temporalClient) SynchronousUpdateWorkflow(ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{}) error {
+	handle, err := t.tClient.UpdateWorkflow(ctx, workflowID, runID, updateType, input)
+	if err != nil {
+		return err
+	}
+	return handle.Get(context.Background(), valuePtr)
+}
+
 func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error) {
 	reqRunId := request.GetWorkflowRunId()
 	if reqRunId == "" {

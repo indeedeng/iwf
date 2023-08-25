@@ -38,6 +38,7 @@ type UnifiedClient interface {
 	QueryWorkflow(ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{}) error // TODO it doesn't return error correctly... the error is nil when query handler is not implemented
 	DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*DescribeWorkflowExecutionResponse, error)
 	GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error
+	SynchronousUpdateWorkflow(ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{}) error
 	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
 }
 

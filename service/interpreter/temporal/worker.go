@@ -50,6 +50,7 @@ func (iw *InterpreterWorker) Start() {
 	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)
 	iw.worker.RegisterActivity(interpreter.StateApiExecute)
 	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
+	iw.worker.RegisterActivity(interpreter.InvokeWorkerRpc)
 
 	err := iw.worker.Start()
 	if err != nil {

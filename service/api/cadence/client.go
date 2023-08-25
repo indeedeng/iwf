@@ -245,6 +245,10 @@ func (t *cadenceClient) GetWorkflowResult(ctx context.Context, valuePtr interfac
 	return run.Get(ctx, valuePtr)
 }
 
+func (t *cadenceClient) SynchronousUpdateWorkflow(ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{}) error {
+	return fmt.Errorf("not supported in Cadence")
+}
+
 func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (newRunId string, err error) {
 
 	reqRunId := request.GetWorkflowRunId()

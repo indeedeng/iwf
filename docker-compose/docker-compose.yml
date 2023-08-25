@@ -56,6 +56,7 @@ services:
     depends_on:
       - temporal
     environment:
+      - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
     image: temporalio/admin-tools:${TEMPORAL_VERSION}
     networks:

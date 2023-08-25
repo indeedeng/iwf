@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/errors"
 	"time"
 )
 
@@ -84,6 +85,7 @@ type WorkflowProvider interface {
 	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
 	UpsertMemo(ctx UnifiedContext, memo map[string]iwfidl.EncodedObject) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
+	SetRpcUpdateHandler(ctx UnifiedContext, updateType string, validator UnifiedRpcValidator, handler UnifiedRpcHandler) error
 	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	GetThreadCount() int
@@ -111,3 +113,14 @@ type Future interface {
 	Get(ctx UnifiedContext, valuePtr interface{}) error
 	IsReady() bool
 }
+
+type HandlerOutput struct {
+	RpcOutput   *iwfidl.WorkflowRpcResponse
+	StatusError *errors.ErrorAndStatus
+}
+type InvokeRpcActivityOutput struct {
+	RpcOutput   *iwfidl.WorkflowWorkerRpcResponse
+	StatusError *errors.ErrorAndStatus
+}
+type UnifiedRpcHandler func(ctx UnifiedContext, input iwfidl.WorkflowRpcRequest) (*HandlerOutput, error)
+type UnifiedRpcValidator func(ctx UnifiedContext, input iwfidl.WorkflowRpcRequest) error

@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -133,13 +134,15 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			Data:     iwfidl.PtrString(fmt.Sprintf("test-data-%v", i)),
 		}
 		req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
-		httpResp2, err := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+		httpResp2, _ := req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 			WorkflowId:        wfId,
 			SignalChannelName: signal.UnhandledSignalName,
 			SignalValue:       sigVal,
 		}).Execute()
-		panicAtHttpError(err, httpResp2)
-		unhandledSignalVals = append(unhandledSignalVals, sigVal)
+		if httpResp2.StatusCode == http.StatusOK {
+			// see why in https://github.com/temporalio/temporal/issues/4801
+			unhandledSignalVals = append(unhandledSignalVals, sigVal)
+		}
 	}
 
 	// signal the workflow
@@ -190,6 +193,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		panic(err)
 	}
 	assertions.Equal(unhandledSignalVals, dump.SignalsReceived[signal.UnhandledSignalName])
+	assertions.True(len(unhandledSignalVals) > 0)
 
 	if config == nil {
 		// TODO add assertion for continueAsNew case
