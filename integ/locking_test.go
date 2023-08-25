@@ -94,10 +94,10 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	assertions := assert.New(t)
 
-	if config != nil {
+	if config != nil && backendType == service.BackendTypeTemporal {
 		// special waiting time for continue as new
 		// the first run will have to take more time to finish all the in parallel waitUntil APIs before continueAsNew
-		time.Sleep(locking.InParallelS2*time.Second + time.Second)
+		time.Sleep(locking.InParallelS2 * time.Second)
 	}
 	rpcIncrease := 0
 	rpcLockingFailure := 0
@@ -156,7 +156,6 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 					rpcLockingFailure++
 					continue
 				} else {
-					time.Sleep(time.Hour)
 					panicAtHttpError(err, httpResp)
 				}
 			}
@@ -182,9 +181,6 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	if err != nil {
-		time.Sleep(time.Minute * 30)
-	}
 	panicAtHttpError(err, httpResp)
 
 	s2StartsDecides := locking.InParallelS2 + rpcIncrease // locking.InParallelS2 original state executions, and a new trigger from rpc
