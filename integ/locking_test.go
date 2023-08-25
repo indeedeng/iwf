@@ -2,8 +2,11 @@ package integ
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/indeedeng/iwf/integ/workflow/locking"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"io/ioutil"
 	"strconv"
 	"testing"
 	"time"
@@ -56,7 +59,7 @@ func TestLockingWorkflowCadenceContinueAsNew(t *testing.T) {
 func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := locking.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -91,7 +94,9 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	assertions := assert.New(t)
 
-	for i := 0; i < 10; i++ {
+	rpcIncrease := 0
+	rpcLockingFailure := 0
+	for i := 0; i < 25; i++ {
 		allSearchAttributes := []iwfidl.SearchAttributeKeyAndType{
 			{
 				Key:       iwfidl.PtrString(locking.TestSearchAttributeKeywordKey),
@@ -112,6 +117,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 				PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
 				PartialLoadingKeys: []string{
 					locking.TestSearchAttributeKeywordKey,
+					locking.TestSearchAttributeIntKey,
 				},
 				LockingKeys: []string{
 					locking.TestSearchAttributeIntKey,
@@ -121,6 +127,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 				PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
 				PartialLoadingKeys: []string{
 					locking.TestDataObjectKey2,
+					locking.TestDataObjectKey1,
 				},
 				LockingKeys: []string{
 					locking.TestDataObjectKey1,
@@ -130,27 +137,61 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 			SearchAttributes: allSearchAttributes,
 		}).Execute()
 		if err != nil || httpResp.StatusCode != 200 {
-			panicAtHttpError(err, httpResp)
+			if httpResp.StatusCode == service.HttpStatusCodeSpecial4xxError2 {
+				var errResp iwfidl.ErrorResponse
+				body, err := ioutil.ReadAll(httpResp.Body)
+				assertions.Nil(err)
+				err = json.Unmarshal(body, &errResp)
+				lockingErrorMsg := "requested data or search attributes are being locked by other operations"
+				assertions.Equal(lockingErrorMsg, errResp.GetDetail())
+				assertions.Equal(iwfidl.WORKER_API_ERROR, errResp.GetSubStatus())
+				fmt.Println(lockingErrorMsg)
+				rpcLockingFailure++
+				continue
+			} else {
+				panicAtHttpError(err, httpResp)
+			}
 		}
+		fmt.Println("rpc execution succeeded")
+		rpcIncrease++
 		assertions.Equal(rpcResp.Output, locking.TestValue)
 	}
+	assertions.True(rpcIncrease > 0)
+	assertions.True(rpcLockingFailure > 0)
+	fmt.Println("rpc results, success, failure:", rpcIncrease, rpcLockingFailure)
+
+	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+	_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+		WorkflowId: wfId,
+		RpcName:    locking.RPCName,
+		Input:      locking.UnblockValue,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
+	if err != nil {
+		time.Sleep(time.Minute * 30)
+	}
 	panicAtHttpError(err, httpResp)
 
+	s2StartsDecides := 10 + rpcIncrease // 10 original state executions, and a new trigger from rpc
+	finalCounterValue := int64(10 + 2*rpcIncrease)
+	stateCompletionCount := 10 + rpcIncrease + 1
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
-		"S1_start":  1,
-		"S1_decide": 1,
-		"S2_start":  10,
-		"S2_decide": 10,
+		"S1_start":            1,
+		"S1_decide":           1,
+		"StateWaiting_start":  1,
+		"StateWaiting_decide": 1,
+		"S2_start":            int64(s2StartsDecides),
+		"S2_decide":           int64(s2StartsDecides),
 	}, history, "locking.test fail, %v", history)
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
-	assertions.Equal(10, len(resp2.GetResults()))
+	assertions.Equal(stateCompletionCount, len(resp2.GetResults()))
 
 	reqSearch := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
 	searchResult2, httpResp, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
@@ -167,7 +208,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
 		Key:          iwfidl.PtrString(locking.TestSearchAttributeIntKey),
 		ValueType:    ptr.Any(iwfidl.INT),
-		IntegerValue: iwfidl.PtrInt64(10),
+		IntegerValue: iwfidl.PtrInt64(finalCounterValue),
 	}
 	assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeInt}, searchResult2.GetSearchAttributes())
 
@@ -191,7 +232,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 			Key: iwfidl.PtrString(locking.TestDataObjectKey1),
 			Value: &iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
-				Data:     iwfidl.PtrString("10"),
+				Data:     iwfidl.PtrString(fmt.Sprintf("%v", finalCounterValue)),
 			},
 		},
 	}

@@ -62,7 +62,7 @@ func (u *WorkflowUpdater) handler(ctx UnifiedContext, input iwfidl.WorkflowRpcRe
 	ctx = u.provider.WithActivityOptions(ctx, activityOptions)
 	var activityOutput InvokeRpcActivityOutput
 	err = u.provider.ExecuteActivity(ctx, InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input).Get(ctx, &activityOutput)
-	u.persistenceManager.UnlockPersistence(input.DataAttributesLoadingPolicy, input.SearchAttributesLoadingPolicy)
+	u.persistenceManager.UnlockPersistence(input.SearchAttributesLoadingPolicy, input.DataAttributesLoadingPolicy)
 
 	if err != nil {
 		return nil, u.provider.NewApplicationError(string(iwfidl.SERVER_INTERNAL_ERROR_TYPE), "activity invocation failure:"+err.Error())

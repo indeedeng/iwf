@@ -24,11 +24,18 @@ const (
 	InternalChannelName           = "test-channel"
 	TestSearchAttributeKeywordKey = "CustomKeywordField"
 	TestSearchAttributeIntKey     = "CustomIntField"
+
+	ShouldUnblockStateWaiting = "shouldUnblockStateWaiting"
 )
 
 var TestValue = &iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
 	Data:     iwfidl.PtrString("data"),
+}
+
+var UnblockValue = &iwfidl.EncodedObject{
+	Encoding: iwfidl.PtrString("json"),
+	Data:     iwfidl.PtrString(ShouldUnblockStateWaiting),
 }
 
 var state2Options = &iwfidl.WorkflowStateOptions{
@@ -84,12 +91,22 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	}
 
 	input := req.Input
-	if input.GetData() != TestValue.GetData() || input.GetEncoding() != TestValue.GetEncoding() {
+	if input.GetEncoding() != TestValue.GetEncoding() {
 		panic("input is incorrect")
 	}
-
+	if input.GetData() == ShouldUnblockStateWaiting {
+		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+			PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+				{
+					ChannelName: InternalChannelName,
+					Value:       TestValue,
+				},
+			},
+		})
+		return
+	}
 	// this RPC will increase both SA and DA
-	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond)
 
 	saInt := int64(0)
 	for _, sa := range req.GetSearchAttributes() {
@@ -146,7 +163,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		},
 	}
 
-	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+	response := iwfidl.WorkflowWorkerRpcResponse{
 		Output: TestValue,
 		StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
 			state2Movement,
@@ -159,13 +176,8 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 				Value: TestValue,
 			},
 		},
-		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
-			{
-				ChannelName: InternalChannelName,
-				Value:       TestValue,
-			},
-		},
-	})
+	}
+	c.JSON(http.StatusOK, response)
 
 }
 
@@ -180,6 +192,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
 		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -265,6 +278,18 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: stms,
+				},
+			})
+			return
+		}
+		if req.GetWorkflowStateId() == StateWaiting {
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: service.GracefulCompletingWorkflowStateId,
+						},
+					},
 				},
 			})
 			return

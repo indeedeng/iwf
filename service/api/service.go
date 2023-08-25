@@ -545,7 +545,12 @@ func (s *serviceImpl) handleRpcBySynchronousUpdate(ctx context.Context, req iwfi
 		if errType != "" {
 			errTypeEnum := iwfidl.WorkflowErrorType(errType)
 			if errTypeEnum == iwfidl.RPC_ACQUIRE_LOCK_FAILURE {
-				return nil, errors.NewErrorAndStatus(service.HttpStatusCodeSpecial4xxError2, iwfidl.WORKER_API_ERROR, err.Error())
+				var details string
+				err2 := s.client.GetApplicationErrorDetails(err, &details)
+				if err2 != nil {
+					details = err2.Error()
+				}
+				return nil, errors.NewErrorAndStatus(service.HttpStatusCodeSpecial4xxError2, iwfidl.WORKER_API_ERROR, details)
 			}
 		}
 		return nil, s.handleError(err)
