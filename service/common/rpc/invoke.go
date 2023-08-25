@@ -81,7 +81,7 @@ func handleWorkerRpcResponseError(err error, httpResp *http.Response) *errors.Er
 	}
 
 	return errors.NewErrorAndStatusWithWorkerError(
-		service.HttpStatusCodeSpecial4xxError,
+		service.HttpStatusCodeSpecial4xxError1,
 		iwfidl.WORKER_API_ERROR,
 		detailedMessage,
 		workerError.GetDetail(),

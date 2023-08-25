@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"time"
@@ -66,7 +65,7 @@ func (u *WorkflowUpdater) handler(ctx UnifiedContext, input iwfidl.WorkflowRpcRe
 	u.persistenceManager.UnlockPersistence(input.DataAttributesLoadingPolicy, input.SearchAttributesLoadingPolicy)
 
 	if err != nil {
-		return nil, err
+		return nil, u.provider.NewApplicationError(string(iwfidl.SERVER_INTERNAL_ERROR_TYPE), "activity invocation failure:"+err.Error())
 	}
 
 	handlerOutput := &HandlerOutput{
@@ -101,6 +100,6 @@ func (u *WorkflowUpdater) validator(_ UnifiedContext, input iwfidl.WorkflowRpcRe
 	if keysUnlocked {
 		return nil
 	} else {
-		return fmt.Errorf("requested data or search attributes are being locked by other operations")
+		return u.provider.NewApplicationError(string(iwfidl.RPC_ACQUIRE_LOCK_FAILURE), "requested data or search attributes are being locked by other operations")
 	}
 }

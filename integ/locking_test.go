@@ -91,6 +91,50 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	assertions := assert.New(t)
 
+	for i := 0; i < 10; i++ {
+		allSearchAttributes := []iwfidl.SearchAttributeKeyAndType{
+			{
+				Key:       iwfidl.PtrString(locking.TestSearchAttributeKeywordKey),
+				ValueType: iwfidl.KEYWORD.Ptr(),
+			},
+			{
+				Key:       iwfidl.PtrString(locking.TestSearchAttributeIntKey),
+				ValueType: iwfidl.INT.Ptr(),
+			},
+		}
+		time.Sleep(time.Second * 1)
+		reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+		rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+			WorkflowId: wfId,
+			RpcName:    locking.RPCName,
+			Input:      locking.TestValue,
+			SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+				PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
+				PartialLoadingKeys: []string{
+					locking.TestSearchAttributeKeywordKey,
+				},
+				LockingKeys: []string{
+					locking.TestSearchAttributeIntKey,
+				},
+			},
+			DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+				PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
+				PartialLoadingKeys: []string{
+					locking.TestDataObjectKey2,
+				},
+				LockingKeys: []string{
+					locking.TestDataObjectKey1,
+				},
+			},
+			TimeoutSeconds:   iwfidl.PtrInt32(2),
+			SearchAttributes: allSearchAttributes,
+		}).Execute()
+		if err != nil || httpResp.StatusCode != 200 {
+			panicAtHttpError(err, httpResp)
+		}
+		assertions.Equal(rpcResp.Output, locking.TestValue)
+	}
+
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

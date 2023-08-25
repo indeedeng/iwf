@@ -306,7 +306,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(ctx context.Context, req iwfidl.Wor
 	if s.client.IsRequestTimeoutError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit
 		return nil, errors.NewErrorAndStatus(
-			service.HttpStatusCodeSpecial4xxError,
+			service.HttpStatusCodeSpecial4xxError1,
 			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
 			"workflow is still running, waiting has exceeded timeout limit")
 	}
@@ -541,6 +541,13 @@ func (s *serviceImpl) handleRpcBySynchronousUpdate(ctx context.Context, req iwfi
 	var output interpreter.HandlerOutput
 	err := s.client.SynchronousUpdateWorkflow(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteOptimisticLockingRpcUpdateType, req)
 	if err != nil {
+		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(err)
+		if errType != "" {
+			errTypeEnum := iwfidl.WorkflowErrorType(errType)
+			if errTypeEnum == iwfidl.RPC_ACQUIRE_LOCK_FAILURE {
+				return nil, errors.NewErrorAndStatus(service.HttpStatusCodeSpecial4xxError2, iwfidl.WORKER_API_ERROR, err.Error())
+			}
+		}
 		return nil, s.handleError(err)
 	}
 	return output.RpcOutput, output.StatusError

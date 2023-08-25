@@ -10,29 +10,163 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const (
-	WorkflowType       = "locking"
-	State1             = "S1"
-	State2             = "S2"
-	TestDataObjectKey1 = "test-data-object-1"
-	TestDataObjectKey2 = "test-data-object-2"
-
+	WorkflowType                  = "locking"
+	State1                        = "S1"
+	State2                        = "S2"
+	StateWaiting                  = "StateWaiting"
+	TestDataObjectKey1            = "test-data-object-1"
+	TestDataObjectKey2            = "test-data-object-2"
+	RPCName                       = "increase-counter"
+	InternalChannelName           = "test-channel"
 	TestSearchAttributeKeywordKey = "CustomKeywordField"
 	TestSearchAttributeIntKey     = "CustomIntField"
 )
+
+var TestValue = &iwfidl.EncodedObject{
+	Encoding: iwfidl.PtrString("json"),
+	Data:     iwfidl.PtrString("data"),
+}
+
+var state2Options = &iwfidl.WorkflowStateOptions{
+	SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+		PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
+		PartialLoadingKeys: []string{
+			TestSearchAttributeIntKey,
+			TestSearchAttributeKeywordKey,
+		},
+		LockingKeys: []string{
+			TestSearchAttributeIntKey,
+		},
+	},
+	DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+		PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
+		PartialLoadingKeys: []string{
+			TestDataObjectKey1,
+			TestDataObjectKey2,
+		},
+		LockingKeys: []string{
+			TestDataObjectKey1,
+		},
+	},
+}
+
+var state2Movement = iwfidl.StateMovement{
+	StateId:      State2,
+	StateOptions: state2Options,
+}
 
 type handler struct {
 	invokeHistory map[string]int64
 	invokeData    map[string]interface{}
 }
 
-func NewHandler() common.WorkflowHandler {
+func NewHandler() common.WorkflowHandlerWithRpc {
 	return &handler{
 		invokeHistory: make(map[string]int64),
 		invokeData:    make(map[string]interface{}),
 	}
+}
+
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+	var req iwfidl.WorkflowWorkerRpcRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("received workflow worker rpc request, ", req)
+
+	if req.WorkflowType != WorkflowType || (req.RpcName != RPCName) {
+		panic("invalid rpc name:" + req.RpcName)
+	}
+
+	input := req.Input
+	if input.GetData() != TestValue.GetData() || input.GetEncoding() != TestValue.GetEncoding() {
+		panic("input is incorrect")
+	}
+
+	// this RPC will increase both SA and DA
+	time.Sleep(time.Second)
+
+	saInt := int64(0)
+	for _, sa := range req.GetSearchAttributes() {
+		if sa.GetKey() == TestSearchAttributeIntKey {
+			saInt = sa.GetIntegerValue()
+		}
+	}
+	saInt++
+
+	context := req.GetContext()
+	upsertSearchAttributes := []iwfidl.SearchAttribute{
+		{
+			Key:         iwfidl.PtrString(TestSearchAttributeKeywordKey),
+			StringValue: iwfidl.PtrString(context.GetStateExecutionId()),
+			ValueType:   ptr.Any(iwfidl.KEYWORD),
+		},
+		{
+			Key:          iwfidl.PtrString(TestSearchAttributeIntKey),
+			IntegerValue: iwfidl.PtrInt64(saInt),
+			ValueType:    ptr.Any(iwfidl.INT),
+		},
+	}
+
+	daInt := 0
+	for _, da := range req.DataAttributes {
+		if da.GetKey() == TestDataObjectKey1 {
+			value := da.GetValue()
+			data := value.GetData()
+			if data != "" {
+				i, err := strconv.ParseInt(data, 10, 32)
+				if err != nil {
+					panic(err)
+				}
+				daInt = int(i)
+			}
+		}
+	}
+	daInt++
+
+	upsertDataAttributes := []iwfidl.KeyValue{
+		{
+			Key: iwfidl.PtrString(TestDataObjectKey1),
+			Value: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString(fmt.Sprintf("%v", daInt)),
+			},
+		},
+		{
+			Key: iwfidl.PtrString(TestDataObjectKey2),
+			Value: &iwfidl.EncodedObject{
+				Encoding: iwfidl.PtrString("json"),
+				Data:     iwfidl.PtrString(context.GetStateExecutionId()),
+			},
+		},
+	}
+
+	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+		Output: TestValue,
+		StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
+			state2Movement,
+		}},
+		UpsertSearchAttributes: upsertSearchAttributes,
+		UpsertDataAttributes:   upsertDataAttributes,
+		RecordEvents: []iwfidl.KeyValue{
+			{
+				Key:   iwfidl.PtrString("test-key"),
+				Value: TestValue,
+			},
+		},
+		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+			{
+				ChannelName: InternalChannelName,
+				Value:       TestValue,
+			},
+		},
+	})
+
 }
 
 // ApiV1WorkflowStateStart - for a workflow
@@ -54,7 +188,23 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+		if req.GetWorkflowStateId() == StateWaiting {
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
+					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+						{
+							ChannelName: InternalChannelName,
+						},
+					},
+				},
+			})
+			return
+
+		}
 		if req.GetWorkflowStateId() == State2 {
+			// this state API is to increase SA
+			time.Sleep(time.Second)
 			saInt := int64(0)
 			for _, sa := range req.GetSearchAttributes() {
 				if sa.GetKey() == TestSearchAttributeIntKey {
@@ -103,33 +253,13 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 
-			var stms []iwfidl.StateMovement
+			stms := []iwfidl.StateMovement{
+				{
+					StateId: StateWaiting,
+				},
+			}
 			for i := 0; i < 10; i++ {
-				stms = append(stms, iwfidl.StateMovement{
-					StateId: State2,
-					StateOptions: &iwfidl.WorkflowStateOptions{
-						SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-							PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
-							PartialLoadingKeys: []string{
-								TestSearchAttributeIntKey,
-								TestSearchAttributeKeywordKey,
-							},
-							LockingKeys: []string{
-								TestSearchAttributeIntKey,
-							},
-						},
-						DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-							PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
-							PartialLoadingKeys: []string{
-								TestDataObjectKey1,
-								TestDataObjectKey2,
-							},
-							LockingKeys: []string{
-								TestDataObjectKey1,
-							},
-						},
-					},
-				})
+				stms = append(stms, state2Movement)
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -140,6 +270,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
+			// this API is to increase DA
+			time.Sleep(time.Second)
 			daInt := 0
 			for _, da := range req.DataObjects {
 				if da.GetKey() == TestDataObjectKey1 {

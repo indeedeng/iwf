@@ -76,7 +76,7 @@ func doTestWorkflowWithWaitTimeout(t *testing.T, backendType service.BackendType
 	elapsedSeconds := time.Now().Unix() - startTimeUnix
 
 	assertions.NotNil(err)
-	assertions.Equalf(service.HttpStatusCodeSpecial4xxError, httpResp.StatusCode, "http code")
+	assertions.Equalf(service.HttpStatusCodeSpecial4xxError1, httpResp.StatusCode, "http code")
 	var errResp iwfidl.ErrorResponse
 	body, err := ioutil.ReadAll(httpResp.Body)
 	assertions.Nil(err)

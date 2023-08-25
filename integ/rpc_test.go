@@ -180,7 +180,7 @@ func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, useMemo, m
 		SearchAttributes:         allSearchAttributes,
 	}).Execute()
 	assertions.NotNil(err)
-	assertions.Equalf(service.HttpStatusCodeSpecial4xxError, httpResp.StatusCode, "http code")
+	assertions.Equalf(service.HttpStatusCodeSpecial4xxError1, httpResp.StatusCode, "http code")
 	var errResp iwfidl.ErrorResponse
 	body, err := ioutil.ReadAll(httpResp.Body)
 	assertions.Nil(err)
