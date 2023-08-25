@@ -177,7 +177,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 20)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
