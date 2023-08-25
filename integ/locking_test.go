@@ -168,7 +168,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		fmt.Println("rpc results, success, failure:", rpcIncrease, rpcLockingFailure)
 	}
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 1)
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 		WorkflowId: wfId,
@@ -177,6 +177,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
+	time.Sleep(time.Second * 10)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
