@@ -46,7 +46,7 @@ func TrimContextByTimeoutWithCappedDDL(parent context.Context, waitSeconds *int3
 	if maxWaitSeconds == 0 {
 		maxWaitSeconds = defaultMaxApiTimeoutSeconds
 	}
-	
+
 	newDdlUnix := time.Now().Unix() + maxWaitSeconds
 
 	// then capped by context
