@@ -6,7 +6,8 @@ const globalChangeId = "global"
 const startingVersionUsingGlobalVersioning = 1
 const startingVersionOptimizedUpsertSearchAttribute = 2
 const startingVersionRenamedStateApi = 3
-const maxOfAllVersions = startingVersionRenamedStateApi
+const continueAsNewOnNoStates = 4
+const maxOfAllVersions = continueAsNewOnNoStates
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
@@ -19,6 +20,11 @@ func NewGlobalVersioner(workflowProvider WorkflowProvider, ctx UnifiedContext) *
 		workflowProvider: workflowProvider,
 		ctx:              ctx,
 	}
+}
+
+func (p *GlobalVersioner) IsAfterVersionOfContinueAsNewOnNoStates() bool {
+	version := p.workflowProvider.GetVersion(p.ctx, globalChangeId, 0, maxOfAllVersions)
+	return version >= continueAsNewOnNoStates
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfUsingGlobalVersioning() bool {

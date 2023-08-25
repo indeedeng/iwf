@@ -113,6 +113,11 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 	for {
 		err = provider.Await(ctx, func() bool {
 			failWorkflowByClient, _ := signalReceiver.IsFailWorkflowRequested()
+			if globalVersioner.IsAfterVersionOfContinueAsNewOnNoStates() {
+				return !stateRequestQueue.IsEmpty() || failWorkflowByClient || shouldGracefulComplete || continueAsNewCounter.IsThresholdMet()
+			}
+			// below was a bug in the older version that workflow didn't continue as new
+			// but have to keep workflow deterministic
 			return !stateRequestQueue.IsEmpty() || failWorkflowByClient || shouldGracefulComplete
 		})
 		if err != nil {
@@ -255,33 +260,45 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 				break
 			}
 			if continueAsNewCounter.IsThresholdMet() {
-				// NOTE: This must be the last thing before continueAsNew!!!
-				// Otherwise, there could be signals unhandled
-				signalReceiver.DrainAllUnreceivedSignals(ctx)
-
-				// after draining signals, there could be some changes
-				// last fail workflow signal, return the workflow so that we don't carry over the fail request
-				failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
-				if failByApi {
-					return &service.InterpreterWorkflowOutput{
-						StateCompletionOutputs: outputCollector.GetAll(),
-					}, failErr
-				}
-				if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() && shouldGracefulComplete {
-					// if it is empty and no stateExecutionsToResume and request a graceful complete just complete the loop
-					// so that we don't carry over shouldGracefulComplete
-					break
-				}
-				// last update config, do it here because we use input to carry over config, not continueAsNewer query
-				input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
-				input.IsResumeFromContinueAsNew = true
-				input.ContinueAsNewInput = service.ContinueAsNewInput{
-					PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-				}
-				return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
+				// the outer logic will do the actual continue as new
+				break
 			}
-		} // end main loop -- loop until no more state can be executed (dead end)
-	}
+		} // end loop until no more state can be executed (dead end)
+
+		if continueAsNewCounter.IsThresholdMet() {
+			// we have to drain this again because this can be from non-state cases
+			err := continueAsNewer.DrainThreads(ctx)
+			if err != nil {
+				errToFailWf = err
+				break
+			}
+
+			// NOTE: This must be the last thing before continueAsNew!!!
+			// Otherwise, there could be signals unhandled
+			signalReceiver.DrainAllUnreceivedSignals(ctx)
+
+			// after draining signals, there could be some changes
+			// last fail workflow signal, return the workflow so that we don't carry over the fail request
+			failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
+			if failByApi {
+				return &service.InterpreterWorkflowOutput{
+					StateCompletionOutputs: outputCollector.GetAll(),
+				}, failErr
+			}
+			if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() && shouldGracefulComplete {
+				// if it is empty and no stateExecutionsToResume and request a graceful complete just complete the loop
+				// so that we don't carry over shouldGracefulComplete
+				break
+			}
+			// last update config, do it here because we use input to carry over config, not continueAsNewer query
+			input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
+			input.IsResumeFromContinueAsNew = true
+			input.ContinueAsNewInput = service.ContinueAsNewInput{
+				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			}
+			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
+		}
+	} // end main loop
 
 	// gracefully complete workflow when all states are executed to dead ends
 	return &service.InterpreterWorkflowOutput{
