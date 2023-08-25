@@ -26,6 +26,8 @@ const (
 	TestSearchAttributeIntKey     = "CustomIntField"
 
 	ShouldUnblockStateWaiting = "shouldUnblockStateWaiting"
+
+	InParallelS2 = 10
 )
 
 var TestValue = &iwfidl.EncodedObject{
@@ -271,7 +273,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					StateId: StateWaiting,
 				},
 			}
-			for i := 0; i < 10; i++ {
+			for i := 0; i < InParallelS2; i++ {
 				stms = append(stms, state2Movement)
 			}
 
