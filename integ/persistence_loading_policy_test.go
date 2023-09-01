@@ -136,6 +136,12 @@ func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendTyp
 	}
 
 	_, httpResp, err = reqRpc.WorkflowRpcRequest(rpcReq).Execute()
+	if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK && backendType == service.BackendTypeCadence {
+		if err == nil {
+			panic("err should not be nil when Locking is not supported with Cadence")
+		}
+		return
+	}
 	panicAtHttpError(err, httpResp)
 
 	time.Sleep(time.Second * 2)
