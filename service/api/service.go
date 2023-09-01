@@ -468,7 +468,6 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 		for _, saKey := range saPolicy.PartialLoadingKeys {
 			requestedSAKeys[saKey] = true
 		}
-		requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
 		for _, sa := range req.SearchAttributes {
 			if requestedSAKeys[sa.GetKey()] {
 				requestedSAs = append(requestedSAs, sa)
