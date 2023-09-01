@@ -460,9 +460,10 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	var searchAttributes []iwfidl.SearchAttribute
 	var dataAttributes []iwfidl.KeyValue
 
-	requestedSAs := req.SearchAttributes
+	var requestedSAs []iwfidl.SearchAttributeKeyAndType
 	saPolicy := req.GetSearchAttributesLoadingPolicy()
-	if saPolicy.GetPersistenceLoadingType() != iwfidl.ALL_WITHOUT_LOCKING {
+	switch saPolicy.GetPersistenceLoadingType() {
+	case iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK, iwfidl.PARTIAL_WITHOUT_LOCKING:
 		requestedSAKeys := map[string]bool{}
 		for _, saKey := range saPolicy.PartialLoadingKeys {
 			requestedSAKeys[saKey] = true
@@ -473,6 +474,10 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 				requestedSAs = append(requestedSAs, sa)
 			}
 		}
+	case iwfidl.NONE:
+		requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
+	default:
+		requestedSAs = req.SearchAttributes
 	}
 
 	requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
@@ -494,14 +499,34 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 		}
 	}
 
+	var allDataAttributes []iwfidl.KeyValue
+
 	for k, v := range response.Memos {
 		if strings.HasPrefix(k, service.IwfSystemConstPrefix) {
 			continue
 		}
-		dataAttributes = append(dataAttributes, iwfidl.KeyValue{
+		allDataAttributes = append(allDataAttributes, iwfidl.KeyValue{
 			Key:   iwfidl.PtrString(k),
 			Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
 		})
+	}
+
+	daPolicy := req.GetDataAttributesLoadingPolicy()
+	switch daPolicy.GetPersistenceLoadingType() {
+	case iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK, iwfidl.PARTIAL_WITHOUT_LOCKING:
+		requestedDAKeys := map[string]bool{}
+		for _, daKey := range daPolicy.PartialLoadingKeys {
+			requestedDAKeys[daKey] = true
+		}
+		for _, da := range allDataAttributes {
+			if requestedDAKeys[da.GetKey()] {
+				dataAttributes = append(dataAttributes, da)
+			}
+		}
+	case iwfidl.NONE:
+		dataAttributes = []iwfidl.KeyValue{}
+	default:
+		dataAttributes = allDataAttributes
 	}
 
 	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
