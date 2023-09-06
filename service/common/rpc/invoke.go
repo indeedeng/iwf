@@ -14,7 +14,7 @@ import (
 )
 
 func InvokeWorkerRpc(ctx context.Context, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest, apiMaxSeconds int64) (*iwfidl.WorkflowWorkerRpcResponse, *errors.ErrorAndStatus) {
-	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(rpcPrep.IwfWorkerUrl)
+	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(rpcPrep.IwfWorkerUrl)
 	// invoke worker rpc
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{

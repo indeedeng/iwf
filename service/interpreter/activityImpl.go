@@ -24,7 +24,7 @@ func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, inp
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateStartActivity", "input", input)
-	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
+	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
@@ -63,7 +63,7 @@ func StateApiExecute(ctx context.Context, backendType service.BackendType, input
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)
 
-	iwfWorkerBaseUrl := urlautofix.GetIwfWorkerBaseUrlWithFix(input.IwfWorkerUrl)
+	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
 		Servers: []iwfidl.ServerConfiguration{
 			{
