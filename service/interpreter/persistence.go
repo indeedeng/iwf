@@ -4,6 +4,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/mapper"
+	"github.com/indeedeng/iwf/service/common/utils"
 )
 
 type PersistenceManager struct {
@@ -84,7 +85,7 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
 		loadingType = loadingPolicy.GetPersistenceLoadingType()
-		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
+		partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedSearchAttributeKeys, loadingPolicy.GetLockingKeys())
@@ -117,7 +118,7 @@ func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy 
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
 		loadingType = loadingPolicy.GetPersistenceLoadingType()
-		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
+		partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
