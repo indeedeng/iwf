@@ -7,7 +7,7 @@ import (
 
 type FixWorkerUrlFunc func(url string) string
 
-var workerUrlFixer FixWorkerUrlFunc = defaultFixWorkerUrl
+var workerUrlFixer FixWorkerUrlFunc = DefaultFixWorkerUrlFunc
 
 func SetWorkerUrlFixer(fixer FixWorkerUrlFunc) {
 	workerUrlFixer = fixer
@@ -17,7 +17,7 @@ func FixWorkerUrl(url string) string {
 	return workerUrlFixer(url)
 }
 
-func defaultFixWorkerUrl(url string) string {
+func DefaultFixWorkerUrlFunc(url string) string {
 	autofixUrl := os.Getenv("AUTO_FIX_WORKER_URL")
 	if autofixUrl != "" {
 		url = strings.Replace(url, "localhost", autofixUrl, 1)
