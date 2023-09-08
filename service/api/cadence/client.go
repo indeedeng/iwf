@@ -76,15 +76,12 @@ func (t *cadenceClient) Close() {
 }
 
 func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
-	if len(options.Memo) > 0 {
-		return "", fmt.Errorf("using Memo is not supported with Cadence")
-	}
-
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
 		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
 		SearchAttributes:             options.SearchAttributes,
+		Memo:                         options.Memo,
 	}
 
 	if options.WorkflowIDReusePolicy != nil {
@@ -190,11 +187,31 @@ func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowI
 		return nil, err
 	}
 
+	memo, err := t.decodeMemo(resp.GetWorkflowExecutionInfo().GetMemo())
+
 	return &api.DescribeWorkflowExecutionResponse{
 		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
 		Status:           status,
 		SearchAttributes: searchAttributes,
+		Memos:            memo,
 	}, nil
+}
+
+func (t *cadenceClient) decodeMemo(memo *shared.Memo) (map[string]iwfidl.EncodedObject, error) {
+	if memo == nil || len(memo.GetFields()) == 0 {
+		return nil, nil
+	}
+
+	out := map[string]iwfidl.EncodedObject{}
+	for k, payload := range memo.GetFields() {
+		var value iwfidl.EncodedObject
+		err := encoded.GetDefaultDataConverter().FromData(payload, &value)
+		if err != nil {
+			return nil, err
+		}
+		out[k] = value
+	}
+	return out, nil
 }
 
 func mapToCadenceWorkflowIdReusePolicy(workflowIdReusePolicy iwfidl.WorkflowIDReusePolicy) (*client.WorkflowIDReusePolicy, error) {
