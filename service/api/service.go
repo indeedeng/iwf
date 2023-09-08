@@ -413,7 +413,9 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	saPolicy := req.GetSearchAttributesLoadingPolicy()
 	daPolicy := req.GetDataAttributesLoadingPolicy()
 
-	if req.GetUseMemoForDataAttributes() || (saPolicy.GetPersistenceLoadingType() == iwfidl.NONE && daPolicy.GetPersistenceLoadingType() == iwfidl.NONE) {
+	if req.GetUseMemoForDataAttributes() ||
+		(daPolicy.GetPersistenceLoadingType() == iwfidl.NONE &&
+			(saPolicy.GetPersistenceLoadingType() == iwfidl.NONE || len(req.GetSearchAttributes()) == 0)) {
 		rpcPrep, retError = s.tryPrepareRPCbyDescribe(ctx, req)
 		if retError != nil {
 			return nil, retError
