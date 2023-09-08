@@ -3,6 +3,7 @@ package cadence
 import (
 	"context"
 	"fmt"
+	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/pkg/errors"
 	"time"
@@ -76,6 +77,10 @@ func (t *cadenceClient) Close() {
 }
 
 func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+	_, ok := options.Memo[service.UseMemoForDataAttributesKey]
+	if ok {
+		return "", fmt.Errorf("using Memo is not supported with Cadence, see https://github.com/uber/cadence/issues/3729")
+	}
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
