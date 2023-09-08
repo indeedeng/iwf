@@ -409,7 +409,11 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	}
 
 	var rpcPrep *service.PrepareRpcQueryResponse
-	if req.GetUseMemoForDataAttributes() {
+
+	saPolicy := req.GetSearchAttributesLoadingPolicy()
+	daPolicy := req.GetDataAttributesLoadingPolicy()
+
+	if req.GetUseMemoForDataAttributes() || (saPolicy.GetPersistenceLoadingType() == iwfidl.NONE && daPolicy.GetPersistenceLoadingType() == iwfidl.NONE) {
 		rpcPrep, retError = s.tryPrepareRPCbyDescribe(ctx, req)
 		if retError != nil {
 			return nil, retError
@@ -534,7 +538,7 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	if !ok {
 		// this means describe workflow is not enough -- we cannot use memo to continue, need to fall back to use query
 		s.logger.Warn("workflow attempt to use memo but probably isn't started with it", tag.WorkflowID(req.WorkflowId))
-		if s.config.Interpreter.FailAtMemoIncompatibility {
+		if s.config.Interpreter.FailAtMemoIncompatibility && req.GetUseMemoForDataAttributes() {
 			return nil, s.handleError(fmt.Errorf("memo is not set correctly to use, workerUrl is missing"))
 		} else {
 			return nil, nil
