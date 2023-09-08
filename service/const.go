@@ -45,7 +45,8 @@ const (
 	UpdateConfigSignalChannelName = IwfSystemConstPrefix + "UpdateWorkflowConfig"
 	ExecuteRpcSignalChannelName   = IwfSystemConstPrefix + "ExecuteRpc"
 
-	WorkerUrlMemoKey = IwfSystemConstPrefix + "WorkerUrl"
+	WorkerUrlMemoKey            = IwfSystemConstPrefix + "WorkerUrl"
+	UseMemoForDataAttributesKey = IwfSystemConstPrefix + "UseMemoForDataAttributes"
 )
 
 var ValidIwfSystemSignalNames = map[string]bool{

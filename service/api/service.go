@@ -61,6 +61,13 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	var initCustomSAs []iwfidl.SearchAttribute
 	workflowConfig := s.config.Interpreter.DefaultWorkflowConfig
 
+	// workerUrl is always needed, for optimizing None as persistence loading type
+	workflowOptions.Memo = map[string]interface{}{
+		service.WorkerUrlMemoKey: iwfidl.EncodedObject{
+			Data: iwfidl.PtrString(req.IwfWorkerUrl),
+		},
+	}
+
 	useMemo := false
 	if req.WorkflowStartOptions != nil {
 		startOptions := req.WorkflowStartOptions
@@ -79,12 +86,11 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
 		if startOptions.GetUseMemoForDataAttributes() {
-			workflowOptions.Memo = map[string]interface{}{
-				service.WorkerUrlMemoKey: iwfidl.EncodedObject{
-					Data: iwfidl.PtrString(req.IwfWorkerUrl), // this is hack to ensure all memos are with the same type
-				},
-			}
 			useMemo = true
+			workflowOptions.Memo[service.UseMemoForDataAttributesKey] = iwfidl.EncodedObject{
+				// Note: the value is actually not too important, we will check the presence of the key only as today
+				Data: iwfidl.PtrString("true"),
+			}
 		}
 	}
 
@@ -198,7 +204,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, r
 			})
 		}
 
-		_, ok := response.Memos[service.WorkerUrlMemoKey]
+		_, ok := response.Memos[service.UseMemoForDataAttributesKey]
 		if ok {
 			// using memo is enough
 			queryToGetDataAttributes = false
@@ -505,7 +511,7 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 		// this means describe workflow is not enough -- we cannot use memo to continue, need to fall back to use query
 		s.logger.Warn("workflow attempt to use memo but probably isn't started with it", tag.WorkflowID(req.WorkflowId))
 		if s.config.Interpreter.FailAtMemoIncompatibility {
-			return nil, s.handleError(fmt.Errorf("memo is not set correctly to use"))
+			return nil, s.handleError(fmt.Errorf("memo is not set correctly to use, workerUrl is missing"))
 		} else {
 			return nil, nil
 		}
