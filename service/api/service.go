@@ -469,7 +469,7 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	var requestedSAs []iwfidl.SearchAttributeKeyAndType
 	saPolicy := req.GetSearchAttributesLoadingPolicy()
 	switch saPolicy.GetPersistenceLoadingType() {
-	case iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK, iwfidl.PARTIAL_WITHOUT_LOCKING:
+	case iwfidl.PARTIAL_WITHOUT_LOCKING:
 		requestedSAKeys := map[string]bool{}
 		for _, saKey := range saPolicy.PartialLoadingKeys {
 			requestedSAKeys[saKey] = true
@@ -481,8 +481,10 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 		}
 	case iwfidl.NONE:
 		requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
-	default:
+	case iwfidl.ALL_WITHOUT_LOCKING:
 		requestedSAs = req.SearchAttributes
+	default:
+		return nil, s.handleError(fmt.Errorf("not supported search attributes loading policy: %s", saPolicy.GetPersistenceLoadingType()))
 	}
 
 	requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
@@ -518,7 +520,7 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 
 	daPolicy := req.GetDataAttributesLoadingPolicy()
 	switch daPolicy.GetPersistenceLoadingType() {
-	case iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK, iwfidl.PARTIAL_WITHOUT_LOCKING:
+	case iwfidl.PARTIAL_WITHOUT_LOCKING:
 		requestedDAKeys := map[string]bool{}
 		for _, daKey := range daPolicy.PartialLoadingKeys {
 			requestedDAKeys[daKey] = true
@@ -530,8 +532,10 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 		}
 	case iwfidl.NONE:
 		dataAttributes = []iwfidl.KeyValue{}
-	default:
+	case iwfidl.ALL_WITHOUT_LOCKING:
 		dataAttributes = allDataAttributes
+	default:
+		return nil, s.handleError(fmt.Errorf("not supported data attributes loading policy: %s", daPolicy.GetPersistenceLoadingType()))
 	}
 
 	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
