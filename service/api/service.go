@@ -484,7 +484,7 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	case iwfidl.ALL_WITHOUT_LOCKING:
 		requestedSAs = req.SearchAttributes
 	default:
-		return nil, s.handleError(fmt.Errorf("not supported search attributes loading policy: %s", saPolicy.GetPersistenceLoadingType()))
+		return nil, s.handleError(fmt.Errorf("not supported search attributes loading type: %s", saPolicy.GetPersistenceLoadingType()))
 	}
 
 	requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
@@ -535,7 +535,7 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	case iwfidl.ALL_WITHOUT_LOCKING:
 		dataAttributes = allDataAttributes
 	default:
-		return nil, s.handleError(fmt.Errorf("not supported data attributes loading policy: %s", daPolicy.GetPersistenceLoadingType()))
+		return nil, s.handleError(fmt.Errorf("not supported data attributes loading type: %s", daPolicy.GetPersistenceLoadingType()))
 	}
 
 	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
