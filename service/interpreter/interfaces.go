@@ -2,10 +2,11 @@ package interpreter
 
 import (
 	"context"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/errors"
-	"time"
 )
 
 type ActivityProvider interface {
@@ -103,6 +104,12 @@ type WorkflowProvider interface {
 	GetBackendType() service.BackendType
 	GetLogger(ctx UnifiedContext) UnifiedLogger
 	NewInterpreterContinueAsNewError(ctx UnifiedContext, input service.InterpreterWorkflowInput) error
+	NewSelector(ctx UnifiedContext) UnifiedSelector
+}
+
+type UnifiedSelector interface {
+	ReceiveSignalValueBlocking(ctx UnifiedContext, signalName string) interface{}
+	Select(ctx UnifiedContext)
 }
 
 type ReceiveChannel interface {

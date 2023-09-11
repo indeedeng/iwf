@@ -19,6 +19,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowStateStartPost**](DefaultApi.md#ApiV1WorkflowStateStartPost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
 [**ApiV1WorkflowStopPost**](DefaultApi.md#ApiV1WorkflowStopPost) | **Post** /api/v1/workflow/stop | stop a workflow
 [**ApiV1WorkflowTimerSkipPost**](DefaultApi.md#ApiV1WorkflowTimerSkipPost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
+[**ApiV1WorkflowWaitForStateCompletionPost**](DefaultApi.md#ApiV1WorkflowWaitForStateCompletionPost) | **Post** /api/v1/workflow/waitForStateCompletion | 
 [**ApiV1WorkflowWorkerRpcPost**](DefaultApi.md#ApiV1WorkflowWorkerRpcPost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
 [**InfoHealthcheckGet**](DefaultApi.md#InfoHealthcheckGet) | **Get** /info/healthcheck | return health info of the server
 
@@ -961,6 +962,70 @@ Name | Type | Description  | Notes
 ### Return type
 
  (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowWaitForStateCompletionPost
+
+> WorkflowWaitForStateCompletionResponse ApiV1WorkflowWaitForStateCompletionPost(ctx).WorkflowWaitForStateCompletionRequest(workflowWaitForStateCompletionRequest).Execute()
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    workflowWaitForStateCompletionRequest := *openapiclient.NewWorkflowWaitForStateCompletionRequest("WorkflowId_example", "StateExecutionId_example") // WorkflowWaitForStateCompletionRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background()).WorkflowWaitForStateCompletionRequest(workflowWaitForStateCompletionRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowWaitForStateCompletionPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowWaitForStateCompletionPost`: WorkflowWaitForStateCompletionResponse
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowWaitForStateCompletionPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowWaitForStateCompletionPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowWaitForStateCompletionRequest** | [**WorkflowWaitForStateCompletionRequest**](WorkflowWaitForStateCompletionRequest.md) |  | 
+
+### Return type
+
+[**WorkflowWaitForStateCompletionResponse**](WorkflowWaitForStateCompletionResponse.md)
 
 ### Authorization
 

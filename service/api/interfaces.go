@@ -11,6 +11,7 @@ import (
 
 type ApiService interface {
 	ApiV1WorkflowStartPost(ctx context.Context, request iwfidl.WorkflowStartRequest) (*iwfidl.WorkflowStartResponse, *errors.ErrorAndStatus)
+	ApiV1WorkflowWaitForStateCompletion(ctx context.Context, request iwfidl.WorkflowWaitForStateCompletionRequest) (*iwfidl.WorkflowWaitForStateCompletionResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowSignalPost(ctx context.Context, request iwfidl.WorkflowSignalRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowStopPost(ctx context.Context, request iwfidl.WorkflowStopRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowConfigUpdate(ctx context.Context, request iwfidl.WorkflowConfigUpdateRequest) *errors.ErrorAndStatus
@@ -31,6 +32,7 @@ type UnifiedClient interface {
 	Close()
 	errorHandler
 	StartInterpreterWorkflow(ctx context.Context, options StartWorkflowOptions, args ...interface{}) (runId string, err error)
+	StartWaitForStateCompletionWorkflow(ctx context.Context, options StartWorkflowOptions, args ...interface{}) (runId string, err error)
 	SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error
 	CancelWorkflow(ctx context.Context, workflowID string, runID string) error
 	TerminateWorkflow(ctx context.Context, workflowID string, runID string, reason string) error

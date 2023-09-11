@@ -1,12 +1,13 @@
 package cadence
 
 import (
+	"log"
+
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
-	"log"
 )
 
 type InterpreterWorker struct {
@@ -45,6 +46,7 @@ func (iw *InterpreterWorker) Start() {
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
+	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
 	iw.worker.RegisterActivity(interpreter.StateStart)  // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateDecide) // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)

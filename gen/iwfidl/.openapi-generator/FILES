@@ -77,6 +77,8 @@ docs/WorkflowStateStartResponse.md
 docs/WorkflowStatus.md
 docs/WorkflowStopRequest.md
 docs/WorkflowStopType.md
+docs/WorkflowWaitForStateCompletionRequest.md
+docs/WorkflowWaitForStateCompletionResponse.md
 docs/WorkflowWorkerRpcRequest.md
 docs/WorkflowWorkerRpcResponse.md
 git_push.sh
@@ -152,6 +154,8 @@ model_workflow_state_start_response.go
 model_workflow_status.go
 model_workflow_stop_request.go
 model_workflow_stop_type.go
+model_workflow_wait_for_state_completion_request.go
+model_workflow_wait_for_state_completion_response.go
 model_workflow_worker_rpc_request.go
 model_workflow_worker_rpc_response.go
 response.go

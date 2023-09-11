@@ -3,9 +3,10 @@ package cadence
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/pkg/errors"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -105,6 +106,42 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 	}
 
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
+	if err != nil {
+		return "", err
+	}
+	return run.RunID, nil
+}
+
+func (t *cadenceClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+	if len(options.Memo) > 0 {
+		return "", fmt.Errorf("using Memo is not supported with Cadence")
+	}
+
+	workflowOptions := client.StartWorkflowOptions{
+		ID:                           options.ID,
+		TaskList:                     options.TaskQueue,
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
+		SearchAttributes:             options.SearchAttributes,
+	}
+
+	if options.WorkflowIDReusePolicy != nil {
+		workflowIdReusePolicy, err := mapToCadenceWorkflowIdReusePolicy(*options.WorkflowIDReusePolicy)
+		if err != nil {
+			return "", nil
+		}
+
+		workflowOptions.WorkflowIDReusePolicy = *workflowIdReusePolicy
+	}
+
+	if options.CronSchedule != nil {
+		workflowOptions.CronSchedule = *options.CronSchedule
+	}
+
+	if options.RetryPolicy != nil {
+		workflowOptions.RetryPolicy = retry.ConvertCadenceWorkflowRetryPolicy(options.RetryPolicy)
+	}
+
+	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.WaitforStateCompletionWorkflow, args...)
 	if err != nil {
 		return "", err
 	}

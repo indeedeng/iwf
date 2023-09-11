@@ -29,12 +29,21 @@ type (
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
 	}
 
+	WaitForStateCompletionWorkflowInput struct {
+		IwfWorkflowType         string `json:"iwfWorkflowType,omitempty"`
+		StateCompletionSignalId string `json:"stateCompletionSignalId,omitempty"`
+	}
+
 	ContinueAsNewInput struct {
 		PreviousInternalRunId string `json:"previousInternalRunId"` // for loading from previous run
 	}
 
 	InterpreterWorkflowOutput struct {
 		StateCompletionOutputs []iwfidl.StateCompletionOutput `json:"stateCompletionOutputs,omitempty"`
+	}
+
+	WaitForStateCompletionWorkflowOutput struct {
+		StateCompletionOutput iwfidl.StateCompletionOutput `json:"stateCompletionOutput,omitempty"`
 	}
 
 	BasicInfo struct {

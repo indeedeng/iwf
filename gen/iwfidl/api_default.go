@@ -197,6 +197,18 @@ type DefaultApi interface {
 	ApiV1WorkflowTimerSkipPostExecute(r ApiApiV1WorkflowTimerSkipPostRequest) (*http.Response, error)
 
 	/*
+		ApiV1WorkflowWaitForStateCompletionPost Method for ApiV1WorkflowWaitForStateCompletionPost
+
+		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+		@return ApiApiV1WorkflowWaitForStateCompletionPostRequest
+	*/
+	ApiV1WorkflowWaitForStateCompletionPost(ctx context.Context) ApiApiV1WorkflowWaitForStateCompletionPostRequest
+
+	// ApiV1WorkflowWaitForStateCompletionPostExecute executes the request
+	//  @return WorkflowWaitForStateCompletionResponse
+	ApiV1WorkflowWaitForStateCompletionPostExecute(r ApiApiV1WorkflowWaitForStateCompletionPostRequest) (*WorkflowWaitForStateCompletionResponse, *http.Response, error)
+
+	/*
 		ApiV1WorkflowWorkerRpcPost for invoking workflow RPC API in the worker
 
 		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -242,8 +254,8 @@ func (r ApiApiV1WorkflowConfigUpdatePostRequest) Execute() (*http.Response, erro
 /*
 ApiV1WorkflowConfigUpdatePost update the config of a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowConfigUpdatePostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowConfigUpdatePostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowConfigUpdatePost(ctx context.Context) ApiApiV1WorkflowConfigUpdatePostRequest {
 	return ApiApiV1WorkflowConfigUpdatePostRequest{
@@ -346,8 +358,8 @@ func (r ApiApiV1WorkflowDataobjectsGetPostRequest) Execute() (*WorkflowGetDataOb
 /*
 ApiV1WorkflowDataobjectsGetPost get workflow data objects
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowDataobjectsGetPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowDataobjectsGetPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowDataobjectsGetPost(ctx context.Context) ApiApiV1WorkflowDataobjectsGetPostRequest {
 	return ApiApiV1WorkflowDataobjectsGetPostRequest{
@@ -357,8 +369,7 @@ func (a *DefaultApiService) ApiV1WorkflowDataobjectsGetPost(ctx context.Context)
 }
 
 // Execute executes the request
-//
-//	@return WorkflowGetDataObjectsResponse
+//  @return WorkflowGetDataObjectsResponse
 func (a *DefaultApiService) ApiV1WorkflowDataobjectsGetPostExecute(r ApiApiV1WorkflowDataobjectsGetPostRequest) (*WorkflowGetDataObjectsResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -462,8 +473,8 @@ func (r ApiApiV1WorkflowGetPostRequest) Execute() (*WorkflowGetResponse, *http.R
 /*
 ApiV1WorkflowGetPost get a workflow's status and results(if completed & requested)
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowGetPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowGetPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowGetPost(ctx context.Context) ApiApiV1WorkflowGetPostRequest {
 	return ApiApiV1WorkflowGetPostRequest{
@@ -473,8 +484,7 @@ func (a *DefaultApiService) ApiV1WorkflowGetPost(ctx context.Context) ApiApiV1Wo
 }
 
 // Execute executes the request
-//
-//	@return WorkflowGetResponse
+//  @return WorkflowGetResponse
 func (a *DefaultApiService) ApiV1WorkflowGetPostExecute(r ApiApiV1WorkflowGetPostRequest) (*WorkflowGetResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -578,8 +588,8 @@ func (r ApiApiV1WorkflowGetWithWaitPostRequest) Execute() (*WorkflowGetResponse,
 /*
 ApiV1WorkflowGetWithWaitPost get a workflow's status and results(if completed & requested), wait if the workflow is still running
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowGetWithWaitPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowGetWithWaitPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowGetWithWaitPost(ctx context.Context) ApiApiV1WorkflowGetWithWaitPostRequest {
 	return ApiApiV1WorkflowGetWithWaitPostRequest{
@@ -589,8 +599,7 @@ func (a *DefaultApiService) ApiV1WorkflowGetWithWaitPost(ctx context.Context) Ap
 }
 
 // Execute executes the request
-//
-//	@return WorkflowGetResponse
+//  @return WorkflowGetResponse
 func (a *DefaultApiService) ApiV1WorkflowGetWithWaitPostExecute(r ApiApiV1WorkflowGetWithWaitPostRequest) (*WorkflowGetResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -705,8 +714,8 @@ func (r ApiApiV1WorkflowInternalDumpPostRequest) Execute() (*WorkflowDumpRespons
 /*
 ApiV1WorkflowInternalDumpPost dump internal info of a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowInternalDumpPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowInternalDumpPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowInternalDumpPost(ctx context.Context) ApiApiV1WorkflowInternalDumpPostRequest {
 	return ApiApiV1WorkflowInternalDumpPostRequest{
@@ -716,8 +725,7 @@ func (a *DefaultApiService) ApiV1WorkflowInternalDumpPost(ctx context.Context) A
 }
 
 // Execute executes the request
-//
-//	@return WorkflowDumpResponse
+//  @return WorkflowDumpResponse
 func (a *DefaultApiService) ApiV1WorkflowInternalDumpPostExecute(r ApiApiV1WorkflowInternalDumpPostRequest) (*WorkflowDumpResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -821,8 +829,8 @@ func (r ApiApiV1WorkflowResetPostRequest) Execute() (*WorkflowResetResponse, *ht
 /*
 ApiV1WorkflowResetPost reset a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowResetPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowResetPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowResetPost(ctx context.Context) ApiApiV1WorkflowResetPostRequest {
 	return ApiApiV1WorkflowResetPostRequest{
@@ -832,8 +840,7 @@ func (a *DefaultApiService) ApiV1WorkflowResetPost(ctx context.Context) ApiApiV1
 }
 
 // Execute executes the request
-//
-//	@return WorkflowResetResponse
+//  @return WorkflowResetResponse
 func (a *DefaultApiService) ApiV1WorkflowResetPostExecute(r ApiApiV1WorkflowResetPostRequest) (*WorkflowResetResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -937,8 +944,8 @@ func (r ApiApiV1WorkflowRpcPostRequest) Execute() (*WorkflowRpcResponse, *http.R
 /*
 ApiV1WorkflowRpcPost execute an RPC of a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowRpcPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowRpcPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowRpcPost(ctx context.Context) ApiApiV1WorkflowRpcPostRequest {
 	return ApiApiV1WorkflowRpcPostRequest{
@@ -948,8 +955,7 @@ func (a *DefaultApiService) ApiV1WorkflowRpcPost(ctx context.Context) ApiApiV1Wo
 }
 
 // Execute executes the request
-//
-//	@return WorkflowRpcResponse
+//  @return WorkflowRpcResponse
 func (a *DefaultApiService) ApiV1WorkflowRpcPostExecute(r ApiApiV1WorkflowRpcPostRequest) (*WorkflowRpcResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1075,8 +1081,8 @@ func (r ApiApiV1WorkflowSearchPostRequest) Execute() (*WorkflowSearchResponse, *
 /*
 ApiV1WorkflowSearchPost search for workflows by a search attribute query
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowSearchPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowSearchPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowSearchPost(ctx context.Context) ApiApiV1WorkflowSearchPostRequest {
 	return ApiApiV1WorkflowSearchPostRequest{
@@ -1086,8 +1092,7 @@ func (a *DefaultApiService) ApiV1WorkflowSearchPost(ctx context.Context) ApiApiV
 }
 
 // Execute executes the request
-//
-//	@return WorkflowSearchResponse
+//  @return WorkflowSearchResponse
 func (a *DefaultApiService) ApiV1WorkflowSearchPostExecute(r ApiApiV1WorkflowSearchPostRequest) (*WorkflowSearchResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1191,8 +1196,8 @@ func (r ApiApiV1WorkflowSearchattributesGetPostRequest) Execute() (*WorkflowGetS
 /*
 ApiV1WorkflowSearchattributesGetPost get workflow search attributes
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowSearchattributesGetPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowSearchattributesGetPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPost(ctx context.Context) ApiApiV1WorkflowSearchattributesGetPostRequest {
 	return ApiApiV1WorkflowSearchattributesGetPostRequest{
@@ -1202,8 +1207,7 @@ func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPost(ctx context.Con
 }
 
 // Execute executes the request
-//
-//	@return WorkflowGetSearchAttributesResponse
+//  @return WorkflowGetSearchAttributesResponse
 func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetSearchAttributesResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1307,8 +1311,8 @@ func (r ApiApiV1WorkflowSignalPostRequest) Execute() (*http.Response, error) {
 /*
 ApiV1WorkflowSignalPost signal a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowSignalPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowSignalPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowSignalPost(ctx context.Context) ApiApiV1WorkflowSignalPostRequest {
 	return ApiApiV1WorkflowSignalPostRequest{
@@ -1411,8 +1415,8 @@ func (r ApiApiV1WorkflowStartPostRequest) Execute() (*WorkflowStartResponse, *ht
 /*
 ApiV1WorkflowStartPost start a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowStartPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowStartPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowStartPost(ctx context.Context) ApiApiV1WorkflowStartPostRequest {
 	return ApiApiV1WorkflowStartPostRequest{
@@ -1422,8 +1426,7 @@ func (a *DefaultApiService) ApiV1WorkflowStartPost(ctx context.Context) ApiApiV1
 }
 
 // Execute executes the request
-//
-//	@return WorkflowStartResponse
+//  @return WorkflowStartResponse
 func (a *DefaultApiService) ApiV1WorkflowStartPostExecute(r ApiApiV1WorkflowStartPostRequest) (*WorkflowStartResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1527,8 +1530,8 @@ func (r ApiApiV1WorkflowStateDecidePostRequest) Execute() (*WorkflowStateDecideR
 /*
 ApiV1WorkflowStateDecidePost for invoking WorkflowState.decide API
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowStateDecidePostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowStateDecidePostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowStateDecidePost(ctx context.Context) ApiApiV1WorkflowStateDecidePostRequest {
 	return ApiApiV1WorkflowStateDecidePostRequest{
@@ -1538,8 +1541,7 @@ func (a *DefaultApiService) ApiV1WorkflowStateDecidePost(ctx context.Context) Ap
 }
 
 // Execute executes the request
-//
-//	@return WorkflowStateDecideResponse
+//  @return WorkflowStateDecideResponse
 func (a *DefaultApiService) ApiV1WorkflowStateDecidePostExecute(r ApiApiV1WorkflowStateDecidePostRequest) (*WorkflowStateDecideResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1643,8 +1645,8 @@ func (r ApiApiV1WorkflowStateStartPostRequest) Execute() (*WorkflowStateStartRes
 /*
 ApiV1WorkflowStateStartPost for invoking WorkflowState.start API
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowStateStartPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowStateStartPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowStateStartPost(ctx context.Context) ApiApiV1WorkflowStateStartPostRequest {
 	return ApiApiV1WorkflowStateStartPostRequest{
@@ -1654,8 +1656,7 @@ func (a *DefaultApiService) ApiV1WorkflowStateStartPost(ctx context.Context) Api
 }
 
 // Execute executes the request
-//
-//	@return WorkflowStateStartResponse
+//  @return WorkflowStateStartResponse
 func (a *DefaultApiService) ApiV1WorkflowStateStartPostExecute(r ApiApiV1WorkflowStateStartPostRequest) (*WorkflowStateStartResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -1759,8 +1760,8 @@ func (r ApiApiV1WorkflowStopPostRequest) Execute() (*http.Response, error) {
 /*
 ApiV1WorkflowStopPost stop a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowStopPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowStopPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowStopPost(ctx context.Context) ApiApiV1WorkflowStopPostRequest {
 	return ApiApiV1WorkflowStopPostRequest{
@@ -1863,8 +1864,8 @@ func (r ApiApiV1WorkflowTimerSkipPostRequest) Execute() (*http.Response, error) 
 /*
 ApiV1WorkflowTimerSkipPost skip the timer of a workflow
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowTimerSkipPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowTimerSkipPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowTimerSkipPost(ctx context.Context) ApiApiV1WorkflowTimerSkipPostRequest {
 	return ApiApiV1WorkflowTimerSkipPostRequest{
@@ -1949,6 +1950,132 @@ func (a *DefaultApiService) ApiV1WorkflowTimerSkipPostExecute(r ApiApiV1Workflow
 	return localVarHTTPResponse, nil
 }
 
+type ApiApiV1WorkflowWaitForStateCompletionPostRequest struct {
+	ctx                                   context.Context
+	ApiService                            DefaultApi
+	workflowWaitForStateCompletionRequest *WorkflowWaitForStateCompletionRequest
+}
+
+func (r ApiApiV1WorkflowWaitForStateCompletionPostRequest) WorkflowWaitForStateCompletionRequest(workflowWaitForStateCompletionRequest WorkflowWaitForStateCompletionRequest) ApiApiV1WorkflowWaitForStateCompletionPostRequest {
+	r.workflowWaitForStateCompletionRequest = &workflowWaitForStateCompletionRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowWaitForStateCompletionPostRequest) Execute() (*WorkflowWaitForStateCompletionResponse, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowWaitForStateCompletionPostExecute(r)
+}
+
+/*
+ApiV1WorkflowWaitForStateCompletionPost Method for ApiV1WorkflowWaitForStateCompletionPost
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowWaitForStateCompletionPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowWaitForStateCompletionPost(ctx context.Context) ApiApiV1WorkflowWaitForStateCompletionPostRequest {
+	return ApiApiV1WorkflowWaitForStateCompletionPostRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return WorkflowWaitForStateCompletionResponse
+func (a *DefaultApiService) ApiV1WorkflowWaitForStateCompletionPostExecute(r ApiApiV1WorkflowWaitForStateCompletionPostRequest) (*WorkflowWaitForStateCompletionResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *WorkflowWaitForStateCompletionResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowWaitForStateCompletionPost")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/waitForStateCompletion"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowWaitForStateCompletionRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 420 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiApiV1WorkflowWorkerRpcPostRequest struct {
 	ctx                      context.Context
 	ApiService               DefaultApi
@@ -1967,8 +2094,8 @@ func (r ApiApiV1WorkflowWorkerRpcPostRequest) Execute() (*WorkflowWorkerRpcRespo
 /*
 ApiV1WorkflowWorkerRpcPost for invoking workflow RPC API in the worker
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiApiV1WorkflowWorkerRpcPostRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiApiV1WorkflowWorkerRpcPostRequest
 */
 func (a *DefaultApiService) ApiV1WorkflowWorkerRpcPost(ctx context.Context) ApiApiV1WorkflowWorkerRpcPostRequest {
 	return ApiApiV1WorkflowWorkerRpcPostRequest{
@@ -1978,8 +2105,7 @@ func (a *DefaultApiService) ApiV1WorkflowWorkerRpcPost(ctx context.Context) ApiA
 }
 
 // Execute executes the request
-//
-//	@return WorkflowWorkerRpcResponse
+//  @return WorkflowWorkerRpcResponse
 func (a *DefaultApiService) ApiV1WorkflowWorkerRpcPostExecute(r ApiApiV1WorkflowWorkerRpcPostRequest) (*WorkflowWorkerRpcResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -2077,8 +2203,8 @@ func (r ApiInfoHealthcheckGetRequest) Execute() (*HealthInfo, *http.Response, er
 /*
 InfoHealthcheckGet return health info of the server
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiInfoHealthcheckGetRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiInfoHealthcheckGetRequest
 */
 func (a *DefaultApiService) InfoHealthcheckGet(ctx context.Context) ApiInfoHealthcheckGetRequest {
 	return ApiInfoHealthcheckGetRequest{
@@ -2088,8 +2214,7 @@ func (a *DefaultApiService) InfoHealthcheckGet(ctx context.Context) ApiInfoHealt
 }
 
 // Execute executes the request
-//
-//	@return HealthInfo
+//  @return HealthInfo
 func (a *DefaultApiService) InfoHealthcheckGetExecute(r ApiInfoHealthcheckGetRequest) (*HealthInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

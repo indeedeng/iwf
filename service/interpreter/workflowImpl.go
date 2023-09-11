@@ -1,9 +1,11 @@
 package interpreter
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/compatibility"
 	"time"
+
+	"github.com/indeedeng/iwf/service/common/compatibility"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -787,4 +789,33 @@ func createUserWorkflowError(provider WorkflowProvider, message string) error {
 		string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
 		message,
 	)
+}
+
+func WaitForStateCompletionWorkflowImpl(ctx UnifiedContext, provider WorkflowProvider, input service.WaitForStateCompletionWorkflowInput) (*service.WaitForStateCompletionWorkflowOutput, error) {
+	signalName := input.StateCompletionSignalId
+	if signalName == "" {
+		return nil, createUserWorkflowError(provider, "state completion signal id is empty")
+	}
+
+	selector := provider.NewSelector(ctx)
+	signalValue := selector.ReceiveSignalValueBlocking(ctx, signalName)
+
+	if signalValue == nil {
+		return nil, createUserWorkflowError(provider, "state completion signal not found")
+	}
+
+	jsonData, err := json.Marshal(signalValue)
+	if err != nil {
+		return nil, createUserWorkflowError(provider, "state completion signal value is not json")
+	}
+
+	var stateCompletionOutput iwfidl.StateCompletionOutput
+	err = json.Unmarshal(jsonData, &stateCompletionOutput)
+	if err != nil {
+		return nil, createUserWorkflowError(provider, "signal value is not StateCompletionOutput")
+	}
+
+	return &service.WaitForStateCompletionWorkflowOutput{
+		StateCompletionOutput: stateCompletionOutput,
+	}, nil
 }

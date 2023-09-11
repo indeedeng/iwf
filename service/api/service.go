@@ -5,15 +5,16 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/compatibility"
-	"github.com/indeedeng/iwf/service/common/rpc"
-	"github.com/indeedeng/iwf/service/common/utils"
-	"github.com/indeedeng/iwf/service/interpreter"
 	"math"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/indeedeng/iwf/service/common/compatibility"
+	"github.com/indeedeng/iwf/service/common/rpc"
+	"github.com/indeedeng/iwf/service/common/utils"
+	"github.com/indeedeng/iwf/service/interpreter"
 
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
@@ -108,6 +109,42 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 
 	return &iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
+	}, nil
+}
+
+func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, req iwfidl.WorkflowWaitForStateCompletionRequest) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	workflowOptions := StartWorkflowOptions{
+		ID:        "__Iwf_system" + req.WorkflowId + "_" + req.StateExecutionId,
+		TaskQueue: s.taskQueue,
+	}
+
+	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, workflowOptions, service.WaitForStateCompletionWorkflowInput{
+		IwfWorkflowType:         "workflow type",
+		StateCompletionSignalId: "signal name",
+	})
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
+
+	_, err = s.client.DescribeWorkflowExecution(ctx, workflowOptions.ID, runId, nil)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, iwfidl.PtrInt32(60), s.config.Api.MaxWaitSeconds)
+	defer cancFunc()
+	var output service.WaitForStateCompletionWorkflowOutput
+	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowOptions.ID, runId)
+	if getErr != nil {
+		return nil, s.handleError(getErr)
+	}
+
+	return &iwfidl.WorkflowWaitForStateCompletionResponse{
+		StateCompletionOutput: &output.StateCompletionOutput,
 	}, nil
 }
 
