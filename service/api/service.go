@@ -62,6 +62,13 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	var initCustomSAs []iwfidl.SearchAttribute
 	workflowConfig := s.config.Interpreter.DefaultWorkflowConfig
 
+	// workerUrl is always needed, for optimizing None as persistence loading type
+	workflowOptions.Memo = map[string]interface{}{
+		service.WorkerUrlMemoKey: iwfidl.EncodedObject{
+			Data: iwfidl.PtrString(req.IwfWorkerUrl),
+		},
+	}
+
 	useMemo := false
 	if req.WorkflowStartOptions != nil {
 		startOptions := req.WorkflowStartOptions
@@ -80,12 +87,11 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
 		if startOptions.GetUseMemoForDataAttributes() {
-			workflowOptions.Memo = map[string]interface{}{
-				service.WorkerUrlMemoKey: iwfidl.EncodedObject{
-					Data: iwfidl.PtrString(req.IwfWorkerUrl), // this is hack to ensure all memos are with the same type
-				},
-			}
 			useMemo = true
+			workflowOptions.Memo[service.UseMemoForDataAttributesKey] = iwfidl.EncodedObject{
+				// Note: the value is actually not too important, we will check the presence of the key only as today
+				Data: iwfidl.PtrString("true"),
+			}
 		}
 	}
 
@@ -235,7 +241,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(ctx context.Context, r
 			})
 		}
 
-		_, ok := response.Memos[service.WorkerUrlMemoKey]
+		_, ok := response.Memos[service.UseMemoForDataAttributesKey]
 		if ok {
 			// using memo is enough
 			queryToGetDataAttributes = false
@@ -440,7 +446,13 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(ctx context.Context, req iwfidl.Workf
 	}
 
 	var rpcPrep *service.PrepareRpcQueryResponse
-	if req.GetUseMemoForDataAttributes() {
+
+	saPolicy := req.GetSearchAttributesLoadingPolicy()
+	daPolicy := req.GetDataAttributesLoadingPolicy()
+
+	if req.GetUseMemoForDataAttributes() ||
+		(daPolicy.GetPersistenceLoadingType() == iwfidl.NONE &&
+			(saPolicy.GetPersistenceLoadingType() == iwfidl.NONE || len(req.GetSearchAttributes()) == 0)) {
 		rpcPrep, retError = s.tryPrepareRPCbyDescribe(ctx, req)
 		if retError != nil {
 			return nil, retError
@@ -491,19 +503,26 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	var searchAttributes []iwfidl.SearchAttribute
 	var dataAttributes []iwfidl.KeyValue
 
-	requestedSAs := req.SearchAttributes
+	var requestedSAs []iwfidl.SearchAttributeKeyAndType
 	saPolicy := req.GetSearchAttributesLoadingPolicy()
-	if saPolicy.GetPersistenceLoadingType() != iwfidl.ALL_WITHOUT_LOCKING {
+
+	switch saPolicy.GetPersistenceLoadingType() {
+	case iwfidl.PARTIAL_WITHOUT_LOCKING:
 		requestedSAKeys := map[string]bool{}
 		for _, saKey := range saPolicy.PartialLoadingKeys {
 			requestedSAKeys[saKey] = true
 		}
-		requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
 		for _, sa := range req.SearchAttributes {
 			if requestedSAKeys[sa.GetKey()] {
 				requestedSAs = append(requestedSAs, sa)
 			}
 		}
+	case iwfidl.NONE:
+		requestedSAs = []iwfidl.SearchAttributeKeyAndType{}
+	case iwfidl.ALL_WITHOUT_LOCKING, "":
+		requestedSAs = req.SearchAttributes
+	default:
+		return nil, s.handleError(fmt.Errorf("not supported search attributes loading type: %s", saPolicy.GetPersistenceLoadingType()))
 	}
 
 	requestedSAs = append(requestedSAs, iwfidl.SearchAttributeKeyAndType{
@@ -525,14 +544,37 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 		}
 	}
 
+	var allDataAttributes []iwfidl.KeyValue
+
 	for k, v := range response.Memos {
 		if strings.HasPrefix(k, service.IwfSystemConstPrefix) {
 			continue
 		}
-		dataAttributes = append(dataAttributes, iwfidl.KeyValue{
+		allDataAttributes = append(allDataAttributes, iwfidl.KeyValue{
 			Key:   iwfidl.PtrString(k),
 			Value: ptr.Any(v), //NOTE: using &v is WRONG: must avoid using & for the iteration item
 		})
+	}
+
+	daPolicy := req.GetDataAttributesLoadingPolicy()
+
+	switch daPolicy.GetPersistenceLoadingType() {
+	case iwfidl.PARTIAL_WITHOUT_LOCKING:
+		requestedDAKeys := map[string]bool{}
+		for _, daKey := range daPolicy.PartialLoadingKeys {
+			requestedDAKeys[daKey] = true
+		}
+		for _, da := range allDataAttributes {
+			if requestedDAKeys[da.GetKey()] {
+				dataAttributes = append(dataAttributes, da)
+			}
+		}
+	case iwfidl.NONE:
+		dataAttributes = []iwfidl.KeyValue{}
+	case iwfidl.ALL_WITHOUT_LOCKING, "":
+		dataAttributes = allDataAttributes
+	default:
+		return nil, s.handleError(fmt.Errorf("not supported data attributes loading type: %s", daPolicy.GetPersistenceLoadingType()))
 	}
 
 	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
@@ -541,8 +583,8 @@ func (s *serviceImpl) tryPrepareRPCbyDescribe(ctx context.Context, req iwfidl.Wo
 	if !ok {
 		// this means describe workflow is not enough -- we cannot use memo to continue, need to fall back to use query
 		s.logger.Warn("workflow attempt to use memo but probably isn't started with it", tag.WorkflowID(req.WorkflowId))
-		if s.config.Interpreter.FailAtMemoIncompatibility {
-			return nil, s.handleError(fmt.Errorf("memo is not set correctly to use"))
+		if s.config.Interpreter.FailAtMemoIncompatibility && req.GetUseMemoForDataAttributes() {
+			return nil, s.handleError(fmt.Errorf("memo is not set correctly to use, workerUrl is missing"))
 		} else {
 			return nil, nil
 		}

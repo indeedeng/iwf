@@ -22,7 +22,7 @@ type handler struct {
 	invokeHistory map[string]int64
 }
 
-func NewHandler() common.WorkflowHandler {
+func NewHandler() common.WorkflowHandlerWithRpc {
 	return &handler{
 		invokeHistory: make(map[string]int64),
 	}
@@ -55,7 +55,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	// go straight to decide methods without any commands
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 		CommandRequest: &iwfidl.CommandRequest{
-			DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
+			DeciderTriggerType: iwfidl.ANY_COMMAND_COMPLETED.Ptr(),
 		},
 	})
 }
@@ -121,43 +121,43 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	var nextStateId string
 	if req.GetWorkflowStateId() == State1 {
-		nextStateId = State2
+		nextStateId = service.DeadEndWorkflowStateId
 	} else if req.GetWorkflowStateId() == State2 {
 		nextStateId = service.GracefulCompletingWorkflowStateId
 	}
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-		StateDecision: &iwfidl.StateDecision{
-			NextStates: []iwfidl.StateMovement{
-				{
-					StateId: nextStateId,
-					StateOptions: &iwfidl.WorkflowStateOptions{
-						SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-							PersistenceLoadingType: &loadingType,
-							PartialLoadingKeys: []string{
-								persistence.TestSearchAttributeKeywordKey,
-							},
-							LockingKeys: []string{
-								persistence.TestSearchAttributeTextKey,
-							},
-						},
-						DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
-							PersistenceLoadingType: &loadingType,
-							PartialLoadingKeys: []string{
-								"da_1",
-							},
-							LockingKeys: []string{
-								"da_2",
-							},
-						},
-					},
-					StateInput: &loadingTypeFromInput,
-				},
-			},
-		},
+		StateDecision:          getStateDecision(nextStateId, loadingTypeFromInput, loadingType),
 		UpsertSearchAttributes: upsertSearchAttributes,
 		UpsertDataObjects:      upsertDataObjects,
 	})
+}
+
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+	var req iwfidl.WorkflowWorkerRpcRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("persistence_loading_policy: received rpc request, ", req)
+
+	if req.GetWorkflowType() != WorkflowType {
+		c.JSON(http.StatusBadRequest, struct{}{})
+		return
+	}
+
+	h.invokeHistory["rpc"]++
+
+	// dynamically get the loadingType from input
+	loadingTypeFromInput := req.GetInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
+	verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataAttributes(), loadingType)
+
+	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+		StateDecision: getStateDecision(State2, loadingTypeFromInput, loadingType),
+	})
+
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
@@ -231,5 +231,36 @@ func verifyLoadedAttributes(
 
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
 		panic("Data attributes should be the same")
+	}
+}
+
+func getStateDecision(nextStateId string, loadingTypeFromInput iwfidl.EncodedObject, loadingType iwfidl.PersistenceLoadingType) *iwfidl.StateDecision {
+	return &iwfidl.StateDecision{
+		NextStates: []iwfidl.StateMovement{
+			{
+				StateId: nextStateId,
+				StateOptions: &iwfidl.WorkflowStateOptions{
+					SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+						PersistenceLoadingType: &loadingType,
+						PartialLoadingKeys: []string{
+							persistence.TestSearchAttributeKeywordKey,
+						},
+						LockingKeys: []string{
+							persistence.TestSearchAttributeTextKey,
+						},
+					},
+					DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+						PersistenceLoadingType: &loadingType,
+						PartialLoadingKeys: []string{
+							"da_1",
+						},
+						LockingKeys: []string{
+							"da_2",
+						},
+					},
+				},
+				StateInput: &loadingTypeFromInput,
+			},
+		},
 	}
 }
