@@ -32,7 +32,7 @@ type UnifiedClient interface {
 	Close()
 	errorHandler
 	StartInterpreterWorkflow(ctx context.Context, options StartWorkflowOptions, args ...interface{}) (runId string, err error)
-	StartWaitForStateCompletionWorkflow(ctx context.Context, options StartWorkflowOptions, args ...interface{}) (runId string, err error)
+	StartWaitForStateCompletionWorkflow(ctx context.Context, options StartWorkflowOptions) (runId string, err error)
 	SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error
 	CancelWorkflow(ctx context.Context, workflowID string, runID string) error
 	TerminateWorkflow(ctx context.Context, workflowID string, runID string, reason string) error

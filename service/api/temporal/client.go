@@ -119,39 +119,14 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 	return run.GetRunID(), nil
 }
 
-func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
-	memo, err := t.encryptMemoIfNeeded(options.Memo)
-	if err != nil {
-		return "", err
-	}
-
+func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options api.StartWorkflowOptions) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                                       options.ID,
-		TaskQueue:                                options.TaskQueue,
-		WorkflowExecutionTimeout:                 options.WorkflowExecutionTimeout,
-		SearchAttributes:                         options.SearchAttributes,
-		Memo:                                     memo,
-		WorkflowExecutionErrorWhenAlreadyStarted: true,
+		ID:                    options.ID,
+		WorkflowIDReusePolicy: enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE,
+		TaskQueue:             options.TaskQueue,
 	}
 
-	if options.WorkflowIDReusePolicy != nil {
-		workflowIdReusePolicy, err := mapToTemporalWorkflowIdReusePolicy(*options.WorkflowIDReusePolicy)
-		if err != nil {
-			return "", nil
-		}
-
-		workflowOptions.WorkflowIDReusePolicy = *workflowIdReusePolicy
-	}
-
-	if options.CronSchedule != nil {
-		workflowOptions.CronSchedule = *options.CronSchedule
-	}
-
-	if options.RetryPolicy != nil {
-		workflowOptions.RetryPolicy = retry.ConvertTemporalWorkflowRetryPolicy(options.RetryPolicy)
-	}
-
-	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.WaitforStateCompletionWorkflow, args...)
+	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.WaitforStateCompletionWorkflow)
 	if err != nil {
 		return "", err
 	}

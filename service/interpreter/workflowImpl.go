@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -791,31 +790,12 @@ func createUserWorkflowError(provider WorkflowProvider, message string) error {
 	)
 }
 
-func WaitForStateCompletionWorkflowImpl(ctx UnifiedContext, provider WorkflowProvider, input service.WaitForStateCompletionWorkflowInput) (*service.WaitForStateCompletionWorkflowOutput, error) {
-	signalName := input.StateCompletionSignalId
-	if signalName == "" {
-		return nil, createUserWorkflowError(provider, "state completion signal id is empty")
-	}
-
-	selector := provider.NewSelector(ctx)
-	signalValue := selector.ReceiveSignalValueBlocking(ctx, signalName)
-
-	if signalValue == nil {
-		return nil, createUserWorkflowError(provider, "state completion signal not found")
-	}
-
-	jsonData, err := json.Marshal(signalValue)
-	if err != nil {
-		return nil, createUserWorkflowError(provider, "state completion signal value is not json")
-	}
-
-	var stateCompletionOutput iwfidl.StateCompletionOutput
-	err = json.Unmarshal(jsonData, &stateCompletionOutput)
-	if err != nil {
-		return nil, createUserWorkflowError(provider, "signal value is not StateCompletionOutput")
-	}
+func WaitForStateCompletionWorkflowImpl(ctx UnifiedContext, provider WorkflowProvider) (*service.WaitForStateCompletionWorkflowOutput, error) {
+	signalReceiveChannel := provider.GetSignalChannel(ctx, service.StateCompletionSignalChannelName)
+	var signalValue iwfidl.StateCompletionOutput
+	signalReceiveChannel.ReceiveBlocking(ctx, &signalValue)
 
 	return &service.WaitForStateCompletionWorkflowOutput{
-		StateCompletionOutput: stateCompletionOutput,
+		StateCompletionOutput: signalValue,
 	}, nil
 }

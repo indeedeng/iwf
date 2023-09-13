@@ -121,22 +121,13 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, req iwfidl.WorkflowWaitForStateCompletionRequest) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	workflowOptions := StartWorkflowOptions{
-		ID:        "__Iwf_system" + req.WorkflowId + "_" + req.StateExecutionId,
+	workflowId := service.IwfSystemConstPrefix + req.WorkflowId + "_" + req.StateExecutionId
+	options := StartWorkflowOptions{
+		ID:        workflowId,
 		TaskQueue: s.taskQueue,
 	}
 
-	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, workflowOptions, service.WaitForStateCompletionWorkflowInput{
-		IwfWorkflowType:         "workflow type",
-		StateCompletionSignalId: "signal name",
-	})
-	if err != nil {
-		return nil, s.handleError(err)
-	}
-
-	s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
-
-	_, err = s.client.DescribeWorkflowExecution(ctx, workflowOptions.ID, runId, nil)
+	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
 	if err != nil {
 		return nil, s.handleError(err)
 	}
@@ -144,7 +135,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, r
 	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, iwfidl.PtrInt32(60), s.config.Api.MaxWaitSeconds)
 	defer cancFunc()
 	var output service.WaitForStateCompletionWorkflowOutput
-	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowOptions.ID, runId)
+	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
 	if getErr != nil {
 		return nil, s.handleError(getErr)
 	}

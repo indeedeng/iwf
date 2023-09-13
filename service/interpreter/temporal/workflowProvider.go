@@ -264,6 +264,15 @@ func (t *temporalReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
 	return t.channel.ReceiveAsync(valuePtr)
 }
 
+func (t *temporalReceiveChannel) ReceiveBlocking(ctx interpreter.UnifiedContext, valuePtr interface{}) (ok bool) {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+
+	return t.channel.Receive(wfCtx, valuePtr)
+}
+
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
@@ -297,16 +306,6 @@ func (w *workflowProvider) GetUnhandledSignalNames(ctx interpreter.UnifiedContex
 		panic("cannot convert to temporal workflow context")
 	}
 	return workflow.GetUnhandledSignalNames(wfCtx)
-}
-
-func (w *workflowProvider) NewSelector(ctx interpreter.UnifiedContext) interpreter.UnifiedSelector {
-	wfCtx, ok := ctx.GetContext().(workflow.Context)
-	if !ok {
-		panic("cannot convert to temporal workflow context")
-	}
-	return &selector{
-		selector: workflow.NewSelector(wfCtx),
-	}
 }
 
 func (s *selector) Select(ctx interpreter.UnifiedContext) {

@@ -40,10 +40,11 @@ const (
 
 	IwfSystemConstPrefix = "__IwfSystem_"
 
-	SkipTimerSignalChannelName    = IwfSystemConstPrefix + "SkipTimerChannel"
-	FailWorkflowSignalChannelName = IwfSystemConstPrefix + "FailWorkflowChannel"
-	UpdateConfigSignalChannelName = IwfSystemConstPrefix + "UpdateWorkflowConfig"
-	ExecuteRpcSignalChannelName   = IwfSystemConstPrefix + "ExecuteRpc"
+	SkipTimerSignalChannelName       = IwfSystemConstPrefix + "SkipTimerChannel"
+	FailWorkflowSignalChannelName    = IwfSystemConstPrefix + "FailWorkflowChannel"
+	UpdateConfigSignalChannelName    = IwfSystemConstPrefix + "UpdateWorkflowConfig"
+	ExecuteRpcSignalChannelName      = IwfSystemConstPrefix + "ExecuteRpc"
+	StateCompletionSignalChannelName = IwfSystemConstPrefix + "StateCompletion"
 
 	WorkerUrlMemoKey            = IwfSystemConstPrefix + "WorkerUrl"
 	UseMemoForDataAttributesKey = IwfSystemConstPrefix + "UseMemoForDataAttributes"

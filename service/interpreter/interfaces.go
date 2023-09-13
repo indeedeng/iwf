@@ -104,16 +104,11 @@ type WorkflowProvider interface {
 	GetBackendType() service.BackendType
 	GetLogger(ctx UnifiedContext) UnifiedLogger
 	NewInterpreterContinueAsNewError(ctx UnifiedContext, input service.InterpreterWorkflowInput) error
-	NewSelector(ctx UnifiedContext) UnifiedSelector
-}
-
-type UnifiedSelector interface {
-	ReceiveSignalValueBlocking(ctx UnifiedContext, signalName string) interface{}
-	Select(ctx UnifiedContext)
 }
 
 type ReceiveChannel interface {
 	ReceiveAsync(valuePtr interface{}) (ok bool)
+	ReceiveBlocking(ctx UnifiedContext, valuePtr interface{}) (ok bool)
 }
 
 type Future interface {
