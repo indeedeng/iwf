@@ -116,12 +116,21 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 
 func (t *cadenceClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options api.StartWorkflowOptions) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                    options.ID,
-		TaskList:              options.TaskQueue,
-		WorkflowIDReusePolicy: client.WorkflowIDReusePolicyRejectDuplicate,
+		ID:                           options.ID,
+		TaskList:                     options.TaskQueue,
+		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyRejectDuplicate,
+		ExecutionStartToCloseTimeout: 600 * time.Second, // TODO, make this configurable
 	}
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.WaitforStateCompletionWorkflow)
 	if err != nil {
+		if t.IsWorkflowAlreadyStartedError(err) {
+			describeResponse, error := t.cClient.DescribeWorkflowExecution(ctx, workflowOptions.ID, "")
+			if error != nil {
+				return "", error
+			}
+
+			return *describeResponse.WorkflowExecutionInfo.Execution.RunId, nil
+		}
 		return "", err
 	}
 	return run.RunID, nil

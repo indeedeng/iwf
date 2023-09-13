@@ -122,7 +122,7 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options api.StartWorkflowOptions) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                    options.ID,
-		WorkflowIDReusePolicy: enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE,
+		WorkflowIDReusePolicy: enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
 		TaskQueue:             options.TaskQueue,
 	}
 
