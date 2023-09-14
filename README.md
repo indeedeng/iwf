@@ -68,7 +68,7 @@ The solution with iWF:
 * Natural to represent business
 * Builtin & rich support for operation tooling
 
-It's so simple & easy to do that the [business logic code](https://github.com/indeedeng/iwf-python-samples#user-sign-up-workflow) can be shown here!
+It's so simple & easy to do that the [business logic code](https://github.com/indeedeng/iwf-python-samples/blob/main/signup/signup_workflow.py) can be shown here!
 
 Also see the [implementation in Java here](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/signup).
 
@@ -137,7 +137,7 @@ class UserSignupWorkflow(ObjectWorkflow):
         return "done"
 ```
 
-And the [application code](signup/main.py) will be simply interacting with the workflow like below:
+And the [application code](https://github.com/indeedeng/iwf-python-samples/blob/main/signup/main.py#L20) will be simply interacting with the workflow like below:
 
 ```python
 @flask_app.route("/signup/submit")
@@ -379,7 +379,7 @@ A WorkflowState is itself like “a small workflow” of 1 or 2 steps:
 
 **[ `waitUntil` ] → `execute`**
 
-**The `waitUntil` API** returns "[commands](#commands-for-workflowstates-waituntil-api)" to wait for. When the commands are completed, the `execute` API will be invoked.
+**The `waitUntil` API** returns "[commands](#commands-from-waituntil)" to wait for. When the commands are completed, the `execute` API will be invoked.
 
 
 The `waitUntil` API is optional. If not defined, then the `execute` API will be invoked immediately when the Workflow State is started.
