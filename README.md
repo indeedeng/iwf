@@ -355,14 +355,14 @@ A user application defines an ObjectWorkflow by implementing the Workflow interf
 
 An implementation of the interface is referred to as a `WorkflowDefinition` and consists of the components shown below:
 
-| Name                                                     | Description                                                                                                                                       | 
-|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------| 
-| [Workflow State](#workflow-state)                        | A basic asyn/background execution unit as a "workflow". A State consists of one or two steps: *waitUntil* (optional) and *execute* with retry     |
-| [RPC](#rpc)                                              | API for application to interact with the workflow. It can access to persistence, internal channel, and state execution                            |
-| [Persistence](#persistence)                              | A Kev-Value storage out-of-box to storing data. Can be accessed by RPC/WorkflowState implementation.                                              |
-| [Durable Timer](#commands-from-waituntil)                | The waitUntil API can return a timer command to wait for certain time. The timer is persisted by server and will not be lost.                     |
-| [Internal Channel](#internalchannel-async-message-queue) | The waitUntil API can return some command for "Internal Channel" -- An internal message queue workflow                                            |
-| ~~[Signal Channel](#signal-channel-vs-rpc)~~             | Legacy concept and deprecated. Use InternalChannel + RPC instead. A message queue for the workflowState to receive messages from external sources |
+| Name                                                    | Description                                                                                                                                       | 
+|:--------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------| 
+| [WorkflowState](#workflow-state)                        | A basic asyn/background execution unit as a "workflow". A State consists of one or two steps: *waitUntil* (optional) and *execute* with retry     |
+| [RPC](#rpc)                                             | API for application to interact with the workflow. It can access to persistence, internal channel, and state execution                            |
+| [Persistence](#persistence)                             | A Kev-Value storage out-of-box to storing data. Can be accessed by RPC/WorkflowState implementation.                                              |
+| [DurableTimer](#commands-from-waituntil)                | The waitUntil API can return a timer command to wait for certain time as a durable timer -- it is persisted by server and will not be lost.       |
+| [InternalChannel](#internalchannel-async-message-queue) | The waitUntil API can return some command for "Internal Channel" -- An internal message queue workflow                                            |
+| ~~[Signal Channel](#signal-channel-vs-rpc)~~            | Legacy concept and deprecated. Use InternalChannel + RPC instead. A message queue for the workflowState to receive messages from external sources |
 
 
 
@@ -383,10 +383,11 @@ The `waitUntil` API is optional. If not defined, then the `execute` API will be 
 
 The `execute` API returns a StateDecision to decide what is next.
 
-Both `waitUntil` and `execute` are implemented by code. So it's extremely dynamic / flexible for business. Any code change deployed will take effect immediately. 
+Both `waitUntil` and `execute` are implemented by code and executed in runtime dynamically! 
+So it's extremely flexible for business -- [any code change deployed will take effect immediately](https://github.com/indeedeng/iwf/wiki/How-to-modify-workflow-code-without-breaking-changes). 
 
 ### StateDecision from `execute` 
-User workflow implements a ** `execute` API** to return a StateDecision for:
+User workflow implements a **`execute` API** to return a StateDecision for:
 * A next state
 * Multiple next states running in parallel
 * Stop the workflow:
