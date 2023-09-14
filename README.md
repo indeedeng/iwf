@@ -26,7 +26,10 @@ Related projects:
 For support or any question, please post in our [Discussion](https://github.com/indeedeng/iwf/discussions), or raise an issue.
 If you are interested in helping this project, check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md) page.
 Below is the basic and comprehensive documentation of iWF. There are some more details in the [wiki pages](https://github.com/indeedeng/iwf/wiki).
+
 # What is iWF
+
+See [concepts](#basic-concepts) if you want to skip the examples. 
 
 ## Example 1 : User sign-up/registry workflow
 A common use case that is almost everywhere -- new user sign-up/register a new account in a website/system.
@@ -383,8 +386,8 @@ The `waitUntil` API is optional. If not defined, then the `execute` API will be 
 
 The `execute` API returns a StateDecision to decide what is next.
 
-Both `waitUntil` and `execute` are implemented by code and executed in runtime dynamically! 
-So it's extremely flexible for business -- [any code change deployed will take effect immediately](https://github.com/indeedeng/iwf/wiki/How-to-modify-workflow-code-without-breaking-changes). 
+Both `waitUntil` and `execute` are implemented by code and executed in runtime dynamically. They are both hosted as REST API for iWF server to call. 
+It's extremely flexible for business -- [any code change deployed will take effect immediately](https://github.com/indeedeng/iwf/wiki/How-to-modify-workflow-code-without-breaking-changes). 
 
 ### StateDecision from `execute` 
 User workflow implements a **`execute` API** to return a StateDecision for:
