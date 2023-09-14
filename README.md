@@ -349,21 +349,20 @@ And the [application code](https://github.com/indeedeng/iwf-java-samples/blob/ma
 ## Basic Concepts
 
 
-The top-level concept is **`ObjectWorkflow`**. 
-
-A user application creates an ObjectWorkflow by implementing the Workflow interface, in one of the supported languages e.g.
+A user application defines an ObjectWorkflow by implementing the Workflow interface, in one of the supported languages e.g.
 [Java](https://github.com/indeedeng/iwf-java-sdk/blob/main/src/main/java/io/iworkflow/core/ObjectWorkflow.java)
 , [Golang](https://github.com/indeedeng/iwf-golang-sdk/blob/main/iwf/workflow.go) , [Python](https://github.com/indeedeng/iwf-python-sdk/blob/main/iwf/workflow.py), or [Typescript/JavaScript](https://github.com/indeedeng/iwf-ts-sdk/blob/main/iwf/src/object-workflow.ts).
+
 An implementation of the interface is referred to as a `WorkflowDefinition` and consists of the components shown below:
 
-| Name                                                        | Description                                                                                                                                       | 
-|:------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------| 
-| [Workflow State](#workflow-state)                           | A basic asyn/background execution unit as a "workflow". A State consists of one or two steps: *waitUntil* (optional) and *execute* with retry     |
-| [RPC](#rpc)                                                 | API for application to interact with the workflow. It can access to persistence, internal channel, and state execution                            |
-| [Persistence](#persistence)                                 | A Kev-Value storage out-of-box to storing data. Can be accessed by RPC/WorkflowState implementation.                                              |
-| [Durable Timer](#commands-for-workflowstates-waituntil-api) | The waitUntil API can return a timer command to wait for certain time. The timer is persisted by server and will not be lost.                     |
-| [Internal Channel](#internalchannel-async-message-queue)    | The waitUntil API can return some command for "Internal Channel" -- An internal message queue workflow                                            |
-| ~~[Signal Channel](#signal-channel-vs-rpc)~~                | Legacy concept and deprecated. Use InternalChannel + RPC instead. A message queue for the workflowState to receive messages from external sources |
+| Name                                                     | Description                                                                                                                                       | 
+|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------| 
+| [Workflow State](#workflow-state)                        | A basic asyn/background execution unit as a "workflow". A State consists of one or two steps: *waitUntil* (optional) and *execute* with retry     |
+| [RPC](#rpc)                                              | API for application to interact with the workflow. It can access to persistence, internal channel, and state execution                            |
+| [Persistence](#persistence)                              | A Kev-Value storage out-of-box to storing data. Can be accessed by RPC/WorkflowState implementation.                                              |
+| [Durable Timer](#commands-from-waituntil)                | The waitUntil API can return a timer command to wait for certain time. The timer is persisted by server and will not be lost.                     |
+| [Internal Channel](#internalchannel-async-message-queue) | The waitUntil API can return some command for "Internal Channel" -- An internal message queue workflow                                            |
+| ~~[Signal Channel](#signal-channel-vs-rpc)~~             | Legacy concept and deprecated. Use InternalChannel + RPC instead. A message queue for the workflowState to receive messages from external sources |
 
 
 
@@ -377,40 +376,33 @@ A WorkflowState is itself like “a small workflow” of 1 or 2 steps:
 
 **[ `waitUntil` ] → `execute`**
 
-The `waitUntil` API returns "commands" to wait for. When the commands are completed, the `execute` API will be invoked.
-Both the `waitUntil` and `execute` APIs have access to read/write the persistence schema defined in the workflow.
+**The `waitUntil` API** returns "[commands](#commands-for-workflowstates-waituntil-api)" to wait for. When the commands are completed, the `execute` API will be invoked.
 
-The full execution flow looks like this:
-
-![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234921554-587d8ad4-84f5-4987-b838-959869293465.png)
 
 The `waitUntil` API is optional. If not defined, then the `execute` API will be invoked immediately when the Workflow State is started.
 
-Note: the `waitUntil` and `execute` APIs are invoked by the iWF service with infinite backoff retry by default. See the [WorkflowStateOptions](#WorkflowStateOptions) section for customization.  
+The `execute` API returns a StateDecision to decide what is next.
 
-The execute API will return a StateDecision:
-* For a single next state a decision can 
-  * Go to a different state
-  * Go to the same state, i.e. a loop
-  * Go to the previous state, i.e. a loop
+Both `waitUntil` and `execute` are implemented by code. So it's extremely dynamic / flexible for business. Any code change deployed will take effect immediately. 
+
+### StateDecision from `execute` 
+User workflow implements a ** `execute` API** to return a StateDecision for:
+* A next state
+* Multiple next states running in parallel
+* Stop the workflow:
+  * Graceful complete -- Stop the thread, and also will stop the workflow when all other threads are stopped
+  * Force complete -- Stop the workflow immediately
+  * Force fail  -- Stop the workflow immediately with failure
 * Dead end -- Just stop the thread
-* Graceful complete -- Stop the thread, and also will stop the workflow when all other threads are stopped
-* Force complete -- Stop the workflow immediately
-* Force fail  -- Stop the workflow immediately with failure
-* For multiple next states, these are executed in parallel as multiple threads
+* Atomically go to next state with condition(e.g. channel is not empty)
 
-With StateDecisions, the workflow definitions can have flows like these:
+State Decisions let you orchestrate the WorkflowState as complex as needed for any use case!
 
-![decision flow1](https://user-images.githubusercontent.com/4523955/234919901-f327dfb6-5b38-4440-a2eb-5d1c832b694e.png)
-
-or 
-
-![decision flow2](https://user-images.githubusercontent.com/4523955/234919896-30db8628-daeb-4f1d-bd2b-7bf826989c75.png)
-
-or as complex as needed for any use case!
+![StateDecision examples](https://github.com/indeedeng/iwf-java-samples/assets/4523955/83f127c2-42d1-454a-a688-389e5419f2bd)
 
 
-### Commands for WorkflowState's WaitUntil API
+
+### Commands from `waitUntil`
 
 iWF provides three types of commands:
 
@@ -447,6 +439,10 @@ For example, in your problem space, WorkflowStates 1,2,3 need to be completed be
 
 In this case, you need to utilize the "InternalChannel". WorkflowState 4 should be waiting on an "InternalChannel" for 3 messages via the `waitUntil` API. 
 WorkflowState 1,2,3 will each publish a message when completing. This ensures propper ordering.  
+
+A full execution flow of a single WorklfowState can look like this:
+
+![Workflow State diagram](https://user-images.githubusercontent.com/4523955/234921554-587d8ad4-84f5-4987-b838-959869293465.png)
 
 ## RPC
 
