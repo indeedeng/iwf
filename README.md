@@ -206,27 +206,21 @@ The solution with iWF:
 
 It's so simple & easy to do that the code can be shown here!
 
-See the running code in [Java samples](https://github.com/indeedeng/iwf-java-samples/tree/main#microservice-ochestration), [Golang samples](https://github.com/indeedeng/iwf-golang-samples#microservice-orchestration). 
+See the running code in [Java samples](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/microservices), [Golang samples](https://github.com/indeedeng/iwf-golang-samples#microservice-orchestration). 
 ```java
 public class OrchestrationWorkflow implements ObjectWorkflow {
 
     public static final String DA_DATA1 = "SomeData";
     public static final String READY_SIGNAL = "Ready";
 
-    private List<StateDef> stateDefs;
-
-    public OrchestrationWorkflow() {
-        this.stateDefs = Arrays.asList(
+    @Override
+    public List<StateDef> getWorkflowStates() {
+        return Arrays.asList(
                 StateDef.startingState(new State1()),
                 StateDef.nonStartingState(new State2()),
                 StateDef.nonStartingState(new State3()),
                 StateDef.nonStartingState(new State4())
         );
-    }
-
-    @Override
-    public List<StateDef> getWorkflowStates() {
-        return stateDefs;
     }
 
     @Override
@@ -241,14 +235,6 @@ public class OrchestrationWorkflow implements ObjectWorkflow {
         return Arrays.asList(
                 SignalChannelDef.create(Void.class, READY_SIGNAL)
         );
-    }
-
-    // NOTE: this is to demonstrate how you can read/write workflow persistence in RPC
-    @RPC
-    public String swap(Context context, String newData, Persistence persistence, Communication communication) {
-        String oldData = persistence.getDataAttribute(DA_DATA1, String.class);
-        persistence.setDataAttribute(DA_DATA1, newData);
-        return oldData;
     }
 }
 
