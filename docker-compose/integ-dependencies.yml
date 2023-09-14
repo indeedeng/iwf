@@ -120,7 +120,7 @@ services:
     depends_on:
       - cadence
     environment:
-      - CADENCE_CLI_ADDRESS=cadence:7833
+      - CADENCE_CLI_ADDRESS=cadence:7933
     image: ubercadence/cli:0.24.0
     networks:
       - testing-network

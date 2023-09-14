@@ -2,7 +2,6 @@ package temporal
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -12,7 +11,6 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
-	"go.uber.org/zap"
 )
 
 type workflowProvider struct {
@@ -314,22 +312,4 @@ func (s *selector) Select(ctx interpreter.UnifiedContext) {
 		panic("cannot convert to temporal workflow context")
 	}
 	s.selector.Select(wfCtx)
-}
-
-func (s *selector) ReceiveSignalValueBlocking(ctx interpreter.UnifiedContext, signalName string) interface{} {
-	wfCtx, ok := ctx.GetContext().(workflow.Context)
-	if !ok {
-		panic("cannot convert to temporal workflow context")
-	}
-
-	var signalValue interface{}
-	signalChannel := workflow.GetSignalChannel(wfCtx, signalName)
-	s.selector.AddReceive(signalChannel, func(c workflow.ReceiveChannel, more bool) {
-		c.Receive(wfCtx, &signalValue)
-		workflow.GetLogger(wfCtx).Info("Received signal!", zap.String("signal", signalName), zap.Any("value", fmt.Sprintf("%v", signalValue)))
-	})
-
-	s.selector.Select(wfCtx)
-
-	return signalValue
 }

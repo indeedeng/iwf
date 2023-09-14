@@ -124,12 +124,7 @@ func (t *cadenceClient) StartWaitForStateCompletionWorkflow(ctx context.Context,
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.WaitforStateCompletionWorkflow)
 	if err != nil {
 		if t.IsWorkflowAlreadyStartedError(err) {
-			describeResponse, error := t.cClient.DescribeWorkflowExecution(ctx, workflowOptions.ID, "")
-			if error != nil {
-				return "", error
-			}
-
-			return *describeResponse.WorkflowExecutionInfo.Execution.RunId, nil
+			return *err.(*shared.WorkflowExecutionAlreadyStartedError).RunId, nil
 		}
 		return "", err
 	}

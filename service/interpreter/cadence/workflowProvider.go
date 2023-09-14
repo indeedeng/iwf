@@ -10,7 +10,6 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.uber.org/cadence"
 	"go.uber.org/cadence/workflow"
-	"go.uber.org/zap"
 )
 
 type workflowProvider struct {
@@ -277,22 +276,4 @@ func (s *selector) Select(ctx interpreter.UnifiedContext) {
 	}
 
 	s.selector.Select(wfCtx)
-}
-
-func (s *selector) ReceiveSignalValueBlocking(ctx interpreter.UnifiedContext, signalName string) interface{} {
-	wfCtx, ok := ctx.GetContext().(workflow.Context)
-	if !ok {
-		panic("cannot convert to cadence workflow context")
-	}
-
-	var signalValue interface{}
-	signalChannel := workflow.GetSignalChannel(wfCtx, signalName)
-	s.selector.AddReceive(signalChannel, func(c workflow.Channel, more bool) {
-		c.Receive(wfCtx, &signalValue)
-		workflow.GetLogger(wfCtx).Info("Received signal!", zap.String("signal", signalName), zap.Any("value", fmt.Sprintf("%v", signalValue)))
-	})
-
-	s.selector.Select(wfCtx)
-
-	return signalValue
 }
