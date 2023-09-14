@@ -53,10 +53,9 @@ With some other existing technologies, you solve it using message queue(like SQS
 * Need to re-enqueue the message for once to have 24 hours timer
 * Need to create one queue for every step
 * Need additional storage for waiting & processing ready signal
-* Only go to 3 or 4 if both conditions are met
 * Also need DLQ and build tooling around
 
-**It's complicated and hard to maintain and extend.**
+**The business code will be scattered. It's complicated and hard to maintain and extend.**
 
 ### New solution with iWF
 
