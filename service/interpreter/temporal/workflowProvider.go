@@ -18,10 +18,6 @@ type workflowProvider struct {
 	pendingThreadNames map[string]int
 }
 
-type selector struct {
-	selector workflow.Selector
-}
-
 func newTemporalWorkflowProvider() interpreter.WorkflowProvider {
 	return &workflowProvider{
 		pendingThreadNames: map[string]int{},
@@ -304,12 +300,4 @@ func (w *workflowProvider) GetUnhandledSignalNames(ctx interpreter.UnifiedContex
 		panic("cannot convert to temporal workflow context")
 	}
 	return workflow.GetUnhandledSignalNames(wfCtx)
-}
-
-func (s *selector) Select(ctx interpreter.UnifiedContext) {
-	wfCtx, ok := ctx.GetContext().(workflow.Context)
-	if !ok {
-		panic("cannot convert to temporal workflow context")
-	}
-	s.selector.Select(wfCtx)
 }
