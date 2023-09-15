@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 )
 
@@ -29,6 +31,8 @@ type (
 		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew"`
 
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
+
+		WorkflowExecutionTimeout time.Duration
 	}
 
 	ContinueAsNewInput struct {

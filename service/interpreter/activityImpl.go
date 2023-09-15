@@ -10,7 +10,7 @@ import (
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/client"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/rpc"
@@ -57,16 +57,26 @@ func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, inp
 }
 
 // StateDecide is deprecated. Will be removed in next release
-func StateDecide(ctx context.Context, backendType service.BackendType, input service.StateDecideActivityInput, shouldSendSignalOnCompletion bool) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion)
+func StateDecide(
+	ctx context.Context,
+	backendType service.BackendType,
+	input service.StateDecideActivityInput,
+	shouldSendSignalOnCompletion bool,
+	timeout time.Duration) (*iwfidl.WorkflowStateDecideResponse, error) {
+	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion, timeout)
 }
 
-func StateApiExecute(ctx context.Context, backendType service.BackendType, input service.StateDecideActivityInput, shouldSendSignalOnCompletion bool) (*iwfidl.WorkflowStateDecideResponse, error) {
+func StateApiExecute(
+	ctx context.Context,
+	backendType service.BackendType,
+	input service.StateDecideActivityInput,
+	shouldSendSignalOnCompletion bool,
+	timeout time.Duration) (*iwfidl.WorkflowStateDecideResponse, error) {
 	defer func() {
 		if shouldSendSignalOnCompletion {
 			unifiedCleint := env.GetUnifiedClient()
 			err := unifiedCleint.SignalWithStartWaitForStateCompletionWorkflow(
-				ctx, client.StartWorkflowOptions{
+				ctx, uclient.StartWorkflowOptions{
 					ID:                       service.IwfSystemConstPrefix + input.Request.Context.WorkflowId + "_" + *input.Request.Context.StateExecutionId,
 					TaskQueue:                env.GetTaskQueue(),
 					WorkflowExecutionTimeout: 600 * time.Second, // TODO: make it configurable

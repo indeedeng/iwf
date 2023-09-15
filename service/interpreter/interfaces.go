@@ -52,8 +52,9 @@ type WorkflowExecution struct {
 
 // WorkflowInfo information about currently executing workflow
 type WorkflowInfo struct {
-	WorkflowExecution WorkflowExecution
-	WorkflowStartTime time.Time
+	WorkflowExecution        WorkflowExecution
+	WorkflowStartTime        time.Time
+	WorkflowExecutionTimeout time.Duration
 }
 
 type ActivityOptions struct {

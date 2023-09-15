@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/indeedeng/iwf/service/client"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log"
 )
@@ -24,7 +24,7 @@ const WorkflowRpcApiPath = "/api/v1/workflow/rpc"
 const InfoHealthCheck = "/info/healthcheck"
 
 // NewService returns a new router.
-func NewService(config config.Config, client client.UnifiedClient, logger log.Logger) *gin.Engine {
+func NewService(config config.Config, client uclient.UnifiedClient, logger log.Logger) *gin.Engine {
 	router := gin.Default()
 
 	handler := newHandler(config, client, logger)

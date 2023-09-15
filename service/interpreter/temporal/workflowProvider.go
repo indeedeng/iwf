@@ -100,7 +100,8 @@ func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) inter
 			ID:    info.WorkflowExecution.ID,
 			RunID: info.WorkflowExecution.RunID,
 		},
-		WorkflowStartTime: info.WorkflowStartTime,
+		WorkflowStartTime:        info.WorkflowStartTime,
+		WorkflowExecutionTimeout: info.WorkflowExecutionTimeout,
 	}
 }
 

@@ -1,7 +1,7 @@
 package env
 
 import (
-	"github.com/indeedeng/iwf/service/client"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"go.temporal.io/sdk/converter"
 )
@@ -16,7 +16,7 @@ var temporalDataConverter converter.DataConverter
 
 var temporalMemoEncryption bool
 
-var unifiedClient client.UnifiedClient
+var unifiedClient uclient.UnifiedClient
 
 var taskQueue string
 
@@ -24,17 +24,17 @@ func SetSharedEnv(
 	config config.Config,
 	memoEncryption bool,
 	temporalMemoEncryptionDataConverter converter.DataConverter,
-	unifiedClient client.UnifiedClient,
-	taskQueue string,
+	client uclient.UnifiedClient,
+	queue string,
 ) {
 	sharedConfig = config
 	temporalDataConverter = temporalMemoEncryptionDataConverter
 	temporalMemoEncryption = memoEncryption
-	unifiedClient = unifiedClient
-	taskQueue = taskQueue
+	client = unifiedClient
+	queue = taskQueue
 }
 
-func GetUnifiedClient() client.UnifiedClient {
+func GetUnifiedClient() uclient.UnifiedClient {
 	return unifiedClient
 }
 

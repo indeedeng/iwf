@@ -464,7 +464,7 @@ func executeState(
 	skipStart := compatibility.GetSkipStartApi(&options)
 	if skipStart {
 		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
+			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
 	}
 
 	if isResumeFromContinueAsNew {
@@ -683,7 +683,7 @@ func executeState(
 	}
 
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
+		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
 }
 func executeStateDecide(
 	ctx UnifiedContext,
@@ -699,6 +699,7 @@ func executeStateDecide(
 	executeApi interface{},
 	stateExecutionLocal []iwfidl.KeyValue,
 	shouldSendSignalOnCompletion bool,
+	workflowTimeout time.Duration,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	var err error
 	activityOptions := ActivityOptions{
@@ -729,7 +730,7 @@ func executeStateDecide(
 			DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			StateInput:       state.StateInput,
 		},
-	}).Get(ctx, &decideResponse)
+	}, shouldSendSignalOnCompletion, workflowTimeout).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err != nil {
 		if shouldProceedOnExecuteApiError(state) {
