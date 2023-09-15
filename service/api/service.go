@@ -125,9 +125,12 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, r
 
 	workflowId := service.IwfSystemConstPrefix + req.WorkflowId + "_" + req.StateExecutionId
 	options := uclient.StartWorkflowOptions{
-		ID:                       workflowId,
-		TaskQueue:                s.taskQueue,
-		WorkflowExecutionTimeout: time.Duration(*req.WaitTimeSeconds) * time.Second,
+		ID:        workflowId,
+		TaskQueue: s.taskQueue,
+	}
+
+	if req.WaitTimeSeconds != nil {
+		options.WorkflowExecutionTimeout = time.Duration(*req.WaitTimeSeconds) * time.Second
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
