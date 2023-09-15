@@ -12,6 +12,8 @@ type (
 
 		StartStateId *string `json:"startStateId,omitempty"`
 
+		WaitForCompletionStateExecutionIds []string `json:"waitForCompletionStateExecutionIds,omitempty"`
+
 		StateInput iwfidl.EncodedObject `json:"stateInput,omitempty"`
 
 		StateOptions iwfidl.WorkflowStateOptions `json:"stateOptions,omitempty"`

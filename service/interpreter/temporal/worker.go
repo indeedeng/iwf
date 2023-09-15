@@ -3,6 +3,7 @@ package temporal
 import (
 	"log"
 
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
@@ -17,8 +18,8 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool, memoEncryptionConverter converter.DataConverter) *InterpreterWorker {
-	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter)
+func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool, memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient) *InterpreterWorker {
+	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue)
 
 	return &InterpreterWorker{
 		temporalClient: temporalClient,

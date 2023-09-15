@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | **string** |  | 
 **StateExecutionId** | **string** |  | 
+**WaitTimeSeconds** | Pointer to **int32** |  | [optional] 
 
 ## Methods
 
@@ -65,6 +66,31 @@ and a boolean to check if the value has been set.
 
 SetStateExecutionId sets StateExecutionId field to given value.
 
+
+### GetWaitTimeSeconds
+
+`func (o *WorkflowWaitForStateCompletionRequest) GetWaitTimeSeconds() int32`
+
+GetWaitTimeSeconds returns the WaitTimeSeconds field if non-nil, zero value otherwise.
+
+### GetWaitTimeSecondsOk
+
+`func (o *WorkflowWaitForStateCompletionRequest) GetWaitTimeSecondsOk() (*int32, bool)`
+
+GetWaitTimeSecondsOk returns a tuple with the WaitTimeSeconds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitTimeSeconds
+
+`func (o *WorkflowWaitForStateCompletionRequest) SetWaitTimeSeconds(v int32)`
+
+SetWaitTimeSeconds sets WaitTimeSeconds field to given value.
+
+### HasWaitTimeSeconds
+
+`func (o *WorkflowWaitForStateCompletionRequest) HasWaitTimeSeconds() bool`
+
+HasWaitTimeSeconds returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

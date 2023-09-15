@@ -753,6 +753,9 @@ components:
       example:
         startStateId: startStateId
         workflowTimeoutSeconds: 0
+        waitForCompletionStateExecutionIds:
+        - waitForCompletionStateExecutionIds
+        - waitForCompletionStateExecutionIds
         stateOptions:
           searchAttributesLoadingPolicy:
             lockingKeys:
@@ -863,6 +866,10 @@ components:
           type: string
         startStateId:
           type: string
+        waitForCompletionStateExecutionIds:
+          items:
+            type: string
+          type: array
         stateInput:
           $ref: '#/components/schemas/EncodedObject'
         stateOptions:
@@ -2130,6 +2137,7 @@ components:
       type: object
     WorkflowWaitForStateCompletionRequest:
       example:
+        waitTimeSeconds: 0
         workflowId: workflowId
         stateExecutionId: stateExecutionId
       properties:
@@ -2137,6 +2145,8 @@ components:
           type: string
         stateExecutionId:
           type: string
+        waitTimeSeconds:
+          type: integer
       required:
       - stateExecutionId
       - workflowId

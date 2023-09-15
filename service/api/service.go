@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/utils"
@@ -28,7 +29,7 @@ import (
 )
 
 type serviceImpl struct {
-	client    UnifiedClient
+	client    client.UnifiedClient
 	taskQueue string
 	logger    log.Logger
 	config    config.Config
@@ -38,7 +39,7 @@ func (s *serviceImpl) Close() {
 	s.client.Close()
 }
 
-func NewApiService(config config.Config, client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
+func NewApiService(config config.Config, client client.UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
 	return &serviceImpl{
 		client:    client,
 		taskQueue: taskQueue,
@@ -50,7 +51,7 @@ func NewApiService(config config.Config, client UnifiedClient, taskQueue string,
 func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.WorkflowStartRequest) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	workflowOptions := StartWorkflowOptions{
+	workflowOptions := client.StartWorkflowOptions{
 		ID:                       req.GetWorkflowId(),
 		TaskQueue:                s.taskQueue,
 		WorkflowExecutionTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
@@ -96,14 +97,15 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	}
 
 	input := service.InterpreterWorkflowInput{
-		IwfWorkflowType:          req.GetIwfWorkflowType(),
-		IwfWorkerUrl:             req.GetIwfWorkerUrl(),
-		StartStateId:             req.StartStateId,
-		StateInput:               req.GetStateInput(),
-		StateOptions:             req.GetStateOptions(),
-		InitSearchAttributes:     initCustomSAs,
-		Config:                   workflowConfig,
-		UseMemoForDataAttributes: useMemo,
+		IwfWorkflowType:                    req.GetIwfWorkflowType(),
+		IwfWorkerUrl:                       req.GetIwfWorkerUrl(),
+		StartStateId:                       req.StartStateId,
+		StateInput:                         req.GetStateInput(),
+		StateOptions:                       req.GetStateOptions(),
+		InitSearchAttributes:               initCustomSAs,
+		Config:                             workflowConfig,
+		UseMemoForDataAttributes:           useMemo,
+		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
 	}
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
@@ -122,9 +124,10 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, r
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
 	workflowId := service.IwfSystemConstPrefix + req.WorkflowId + "_" + req.StateExecutionId
-	options := StartWorkflowOptions{
-		ID:        workflowId,
-		TaskQueue: s.taskQueue,
+	options := client.StartWorkflowOptions{
+		ID:                       workflowId,
+		TaskQueue:                s.taskQueue,
+		WorkflowExecutionTimeout: time.Duration(*req.WaitTimeSeconds) * time.Second,
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
@@ -132,7 +135,12 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, r
 		return nil, s.handleError(err)
 	}
 
-	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, iwfidl.PtrInt32(60), s.config.Api.MaxWaitSeconds)
+	waitTimeSeconds := 60 // default to 60 seconds
+	if req.WaitTimeSeconds != nil {
+		waitTimeSeconds = int(*req.WaitTimeSeconds)
+	}
+
+	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, iwfidl.PtrInt32(int32(waitTimeSeconds)), s.config.Api.MaxWaitSeconds)
 	defer cancFunc()
 	var output service.WaitForStateCompletionWorkflowOutput
 	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
@@ -415,7 +423,7 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 	if req.GetPageSize() > 0 {
 		pageSize = req.GetPageSize()
 	}
-	resp, err := s.client.ListWorkflow(ctx, &ListWorkflowExecutionsRequest{
+	resp, err := s.client.ListWorkflow(ctx, &client.ListWorkflowExecutionsRequest{
 		PageSize:      pageSize,
 		Query:         req.GetQuery(),
 		NextPageToken: []byte(req.GetNextPageToken()),

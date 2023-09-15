@@ -21,6 +21,7 @@ var _ MappedNullable = &WorkflowWaitForStateCompletionRequest{}
 type WorkflowWaitForStateCompletionRequest struct {
 	WorkflowId       string `json:"workflowId"`
 	StateExecutionId string `json:"stateExecutionId"`
+	WaitTimeSeconds  *int32 `json:"waitTimeSeconds,omitempty"`
 }
 
 // NewWorkflowWaitForStateCompletionRequest instantiates a new WorkflowWaitForStateCompletionRequest object
@@ -90,6 +91,38 @@ func (o *WorkflowWaitForStateCompletionRequest) SetStateExecutionId(v string) {
 	o.StateExecutionId = v
 }
 
+// GetWaitTimeSeconds returns the WaitTimeSeconds field value if set, zero value otherwise.
+func (o *WorkflowWaitForStateCompletionRequest) GetWaitTimeSeconds() int32 {
+	if o == nil || IsNil(o.WaitTimeSeconds) {
+		var ret int32
+		return ret
+	}
+	return *o.WaitTimeSeconds
+}
+
+// GetWaitTimeSecondsOk returns a tuple with the WaitTimeSeconds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowWaitForStateCompletionRequest) GetWaitTimeSecondsOk() (*int32, bool) {
+	if o == nil || IsNil(o.WaitTimeSeconds) {
+		return nil, false
+	}
+	return o.WaitTimeSeconds, true
+}
+
+// HasWaitTimeSeconds returns a boolean if a field has been set.
+func (o *WorkflowWaitForStateCompletionRequest) HasWaitTimeSeconds() bool {
+	if o != nil && !IsNil(o.WaitTimeSeconds) {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitTimeSeconds gets a reference to the given int32 and assigns it to the WaitTimeSeconds field.
+func (o *WorkflowWaitForStateCompletionRequest) SetWaitTimeSeconds(v int32) {
+	o.WaitTimeSeconds = &v
+}
+
 func (o WorkflowWaitForStateCompletionRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -102,6 +135,9 @@ func (o WorkflowWaitForStateCompletionRequest) ToMap() (map[string]interface{}, 
 	toSerialize := map[string]interface{}{}
 	toSerialize["workflowId"] = o.WorkflowId
 	toSerialize["stateExecutionId"] = o.StateExecutionId
+	if !IsNil(o.WaitTimeSeconds) {
+		toSerialize["waitTimeSeconds"] = o.WaitTimeSeconds
+	}
 	return toSerialize, nil
 }
 

@@ -7,7 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service/api"
+	"github.com/indeedeng/iwf/service"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
@@ -28,7 +29,7 @@ type temporalClient struct {
 	memoEncryption bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
 }
 
-func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool) api.UnifiedClient {
+func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool) uclient.UnifiedClient {
 	return &temporalClient{
 		tClient:        tClient,
 		namespace:      namespace,
@@ -80,7 +81,7 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 	return fmt.Errorf("application error doesn't have details. Critical code bug")
 }
 
-func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	memo, err := t.encryptMemoIfNeeded(options.Memo)
 	if err != nil {
 		return "", err
@@ -119,11 +120,12 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options a
 	return run.GetRunID(), nil
 }
 
-func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options api.StartWorkflowOptions) (runId string, err error) {
+func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
-		ID:                    options.ID,
-		WorkflowIDReusePolicy: enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
-		TaskQueue:             options.TaskQueue,
+		ID:                       options.ID,
+		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
+		TaskQueue:                options.TaskQueue,
+		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.WaitforStateCompletionWorkflow)
@@ -131,6 +133,21 @@ func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context
 		return "", err
 	}
 	return run.GetRunID(), nil
+}
+
+func (t *temporalClient) SignalWithStartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput) error {
+	workflowOptions := client.StartWorkflowOptions{
+		ID:                       options.ID,
+		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
+		TaskQueue:                options.TaskQueue,
+		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
+	}
+
+	_, err := t.tClient.SignalWithStartWorkflow(ctx, options.ID, service.StateCompletionSignalChannelName, stateCompletionOutput, workflowOptions, temporal.WaitforStateCompletionWorkflow)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (t *temporalClient) SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error {
@@ -152,7 +169,7 @@ func (t *temporalClient) TerminateWorkflow(ctx context.Context, workflowID strin
 	return t.tClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr)
 }
 
-func (t *temporalClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
+func (t *temporalClient) ListWorkflow(ctx context.Context, request *uclient.ListWorkflowExecutionsRequest) (*uclient.ListWorkflowExecutionsResponse, error) {
 	listReq := &workflowservice.ListWorkflowExecutionsRequest{
 		PageSize:      request.PageSize,
 		Query:         request.Query,
@@ -169,7 +186,7 @@ func (t *temporalClient) ListWorkflow(ctx context.Context, request *api.ListWork
 			WorkflowRunId: exe.Execution.RunId,
 		})
 	}
-	return &api.ListWorkflowExecutionsResponse{
+	return &uclient.ListWorkflowExecutionsResponse{
 		Executions:    executions,
 		NextPageToken: resp.NextPageToken,
 	}, nil
@@ -183,7 +200,7 @@ func (t *temporalClient) QueryWorkflow(ctx context.Context, valuePtr interface{}
 	return qres.Get(valuePtr)
 }
 
-func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*api.DescribeWorkflowExecutionResponse, error) {
+func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*uclient.DescribeWorkflowExecutionResponse, error) {
 	resp, err := t.tClient.DescribeWorkflowExecution(ctx, workflowID, runID)
 	if err != nil {
 		return nil, err
@@ -200,7 +217,7 @@ func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflow
 
 	memo, err := t.getMemoAndDecryptIfNeeded(resp.GetWorkflowExecutionInfo().GetMemo())
 
-	return &api.DescribeWorkflowExecutionResponse{
+	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:                    resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
 		Status:                   status,
 		SearchAttributes:         searchAttributes,

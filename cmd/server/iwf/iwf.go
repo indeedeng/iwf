@@ -22,10 +22,16 @@ package iwf
 
 import (
 	"fmt"
+	rawLog "log"
+	"strings"
+	"sync"
+	"time"
+
 	isvc "github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
 	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"
@@ -46,10 +52,6 @@ import (
 	"go.uber.org/cadence/encoded"
 	"go.uber.org/yarpc"
 	"go.uber.org/yarpc/transport/grpc"
-	rawLog "log"
-	"strings"
-	"sync"
-	"time"
 )
 
 const serviceAPI = "api"
@@ -106,7 +108,7 @@ func start(c *cli.Context) {
 	services := getServices(c)
 
 	// The client is a heavyweight object that should be created once per process.
-	var unifiedClient api.UnifiedClient
+	var unifiedClient uclient.UnifiedClient
 	if config.Interpreter.Temporal != nil {
 		var metricHandler client.MetricsHandler
 		if config.Interpreter.Temporal.Prometheus != nil {
@@ -159,13 +161,13 @@ func start(c *cli.Context) {
 	wg.Wait()
 }
 
-func launchTemporalService(svcName string, config config.Config, unifiedClient api.UnifiedClient, temporalClient client.Client, logger log.Logger) {
+func launchTemporalService(svcName string, config config.Config, unifiedClient uclient.UnifiedClient, temporalClient client.Client, logger log.Logger) {
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil)
+		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -175,7 +177,7 @@ func launchTemporalService(svcName string, config config.Config, unifiedClient a
 func launchCadenceService(
 	svcName string,
 	config config.Config,
-	unifiedClient api.UnifiedClient,
+	unifiedClient uclient.UnifiedClient,
 	service workflowserviceclient.Interface,
 	domain string,
 	closeFunc func(),
@@ -185,7 +187,7 @@ func launchCadenceService(
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)

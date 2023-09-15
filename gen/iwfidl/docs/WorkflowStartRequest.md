@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **WorkflowTimeoutSeconds** | **int32** |  | 
 **IwfWorkerUrl** | **string** |  | 
 **StartStateId** | Pointer to **string** |  | [optional] 
+**WaitForCompletionStateExecutionIds** | Pointer to **[]string** |  | [optional] 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **StateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
 **WorkflowStartOptions** | Pointer to [**WorkflowStartOptions**](WorkflowStartOptions.md) |  | [optional] 
@@ -136,6 +137,31 @@ SetStartStateId sets StartStateId field to given value.
 `func (o *WorkflowStartRequest) HasStartStateId() bool`
 
 HasStartStateId returns a boolean if a field has been set.
+
+### GetWaitForCompletionStateExecutionIds
+
+`func (o *WorkflowStartRequest) GetWaitForCompletionStateExecutionIds() []string`
+
+GetWaitForCompletionStateExecutionIds returns the WaitForCompletionStateExecutionIds field if non-nil, zero value otherwise.
+
+### GetWaitForCompletionStateExecutionIdsOk
+
+`func (o *WorkflowStartRequest) GetWaitForCompletionStateExecutionIdsOk() (*[]string, bool)`
+
+GetWaitForCompletionStateExecutionIdsOk returns a tuple with the WaitForCompletionStateExecutionIds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitForCompletionStateExecutionIds
+
+`func (o *WorkflowStartRequest) SetWaitForCompletionStateExecutionIds(v []string)`
+
+SetWaitForCompletionStateExecutionIds sets WaitForCompletionStateExecutionIds field to given value.
+
+### HasWaitForCompletionStateExecutionIds
+
+`func (o *WorkflowStartRequest) HasWaitForCompletionStateExecutionIds() bool`
+
+HasWaitForCompletionStateExecutionIds returns a boolean if a field has been set.
 
 ### GetStateInput
 
