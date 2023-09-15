@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
@@ -20,7 +21,7 @@ type handler struct {
 	logger log.Logger
 }
 
-func newHandler(config config.Config, client UnifiedClient, logger log.Logger) *handler {
+func newHandler(config config.Config, client client.UnifiedClient, logger log.Logger) *handler {
 	svc, err := NewApiService(config, client, service.TaskQueue, logger)
 	if err != nil {
 		panic(err)

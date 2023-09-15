@@ -20,7 +20,7 @@ type InterpreterWorker struct {
 }
 
 func NewInterpreterWorker(config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(), unifiedClient uclient.UnifiedClient) *InterpreterWorker {
-	env.SetSharedEnv(config, false, nil, unifiedClient)
+	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist)
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,
