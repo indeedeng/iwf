@@ -30,8 +30,8 @@ func SetSharedEnv(
 	sharedConfig = config
 	temporalDataConverter = temporalMemoEncryptionDataConverter
 	temporalMemoEncryption = memoEncryption
-	client = unifiedClient
-	queue = taskQueue
+	unifiedClient = client
+	taskQueue = queue
 }
 
 func GetUnifiedClient() uclient.UnifiedClient {
