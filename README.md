@@ -10,31 +10,18 @@
 **iWF will make you a 10x developer!**
 
 iWF is an API orchestration platform for building resilient, fault-tolerant, scalable long-running applications. 
-It offers an orchestration coding framework with abstractions for durable timers, async/background execution with backoff retry, 
+It offers an orchestration **coding framework** with abstractions for durable timers, async/background execution with backoff retry, 
 KV storage,  RPC, and message queues. You will build long-running reliable processes faster than ever.
 
-Related projects:
 
-* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) and [samples](https://github.com/indeedeng/iwf-java-samples) 
-* [iWF Golang SDK](https://github.com/indeedeng/iwf-golang-sdk) and [samples](https://github.com/indeedeng/iwf-golang-samples)
-* [iWF Python SDK](https://github.com/indeedeng/iwf-python-sdk) and [samples](https://github.com/indeedeng/iwf-python-samples)
-* WIP [iWF TypeScript SDK](https://github.com/indeedeng/iwf-ts-sdk)
-
-For support or any question, please post in our [Discussion](https://github.com/indeedeng/iwf/discussions), or raise an issue.
-If you are interested in helping this project, check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md) page.
-Below is the basic and comprehensive documentation of iWF. There are some more details in the [wiki pages](https://github.com/indeedeng/iwf/wiki).
-
-# What is [iWF](https://github.com/indeedeng/iwf/wiki)
+# What is [iWF](https://github.com/indeedeng/iwf/wiki/Basic-concepts-overview)
 
 ## Use case study/examples
 * [User sign-up/registry in Python/Java](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-user-signup-workflow)
 * [Abstracted microservice orchestration in Java/Golang](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-Microservice-Orchestration)
-* Employer & JobSeeker engagement
-  * [in Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement)
-  * [in Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/engagement)
-* Subscription Workflow
-  * [in Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription)
-  * [in Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/subscription)
+* Employer & JobSeeker engagement in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/engagement)
+* Subscription Workflow in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/subscription)
+
 ## Basic concepts
 * [Basic concepts overview](https://github.com/indeedeng/iwf/wiki/Basic-concepts-overview)
 * [WorkflowState](https://github.com/indeedeng/iwf/wiki/WorkflowState)
@@ -48,7 +35,17 @@ Below is the basic and comprehensive documentation of iWF. There are some more d
 
 # How to use
 
+As a coding framework, iWF provides three SDKs to use with:
+
+* [iWF Java SDK](https://github.com/indeedeng/iwf-java-sdk) and [samples](https://github.com/indeedeng/iwf-java-samples)
+* [iWF Golang SDK](https://github.com/indeedeng/iwf-golang-sdk) and [samples](https://github.com/indeedeng/iwf-golang-samples)
+* [iWF Python SDK](https://github.com/indeedeng/iwf-python-sdk) and [samples](https://github.com/indeedeng/iwf-python-samples)
+
+The iWF SDKs required to run with the server:
+
 ## Using docker image & docker-compose
+
+This is the simpler(preferred) option to run the server locally for development.
 
 Checkout this repo, go to the docker-compose folder and run it:
 
@@ -84,14 +81,12 @@ the version tag.
   instructions for setting up local Cadence.
 
 
-## Troubleshooting
+# Support
 
-See our [wiki pages](https://github.com/indeedeng/iwf/wiki/iWF-Application-Operations#troubleshoot--debugging).
+For support or any question, please post in our [Discussion](https://github.com/indeedeng/iwf/discussions), or raise an issue.
+If you are interested in helping this project, check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md) page.
+Below is the basic and comprehensive documentation of iWF. There are some more details in the [wiki pages](https://github.com/indeedeng/iwf/wiki).
 
-
-## Operation
-
-See our [wiki pages](https://github.com/indeedeng/iwf/wiki/iWF-Application-Operations).
 
 # Posts & Articles & Reference
 
