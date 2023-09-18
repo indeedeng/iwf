@@ -85,7 +85,10 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
 		loadingType = loadingPolicy.GetPersistenceLoadingType()
-		partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
+		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
+		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+			partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
+		}
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedSearchAttributeKeys, loadingPolicy.GetLockingKeys())
@@ -118,7 +121,10 @@ func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy 
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
 		loadingType = loadingPolicy.GetPersistenceLoadingType()
-		partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
+		partialLoadingKeys = loadingPolicy.PartialLoadingKeys
+		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+			partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
+		}
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
