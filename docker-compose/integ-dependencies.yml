@@ -130,9 +130,9 @@ services:
       - ./init-ci-cadence.sh:/etc/cadence/init-ci-cadence.sh
     entrypoint: sh -c "/etc/cadence/init-ci-cadence.sh"
   cadence-web:
-    image: ubercadence/web:latest
+    image: ubercadence/web:v3.29.6
     environment:
-      - "CADENCE_TCHANNEL_PEERS=cadence:7833"
+      - "CADENCE_TCHANNEL_PEERS=cadence:7933"
     ports:
       - "8088:8088"
     depends_on:
