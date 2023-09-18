@@ -30,7 +30,7 @@ func TestWaitForStateCompletionCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWaitForStateCompletion(t, service.BackendTypeTemporal, nil)
+		doTestWaitForStateCompletion(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
 	}
 }
