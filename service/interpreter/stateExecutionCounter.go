@@ -14,6 +14,7 @@ type StateExecutionCounter struct {
 	globalVersioner      *GlobalVersioner
 	continueAsNewCounter *ContinueAsNewCounter
 
+	stateIdCompletedCounts          map[string]int
 	stateIdStartedCounts            map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
 	stateIdCurrentlyExecutingCounts map[string]int // For system search attributes service.SearchAttributeExecutingStateIds: keep counting the pending stateIds
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
