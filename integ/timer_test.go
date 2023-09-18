@@ -2,15 +2,16 @@ package integ
 
 import (
 	"context"
+	"log"
+	"strconv"
+	"testing"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/timer"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"strconv"
-	"testing"
-	"time"
 )
 
 func TestTimerWorkflowTemporal(t *testing.T) {
