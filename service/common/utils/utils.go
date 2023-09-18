@@ -11,6 +11,24 @@ const (
 	defaultMaxApiTimeoutSeconds = 60
 )
 
+func MergeStringSlice(first, second []string) []string {
+	exists := map[string]bool{}
+	var out []string
+	for _, k := range first {
+		if !exists[k] {
+			exists[k] = true
+			out = append(out, k)
+		}
+	}
+	for _, k := range second {
+		if !exists[k] {
+			exists[k] = true
+			out = append(out, k)
+		}
+	}
+	return out
+}
+
 func MergeMap(first map[string]interface{}, second map[string]interface{}) map[string]interface{} {
 	out := make(map[string]interface{}, len(first))
 	for k, v := range first {

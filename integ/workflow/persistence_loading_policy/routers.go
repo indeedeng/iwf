@@ -172,7 +172,7 @@ func verifyLoadedAttributes(
 	var expectedSearchAttributes []iwfidl.SearchAttribute
 	var expectedDataAttributes []iwfidl.KeyValue
 
-	if loadingType == iwfidl.ALL_WITHOUT_LOCKING {
+	if loadingType == iwfidl.ALL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		expectedSearchAttributes = []iwfidl.SearchAttribute{
 			{
 				Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
@@ -201,7 +201,7 @@ func verifyLoadedAttributes(
 				},
 			},
 		}
-	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING {
 		expectedSearchAttributes = []iwfidl.SearchAttribute{
 			{
 				Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
