@@ -2,12 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/indeedeng/iwf/service"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
-	"net/http"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 
@@ -19,7 +21,7 @@ type handler struct {
 	logger log.Logger
 }
 
-func newHandler(config config.Config, client UnifiedClient, logger log.Logger) *handler {
+func newHandler(config config.Config, client uclient.UnifiedClient, logger log.Logger) *handler {
 	svc, err := NewApiService(config, client, service.TaskQueue, logger)
 	if err != nil {
 		panic(err)
@@ -49,6 +51,23 @@ func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowStartPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *handler) apiV1WorkflowWaitForStateCompletion(c *gin.Context) {
+	var req iwfidl.WorkflowWaitForStateCompletionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+
+	resp, errResp := h.svc.ApiV1WorkflowWaitForStateCompletion(c.Request.Context(), req)
 	if errResp != nil {
 		h.processError(c, errResp)
 		return

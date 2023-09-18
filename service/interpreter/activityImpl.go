@@ -3,16 +3,19 @@ package interpreter
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
-	"io/ioutil"
-	"net/http"
-	"os"
 )
 
 // StateStart is Deprecated, will be removed in next release
@@ -54,11 +57,38 @@ func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, inp
 }
 
 // StateDecide is deprecated. Will be removed in next release
-func StateDecide(ctx context.Context, backendType service.BackendType, input service.StateDecideActivityInput) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input)
+func StateDecide(
+	ctx context.Context,
+	backendType service.BackendType,
+	input service.StateDecideActivityInput,
+	shouldSendSignalOnCompletion bool,
+	timeout time.Duration) (*iwfidl.WorkflowStateDecideResponse, error) {
+	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion, timeout)
 }
 
-func StateApiExecute(ctx context.Context, backendType service.BackendType, input service.StateDecideActivityInput) (*iwfidl.WorkflowStateDecideResponse, error) {
+func StateApiExecute(
+	ctx context.Context,
+	backendType service.BackendType,
+	input service.StateDecideActivityInput,
+	shouldSendSignalOnCompletion bool,
+	timeout time.Duration) (*iwfidl.WorkflowStateDecideResponse, error) {
+	defer func() {
+		if shouldSendSignalOnCompletion {
+			unifiedCleint := env.GetUnifiedClient()
+			err := unifiedCleint.SignalWithStartWaitForStateCompletionWorkflow(
+				ctx, uclient.StartWorkflowOptions{
+					ID:                       service.IwfSystemConstPrefix + input.Request.Context.WorkflowId + "_" + *input.Request.Context.StateExecutionId,
+					TaskQueue:                env.GetTaskQueue(),
+					WorkflowExecutionTimeout: 600 * time.Second, // TODO: make it configurable
+				},
+				iwfidl.StateCompletionOutput{
+					CompletedStateExecutionId: *input.Request.Context.StateExecutionId,
+				})
+			if err != nil {
+				getActivityProviderByType(backendType).GetLogger(ctx).Error("failed to signal on completion", "err", err)
+			}
+		}
+	}()
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)

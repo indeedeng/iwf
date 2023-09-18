@@ -19,14 +19,15 @@ var _ MappedNullable = &WorkflowStartRequest{}
 
 // WorkflowStartRequest struct for WorkflowStartRequest
 type WorkflowStartRequest struct {
-	WorkflowId             string                `json:"workflowId"`
-	IwfWorkflowType        string                `json:"iwfWorkflowType"`
-	WorkflowTimeoutSeconds int32                 `json:"workflowTimeoutSeconds"`
-	IwfWorkerUrl           string                `json:"iwfWorkerUrl"`
-	StartStateId           *string               `json:"startStateId,omitempty"`
-	StateInput             *EncodedObject        `json:"stateInput,omitempty"`
-	StateOptions           *WorkflowStateOptions `json:"stateOptions,omitempty"`
-	WorkflowStartOptions   *WorkflowStartOptions `json:"workflowStartOptions,omitempty"`
+	WorkflowId                         string                `json:"workflowId"`
+	IwfWorkflowType                    string                `json:"iwfWorkflowType"`
+	WorkflowTimeoutSeconds             int32                 `json:"workflowTimeoutSeconds"`
+	IwfWorkerUrl                       string                `json:"iwfWorkerUrl"`
+	StartStateId                       *string               `json:"startStateId,omitempty"`
+	WaitForCompletionStateExecutionIds []string              `json:"waitForCompletionStateExecutionIds,omitempty"`
+	StateInput                         *EncodedObject        `json:"stateInput,omitempty"`
+	StateOptions                       *WorkflowStateOptions `json:"stateOptions,omitempty"`
+	WorkflowStartOptions               *WorkflowStartOptions `json:"workflowStartOptions,omitempty"`
 }
 
 // NewWorkflowStartRequest instantiates a new WorkflowStartRequest object
@@ -178,6 +179,38 @@ func (o *WorkflowStartRequest) SetStartStateId(v string) {
 	o.StartStateId = &v
 }
 
+// GetWaitForCompletionStateExecutionIds returns the WaitForCompletionStateExecutionIds field value if set, zero value otherwise.
+func (o *WorkflowStartRequest) GetWaitForCompletionStateExecutionIds() []string {
+	if o == nil || IsNil(o.WaitForCompletionStateExecutionIds) {
+		var ret []string
+		return ret
+	}
+	return o.WaitForCompletionStateExecutionIds
+}
+
+// GetWaitForCompletionStateExecutionIdsOk returns a tuple with the WaitForCompletionStateExecutionIds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartRequest) GetWaitForCompletionStateExecutionIdsOk() ([]string, bool) {
+	if o == nil || IsNil(o.WaitForCompletionStateExecutionIds) {
+		return nil, false
+	}
+	return o.WaitForCompletionStateExecutionIds, true
+}
+
+// HasWaitForCompletionStateExecutionIds returns a boolean if a field has been set.
+func (o *WorkflowStartRequest) HasWaitForCompletionStateExecutionIds() bool {
+	if o != nil && !IsNil(o.WaitForCompletionStateExecutionIds) {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitForCompletionStateExecutionIds gets a reference to the given []string and assigns it to the WaitForCompletionStateExecutionIds field.
+func (o *WorkflowStartRequest) SetWaitForCompletionStateExecutionIds(v []string) {
+	o.WaitForCompletionStateExecutionIds = v
+}
+
 // GetStateInput returns the StateInput field value if set, zero value otherwise.
 func (o *WorkflowStartRequest) GetStateInput() EncodedObject {
 	if o == nil || IsNil(o.StateInput) {
@@ -290,6 +323,9 @@ func (o WorkflowStartRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize["iwfWorkerUrl"] = o.IwfWorkerUrl
 	if !IsNil(o.StartStateId) {
 		toSerialize["startStateId"] = o.StartStateId
+	}
+	if !IsNil(o.WaitForCompletionStateExecutionIds) {
+		toSerialize["waitForCompletionStateExecutionIds"] = o.WaitForCompletionStateExecutionIds
 	}
 	if !IsNil(o.StateInput) {
 		toSerialize["stateInput"] = o.StateInput

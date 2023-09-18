@@ -1,6 +1,10 @@
 package integ
 
 import (
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -9,15 +13,13 @@ import (
 	"github.com/indeedeng/iwf/service/api"
 	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	"go.uber.org/cadence/encoded"
-	"log"
-	"net/http"
-	"time"
 )
 
 const testNamespace = "default"
@@ -71,11 +73,11 @@ func startIwfService(backendType service.BackendType) (closeFunc func()) {
 	return cf
 }
 
-func startIwfServiceByConfig(config IwfServiceTestConfig) (uclient api.UnifiedClient, closeFunc func()) {
+func startIwfServiceByConfig(config IwfServiceTestConfig) (uclient uclient.UnifiedClient, closeFunc func()) {
 	return doStartIwfServiceWithClient(config)
 }
 
-func startIwfServiceWithClient(backendType service.BackendType) (uclient api.UnifiedClient, closeFunc func()) {
+func startIwfServiceWithClient(backendType service.BackendType) (uclient uclient.UnifiedClient, closeFunc func()) {
 	return doStartIwfServiceWithClient(IwfServiceTestConfig{BackendType: backendType})
 
 	//if backendType == service.BackendTypeTemporal {
@@ -94,7 +96,7 @@ func startIwfServiceWithClient(backendType service.BackendType) (uclient api.Uni
 //var integCadenceUclientCached api.UnifiedClient
 //var integTemporalUclientCached api.UnifiedClient
 
-func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.UnifiedClient, closeFunc func()) {
+func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.UnifiedClient, closeFunc func()) {
 	failAtMemoIncompatibility := !config.DisableFailAtMemoIncompatibility
 	if config.BackendType == service.BackendTypeTemporal {
 		dataConverter := converter.GetDefaultDataConverter()
@@ -120,7 +122,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter)
+		interpreter := temporal.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient)
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()
@@ -151,7 +153,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient api.Unifi
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc)
+		interpreter := cadence.NewInterpreterWorker(createTestConfig(failAtMemoIncompatibility), serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient)
 		interpreter.Start()
 		return uclient, func() {
 			iwfServer.Close()

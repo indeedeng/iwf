@@ -299,6 +299,32 @@ paths:
                 $ref: '#/components/schemas/HealthInfo'
           description: successful operation
       summary: return health info of the server
+  /api/v1/workflow/waitForStateCompletion:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowWaitForStateCompletionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowWaitForStateCompletionResponse'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+        "420":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: wait has exceeded timeout
   /api/v1/workflowState/start:
     post:
       requestBody:
@@ -727,6 +753,9 @@ components:
       example:
         startStateId: startStateId
         workflowTimeoutSeconds: 0
+        waitForCompletionStateExecutionIds:
+        - waitForCompletionStateExecutionIds
+        - waitForCompletionStateExecutionIds
         stateOptions:
           searchAttributesLoadingPolicy:
             lockingKeys:
@@ -837,6 +866,10 @@ components:
           type: string
         startStateId:
           type: string
+        waitForCompletionStateExecutionIds:
+          items:
+            type: string
+          type: array
         stateInput:
           $ref: '#/components/schemas/EncodedObject'
         stateOptions:
@@ -2101,6 +2134,34 @@ components:
           items:
             $ref: '#/components/schemas/InterStateChannelPublishing'
           type: array
+      type: object
+    WorkflowWaitForStateCompletionRequest:
+      example:
+        waitTimeSeconds: 0
+        workflowId: workflowId
+        stateExecutionId: stateExecutionId
+      properties:
+        workflowId:
+          type: string
+        stateExecutionId:
+          type: string
+        waitTimeSeconds:
+          type: integer
+      required:
+      - stateExecutionId
+      - workflowId
+      type: object
+    WorkflowWaitForStateCompletionResponse:
+      example:
+        stateCompletionOutput:
+          completedStateOutput:
+            data: data
+            encoding: encoding
+          completedStateExecutionId: completedStateExecutionId
+          completedStateId: completedStateId
+      properties:
+        stateCompletionOutput:
+          $ref: '#/components/schemas/StateCompletionOutput'
       type: object
     StateDecision:
       example:

@@ -4,15 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/indeedeng/iwf/cmd/server/iwf"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/sdk/client"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/.gen/go/shared"
-	"log"
-	"os"
-	"testing"
-	"time"
 )
 
 func TestMain(m *testing.M) {

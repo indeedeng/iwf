@@ -2,6 +2,8 @@ package temporal
 
 import (
 	"errors"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
@@ -9,7 +11,6 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/workflow"
-	"time"
 )
 
 type workflowProvider struct {
@@ -99,7 +100,8 @@ func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) inter
 			ID:    info.WorkflowExecution.ID,
 			RunID: info.WorkflowExecution.RunID,
 		},
-		WorkflowStartTime: info.WorkflowStartTime,
+		WorkflowStartTime:        info.WorkflowStartTime,
+		WorkflowExecutionTimeout: info.WorkflowExecutionTimeout,
 	}
 }
 
@@ -255,6 +257,15 @@ type temporalReceiveChannel struct {
 
 func (t *temporalReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
 	return t.channel.ReceiveAsync(valuePtr)
+}
+
+func (t *temporalReceiveChannel) ReceiveBlocking(ctx interpreter.UnifiedContext, valuePtr interface{}) (ok bool) {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+
+	return t.channel.Receive(wfCtx, valuePtr)
 }
 
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {

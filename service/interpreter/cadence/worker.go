@@ -1,12 +1,14 @@
 package cadence
 
 import (
+	"log"
+
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
-	"log"
 )
 
 type InterpreterWorker struct {
@@ -17,8 +19,8 @@ type InterpreterWorker struct {
 	tasklist  string
 }
 
-func NewInterpreterWorker(config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func()) *InterpreterWorker {
-	env.SetSharedEnv(config, false, nil)
+func NewInterpreterWorker(config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(), unifiedClient uclient.UnifiedClient) *InterpreterWorker {
+	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist)
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,
@@ -45,6 +47,7 @@ func (iw *InterpreterWorker) Start() {
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
+	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
 	iw.worker.RegisterActivity(interpreter.StateStart)  // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateDecide) // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)

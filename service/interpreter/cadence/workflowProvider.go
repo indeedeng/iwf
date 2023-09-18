@@ -2,13 +2,14 @@ package cadence
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"go.uber.org/cadence"
 	"go.uber.org/cadence/workflow"
-	"time"
 )
 
 type workflowProvider struct {
@@ -77,7 +78,8 @@ func (w *workflowProvider) GetWorkflowInfo(ctx interpreter.UnifiedContext) inter
 			ID:    info.WorkflowExecution.ID,
 			RunID: info.WorkflowExecution.RunID,
 		},
-		WorkflowStartTime: time.UnixMilli(0), // TODO need support from Cadence client: https://github.com/uber-go/cadence-client/issues/1204
+		WorkflowStartTime:        time.UnixMilli(0), // TODO need support from Cadence client: https://github.com/uber-go/cadence-client/issues/1204
+		WorkflowExecutionTimeout: time.Duration(info.ExecutionStartToCloseTimeoutSeconds) * time.Second,
 	}
 }
 
@@ -214,6 +216,15 @@ type cadenceReceiveChannel struct {
 
 func (t *cadenceReceiveChannel) ReceiveAsync(valuePtr interface{}) (ok bool) {
 	return t.channel.ReceiveAsync(valuePtr)
+}
+
+func (t *cadenceReceiveChannel) ReceiveBlocking(ctx interpreter.UnifiedContext, valuePtr interface{}) (ok bool) {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to cadence workflow context")
+	}
+
+	return t.channel.Receive(wfCtx, valuePtr)
 }
 
 func (w *workflowProvider) GetSignalChannel(ctx interpreter.UnifiedContext, signalName string) interpreter.ReceiveChannel {

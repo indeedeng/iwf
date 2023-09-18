@@ -2,8 +2,10 @@ package interpreter
 
 import (
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/compatibility"
 	"time"
+
+	"github.com/indeedeng/iwf/service/common/compatibility"
+	"golang.org/x/exp/slices"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -167,9 +169,11 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 						stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
 					}
 
+					shouldSendSignalOnCompletion := slices.Contains(input.WaitForCompletionStateExecutionIds, stateExeId)
+
 					decision, stateExecStatus, err := executeState(
 						ctx, provider, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
-						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter)
+						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, shouldSendSignalOnCompletion)
 					if err != nil {
 						// this is the case where stateExecStatus == FailureStateExecutionStatus
 						errToFailWf = err
@@ -423,6 +427,7 @@ func executeState(
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
 	continueAsNewCounter *ContinueAsNewCounter,
+	shouldSendSignalOnCompletion bool,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	globalVersioner := NewGlobalVersioner(provider, ctx)
 	waitUntilApi := StateStart
@@ -459,7 +464,7 @@ func executeState(
 	skipStart := compatibility.GetSkipStartApi(&options)
 	if skipStart {
 		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-			nil, continueAsNewer, executeApi, stateExecutionLocal)
+			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
 	}
 
 	if isResumeFromContinueAsNew {
@@ -678,7 +683,7 @@ func executeState(
 	}
 
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-		commandRes, continueAsNewer, executeApi, stateExecutionLocal)
+		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
 }
 func executeStateDecide(
 	ctx UnifiedContext,
@@ -693,6 +698,8 @@ func executeStateDecide(
 	continueAsNewer *ContinueAsNewer,
 	executeApi interface{},
 	stateExecutionLocal []iwfidl.KeyValue,
+	shouldSendSignalOnCompletion bool,
+	workflowTimeout time.Duration,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	var err error
 	activityOptions := ActivityOptions{
@@ -723,7 +730,7 @@ func executeStateDecide(
 			DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			StateInput:       state.StateInput,
 		},
-	}).Get(ctx, &decideResponse)
+	}, shouldSendSignalOnCompletion, workflowTimeout).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err != nil {
 		if shouldProceedOnExecuteApiError(state) {
@@ -787,4 +794,14 @@ func createUserWorkflowError(provider WorkflowProvider, message string) error {
 		string(iwfidl.INVALID_USER_WORKFLOW_CODE_ERROR_TYPE),
 		message,
 	)
+}
+
+func WaitForStateCompletionWorkflowImpl(ctx UnifiedContext, provider WorkflowProvider) (*service.WaitForStateCompletionWorkflowOutput, error) {
+	signalReceiveChannel := provider.GetSignalChannel(ctx, service.StateCompletionSignalChannelName)
+	var signalValue iwfidl.StateCompletionOutput
+	signalReceiveChannel.ReceiveBlocking(ctx, &signalValue)
+
+	return &service.WaitForStateCompletionWorkflowOutput{
+		StateCompletionOutput: signalValue,
+	}, nil
 }

@@ -3,14 +3,15 @@ package cadence
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/pkg/errors"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/service/api"
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/retry"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
@@ -62,7 +63,7 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 	return fmt.Errorf("not an application error. Critical code bug")
 }
 
-func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, converter encoded.DataConverter, closeFunc func()) api.UnifiedClient {
+func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, converter encoded.DataConverter, closeFunc func()) uclient.UnifiedClient {
 	return &cadenceClient{
 		domain:        domain,
 		cClient:       cClient,
@@ -76,7 +77,7 @@ func (t *cadenceClient) Close() {
 	t.closeFunc()
 }
 
-func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options api.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
 	_, ok := options.Memo[service.UseMemoForDataAttributesKey]
 	if ok {
 		return "", fmt.Errorf("using Memo is not supported with Cadence, see https://github.com/uber/cadence/issues/3729")
@@ -113,6 +114,38 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options ap
 	return run.RunID, nil
 }
 
+func (t *cadenceClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions) (runId string, err error) {
+	workflowOptions := client.StartWorkflowOptions{
+		ID:                           options.ID,
+		TaskList:                     options.TaskQueue,
+		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyRejectDuplicate,
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout, // TODO, make this configurable
+	}
+	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.WaitforStateCompletionWorkflow)
+	if err != nil {
+		if t.IsWorkflowAlreadyStartedError(err) {
+			return *err.(*shared.WorkflowExecutionAlreadyStartedError).RunId, nil
+		}
+		return "", err
+	}
+	return run.RunID, nil
+}
+
+func (t *cadenceClient) SignalWithStartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput) error {
+	workflowOptions := client.StartWorkflowOptions{
+		ID:                           options.ID,
+		TaskList:                     options.TaskQueue,
+		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyRejectDuplicate,
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout, // TODO, make this configurable
+	}
+
+	_, err := t.cClient.SignalWithStartWorkflow(ctx, options.ID, service.StateCompletionSignalChannelName, stateCompletionOutput, workflowOptions, cadence.WaitforStateCompletionWorkflow)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (t *cadenceClient) SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error {
 	return t.cClient.SignalWorkflow(ctx, workflowID, runID, signalName, arg)
 }
@@ -132,7 +165,7 @@ func (t *cadenceClient) TerminateWorkflow(ctx context.Context, workflowID string
 	return t.cClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr, nil)
 }
 
-func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkflowExecutionsRequest) (*api.ListWorkflowExecutionsResponse, error) {
+func (t *cadenceClient) ListWorkflow(ctx context.Context, request *uclient.ListWorkflowExecutionsRequest) (*uclient.ListWorkflowExecutionsResponse, error) {
 	listReq := &shared.ListWorkflowExecutionsRequest{
 		PageSize:      &request.PageSize,
 		Query:         &request.Query,
@@ -149,7 +182,7 @@ func (t *cadenceClient) ListWorkflow(ctx context.Context, request *api.ListWorkf
 			WorkflowRunId: *exe.Execution.RunId,
 		})
 	}
-	return &api.ListWorkflowExecutionsResponse{
+	return &uclient.ListWorkflowExecutionsResponse{
 		Executions:    executions,
 		NextPageToken: resp.NextPageToken,
 	}, nil
@@ -178,7 +211,7 @@ func queryWorkflowWithStrongConsistency(t *cadenceClient, ctx context.Context, w
 	return result.QueryResult, nil
 }
 
-func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*api.DescribeWorkflowExecutionResponse, error) {
+func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*uclient.DescribeWorkflowExecutionResponse, error) {
 	resp, err := t.cClient.DescribeWorkflowExecution(ctx, workflowID, runID)
 	if err != nil {
 		return nil, err
@@ -194,7 +227,7 @@ func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowI
 
 	memo, err := t.decodeMemo(resp.GetWorkflowExecutionInfo().GetMemo())
 
-	return &api.DescribeWorkflowExecutionResponse{
+	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
 		Status:           status,
 		SearchAttributes: searchAttributes,

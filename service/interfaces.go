@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 )
 
@@ -11,6 +13,8 @@ type (
 		IwfWorkerUrl string `json:"iwfWorkerUrl,omitempty"`
 
 		StartStateId *string `json:"startStateId,omitempty"`
+
+		WaitForCompletionStateExecutionIds []string `json:"waitForCompletionStateExecutionIds,omitempty"`
 
 		StateInput iwfidl.EncodedObject `json:"stateInput,omitempty"`
 
@@ -27,6 +31,8 @@ type (
 		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew"`
 
 		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
+
+		WorkflowExecutionTimeout time.Duration
 	}
 
 	ContinueAsNewInput struct {
@@ -35,6 +41,10 @@ type (
 
 	InterpreterWorkflowOutput struct {
 		StateCompletionOutputs []iwfidl.StateCompletionOutput `json:"stateCompletionOutputs,omitempty"`
+	}
+
+	WaitForStateCompletionWorkflowOutput struct {
+		StateCompletionOutput iwfidl.StateCompletionOutput `json:"stateCompletionOutput,omitempty"`
 	}
 
 	BasicInfo struct {

@@ -1,13 +1,15 @@
 package temporal
 
 import (
+	"log"
+
+	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	"go.temporal.io/sdk/worker"
-	"log"
 )
 
 type InterpreterWorker struct {
@@ -16,8 +18,8 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool, memoEncryptionConverter converter.DataConverter) *InterpreterWorker {
-	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter)
+func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool, memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient) *InterpreterWorker {
+	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue)
 
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
@@ -45,6 +47,7 @@ func (iw *InterpreterWorker) Start() {
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
+	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
 	iw.worker.RegisterActivity(interpreter.StateStart)  // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateDecide) // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)

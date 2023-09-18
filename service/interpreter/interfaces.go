@@ -2,10 +2,11 @@ package interpreter
 
 import (
 	"context"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/errors"
-	"time"
 )
 
 type ActivityProvider interface {
@@ -51,8 +52,9 @@ type WorkflowExecution struct {
 
 // WorkflowInfo information about currently executing workflow
 type WorkflowInfo struct {
-	WorkflowExecution WorkflowExecution
-	WorkflowStartTime time.Time
+	WorkflowExecution        WorkflowExecution
+	WorkflowStartTime        time.Time
+	WorkflowExecutionTimeout time.Duration
 }
 
 type ActivityOptions struct {
@@ -107,6 +109,7 @@ type WorkflowProvider interface {
 
 type ReceiveChannel interface {
 	ReceiveAsync(valuePtr interface{}) (ok bool)
+	ReceiveBlocking(ctx UnifiedContext, valuePtr interface{}) (ok bool)
 }
 
 type Future interface {

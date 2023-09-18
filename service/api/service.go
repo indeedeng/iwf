@@ -5,15 +5,17 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/compatibility"
-	"github.com/indeedeng/iwf/service/common/rpc"
-	"github.com/indeedeng/iwf/service/common/utils"
-	"github.com/indeedeng/iwf/service/interpreter"
 	"math"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/compatibility"
+	"github.com/indeedeng/iwf/service/common/rpc"
+	"github.com/indeedeng/iwf/service/common/utils"
+	"github.com/indeedeng/iwf/service/interpreter"
 
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
@@ -27,7 +29,7 @@ import (
 )
 
 type serviceImpl struct {
-	client    UnifiedClient
+	client    uclient.UnifiedClient
 	taskQueue string
 	logger    log.Logger
 	config    config.Config
@@ -37,7 +39,7 @@ func (s *serviceImpl) Close() {
 	s.client.Close()
 }
 
-func NewApiService(config config.Config, client UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
+func NewApiService(config config.Config, client uclient.UnifiedClient, taskQueue string, logger log.Logger) (ApiService, error) {
 	return &serviceImpl{
 		client:    client,
 		taskQueue: taskQueue,
@@ -49,7 +51,7 @@ func NewApiService(config config.Config, client UnifiedClient, taskQueue string,
 func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.WorkflowStartRequest) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	workflowOptions := StartWorkflowOptions{
+	workflowOptions := uclient.StartWorkflowOptions{
 		ID:                       req.GetWorkflowId(),
 		TaskQueue:                s.taskQueue,
 		WorkflowExecutionTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
@@ -95,14 +97,15 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 	}
 
 	input := service.InterpreterWorkflowInput{
-		IwfWorkflowType:          req.GetIwfWorkflowType(),
-		IwfWorkerUrl:             req.GetIwfWorkerUrl(),
-		StartStateId:             req.StartStateId,
-		StateInput:               req.GetStateInput(),
-		StateOptions:             req.GetStateOptions(),
-		InitSearchAttributes:     initCustomSAs,
-		Config:                   workflowConfig,
-		UseMemoForDataAttributes: useMemo,
+		IwfWorkflowType:                    req.GetIwfWorkflowType(),
+		IwfWorkerUrl:                       req.GetIwfWorkerUrl(),
+		StartStateId:                       req.StartStateId,
+		StateInput:                         req.GetStateInput(),
+		StateOptions:                       req.GetStateOptions(),
+		InitSearchAttributes:               initCustomSAs,
+		Config:                             workflowConfig,
+		UseMemoForDataAttributes:           useMemo,
+		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
 	}
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
@@ -114,6 +117,37 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(ctx context.Context, req iwfidl.Wor
 
 	return &iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
+	}, nil
+}
+
+func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(ctx context.Context, req iwfidl.WorkflowWaitForStateCompletionRequest) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	workflowId := service.IwfSystemConstPrefix + req.WorkflowId + "_" + req.StateExecutionId
+	options := uclient.StartWorkflowOptions{
+		ID:        workflowId,
+		TaskQueue: s.taskQueue,
+	}
+
+	if req.WaitTimeSeconds != nil {
+		options.WorkflowExecutionTimeout = time.Duration(*req.WaitTimeSeconds) * time.Second
+	}
+
+	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
+	if err != nil {
+		return nil, s.handleError(err)
+	}
+
+	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds, s.config.Api.MaxWaitSeconds)
+	defer cancFunc()
+	var output service.WaitForStateCompletionWorkflowOutput
+	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
+	if getErr != nil {
+		return nil, s.handleError(getErr)
+	}
+
+	return &iwfidl.WorkflowWaitForStateCompletionResponse{
+		StateCompletionOutput: &output.StateCompletionOutput,
 	}, nil
 }
 
@@ -387,7 +421,7 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(ctx context.Context, req iwfidl.Wo
 	if req.GetPageSize() > 0 {
 		pageSize = req.GetPageSize()
 	}
-	resp, err := s.client.ListWorkflow(ctx, &ListWorkflowExecutionsRequest{
+	resp, err := s.client.ListWorkflow(ctx, &uclient.ListWorkflowExecutionsRequest{
 		PageSize:      pageSize,
 		Query:         req.GetQuery(),
 		NextPageToken: []byte(req.GetNextPageToken()),
