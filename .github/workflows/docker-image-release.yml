@@ -27,3 +27,11 @@ jobs:
           push: true
           platforms: linux/arm64,linux/amd64
           tags: iworkflowio/iwf-server:${{ github.event.release.tag_name }}
+      -
+        name: Build and push lite
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          platforms: linux/arm64,linux/amd64
+          tags: iworkflowio/iwf-server:${{ github.event.release.tag_name }}    
+          file: {context}/lite/Dockerfile
