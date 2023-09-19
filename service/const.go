@@ -34,6 +34,7 @@ const (
 	SearchAttributeGlobalVersion     = "IwfGlobalWorkflowVersion"
 	SearchAttributeExecutingStateIds = "IwfExecutingStateIds"
 	SearchAttributeIwfWorkflowType   = "IwfWorkflowType"
+	SearchAttributeIwfFirstRunId     = "IwfFirstRunId"
 
 	BackendTypeCadence  BackendType = "cadence"
 	BackendTypeTemporal BackendType = "temporal"
