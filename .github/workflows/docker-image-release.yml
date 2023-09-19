@@ -33,5 +33,5 @@ jobs:
         with:
           push: true
           platforms: linux/arm64,linux/amd64
-          tags: iworkflowio/iwf-server:${{ github.event.release.tag_name }}    
+          tags: iworkflowio/iwf-server-lite:${{ github.event.release.tag_name }}    
           file: lite/Dockerfile

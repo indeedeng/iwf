@@ -35,5 +35,5 @@ jobs:
         with:
           push: true
           platforms: linux/arm64,linux/amd64
-          tags: iworkflowio/iwf-server:latest
+          tags: iworkflowio/iwf-server-lite:latest
           file: lite/Dockerfile
