@@ -43,6 +43,19 @@ As a coding framework, iWF provides three SDKs to use with:
 
 The iWF SDKs required to run with the server:
 
+## Using all-in-one docker image
+
+Run the docker command to start the container for:
+* IWF service: http://localhost:8801/
+* Temporal WebUI: http://localhost:8233/
+* Temporal service: localhost:7233
+```shell
+docker run -p 8801:8801 -p 7233:7233 -p 8233:8233 -e AUTO_FIX_WORKER_URL=host.docker.internal --add-host host.docker.internal:host-gateway -it iworkflowio/iwf-server-lite:latest
+```
+
+Use `docker pull iworkflowio/iwf-server-lite:latest` to update the latest image.Or update the docker-compose file to specify
+the version tag.
+
 ## Using docker image & docker-compose
 
 This is the simpler(preferred) option to run the server locally for development.
@@ -53,13 +66,10 @@ Checkout this repo, go to the docker-compose folder and run it:
 cd docker-compose && docker-compose up
 ```
 
-This by default will run Temporal server with it.
-And it will also register a `default` Temporal namespace and required search attributes by iWF.
-Link to the Temporal WebUI: http://localhost:8233/namespaces/default/workflows
-
-By default, iWF server is serving port **8801**, server URL is http://localhost:8801/ )
-
-NOTE:
+This by default will run Temporal server with it, again:
+* IWF service: http://localhost:8801/
+* Temporal WebUI: http://localhost:8233/
+* Temporal service: localhost:7233
 
 Use `docker pull iworkflowio/iwf-server:latest` to update the latest image.Or update the docker-compose file to specify
 the version tag.
