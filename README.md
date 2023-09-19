@@ -67,11 +67,7 @@ the version tag.
 ## How to build & run locally
 
 * Run `make bins` to build the binary `iwf-server`
-* Make sure you have registered the system search attributes required by iWF server:
-    * Keyword: IwfWorkflowType
-    * Int: IwfGlobalWorkflowVersion
-    * Keyword: IwfExecutingStateIds
-    * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
+* Make sure you have registered the system search attributes required by iWF server. See [Contribution](./CONTRIBUTING.md) for more detailed commands.
     * For Cadence without advancedVisibility enabled,
       set [disableSystemSearchAttributes](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L8)
       to true

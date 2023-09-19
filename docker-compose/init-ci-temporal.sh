@@ -14,6 +14,8 @@ for run in {1..120}; do
   sleep 1
   temporal  operator search-attribute  create -name IwfWorkflowType -type Keyword
   sleep 0.1
+  temporal  operator search-attribute  create -name IwfFirstRunId -type Keyword
+  sleep 0.1  
   temporal  operator search-attribute  create -name IwfGlobalWorkflowVersion -type Int
   sleep 0.1 
   temporal  operator search-attribute  create -name IwfExecutingStateIds -type KeywordList 
@@ -31,7 +33,7 @@ for run in {1..120}; do
   temporal  operator search-attribute  create -name CustomStringField -type Text
   sleep 0.1
 
-  if checkExists "IwfWorkflowType" ] && checkExists "IwfGlobalWorkflowVersion" && checkExists "IwfExecutingStateIds" && checkExists "CustomKeywordField" && checkExists "CustomIntField" && checkExists "CustomBoolField" && checkExists "CustomDoubleField" && checkExists "CustomDatetimeField" && checkExists "CustomStringField" ] ; then
+  if checkExists "IwfWorkflowType" && checkExists "IwfFirstRunId" && checkExists "IwfGlobalWorkflowVersion" && checkExists "IwfExecutingStateIds" && checkExists "CustomKeywordField" && checkExists "CustomIntField" && checkExists "CustomBoolField" && checkExists "CustomDoubleField" && checkExists "CustomDatetimeField" && checkExists "CustomStringField"; then
     echo "All search attributes are registered"
     break
   fi

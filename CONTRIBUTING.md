@@ -89,6 +89,7 @@ Assuming you are using `default` namespace:
   temporal  operator search-attribute  create -name IwfWorkflowType -type Keyword
   temporal  operator search-attribute  create -name IwfGlobalWorkflowVersion -type Int 
   temporal  operator search-attribute  create -name IwfExecutingStateIds -type KeywordList 
+  temporal  operator search-attribute  create -name IwfFirstRunId -type Keyword
 ```
 
 2. For `persistence_test.go` integTests, you need to register below custom search attributes.
@@ -120,6 +121,7 @@ docker-compose -f docker-compose-es-v7.yml up
 cadence adm cl asa --search_attr_key IwfGlobalWorkflowVersion --search_attr_type 2
 cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_type 1
 cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
+cadence adm cl asa --search_attr_key IwfFirstRunId --search_attr_type 1
 ```
 
 After registering, it may
