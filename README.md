@@ -14,7 +14,7 @@ It offers an orchestration **coding framework** with abstractions for durable ti
 KV storage,  RPC, and message queues. You will build long-running reliable processes faster than ever.
 
 
-# What is [iWF](https://github.com/indeedeng/iwf/wiki/Basic-concepts-overview)
+# What is [iWF](https://github.com/indeedeng/iwf/wiki)
 
 ## Use case study/examples
 * [User sign-up/registry in Python/Java](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-user-signup-workflow)
@@ -53,8 +53,7 @@ Run the docker command to start the container for:
 docker run -p 8801:8801 -p 7233:7233 -p 8233:8233 -e AUTO_FIX_WORKER_URL=host.docker.internal --add-host host.docker.internal:host-gateway -it iworkflowio/iwf-server-lite:latest
 ```
 
-Use `docker pull iworkflowio/iwf-server-lite:latest` to update the latest image.Or update the docker-compose file to specify
-the version tag.
+To update the server version, use `docker pull iworkflowio/iwf-server-lite:latest` to get the latest image. Or change `latest` to specify a version tag.
 
 ## Using docker image & docker-compose
 
@@ -71,8 +70,8 @@ This by default will run Temporal server with it, again:
 * Temporal WebUI: http://localhost:8233/
 * Temporal service: localhost:7233
 
-Use `docker pull iworkflowio/iwf-server:latest` to update the latest image.Or update the docker-compose file to specify
-the version tag.
+To update the server version, use `docker pull iworkflowio/iwf-server:latest` to get the latest image. Or update the docker-compose file to specify
+a version tag.
 
 ## How to build & run locally
 
