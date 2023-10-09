@@ -103,5 +103,11 @@ func doTestStateExecuteApiFailAndProceed(t *testing.T, backendType service.Backe
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.COMPLETED,
+		Results: []iwfidl.StateCompletionOutput{
+			{
+				CompletedStateId:          wf_execute_api_fail_and_proceed.StateRecover,
+				CompletedStateExecutionId: wf_execute_api_fail_and_proceed.StateRecover + "-1",
+			},
+		},
 	}, resp, "response not expected")
 }

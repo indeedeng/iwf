@@ -159,8 +159,13 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData[State31+"received"] = results.GetInterStateChannelResults()[0].GetValue()
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				// old legacy dead end
-				StateDecision: &iwfidl.StateDecision{},
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: service.GracefulCompletingWorkflowStateId,
+						},
+					},
+				},
 			})
 			return
 		}

@@ -113,7 +113,19 @@ func StateApiExecute(
 	if checkHttpError(err, httpResp) {
 		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
+
+	if err = checkStateDecisionFromResponse(resp); err != nil {
+		return nil, composeExecuteApiRespError(provider, err, resp)
+	}
+
 	return resp, nil
+}
+
+func checkStateDecisionFromResponse(resp *iwfidl.WorkflowStateDecideResponse) error {
+	if resp == nil || resp.StateDecision == nil || len(resp.StateDecision.NextStates) == 0 {
+		return fmt.Errorf("empty state decision is no longer supported. If it's from old SDKs then upgrade the SDK to newer versions")
+	}
+	return nil
 }
 
 func printDebugMsg(logger UnifiedLogger, err error, url string) {
@@ -124,6 +136,12 @@ func printDebugMsg(logger UnifiedLogger, err error, url string) {
 }
 
 func composeStartApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
+	respStr, _ := resp.MarshalJSON()
+	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
+		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))
+}
+
+func composeExecuteApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateDecideResponse) error {
 	respStr, _ := resp.MarshalJSON()
 	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
 		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))

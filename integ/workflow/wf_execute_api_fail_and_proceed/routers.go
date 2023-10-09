@@ -1,6 +1,7 @@
 package wf_execute_api_fail_and_proceed
 
 import (
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 
@@ -56,7 +57,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	}
 	if req.WorkflowStateId == StateRecover {
 		if input.GetData() == InputData && input.GetEncoding() == InputDataEncoding {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{})
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: service.GracefulCompletingWorkflowStateId,
+						},
+					},
+				},
+			})
 		} else {
 			panic("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
 		}
