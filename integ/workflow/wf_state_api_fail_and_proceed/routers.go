@@ -1,6 +1,7 @@
 package wf_state_api_fail_and_proceed
 
 import (
+	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 
@@ -60,7 +61,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 	}
-	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{})
+	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+		StateDecision: &iwfidl.StateDecision{
+			NextStates: []iwfidl.StateMovement{
+				{
+					StateId: service.GracefulCompletingWorkflowStateId,
+				},
+			},
+		},
+	})
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
