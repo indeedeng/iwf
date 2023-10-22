@@ -735,8 +735,8 @@ func executeStateDecide(
 		},
 	}, shouldSendSignalOnCompletion, workflowTimeout).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
-	if err == nil && shouldSendSignalOnCompletion && provider.IsReplaying(ctx) {
-		// NOTE: here uses IsReplaying to signalWithStart, to save an activity for this operation
+	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
+		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
 		// this is not a problem because the signalWithStart will be very fast and highly available
 		unifiedClient := env.GetUnifiedClient()
 		err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
