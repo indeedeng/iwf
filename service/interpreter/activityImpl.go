@@ -10,7 +10,6 @@ import (
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/rpc"
@@ -23,7 +22,9 @@ func StateStart(ctx context.Context, backendType service.BackendType, input serv
 	return StateApiWaitUntil(ctx, backendType, input)
 }
 
-func StateApiWaitUntil(ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
+func StateApiWaitUntil(
+	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
+) (*iwfidl.WorkflowStateStartResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateStartActivity", "input", input)
@@ -62,7 +63,8 @@ func StateDecide(
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
 	shouldSendSignalOnCompletion bool,
-	timeout time.Duration) (*iwfidl.WorkflowStateDecideResponse, error) {
+	timeout time.Duration,
+) (*iwfidl.WorkflowStateDecideResponse, error) {
 	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion, timeout)
 }
 
@@ -70,25 +72,9 @@ func StateApiExecute(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	shouldSendSignalOnCompletion bool,
-	timeout time.Duration) (*iwfidl.WorkflowStateDecideResponse, error) {
-	defer func() {
-		if shouldSendSignalOnCompletion {
-			unifiedCleint := env.GetUnifiedClient()
-			err := unifiedCleint.SignalWithStartWaitForStateCompletionWorkflow(
-				ctx, uclient.StartWorkflowOptions{
-					ID:                       service.IwfSystemConstPrefix + input.Request.Context.WorkflowId + "_" + *input.Request.Context.StateExecutionId,
-					TaskQueue:                env.GetTaskQueue(),
-					WorkflowExecutionTimeout: 600 * time.Second, // TODO: make it configurable
-				},
-				iwfidl.StateCompletionOutput{
-					CompletedStateExecutionId: *input.Request.Context.StateExecutionId,
-				})
-			if err != nil {
-				getActivityProviderByType(backendType).GetLogger(ctx).Error("failed to signal on completion", "err", err)
-			}
-		}
-	}()
+	shouldSendSignalOnCompletion bool, // no used anymore, keep for compatibility
+	timeout time.Duration, // no used anymore, keep for compatibility
+) (*iwfidl.WorkflowStateDecideResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)

@@ -96,6 +96,7 @@ type WorkflowProvider interface {
 	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext
 	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future Future)
 	Now(ctx UnifiedContext) time.Time
+	IsReplaying(ctx UnifiedContext) bool
 	Sleep(ctx UnifiedContext, d time.Duration) (err error)
 	NewTimer(ctx UnifiedContext, d time.Duration) Future
 	GetSignalChannel(ctx UnifiedContext, signalName string) (receiveChannel ReceiveChannel)
