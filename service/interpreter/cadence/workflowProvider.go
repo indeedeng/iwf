@@ -197,7 +197,7 @@ func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {
 func (w *workflowProvider) IsReplaying(ctx interpreter.UnifiedContext) bool {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
-		panic("cannot convert to temporal workflow context")
+		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.IsReplaying(wfCtx)
 }
