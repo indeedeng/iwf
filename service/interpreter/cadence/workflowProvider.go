@@ -91,7 +91,9 @@ func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, query
 	return workflow.SetQueryHandler(wfCtx, queryType, handler)
 }
 
-func (w *workflowProvider) SetRpcUpdateHandler(ctx interpreter.UnifiedContext, updateType string, validator interpreter.UnifiedRpcValidator, handler interpreter.UnifiedRpcHandler) error {
+func (w *workflowProvider) SetRpcUpdateHandler(
+	ctx interpreter.UnifiedContext, updateType string, validator interpreter.UnifiedRpcValidator, handler interpreter.UnifiedRpcHandler,
+) error {
 	// NOTE: this feature is not available in Cadence
 	return nil
 }
@@ -190,6 +192,14 @@ func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {
 		panic("cannot convert to cadence workflow context")
 	}
 	return workflow.Now(wfCtx)
+}
+
+func (w *workflowProvider) IsReplaying(ctx interpreter.UnifiedContext) bool {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to cadence workflow context")
+	}
+	return workflow.IsReplaying(wfCtx)
 }
 
 func (w *workflowProvider) Sleep(ctx interpreter.UnifiedContext, d time.Duration) (err error) {

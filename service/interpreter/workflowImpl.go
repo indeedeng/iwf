@@ -1,7 +1,10 @@
 package interpreter
 
 import (
+	"context"
 	"fmt"
+	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
 
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -732,6 +735,25 @@ func executeStateDecide(
 		},
 	}, shouldSendSignalOnCompletion, workflowTimeout).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
+	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
+		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
+		// this is not a problem because the signalWithStart will be very fast and highly available
+		unifiedClient := env.GetUnifiedClient()
+		err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
+			context.Background(),
+			uclient.StartWorkflowOptions{
+				ID:                       service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId,
+				TaskQueue:                env.GetTaskQueue(),
+				WorkflowExecutionTimeout: workflowTimeout,
+			},
+			iwfidl.StateCompletionOutput{
+				CompletedStateExecutionId: *executionContext.StateExecutionId,
+			})
+		if err != nil {
+			// for any reasons this fail, just panic and the workflow task will retry
+			panic(fmt.Errorf("failed to signal on completion %w", err))
+		}
+	}
 	if err != nil {
 		if shouldProceedOnExecuteApiError(state) {
 			return nil, service.ExecuteApiFailedAndProceed, nil

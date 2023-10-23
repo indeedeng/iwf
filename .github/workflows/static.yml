@@ -9,5 +9,7 @@ jobs:
         uses: actions/checkout@v3
       - name: golangci-lint by reviewdog
         uses: reviewdog/action-golangci-lint@v2
+        with:
+          golangci_lint_flags: '--timeout=5m'
       - name: Check code formatting using gofmt
         uses: Jerome1337/gofmt-action@v1.0.5

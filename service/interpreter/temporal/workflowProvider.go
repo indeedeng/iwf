@@ -113,7 +113,9 @@ func (w *workflowProvider) SetQueryHandler(ctx interpreter.UnifiedContext, query
 	return workflow.SetQueryHandler(wfCtx, queryType, handler)
 }
 
-func (w *workflowProvider) SetRpcUpdateHandler(ctx interpreter.UnifiedContext, updateType string, validator interpreter.UnifiedRpcValidator, handler interpreter.UnifiedRpcHandler) error {
+func (w *workflowProvider) SetRpcUpdateHandler(
+	ctx interpreter.UnifiedContext, updateType string, validator interpreter.UnifiedRpcValidator, handler interpreter.UnifiedRpcHandler,
+) error {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
@@ -239,6 +241,14 @@ func (w *workflowProvider) Sleep(ctx interpreter.UnifiedContext, d time.Duration
 		panic("cannot convert to temporal workflow context")
 	}
 	return workflow.Sleep(wfCtx, d)
+}
+
+func (w *workflowProvider) IsReplaying(ctx interpreter.UnifiedContext) bool {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+	return workflow.IsReplaying(wfCtx)
 }
 
 func (w *workflowProvider) GetVersion(ctx interpreter.UnifiedContext, changeID string, minSupported, maxSupported int) int {
