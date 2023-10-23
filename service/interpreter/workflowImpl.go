@@ -751,7 +751,7 @@ func executeStateDecide(
 			})
 		if err != nil {
 			// for any reasons this fail, just panic and the workflow task will retry
-			panic(fmt.Sprintf("failed to signal on completion %w", err))
+			panic(fmt.Errorf("failed to signal on completion %w", err))
 		}
 	}
 	if err != nil {
