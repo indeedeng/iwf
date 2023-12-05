@@ -1,5 +1,6 @@
 # iWF project - main & server repo
 
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](http://iworkflow-slack.work)
 [![Go Reference](https://pkg.go.dev/badge/github.com/indeedeng/iwf.svg)](https://pkg.go.dev/github.com/indeedeng/iwf)
 [![Go Report Card](https://goreportcard.com/badge/github.com/indeedeng/iwf)](https://goreportcard.com/report/github.com/indeedeng/iwf)
 [![Coverage Status](https://codecov.io/github/indeedeng/iwf/coverage.svg?branch=main)](https://app.codecov.io/gh/indeedeng/iwf/branch/main)
@@ -17,6 +18,8 @@ KV storage,  RPC, and message queues. You will build long-running reliable proce
 # What is [iWF](https://github.com/indeedeng/iwf/wiki)
 
 ## Use case study/examples
+* [SAGA pattern](https://medium.com/@qlong/saga-pattern-deep-dive-with-indeed-workflow-engine-b7e82c59e51f?sk=672abd70b0e092d4cda7788276c5a241)
+  * [Java samples](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/money/transfer), [Golang samples](https://github.com/indeedeng/iwf-golang-samples/tree/main/workflows/moneytransfer), [Python samples](https://github.com/indeedeng/iwf-python-samples/tree/main/moneytransfer)
 * [User sign-up/registry in Python/Java](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-user-signup-workflow)
 * [Abstracted microservice orchestration in Java/Golang](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-Microservice-Orchestration)
 * Employer & JobSeeker engagement in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/engagement)
@@ -92,13 +95,21 @@ a version tag.
 
 # Support
 
-For support or any question, please post in our [Discussion](https://github.com/indeedeng/iwf/discussions), or raise an issue.
-If you are interested in helping this project, check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md) page.
-Below is the basic and comprehensive documentation of iWF. There are some more details in the [wiki pages](https://github.com/indeedeng/iwf/wiki).
+Join our Slack channel! [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](http://iworkflow-slack.work)
+
+You can also post in our [Discussion](https://github.com/indeedeng/iwf/discussions), or raise an issue.
+
+# Contributing
+
+Check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md) page.
 
 
 # Posts & Articles & Reference
-
-* [Cadence community spotlight](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/)
-* [A story of iWF](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
+* [Why I created Indeed Workflow Engine](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
+* [Durable Timers in Indeed Workflow Engine](https://medium.com/@qlong/iwf-deep-dive-workflowstate-durable-timer-1-0bb89e6d6fd4?sk=6095e32b5ad677b6ea4f3c604751ece5)
+* Cadence community spotlights
+  * [#1](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/)
+  * [#2](https://cadenceworkflow.io/blog/2023/11/30/community-spotlight-update-november-2023/)
+  * [#3](https://cadenceworkflow.io/blog/2023/08/31/community-spotlight-august-2023/)
 * iWF is an abstracted Temporal [framework](https://github.com/temporalio/awesome-temporal). Same for [Cadence](https://github.com/uber/cadence#cadence).
+* [How ContinueAsNew is built in iWF](https://medium.com/@qlong/guide-to-continueasnew-in-cadence-temporal-workflow-using-iwf-as-an-example-part-1-c24ae5266f07)
