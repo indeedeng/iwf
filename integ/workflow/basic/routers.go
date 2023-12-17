@@ -3,6 +3,7 @@ package basic
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
@@ -26,6 +27,10 @@ func NewHandler() *handler {
 
 // ApiV1WorkflowStartPost - for a workflow
 func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+	val := c.GetHeader(integ.TestHeaderKey)
+	if val != integ.TestHeaderValue {
+		panic("test header not found")
+	}
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -55,6 +60,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+	val := c.GetHeader(integ.TestHeaderKey)
+	if val != integ.TestHeaderValue {
+		panic("test header not found")
+	}
+
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
