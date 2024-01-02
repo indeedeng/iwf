@@ -33,7 +33,7 @@ type (
 		Temporal *TemporalConfig `yaml:"temporal"`
 		// Cadence config is the config to connect to Cadence
 		Cadence                   *CadenceConfig            `yaml:"cadence"`
-		DefaultWorkflowConfig     iwfidl.WorkflowConfig     `json:"defaultWorkflowConfig"`
+		DefaultWorkflowConfig     *iwfidl.WorkflowConfig    `json:"defaultWorkflowConfig"`
 		InterpreterActivityConfig InterpreterActivityConfig `yaml:"interpreterActivityConfig"`
 		VerboseDebug              bool
 		FailAtMemoIncompatibility bool
@@ -88,6 +88,11 @@ type (
 		Encoding string `yaml:"encoding"`
 	}
 )
+
+var DefaultWorkflowConfig = &iwfidl.WorkflowConfig{
+	ContinueAsNewThreshold:       iwfidl.PtrInt32(100),
+	DisableSystemSearchAttribute: iwfidl.PtrBool(true),
+}
 
 // NewConfig returns a new decoded Config struct
 func NewConfig(configPath string) (*Config, error) {
