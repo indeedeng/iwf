@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/signal"
 	"github.com/indeedeng/iwf/service"
+	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -78,7 +79,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	if err != nil {
 		panic(err)
 	}
-	expectedConfig := iwfidl.WorkflowConfig{}
+	expectedConfig := *config2.DefaultWorkflowConfig
 	if config != nil {
 		expectedConfig = *config
 	}
