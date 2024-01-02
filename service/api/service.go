@@ -64,9 +64,14 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		},
 	}
 
-	var initCustomSAs []iwfidl.SearchAttribute
-	workflowConfig := *s.config.Interpreter.DefaultWorkflowConfig
+	var workflowConfig iwfidl.WorkflowConfig
+	if s.config.Interpreter.DefaultWorkflowConfig == nil {
+		workflowConfig = *config.DefaultWorkflowConfig
+	} else {
+		workflowConfig = *s.config.Interpreter.DefaultWorkflowConfig
+	}
 
+	var initCustomSAs []iwfidl.SearchAttribute
 	// workerUrl is always needed, for optimizing None as persistence loading type
 	workflowOptions.Memo = map[string]interface{}{
 		service.WorkerUrlMemoKey: iwfidl.EncodedObject{

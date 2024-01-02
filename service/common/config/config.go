@@ -89,6 +89,11 @@ type (
 	}
 )
 
+var DefaultWorkflowConfig = &iwfidl.WorkflowConfig{
+	ContinueAsNewThreshold:       iwfidl.PtrInt32(100),
+	DisableSystemSearchAttribute: iwfidl.PtrBool(true),
+}
+
 // NewConfig returns a new decoded Config struct
 func NewConfig(configPath string) (*Config, error) {
 	log.Printf("Loading configFile=%v\n", configPath)
@@ -107,12 +112,6 @@ func NewConfig(configPath string) (*Config, error) {
 		return nil, err
 	}
 
-	if config.Interpreter.DefaultWorkflowConfig == nil {
-		config.Interpreter.DefaultWorkflowConfig = &iwfidl.WorkflowConfig{
-			ContinueAsNewThreshold:       iwfidl.PtrInt32(100),
-			DisableSystemSearchAttribute: iwfidl.PtrBool(true),
-		}
-	}
 	return config, nil
 }
 
