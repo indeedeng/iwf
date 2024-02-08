@@ -77,7 +77,9 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 			WorkflowIDReusePolicy:  ptr.Any(iwfidl.REJECT_DUPLICATE),
-			// CronSchedule:          iwfidl.PtrString("* * * * *"),
+			// TODO: need more work to write integ test for cron
+			// manual testing for now by uncomment the following line
+			// CronSchedule:           iwfidl.PtrString("* * * * *"),
 			RetryPolicy: &iwfidl.WorkflowRetryPolicy{
 				InitialIntervalSeconds: iwfidl.PtrInt32(11),
 				BackoffCoefficient:     iwfidl.PtrFloat32(11),
