@@ -29,7 +29,9 @@ type temporalClient struct {
 	memoEncryption bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
 }
 
-func NewTemporalClient(tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool) uclient.UnifiedClient {
+func NewTemporalClient(
+	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool,
+) uclient.UnifiedClient {
 	return &temporalClient{
 		tClient:        tClient,
 		namespace:      namespace,
@@ -81,7 +83,9 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 	return fmt.Errorf("application error doesn't have details. Critical code bug")
 }
 
-func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+func (t *temporalClient) StartInterpreterWorkflow(
+	ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{},
+) (runId string, err error) {
 	memo, err := t.encryptMemoIfNeeded(options.Memo)
 	if err != nil {
 		return "", err
@@ -105,12 +109,33 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options u
 		workflowOptions.WorkflowIDReusePolicy = *workflowIdReusePolicy
 	}
 
-	if options.CronSchedule != nil {
-		workflowOptions.CronSchedule = *options.CronSchedule
-	}
-
 	if options.RetryPolicy != nil {
 		workflowOptions.RetryPolicy = retry.ConvertTemporalWorkflowRetryPolicy(options.RetryPolicy)
+	}
+
+	if options.CronSchedule != nil && *options.CronSchedule != "" {
+		// use temporal schedule instead of cron
+		// https://temporal.io/blog/how-do-i-convert-my-cron-into-a-schedule
+		// workflowOptions.CronSchedule = *options.CronSchedule
+
+		_, err := t.tClient.ScheduleClient().Create(ctx, client.ScheduleOptions{
+			ID: "schedule for workflow: " + options.ID,
+			Spec: client.ScheduleSpec{
+				CronExpressions: []string{*options.CronSchedule},
+			},
+			Action: &client.ScheduleWorkflowAction{
+				ID:                       workflowOptions.ID,
+				TaskQueue:                workflowOptions.TaskQueue,
+				Workflow:                 temporal.Interpreter,
+				Args:                     args,
+				WorkflowExecutionTimeout: workflowOptions.WorkflowExecutionTimeout,
+				RetryPolicy:              workflowOptions.RetryPolicy,
+				Memo:                     workflowOptions.Memo,
+				SearchAttributes:         workflowOptions.SearchAttributes,
+			},
+		})
+
+		return "", err
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)
@@ -120,7 +145,9 @@ func (t *temporalClient) StartInterpreterWorkflow(ctx context.Context, options u
 	return run.GetRunID(), nil
 }
 
-func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions) (runId string, err error) {
+func (t *temporalClient) StartWaitForStateCompletionWorkflow(
+	ctx context.Context, options uclient.StartWorkflowOptions,
+) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                       options.ID,
 		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
@@ -135,7 +162,9 @@ func (t *temporalClient) StartWaitForStateCompletionWorkflow(ctx context.Context
 	return run.GetRunID(), nil
 }
 
-func (t *temporalClient) SignalWithStartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput) error {
+func (t *temporalClient) SignalWithStartWaitForStateCompletionWorkflow(
+	ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput,
+) error {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                       options.ID,
 		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
@@ -150,7 +179,9 @@ func (t *temporalClient) SignalWithStartWaitForStateCompletionWorkflow(ctx conte
 	return nil
 }
 
-func (t *temporalClient) SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error {
+func (t *temporalClient) SignalWorkflow(
+	ctx context.Context, workflowID string, runID string, signalName string, arg interface{},
+) error {
 	return t.tClient.SignalWorkflow(ctx, workflowID, runID, signalName, arg)
 }
 
@@ -169,7 +200,9 @@ func (t *temporalClient) TerminateWorkflow(ctx context.Context, workflowID strin
 	return t.tClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr)
 }
 
-func (t *temporalClient) ListWorkflow(ctx context.Context, request *uclient.ListWorkflowExecutionsRequest) (*uclient.ListWorkflowExecutionsResponse, error) {
+func (t *temporalClient) ListWorkflow(
+	ctx context.Context, request *uclient.ListWorkflowExecutionsRequest,
+) (*uclient.ListWorkflowExecutionsResponse, error) {
 	listReq := &workflowservice.ListWorkflowExecutionsRequest{
 		PageSize:      request.PageSize,
 		Query:         request.Query,
@@ -192,7 +225,9 @@ func (t *temporalClient) ListWorkflow(ctx context.Context, request *uclient.List
 	}, nil
 }
 
-func (t *temporalClient) QueryWorkflow(ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{}) error {
+func (t *temporalClient) QueryWorkflow(
+	ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{},
+) error {
 	qres, err := t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
 	if err != nil {
 		return err
@@ -200,7 +235,9 @@ func (t *temporalClient) QueryWorkflow(ctx context.Context, valuePtr interface{}
 	return qres.Get(valuePtr)
 }
 
-func (t *temporalClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*uclient.DescribeWorkflowExecutionResponse, error) {
+func (t *temporalClient) DescribeWorkflowExecution(
+	ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType,
+) (*uclient.DescribeWorkflowExecutionResponse, error) {
 	resp, err := t.tClient.DescribeWorkflowExecution(ctx, workflowID, runID)
 	if err != nil {
 		return nil, err
@@ -317,12 +354,16 @@ func mapToIwfWorkflowStatus(status enums.WorkflowExecutionStatus) (iwfidl.Workfl
 	}
 }
 
-func (t *temporalClient) GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error {
+func (t *temporalClient) GetWorkflowResult(
+	ctx context.Context, valuePtr interface{}, workflowID string, runID string,
+) error {
 	run := t.tClient.GetWorkflow(ctx, workflowID, runID)
 	return run.Get(ctx, valuePtr)
 }
 
-func (t *temporalClient) SynchronousUpdateWorkflow(ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{}) error {
+func (t *temporalClient) SynchronousUpdateWorkflow(
+	ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
+) error {
 	handle, err := t.tClient.UpdateWorkflow(ctx, workflowID, runID, updateType, input)
 	if err != nil {
 		return err
@@ -330,7 +371,9 @@ func (t *temporalClient) SynchronousUpdateWorkflow(ctx context.Context, valuePtr
 	return handle.Get(context.Background(), valuePtr)
 }
 
-func (t *temporalClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error) {
+func (t *temporalClient) ResetWorkflow(
+	ctx context.Context, request iwfidl.WorkflowResetRequest,
+) (runId string, err error) {
 	reqRunId := request.GetWorkflowRunId()
 	if reqRunId == "" {
 		// set default runId to current

@@ -77,7 +77,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 			WorkflowIDReusePolicy:  ptr.Any(iwfidl.REJECT_DUPLICATE),
-			// CronSchedule:          iwfidl.PtrString("* * * * *"),
+			// CronSchedule:           iwfidl.PtrString("* * * * *"),
 			RetryPolicy: &iwfidl.WorkflowRetryPolicy{
 				InitialIntervalSeconds: iwfidl.PtrInt32(11),
 				BackoffCoefficient:     iwfidl.PtrFloat32(11),
