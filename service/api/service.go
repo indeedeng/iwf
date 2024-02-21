@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
 	"net/http"
 	"os"
@@ -61,6 +62,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		WorkflowExecutionTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
 		SearchAttributes: map[string]interface{}{
 			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
+			service.SearchAttributeGlobalVersion:   versions.MaxOfAllVersions,
 		},
 	}
 
