@@ -14,7 +14,9 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
-func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+func InterpreterImpl(
+	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
+) (*service.InterpreterWorkflowOutput, error) {
 	var err error
 	globalVersioner := NewGlobalVersioner(provider, ctx)
 	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
@@ -314,7 +316,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 }
 
 func checkClosingWorkflow(
-	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
+	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision,
+	currentStateId, currentStateExeId string,
 	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	if decision.HasConditionalClose() {
@@ -467,7 +470,7 @@ func executeState(
 	skipStart := compatibility.GetSkipStartApi(&options)
 	if skipStart {
 		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
+			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 	}
 
 	if isResumeFromContinueAsNew {
@@ -686,7 +689,7 @@ func executeState(
 	}
 
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
+		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
 func executeStateDecide(
 	ctx UnifiedContext,
@@ -702,7 +705,6 @@ func executeStateDecide(
 	executeApi interface{},
 	stateExecutionLocal []iwfidl.KeyValue,
 	shouldSendSignalOnCompletion bool,
-	workflowTimeout time.Duration,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	var err error
 	activityOptions := ActivityOptions{
@@ -733,7 +735,7 @@ func executeStateDecide(
 			DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			StateInput:       state.StateInput,
 		},
-	}, shouldSendSignalOnCompletion, workflowTimeout).Get(ctx, &decideResponse)
+	}, false, 0).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
@@ -744,13 +746,14 @@ func executeStateDecide(
 			uclient.StartWorkflowOptions{
 				ID:                       service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId,
 				TaskQueue:                env.GetTaskQueue(),
-				WorkflowExecutionTimeout: workflowTimeout,
+				WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
 			},
 			iwfidl.StateCompletionOutput{
 				CompletedStateExecutionId: *executionContext.StateExecutionId,
 			})
-		if err != nil {
-			// for any reasons this fail, just panic and the workflow task will retry
+		if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+			// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
+			// panic will let the workflow task will retry until the signal is sent
 			panic(fmt.Errorf("failed to signal on completion %w", err))
 		}
 	}
@@ -818,7 +821,9 @@ func createUserWorkflowError(provider WorkflowProvider, message string) error {
 	)
 }
 
-func WaitForStateCompletionWorkflowImpl(ctx UnifiedContext, provider WorkflowProvider) (*service.WaitForStateCompletionWorkflowOutput, error) {
+func WaitForStateCompletionWorkflowImpl(
+	ctx UnifiedContext, provider WorkflowProvider,
+) (*service.WaitForStateCompletionWorkflowOutput, error) {
 	signalReceiveChannel := provider.GetSignalChannel(ctx, service.StateCompletionSignalChannelName)
 	var signalValue iwfidl.StateCompletionOutput
 	signalReceiveChannel.ReceiveBlocking(ctx, &signalValue)

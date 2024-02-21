@@ -138,14 +138,15 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	options := uclient.StartWorkflowOptions{
 		ID:        workflowId,
 		TaskQueue: s.taskQueue,
-	}
-
-	if req.WaitTimeSeconds != nil {
-		options.WorkflowExecutionTimeout = time.Duration(*req.WaitTimeSeconds) * time.Second
+		// TODO: https://github.com/indeedeng/iwf-java-sdk/issues/218
+		// it doesn't seem to have a way for SDK to know the timeout at this API
+		// So hardcoded to 1 minute for now. If it timeouts, the IDReusePolicy will restart a new one
+		WorkflowExecutionTimeout: 60 * time.Second,
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
 	if err != nil {
+		// TODO fix error handling so that this API can be called again to wait for multiple times
 		return nil, s.handleError(err)
 	}
 
@@ -153,6 +154,15 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	defer cancFunc()
 	var output service.WaitForStateCompletionWorkflowOutput
 	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
+
+	if s.client.IsRequestTimeoutError(getErr) || s.client.IsWorkflowTimeoutError(getErr) {
+		// the workflow is still running, but the wait has exceeded limit
+		return nil, errors.NewErrorAndStatus(
+			service.HttpStatusCodeSpecial4xxError1,
+			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
+			"waiting has exceeded timeout limit, please retry")
+	}
+
 	if getErr != nil {
 		return nil, s.handleError(getErr)
 	}
@@ -375,7 +385,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		return nil, errors.NewErrorAndStatus(
 			service.HttpStatusCodeSpecial4xxError1,
 			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
-			"workflow is still running, waiting has exceeded timeout limit")
+			"workflow is still running, waiting has exceeded timeout limit, please retry")
 	}
 
 	var outputsToReturnWf []iwfidl.StateCompletionOutput

@@ -40,6 +40,10 @@ func (t *cadenceClient) IsNotFoundError(err error) bool {
 	return ok
 }
 
+func (t *cadenceClient) IsWorkflowTimeoutError(err error) bool {
+	return realcadence.IsTimeoutError(err)
+}
+
 func (t *cadenceClient) IsRequestTimeoutError(err error) bool {
 	return errors.Is(err, context.DeadlineExceeded)
 }
@@ -63,7 +67,10 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 	return fmt.Errorf("not an application error. Critical code bug")
 }
 
-func NewCadenceClient(domain string, cClient client.Client, serviceClient workflowserviceclient.Interface, converter encoded.DataConverter, closeFunc func()) uclient.UnifiedClient {
+func NewCadenceClient(
+	domain string, cClient client.Client, serviceClient workflowserviceclient.Interface,
+	converter encoded.DataConverter, closeFunc func(),
+) uclient.UnifiedClient {
 	return &cadenceClient{
 		domain:        domain,
 		cClient:       cClient,
@@ -77,7 +84,9 @@ func (t *cadenceClient) Close() {
 	t.closeFunc()
 }
 
-func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{}) (runId string, err error) {
+func (t *cadenceClient) StartInterpreterWorkflow(
+	ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{},
+) (runId string, err error) {
 	_, ok := options.Memo[service.UseMemoForDataAttributesKey]
 	if ok {
 		return "", fmt.Errorf("using Memo is not supported with Cadence, see https://github.com/uber/cadence/issues/3729")
@@ -114,16 +123,19 @@ func (t *cadenceClient) StartInterpreterWorkflow(ctx context.Context, options uc
 	return run.RunID, nil
 }
 
-func (t *cadenceClient) StartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions) (runId string, err error) {
+func (t *cadenceClient) StartWaitForStateCompletionWorkflow(
+	ctx context.Context, options uclient.StartWorkflowOptions,
+) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
-		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyRejectDuplicate,
-		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout, // TODO, make this configurable
+		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyAllowDuplicateFailedOnly, // the workflow could be timeout, so we allow duplicate
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
 	}
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.WaitforStateCompletionWorkflow)
 	if err != nil {
 		if t.IsWorkflowAlreadyStartedError(err) {
+			// if the workflow is already started, we return the runId
 			return *err.(*shared.WorkflowExecutionAlreadyStartedError).RunId, nil
 		}
 		return "", err
@@ -131,12 +143,14 @@ func (t *cadenceClient) StartWaitForStateCompletionWorkflow(ctx context.Context,
 	return run.RunID, nil
 }
 
-func (t *cadenceClient) SignalWithStartWaitForStateCompletionWorkflow(ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput) error {
+func (t *cadenceClient) SignalWithStartWaitForStateCompletionWorkflow(
+	ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput,
+) error {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
-		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyRejectDuplicate,
-		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout, // TODO, make this configurable
+		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyAllowDuplicateFailedOnly, // the workflow could be timeout, so we allow duplicate
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	_, err := t.cClient.SignalWithStartWorkflow(ctx, options.ID, service.StateCompletionSignalChannelName, stateCompletionOutput, workflowOptions, cadence.WaitforStateCompletionWorkflow)
@@ -146,7 +160,9 @@ func (t *cadenceClient) SignalWithStartWaitForStateCompletionWorkflow(ctx contex
 	return nil
 }
 
-func (t *cadenceClient) SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error {
+func (t *cadenceClient) SignalWorkflow(
+	ctx context.Context, workflowID string, runID string, signalName string, arg interface{},
+) error {
 	return t.cClient.SignalWorkflow(ctx, workflowID, runID, signalName, arg)
 }
 
@@ -165,7 +181,9 @@ func (t *cadenceClient) TerminateWorkflow(ctx context.Context, workflowID string
 	return t.cClient.TerminateWorkflow(ctx, workflowID, runID, reasonStr, nil)
 }
 
-func (t *cadenceClient) ListWorkflow(ctx context.Context, request *uclient.ListWorkflowExecutionsRequest) (*uclient.ListWorkflowExecutionsResponse, error) {
+func (t *cadenceClient) ListWorkflow(
+	ctx context.Context, request *uclient.ListWorkflowExecutionsRequest,
+) (*uclient.ListWorkflowExecutionsResponse, error) {
 	listReq := &shared.ListWorkflowExecutionsRequest{
 		PageSize:      &request.PageSize,
 		Query:         &request.Query,
@@ -188,7 +206,9 @@ func (t *cadenceClient) ListWorkflow(ctx context.Context, request *uclient.ListW
 	}, nil
 }
 
-func (t *cadenceClient) QueryWorkflow(ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{}) error {
+func (t *cadenceClient) QueryWorkflow(
+	ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{},
+) error {
 	qres, err := queryWorkflowWithStrongConsistency(t, ctx, workflowID, runID, queryType, args)
 	if err != nil {
 		return err
@@ -196,7 +216,9 @@ func (t *cadenceClient) QueryWorkflow(ctx context.Context, valuePtr interface{},
 	return qres.Get(valuePtr)
 }
 
-func queryWorkflowWithStrongConsistency(t *cadenceClient, ctx context.Context, workflowID string, runID string, queryType string, args []interface{}) (encoded.Value, error) {
+func queryWorkflowWithStrongConsistency(
+	t *cadenceClient, ctx context.Context, workflowID string, runID string, queryType string, args []interface{},
+) (encoded.Value, error) {
 	queryWorkflowWithOptionsRequest := &client.QueryWorkflowWithOptionsRequest{
 		WorkflowID:            workflowID,
 		RunID:                 runID,
@@ -211,7 +233,9 @@ func queryWorkflowWithStrongConsistency(t *cadenceClient, ctx context.Context, w
 	return result.QueryResult, nil
 }
 
-func (t *cadenceClient) DescribeWorkflowExecution(ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (*uclient.DescribeWorkflowExecutionResponse, error) {
+func (t *cadenceClient) DescribeWorkflowExecution(
+	ctx context.Context, workflowID, runID string, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType,
+) (*uclient.DescribeWorkflowExecutionResponse, error) {
 	resp, err := t.cClient.DescribeWorkflowExecution(ctx, workflowID, runID)
 	if err != nil {
 		return nil, err
@@ -295,16 +319,22 @@ func mapToIwfWorkflowStatus(status *shared.WorkflowExecutionCloseStatus) (iwfidl
 	}
 }
 
-func (t *cadenceClient) GetWorkflowResult(ctx context.Context, valuePtr interface{}, workflowID string, runID string) error {
+func (t *cadenceClient) GetWorkflowResult(
+	ctx context.Context, valuePtr interface{}, workflowID string, runID string,
+) error {
 	run := t.cClient.GetWorkflow(ctx, workflowID, runID)
 	return run.Get(ctx, valuePtr)
 }
 
-func (t *cadenceClient) SynchronousUpdateWorkflow(ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{}) error {
+func (t *cadenceClient) SynchronousUpdateWorkflow(
+	ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
+) error {
 	return fmt.Errorf("not supported in Cadence")
 }
 
-func (t *cadenceClient) ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (newRunId string, err error) {
+func (t *cadenceClient) ResetWorkflow(
+	ctx context.Context, request iwfidl.WorkflowResetRequest,
+) (newRunId string, err error) {
 
 	reqRunId := request.GetWorkflowRunId()
 	if reqRunId == "" {
