@@ -305,6 +305,10 @@ func InterpreterImpl(
 			input.ContinueAsNewInput = service.ContinueAsNewInput{
 				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 			}
+			// nix the unused data
+			input.StateInput = iwfidl.EncodedObject{}
+			input.StateOptions = iwfidl.WorkflowStateOptions{}
+			input.StartStateId = nil
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop
@@ -478,7 +482,15 @@ func executeState(
 		stateExecutionLocal = resumeStateRequest.StateExecutionLocals
 		commandReq = resumeStateRequest.CommandRequest
 		completedCmds := resumeStateRequest.StateExecutionCompletedCommands
-		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds = completedCmds.CompletedTimerCommands, completedCmds.CompletedSignalCommands, completedCmds.CompletedInterStateChannelCommands
+		if completedCmds.CompletedTimerCommands != nil {
+			completedTimerCmds = completedCmds.CompletedTimerCommands
+		}
+		if completedCmds.CompletedSignalCommands != nil {
+			completedSignalCmds = completedCmds.CompletedSignalCommands
+		}
+		if completedCmds.CompletedInterStateChannelCommands != nil {
+			completedInterStateChannelCmds = completedCmds.CompletedInterStateChannelCommands
+		}
 	} else {
 		if state.StateOptions != nil {
 			startApiTimeout := compatibility.GetStartApiTimeoutSeconds(state.StateOptions)
