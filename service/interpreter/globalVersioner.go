@@ -31,7 +31,10 @@ func NewGlobalVersioner(workflowProvider WorkflowProvider, ctx UnifiedContext) (
 		version = workflowProvider.GetVersion(ctx, globalChangeId, 0, versions.MaxOfAllVersions)
 	} else {
 		// TODO: future improvement https://github.com/indeedeng/iwf/issues/369
-		attribute := sas[service.SearchAttributeGlobalVersion]
+		attribute, ok := sas[service.SearchAttributeGlobalVersion]
+		if !ok {
+			panic("search attribute global version is not found")
+		}
 		version = int(attribute.GetIntegerValue())
 		isFromStart = true
 	}

@@ -18,7 +18,11 @@ func InterpreterImpl(
 	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
 ) (*service.InterpreterWorkflowOutput, error) {
 	var err error
-	globalVersioner := NewGlobalVersioner(provider, ctx)
+	globalVersioner, err := NewGlobalVersioner(provider, ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
 		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
