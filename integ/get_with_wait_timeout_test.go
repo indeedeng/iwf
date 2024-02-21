@@ -82,7 +82,7 @@ func doTestWorkflowWithWaitTimeout(t *testing.T, backendType service.BackendType
 	assertions.Nil(err)
 	err = json.Unmarshal(body, &errResp)
 	assertions.Equalf(iwfidl.ErrorResponse{
-		Detail:    ptr.Any("workflow is still running, waiting has exceeded timeout limit"),
+		Detail:    ptr.Any("workflow is still running, waiting has exceeded timeout limit, please retry"),
 		SubStatus: iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS.Ptr(),
 	}, errResp, "body")
 
