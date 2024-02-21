@@ -62,6 +62,10 @@ func (t *temporalClient) IsRequestTimeoutError(err error) bool {
 	return ok
 }
 
+func (t *temporalClient) IsWorkflowTimeoutError(err error) bool {
+	return realtemporal.IsTimeoutError(err)
+}
+
 func (t *temporalClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {
 	var applicationError *realtemporal.ApplicationError
 	isAppErr := errors.As(err, &applicationError)
@@ -150,7 +154,7 @@ func (t *temporalClient) StartWaitForStateCompletionWorkflow(
 ) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                       options.ID,
-		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY, // the workflow could be timeout, so we allow duplicate
+		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE, //ALLOW_DUPLICATE_FAILED_ONLY, // the workflow could be timeout, so we allow duplicate
 		TaskQueue:                options.TaskQueue,
 		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
 	}

@@ -155,12 +155,12 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	var output service.WaitForStateCompletionWorkflowOutput
 	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
 
-	if s.client.IsRequestTimeoutError(getErr) {
+	if s.client.IsRequestTimeoutError(getErr) || s.client.IsWorkflowTimeoutError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit
 		return nil, errors.NewErrorAndStatus(
 			service.HttpStatusCodeSpecial4xxError1,
 			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
-			"waiting has exceeded timeout limit")
+			"waiting has exceeded timeout limit, please retry")
 	}
 
 	if getErr != nil {
@@ -385,7 +385,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		return nil, errors.NewErrorAndStatus(
 			service.HttpStatusCodeSpecial4xxError1,
 			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
-			"workflow is still running, waiting has exceeded timeout limit")
+			"workflow is still running, waiting has exceeded timeout limit, please retry")
 	}
 
 	var outputsToReturnWf []iwfidl.StateCompletionOutput

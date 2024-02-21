@@ -40,6 +40,10 @@ func (t *cadenceClient) IsNotFoundError(err error) bool {
 	return ok
 }
 
+func (t *cadenceClient) IsWorkflowTimeoutError(err error) bool {
+	return realcadence.IsTimeoutError(err)
+}
+
 func (t *cadenceClient) IsRequestTimeoutError(err error) bool {
 	return errors.Is(err, context.DeadlineExceeded)
 }
