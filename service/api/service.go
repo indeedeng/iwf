@@ -138,10 +138,9 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	options := uclient.StartWorkflowOptions{
 		ID:        workflowId,
 		TaskQueue: s.taskQueue,
-	}
-
-	if req.WaitTimeSeconds != nil {
-		options.WorkflowExecutionTimeout = time.Duration(*req.WaitTimeSeconds) * time.Second
+		// TODO: it doesn't seem to have a way for SDK to know the timeout at this API
+		// So hardcoded to 1 minute for now. If it timeouts, the IDReusePolicy will restart a new one
+		WorkflowExecutionTimeout: 60 * time.Second,
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
