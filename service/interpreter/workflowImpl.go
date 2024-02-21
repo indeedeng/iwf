@@ -470,7 +470,7 @@ func executeState(
 	skipStart := compatibility.GetSkipStartApi(&options)
 	if skipStart {
 		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
+			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 	}
 
 	if isResumeFromContinueAsNew {
@@ -689,7 +689,7 @@ func executeState(
 	}
 
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion, info.WorkflowExecutionTimeout)
+		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
 func executeStateDecide(
 	ctx UnifiedContext,
@@ -705,7 +705,6 @@ func executeStateDecide(
 	executeApi interface{},
 	stateExecutionLocal []iwfidl.KeyValue,
 	shouldSendSignalOnCompletion bool,
-	workflowTimeout time.Duration,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	var err error
 	activityOptions := ActivityOptions{
@@ -747,7 +746,7 @@ func executeStateDecide(
 			uclient.StartWorkflowOptions{
 				ID:                       service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId,
 				TaskQueue:                env.GetTaskQueue(),
-				WorkflowExecutionTimeout: workflowTimeout,
+				WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
 			},
 			iwfidl.StateCompletionOutput{
 				CompletedStateExecutionId: *executionContext.StateExecutionId,
