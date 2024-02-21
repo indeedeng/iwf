@@ -119,16 +119,18 @@ type (
 	InternalTimerStatus string
 
 	ContinueAsNewDumpResponse struct {
-		StatesToStartFromBeginning []iwfidl.StateMovement              // StatesToStartFromBeginning means they haven't started in the previous run
-		StateExecutionsToResume    map[string]StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
-		InterStateChannelReceived  map[string][]*iwfidl.EncodedObject
-		SignalsReceived            map[string][]*iwfidl.EncodedObject
-		StateExecutionCounterInfo  StateExecutionCounterInfo
-		StateOutputs               []iwfidl.StateCompletionOutput
-		StaleSkipTimerSignals      []StaleSkipTimerSignal
+		// StatesToStartFromBeginning means they haven't started in the previous run
+		StatesToStartFromBeginning []iwfidl.StateMovement `json:"statesToStartFromBeginning,omitempty"`
+		// stateExeId to StateExecutionResumeInfo
+		StateExecutionsToResume   map[string]StateExecutionResumeInfo `json:"stateExecutionsToResume,omitempty"`
+		InterStateChannelReceived map[string][]*iwfidl.EncodedObject  `json:"interStateChannelReceived,omitempty"`
+		SignalsReceived           map[string][]*iwfidl.EncodedObject  `json:"signalsReceived,omitempty"`
+		StateExecutionCounterInfo StateExecutionCounterInfo
+		StateOutputs              []iwfidl.StateCompletionOutput `json:"stateOutputs,omitempty"`
+		StaleSkipTimerSignals     []StaleSkipTimerSignal         `json:"staleSkipTimerSignals,omitempty"`
 
-		DataObjects      []iwfidl.KeyValue
-		SearchAttributes []iwfidl.SearchAttribute
+		DataObjects      []iwfidl.KeyValue        `json:"dataObjects,omitempty"`
+		SearchAttributes []iwfidl.SearchAttribute `json:"searchAttributes,omitempty"`
 	}
 
 	DebugDumpResponse struct {
@@ -146,13 +148,13 @@ type (
 		State                           iwfidl.StateMovement            `json:"state"`
 		StateExecutionCompletedCommands StateExecutionCompletedCommands `json:"stateExecutionCompletedCommands"`
 		CommandRequest                  iwfidl.CommandRequest           `json:"commandRequest"`
-		StateExecutionLocals            []iwfidl.KeyValue               `json:"stateExecutionLocals"`
+		StateExecutionLocals            []iwfidl.KeyValue               `json:"stateExecutionLocals,omitempty"`
 	}
 
 	StateExecutionCompletedCommands struct {
-		CompletedTimerCommands             map[int]InternalTimerStatus   `json:"completedTimerCommands"`
-		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
-		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
+		CompletedTimerCommands             map[int]InternalTimerStatus   `json:"completedTimerCommands,omitempty"`
+		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands,omitempty"`
+		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands,omitempty"`
 	}
 
 	StaleSkipTimerSignal struct {
@@ -178,7 +180,9 @@ const (
 // ValidateTimerSkipRequest validates if the skip timer request is valid
 // return true if it's valid, along with the timer pointer
 // use timerIdx if timerId is not empty
-func ValidateTimerSkipRequest(stateExeTimerInfos map[string][]*TimerInfo, stateExeId, timerId string, timerIdx int) (*TimerInfo, bool) {
+func ValidateTimerSkipRequest(
+	stateExeTimerInfos map[string][]*TimerInfo, stateExeId, timerId string, timerIdx int,
+) (*TimerInfo, bool) {
 	timerInfos := stateExeTimerInfos[stateExeId]
 	if len(timerInfos) == 0 {
 		return nil, false

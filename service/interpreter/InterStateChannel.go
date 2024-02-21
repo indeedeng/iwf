@@ -14,6 +14,9 @@ func NewInterStateChannel() *InterStateChannel {
 }
 
 func RebuildInterStateChannel(refill map[string][]*iwfidl.EncodedObject) *InterStateChannel {
+	if refill == nil {
+		return NewInterStateChannel()
+	}
 	return &InterStateChannel{
 		receivedData: refill,
 	}
