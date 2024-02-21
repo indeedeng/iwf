@@ -138,7 +138,8 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	options := uclient.StartWorkflowOptions{
 		ID:        workflowId,
 		TaskQueue: s.taskQueue,
-		// TODO: it doesn't seem to have a way for SDK to know the timeout at this API
+		// TODO: https://github.com/indeedeng/iwf-java-sdk/issues/218
+		// it doesn't seem to have a way for SDK to know the timeout at this API
 		// So hardcoded to 1 minute for now. If it timeouts, the IDReusePolicy will restart a new one
 		WorkflowExecutionTimeout: 60 * time.Second,
 	}
