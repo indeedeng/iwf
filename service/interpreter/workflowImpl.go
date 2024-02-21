@@ -14,7 +14,9 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
-func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput) (*service.InterpreterWorkflowOutput, error) {
+func InterpreterImpl(
+	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
+) (*service.InterpreterWorkflowOutput, error) {
 	var err error
 	globalVersioner := NewGlobalVersioner(provider, ctx)
 	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
@@ -314,7 +316,8 @@ func InterpreterImpl(ctx UnifiedContext, provider WorkflowProvider, input servic
 }
 
 func checkClosingWorkflow(
-	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision, currentStateId, currentStateExeId string,
+	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision,
+	currentStateId, currentStateExeId string,
 	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	if decision.HasConditionalClose() {
@@ -733,7 +736,7 @@ func executeStateDecide(
 			DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 			StateInput:       state.StateInput,
 		},
-	}, shouldSendSignalOnCompletion, workflowTimeout).Get(ctx, &decideResponse)
+	}, false, 0).Get(ctx, &decideResponse)
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
@@ -749,8 +752,8 @@ func executeStateDecide(
 			iwfidl.StateCompletionOutput{
 				CompletedStateExecutionId: *executionContext.StateExecutionId,
 			})
-		if err != nil {
-			// for any reasons this fail, just panic and the workflow task will retry
+		if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+			// panic will let the workflow task will retry until the signal is sent
 			panic(fmt.Errorf("failed to signal on completion %w", err))
 		}
 	}
@@ -818,7 +821,9 @@ func createUserWorkflowError(provider WorkflowProvider, message string) error {
 	)
 }
 
-func WaitForStateCompletionWorkflowImpl(ctx UnifiedContext, provider WorkflowProvider) (*service.WaitForStateCompletionWorkflowOutput, error) {
+func WaitForStateCompletionWorkflowImpl(
+	ctx UnifiedContext, provider WorkflowProvider,
+) (*service.WaitForStateCompletionWorkflowOutput, error) {
 	signalReceiveChannel := provider.GetSignalChannel(ctx, service.StateCompletionSignalChannelName)
 	var signalValue iwfidl.StateCompletionOutput
 	signalReceiveChannel.ReceiveBlocking(ctx, &signalValue)

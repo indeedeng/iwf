@@ -146,6 +146,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
 	if err != nil {
+		// TODO fix error handling so that this API can be called again to wait for multiple times
 		return nil, s.handleError(err)
 	}
 
