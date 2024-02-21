@@ -1,6 +1,8 @@
 package interpreter
 
-import "github.com/indeedeng/iwf/service"
+import (
+	"github.com/indeedeng/iwf/service"
+)
 
 const globalChangeId = "global"
 const startingVersionUsingGlobalVersioning = 1
