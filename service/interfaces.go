@@ -1,8 +1,6 @@
 package service
 
 import (
-	"time"
-
 	"github.com/indeedeng/iwf/gen/iwfidl"
 )
 
@@ -16,23 +14,21 @@ type (
 
 		WaitForCompletionStateExecutionIds []string `json:"waitForCompletionStateExecutionIds,omitempty"`
 
-		StateInput iwfidl.EncodedObject `json:"stateInput,omitempty"`
+		StateInput *iwfidl.EncodedObject `json:"stateInput,omitempty"`
 
-		StateOptions iwfidl.WorkflowStateOptions `json:"stateOptions,omitempty"`
+		StateOptions *iwfidl.WorkflowStateOptions `json:"stateOptions,omitempty"`
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
-		UseMemoForDataAttributes bool `json:"useMemoForDataAttributes"`
+		UseMemoForDataAttributes bool `json:"useMemoForDataAttributes,omitempty"`
 
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`
 
 		// IsResumeFromContinueAsNew indicate this is input for continueAsNew
 		// when true, will ignore StartStateId, StateInput, StateOptions, InitSearchAttributes
-		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew"`
+		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew,omitempty"`
 
-		ContinueAsNewInput ContinueAsNewInput `json:"continueAsNewInput"`
-
-		WorkflowExecutionTimeout time.Duration
+		ContinueAsNewInput *ContinueAsNewInput `json:"continueAsNewInput,omitempty"`
 	}
 
 	ContinueAsNewInput struct {
@@ -178,7 +174,9 @@ const (
 // ValidateTimerSkipRequest validates if the skip timer request is valid
 // return true if it's valid, along with the timer pointer
 // use timerIdx if timerId is not empty
-func ValidateTimerSkipRequest(stateExeTimerInfos map[string][]*TimerInfo, stateExeId, timerId string, timerIdx int) (*TimerInfo, bool) {
+func ValidateTimerSkipRequest(
+	stateExeTimerInfos map[string][]*TimerInfo, stateExeId, timerId string, timerIdx int,
+) (*TimerInfo, bool) {
 	timerInfos := stateExeTimerInfos[stateExeId]
 	if len(timerInfos) == 0 {
 		return nil, false
