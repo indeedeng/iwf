@@ -154,6 +154,15 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	defer cancFunc()
 	var output service.WaitForStateCompletionWorkflowOutput
 	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
+
+	if s.client.IsRequestTimeoutError(getErr) {
+		// the workflow is still running, but the wait has exceeded limit
+		return nil, errors.NewErrorAndStatus(
+			service.HttpStatusCodeSpecial4xxError1,
+			iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS,
+			"waiting has exceeded timeout limit")
+	}
+
 	if getErr != nil {
 		return nil, s.handleError(getErr)
 	}
