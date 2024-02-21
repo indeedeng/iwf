@@ -150,13 +150,14 @@ func (t *temporalClient) StartWaitForStateCompletionWorkflow(
 ) (runId string, err error) {
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                       options.ID,
-		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE,
+		WorkflowIDReusePolicy:    enums.WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY, // the workflow could be timeout, so we allow duplicate
 		TaskQueue:                options.TaskQueue,
 		WorkflowExecutionTimeout: options.WorkflowExecutionTimeout,
 	}
 
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.WaitforStateCompletionWorkflow)
 	if err != nil {
+		// because of WorkflowExecutionErrorWhenAlreadyStarted: false, we won't get WorkflowAlreadyStartedError as we do in Cadence
 		return "", err
 	}
 	return run.GetRunID(), nil

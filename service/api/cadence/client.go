@@ -125,12 +125,13 @@ func (t *cadenceClient) StartWaitForStateCompletionWorkflow(
 	workflowOptions := client.StartWorkflowOptions{
 		ID:                           options.ID,
 		TaskList:                     options.TaskQueue,
-		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyRejectDuplicate,
-		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout, // TODO, make this configurable
+		WorkflowIDReusePolicy:        client.WorkflowIDReusePolicyAllowDuplicateFailedOnly, // the workflow could be timeout, so we allow duplicate
+		ExecutionStartToCloseTimeout: options.WorkflowExecutionTimeout,                     // TODO, make this configurable
 	}
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.WaitforStateCompletionWorkflow)
 	if err != nil {
 		if t.IsWorkflowAlreadyStartedError(err) {
+			// if the workflow is already started, we return the runId
 			return *err.(*shared.WorkflowExecutionAlreadyStartedError).RunId, nil
 		}
 		return "", err

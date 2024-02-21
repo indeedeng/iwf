@@ -753,6 +753,7 @@ func executeStateDecide(
 				CompletedStateExecutionId: *executionContext.StateExecutionId,
 			})
 		if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+			// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
 			// panic will let the workflow task will retry until the signal is sent
 			panic(fmt.Errorf("failed to signal on completion %w", err))
 		}
