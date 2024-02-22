@@ -110,8 +110,8 @@ func InterpreterImpl(
 		if input.StartStateId != nil {
 			startingState := iwfidl.StateMovement{
 				StateId:      *input.StartStateId,
-				StateOptions: &input.StateOptions,
-				StateInput:   &input.StateInput,
+				StateOptions: input.StateOptions,
+				StateInput:   input.StateInput,
 			}
 			stateRequestQueue.AddStateStartRequests([]iwfidl.StateMovement{startingState})
 		}
@@ -302,9 +302,13 @@ func InterpreterImpl(
 			// last update config, do it here because we use input to carry over config, not continueAsNewer query
 			input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
 			input.IsResumeFromContinueAsNew = true
-			input.ContinueAsNewInput = service.ContinueAsNewInput{
+			input.ContinueAsNewInput = &service.ContinueAsNewInput{
 				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 			}
+			// nix the unused data
+			input.StateInput = nil
+			input.StateOptions = nil
+			input.StartStateId = nil
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop
