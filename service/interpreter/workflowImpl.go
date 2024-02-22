@@ -305,6 +305,10 @@ func InterpreterImpl(
 			input.ContinueAsNewInput = &service.ContinueAsNewInput{
 				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 			}
+			// nix the unused data
+			input.StateInput = nil
+			input.StateOptions = nil
+			input.StartStateId = nil
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop
