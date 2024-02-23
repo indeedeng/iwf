@@ -36,6 +36,9 @@ func NewGlobalVersioner(workflowProvider WorkflowProvider, ctx UnifiedContext) (
 			panic("search attribute global version is not found")
 		}
 		version = int(attribute.GetIntegerValue())
+		if versions.MaxOfAllVersions < version {
+			panic("requesting for a version that is not supported, panic to retry in next workflow task")
+		}
 		isFromStart = true
 	}
 

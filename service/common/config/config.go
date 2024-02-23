@@ -26,6 +26,9 @@ type (
 		// Port is the port on which the API service will bind to
 		Port           int   `yaml:"port"`
 		MaxWaitSeconds int64 `yaml:"maxWaitSeconds"`
+		// SetVersionAtStart is the flag to set version at startAPI
+		// This is for optimizing the workflow actions(version marker, upsertSearchAttribute)
+		SetVersionAtStart bool `yaml:"setVersionAtStart"`
 	}
 
 	Interpreter struct {

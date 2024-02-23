@@ -96,7 +96,9 @@ func TestPersistenceWorkflowCadenceContinueAsNew(t *testing.T) {
 	}
 }
 
-func doTestPersistenceWorkflow(t *testing.T, backendType service.BackendType, useMemo, memoEncryption bool, config *iwfidl.WorkflowConfig) {
+func doTestPersistenceWorkflow(
+	t *testing.T, backendType service.BackendType, useMemo, memoEncryption bool, config *iwfidl.WorkflowConfig,
+) {
 	assertions := assert.New(t)
 	wfHandler := persistence.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)

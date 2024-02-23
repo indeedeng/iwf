@@ -50,7 +50,10 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 	closeFunc1 := startWorkflowWorker(wfHandler)
 	defer closeFunc1()
 
-	closeFunc2 := startIwfService(backendType)
+	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
+		BackendType:       backendType,
+		SetVersionAtStart: true,
+	})
 	defer closeFunc2()
 
 	// start a workflow

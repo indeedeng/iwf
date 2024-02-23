@@ -56,14 +56,23 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 ) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
+	var sysSAs map[string]interface{}
+	if s.config.Api.SetVersionAtStart {
+		sysSAs = map[string]interface{}{
+			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
+			service.SearchAttributeGlobalVersion:   versions.MaxOfAllVersions,
+		}
+	} else {
+		sysSAs = map[string]interface{}{
+			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
+		}
+	}
+
 	workflowOptions := uclient.StartWorkflowOptions{
 		ID:                       req.GetWorkflowId(),
 		TaskQueue:                s.taskQueue,
 		WorkflowExecutionTimeout: time.Duration(req.WorkflowTimeoutSeconds) * time.Second,
-		SearchAttributes: map[string]interface{}{
-			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
-			service.SearchAttributeGlobalVersion:   versions.MaxOfAllVersions,
-		},
+		SearchAttributes:         sysSAs,
 	}
 
 	var workflowConfig iwfidl.WorkflowConfig
