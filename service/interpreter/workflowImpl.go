@@ -18,7 +18,11 @@ func InterpreterImpl(
 	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
 ) (*service.InterpreterWorkflowOutput, error) {
 	var err error
-	globalVersioner := NewGlobalVersioner(provider, ctx)
+	globalVersioner, err := NewGlobalVersioner(provider, ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
 		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
@@ -70,7 +74,7 @@ func InterpreterImpl(
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
-		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider,
+		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider, globalVersioner,
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
 			workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(previous.StateOutputs)
@@ -82,7 +86,7 @@ func InterpreterImpl(
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
-		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, workflowConfiger, continueAsNewCounter)
+		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, globalVersioner, workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
@@ -177,7 +181,7 @@ func InterpreterImpl(
 					shouldSendSignalOnCompletion := slices.Contains(input.WaitForCompletionStateExecutionIds, stateExeId)
 
 					decision, stateExecStatus, err := executeState(
-						ctx, provider, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
+						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
 						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, shouldSendSignalOnCompletion)
 					if err != nil {
 						// this is the case where stateExecStatus == FailureStateExecutionStatus
@@ -428,6 +432,7 @@ func checkClosingWorkflow(
 func executeState(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
+	globalVersioner *GlobalVersioner,
 	basicInfo service.BasicInfo,
 	stateReq StateRequest,
 	stateExeId string,
@@ -439,7 +444,6 @@ func executeState(
 	continueAsNewCounter *ContinueAsNewCounter,
 	shouldSendSignalOnCompletion bool,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
-	globalVersioner := NewGlobalVersioner(provider, ctx)
 	waitUntilApi := StateStart
 	executeApi := StateDecide
 	if globalVersioner.IsAfterVersionOfRenamedStateApi() {

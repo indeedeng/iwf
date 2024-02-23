@@ -20,7 +20,10 @@ type StateExecutionCounter struct {
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
-func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter) *StateExecutionCounter {
+func NewStateExecutionCounter(
+	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
+	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
+) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                             ctx,
 		provider:                        provider,
@@ -28,13 +31,15 @@ func NewStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider, con
 		stateIdCurrentlyExecutingCounts: make(map[string]int),
 		totalCurrentlyExecutingCount:    0,
 		configer:                        configer,
-		globalVersioner:                 NewGlobalVersioner(provider, ctx),
+		globalVersioner:                 globalVersioner,
 		continueAsNewCounter:            continueAsNewCounter,
 	}
 }
 
-func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
-	stateIdStartedCounts map[string]int, stateIdCurrentlyExecutingCounts map[string]int, totalCurrentlyExecutingCount int,
+func RebuildStateExecutionCounter(
+	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
+	stateIdStartedCounts map[string]int, stateIdCurrentlyExecutingCounts map[string]int,
+	totalCurrentlyExecutingCount int,
 	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{
@@ -44,7 +49,7 @@ func RebuildStateExecutionCounter(ctx UnifiedContext, provider WorkflowProvider,
 		stateIdCurrentlyExecutingCounts: stateIdCurrentlyExecutingCounts,
 		totalCurrentlyExecutingCount:    totalCurrentlyExecutingCount,
 		configer:                        configer,
-		globalVersioner:                 NewGlobalVersioner(provider, ctx),
+		globalVersioner:                 globalVersioner,
 		continueAsNewCounter:            continueAsNewCounter,
 	}
 }

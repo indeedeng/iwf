@@ -84,10 +84,15 @@ type WorkflowProvider interface {
 	NewApplicationError(errType string, details interface{}) error
 	IsApplicationError(err error) bool
 	GetWorkflowInfo(ctx UnifiedContext) WorkflowInfo
+	GetSearchAttributes(
+		ctx UnifiedContext, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType,
+	) (map[string]iwfidl.SearchAttribute, error)
 	UpsertSearchAttributes(ctx UnifiedContext, attributes map[string]interface{}) error
 	UpsertMemo(ctx UnifiedContext, memo map[string]iwfidl.EncodedObject) error
 	SetQueryHandler(ctx UnifiedContext, queryType string, handler interface{}) error
-	SetRpcUpdateHandler(ctx UnifiedContext, updateType string, validator UnifiedRpcValidator, handler UnifiedRpcHandler) error
+	SetRpcUpdateHandler(
+		ctx UnifiedContext, updateType string, validator UnifiedRpcValidator, handler UnifiedRpcHandler,
+	) error
 	ExtendContextWithValue(parent UnifiedContext, key string, val interface{}) UnifiedContext
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	GetThreadCount() int
