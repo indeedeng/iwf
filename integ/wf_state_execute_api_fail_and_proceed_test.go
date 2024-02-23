@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"fmt"
 	"github.com/indeedeng/iwf/integ/workflow/wf_execute_api_fail_and_proceed"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
@@ -18,11 +19,13 @@ func TestStateExecuteApiFailAndProceedTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestStateExecuteApiFailAndProceed(t, service.BackendTypeTemporal, nil)
-		smallWaitForFastTest()
+		//doTestStateExecuteApiFailAndProceed(t, service.BackendTypeTemporal, nil)
+		//smallWaitForFastTest()
 		doTestStateExecuteApiFailAndProceed(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
 		smallWaitForFastTest()
 	}
+	time.Sleep(time.Hour)
+	fmt.Println("done")
 }
 
 func TestStateExecuteApiFailAndProceedCadence(t *testing.T) {

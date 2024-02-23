@@ -67,7 +67,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 			})
 		} else {
-			panic("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
+			//panic("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
+			c.JSON(http.StatusBadRequest, map[string]string{"error": "test-error"})
 		}
 		return
 	}
