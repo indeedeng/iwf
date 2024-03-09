@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"strconv"
@@ -51,8 +52,8 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
-		BackendType:       backendType,
-		SetVersionAtStart: true,
+		BackendType:         backendType,
+		OptimizationVersion: ptr.Any(config2.OptimizationVersionNone),
 	})
 	defer closeFunc2()
 

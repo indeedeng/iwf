@@ -26,9 +26,8 @@ type (
 		// Port is the port on which the API service will bind to
 		Port           int   `yaml:"port"`
 		MaxWaitSeconds int64 `yaml:"maxWaitSeconds"`
-		// SetVersionAtStart is the flag to set version at startAPI
-		// This is for optimizing the workflow actions(version marker, upsertSearchAttribute)
-		SetVersionAtStart bool `yaml:"setVersionAtStart"`
+		// OptimizationVersion is the flag to use optimization
+		OptimizationVersion *int `yaml:"optimizationVersion"`
 	}
 
 	Interpreter struct {
@@ -91,6 +90,17 @@ type (
 		Encoding string `yaml:"encoding"`
 	}
 )
+
+const (
+	OptimizationVersionNone = 0
+	// OptimizationVersionV1 is for optimizing the workflow actions(version marker, upsertSearchAttribute)
+	OptimizationVersionV1      = 1
+	DefaultOptimizationVersion = OptimizationVersionV1
+)
+
+func IsVersioningOptimized(version int) bool {
+	return version >= OptimizationVersionV1
+}
 
 var DefaultWorkflowConfig = &iwfidl.WorkflowConfig{
 	ContinueAsNewThreshold:       iwfidl.PtrInt32(100),
