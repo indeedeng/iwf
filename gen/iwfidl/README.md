@@ -77,24 +77,24 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**ApiV1WorkflowConfigUpdatePost**](docs/DefaultApi.md#apiv1workflowconfigupdatepost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
-*DefaultApi* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultApi.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
-*DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
-*DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
-*DefaultApi* | [**ApiV1WorkflowInternalDumpPost**](docs/DefaultApi.md#apiv1workflowinternaldumppost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
-*DefaultApi* | [**ApiV1WorkflowResetPost**](docs/DefaultApi.md#apiv1workflowresetpost) | **Post** /api/v1/workflow/reset | reset a workflow
-*DefaultApi* | [**ApiV1WorkflowRpcPost**](docs/DefaultApi.md#apiv1workflowrpcpost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
-*DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
-*DefaultApi* | [**ApiV1WorkflowSearchattributesGetPost**](docs/DefaultApi.md#apiv1workflowsearchattributesgetpost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
-*DefaultApi* | [**ApiV1WorkflowSignalPost**](docs/DefaultApi.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
-*DefaultApi* | [**ApiV1WorkflowStartPost**](docs/DefaultApi.md#apiv1workflowstartpost) | **Post** /api/v1/workflow/start | start a workflow
-*DefaultApi* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultApi.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
-*DefaultApi* | [**ApiV1WorkflowStateStartPost**](docs/DefaultApi.md#apiv1workflowstatestartpost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
-*DefaultApi* | [**ApiV1WorkflowStopPost**](docs/DefaultApi.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
-*DefaultApi* | [**ApiV1WorkflowTimerSkipPost**](docs/DefaultApi.md#apiv1workflowtimerskippost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
-*DefaultApi* | [**ApiV1WorkflowWaitForStateCompletionPost**](docs/DefaultApi.md#apiv1workflowwaitforstatecompletionpost) | **Post** /api/v1/workflow/waitForStateCompletion | 
-*DefaultApi* | [**ApiV1WorkflowWorkerRpcPost**](docs/DefaultApi.md#apiv1workflowworkerrpcpost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
-*DefaultApi* | [**InfoHealthcheckGet**](docs/DefaultApi.md#infohealthcheckget) | **Get** /info/healthcheck | return health info of the server
+*DefaultAPI* | [**ApiV1WorkflowConfigUpdatePost**](docs/DefaultAPI.md#apiv1workflowconfigupdatepost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
+*DefaultAPI* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultAPI.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
+*DefaultAPI* | [**ApiV1WorkflowGetPost**](docs/DefaultAPI.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
+*DefaultAPI* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultAPI.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
+*DefaultAPI* | [**ApiV1WorkflowInternalDumpPost**](docs/DefaultAPI.md#apiv1workflowinternaldumppost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
+*DefaultAPI* | [**ApiV1WorkflowResetPost**](docs/DefaultAPI.md#apiv1workflowresetpost) | **Post** /api/v1/workflow/reset | reset a workflow
+*DefaultAPI* | [**ApiV1WorkflowRpcPost**](docs/DefaultAPI.md#apiv1workflowrpcpost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
+*DefaultAPI* | [**ApiV1WorkflowSearchPost**](docs/DefaultAPI.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
+*DefaultAPI* | [**ApiV1WorkflowSearchattributesGetPost**](docs/DefaultAPI.md#apiv1workflowsearchattributesgetpost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
+*DefaultAPI* | [**ApiV1WorkflowSignalPost**](docs/DefaultAPI.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
+*DefaultAPI* | [**ApiV1WorkflowStartPost**](docs/DefaultAPI.md#apiv1workflowstartpost) | **Post** /api/v1/workflow/start | start a workflow
+*DefaultAPI* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultAPI.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
+*DefaultAPI* | [**ApiV1WorkflowStateStartPost**](docs/DefaultAPI.md#apiv1workflowstatestartpost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
+*DefaultAPI* | [**ApiV1WorkflowStopPost**](docs/DefaultAPI.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
+*DefaultAPI* | [**ApiV1WorkflowTimerSkipPost**](docs/DefaultAPI.md#apiv1workflowtimerskippost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
+*DefaultAPI* | [**ApiV1WorkflowWaitForStateCompletionPost**](docs/DefaultAPI.md#apiv1workflowwaitforstatecompletionpost) | **Post** /api/v1/workflow/waitForStateCompletion | 
+*DefaultAPI* | [**ApiV1WorkflowWorkerRpcPost**](docs/DefaultAPI.md#apiv1workflowworkerrpcpost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
+*DefaultAPI* | [**InfoHealthcheckGet**](docs/DefaultAPI.md#infohealthcheckget) | **Get** /info/healthcheck | return health info of the server
 
 
 ## Documentation For Models
