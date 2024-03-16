@@ -29,6 +29,8 @@ type (
 		IsResumeFromContinueAsNew bool `json:"isResumeFromContinueAsNew,omitempty"`
 
 		ContinueAsNewInput *ContinueAsNewInput `json:"continueAsNewInput,omitempty"`
+
+		OptimizationVersion *int `json:"optmn,omitempty"`
 	}
 
 	ContinueAsNewInput struct {

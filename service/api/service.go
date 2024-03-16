@@ -57,7 +57,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
 	var sysSAs map[string]interface{}
-	if s.config.Api.SetVersionAtStart {
+	if config.IsVersioningOptimized(s.config.Api.OptimizationVersion) {
 		sysSAs = map[string]interface{}{
 			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
 			service.SearchAttributeGlobalVersion:   versions.MaxOfAllVersions,
@@ -126,6 +126,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		Config:                             workflowConfig,
 		UseMemoForDataAttributes:           useMemo,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
+		OptimizationVersion:                s.config.Api.OptimizationVersion,
 	}
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
@@ -151,13 +152,12 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 		TaskQueue: s.taskQueue,
 		// TODO: https://github.com/indeedeng/iwf-java-sdk/issues/218
 		// it doesn't seem to have a way for SDK to know the timeout at this API
-		// So hardcoded to 1 minute for now. If it timeouts, the IDReusePolicy will restart a new one
-		WorkflowExecutionTimeout: 60 * time.Second,
+		// So hardcoded to 1 hour for now. If it timeouts, the IDReusePolicy will restart a new one
+		WorkflowExecutionTimeout: 60 * time.Minute,
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
 	if err != nil {
-		// TODO fix error handling so that this API can be called again to wait for multiple times
 		return nil, s.handleError(err)
 	}
 

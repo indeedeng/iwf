@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
 
@@ -18,7 +19,7 @@ func InterpreterImpl(
 	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
 ) (*service.InterpreterWorkflowOutput, error) {
 	var err error
-	globalVersioner, err := NewGlobalVersioner(provider, ctx)
+	globalVersioner, err := NewGlobalVersioner(provider, config.IsVersioningOptimized(input.OptimizationVersion), ctx)
 	if err != nil {
 		return nil, err
 	}

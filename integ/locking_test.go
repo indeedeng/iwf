@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/integ/workflow/locking"
+	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"io/ioutil"
 	"strconv"
@@ -65,6 +66,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
 		BackendType:                      backendType,
 		DisableFailAtMemoIncompatibility: true,
+		OptimizationVersion:              ptr.Any(config2.OptimizationVersionV1),
 	})
 	defer closeFunc2()
 
