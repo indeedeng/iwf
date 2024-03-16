@@ -30,7 +30,7 @@ type (
 
 		ContinueAsNewInput *ContinueAsNewInput `json:"continueAsNewInput,omitempty"`
 
-		OptimizationVersion int `json:"optmn,omitempty"`
+		OptimizationVersion *int `json:"optmn,omitempty"`
 	}
 
 	ContinueAsNewInput struct {

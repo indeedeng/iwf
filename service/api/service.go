@@ -56,13 +56,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 ) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	optimizationVersion := config.DefaultOptimizationVersion
-	if s.config.Api.OptimizationVersion != nil {
-		optimizationVersion = *s.config.Api.OptimizationVersion
-	}
-
 	var sysSAs map[string]interface{}
-	if config.IsVersioningOptimized(optimizationVersion) {
+	if config.IsVersioningOptimized(s.config.Api.OptimizationVersion) {
 		sysSAs = map[string]interface{}{
 			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
 			service.SearchAttributeGlobalVersion:   versions.MaxOfAllVersions,
@@ -131,7 +126,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		Config:                             workflowConfig,
 		UseMemoForDataAttributes:           useMemo,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
-		OptimizationVersion:                optimizationVersion,
+		OptimizationVersion:                s.config.Api.OptimizationVersion,
 	}
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)

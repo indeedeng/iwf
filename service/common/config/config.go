@@ -92,14 +92,14 @@ type (
 )
 
 const (
+	// OptimizationVersionNone is not doing any optimization. This is the default optimization version
 	OptimizationVersionNone = 0
 	// OptimizationVersionV1 is for optimizing the workflow actions(version marker, upsertSearchAttribute)
-	OptimizationVersionV1      = 1
-	DefaultOptimizationVersion = OptimizationVersionV1
+	OptimizationVersionV1 = 1
 )
 
-func IsVersioningOptimized(version int) bool {
-	return version >= OptimizationVersionV1
+func IsVersioningOptimized(version *int) bool {
+	return version != nil && *version >= OptimizationVersionV1
 }
 
 var DefaultWorkflowConfig = &iwfidl.WorkflowConfig{

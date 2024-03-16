@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"fmt"
+	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/timeparser"
 	"log"
@@ -105,8 +106,9 @@ func doTestPersistenceWorkflow(
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
-		BackendType:    backendType,
-		MemoEncryption: memoEncryption,
+		BackendType:         backendType,
+		MemoEncryption:      memoEncryption,
+		OptimizationVersion: ptr.Any(config2.OptimizationVersionV1),
 	})
 	defer closeFunc2()
 
