@@ -436,9 +436,9 @@ components:
       example:
         stringValue: stringValue
         valueType: null
-        integerValue: 1
+        integerValue: 6
         boolValue: true
-        doubleValue: 6.84685269835264
+        doubleValue: 7.457744773683766
         stringArrayValue:
         - stringArrayValue
         - stringArrayValue
@@ -486,9 +486,9 @@ components:
     WorkflowRetryPolicy:
       example:
         maximumAttempts: 1
-        initialIntervalSeconds: 4
+        initialIntervalSeconds: 7
         maximumIntervalSeconds: 1
-        backoffCoefficient: 7.386282
+        backoffCoefficient: 1.2315135
       properties:
         initialIntervalSeconds:
           type: integer
@@ -616,31 +616,32 @@ components:
       type: object
     WorkflowStartOptions:
       example:
+        workflowStartDelaySeconds: 4
         retryPolicy:
           maximumAttempts: 1
-          initialIntervalSeconds: 4
+          initialIntervalSeconds: 7
           maximumIntervalSeconds: 1
-          backoffCoefficient: 7.386282
+          backoffCoefficient: 1.2315135
         workflowConfigOverride:
           disableSystemSearchAttribute: true
-          continueAsNewThreshold: 7
-          continueAsNewPageSizeInBytes: 1
+          continueAsNewThreshold: 1
+          continueAsNewPageSizeInBytes: 4
         idReusePolicy: null
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -653,6 +654,9 @@ components:
           $ref: '#/components/schemas/WorkflowIDReusePolicy'
         cronSchedule:
           type: string
+        workflowStartDelaySeconds:
+          format: int32
+          type: integer
         retryPolicy:
           $ref: '#/components/schemas/WorkflowRetryPolicy'
         searchAttributes:
@@ -818,31 +822,32 @@ components:
             backoffCoefficient: 5.637377
         iwfWorkflowType: iwfWorkflowType
         workflowStartOptions:
+          workflowStartDelaySeconds: 4
           retryPolicy:
             maximumAttempts: 1
-            initialIntervalSeconds: 4
+            initialIntervalSeconds: 7
             maximumIntervalSeconds: 1
-            backoffCoefficient: 7.386282
+            backoffCoefficient: 1.2315135
           workflowConfigOverride:
             disableSystemSearchAttribute: true
-            continueAsNewThreshold: 7
-            continueAsNewPageSizeInBytes: 1
+            continueAsNewThreshold: 1
+            continueAsNewPageSizeInBytes: 4
           idReusePolicy: null
           searchAttributes:
           - stringValue: stringValue
             valueType: null
-            integerValue: 1
+            integerValue: 6
             boolValue: true
-            doubleValue: 6.84685269835264
+            doubleValue: 7.457744773683766
             stringArrayValue:
             - stringArrayValue
             - stringArrayValue
             key: key
           - stringValue: stringValue
             valueType: null
-            integerValue: 1
+            integerValue: 6
             boolValue: true
-            doubleValue: 6.84685269835264
+            doubleValue: 7.457744773683766
             stringArrayValue:
             - stringArrayValue
             - stringArrayValue
@@ -999,18 +1004,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1267,18 +1272,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1334,8 +1339,8 @@ components:
       example:
         workflowConfig:
           disableSystemSearchAttribute: true
-          continueAsNewThreshold: 7
-          continueAsNewPageSizeInBytes: 1
+          continueAsNewThreshold: 1
+          continueAsNewPageSizeInBytes: 4
         workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
@@ -1430,18 +1435,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1486,18 +1491,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1705,18 +1710,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1862,18 +1867,18 @@ components:
         searchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -1923,18 +1928,18 @@ components:
         upsertSearchAttributes:
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
           key: key
         - stringValue: stringValue
           valueType: null
-          integerValue: 1
+          integerValue: 6
           boolValue: true
-          doubleValue: 6.84685269835264
+          doubleValue: 7.457744773683766
           stringArrayValue:
           - stringArrayValue
           - stringArrayValue
@@ -2650,8 +2655,8 @@ components:
     WorkflowConfig:
       example:
         disableSystemSearchAttribute: true
-        continueAsNewThreshold: 7
-        continueAsNewPageSizeInBytes: 1
+        continueAsNewThreshold: 1
+        continueAsNewPageSizeInBytes: 4
       properties:
         disableSystemSearchAttribute:
           type: boolean
