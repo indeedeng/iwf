@@ -17,10 +17,16 @@ import (
 )
 
 func TestStartDelayTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
 	doTestStartDelay(t, service.BackendTypeTemporal, nil)
 }
 
 func TestStartDelayCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
 	doTestStartDelay(t, service.BackendTypeCadence, nil)
 }
 
