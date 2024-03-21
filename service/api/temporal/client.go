@@ -142,6 +142,10 @@ func (t *temporalClient) StartInterpreterWorkflow(
 		return "", err
 	}
 
+	if options.WorkflowStartDelay != nil {
+		workflowOptions.StartDelay = *options.WorkflowStartDelay
+	}
+
 	run, err := t.tClient.ExecuteWorkflow(ctx, workflowOptions, temporal.Interpreter, args...)
 	if err != nil {
 		return "", err

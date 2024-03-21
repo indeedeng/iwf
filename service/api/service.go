@@ -114,6 +114,10 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 				Data: iwfidl.PtrString("true"),
 			}
 		}
+		if startOptions.WorkflowStartDelaySeconds != nil {
+			workflowOptions.WorkflowStartDelay =
+				ptr.Any(time.Duration(*startOptions.WorkflowStartDelaySeconds) * time.Second)
+		}
 	}
 
 	input := service.InterpreterWorkflowInput{

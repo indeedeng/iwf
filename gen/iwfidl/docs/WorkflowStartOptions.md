@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowIDReusePolicy** | Pointer to [**WorkflowIDReusePolicy**](WorkflowIDReusePolicy.md) |  | [optional] 
 **CronSchedule** | Pointer to **string** |  | [optional] 
+**WorkflowStartDelaySeconds** | Pointer to **int32** |  | [optional] 
 **RetryPolicy** | Pointer to [**WorkflowRetryPolicy**](WorkflowRetryPolicy.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **WorkflowConfigOverride** | Pointer to [**WorkflowConfig**](WorkflowConfig.md) |  | [optional] 
@@ -80,6 +81,31 @@ SetCronSchedule sets CronSchedule field to given value.
 `func (o *WorkflowStartOptions) HasCronSchedule() bool`
 
 HasCronSchedule returns a boolean if a field has been set.
+
+### GetWorkflowStartDelaySeconds
+
+`func (o *WorkflowStartOptions) GetWorkflowStartDelaySeconds() int32`
+
+GetWorkflowStartDelaySeconds returns the WorkflowStartDelaySeconds field if non-nil, zero value otherwise.
+
+### GetWorkflowStartDelaySecondsOk
+
+`func (o *WorkflowStartOptions) GetWorkflowStartDelaySecondsOk() (*int32, bool)`
+
+GetWorkflowStartDelaySecondsOk returns a tuple with the WorkflowStartDelaySeconds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWorkflowStartDelaySeconds
+
+`func (o *WorkflowStartOptions) SetWorkflowStartDelaySeconds(v int32)`
+
+SetWorkflowStartDelaySeconds sets WorkflowStartDelaySeconds field to given value.
+
+### HasWorkflowStartDelaySeconds
+
+`func (o *WorkflowStartOptions) HasWorkflowStartDelaySeconds() bool`
+
+HasWorkflowStartDelaySeconds returns a boolean if a field has been set.
 
 ### GetRetryPolicy
 

@@ -19,13 +19,14 @@ var _ MappedNullable = &WorkflowStartOptions{}
 
 // WorkflowStartOptions struct for WorkflowStartOptions
 type WorkflowStartOptions struct {
-	WorkflowIDReusePolicy    *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
-	CronSchedule             *string                `json:"cronSchedule,omitempty"`
-	RetryPolicy              *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
-	SearchAttributes         []SearchAttribute      `json:"searchAttributes,omitempty"`
-	WorkflowConfigOverride   *WorkflowConfig        `json:"workflowConfigOverride,omitempty"`
-	IdReusePolicy            *IDReusePolicy         `json:"idReusePolicy,omitempty"`
-	UseMemoForDataAttributes *bool                  `json:"useMemoForDataAttributes,omitempty"`
+	WorkflowIDReusePolicy     *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
+	CronSchedule              *string                `json:"cronSchedule,omitempty"`
+	WorkflowStartDelaySeconds *int32                 `json:"workflowStartDelaySeconds,omitempty"`
+	RetryPolicy               *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
+	SearchAttributes          []SearchAttribute      `json:"searchAttributes,omitempty"`
+	WorkflowConfigOverride    *WorkflowConfig        `json:"workflowConfigOverride,omitempty"`
+	IdReusePolicy             *IDReusePolicy         `json:"idReusePolicy,omitempty"`
+	UseMemoForDataAttributes  *bool                  `json:"useMemoForDataAttributes,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -107,6 +108,38 @@ func (o *WorkflowStartOptions) HasCronSchedule() bool {
 // SetCronSchedule gets a reference to the given string and assigns it to the CronSchedule field.
 func (o *WorkflowStartOptions) SetCronSchedule(v string) {
 	o.CronSchedule = &v
+}
+
+// GetWorkflowStartDelaySeconds returns the WorkflowStartDelaySeconds field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetWorkflowStartDelaySeconds() int32 {
+	if o == nil || IsNil(o.WorkflowStartDelaySeconds) {
+		var ret int32
+		return ret
+	}
+	return *o.WorkflowStartDelaySeconds
+}
+
+// GetWorkflowStartDelaySecondsOk returns a tuple with the WorkflowStartDelaySeconds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartOptions) GetWorkflowStartDelaySecondsOk() (*int32, bool) {
+	if o == nil || IsNil(o.WorkflowStartDelaySeconds) {
+		return nil, false
+	}
+	return o.WorkflowStartDelaySeconds, true
+}
+
+// HasWorkflowStartDelaySeconds returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasWorkflowStartDelaySeconds() bool {
+	if o != nil && !IsNil(o.WorkflowStartDelaySeconds) {
+		return true
+	}
+
+	return false
+}
+
+// SetWorkflowStartDelaySeconds gets a reference to the given int32 and assigns it to the WorkflowStartDelaySeconds field.
+func (o *WorkflowStartOptions) SetWorkflowStartDelaySeconds(v int32) {
+	o.WorkflowStartDelaySeconds = &v
 }
 
 // GetRetryPolicy returns the RetryPolicy field value if set, zero value otherwise.
@@ -284,6 +317,9 @@ func (o WorkflowStartOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.CronSchedule) {
 		toSerialize["cronSchedule"] = o.CronSchedule
+	}
+	if !IsNil(o.WorkflowStartDelaySeconds) {
+		toSerialize["workflowStartDelaySeconds"] = o.WorkflowStartDelaySeconds
 	}
 	if !IsNil(o.RetryPolicy) {
 		toSerialize["retryPolicy"] = o.RetryPolicy

@@ -116,6 +116,10 @@ func (t *cadenceClient) StartInterpreterWorkflow(
 		workflowOptions.RetryPolicy = retry.ConvertCadenceWorkflowRetryPolicy(options.RetryPolicy)
 	}
 
+	if options.WorkflowStartDelay != nil {
+		workflowOptions.DelayStart = *options.WorkflowStartDelay
+	}
+
 	run, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.Interpreter, args...)
 	if err != nil {
 		return "", err

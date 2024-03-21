@@ -53,6 +53,7 @@ type StartWorkflowOptions struct {
 	RetryPolicy              *iwfidl.WorkflowRetryPolicy
 	SearchAttributes         map[string]interface{}
 	Memo                     map[string]interface{}
+	WorkflowStartDelay       *time.Duration
 }
 
 type ListWorkflowExecutionsRequest struct {
