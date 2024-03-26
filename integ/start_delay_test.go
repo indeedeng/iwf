@@ -2,15 +2,12 @@ package integ
 
 import (
 	"context"
-	"github.com/indeedeng/iwf/cmd/server/iwf"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/basic"
 	"github.com/indeedeng/iwf/service"
 	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
-	"go.temporal.io/sdk/client"
-	rawLog "log"
 	"strconv"
 	"testing"
 	"time"
@@ -93,56 +90,18 @@ func doTestStartDelay(t *testing.T, backendType service.BackendType, config *iwf
 	}
 
 	timeSentReq := time.Now()
-
-	resp, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
+	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(5 * time.Second)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	var delay time.Duration
-	if backendType == service.BackendTypeTemporal {
-		temporalClient, err := client.Dial(client.Options{})
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer temporalClient.Close()
-
-		describeResp, err := temporalClient.DescribeWorkflowExecution(context.Background(), wfId, *resp.WorkflowRunId)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if describeResp.WorkflowExecutionInfo.GetStartTime() == nil {
-			t.Fatal("start time is nil")
-		}
-
-		delay = describeResp.WorkflowExecutionInfo.GetExecutionTime().Sub(timeSentReq)
-	} else {
-		serviceClient, closeFunc, err := iwf.BuildCadenceServiceClient("localhost:7833")
-		if err != nil {
-			rawLog.Fatalf("Unable to connect to Cadence because of error %v", err)
-		}
-		defer closeFunc()
-
-		cadenceClient, err := iwf.BuildCadenceClient(serviceClient, "default")
-		if err != nil {
-			rawLog.Fatalf("Unable to connect to Cadence because of error %v", err)
-		}
-
-		describeResp, err := cadenceClient.DescribeWorkflowExecution(context.Background(), wfId, *resp.WorkflowRunId)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if describeResp.GetWorkflowExecutionInfo().ExecutionTime == nil {
-			t.Fatal("start time is nil")
-		}
-
-		delay = time.Unix(0, describeResp.GetWorkflowExecutionInfo().GetExecutionTime()).Sub(timeSentReq)
-	}
+	// here the delay is startDelay + execution time period, and the execution time period is negligible
+	delay := time.Since(timeSentReq)
 
 	assertions := assert.New(t)
 	assertions.True(delay.Seconds() > 8, "delay is %v", delay)
