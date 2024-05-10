@@ -76,6 +76,16 @@ func WorkflowID(workflowID string) Tag {
 	return newStringTag("wf-id", workflowID)
 }
 
+// StatusCode returns tag for StatusCode
+func StatusCode(code int) Tag {
+	return newInt("statusCode", code)
+}
+
+// SubStatus returns tag for SubStatus
+func SubStatus(status string) Tag {
+	return newStringTag("subStatus", status)
+}
+
 // WorkflowType returns tag for WorkflowType
 func WorkflowType(wfType string) Tag {
 	return newStringTag("wf-type", wfType)
