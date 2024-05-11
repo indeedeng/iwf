@@ -5,7 +5,6 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/basic"
 	"github.com/indeedeng/iwf/service"
-	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 	"strconv"
@@ -35,7 +34,7 @@ func doTestStartDelay(t *testing.T, backendType service.BackendType, config *iwf
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
 		BackendType:         backendType,
-		OptimizationVersion: ptr.Any(config2.OptimizationVersionNone),
+		OptimizedVersioning: ptr.Any(false),
 	})
 	defer closeFunc2()
 
