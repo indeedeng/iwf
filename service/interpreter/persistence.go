@@ -18,7 +18,9 @@ type PersistenceManager struct {
 	useMemo bool
 }
 
-func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute, useMemo bool) *PersistenceManager {
+func NewPersistenceManager(
+	provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute, useMemo bool,
+) *PersistenceManager {
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
 	for _, sa := range initSearchAttributes {
 		searchAttributes[sa.GetKey()] = sa
@@ -35,7 +37,8 @@ func NewPersistenceManager(provider WorkflowProvider, initSearchAttributes []iwf
 	}
 }
 
-func RebuildPersistenceManager(provider WorkflowProvider,
+func RebuildPersistenceManager(
+	provider WorkflowProvider,
 	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
 	useMemo bool,
 ) *PersistenceManager {
@@ -80,7 +83,9 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 	}
 }
 
-func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.SearchAttribute {
+func (am *PersistenceManager) LoadSearchAttributes(
+	ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
+) []iwfidl.SearchAttribute {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
@@ -90,12 +95,12 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 			partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
 		}
 
-		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedSearchAttributeKeys, loadingPolicy.GetLockingKeys())
 		}
 	}
 
-	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
+	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
 		return am.GetAllSearchAttributes()
 	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		var res []iwfidl.SearchAttribute
@@ -116,7 +121,9 @@ func (am *PersistenceManager) LoadSearchAttributes(ctx UnifiedContext, loadingPo
 	}
 }
 
-func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy) []iwfidl.KeyValue {
+func (am *PersistenceManager) LoadDataObjects(
+	ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
+) []iwfidl.KeyValue {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
 	if loadingPolicy != nil {
@@ -126,12 +133,12 @@ func (am *PersistenceManager) LoadDataObjects(ctx UnifiedContext, loadingPolicy 
 			partialLoadingKeys = utils.MergeStringSlice(loadingPolicy.PartialLoadingKeys, loadingPolicy.LockingKeys)
 		}
 
-		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
 			am.awaitAndLockForKeys(ctx, am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
 		}
 	}
 
-	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING {
+	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
 		return am.GetAllDataObjects()
 	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
 		res := am.GetDataObjectsByKey(service.GetDataObjectsQueryRequest{
@@ -161,7 +168,9 @@ func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 	return res
 }
 
-func (am *PersistenceManager) ProcessUpsertSearchAttribute(ctx UnifiedContext, attributes []iwfidl.SearchAttribute) error {
+func (am *PersistenceManager) ProcessUpsertSearchAttribute(
+	ctx UnifiedContext, attributes []iwfidl.SearchAttribute,
+) error {
 	if len(attributes) == 0 {
 		return nil
 	}
@@ -232,12 +241,18 @@ func (am *PersistenceManager) unlockKeys(lockedKeys map[string]bool, keysToUnloc
 	}
 }
 
-func (am *PersistenceManager) UnlockPersistence(saPolicy *iwfidl.PersistenceLoadingPolicy, daPolicy *iwfidl.PersistenceLoadingPolicy) {
-	if saPolicy != nil && saPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+func (am *PersistenceManager) UnlockPersistence(
+	saPolicy *iwfidl.PersistenceLoadingPolicy, daPolicy *iwfidl.PersistenceLoadingPolicy,
+) {
+	if saPolicy != nil &&
+		(saPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK ||
+			saPolicy.GetPersistenceLoadingType() == iwfidl.ALL_WITH_PARTIAL_LOCK) {
 		am.unlockKeys(am.lockedSearchAttributeKeys, saPolicy.GetLockingKeys())
 	}
 
-	if daPolicy != nil && daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+	if daPolicy != nil &&
+		(daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK ||
+			saPolicy.GetPersistenceLoadingType() == iwfidl.ALL_WITH_PARTIAL_LOCK) {
 		am.unlockKeys(am.lockedDataObjectKeys, daPolicy.GetLockingKeys())
 	}
 }
