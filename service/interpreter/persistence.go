@@ -252,7 +252,7 @@ func (am *PersistenceManager) UnlockPersistence(
 
 	if daPolicy != nil &&
 		(daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK ||
-			saPolicy.GetPersistenceLoadingType() == iwfidl.ALL_WITH_PARTIAL_LOCK) {
+			daPolicy.GetPersistenceLoadingType() == iwfidl.ALL_WITH_PARTIAL_LOCK) {
 		am.unlockKeys(am.lockedDataObjectKeys, daPolicy.GetLockingKeys())
 	}
 }
