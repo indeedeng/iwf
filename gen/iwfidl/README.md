@@ -92,6 +92,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowStateStartPost**](docs/DefaultApi.md#apiv1workflowstatestartpost) | **Post** /api/v1/workflowState/start | for invoking WorkflowState.start API
 *DefaultApi* | [**ApiV1WorkflowStopPost**](docs/DefaultApi.md#apiv1workflowstoppost) | **Post** /api/v1/workflow/stop | stop a workflow
 *DefaultApi* | [**ApiV1WorkflowTimerSkipPost**](docs/DefaultApi.md#apiv1workflowtimerskippost) | **Post** /api/v1/workflow/timer/skip | skip the timer of a workflow
+*DefaultApi* | [**ApiV1WorkflowTriggerContinueAsNewPost**](docs/DefaultApi.md#apiv1workflowtriggercontinueasnewpost) | **Post** /api/v1/workflow/triggerContinueAsNew | trigger ContinueAsNew for a workflow
 *DefaultApi* | [**ApiV1WorkflowWaitForStateCompletionPost**](docs/DefaultApi.md#apiv1workflowwaitforstatecompletionpost) | **Post** /api/v1/workflow/waitForStateCompletion | 
 *DefaultApi* | [**ApiV1WorkflowWorkerRpcPost**](docs/DefaultApi.md#apiv1workflowworkerrpcpost) | **Post** /api/v1/workflowWorker/rpc | for invoking workflow RPC API in the worker
 *DefaultApi* | [**InfoHealthcheckGet**](docs/DefaultApi.md#infohealthcheckget) | **Get** /info/healthcheck | return health info of the server
@@ -131,6 +132,7 @@ Class | Method | HTTP request | Description
  - [TimerCommand](docs/TimerCommand.md)
  - [TimerResult](docs/TimerResult.md)
  - [TimerStatus](docs/TimerStatus.md)
+ - [TriggerContinueAsNewRequest](docs/TriggerContinueAsNewRequest.md)
  - [WaitUntilApiFailurePolicy](docs/WaitUntilApiFailurePolicy.md)
  - [WorkerErrorResponse](docs/WorkerErrorResponse.md)
  - [WorkflowConditionalClose](docs/WorkflowConditionalClose.md)

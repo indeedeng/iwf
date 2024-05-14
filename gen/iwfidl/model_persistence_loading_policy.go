@@ -22,6 +22,7 @@ type PersistenceLoadingPolicy struct {
 	PersistenceLoadingType *PersistenceLoadingType `json:"persistenceLoadingType,omitempty"`
 	PartialLoadingKeys     []string                `json:"partialLoadingKeys,omitempty"`
 	LockingKeys            []string                `json:"lockingKeys,omitempty"`
+	UseKeyAsPrefix         *bool                   `json:"useKeyAsPrefix,omitempty"`
 }
 
 // NewPersistenceLoadingPolicy instantiates a new PersistenceLoadingPolicy object
@@ -137,6 +138,38 @@ func (o *PersistenceLoadingPolicy) SetLockingKeys(v []string) {
 	o.LockingKeys = v
 }
 
+// GetUseKeyAsPrefix returns the UseKeyAsPrefix field value if set, zero value otherwise.
+func (o *PersistenceLoadingPolicy) GetUseKeyAsPrefix() bool {
+	if o == nil || IsNil(o.UseKeyAsPrefix) {
+		var ret bool
+		return ret
+	}
+	return *o.UseKeyAsPrefix
+}
+
+// GetUseKeyAsPrefixOk returns a tuple with the UseKeyAsPrefix field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PersistenceLoadingPolicy) GetUseKeyAsPrefixOk() (*bool, bool) {
+	if o == nil || IsNil(o.UseKeyAsPrefix) {
+		return nil, false
+	}
+	return o.UseKeyAsPrefix, true
+}
+
+// HasUseKeyAsPrefix returns a boolean if a field has been set.
+func (o *PersistenceLoadingPolicy) HasUseKeyAsPrefix() bool {
+	if o != nil && !IsNil(o.UseKeyAsPrefix) {
+		return true
+	}
+
+	return false
+}
+
+// SetUseKeyAsPrefix gets a reference to the given bool and assigns it to the UseKeyAsPrefix field.
+func (o *PersistenceLoadingPolicy) SetUseKeyAsPrefix(v bool) {
+	o.UseKeyAsPrefix = &v
+}
+
 func (o PersistenceLoadingPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o PersistenceLoadingPolicy) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.LockingKeys) {
 		toSerialize["lockingKeys"] = o.LockingKeys
+	}
+	if !IsNil(o.UseKeyAsPrefix) {
+		toSerialize["useKeyAsPrefix"] = o.UseKeyAsPrefix
 	}
 	return toSerialize, nil
 }

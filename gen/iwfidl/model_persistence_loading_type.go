@@ -24,6 +24,7 @@ const (
 	PARTIAL_WITHOUT_LOCKING     PersistenceLoadingType = "LOAD_PARTIAL_WITHOUT_LOCKING"
 	PARTIAL_WITH_EXCLUSIVE_LOCK PersistenceLoadingType = "LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK"
 	NONE                        PersistenceLoadingType = "LOAD_NONE"
+	ALL_WITH_PARTIAL_LOCK       PersistenceLoadingType = "LOAD_ALL_WITH_PARTIAL_LOCK"
 )
 
 // All allowed values of PersistenceLoadingType enum
@@ -32,6 +33,7 @@ var AllowedPersistenceLoadingTypeEnumValues = []PersistenceLoadingType{
 	"LOAD_PARTIAL_WITHOUT_LOCKING",
 	"LOAD_PARTIAL_WITH_EXCLUSIVE_LOCK",
 	"LOAD_NONE",
+	"LOAD_ALL_WITH_PARTIAL_LOCK",
 }
 
 func (v *PersistenceLoadingType) UnmarshalJSON(src []byte) error {

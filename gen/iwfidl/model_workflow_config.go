@@ -19,9 +19,11 @@ var _ MappedNullable = &WorkflowConfig{}
 
 // WorkflowConfig struct for WorkflowConfig
 type WorkflowConfig struct {
-	DisableSystemSearchAttribute *bool  `json:"disableSystemSearchAttribute,omitempty"`
-	ContinueAsNewThreshold       *int32 `json:"continueAsNewThreshold,omitempty"`
-	ContinueAsNewPageSizeInBytes *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
+	DisableSystemSearchAttribute      *bool  `json:"disableSystemSearchAttribute,omitempty"`
+	EnabledExecutingStateExecutionIds *bool  `json:"enabledExecutingStateExecutionIds,omitempty"`
+	ContinueAsNewThreshold            *int32 `json:"continueAsNewThreshold,omitempty"`
+	ContinueAsNewPageSizeInBytes      *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
+	OptimizeActivity                  *bool  `json:"optimizeActivity,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -71,6 +73,38 @@ func (o *WorkflowConfig) HasDisableSystemSearchAttribute() bool {
 // SetDisableSystemSearchAttribute gets a reference to the given bool and assigns it to the DisableSystemSearchAttribute field.
 func (o *WorkflowConfig) SetDisableSystemSearchAttribute(v bool) {
 	o.DisableSystemSearchAttribute = &v
+}
+
+// GetEnabledExecutingStateExecutionIds returns the EnabledExecutingStateExecutionIds field value if set, zero value otherwise.
+func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIds() bool {
+	if o == nil || IsNil(o.EnabledExecutingStateExecutionIds) {
+		var ret bool
+		return ret
+	}
+	return *o.EnabledExecutingStateExecutionIds
+}
+
+// GetEnabledExecutingStateExecutionIdsOk returns a tuple with the EnabledExecutingStateExecutionIds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIdsOk() (*bool, bool) {
+	if o == nil || IsNil(o.EnabledExecutingStateExecutionIds) {
+		return nil, false
+	}
+	return o.EnabledExecutingStateExecutionIds, true
+}
+
+// HasEnabledExecutingStateExecutionIds returns a boolean if a field has been set.
+func (o *WorkflowConfig) HasEnabledExecutingStateExecutionIds() bool {
+	if o != nil && !IsNil(o.EnabledExecutingStateExecutionIds) {
+		return true
+	}
+
+	return false
+}
+
+// SetEnabledExecutingStateExecutionIds gets a reference to the given bool and assigns it to the EnabledExecutingStateExecutionIds field.
+func (o *WorkflowConfig) SetEnabledExecutingStateExecutionIds(v bool) {
+	o.EnabledExecutingStateExecutionIds = &v
 }
 
 // GetContinueAsNewThreshold returns the ContinueAsNewThreshold field value if set, zero value otherwise.
@@ -137,6 +171,38 @@ func (o *WorkflowConfig) SetContinueAsNewPageSizeInBytes(v int32) {
 	o.ContinueAsNewPageSizeInBytes = &v
 }
 
+// GetOptimizeActivity returns the OptimizeActivity field value if set, zero value otherwise.
+func (o *WorkflowConfig) GetOptimizeActivity() bool {
+	if o == nil || IsNil(o.OptimizeActivity) {
+		var ret bool
+		return ret
+	}
+	return *o.OptimizeActivity
+}
+
+// GetOptimizeActivityOk returns a tuple with the OptimizeActivity field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowConfig) GetOptimizeActivityOk() (*bool, bool) {
+	if o == nil || IsNil(o.OptimizeActivity) {
+		return nil, false
+	}
+	return o.OptimizeActivity, true
+}
+
+// HasOptimizeActivity returns a boolean if a field has been set.
+func (o *WorkflowConfig) HasOptimizeActivity() bool {
+	if o != nil && !IsNil(o.OptimizeActivity) {
+		return true
+	}
+
+	return false
+}
+
+// SetOptimizeActivity gets a reference to the given bool and assigns it to the OptimizeActivity field.
+func (o *WorkflowConfig) SetOptimizeActivity(v bool) {
+	o.OptimizeActivity = &v
+}
+
 func (o WorkflowConfig) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -150,11 +216,17 @@ func (o WorkflowConfig) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DisableSystemSearchAttribute) {
 		toSerialize["disableSystemSearchAttribute"] = o.DisableSystemSearchAttribute
 	}
+	if !IsNil(o.EnabledExecutingStateExecutionIds) {
+		toSerialize["enabledExecutingStateExecutionIds"] = o.EnabledExecutingStateExecutionIds
+	}
 	if !IsNil(o.ContinueAsNewThreshold) {
 		toSerialize["continueAsNewThreshold"] = o.ContinueAsNewThreshold
 	}
 	if !IsNil(o.ContinueAsNewPageSizeInBytes) {
 		toSerialize["continueAsNewPageSizeInBytes"] = o.ContinueAsNewPageSizeInBytes
+	}
+	if !IsNil(o.OptimizeActivity) {
+		toSerialize["optimizeActivity"] = o.OptimizeActivity
 	}
 	return toSerialize, nil
 }

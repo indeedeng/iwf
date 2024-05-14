@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **PersistenceLoadingType** | Pointer to [**PersistenceLoadingType**](PersistenceLoadingType.md) |  | [optional] 
 **PartialLoadingKeys** | Pointer to **[]string** |  | [optional] 
 **LockingKeys** | Pointer to **[]string** |  | [optional] 
+**UseKeyAsPrefix** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -101,6 +102,31 @@ SetLockingKeys sets LockingKeys field to given value.
 `func (o *PersistenceLoadingPolicy) HasLockingKeys() bool`
 
 HasLockingKeys returns a boolean if a field has been set.
+
+### GetUseKeyAsPrefix
+
+`func (o *PersistenceLoadingPolicy) GetUseKeyAsPrefix() bool`
+
+GetUseKeyAsPrefix returns the UseKeyAsPrefix field if non-nil, zero value otherwise.
+
+### GetUseKeyAsPrefixOk
+
+`func (o *PersistenceLoadingPolicy) GetUseKeyAsPrefixOk() (*bool, bool)`
+
+GetUseKeyAsPrefixOk returns a tuple with the UseKeyAsPrefix field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUseKeyAsPrefix
+
+`func (o *PersistenceLoadingPolicy) SetUseKeyAsPrefix(v bool)`
+
+SetUseKeyAsPrefix sets UseKeyAsPrefix field to given value.
+
+### HasUseKeyAsPrefix
+
+`func (o *PersistenceLoadingPolicy) HasUseKeyAsPrefix() bool`
+
+HasUseKeyAsPrefix returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

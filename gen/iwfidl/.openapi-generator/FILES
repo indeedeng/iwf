@@ -39,6 +39,7 @@ docs/StateMovement.md
 docs/TimerCommand.md
 docs/TimerResult.md
 docs/TimerStatus.md
+docs/TriggerContinueAsNewRequest.md
 docs/WaitUntilApiFailurePolicy.md
 docs/WorkerErrorResponse.md
 docs/WorkflowConditionalClose.md
@@ -116,6 +117,7 @@ model_state_movement.go
 model_timer_command.go
 model_timer_result.go
 model_timer_status.go
+model_trigger_continue_as_new_request.go
 model_wait_until_api_failure_policy.go
 model_worker_error_response.go
 model_workflow_conditional_close.go

@@ -705,7 +705,8 @@ func (s *serviceImpl) handleRpcBySynchronousUpdate(
 }
 
 func doNeedLocking(policy *iwfidl.PersistenceLoadingPolicy) bool {
-	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
+	if policy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK ||
+		policy.GetPersistenceLoadingType() == iwfidl.ALL_WITH_PARTIAL_LOCK {
 		return true
 	}
 	return false
