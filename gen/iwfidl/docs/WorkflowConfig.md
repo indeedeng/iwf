@@ -5,8 +5,10 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DisableSystemSearchAttribute** | Pointer to **bool** |  | [optional] 
+**EnabledExecutingStateExecutionIds** | Pointer to **bool** |  | [optional] 
 **ContinueAsNewThreshold** | Pointer to **int32** |  | [optional] 
 **ContinueAsNewPageSizeInBytes** | Pointer to **int32** |  | [optional] 
+**OptimizeActivity** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -51,6 +53,31 @@ SetDisableSystemSearchAttribute sets DisableSystemSearchAttribute field to given
 `func (o *WorkflowConfig) HasDisableSystemSearchAttribute() bool`
 
 HasDisableSystemSearchAttribute returns a boolean if a field has been set.
+
+### GetEnabledExecutingStateExecutionIds
+
+`func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIds() bool`
+
+GetEnabledExecutingStateExecutionIds returns the EnabledExecutingStateExecutionIds field if non-nil, zero value otherwise.
+
+### GetEnabledExecutingStateExecutionIdsOk
+
+`func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIdsOk() (*bool, bool)`
+
+GetEnabledExecutingStateExecutionIdsOk returns a tuple with the EnabledExecutingStateExecutionIds field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetEnabledExecutingStateExecutionIds
+
+`func (o *WorkflowConfig) SetEnabledExecutingStateExecutionIds(v bool)`
+
+SetEnabledExecutingStateExecutionIds sets EnabledExecutingStateExecutionIds field to given value.
+
+### HasEnabledExecutingStateExecutionIds
+
+`func (o *WorkflowConfig) HasEnabledExecutingStateExecutionIds() bool`
+
+HasEnabledExecutingStateExecutionIds returns a boolean if a field has been set.
 
 ### GetContinueAsNewThreshold
 
@@ -101,6 +128,31 @@ SetContinueAsNewPageSizeInBytes sets ContinueAsNewPageSizeInBytes field to given
 `func (o *WorkflowConfig) HasContinueAsNewPageSizeInBytes() bool`
 
 HasContinueAsNewPageSizeInBytes returns a boolean if a field has been set.
+
+### GetOptimizeActivity
+
+`func (o *WorkflowConfig) GetOptimizeActivity() bool`
+
+GetOptimizeActivity returns the OptimizeActivity field if non-nil, zero value otherwise.
+
+### GetOptimizeActivityOk
+
+`func (o *WorkflowConfig) GetOptimizeActivityOk() (*bool, bool)`
+
+GetOptimizeActivityOk returns a tuple with the OptimizeActivity field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOptimizeActivity
+
+`func (o *WorkflowConfig) SetOptimizeActivity(v bool)`
+
+SetOptimizeActivity sets OptimizeActivity field to given value.
+
+### HasOptimizeActivity
+
+`func (o *WorkflowConfig) HasOptimizeActivity() bool`
+
+HasOptimizeActivity returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
