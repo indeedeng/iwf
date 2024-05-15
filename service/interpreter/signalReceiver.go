@@ -20,9 +20,13 @@ type SignalReceiver struct {
 	persistenceManager         *PersistenceManager
 }
 
-func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interStateChannel *InterStateChannel, stateRequestQueue *StateRequestQueue,
-	persistenceManager *PersistenceManager, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter, workflowConfiger *WorkflowConfiger,
-	initReceivedSignals map[string][]*iwfidl.EncodedObject) *SignalReceiver {
+func NewSignalReceiver(
+	ctx UnifiedContext, provider WorkflowProvider, interStateChannel *InterStateChannel,
+	stateRequestQueue *StateRequestQueue,
+	persistenceManager *PersistenceManager, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter,
+	workflowConfiger *WorkflowConfiger,
+	initReceivedSignals map[string][]*iwfidl.EncodedObject,
+) *SignalReceiver {
 	if initReceivedSignals == nil {
 		initReceivedSignals = map[string][]*iwfidl.EncodedObject{}
 	}
@@ -108,6 +112,26 @@ func NewSignalReceiver(ctx UnifiedContext, provider WorkflowProvider, interState
 				return
 			}
 		}
+	})
+
+	provider.GoNamed(ctx, "trigger-continue-as-new-handler", func(ctx UnifiedContext) {
+		// NOTE: unlike other signal channels, this one doesn't need to drain during continueAsNew
+		// because if there is a continueAsNew, this signal is not needed anymore
+		ch := provider.GetSignalChannel(ctx, service.TriggerContinueAsNewSignalChannelName)
+
+		received := false
+		err := provider.Await(ctx, func() bool {
+			received = ch.ReceiveAsync(nil)
+			return received || continueAsNewCounter.IsThresholdMet()
+		})
+		if err != nil {
+			return
+		}
+		if received {
+			continueAsNewCounter.TriggerByAPI()
+			return
+		}
+		return
 	})
 
 	provider.GoNamed(ctx, "execute-rpc-signal-handler", func(ctx UnifiedContext) {

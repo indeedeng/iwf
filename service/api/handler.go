@@ -144,6 +144,23 @@ func (h *handler) apiV1WorkflowConfigUpdate(c *gin.Context) {
 	return
 }
 
+func (h *handler) apiV1WorkflowTriggerContinueAsNew(c *gin.Context) {
+	var req iwfidl.TriggerContinueAsNewRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+
+	errResp := h.svc.ApiV1WorkflowTriggerContinueAsNew(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, struct{}{})
+	return
+}
+
 func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 	var req iwfidl.WorkflowSearchRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

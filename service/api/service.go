@@ -213,6 +213,19 @@ func (s *serviceImpl) ApiV1WorkflowConfigUpdate(
 	return nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowTriggerContinueAsNew(
+	ctx context.Context, req iwfidl.TriggerContinueAsNewRequest,
+) (retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	err := s.client.SignalWorkflow(ctx,
+		req.GetWorkflowId(), req.GetWorkflowRunId(), service.TriggerContinueAsNewSignalChannelName, nil)
+	if err != nil {
+		return s.handleError(err, WorkflowTriggerContinueAsNewApiPath, req.GetWorkflowId())
+	}
+	return nil
+}
+
 func (s *serviceImpl) ApiV1WorkflowStopPost(
 	ctx context.Context, req iwfidl.WorkflowStopRequest,
 ) (retError *errors.ErrorAndStatus) {
