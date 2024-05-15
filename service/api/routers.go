@@ -20,6 +20,7 @@ const WorkflowSkipTimerApiPath = "/api/v1/workflow/timer/skip"
 const WorkflowStopApiPath = "/api/v1/workflow/stop"
 const WorkflowInternalDumpApiPath = "/api/v1/workflow/internal/dump"
 const WorkflowConfigUpdateApiPath = "/api/v1/workflow/config/update"
+const WorkflowTriggerContinueAsNewApiPath = "/api/v1/workflow/triggerContinueAsNew"
 const WorkflowRpcApiPath = "/api/v1/workflow/rpc"
 const InfoHealthCheck = "/info/healthcheck"
 
@@ -43,6 +44,7 @@ func NewService(config config.Config, client uclient.UnifiedClient, logger log.L
 	router.POST(WorkflowSkipTimerApiPath, handler.apiV1WorkflowSkipTimer)
 	router.POST(WorkflowInternalDumpApiPath, handler.apiV1WorkflowInternalDump)
 	router.POST(WorkflowConfigUpdateApiPath, handler.apiV1WorkflowConfigUpdate)
+	router.POST(WorkflowTriggerContinueAsNewApiPath, handler.apiV1WorkflowTriggerContinueAsNew)
 	router.POST(WorkflowRpcApiPath, handler.apiV1WorkflowRpc)
 	router.GET(InfoHealthCheck, handler.infoHealthCheck)
 

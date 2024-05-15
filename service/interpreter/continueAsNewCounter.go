@@ -4,13 +4,16 @@ type ContinueAsNewCounter struct {
 	executedStateApis  int32
 	signalsReceived    int32
 	syncUpdateReceived int32
+	triggeredByAPI     bool
 
 	configer *WorkflowConfiger
 	rootCtx  UnifiedContext
 	provider WorkflowProvider
 }
 
-func NewContinueAsCounter(configer *WorkflowConfiger, rootCtx UnifiedContext, provider WorkflowProvider) *ContinueAsNewCounter {
+func NewContinueAsCounter(
+	configer *WorkflowConfiger, rootCtx UnifiedContext, provider WorkflowProvider,
+) *ContinueAsNewCounter {
 	return &ContinueAsNewCounter{
 		configer: configer,
 
@@ -35,6 +38,10 @@ func (c *ContinueAsNewCounter) IncSyncUpdateReceived() {
 }
 
 func (c *ContinueAsNewCounter) IsThresholdMet() bool {
+	if c.triggeredByAPI {
+		return true
+	}
+
 	// Note: when threshold == 0, it means unlimited
 
 	config := c.configer.Get()
@@ -44,4 +51,8 @@ func (c *ContinueAsNewCounter) IsThresholdMet() bool {
 	totalOperations := c.signalsReceived + c.executedStateApis + c.syncUpdateReceived
 
 	return totalOperations >= config.GetContinueAsNewThreshold()
+}
+
+func (c *ContinueAsNewCounter) TriggerByAPI() {
+	c.triggeredByAPI = true
 }
