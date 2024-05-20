@@ -560,6 +560,11 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 			RecordEvents:                resp.RecordEvents,
 			InterStateChannelPublishing: resp.PublishToInterStateChannel,
 		}
+		if s.config.Api.OmitRpcInputOutputInHistory != nil && *s.config.Api.OmitRpcInputOutputInHistory {
+			// the input/output is only for debugging purpose but could be too expensive to store
+			sigVal.RpcInput = nil
+			sigVal.RpcOutput = nil
+		}
 		err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
 		if err != nil {
 			return nil, s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
