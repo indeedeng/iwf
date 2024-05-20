@@ -250,23 +250,24 @@ func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) e
 }
 
 func (w *workflowProvider) ExecuteActivity(
-	optimizeByLocalActivity bool,
+	valuePtr interface{}, optimizeByLocalActivity bool,
 	ctx interpreter.UnifiedContext, activity interface{}, args ...interface{},
-) (future interpreter.Future) {
+) (err error) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
 	if optimizeByLocalActivity {
 		f := workflow.ExecuteLocalActivity(wfCtx, activity, args...)
-		//return &futureImpl{
-		//	future: f,
-		//}
+		err = f.Get(wfCtx, valuePtr)
+		if err != nil {
+			f = workflow.ExecuteActivity(wfCtx, activity, args...)
+			return f.Get(wfCtx, valuePtr)
+		}
+		return err
 	}
 	f := workflow.ExecuteActivity(wfCtx, activity, args...)
-	return &futureImpl{
-		future: f,
-	}
+	return f.Get(wfCtx, valuePtr)
 }
 
 func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {

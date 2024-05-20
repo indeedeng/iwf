@@ -106,7 +106,7 @@ func NewSignalReceiver(
 			}
 			if received {
 				continueAsNewCounter.IncSignalsReceived()
-				workflowConfiger.SetIfPresent(val.WorkflowConfig)
+				workflowConfiger.UpdateByAPI(val.WorkflowConfig)
 			} else {
 				// NOTE: continueAsNew will wait for all threads to complete, so we must stop this thread for continueAsNew when no more signals to process
 				return
@@ -275,7 +275,7 @@ func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
 						val := iwfidl.WorkflowConfigUpdateRequest{}
 						ok := ch.ReceiveAsync(&val)
 						if ok {
-							sr.workflowConfiger.SetIfPresent(val.WorkflowConfig)
+							sr.workflowConfiger.UpdateByAPI(val.WorkflowConfig)
 						} else {
 							break
 						}

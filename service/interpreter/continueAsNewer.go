@@ -27,7 +27,8 @@ type ContinueAsNewer struct {
 func NewContinueAsNewer(
 	provider WorkflowProvider,
 	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
-	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector, timerProcessor *TimerProcessor,
+	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector,
+	timerProcessor *TimerProcessor,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		provider: provider,
@@ -44,7 +45,9 @@ func NewContinueAsNewer(
 	}
 }
 
-func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider, previousRunId string, continueAsNewPageSizeInBytes int32) (*service.ContinueAsNewDumpResponse, error) {
+func LoadInternalsFromPreviousRun(
+	ctx UnifiedContext, provider WorkflowProvider, previousRunId string, continueAsNewPageSizeInBytes int32,
+) (*service.ContinueAsNewDumpResponse, error) {
 	activityOptions := ActivityOptions{
 		StartToCloseTimeout: 5 * time.Second,
 		RetryPolicy: &iwfidl.RetryPolicy{
@@ -71,13 +74,13 @@ func LoadInternalsFromPreviousRun(ctx UnifiedContext, provider WorkflowProvider,
 	pageNum := int32(0)
 	for {
 		var resp iwfidl.WorkflowDumpResponse
-		err := provider.ExecuteActivity(ctx, DumpWorkflowInternal, provider.GetBackendType(),
+		err := provider.ExecuteActivity(&resp, false, ctx, DumpWorkflowInternal, provider.GetBackendType(),
 			iwfidl.WorkflowDumpRequest{
 				WorkflowId:      workflowId,
 				WorkflowRunId:   previousRunId,
 				PageNum:         pageNum,
 				PageSizeInBytes: pageSize,
-			}).Get(ctx, &resp)
+			})
 		if err != nil {
 			return nil, err
 		}
@@ -124,8 +127,10 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 }
 
 func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(
-	stateExecutionId string, state iwfidl.StateMovement, stateExecLocals []iwfidl.KeyValue, commandRequest iwfidl.CommandRequest,
-	completedTimerCommands map[int]service.InternalTimerStatus, completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
+	stateExecutionId string, state iwfidl.StateMovement, stateExecLocals []iwfidl.KeyValue,
+	commandRequest iwfidl.CommandRequest,
+	completedTimerCommands map[int]service.InternalTimerStatus,
+	completedSignalCommands, completedInterStateChannelCommands map[int]*iwfidl.EncodedObject,
 ) {
 	c.StateExecutionToResumeMap[stateExecutionId] = service.StateExecutionResumeInfo{
 		StateExecutionId:     stateExecutionId,
