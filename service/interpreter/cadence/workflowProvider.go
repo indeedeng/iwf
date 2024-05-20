@@ -202,6 +202,7 @@ func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) e
 }
 
 func (w *workflowProvider) ExecuteActivity(
+	optimizeByLocalActivity bool,
 	ctx interpreter.UnifiedContext, activity interface{}, args ...interface{},
 ) (future interpreter.Future) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
