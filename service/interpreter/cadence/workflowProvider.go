@@ -225,7 +225,7 @@ func (w *workflowProvider) ExecuteActivity(
 		}
 		return err
 	}
-	
+
 	f := workflow.ExecuteActivity(wfCtx, activity, args...)
 	return f.Get(wfCtx, valuePtr)
 }
