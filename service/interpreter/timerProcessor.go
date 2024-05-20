@@ -14,7 +14,9 @@ type TimerProcessor struct {
 	logger                          UnifiedLogger
 }
 
-func NewTimerProcessor(ctx UnifiedContext, provider WorkflowProvider, staleSkipTimerSignals []service.StaleSkipTimerSignal) *TimerProcessor {
+func NewTimerProcessor(
+	ctx UnifiedContext, provider WorkflowProvider, staleSkipTimerSignals []service.StaleSkipTimerSignal,
+) *TimerProcessor {
 	tp := &TimerProcessor{
 		provider:                        provider,
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
@@ -79,7 +81,9 @@ func removeElement(s []service.StaleSkipTimerSignal, i int) []service.StaleSkipT
 // WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
 // return true when the timer is fired or skipped
 // return false if the waitingCommands is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
-func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) service.InternalTimerStatus {
+func (t *TimerProcessor) WaitForTimerFiredOrSkipped(
+	ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool,
+) service.InternalTimerStatus {
 	timerInfos := t.stateExecutionCurrentTimerInfos[stateExeId]
 	if len(timerInfos) == 0 {
 		if *cancelWaiting {
@@ -100,10 +104,7 @@ func (t *TimerProcessor) WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExe
 		t.logger.Warn("timer skipped by stale skip signal", stateExeId, timerIdx)
 		return service.TimerSkipped
 	}
-	now := t.provider.Now(ctx).Unix()
-	fireAt := timer.FiringUnixTimestampSeconds
-	duration := time.Duration(fireAt-now) * time.Second
-	future := t.provider.NewTimer(ctx, duration)
+	future := t.provider.NewTimer(ctx, time.Second*time.Duration(timer.DurationSeconds))
 	_ = t.provider.Await(ctx, func() bool {
 		return future.IsReady() || timer.Status == service.TimerSkipped || *cancelWaiting
 	})
@@ -122,21 +123,33 @@ func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-func (t *TimerProcessor) AddTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]service.InternalTimerStatus) {
+func (t *TimerProcessor) AddTimers(
+	ctx UnifiedContext, stateExeId string, commands []iwfidl.TimerCommand,
+	completedTimerCmds map[int]service.InternalTimerStatus,
+) {
 	timers := make([]*service.TimerInfo, len(commands))
 	for idx, cmd := range commands {
 		var timer service.TimerInfo
+
+		duSecs := 0
+		if cmd.GetFiringUnixTimestampSeconds() > 0 {
+			now := t.provider.Now(ctx).Unix()
+			duSecs = int(cmd.GetFiringUnixTimestampSeconds() - now)
+		} else {
+			duSecs = int(cmd.GetDurationSeconds())
+		}
+
 		if status, ok := completedTimerCmds[idx]; ok {
 			timer = service.TimerInfo{
-				CommandId:                  cmd.CommandId,
-				FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
-				Status:                     status,
+				CommandId:       cmd.CommandId,
+				DurationSeconds: duSecs,
+				Status:          status,
 			}
 		} else {
 			timer = service.TimerInfo{
-				CommandId:                  cmd.CommandId,
-				FiringUnixTimestampSeconds: cmd.GetFiringUnixTimestampSeconds(),
-				Status:                     service.TimerPending,
+				CommandId:       cmd.CommandId,
+				DurationSeconds: duSecs,
+				Status:          service.TimerPending,
 			}
 		}
 

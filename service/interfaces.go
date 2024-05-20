@@ -99,9 +99,9 @@ type (
 	}
 
 	TimerInfo struct {
-		CommandId                  string
-		FiringUnixTimestampSeconds int64
-		Status                     InternalTimerStatus
+		CommandId       string
+		DurationSeconds int
+		Status          InternalTimerStatus
 	}
 
 	SkipTimerSignalRequest struct {
