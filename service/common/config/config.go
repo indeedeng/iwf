@@ -28,6 +28,9 @@ type (
 		MaxWaitSeconds int64 `yaml:"maxWaitSeconds"`
 		// OptimizedVersioning is the versioning optimization flag
 		OptimizedVersioning *bool `yaml:"optimizedVersioning"`
+		// omitRpcInputOutputInHistory is the flag to omit rpc input/output in history
+		// the input/output is only for debugging purpose but could be too expensive to store
+		OmitRpcInputOutputInHistory *bool `yaml:"omitRpcInputOutputInHistory"`
 	}
 
 	Interpreter struct {
