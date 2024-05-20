@@ -138,6 +138,9 @@ func (t *TimerProcessor) AddTimers(
 		} else {
 			duSecs = int(cmd.GetDurationSeconds())
 		}
+		if duSecs <= 0 {
+			t.provider.GetLogger(ctx).Error("timer duration is less than or equal to 0", stateExeId, cmd.CommandId, duSecs)
+		}
 
 		if status, ok := completedTimerCmds[idx]; ok {
 			timer = service.TimerInfo{
