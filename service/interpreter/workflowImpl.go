@@ -532,7 +532,7 @@ func executeState(
 	}
 
 	if len(commandReq.GetTimerCommands()) > 0 {
-		timerProcessor.AddTimers(stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
+		timerProcessor.AddTimers(ctx, stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			if _, ok := completedTimerCmds[idx]; ok {
 				// skip the completed timers(from continueAsNew)
