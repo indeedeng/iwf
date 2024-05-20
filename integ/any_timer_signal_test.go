@@ -37,7 +37,7 @@ func TestAnyTimerSignalWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -47,7 +47,7 @@ func TestAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }

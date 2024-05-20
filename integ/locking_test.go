@@ -31,7 +31,7 @@ func TestLockingWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestLockingWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestLockingWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -51,7 +51,7 @@ func TestLockingWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestLockingWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestLockingWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }

@@ -36,7 +36,7 @@ func TestDeadEndWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestDeadEndWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestDeadEndWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -46,7 +46,7 @@ func TestDeadEndWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestDeadEndWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestDeadEndWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }

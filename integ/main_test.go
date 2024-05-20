@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"testing"
 	"time"
 
@@ -19,6 +20,23 @@ import (
 func TestMain(m *testing.M) {
 	flag.Parse()
 	var err error
+
+	fmt.Println(len(os.Args), os.Args)
+	if len(os.Args) > 0 {
+		lastArg := os.Args[len(os.Args)-1]
+		// check if lastArg is the regex  pattern of ^\QTest.*Temporal.*\E$
+		matched, err := regexp.MatchString(`Test.*Temporal.*`, lastArg)
+		if err == nil && matched {
+			*temporalIntegTest = true
+			*cadenceIntegTest = false
+		} else {
+			matched, err := regexp.MatchString(`Test.*Cadence.*`, lastArg)
+			if err == nil && matched {
+				*temporalIntegTest = false
+				*cadenceIntegTest = true
+			}
+		}
+	}
 
 	fmt.Println("*temporalIntegTest, *cadenceIntegTest", *temporalIntegTest, *cadenceIntegTest)
 

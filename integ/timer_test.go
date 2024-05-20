@@ -39,7 +39,7 @@ func TestTimerWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -49,7 +49,7 @@ func TestTimerWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestTimerWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestTimerWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }

@@ -36,7 +36,7 @@ func TestCreateWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestCreateWithoutStartingState(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestCreateWithoutStartingState(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -46,7 +46,7 @@ func TestCreateWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestCreateWithoutStartingState(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestCreateWithoutStartingState(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }

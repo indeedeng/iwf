@@ -28,7 +28,7 @@ func TestSkipStartWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestSkipStartWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestSkipStartWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -48,7 +48,7 @@ func TestSkipStartWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestSkipStartWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestSkipStartWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }

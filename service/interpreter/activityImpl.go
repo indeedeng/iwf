@@ -18,7 +18,9 @@ import (
 )
 
 // StateStart is Deprecated, will be removed in next release
-func StateStart(ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
+func StateStart(
+	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
+) (*iwfidl.WorkflowStateStartResponse, error) {
 	return StateApiWaitUntil(ctx, backendType, input)
 }
 
@@ -193,7 +195,9 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 	return nil
 }
 
-func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
+func DumpWorkflowInternal(
+	ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest,
+) (*iwfidl.WorkflowDumpResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternal", "input", req)
@@ -217,7 +221,8 @@ func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, 
 }
 
 func InvokeWorkerRpc(
-	ctx context.Context, backendType service.BackendType, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest,
+	ctx context.Context, backendType service.BackendType, rpcPrep *service.PrepareRpcQueryResponse,
+	req iwfidl.WorkflowRpcRequest,
 ) (*InvokeRpcActivityOutput, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
