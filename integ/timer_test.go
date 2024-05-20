@@ -97,22 +97,22 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}
 	assertions := assert.New(t)
 	timer2 := &service.TimerInfo{
-		CommandId:                  "timer-cmd-id-2",
-		FiringUnixTimestampSeconds: nowTimestamp + 86400,
-		Status:                     service.TimerPending,
+		CommandId:       "timer-cmd-id-2",
+		DurationSeconds: 86400,
+		Status:          service.TimerPending,
 	}
 	timer3 := &service.TimerInfo{
-		CommandId:                  "timer-cmd-id-3",
-		FiringUnixTimestampSeconds: nowTimestamp + 86400*365,
-		Status:                     service.TimerPending,
+		CommandId:       "timer-cmd-id-3",
+		DurationSeconds: 86400 * 365,
+		Status:          service.TimerPending,
 	}
 	expectedTimerInfos := service.GetCurrentTimerInfosQueryResponse{
 		StateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{
 			"S1-1": {
 				{
-					CommandId:                  "timer-cmd-id",
-					FiringUnixTimestampSeconds: nowTimestamp + 10,
-					Status:                     service.TimerPending,
+					CommandId:       "timer-cmd-id",
+					DurationSeconds: 10,
+					Status:          service.TimerPending,
 				},
 				timer2,
 				timer3,

@@ -49,13 +49,13 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	invalidTimerCommands := []iwfidl.TimerCommand{
 		{
 			CommandId:                  "",
-			FiringUnixTimestampSeconds: time.Now().Unix() + 86400*365, // one year later
+			FiringUnixTimestampSeconds: iwfidl.PtrInt64(time.Now().Unix() + 86400*365), // one year later
 		},
 	}
 	validTimerCommands := []iwfidl.TimerCommand{
 		{
 			CommandId:                  TimerId1,
-			FiringUnixTimestampSeconds: time.Now().Unix() + 86400*365, // one year later
+			FiringUnixTimestampSeconds: iwfidl.PtrInt64(time.Now().Unix() + 86400*365), // one year later
 		},
 	}
 	invalidSignalCommands := []iwfidl.SignalCommand{
