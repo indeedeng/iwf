@@ -1780,17 +1780,19 @@ components:
         commandRequest:
           signalCommands:
           - signalChannelName: signalChannelName
-            atLeast: 6
-            atMost: 1
+            atLeast: 1
+            atMost: 5
             commandId: commandId
           - signalChannelName: signalChannelName
-            atLeast: 6
-            atMost: 1
+            atLeast: 1
+            atMost: 5
             commandId: commandId
           timerCommands:
-          - firingUnixTimestampSeconds: 0
+          - durationSeconds: 6
+            firingUnixTimestampSeconds: 0
             commandId: commandId
-          - firingUnixTimestampSeconds: 0
+          - durationSeconds: 6
+            firingUnixTimestampSeconds: 0
             commandId: commandId
           deciderTriggerType: null
           commandCombinations:
@@ -1804,11 +1806,11 @@ components:
           interStateChannelCommands:
           - channelName: channelName
             atLeast: 5
-            atMost: 5
+            atMost: 2
             commandId: commandId
           - channelName: channelName
             atLeast: 5
-            atMost: 5
+            atMost: 2
             commandId: commandId
         publishToInterStateChannel:
         - channelName: channelName
@@ -2491,17 +2493,19 @@ components:
       example:
         signalCommands:
         - signalChannelName: signalChannelName
-          atLeast: 6
-          atMost: 1
+          atLeast: 1
+          atMost: 5
           commandId: commandId
         - signalChannelName: signalChannelName
-          atLeast: 6
-          atMost: 1
+          atLeast: 1
+          atMost: 5
           commandId: commandId
         timerCommands:
-        - firingUnixTimestampSeconds: 0
+        - durationSeconds: 6
+          firingUnixTimestampSeconds: 0
           commandId: commandId
-        - firingUnixTimestampSeconds: 0
+        - durationSeconds: 6
+          firingUnixTimestampSeconds: 0
           commandId: commandId
         deciderTriggerType: null
         commandCombinations:
@@ -2515,11 +2519,11 @@ components:
         interStateChannelCommands:
         - channelName: channelName
           atLeast: 5
-          atMost: 5
+          atMost: 2
           commandId: commandId
         - channelName: channelName
           atLeast: 5
-          atMost: 5
+          atMost: 2
           commandId: commandId
       properties:
         deciderTriggerType:
@@ -2618,6 +2622,7 @@ components:
       type: object
     TimerCommand:
       example:
+        durationSeconds: 6
         firingUnixTimestampSeconds: 0
         commandId: commandId
       properties:
@@ -2626,15 +2631,16 @@ components:
         firingUnixTimestampSeconds:
           format: int64
           type: integer
+        durationSeconds:
+          type: integer
       required:
       - commandId
-      - firingUnixTimestampSeconds
       type: object
     SignalCommand:
       example:
         signalChannelName: signalChannelName
-        atLeast: 6
-        atMost: 1
+        atLeast: 1
+        atMost: 5
         commandId: commandId
       properties:
         commandId:
@@ -2653,7 +2659,7 @@ components:
       example:
         channelName: channelName
         atLeast: 5
-        atMost: 5
+        atMost: 2
         commandId: commandId
       properties:
         commandId:
