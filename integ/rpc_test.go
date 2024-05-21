@@ -29,7 +29,7 @@ func TestRpcWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeTemporal, false, false, minimumContinueAsNewConfig())
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, false, false, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -59,7 +59,7 @@ func TestRpcWorkflowTemporalContinueAsNewWithMemo(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig())
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -69,7 +69,7 @@ func TestRpcWorkflowTemporalContinueAsNewWithMemoAndEncryption(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, true, minimumContinueAsNewConfig())
+		doTestRpcWorkflow(t, service.BackendTypeTemporal, true, true, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -89,12 +89,14 @@ func TestRpcWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestRpcWorkflow(t, service.BackendTypeCadence, false, false, minimumContinueAsNewConfig())
+		doTestRpcWorkflow(t, service.BackendTypeCadence, false, false, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
 
-func doTestRpcWorkflow(t *testing.T, backendType service.BackendType, useMemo, memoEncryption bool, config *iwfidl.WorkflowConfig) {
+func doTestRpcWorkflow(
+	t *testing.T, backendType service.BackendType, useMemo, memoEncryption bool, config *iwfidl.WorkflowConfig,
+) {
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()

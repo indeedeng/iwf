@@ -20,17 +20,17 @@ func TestWorkflowCanceledTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestWorkflowCanceled(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestWorkflowCanceled(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestWorkflowCanceled(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 
 		doTestWorkflowTerminated(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestWorkflowTerminated(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestWorkflowTerminated(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 
 		doTestWorkflowFail(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestWorkflowFail(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestWorkflowFail(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -42,17 +42,17 @@ func TestWorkflowCanceledCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestWorkflowCanceled(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestWorkflowCanceled(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestWorkflowCanceled(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 
 		doTestWorkflowTerminated(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestWorkflowTerminated(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestWorkflowTerminated(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 
 		doTestWorkflowFail(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestWorkflowFail(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestWorkflowFail(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }

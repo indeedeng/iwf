@@ -3,11 +3,6 @@ package interpreter
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"time"
-
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -15,10 +10,15 @@ import (
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
+	"io"
+	"net/http"
+	"os"
 )
 
 // StateStart is Deprecated, will be removed in next release
-func StateStart(ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput) (*iwfidl.WorkflowStateStartResponse, error) {
+func StateStart(
+	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
+) (*iwfidl.WorkflowStateStartResponse, error) {
 	return StateApiWaitUntil(ctx, backendType, input)
 }
 
@@ -62,18 +62,14 @@ func StateDecide(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	shouldSendSignalOnCompletion bool,
-	timeout time.Duration,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion, timeout)
+	return StateApiExecute(ctx, backendType, input)
 }
 
 func StateApiExecute(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	_ bool, // no used anymore, keep for compatibility
-	_ time.Duration, // no used anymore, keep for compatibility
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
@@ -144,7 +140,7 @@ func composeHttpError(provider ActivityProvider, err error, httpResp *http.Respo
 	responseBody := "None"
 	var statusCode int
 	if httpResp != nil {
-		body, err := ioutil.ReadAll(httpResp.Body)
+		body, err := io.ReadAll(httpResp.Body)
 		if err != nil {
 			responseBody = "cannot read body from http response"
 		} else {
@@ -193,7 +189,9 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 	return nil
 }
 
-func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
+func DumpWorkflowInternal(
+	ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest,
+) (*iwfidl.WorkflowDumpResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternal", "input", req)
@@ -217,7 +215,8 @@ func DumpWorkflowInternal(ctx context.Context, backendType service.BackendType, 
 }
 
 func InvokeWorkerRpc(
-	ctx context.Context, backendType service.BackendType, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest,
+	ctx context.Context, backendType service.BackendType, rpcPrep *service.PrepareRpcQueryResponse,
+	req iwfidl.WorkflowRpcRequest,
 ) (*InvokeRpcActivityOutput, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)

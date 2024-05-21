@@ -194,10 +194,15 @@ func smallWaitForFastTest() {
 	time.Sleep(du)
 }
 
-func minimumContinueAsNewConfig() *iwfidl.WorkflowConfig {
+func minimumContinueAsNewConfig(optimizeActivity bool) *iwfidl.WorkflowConfig {
 	return &iwfidl.WorkflowConfig{
 		ContinueAsNewThreshold: iwfidl.PtrInt32(1),
+		OptimizeActivity:       iwfidl.PtrBool(optimizeActivity),
 	}
+}
+
+func minimumContinueAsNewConfigV0() *iwfidl.WorkflowConfig {
+	return minimumContinueAsNewConfig(false)
 }
 
 func getBackendTypes() []service.BackendType {

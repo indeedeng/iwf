@@ -13,12 +13,16 @@ type WorkflowUpdater struct {
 	continueAsNewCounter *ContinueAsNewCounter
 	interStateChannel    *InterStateChannel
 	stateRequestQueue    *StateRequestQueue
+	configer             *WorkflowConfiger
 	logger               UnifiedLogger
 	basicInfo            service.BasicInfo
 }
 
-func NewWorkflowUpdater(ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue,
-	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, interStateChannel *InterStateChannel, basicInfo service.BasicInfo,
+func NewWorkflowUpdater(
+	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
+	stateRequestQueue *StateRequestQueue,
+	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, configer *WorkflowConfiger,
+	interStateChannel *InterStateChannel, basicInfo service.BasicInfo,
 ) (*WorkflowUpdater, error) {
 	updater := &WorkflowUpdater{
 		persistenceManager:   persistenceManager,
@@ -26,6 +30,7 @@ func NewWorkflowUpdater(ctx UnifiedContext, provider WorkflowProvider, persisten
 		continueAsNewCounter: continueAsNewCounter,
 		interStateChannel:    interStateChannel,
 		stateRequestQueue:    stateRequestQueue,
+		configer:             configer,
 		basicInfo:            basicInfo,
 		provider:             provider,
 		logger:               provider.GetLogger(ctx),
@@ -37,7 +42,9 @@ func NewWorkflowUpdater(ctx UnifiedContext, provider WorkflowProvider, persisten
 	return updater, nil
 }
 
-func (u *WorkflowUpdater) handler(ctx UnifiedContext, input iwfidl.WorkflowRpcRequest) (output *HandlerOutput, err error) {
+func (u *WorkflowUpdater) handler(
+	ctx UnifiedContext, input iwfidl.WorkflowRpcRequest,
+) (output *HandlerOutput, err error) {
 
 	u.continueAsNewer.IncreaseInflightOperation()
 	defer u.continueAsNewer.DecreaseInflightOperation()
@@ -61,7 +68,8 @@ func (u *WorkflowUpdater) handler(ctx UnifiedContext, input iwfidl.WorkflowRpcRe
 	}
 	ctx = u.provider.WithActivityOptions(ctx, activityOptions)
 	var activityOutput InvokeRpcActivityOutput
-	err = u.provider.ExecuteActivity(ctx, InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input).Get(ctx, &activityOutput)
+	err = u.provider.ExecuteActivity(&activityOutput, u.configer.ShouldOptimizeActivity(), ctx,
+		InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input)
 	u.persistenceManager.UnlockPersistence(input.SearchAttributesLoadingPolicy, input.DataAttributesLoadingPolicy)
 
 	if err != nil {

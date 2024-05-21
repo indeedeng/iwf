@@ -51,7 +51,7 @@ func TestPersistenceWorkflowTemporalContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, false, false, minimumContinueAsNewConfig())
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, false, false, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -61,7 +61,7 @@ func TestPersistenceWorkflowTemporalContinueAsNewWithMemo(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig())
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, false, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -71,7 +71,7 @@ func TestPersistenceWorkflowTemporalContinueAsNewWithMemoAndEncryption(t *testin
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, true, minimumContinueAsNewConfig())
+		doTestPersistenceWorkflow(t, service.BackendTypeTemporal, true, true, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -91,7 +91,7 @@ func TestPersistenceWorkflowCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestPersistenceWorkflow(t, service.BackendTypeCadence, false, false, minimumContinueAsNewConfig())
+		doTestPersistenceWorkflow(t, service.BackendTypeCadence, false, false, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }

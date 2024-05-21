@@ -91,7 +91,7 @@ func InterpreterImpl(
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
 
-	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, interStateChannel, basicInfo)
+	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, interStateChannel, basicInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func InterpreterImpl(
 
 					decision, stateExecStatus, err := executeState(
 						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
-						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, shouldSendSignalOnCompletion)
+						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, workflowConfiger, shouldSendSignalOnCompletion)
 					if err != nil {
 						// this is the case where stateExecStatus == FailureStateExecutionStatus
 						errToFailWf = err
@@ -442,6 +442,7 @@ func executeState(
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
 	continueAsNewCounter *ContinueAsNewCounter,
+	configer *WorkflowConfiger,
 	shouldSendSignalOnCompletion bool,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	waitUntilApi := StateStart
@@ -478,7 +479,7 @@ func executeState(
 	skipStart := compatibility.GetSkipStartApi(&options)
 	if skipStart {
 		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-			nil, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
+			nil, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 	}
 
 	if isResumeFromContinueAsNew {
@@ -501,17 +502,18 @@ func executeState(
 		saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
 		doLoadingPolicy := compatibility.GetDataObjectsLoadingPolicy(state.StateOptions)
 
-		errStartApi = provider.ExecuteActivity(ctx, waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
-			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
-			Request: iwfidl.WorkflowStateStartRequest{
-				Context:          executionContext,
-				WorkflowType:     basicInfo.IwfWorkflowType,
-				WorkflowStateId:  state.StateId,
-				StateInput:       state.StateInput,
-				SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
-				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
-			},
-		}).Get(ctx, &startResponse)
+		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
+			waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
+				IwfWorkerUrl: basicInfo.IwfWorkerUrl,
+				Request: iwfidl.WorkflowStateStartRequest{
+					Context:          executionContext,
+					WorkflowType:     basicInfo.IwfWorkflowType,
+					WorkflowStateId:  state.StateId,
+					StateInput:       state.StateInput,
+					SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
+					DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
+				},
+			})
 		persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 		if errStartApi != nil && !shouldProceedOnStartApiError(state) {
 			return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
@@ -697,7 +699,7 @@ func executeState(
 	}
 
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
-		commandRes, continueAsNewer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
+		commandRes, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
 func executeStateDecide(
 	ctx UnifiedContext,
@@ -710,6 +712,7 @@ func executeStateDecide(
 	executionContext iwfidl.Context,
 	commandRes *iwfidl.CommandResults,
 	continueAsNewer *ContinueAsNewer,
+	configer *WorkflowConfiger,
 	executeApi interface{},
 	stateExecutionLocal []iwfidl.KeyValue,
 	shouldSendSignalOnCompletion bool,
@@ -731,19 +734,20 @@ func executeStateDecide(
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
-	err = provider.ExecuteActivity(ctx, executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
-		IwfWorkerUrl: basicInfo.IwfWorkerUrl,
-		Request: iwfidl.WorkflowStateDecideRequest{
-			Context:          executionContext,
-			WorkflowType:     basicInfo.IwfWorkflowType,
-			WorkflowStateId:  state.StateId,
-			CommandResults:   commandRes,
-			StateLocals:      stateExecutionLocal,
-			SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
-			DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
-			StateInput:       state.StateInput,
-		},
-	}, false, 0).Get(ctx, &decideResponse)
+	err = provider.ExecuteActivity(&decideResponse, configer.ShouldOptimizeActivity(), ctx,
+		executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
+			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
+			Request: iwfidl.WorkflowStateDecideRequest{
+				Context:          executionContext,
+				WorkflowType:     basicInfo.IwfWorkflowType,
+				WorkflowStateId:  state.StateId,
+				CommandResults:   commandRes,
+				StateLocals:      stateExecutionLocal,
+				SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
+				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
+				StateInput:       state.StateInput,
+			},
+		})
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation

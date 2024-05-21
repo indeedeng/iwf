@@ -22,7 +22,7 @@ func TestSignalWorkflowTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestSignalWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -34,7 +34,7 @@ func TestSignalWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestSignalWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }

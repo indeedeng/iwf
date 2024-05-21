@@ -37,7 +37,8 @@ func TestConditionalForceCompleteOnInternalChannelEmptyWorkflowTemporalContinueA
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		// TODO not sure why using minimumContinueAsNewConfig(true) will fail
+		doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }
@@ -47,17 +48,21 @@ func TestConditionalForceCompleteOnInternalChannelEmptyWorkflowCadenceContinueAs
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }
 
-func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestConditionalForceCompleteOnInternalChannelEmptyWorkflow(
+	t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig,
+) {
 	doTestConditionalForceCompleteOnChannelEmptyWorkflow(t, backendType, config, false)
 	doTestConditionalForceCompleteOnChannelEmptyWorkflow(t, backendType, config, true)
 }
 
-func doTestConditionalForceCompleteOnChannelEmptyWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig, useSignalChannel bool) {
+func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
+	t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig, useSignalChannel bool,
+) {
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := conditionalClose.NewHandler()

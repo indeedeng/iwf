@@ -19,7 +19,7 @@ func TestInterStateWorkflowTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestInterStateWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestInterStateWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestInterStateWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -31,7 +31,7 @@ func TestInterStateWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestInterStateWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestInterStateWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestInterStateWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
 		smallWaitForFastTest()
 	}
 }

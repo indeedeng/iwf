@@ -18,7 +18,11 @@ func (wc *WorkflowConfiger) Get() iwfidl.WorkflowConfig {
 	return wc.config
 }
 
-func (wc *WorkflowConfiger) SetIfPresent(config iwfidl.WorkflowConfig) {
+func (wc *WorkflowConfiger) ShouldOptimizeActivity() bool {
+	return wc.config.GetOptimizeActivity()
+}
+
+func (wc *WorkflowConfiger) UpdateByAPI(config iwfidl.WorkflowConfig) {
 	if config.DisableSystemSearchAttribute != nil {
 		wc.config.DisableSystemSearchAttribute = config.DisableSystemSearchAttribute
 	}
@@ -27,5 +31,8 @@ func (wc *WorkflowConfiger) SetIfPresent(config iwfidl.WorkflowConfig) {
 	}
 	if config.ContinueAsNewThreshold != nil {
 		wc.config.ContinueAsNewThreshold = config.ContinueAsNewThreshold
+	}
+	if config.OptimizeActivity != nil {
+		wc.config.OptimizeActivity = config.OptimizeActivity
 	}
 }

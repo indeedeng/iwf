@@ -99,7 +99,10 @@ type WorkflowProvider interface {
 	GetPendingThreadNames() map[string]int
 	Await(ctx UnifiedContext, condition func() bool) error
 	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext
-	ExecuteActivity(ctx UnifiedContext, activity interface{}, args ...interface{}) (future Future)
+	ExecuteActivity(
+		valuePtr interface{}, optimizeByLocalActivity bool, ctx UnifiedContext, activity interface{},
+		args ...interface{},
+	) (err error)
 	Now(ctx UnifiedContext) time.Time
 	IsReplaying(ctx UnifiedContext) bool
 	Sleep(ctx UnifiedContext, d time.Duration) (err error)

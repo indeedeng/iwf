@@ -222,7 +222,14 @@ func (w *workflowProvider) WithActivityOptions(
 		StartToCloseTimeout:    options.StartToCloseTimeout,
 		RetryPolicy:            retry.ConvertTemporalActivityRetryPolicy(options.RetryPolicy),
 	})
-	return interpreter.NewUnifiedContext(wfCtx2)
+
+	// support local activity optimization
+	wfCtx3 := workflow.WithLocalActivityOptions(wfCtx2, workflow.LocalActivityOptions{
+		// set the LA timeout to 7s to make sure the workflow will not need a heartbeat
+		ScheduleToCloseTimeout: time.Second * 7,
+		RetryPolicy:            retry.ConvertTemporalActivityRetryPolicy(options.RetryPolicy),
+	})
+	return interpreter.NewUnifiedContext(wfCtx3)
 }
 
 type futureImpl struct {
@@ -243,16 +250,24 @@ func (t *futureImpl) Get(ctx interpreter.UnifiedContext, valuePtr interface{}) e
 }
 
 func (w *workflowProvider) ExecuteActivity(
+	valuePtr interface{}, optimizeByLocalActivity bool,
 	ctx interpreter.UnifiedContext, activity interface{}, args ...interface{},
-) (future interpreter.Future) {
+) (err error) {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
 	}
-	f := workflow.ExecuteActivity(wfCtx, activity, args...)
-	return &futureImpl{
-		future: f,
+	if optimizeByLocalActivity {
+		f := workflow.ExecuteLocalActivity(wfCtx, activity, args...)
+		err = f.Get(wfCtx, valuePtr)
+		if err != nil {
+			f = workflow.ExecuteActivity(wfCtx, activity, args...)
+			return f.Get(wfCtx, valuePtr)
+		}
+		return err
 	}
+	f := workflow.ExecuteActivity(wfCtx, activity, args...)
+	return f.Get(wfCtx, valuePtr)
 }
 
 func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {

@@ -20,7 +20,7 @@ func TestStateApiFailAndProceedTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, minimumContinueAsNewConfig())
+		doTestStateApiFailAndProceed(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
@@ -32,7 +32,7 @@ func TestStateApiFailAndProceedCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, minimumContinueAsNewConfig())
+		doTestStateApiFailAndProceed(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
 }
