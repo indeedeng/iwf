@@ -62,18 +62,14 @@ func StateDecide(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	shouldSendSignalOnCompletion bool,
-	timeout int,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion, timeout)
+	return StateApiExecute(ctx, backendType, input)
 }
 
 func StateApiExecute(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	_ bool, // no used anymore, keep for compatibility
-	_ int, // no used anymore, keep for compatibility
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)

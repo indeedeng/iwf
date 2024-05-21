@@ -747,7 +747,7 @@ func executeStateDecide(
 				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 				StateInput:       state.StateInput,
 			},
-		}, false, 0)
+		})
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
