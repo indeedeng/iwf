@@ -21,7 +21,6 @@ func TestMain(m *testing.M) {
 	flag.Parse()
 	var err error
 
-	fmt.Println(len(os.Args), os.Args)
 	if len(os.Args) > 0 {
 		lastArg := os.Args[len(os.Args)-1]
 		// check if lastArg is the regex  pattern of ^\QTest.*Temporal.*\E$
