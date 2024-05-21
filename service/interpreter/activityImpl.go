@@ -3,11 +3,6 @@ package interpreter
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"time"
-
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -15,6 +10,9 @@ import (
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
+	"io/ioutil"
+	"net/http"
+	"os"
 )
 
 // StateStart is Deprecated, will be removed in next release
@@ -65,7 +63,7 @@ func StateDecide(
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
 	shouldSendSignalOnCompletion bool,
-	timeout time.Duration,
+	timeout int,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	return StateApiExecute(ctx, backendType, input, shouldSendSignalOnCompletion, timeout)
 }
@@ -75,7 +73,7 @@ func StateApiExecute(
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
 	_ bool, // no used anymore, keep for compatibility
-	_ time.Duration, // no used anymore, keep for compatibility
+	_ int, // no used anymore, keep for compatibility
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
