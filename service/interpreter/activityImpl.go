@@ -10,7 +10,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -140,7 +140,7 @@ func composeHttpError(provider ActivityProvider, err error, httpResp *http.Respo
 	responseBody := "None"
 	var statusCode int
 	if httpResp != nil {
-		body, err := ioutil.ReadAll(httpResp.Body)
+		body, err := io.ReadAll(httpResp.Body)
 		if err != nil {
 			responseBody = "cannot read body from http response"
 		} else {
