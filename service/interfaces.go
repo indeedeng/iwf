@@ -85,13 +85,13 @@ type (
 	}
 
 	ExecuteRpcSignalRequest struct {
-		RpcInput                    *iwfidl.EncodedObject
-		RpcOutput                   *iwfidl.EncodedObject
-		UpsertDataObjects           []iwfidl.KeyValue
-		UpsertSearchAttributes      []iwfidl.SearchAttribute
-		StateDecision               *iwfidl.StateDecision
-		RecordEvents                []iwfidl.KeyValue
-		InterStateChannelPublishing []iwfidl.InterStateChannelPublishing
+		RpcInput                    *iwfidl.EncodedObject                `json:"rpcInput,omitempty"`
+		RpcOutput                   *iwfidl.EncodedObject                `json:"rpcOutput,omitempty"`
+		UpsertDataObjects           []iwfidl.KeyValue                    `json:"upsertDataObjects,omitempty"`
+		UpsertSearchAttributes      []iwfidl.SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
+		StateDecision               *iwfidl.StateDecision                `json:"stateDecision,omitempty"`
+		RecordEvents                []iwfidl.KeyValue                    `json:"recordEvents,omitempty"`
+		InterStateChannelPublishing []iwfidl.InterStateChannelPublishing `json:"interStateChannelPublishing,omitempty"`
 	}
 
 	GetCurrentTimerInfosQueryResponse struct {
