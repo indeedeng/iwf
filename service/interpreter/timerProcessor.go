@@ -162,10 +162,7 @@ func FixTimerCommandFromActivityOutput(now time.Time, request iwfidl.CommandRequ
 				FiringUnixTimestampSeconds: iwfidl.PtrInt64(now.Unix() + int64(cmd.GetDurationSeconds())),
 			})
 		} else {
-			timerCommands = append(timerCommands, iwfidl.TimerCommand{
-				CommandId:                  cmd.CommandId,
-				FiringUnixTimestampSeconds: cmd.FiringUnixTimestampSeconds,
-			})
+			timerCommands = append(timerCommands, cmd)
 		}
 	}
 	request.TimerCommands = timerCommands
