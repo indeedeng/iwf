@@ -529,7 +529,7 @@ func executeState(
 		}
 		interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
-		commandReq = startResponse.GetCommandRequest()
+		commandReq = fixTimerCommandFromActivityOutput(provider.Now(ctx), startResponse.GetCommandRequest())
 		stateExecutionLocal = startResponse.GetUpsertStateLocals()
 	}
 
@@ -701,6 +701,28 @@ func executeState(
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 		commandRes, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
+
+// convert the durationSeconds to firingUnixTimestampSeconds
+// doing it right after the activity output so that we don't need to worry about the time drift after continueAsNew
+func fixTimerCommandFromActivityOutput(now time.Time, request iwfidl.CommandRequest) iwfidl.CommandRequest {
+	var timerCommands []iwfidl.TimerCommand
+	for _, cmd := range request.GetTimerCommands() {
+		if cmd.HasDurationSeconds() {
+			timerCommands = append(timerCommands, iwfidl.TimerCommand{
+				CommandId:                  cmd.CommandId,
+				FiringUnixTimestampSeconds: iwfidl.PtrInt64(now.Unix() + int64(cmd.GetDurationSeconds())),
+			})
+		} else {
+			timerCommands = append(timerCommands, iwfidl.TimerCommand{
+				CommandId:                  cmd.CommandId,
+				FiringUnixTimestampSeconds: cmd.FiringUnixTimestampSeconds,
+			})
+		}
+	}
+	request.TimerCommands = timerCommands
+	return request
+}
+
 func executeStateDecide(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
