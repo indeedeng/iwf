@@ -120,7 +120,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 			},
 		},
 	}
-	assertions.Equal(expectedTimerInfos, timerInfos)
+	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
 	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
@@ -137,7 +137,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 		log.Fatalf("Fail to invoke query %v", err)
 	}
 	timer2.Status = service.TimerSkipped
-	assertions.Equal(expectedTimerInfos, timerInfos)
+	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
 	time.Sleep(time.Second * 1)
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
@@ -154,7 +154,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 		log.Fatalf("Fail to invoke query %v", err)
 	}
 	timer3.Status = service.TimerSkipped
-	assertions.Equal(expectedTimerInfos, timerInfos)
+	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
