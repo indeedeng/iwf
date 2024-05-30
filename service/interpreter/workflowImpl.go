@@ -529,7 +529,7 @@ func executeState(
 		}
 		interStateChannel.ProcessPublishing(startResponse.GetPublishToInterStateChannel())
 
-		commandReq = startResponse.GetCommandRequest()
+		commandReq = FixTimerCommandFromActivityOutput(provider.Now(ctx), startResponse.GetCommandRequest())
 		stateExecutionLocal = startResponse.GetUpsertStateLocals()
 	}
 
@@ -701,6 +701,7 @@ func executeState(
 	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 		commandRes, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
+
 func executeStateDecide(
 	ctx UnifiedContext,
 	provider WorkflowProvider,

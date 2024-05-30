@@ -20,17 +20,17 @@ var _ MappedNullable = &TimerCommand{}
 // TimerCommand struct for TimerCommand
 type TimerCommand struct {
 	CommandId                  string `json:"commandId"`
-	FiringUnixTimestampSeconds int64  `json:"firingUnixTimestampSeconds"`
+	FiringUnixTimestampSeconds *int64 `json:"firingUnixTimestampSeconds,omitempty"`
+	DurationSeconds            *int32 `json:"durationSeconds,omitempty"`
 }
 
 // NewTimerCommand instantiates a new TimerCommand object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTimerCommand(commandId string, firingUnixTimestampSeconds int64) *TimerCommand {
+func NewTimerCommand(commandId string) *TimerCommand {
 	this := TimerCommand{}
 	this.CommandId = commandId
-	this.FiringUnixTimestampSeconds = firingUnixTimestampSeconds
 	return &this
 }
 
@@ -66,28 +66,68 @@ func (o *TimerCommand) SetCommandId(v string) {
 	o.CommandId = v
 }
 
-// GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field value
+// GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field value if set, zero value otherwise.
 func (o *TimerCommand) GetFiringUnixTimestampSeconds() int64 {
-	if o == nil {
+	if o == nil || IsNil(o.FiringUnixTimestampSeconds) {
 		var ret int64
 		return ret
 	}
-
-	return o.FiringUnixTimestampSeconds
+	return *o.FiringUnixTimestampSeconds
 }
 
-// GetFiringUnixTimestampSecondsOk returns a tuple with the FiringUnixTimestampSeconds field value
+// GetFiringUnixTimestampSecondsOk returns a tuple with the FiringUnixTimestampSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TimerCommand) GetFiringUnixTimestampSecondsOk() (*int64, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.FiringUnixTimestampSeconds) {
 		return nil, false
 	}
-	return &o.FiringUnixTimestampSeconds, true
+	return o.FiringUnixTimestampSeconds, true
 }
 
-// SetFiringUnixTimestampSeconds sets field value
+// HasFiringUnixTimestampSeconds returns a boolean if a field has been set.
+func (o *TimerCommand) HasFiringUnixTimestampSeconds() bool {
+	if o != nil && !IsNil(o.FiringUnixTimestampSeconds) {
+		return true
+	}
+
+	return false
+}
+
+// SetFiringUnixTimestampSeconds gets a reference to the given int64 and assigns it to the FiringUnixTimestampSeconds field.
 func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int64) {
-	o.FiringUnixTimestampSeconds = v
+	o.FiringUnixTimestampSeconds = &v
+}
+
+// GetDurationSeconds returns the DurationSeconds field value if set, zero value otherwise.
+func (o *TimerCommand) GetDurationSeconds() int32 {
+	if o == nil || IsNil(o.DurationSeconds) {
+		var ret int32
+		return ret
+	}
+	return *o.DurationSeconds
+}
+
+// GetDurationSecondsOk returns a tuple with the DurationSeconds field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TimerCommand) GetDurationSecondsOk() (*int32, bool) {
+	if o == nil || IsNil(o.DurationSeconds) {
+		return nil, false
+	}
+	return o.DurationSeconds, true
+}
+
+// HasDurationSeconds returns a boolean if a field has been set.
+func (o *TimerCommand) HasDurationSeconds() bool {
+	if o != nil && !IsNil(o.DurationSeconds) {
+		return true
+	}
+
+	return false
+}
+
+// SetDurationSeconds gets a reference to the given int32 and assigns it to the DurationSeconds field.
+func (o *TimerCommand) SetDurationSeconds(v int32) {
+	o.DurationSeconds = &v
 }
 
 func (o TimerCommand) MarshalJSON() ([]byte, error) {
@@ -101,7 +141,12 @@ func (o TimerCommand) MarshalJSON() ([]byte, error) {
 func (o TimerCommand) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["commandId"] = o.CommandId
-	toSerialize["firingUnixTimestampSeconds"] = o.FiringUnixTimestampSeconds
+	if !IsNil(o.FiringUnixTimestampSeconds) {
+		toSerialize["firingUnixTimestampSeconds"] = o.FiringUnixTimestampSeconds
+	}
+	if !IsNil(o.DurationSeconds) {
+		toSerialize["durationSeconds"] = o.DurationSeconds
+	}
 	return toSerialize, nil
 }
 

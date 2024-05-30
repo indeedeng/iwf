@@ -48,7 +48,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				now := time.Now().Unix()
 				timerCommands = []iwfidl.TimerCommand{
 					{
-						FiringUnixTimestampSeconds: now + 1, // fire after 1s
+						FiringUnixTimestampSeconds: iwfidl.PtrInt64(now + 1), // fire after 1s
 					},
 				}
 			}
