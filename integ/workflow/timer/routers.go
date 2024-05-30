@@ -57,7 +57,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 						},
 						{
 							CommandId:       "timer-cmd-id-2",
-							DurationSeconds: iwfidl.PtrInt32(86500), // fire after one day
+							DurationSeconds: iwfidl.PtrInt32(86400), // fire after one day
 						},
 						{
 							CommandId:       "timer-cmd-id-3",
