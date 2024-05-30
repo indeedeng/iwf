@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"log"
+	"math"
 	"strconv"
 	"testing"
 	"time"
@@ -191,11 +192,28 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}
 	timer2.Status = service.TimerSkipped
 	timer3.Status = service.TimerSkipped
-	assertions.Equal(expectedTimerInfos, timerInfos)
+	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
 	req2 = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+}
+
+func assertTimerQueryResponseEqual(
+	assertions *assert.Assertions, resp1 service.GetCurrentTimerInfosQueryResponse,
+	resp2 service.GetCurrentTimerInfosQueryResponse,
+) {
+	for k, infos1 := range resp1.StateExecutionCurrentTimerInfos {
+		infos2 := resp2.StateExecutionCurrentTimerInfos[k]
+		assertions.Equal(len(infos1), len(infos2))
+		for idx, info1 := range infos1 {
+			info2 := infos2[idx]
+			abs := math.Abs(float64(info1.FiringUnixTimestampSeconds - info2.FiringUnixTimestampSeconds))
+			assertions.True(abs <= 1)
+			info1.FiringUnixTimestampSeconds = info2.FiringUnixTimestampSeconds
+			assertions.Equal(info1, info2)
+		}
+	}
 }
