@@ -25,7 +25,8 @@ func (a *activityProvider) NewApplicationError(errType string, details interface
 func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.ActivityInfo {
 	info := activity.GetInfo(ctx)
 	return interpreter.ActivityInfo{
-		ScheduledTime: info.ScheduledTime,
-		Attempt:       info.Attempt,
+		ScheduledTime:   info.ScheduledTime,
+		Attempt:         info.Attempt,
+		IsLocalActivity: info.IsLocalActivity,
 	}
 }

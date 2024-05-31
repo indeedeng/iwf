@@ -47,7 +47,9 @@ func StateApiWaitUntil(
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
-		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
+		return nil, composeHttpError(
+			provider.GetActivityInfo(ctx).IsLocalActivity,
+			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
 	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
@@ -93,7 +95,9 @@ func StateApiExecute(
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
-		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
+		return nil, composeHttpError(
+			provider.GetActivityInfo(ctx).IsLocalActivity,
+			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
 	if err = checkStateDecisionFromResponse(resp); err != nil {
@@ -136,7 +140,9 @@ func checkHttpError(err error, httpResp *http.Response) bool {
 	return false
 }
 
-func composeHttpError(provider ActivityProvider, err error, httpResp *http.Response, errType string) error {
+func composeHttpError(
+	isLocalActivity bool, provider ActivityProvider, err error, httpResp *http.Response, errType string,
+) error {
 	responseBody := "None"
 	var statusCode int
 	if httpResp != nil {
@@ -148,8 +154,23 @@ func composeHttpError(provider ActivityProvider, err error, httpResp *http.Respo
 		}
 		statusCode = httpResp.StatusCode
 	}
+	errMsg := err.Error()
+	if isLocalActivity {
+		maxL := len(errMsg)
+		if maxL > 5 {
+			maxL = 5
+		}
+		errMsg = errMsg[:maxL] + "..."
+
+		maxL = len(responseBody)
+		if maxL > 50 {
+			maxL = 50
+		}
+		responseBody = responseBody[:maxL] + "..."
+		errType = "1st-attempt-failure"
+	}
 	return provider.NewApplicationError(errType,
-		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, responseBody, err))
+		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, responseBody, errMsg))
 }
 
 func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartResponse) error {
@@ -209,7 +230,8 @@ func DumpWorkflowInternal(
 	request := apiClient.DefaultApi.ApiV1WorkflowInternalDumpPost(ctx)
 	resp, httpResp, err := request.WorkflowDumpRequest(req).Execute()
 	if checkHttpError(err, httpResp) {
-		return nil, composeHttpError(provider, err, httpResp, string(iwfidl.SERVER_INTERNAL_ERROR_TYPE))
+		return nil, composeHttpError(provider.GetActivityInfo(ctx).IsLocalActivity,
+			provider, err, httpResp, string(iwfidl.SERVER_INTERNAL_ERROR_TYPE))
 	}
 	return resp, nil
 }

@@ -20,6 +20,7 @@ var jsonHistoryFiles = []string{
 	"v3-bug-no-state-stuck.json",
 	"v4-continue-as-new-on-no-state.json",
 	"v4-continued-as-new-before-versioning-optimization.json",
+	"v4-local-activity-optimization.json",
 }
 
 func TestTemporalReplay(t *testing.T) {

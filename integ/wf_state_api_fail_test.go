@@ -20,7 +20,7 @@ func TestStateApiFailTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestStateApiFail(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
-		doTestStateApiFail(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
+		doTestStateApiFail(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -82,8 +82,13 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType, config *i
 
 	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)
+	expectedStart := int64(1)
+	if config != nil && *config.OptimizeActivity {
+		// NOTE:3 attempts are from LocalActivity, 1 attempt is from State API Options
+		expectedStart = 4
+	}
 	assertions.Equalf(map[string]int64{
-		"S1_start": 1,
+		"S1_start": expectedStart,
 	}, history, "wf state api fail test fail, %v", history)
 
 	// TODO: fix (%!s(*string=<nil>)) in the error message
