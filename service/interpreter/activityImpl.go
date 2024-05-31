@@ -156,8 +156,17 @@ func composeHttpError(
 	}
 	errMsg := err.Error()
 	if isLocalActivity {
-		errMsg = errMsg[:5] + "..."
-		responseBody = responseBody[:100] + "..."
+		maxL := len(errMsg)
+		if maxL > 5 {
+			maxL = 5
+		}
+		errMsg = errMsg[:maxL] + "..."
+
+		maxL = len(responseBody)
+		if maxL > 50 {
+			maxL = 50
+		}
+		responseBody = responseBody[:maxL] + "..."
 		errType = "1st-attempt-failure"
 	}
 	return provider.NewApplicationError(errType,
