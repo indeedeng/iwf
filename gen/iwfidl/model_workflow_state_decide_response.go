@@ -19,6 +19,7 @@ var _ MappedNullable = &WorkflowStateDecideResponse{}
 
 // WorkflowStateDecideResponse struct for WorkflowStateDecideResponse
 type WorkflowStateDecideResponse struct {
+	LocalActivityInput         *string                       `json:"localActivityInput,omitempty"`
 	StateDecision              *StateDecision                `json:"stateDecision,omitempty"`
 	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
 	UpsertDataObjects          []KeyValue                    `json:"upsertDataObjects,omitempty"`
@@ -42,6 +43,38 @@ func NewWorkflowStateDecideResponse() *WorkflowStateDecideResponse {
 func NewWorkflowStateDecideResponseWithDefaults() *WorkflowStateDecideResponse {
 	this := WorkflowStateDecideResponse{}
 	return &this
+}
+
+// GetLocalActivityInput returns the LocalActivityInput field value if set, zero value otherwise.
+func (o *WorkflowStateDecideResponse) GetLocalActivityInput() string {
+	if o == nil || IsNil(o.LocalActivityInput) {
+		var ret string
+		return ret
+	}
+	return *o.LocalActivityInput
+}
+
+// GetLocalActivityInputOk returns a tuple with the LocalActivityInput field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateDecideResponse) GetLocalActivityInputOk() (*string, bool) {
+	if o == nil || IsNil(o.LocalActivityInput) {
+		return nil, false
+	}
+	return o.LocalActivityInput, true
+}
+
+// HasLocalActivityInput returns a boolean if a field has been set.
+func (o *WorkflowStateDecideResponse) HasLocalActivityInput() bool {
+	if o != nil && !IsNil(o.LocalActivityInput) {
+		return true
+	}
+
+	return false
+}
+
+// SetLocalActivityInput gets a reference to the given string and assigns it to the LocalActivityInput field.
+func (o *WorkflowStateDecideResponse) SetLocalActivityInput(v string) {
+	o.LocalActivityInput = &v
 }
 
 // GetStateDecision returns the StateDecision field value if set, zero value otherwise.
@@ -246,6 +279,9 @@ func (o WorkflowStateDecideResponse) MarshalJSON() ([]byte, error) {
 
 func (o WorkflowStateDecideResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.LocalActivityInput) {
+		toSerialize["localActivityInput"] = o.LocalActivityInput
+	}
 	if !IsNil(o.StateDecision) {
 		toSerialize["stateDecision"] = o.StateDecision
 	}

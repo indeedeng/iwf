@@ -21,7 +21,7 @@ var _ MappedNullable = &TimerCommand{}
 type TimerCommand struct {
 	CommandId                  string `json:"commandId"`
 	FiringUnixTimestampSeconds *int64 `json:"firingUnixTimestampSeconds,omitempty"`
-	DurationSeconds            *int32 `json:"durationSeconds,omitempty"`
+	DurationSeconds            *int64 `json:"durationSeconds,omitempty"`
 }
 
 // NewTimerCommand instantiates a new TimerCommand object
@@ -99,9 +99,9 @@ func (o *TimerCommand) SetFiringUnixTimestampSeconds(v int64) {
 }
 
 // GetDurationSeconds returns the DurationSeconds field value if set, zero value otherwise.
-func (o *TimerCommand) GetDurationSeconds() int32 {
+func (o *TimerCommand) GetDurationSeconds() int64 {
 	if o == nil || IsNil(o.DurationSeconds) {
-		var ret int32
+		var ret int64
 		return ret
 	}
 	return *o.DurationSeconds
@@ -109,7 +109,7 @@ func (o *TimerCommand) GetDurationSeconds() int32 {
 
 // GetDurationSecondsOk returns a tuple with the DurationSeconds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TimerCommand) GetDurationSecondsOk() (*int32, bool) {
+func (o *TimerCommand) GetDurationSecondsOk() (*int64, bool) {
 	if o == nil || IsNil(o.DurationSeconds) {
 		return nil, false
 	}
@@ -125,8 +125,8 @@ func (o *TimerCommand) HasDurationSeconds() bool {
 	return false
 }
 
-// SetDurationSeconds gets a reference to the given int32 and assigns it to the DurationSeconds field.
-func (o *TimerCommand) SetDurationSeconds(v int32) {
+// SetDurationSeconds gets a reference to the given int64 and assigns it to the DurationSeconds field.
+func (o *TimerCommand) SetDurationSeconds(v int64) {
 	o.DurationSeconds = &v
 }
 

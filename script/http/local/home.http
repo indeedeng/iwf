@@ -2,7 +2,7 @@
 GET http://localhost:8801/
 
 ### start API POST
-POST http://localhost:8801//api/v1/workflow/start
+POST http://localhost:8801/api/v1/workflow/start
 Content-Type: application/json
 
 {
