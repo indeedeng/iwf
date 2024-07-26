@@ -130,6 +130,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		Config:                             workflowConfig,
 		UseMemoForDataAttributes:           useMemo,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
+		WaitForCompletionStateIds:          req.GetWaitForCompletionStateIds(),
 		OmitVersionMarker:                  s.config.Api.OptimizedVersioning,
 	}
 
