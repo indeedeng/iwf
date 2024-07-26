@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**LocalActivityInput** | Pointer to **string** |  | [optional] 
 **UpsertSearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **UpsertDataObjects** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **CommandRequest** | Pointer to [**CommandRequest**](CommandRequest.md) |  | [optional] 
@@ -29,6 +30,31 @@ will change when the set of required properties is changed
 NewWorkflowStateStartResponseWithDefaults instantiates a new WorkflowStateStartResponse object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetLocalActivityInput
+
+`func (o *WorkflowStateStartResponse) GetLocalActivityInput() string`
+
+GetLocalActivityInput returns the LocalActivityInput field if non-nil, zero value otherwise.
+
+### GetLocalActivityInputOk
+
+`func (o *WorkflowStateStartResponse) GetLocalActivityInputOk() (*string, bool)`
+
+GetLocalActivityInputOk returns a tuple with the LocalActivityInput field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetLocalActivityInput
+
+`func (o *WorkflowStateStartResponse) SetLocalActivityInput(v string)`
+
+SetLocalActivityInput sets LocalActivityInput field to given value.
+
+### HasLocalActivityInput
+
+`func (o *WorkflowStateStartResponse) HasLocalActivityInput() bool`
+
+HasLocalActivityInput returns a boolean if a field has been set.
 
 ### GetUpsertSearchAttributes
 

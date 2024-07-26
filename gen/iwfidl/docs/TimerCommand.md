@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CommandId** | **string** |  | 
 **FiringUnixTimestampSeconds** | Pointer to **int64** |  | [optional] 
-**DurationSeconds** | Pointer to **int32** |  | [optional] 
+**DurationSeconds** | Pointer to **int64** |  | [optional] 
 
 ## Methods
 
@@ -74,20 +74,20 @@ HasFiringUnixTimestampSeconds returns a boolean if a field has been set.
 
 ### GetDurationSeconds
 
-`func (o *TimerCommand) GetDurationSeconds() int32`
+`func (o *TimerCommand) GetDurationSeconds() int64`
 
 GetDurationSeconds returns the DurationSeconds field if non-nil, zero value otherwise.
 
 ### GetDurationSecondsOk
 
-`func (o *TimerCommand) GetDurationSecondsOk() (*int32, bool)`
+`func (o *TimerCommand) GetDurationSecondsOk() (*int64, bool)`
 
 GetDurationSecondsOk returns a tuple with the DurationSeconds field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDurationSeconds
 
-`func (o *TimerCommand) SetDurationSeconds(v int32)`
+`func (o *TimerCommand) SetDurationSeconds(v int64)`
 
 SetDurationSeconds sets DurationSeconds field to given value.
 

@@ -20,7 +20,9 @@ func TestWaitForStateCompletionTemporal(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWaitForStateCompletion(t, service.BackendTypeTemporal, nil)
+		doTestWaitForStateCompletion(t, service.BackendTypeTemporal, nil, false)
+		smallWaitForFastTest()
+		doTestWaitForStateCompletion(t, service.BackendTypeTemporal, nil, true)
 		smallWaitForFastTest()
 	}
 }
@@ -30,12 +32,16 @@ func TestWaitForStateCompletionCadence(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestWaitForStateCompletion(t, service.BackendTypeCadence, nil)
+		doTestWaitForStateCompletion(t, service.BackendTypeCadence, nil, false)
+		smallWaitForFastTest()
+		doTestWaitForStateCompletion(t, service.BackendTypeCadence, nil, true)
 		smallWaitForFastTest()
 	}
 }
 
-func doTestWaitForStateCompletion(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestWaitForStateCompletion(
+	t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig, useStateId bool,
+) {
 	// start test workflow server
 	wfHandler := wait_for_state_completion.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler)
@@ -55,7 +61,7 @@ func doTestWaitForStateCompletion(t *testing.T, backendType service.BackendType,
 	wfId := wait_for_state_completion.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	nowTimestamp := time.Now().Unix()
-	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+	startReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        wait_for_state_completion.WorkflowType,
 		WorkflowTimeoutSeconds: 30,
@@ -67,8 +73,13 @@ func doTestWaitForStateCompletion(t *testing.T, backendType service.BackendType,
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
-		WaitForCompletionStateExecutionIds: []string{"S1-1"},
-	}).Execute()
+	}
+	if useStateId {
+		startReq.WaitForCompletionStateIds = []string{"S1"}
+	} else {
+		startReq.WaitForCompletionStateExecutionIds = []string{"S1-1"}
+	}
+	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	panicAtHttpError(err, httpResp)
 
 	req1 := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background())

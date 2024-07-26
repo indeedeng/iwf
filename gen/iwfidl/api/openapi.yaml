@@ -783,6 +783,9 @@ components:
     WorkflowStartRequest:
       example:
         startStateId: startStateId
+        waitForCompletionStateIds:
+        - waitForCompletionStateIds
+        - waitForCompletionStateIds
         workflowTimeoutSeconds: 0
         waitForCompletionStateExecutionIds:
         - waitForCompletionStateExecutionIds
@@ -903,6 +906,10 @@ components:
           type: string
         startStateId:
           type: string
+        waitForCompletionStateIds:
+          items:
+            type: string
+          type: array
         waitForCompletionStateExecutionIds:
           items:
             type: string
@@ -1777,6 +1784,7 @@ components:
             data: data
             encoding: encoding
           key: key
+        localActivityInput: localActivityInput
         commandRequest:
           signalCommands:
           - signalChannelName: signalChannelName
@@ -1840,6 +1848,8 @@ components:
             encoding: encoding
           key: key
       properties:
+        localActivityInput:
+          type: string
         upsertSearchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
@@ -2147,6 +2157,7 @@ components:
               encoding: encoding
             channelName: channelName
             conditionalCloseType: null
+        localActivityInput: localActivityInput
         publishToInterStateChannel:
         - channelName: channelName
           value:
@@ -2175,6 +2186,8 @@ components:
             encoding: encoding
           key: key
       properties:
+        localActivityInput:
+          type: string
         stateDecision:
           $ref: '#/components/schemas/StateDecision'
         upsertSearchAttributes:
@@ -2632,6 +2645,7 @@ components:
           format: int64
           type: integer
         durationSeconds:
+          format: int64
           type: integer
       required:
       - commandId

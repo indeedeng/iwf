@@ -19,6 +19,7 @@ var _ MappedNullable = &WorkflowStateStartResponse{}
 
 // WorkflowStateStartResponse struct for WorkflowStateStartResponse
 type WorkflowStateStartResponse struct {
+	LocalActivityInput         *string                       `json:"localActivityInput,omitempty"`
 	UpsertSearchAttributes     []SearchAttribute             `json:"upsertSearchAttributes,omitempty"`
 	UpsertDataObjects          []KeyValue                    `json:"upsertDataObjects,omitempty"`
 	CommandRequest             *CommandRequest               `json:"commandRequest,omitempty"`
@@ -42,6 +43,38 @@ func NewWorkflowStateStartResponse() *WorkflowStateStartResponse {
 func NewWorkflowStateStartResponseWithDefaults() *WorkflowStateStartResponse {
 	this := WorkflowStateStartResponse{}
 	return &this
+}
+
+// GetLocalActivityInput returns the LocalActivityInput field value if set, zero value otherwise.
+func (o *WorkflowStateStartResponse) GetLocalActivityInput() string {
+	if o == nil || IsNil(o.LocalActivityInput) {
+		var ret string
+		return ret
+	}
+	return *o.LocalActivityInput
+}
+
+// GetLocalActivityInputOk returns a tuple with the LocalActivityInput field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateStartResponse) GetLocalActivityInputOk() (*string, bool) {
+	if o == nil || IsNil(o.LocalActivityInput) {
+		return nil, false
+	}
+	return o.LocalActivityInput, true
+}
+
+// HasLocalActivityInput returns a boolean if a field has been set.
+func (o *WorkflowStateStartResponse) HasLocalActivityInput() bool {
+	if o != nil && !IsNil(o.LocalActivityInput) {
+		return true
+	}
+
+	return false
+}
+
+// SetLocalActivityInput gets a reference to the given string and assigns it to the LocalActivityInput field.
+func (o *WorkflowStateStartResponse) SetLocalActivityInput(v string) {
+	o.LocalActivityInput = &v
 }
 
 // GetUpsertSearchAttributes returns the UpsertSearchAttributes field value if set, zero value otherwise.
@@ -246,6 +279,9 @@ func (o WorkflowStateStartResponse) MarshalJSON() ([]byte, error) {
 
 func (o WorkflowStateStartResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.LocalActivityInput) {
+		toSerialize["localActivityInput"] = o.LocalActivityInput
+	}
 	if !IsNil(o.UpsertSearchAttributes) {
 		toSerialize["upsertSearchAttributes"] = o.UpsertSearchAttributes
 	}

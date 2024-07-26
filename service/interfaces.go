@@ -13,6 +13,7 @@ type (
 		StartStateId *string `json:"startStateId,omitempty"`
 
 		WaitForCompletionStateExecutionIds []string `json:"waitForCompletionStateExecutionIds,omitempty"`
+		WaitForCompletionStateIds          []string `json:"waitForCompletionStateIds,omitempty"`
 
 		StateInput *iwfidl.EncodedObject `json:"stateInput,omitempty"`
 

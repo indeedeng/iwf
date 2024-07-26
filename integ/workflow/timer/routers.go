@@ -53,15 +53,15 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					TimerCommands: []iwfidl.TimerCommand{
 						{
 							CommandId:       "timer-cmd-id",
-							DurationSeconds: iwfidl.PtrInt32(10), // fire after 10s
+							DurationSeconds: iwfidl.PtrInt64(10), // fire after 10s
 						},
 						{
 							CommandId:       "timer-cmd-id-2",
-							DurationSeconds: iwfidl.PtrInt32(86400), // fire after one day
+							DurationSeconds: iwfidl.PtrInt64(86400), // fire after one day
 						},
 						{
 							CommandId:       "timer-cmd-id-3",
-							DurationSeconds: iwfidl.PtrInt32(86400 * 365), // fire after one year
+							DurationSeconds: iwfidl.PtrInt64(86400 * 365), // fire after one year
 						},
 					},
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),

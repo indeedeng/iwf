@@ -178,7 +178,9 @@ func InterpreterImpl(
 						stateExeId = stateExecutionCounter.CreateNextExecutionId(state.GetStateId())
 					}
 
-					shouldSendSignalOnCompletion := slices.Contains(input.WaitForCompletionStateExecutionIds, stateExeId)
+					shouldSendSignalOnCompletion :=
+						slices.Contains(input.WaitForCompletionStateExecutionIds, stateExeId) ||
+							slices.Contains(input.WaitForCompletionStateIds, state.GetStateId())
 
 					decision, stateExecStatus, err := executeState(
 						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
