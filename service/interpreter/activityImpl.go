@@ -38,8 +38,9 @@ func StateApiWaitUntil(
 		},
 	})
 
-	attempt := provider.GetActivityInfo(ctx).Attempt
-	scheduledTs := provider.GetActivityInfo(ctx).ScheduledTime.Unix()
+	activityInfo := provider.GetActivityInfo(ctx)
+	attempt := activityInfo.Attempt
+	scheduledTs := activityInfo.ScheduledTime.Unix()
 	input.Request.Context.Attempt = &attempt
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
 
@@ -48,7 +49,7 @@ func StateApiWaitUntil(
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		return nil, composeHttpError(
-			provider.GetActivityInfo(ctx).IsLocalActivity,
+			activityInfo.IsLocalActivity,
 			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
@@ -56,6 +57,12 @@ func StateApiWaitUntil(
 		return nil, composeStartApiRespError(provider, err, resp)
 	}
 
+	// Before returning successful results, check if it's local activity then compose some info for debug purpose
+	// This is because local activity doesn't record input into the history.
+	// But there are some small info that are important to record
+	if activityInfo.IsLocalActivity {
+		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
+	}
 	return resp, nil
 }
 
@@ -86,8 +93,9 @@ func StateApiExecute(
 		},
 	})
 
-	attempt := provider.GetActivityInfo(ctx).Attempt
-	scheduledTs := provider.GetActivityInfo(ctx).ScheduledTime.Unix()
+	activityInfo := provider.GetActivityInfo(ctx)
+	attempt := activityInfo.Attempt
+	scheduledTs := activityInfo.ScheduledTime.Unix()
 	input.Request.Context.Attempt = &attempt
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
 
@@ -96,7 +104,7 @@ func StateApiExecute(
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		return nil, composeHttpError(
-			provider.GetActivityInfo(ctx).IsLocalActivity,
+			activityInfo.IsLocalActivity,
 			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
@@ -104,7 +112,19 @@ func StateApiExecute(
 		return nil, composeExecuteApiRespError(provider, err, resp)
 	}
 
+	// Before returning successful results, check if it's local activity then compose some info for debug purpose
+	// This is because local activity doesn't record input into the history.
+	// But there are some small info that are important to record
+	if activityInfo.IsLocalActivity {
+		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
+	}
+
 	return resp, nil
+}
+
+func composeInputForDebug(stateExeId string) *string {
+	// NOTE: only use the stateExecutionId for now, but we can add more later if needed
+	return iwfidl.PtrString(fmt.Sprintf("stateExeId: %s", stateExeId))
 }
 
 func checkStateDecisionFromResponse(resp *iwfidl.WorkflowStateDecideResponse) error {
