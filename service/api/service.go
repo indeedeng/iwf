@@ -269,7 +269,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 ) (wresp *iwfidl.WorkflowGetDataObjectsResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	var queryResp service.GetDataObjectsQueryResponse
+	var queryResp service.GetDataAttributesQueryResponse
 	queryToGetDataAttributes := true
 	if req.GetUseMemoForDataAttributes() {
 		requestedKeys := map[string]bool{}
@@ -312,15 +312,15 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 			}
 		}
 
-		queryResp = service.GetDataObjectsQueryResponse{
-			DataObjects: dataAttributes,
+		queryResp = service.GetDataAttributesQueryResponse{
+			DataAttributes: dataAttributes,
 		}
 	}
 
 	if queryToGetDataAttributes {
 		err := s.client.QueryWorkflow(ctx, &queryResp,
-			req.GetWorkflowId(), req.GetWorkflowRunId(), service.GetDataObjectsWorkflowQueryType,
-			service.GetDataObjectsQueryRequest{
+			req.GetWorkflowId(), req.GetWorkflowRunId(), service.GetDataAttributesWorkflowQueryType,
+			service.GetDataAttributesQueryRequest{
 				Keys: req.Keys,
 			})
 
@@ -330,7 +330,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 	}
 
 	return &iwfidl.WorkflowGetDataObjectsResponse{
-		Objects: queryResp.DataObjects,
+		Objects: queryResp.DataAttributes,
 	}, nil
 }
 

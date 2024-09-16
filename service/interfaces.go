@@ -62,12 +62,12 @@ type (
 		Request      iwfidl.WorkflowStateDecideRequest
 	}
 
-	GetDataObjectsQueryRequest struct {
+	GetDataAttributesQueryRequest struct {
 		Keys []string
 	}
 
-	GetDataObjectsQueryResponse struct {
-		DataObjects []iwfidl.KeyValue
+	GetDataAttributesQueryResponse struct {
+		DataAttributes []iwfidl.KeyValue
 	}
 
 	PrepareRpcQueryRequest struct {
