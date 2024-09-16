@@ -63,7 +63,7 @@ func RebuildPersistenceManager(
 	}
 }
 
-func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjectsQueryRequest) service.GetDataObjectsQueryResponse {
+func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataAttributesQueryRequest) service.GetDataAttributesQueryResponse {
 	all := false
 	if len(request.Keys) == 0 {
 		all = true
@@ -78,8 +78,8 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataObjects
 			res = append(res, value)
 		}
 	}
-	return service.GetDataObjectsQueryResponse{
-		DataObjects: res,
+	return service.GetDataAttributesQueryResponse{
+		DataAttributes: res,
 	}
 }
 
@@ -141,10 +141,10 @@ func (am *PersistenceManager) LoadDataObjects(
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
 		return am.GetAllDataObjects()
 	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
-		res := am.GetDataObjectsByKey(service.GetDataObjectsQueryRequest{
+		res := am.GetDataObjectsByKey(service.GetDataAttributesQueryRequest{
 			Keys: partialLoadingKeys,
 		})
-		return res.DataObjects
+		return res.DataAttributes
 	} else if loadingType == iwfidl.NONE {
 		return []iwfidl.KeyValue{}
 	} else {

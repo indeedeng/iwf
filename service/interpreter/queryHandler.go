@@ -5,9 +5,12 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
-func SetQueryHandlers(ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager, continueAsNewer *ContinueAsNewer,
-	workflowConfiger *WorkflowConfiger, basicInfo service.BasicInfo) error {
-	err := provider.SetQueryHandler(ctx, service.GetDataObjectsWorkflowQueryType, func(req service.GetDataObjectsQueryRequest) (service.GetDataObjectsQueryResponse, error) {
+func SetQueryHandlers(
+	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
+	continueAsNewer *ContinueAsNewer,
+	workflowConfiger *WorkflowConfiger, basicInfo service.BasicInfo,
+) error {
+	err := provider.SetQueryHandler(ctx, service.GetDataAttributesWorkflowQueryType, func(req service.GetDataAttributesQueryRequest) (service.GetDataAttributesQueryResponse, error) {
 		dos := persistenceManager.GetDataObjectsByKey(req)
 		return dos, nil
 	})

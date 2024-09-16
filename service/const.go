@@ -22,7 +22,7 @@ const (
 	StateDecideApi       = "/api/v1/workflowState/decide"
 	WorkflowWorkerRpcApi = "/api/v1/workflowWorker/rpc"
 
-	GetDataObjectsWorkflowQueryType      = "GetDataObjects"
+	GetDataAttributesWorkflowQueryType   = "GetDataAttributes"
 	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"
 	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
 	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
