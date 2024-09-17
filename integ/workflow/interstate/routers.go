@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"time"
@@ -68,7 +69,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
-							CommandId:   "cmd-1",
+							CommandId:   ptr.Any("cmd-1"),
 							ChannelName: channel1,
 						},
 					},
@@ -82,7 +83,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 						{
-							CommandId:   "cmd-2",
+							CommandId:   ptr.Any("cmd-2"),
 							ChannelName: channel2,
 						},
 					},

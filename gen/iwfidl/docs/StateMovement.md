@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **StateId** | **string** |  | 
 **StateInput** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **StateOptions** | Pointer to [**WorkflowStateOptions**](WorkflowStateOptions.md) |  | [optional] 
+**WaitForKey** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -96,6 +97,31 @@ SetStateOptions sets StateOptions field to given value.
 `func (o *StateMovement) HasStateOptions() bool`
 
 HasStateOptions returns a boolean if a field has been set.
+
+### GetWaitForKey
+
+`func (o *StateMovement) GetWaitForKey() string`
+
+GetWaitForKey returns the WaitForKey field if non-nil, zero value otherwise.
+
+### GetWaitForKeyOk
+
+`func (o *StateMovement) GetWaitForKeyOk() (*string, bool)`
+
+GetWaitForKeyOk returns a tuple with the WaitForKey field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitForKey
+
+`func (o *StateMovement) SetWaitForKey(v string)`
+
+SetWaitForKey sets WaitForKey field to given value.
+
+### HasWaitForKey
+
+`func (o *StateMovement) HasWaitForKey() bool`
+
+HasWaitForKey returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

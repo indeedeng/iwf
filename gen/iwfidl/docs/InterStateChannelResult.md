@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | **string** |  | 
+**CommandId** | Pointer to **string** |  | [optional] 
 **RequestStatus** | [**ChannelRequestStatus**](ChannelRequestStatus.md) |  | 
 **ChannelName** | **string** |  | 
 **Value** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewInterStateChannelResult
 
-`func NewInterStateChannelResult(commandId string, requestStatus ChannelRequestStatus, channelName string, ) *InterStateChannelResult`
+`func NewInterStateChannelResult(requestStatus ChannelRequestStatus, channelName string, ) *InterStateChannelResult`
 
 NewInterStateChannelResult instantiates a new InterStateChannelResult object
 This constructor will assign default values to properties that have it defined,
@@ -47,6 +47,11 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
+### HasCommandId
+
+`func (o *InterStateChannelResult) HasCommandId() bool`
+
+HasCommandId returns a boolean if a field has been set.
 
 ### GetRequestStatus
 

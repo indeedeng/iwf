@@ -19,18 +19,17 @@ var _ MappedNullable = &TimerCommand{}
 
 // TimerCommand struct for TimerCommand
 type TimerCommand struct {
-	CommandId                  string `json:"commandId"`
-	FiringUnixTimestampSeconds *int64 `json:"firingUnixTimestampSeconds,omitempty"`
-	DurationSeconds            *int64 `json:"durationSeconds,omitempty"`
+	CommandId                  *string `json:"commandId,omitempty"`
+	FiringUnixTimestampSeconds *int64  `json:"firingUnixTimestampSeconds,omitempty"`
+	DurationSeconds            *int64  `json:"durationSeconds,omitempty"`
 }
 
 // NewTimerCommand instantiates a new TimerCommand object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTimerCommand(commandId string) *TimerCommand {
+func NewTimerCommand() *TimerCommand {
 	this := TimerCommand{}
-	this.CommandId = commandId
 	return &this
 }
 
@@ -42,28 +41,36 @@ func NewTimerCommandWithDefaults() *TimerCommand {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value
+// GetCommandId returns the CommandId field value if set, zero value otherwise.
 func (o *TimerCommand) GetCommandId() string {
-	if o == nil {
+	if o == nil || IsNil(o.CommandId) {
 		var ret string
 		return ret
 	}
-
-	return o.CommandId
+	return *o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value
+// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TimerCommand) GetCommandIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.CommandId) {
 		return nil, false
 	}
-	return &o.CommandId, true
+	return o.CommandId, true
 }
 
-// SetCommandId sets field value
+// HasCommandId returns a boolean if a field has been set.
+func (o *TimerCommand) HasCommandId() bool {
+	if o != nil && !IsNil(o.CommandId) {
+		return true
+	}
+
+	return false
+}
+
+// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
 func (o *TimerCommand) SetCommandId(v string) {
-	o.CommandId = v
+	o.CommandId = &v
 }
 
 // GetFiringUnixTimestampSeconds returns the FiringUnixTimestampSeconds field value if set, zero value otherwise.
@@ -140,7 +147,9 @@ func (o TimerCommand) MarshalJSON() ([]byte, error) {
 
 func (o TimerCommand) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["commandId"] = o.CommandId
+	if !IsNil(o.CommandId) {
+		toSerialize["commandId"] = o.CommandId
+	}
 	if !IsNil(o.FiringUnixTimestampSeconds) {
 		toSerialize["firingUnixTimestampSeconds"] = o.FiringUnixTimestampSeconds
 	}

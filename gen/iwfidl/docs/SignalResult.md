@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | **string** |  | 
+**CommandId** | Pointer to **string** |  | [optional] 
 **SignalRequestStatus** | [**ChannelRequestStatus**](ChannelRequestStatus.md) |  | 
 **SignalChannelName** | **string** |  | 
 **SignalValue** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewSignalResult
 
-`func NewSignalResult(commandId string, signalRequestStatus ChannelRequestStatus, signalChannelName string, ) *SignalResult`
+`func NewSignalResult(signalRequestStatus ChannelRequestStatus, signalChannelName string, ) *SignalResult`
 
 NewSignalResult instantiates a new SignalResult object
 This constructor will assign default values to properties that have it defined,
@@ -47,6 +47,11 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
+### HasCommandId
+
+`func (o *SignalResult) HasCommandId() bool`
+
+HasCommandId returns a boolean if a field has been set.
 
 ### GetSignalRequestStatus
 

@@ -1628,6 +1628,7 @@ components:
             stateInput:
               data: data
               encoding: encoding
+            waitForKey: waitForKey
           - stateId: stateId
             stateOptions:
               searchAttributesLoadingPolicy:
@@ -1695,6 +1696,7 @@ components:
             stateInput:
               data: data
               encoding: encoding
+            waitForKey: waitForKey
           conditionalClose:
             closeInput:
               data: data
@@ -2084,6 +2086,7 @@ components:
             stateInput:
               data: data
               encoding: encoding
+            waitForKey: waitForKey
           - stateId: stateId
             stateOptions:
               searchAttributesLoadingPolicy:
@@ -2151,6 +2154,7 @@ components:
             stateInput:
               data: data
               encoding: encoding
+            waitForKey: waitForKey
           conditionalClose:
             closeInput:
               data: data
@@ -2214,17 +2218,22 @@ components:
     WorkflowWaitForStateCompletionRequest:
       example:
         waitTimeSeconds: 0
+        stateId: stateId
         workflowId: workflowId
         stateExecutionId: stateExecutionId
+        waitForKey: waitForKey
       properties:
         workflowId:
           type: string
         stateExecutionId:
           type: string
+        stateId:
+          type: string
+        waitForKey:
+          type: string
         waitTimeSeconds:
           type: integer
       required:
-      - stateExecutionId
       - workflowId
       type: object
     WorkflowWaitForStateCompletionResponse:
@@ -2321,6 +2330,7 @@ components:
           stateInput:
             data: data
             encoding: encoding
+          waitForKey: waitForKey
         - stateId: stateId
           stateOptions:
             searchAttributesLoadingPolicy:
@@ -2388,6 +2398,7 @@ components:
           stateInput:
             data: data
             encoding: encoding
+          waitForKey: waitForKey
         conditionalClose:
           closeInput:
             data: data
@@ -2492,6 +2503,7 @@ components:
         stateInput:
           data: data
           encoding: encoding
+        waitForKey: waitForKey
       properties:
         stateId:
           type: string
@@ -2499,6 +2511,8 @@ components:
           $ref: '#/components/schemas/EncodedObject'
         stateOptions:
           $ref: '#/components/schemas/WorkflowStateOptions'
+        waitForKey:
+          type: string
       required:
       - stateId
       type: object
@@ -2647,8 +2661,6 @@ components:
         durationSeconds:
           format: int64
           type: integer
-      required:
-      - commandId
       type: object
     SignalCommand:
       example:
@@ -2666,7 +2678,6 @@ components:
         atMost:
           type: integer
       required:
-      - commandId
       - signalChannelName
       type: object
     InterStateChannelCommand:
@@ -2686,7 +2697,6 @@ components:
           type: integer
       required:
       - channelName
-      - commandId
       type: object
     TimerResult:
       example:
@@ -2698,7 +2708,6 @@ components:
         timerStatus:
           $ref: '#/components/schemas/TimerStatus'
       required:
-      - commandId
       - timerStatus
       type: object
     TimerStatus:
@@ -2724,7 +2733,6 @@ components:
         signalValue:
           $ref: '#/components/schemas/EncodedObject'
       required:
-      - commandId
       - signalChannelName
       - signalRequestStatus
       type: object
@@ -2747,7 +2755,6 @@ components:
           $ref: '#/components/schemas/EncodedObject'
       required:
       - channelName
-      - commandId
       - requestStatus
       type: object
     ChannelRequestStatus:

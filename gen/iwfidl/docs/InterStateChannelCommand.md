@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | **string** |  | 
+**CommandId** | Pointer to **string** |  | [optional] 
 **ChannelName** | **string** |  | 
 **AtLeast** | Pointer to **int32** |  | [optional] 
 **AtMost** | Pointer to **int32** |  | [optional] 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewInterStateChannelCommand
 
-`func NewInterStateChannelCommand(commandId string, channelName string, ) *InterStateChannelCommand`
+`func NewInterStateChannelCommand(channelName string, ) *InterStateChannelCommand`
 
 NewInterStateChannelCommand instantiates a new InterStateChannelCommand object
 This constructor will assign default values to properties that have it defined,
@@ -47,6 +47,11 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
+### HasCommandId
+
+`func (o *InterStateChannelCommand) HasCommandId() bool`
+
+HasCommandId returns a boolean if a field has been set.
 
 ### GetChannelName
 

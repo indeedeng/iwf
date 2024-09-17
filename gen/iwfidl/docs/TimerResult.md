@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | **string** |  | 
+**CommandId** | Pointer to **string** |  | [optional] 
 **TimerStatus** | [**TimerStatus**](TimerStatus.md) |  | 
 
 ## Methods
 
 ### NewTimerResult
 
-`func NewTimerResult(commandId string, timerStatus TimerStatus, ) *TimerResult`
+`func NewTimerResult(timerStatus TimerStatus, ) *TimerResult`
 
 NewTimerResult instantiates a new TimerResult object
 This constructor will assign default values to properties that have it defined,
@@ -45,6 +45,11 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
+### HasCommandId
+
+`func (o *TimerResult) HasCommandId() bool`
+
+HasCommandId returns a boolean if a field has been set.
 
 ### GetTimerStatus
 

@@ -57,7 +57,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
 						{
-							CommandId:         "signal-cmd-id",
+							CommandId:         ptr.Any("signal-cmd-id"),
 							SignalChannelName: SignalName,
 						},
 					},
