@@ -86,7 +86,7 @@ func doTestWaitForStateCompletion(
 	_, httpResp, err = req1.WorkflowWaitForStateCompletionRequest(
 		iwfidl.WorkflowWaitForStateCompletionRequest{
 			WorkflowId:       wfId,
-			StateExecutionId: "S1-1",
+			StateExecutionId: ptr.Any("S1-1"),
 			WaitTimeSeconds:  iwfidl.PtrInt32(30),
 		}).Execute()
 	panicAtHttpError(err, httpResp)

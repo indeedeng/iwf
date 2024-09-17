@@ -151,7 +151,13 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 ) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	workflowId := service.IwfSystemConstPrefix + req.WorkflowId + "_" + req.StateExecutionId
+	var workflowId string
+	if req.WaitForKey != nil {
+		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.WaitForKey
+	} else {
+		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateExecutionId
+	}
+
 	options := uclient.StartWorkflowOptions{
 		ID:        workflowId,
 		TaskQueue: s.taskQueue,

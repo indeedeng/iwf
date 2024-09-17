@@ -1,6 +1,7 @@
 package timer
 
 import (
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"strconv"
@@ -52,15 +53,15 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
 						{
-							CommandId:       "timer-cmd-id",
+							CommandId:       ptr.Any("timer-cmd-id"),
 							DurationSeconds: iwfidl.PtrInt64(10), // fire after 10s
 						},
 						{
-							CommandId:       "timer-cmd-id-2",
+							CommandId:       ptr.Any("timer-cmd-id-2"),
 							DurationSeconds: iwfidl.PtrInt64(86400), // fire after one day
 						},
 						{
-							CommandId:       "timer-cmd-id-3",
+							CommandId:       ptr.Any("timer-cmd-id-3"),
 							DurationSeconds: iwfidl.PtrInt64(86400 * 365), // fire after one year
 						},
 					},

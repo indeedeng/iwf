@@ -5,6 +5,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"time"
@@ -48,41 +49,39 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	invalidTimerCommands := []iwfidl.TimerCommand{
 		{
-			CommandId:                  "",
 			FiringUnixTimestampSeconds: iwfidl.PtrInt64(time.Now().Unix() + 86400*365), // one year later
 		},
 	}
 	validTimerCommands := []iwfidl.TimerCommand{
 		{
-			CommandId:                  TimerId1,
+			CommandId:                  ptr.Any(TimerId1),
 			FiringUnixTimestampSeconds: iwfidl.PtrInt64(time.Now().Unix() + 86400*365), // one year later
 		},
 	}
 	invalidSignalCommands := []iwfidl.SignalCommand{
 		{
-			CommandId:         "",
 			SignalChannelName: SignalNameAndId1,
 		},
 		{
-			CommandId:         SignalNameAndId2,
+			CommandId:         ptr.Any(SignalNameAndId2),
 			SignalChannelName: SignalNameAndId2,
 		},
 	}
 	validSignalCommands := []iwfidl.SignalCommand{
 		{
-			CommandId:         SignalNameAndId1,
+			CommandId:         ptr.Any(SignalNameAndId1),
 			SignalChannelName: SignalNameAndId1,
 		},
 		{
-			CommandId:         SignalNameAndId1,
+			CommandId:         ptr.Any(SignalNameAndId1),
 			SignalChannelName: SignalNameAndId1,
 		},
 		{
-			CommandId:         SignalNameAndId2,
+			CommandId:         ptr.Any(SignalNameAndId2),
 			SignalChannelName: SignalNameAndId2,
 		},
 		{
-			CommandId:         SignalNameAndId3,
+			CommandId:         ptr.Any(SignalNameAndId3),
 			SignalChannelName: SignalNameAndId3,
 		},
 	}

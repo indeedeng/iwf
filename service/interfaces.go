@@ -100,7 +100,7 @@ type (
 	}
 
 	TimerInfo struct {
-		CommandId                  string
+		CommandId                  *string
 		FiringUnixTimestampSeconds int64
 		Status                     InternalTimerStatus
 	}
@@ -186,7 +186,7 @@ func ValidateTimerSkipRequest(
 	}
 	if timerId != "" {
 		for _, t := range timerInfos {
-			if t.CommandId == timerId {
+			if t.CommandId != nil && *t.CommandId == timerId {
 				return t, true
 			}
 		}

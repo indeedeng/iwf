@@ -27,15 +27,15 @@ func IsDeciderTriggerConditionMet(
 			var completedCmdIds []string
 			for idx := range completedTimerCmds {
 				cmdId := commandReq.GetTimerCommands()[idx].CommandId
-				completedCmdIds = append(completedCmdIds, cmdId)
+				completedCmdIds = append(completedCmdIds, *cmdId)
 			}
 			for idx := range completedSignalCmds {
 				cmdId := commandReq.GetSignalCommands()[idx].CommandId
-				completedCmdIds = append(completedCmdIds, cmdId)
+				completedCmdIds = append(completedCmdIds, *cmdId)
 			}
 			for idx := range completedInterStateChannelCmds {
 				cmdId := commandReq.GetInterStateChannelCommands()[idx].CommandId
-				completedCmdIds = append(completedCmdIds, cmdId)
+				completedCmdIds = append(completedCmdIds, *cmdId)
 			}
 
 			for _, acceptedComb := range commandReq.GetCommandCombinations() {

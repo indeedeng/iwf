@@ -1,6 +1,7 @@
 package wait_for_state_completion
 
 import (
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"strconv"
@@ -52,7 +53,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
 						{
-							CommandId:                  "timer-cmd-id",
+							CommandId:                  ptr.Any("timer-cmd-id"),
 							FiringUnixTimestampSeconds: iwfidl.PtrInt64(now + 10), // fire after 10s
 						},
 					},
