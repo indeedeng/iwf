@@ -19,19 +19,20 @@ var _ MappedNullable = &WorkflowWaitForStateCompletionRequest{}
 
 // WorkflowWaitForStateCompletionRequest struct for WorkflowWaitForStateCompletionRequest
 type WorkflowWaitForStateCompletionRequest struct {
-	WorkflowId       string `json:"workflowId"`
-	StateExecutionId string `json:"stateExecutionId"`
-	WaitTimeSeconds  *int32 `json:"waitTimeSeconds,omitempty"`
+	WorkflowId       string  `json:"workflowId"`
+	StateExecutionId *string `json:"stateExecutionId,omitempty"`
+	StateId          *string `json:"stateId,omitempty"`
+	WaitForKey       *string `json:"waitForKey,omitempty"`
+	WaitTimeSeconds  *int32  `json:"waitTimeSeconds,omitempty"`
 }
 
 // NewWorkflowWaitForStateCompletionRequest instantiates a new WorkflowWaitForStateCompletionRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowWaitForStateCompletionRequest(workflowId string, stateExecutionId string) *WorkflowWaitForStateCompletionRequest {
+func NewWorkflowWaitForStateCompletionRequest(workflowId string) *WorkflowWaitForStateCompletionRequest {
 	this := WorkflowWaitForStateCompletionRequest{}
 	this.WorkflowId = workflowId
-	this.StateExecutionId = stateExecutionId
 	return &this
 }
 
@@ -67,28 +68,100 @@ func (o *WorkflowWaitForStateCompletionRequest) SetWorkflowId(v string) {
 	o.WorkflowId = v
 }
 
-// GetStateExecutionId returns the StateExecutionId field value
+// GetStateExecutionId returns the StateExecutionId field value if set, zero value otherwise.
 func (o *WorkflowWaitForStateCompletionRequest) GetStateExecutionId() string {
-	if o == nil {
+	if o == nil || IsNil(o.StateExecutionId) {
 		var ret string
 		return ret
 	}
-
-	return o.StateExecutionId
+	return *o.StateExecutionId
 }
 
-// GetStateExecutionIdOk returns a tuple with the StateExecutionId field value
+// GetStateExecutionIdOk returns a tuple with the StateExecutionId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WorkflowWaitForStateCompletionRequest) GetStateExecutionIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.StateExecutionId) {
 		return nil, false
 	}
-	return &o.StateExecutionId, true
+	return o.StateExecutionId, true
 }
 
-// SetStateExecutionId sets field value
+// HasStateExecutionId returns a boolean if a field has been set.
+func (o *WorkflowWaitForStateCompletionRequest) HasStateExecutionId() bool {
+	if o != nil && !IsNil(o.StateExecutionId) {
+		return true
+	}
+
+	return false
+}
+
+// SetStateExecutionId gets a reference to the given string and assigns it to the StateExecutionId field.
 func (o *WorkflowWaitForStateCompletionRequest) SetStateExecutionId(v string) {
-	o.StateExecutionId = v
+	o.StateExecutionId = &v
+}
+
+// GetStateId returns the StateId field value if set, zero value otherwise.
+func (o *WorkflowWaitForStateCompletionRequest) GetStateId() string {
+	if o == nil || IsNil(o.StateId) {
+		var ret string
+		return ret
+	}
+	return *o.StateId
+}
+
+// GetStateIdOk returns a tuple with the StateId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowWaitForStateCompletionRequest) GetStateIdOk() (*string, bool) {
+	if o == nil || IsNil(o.StateId) {
+		return nil, false
+	}
+	return o.StateId, true
+}
+
+// HasStateId returns a boolean if a field has been set.
+func (o *WorkflowWaitForStateCompletionRequest) HasStateId() bool {
+	if o != nil && !IsNil(o.StateId) {
+		return true
+	}
+
+	return false
+}
+
+// SetStateId gets a reference to the given string and assigns it to the StateId field.
+func (o *WorkflowWaitForStateCompletionRequest) SetStateId(v string) {
+	o.StateId = &v
+}
+
+// GetWaitForKey returns the WaitForKey field value if set, zero value otherwise.
+func (o *WorkflowWaitForStateCompletionRequest) GetWaitForKey() string {
+	if o == nil || IsNil(o.WaitForKey) {
+		var ret string
+		return ret
+	}
+	return *o.WaitForKey
+}
+
+// GetWaitForKeyOk returns a tuple with the WaitForKey field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowWaitForStateCompletionRequest) GetWaitForKeyOk() (*string, bool) {
+	if o == nil || IsNil(o.WaitForKey) {
+		return nil, false
+	}
+	return o.WaitForKey, true
+}
+
+// HasWaitForKey returns a boolean if a field has been set.
+func (o *WorkflowWaitForStateCompletionRequest) HasWaitForKey() bool {
+	if o != nil && !IsNil(o.WaitForKey) {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitForKey gets a reference to the given string and assigns it to the WaitForKey field.
+func (o *WorkflowWaitForStateCompletionRequest) SetWaitForKey(v string) {
+	o.WaitForKey = &v
 }
 
 // GetWaitTimeSeconds returns the WaitTimeSeconds field value if set, zero value otherwise.
@@ -134,7 +207,15 @@ func (o WorkflowWaitForStateCompletionRequest) MarshalJSON() ([]byte, error) {
 func (o WorkflowWaitForStateCompletionRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["workflowId"] = o.WorkflowId
-	toSerialize["stateExecutionId"] = o.StateExecutionId
+	if !IsNil(o.StateExecutionId) {
+		toSerialize["stateExecutionId"] = o.StateExecutionId
+	}
+	if !IsNil(o.StateId) {
+		toSerialize["stateId"] = o.StateId
+	}
+	if !IsNil(o.WaitForKey) {
+		toSerialize["waitForKey"] = o.WaitForKey
+	}
 	if !IsNil(o.WaitTimeSeconds) {
 		toSerialize["waitTimeSeconds"] = o.WaitTimeSeconds
 	}

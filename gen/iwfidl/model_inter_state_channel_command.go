@@ -19,19 +19,18 @@ var _ MappedNullable = &InterStateChannelCommand{}
 
 // InterStateChannelCommand struct for InterStateChannelCommand
 type InterStateChannelCommand struct {
-	CommandId   string `json:"commandId"`
-	ChannelName string `json:"channelName"`
-	AtLeast     *int32 `json:"atLeast,omitempty"`
-	AtMost      *int32 `json:"atMost,omitempty"`
+	CommandId   *string `json:"commandId,omitempty"`
+	ChannelName string  `json:"channelName"`
+	AtLeast     *int32  `json:"atLeast,omitempty"`
+	AtMost      *int32  `json:"atMost,omitempty"`
 }
 
 // NewInterStateChannelCommand instantiates a new InterStateChannelCommand object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInterStateChannelCommand(commandId string, channelName string) *InterStateChannelCommand {
+func NewInterStateChannelCommand(channelName string) *InterStateChannelCommand {
 	this := InterStateChannelCommand{}
-	this.CommandId = commandId
 	this.ChannelName = channelName
 	return &this
 }
@@ -44,28 +43,36 @@ func NewInterStateChannelCommandWithDefaults() *InterStateChannelCommand {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value
+// GetCommandId returns the CommandId field value if set, zero value otherwise.
 func (o *InterStateChannelCommand) GetCommandId() string {
-	if o == nil {
+	if o == nil || IsNil(o.CommandId) {
 		var ret string
 		return ret
 	}
-
-	return o.CommandId
+	return *o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value
+// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InterStateChannelCommand) GetCommandIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.CommandId) {
 		return nil, false
 	}
-	return &o.CommandId, true
+	return o.CommandId, true
 }
 
-// SetCommandId sets field value
+// HasCommandId returns a boolean if a field has been set.
+func (o *InterStateChannelCommand) HasCommandId() bool {
+	if o != nil && !IsNil(o.CommandId) {
+		return true
+	}
+
+	return false
+}
+
+// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
 func (o *InterStateChannelCommand) SetCommandId(v string) {
-	o.CommandId = v
+	o.CommandId = &v
 }
 
 // GetChannelName returns the ChannelName field value
@@ -166,7 +173,9 @@ func (o InterStateChannelCommand) MarshalJSON() ([]byte, error) {
 
 func (o InterStateChannelCommand) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["commandId"] = o.CommandId
+	if !IsNil(o.CommandId) {
+		toSerialize["commandId"] = o.CommandId
+	}
 	toSerialize["channelName"] = o.ChannelName
 	if !IsNil(o.AtLeast) {
 		toSerialize["atLeast"] = o.AtLeast

@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CommandId** | **string** |  | 
+**CommandId** | Pointer to **string** |  | [optional] 
 **SignalChannelName** | **string** |  | 
 **AtLeast** | Pointer to **int32** |  | [optional] 
 **AtMost** | Pointer to **int32** |  | [optional] 
@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 
 ### NewSignalCommand
 
-`func NewSignalCommand(commandId string, signalChannelName string, ) *SignalCommand`
+`func NewSignalCommand(signalChannelName string, ) *SignalCommand`
 
 NewSignalCommand instantiates a new SignalCommand object
 This constructor will assign default values to properties that have it defined,
@@ -47,6 +47,11 @@ and a boolean to check if the value has been set.
 
 SetCommandId sets CommandId field to given value.
 
+### HasCommandId
+
+`func (o *SignalCommand) HasCommandId() bool`
+
+HasCommandId returns a boolean if a field has been set.
 
 ### GetSignalChannelName
 

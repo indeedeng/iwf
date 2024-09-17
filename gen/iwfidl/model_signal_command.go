@@ -19,19 +19,18 @@ var _ MappedNullable = &SignalCommand{}
 
 // SignalCommand struct for SignalCommand
 type SignalCommand struct {
-	CommandId         string `json:"commandId"`
-	SignalChannelName string `json:"signalChannelName"`
-	AtLeast           *int32 `json:"atLeast,omitempty"`
-	AtMost            *int32 `json:"atMost,omitempty"`
+	CommandId         *string `json:"commandId,omitempty"`
+	SignalChannelName string  `json:"signalChannelName"`
+	AtLeast           *int32  `json:"atLeast,omitempty"`
+	AtMost            *int32  `json:"atMost,omitempty"`
 }
 
 // NewSignalCommand instantiates a new SignalCommand object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSignalCommand(commandId string, signalChannelName string) *SignalCommand {
+func NewSignalCommand(signalChannelName string) *SignalCommand {
 	this := SignalCommand{}
-	this.CommandId = commandId
 	this.SignalChannelName = signalChannelName
 	return &this
 }
@@ -44,28 +43,36 @@ func NewSignalCommandWithDefaults() *SignalCommand {
 	return &this
 }
 
-// GetCommandId returns the CommandId field value
+// GetCommandId returns the CommandId field value if set, zero value otherwise.
 func (o *SignalCommand) GetCommandId() string {
-	if o == nil {
+	if o == nil || IsNil(o.CommandId) {
 		var ret string
 		return ret
 	}
-
-	return o.CommandId
+	return *o.CommandId
 }
 
-// GetCommandIdOk returns a tuple with the CommandId field value
+// GetCommandIdOk returns a tuple with the CommandId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *SignalCommand) GetCommandIdOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.CommandId) {
 		return nil, false
 	}
-	return &o.CommandId, true
+	return o.CommandId, true
 }
 
-// SetCommandId sets field value
+// HasCommandId returns a boolean if a field has been set.
+func (o *SignalCommand) HasCommandId() bool {
+	if o != nil && !IsNil(o.CommandId) {
+		return true
+	}
+
+	return false
+}
+
+// SetCommandId gets a reference to the given string and assigns it to the CommandId field.
 func (o *SignalCommand) SetCommandId(v string) {
-	o.CommandId = v
+	o.CommandId = &v
 }
 
 // GetSignalChannelName returns the SignalChannelName field value
@@ -166,7 +173,9 @@ func (o SignalCommand) MarshalJSON() ([]byte, error) {
 
 func (o SignalCommand) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["commandId"] = o.CommandId
+	if !IsNil(o.CommandId) {
+		toSerialize["commandId"] = o.CommandId
+	}
 	toSerialize["signalChannelName"] = o.SignalChannelName
 	if !IsNil(o.AtLeast) {
 		toSerialize["atLeast"] = o.AtLeast

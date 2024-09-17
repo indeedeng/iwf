@@ -1059,7 +1059,7 @@ import (
 )
 
 func main() {
-    workflowWaitForStateCompletionRequest := *openapiclient.NewWorkflowWaitForStateCompletionRequest("WorkflowId_example", "StateExecutionId_example") // WorkflowWaitForStateCompletionRequest |  (optional)
+    workflowWaitForStateCompletionRequest := *openapiclient.NewWorkflowWaitForStateCompletionRequest("WorkflowId_example") // WorkflowWaitForStateCompletionRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
