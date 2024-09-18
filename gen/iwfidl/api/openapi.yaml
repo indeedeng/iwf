@@ -2708,6 +2708,7 @@ components:
         timerStatus:
           $ref: '#/components/schemas/TimerStatus'
       required:
+      - commandId
       - timerStatus
       type: object
     TimerStatus:
@@ -2733,6 +2734,7 @@ components:
         signalValue:
           $ref: '#/components/schemas/EncodedObject'
       required:
+      - commandId
       - signalChannelName
       - signalRequestStatus
       type: object
@@ -2755,6 +2757,7 @@ components:
           $ref: '#/components/schemas/EncodedObject'
       required:
       - channelName
+      - commandId
       - requestStatus
       type: object
     ChannelRequestStatus:
