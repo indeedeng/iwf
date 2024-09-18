@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
 
@@ -656,7 +655,7 @@ func executeState(
 				status = iwfidl.FIRED
 			}
 			timerResults = append(timerResults, iwfidl.TimerResult{
-				CommandId:   ptr.Any(cmd.GetCommandId()),
+				CommandId:   cmd.GetCommandId(),
 				TimerStatus: status,
 			})
 		}
@@ -673,7 +672,7 @@ func executeState(
 			}
 
 			signalResults = append(signalResults, iwfidl.SignalResult{
-				CommandId:           ptr.Any(cmd.GetCommandId()),
+				CommandId:           cmd.GetCommandId(),
 				SignalChannelName:   cmd.GetSignalChannelName(),
 				SignalValue:         result,
 				SignalRequestStatus: status,
@@ -692,7 +691,7 @@ func executeState(
 			}
 
 			interStateChannelResults = append(interStateChannelResults, iwfidl.InterStateChannelResult{
-				CommandId:     cmd.CommandId,
+				CommandId:     cmd.GetCommandId(),
 				ChannelName:   cmd.ChannelName,
 				RequestStatus: status,
 				Value:         result,
