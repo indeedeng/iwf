@@ -29,5 +29,10 @@ import (
 // main entry point for the iwf server
 func main() {
 	app := iwf.BuildCLI()
+
+	if len(os.Args) == 1 {
+		os.Args = append(os.Args, "start")
+	}
+
 	app.Run(os.Args)
 }
