@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"slices"
 )
 
 // StateStart is Deprecated, will be removed in next release
@@ -224,10 +225,40 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 					return err
 				}
 			}
+			// Check if each command in the combinations has a matching command in one of the lists
+			if !areAllCommandCombinationsIdsValid(commandReq) {
+				return fmt.Errorf("ANY_COMMAND_COMBINATION_COMPLETED can only be used when every command has an commandId that is found in TimerCommands, SignalCommands or InterStateChannelCommands")
+			}
 		}
 	}
 	// NOTE: we don't require decider trigger type when there is no commands
 	return nil
+}
+
+func areAllCommandCombinationsIdsValid(commandReq *iwfidl.CommandRequest) bool {
+	timerSignalInterStateChannelCmdIds := listTimerSignalInterStateChannelCommandIds(commandReq)
+	for _, commandCombo := range commandReq.GetCommandCombinations() {
+		for _, cmdId := range commandCombo.GetCommandIds() {
+			if !slices.Contains(timerSignalInterStateChannelCmdIds, cmdId) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func listTimerSignalInterStateChannelCommandIds(commandReq *iwfidl.CommandRequest) []string {
+	var ids []string
+	for _, timerCmd := range commandReq.GetTimerCommands() {
+		ids = append(ids, timerCmd.GetCommandId())
+	}
+	for _, signalCmd := range commandReq.GetSignalCommands() {
+		ids = append(ids, signalCmd.GetCommandId())
+	}
+	for _, interStateChannelCmd := range commandReq.GetInterStateChannelCommands() {
+		ids = append(ids, interStateChannelCmd.GetCommandId())
+	}
+	return ids
 }
 
 func DumpWorkflowInternal(
