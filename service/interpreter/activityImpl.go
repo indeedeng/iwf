@@ -227,7 +227,7 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 			}
 			// Check if each command in the combinations has a matching command in one of the lists
 			if !areAllCommandCombinationsIdsValid(commandReq) {
-				return fmt.Errorf("ANY_COMMAND_COMBINATION_COMPLETED can only be used when every command has an commandId that is found in TimerCommands, SignalCommands or InterStateChannelCommands")
+				return fmt.Errorf("ANY_COMMAND_COMBINATION_COMPLETED can only be used when every command has an commandId that is found in TimerCommands, SignalCommands or InternalChannelCommand")
 			}
 		}
 	}
@@ -236,10 +236,10 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 }
 
 func areAllCommandCombinationsIdsValid(commandReq *iwfidl.CommandRequest) bool {
-	timerSignalInterStateChannelCmdIds := listTimerSignalInterStateChannelCommandIds(commandReq)
+	timerSignalInternalChannelCmdIds := listTimerSignalInternalChannelCommandIds(commandReq)
 	for _, commandCombo := range commandReq.GetCommandCombinations() {
 		for _, cmdId := range commandCombo.GetCommandIds() {
-			if !slices.Contains(timerSignalInterStateChannelCmdIds, cmdId) {
+			if !slices.Contains(timerSignalInternalChannelCmdIds, cmdId) {
 				return false
 			}
 		}
@@ -247,7 +247,7 @@ func areAllCommandCombinationsIdsValid(commandReq *iwfidl.CommandRequest) bool {
 	return true
 }
 
-func listTimerSignalInterStateChannelCommandIds(commandReq *iwfidl.CommandRequest) []string {
+func listTimerSignalInternalChannelCommandIds(commandReq *iwfidl.CommandRequest) []string {
 	var ids []string
 	for _, timerCmd := range commandReq.GetTimerCommands() {
 		ids = append(ids, timerCmd.GetCommandId())
@@ -255,8 +255,8 @@ func listTimerSignalInterStateChannelCommandIds(commandReq *iwfidl.CommandReques
 	for _, signalCmd := range commandReq.GetSignalCommands() {
 		ids = append(ids, signalCmd.GetCommandId())
 	}
-	for _, interStateChannelCmd := range commandReq.GetInterStateChannelCommands() {
-		ids = append(ids, interStateChannelCmd.GetCommandId())
+	for _, internalChannelCmd := range commandReq.GetInterStateChannelCommands() {
+		ids = append(ids, internalChannelCmd.GetCommandId())
 	}
 	return ids
 }
