@@ -45,6 +45,11 @@ func (t *temporalClient) Close() {
 }
 
 func (t *temporalClient) IsWorkflowAlreadyStartedError(err error) bool {
+	if err.Error() == "schedule with this ID is already registered" {
+		// there is no type to check, just a string
+		// https://github.com/temporalio/sdk-go/blob/d10e87118a07b44fd09bf88d39a628f0e6e70c34/internal/error.go#L336
+		return true
+	}
 	return realtemporal.IsWorkflowExecutionAlreadyStartedError(err)
 }
 
