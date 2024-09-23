@@ -189,7 +189,20 @@ func composeHttpError(
 		}
 		responseBody = responseBody[:maxL] + "..."
 		errType = "1st-attempt-failure"
+	} else {
+		maxL := len(errMsg)
+		if maxL > 50 {
+			maxL = 50
+		}
+		errMsg = errMsg[:maxL] + "..."
+
+		maxL = len(responseBody)
+		if maxL > 500 {
+			maxL = 500
+		}
+		responseBody = responseBody[:maxL] + "..."
 	}
+
 	return provider.NewApplicationError(errType,
 		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, responseBody, errMsg))
 }
