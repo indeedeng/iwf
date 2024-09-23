@@ -68,6 +68,7 @@ type (
 		// default is http://localhost:ApiConfig.Port
 		ApiServiceAddress                  string                              `json:"serviceAddress"`
 		DumpWorkflowInternalActivityConfig *DumpWorkflowInternalActivityConfig `json:"dumpWorkflowInternalActivityConfig"`
+		DefaultHeader                      map[string]string                   `json:"defaultHeader"`
 	}
 
 	DumpWorkflowInternalActivityConfig struct {
