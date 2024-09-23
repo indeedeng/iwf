@@ -1,0 +1,15 @@
+name: Unit Test
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  tests:
+    name: "Unit testing"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Run unit tests"
+        run: make unitTests
