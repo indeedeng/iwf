@@ -2,8 +2,10 @@
 
 ## Enum
 
-
+# Keeping typo enum for backwards compatibility
 * `ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY` (value: `"ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY"`)
+
+* `ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY` (value: `"ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY"`)
 
 * `ALLOW_IF_NO_RUNNING` (value: `"ALLOW_IF_NO_RUNNING"`)
 
