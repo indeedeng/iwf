@@ -176,35 +176,25 @@ func composeHttpError(
 		statusCode = httpResp.StatusCode
 	}
 	errMsg := err.Error()
+	var trimmedResponseBody, trimmedErrMsg string
 	if isLocalActivity {
-		maxL := len(errMsg)
-		if maxL > 5 {
-			maxL = 5
-			errMsg = errMsg[:maxL] + "..."
-		}
-
-		maxL = len(responseBody)
-		if maxL > 50 {
-			maxL = 50
-			responseBody = responseBody[:maxL] + "..."
-		}
+		trimmedErrMsg = trimText(errMsg, 5)
+		trimmedResponseBody = trimText(responseBody, 50)
 		errType = "1st-attempt-failure"
 	} else {
-		maxL := len(errMsg)
-		if maxL > 50 {
-			maxL = 50
-			errMsg = errMsg[:maxL] + "..."
-		}
-
-		maxL = len(responseBody)
-		if maxL > 500 {
-			maxL = 500
-			responseBody = responseBody[:maxL] + "..."
-		}
+		trimmedErrMsg = trimText(errMsg, 50)
+		trimmedResponseBody = trimText(responseBody, 500)
 	}
 
 	return provider.NewApplicationError(errType,
-		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, responseBody, errMsg))
+		fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", statusCode, trimmedResponseBody, trimmedErrMsg))
+}
+
+func trimText(msg string, maxLength int) string {
+	if len(msg) > maxLength {
+		return msg[:maxLength] + "..."
+	}
+	return msg
 }
 
 func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartResponse) error {
