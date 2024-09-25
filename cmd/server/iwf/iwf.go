@@ -22,6 +22,7 @@ package iwf
 
 import (
 	"fmt"
+	"github.com/indeedeng/iwf/config"
 	rawLog "log"
 	"strings"
 	"sync"
@@ -32,7 +33,6 @@ import (
 	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"
 	"github.com/indeedeng/iwf/service/common/log/tag"
@@ -161,7 +161,10 @@ func start(c *cli.Context) {
 	wg.Wait()
 }
 
-func launchTemporalService(svcName string, config config.Config, unifiedClient uclient.UnifiedClient, temporalClient client.Client, logger log.Logger) {
+func launchTemporalService(
+	svcName string, config config.Config, unifiedClient uclient.UnifiedClient, temporalClient client.Client,
+	logger log.Logger,
+) {
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
@@ -181,7 +184,8 @@ func launchCadenceService(
 	service workflowserviceclient.Interface,
 	domain string,
 	closeFunc func(),
-	logger log.Logger) {
+	logger log.Logger,
+) {
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))

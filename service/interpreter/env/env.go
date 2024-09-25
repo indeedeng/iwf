@@ -1,8 +1,8 @@
 package env
 
 import (
+	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/config"
 	"go.temporal.io/sdk/converter"
 )
 

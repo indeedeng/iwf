@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter"
 
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
