@@ -16,3 +16,5 @@ The pattern makes it simple to manage the workflow versioning and replay tests.
 
 * For every new [global version](../service/interpreter/versions/versions.go), we add at least a new [history file](./history) in the replay_test.
 * For each version, we may need to have multiple history files to cover different scenarios(code paths).
+* To get the JSON history file, start and run a workflow that will use the code path that you want to protect the determinism. Then download the JSON from WebUI.
+* Usually, the workflow is from an integration test 
