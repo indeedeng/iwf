@@ -183,7 +183,7 @@ ci-temporal-integ-test:
 	$Q go test -v ./integ  -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60
 
 allTests:
-	$Q go test -v ./... -cover -coverprofile coverage.out -coverpkg ./service/... -dependencyWaitSeconds=60
+	$Q go test -v ./... -cover -coverprofile coverage.out -coverpkg ./service/...
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false
