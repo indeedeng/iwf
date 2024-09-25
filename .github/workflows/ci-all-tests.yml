@@ -1,4 +1,4 @@
-name: Temporal/Cadence 2-in-1 Integration Test
+name: All tests
 on:
   pull_request:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    name: "Integration testing"
+    name: "All tests"
     runs-on: ubuntu-latest
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
@@ -15,10 +15,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - name: "Set up Cadence/Temporal environment"
+      - name: "Set up Cadence/Temporal environment for integration tests"
         run: docker compose -f docker-compose/ci-cadence-temporal-dependencies.yml up -d
-      - name: "Test against cadence/temporal"
-        run: make ci-cadence-temporal-integ-test
+      - name: "Run all tests against cadence/temporal"
+        run: make allTests
       - name: Dump docker logs
         if: always()
         uses: jwalton/gh-docker-logs@v2
