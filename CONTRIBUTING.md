@@ -11,7 +11,7 @@ Here is the repository layout if you are interested to learn about it:
 * `config/` the config to start the server, and also config template to start the Docker image
 * `docker-compose/` the docker compose file to start a full iWF server with Temporal dependency
 * `gen/` the generated code from iwf-idl (Open API definition/Swagger)
-* `integTests/` the end to end integration tests.
+* `integ/` the end to end integration tests.
     * `workflow/` the iWF workflows that are written without SDK(just implemented the REST APIs)
     * `*.go` the tests
 * `iwf-idl/` the idl submodule
