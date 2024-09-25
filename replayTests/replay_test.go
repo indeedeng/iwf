@@ -1,4 +1,4 @@
-package integ
+package replayTests
 
 import (
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
