@@ -1,9 +1,15 @@
 package interpreter
 
 import (
+	"errors"
+	"fmt"
+	"github.com/golang/mock/gomock"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 )
@@ -87,4 +93,119 @@ func createCommands() ([]iwfidl.TimerCommand, []iwfidl.SignalCommand, []iwfidl.I
 		},
 	}
 	return validTimerCommands, validSignalCommands, internalCommands
+}
+
+func TestComposeHttpError_LocalActivity_LongErrorResponse(t *testing.T) {
+	longError := strings.Repeat("a", 1000)
+	errMsg := "original error message"
+	mockActivityProvider, httpResp, err := createTestComposeHttpErrorInitialState(t, longError, errMsg)
+
+	returnedError := errors.New("test error msg")
+	mockActivityProvider.EXPECT().NewApplicationError("1st-attempt-failure", fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", httpResp.StatusCode, longError[:50]+"...", errors.New(errMsg[:5]+"..."))).Return(returnedError)
+
+	err = composeHttpError(true, mockActivityProvider, err, httpResp, "test-error-type")
+	if err != nil {
+		return
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, returnedError, err)
+}
+
+func TestComposeHttpError_RegularActivity_LongErrorResponse(t *testing.T) {
+	longError := strings.Repeat("a", 1000)
+	errMsg := "original error message which is very long like this"
+	mockActivityProvider, httpResp, err := createTestComposeHttpErrorInitialState(t, longError, errMsg)
+
+	returnedError := errors.New("test error msg")
+	mockActivityProvider.EXPECT().NewApplicationError("test-error-type", fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", httpResp.StatusCode, longError[:500]+"...", errors.New(errMsg[:50]+"..."))).Return(returnedError)
+
+	err = composeHttpError(false, mockActivityProvider, err, httpResp, "test-error-type")
+	if err != nil {
+		return
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, returnedError, err)
+}
+
+func TestComposeHttpError_LocalActivity_ShortErrorResponse(t *testing.T) {
+	shortError := strings.Repeat("a", 40)
+	errMsg := "OK"
+	mockActivityProvider, httpResp, err := createTestComposeHttpErrorInitialState(t, shortError, errMsg)
+
+	returnedError := errors.New("test error msg")
+	mockActivityProvider.EXPECT().NewApplicationError("1st-attempt-failure", fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", httpResp.StatusCode, shortError, errors.New(errMsg))).Return(returnedError)
+
+	err = composeHttpError(true, mockActivityProvider, err, httpResp, "test-error-type")
+	if err != nil {
+		return
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, returnedError, err)
+}
+
+func TestComposeHttpError_RegularActivity_ShortErrorResponse(t *testing.T) {
+	shortError := strings.Repeat("a", 40)
+	errMsg := "OK"
+	mockActivityProvider, httpResp, err := createTestComposeHttpErrorInitialState(t, shortError, errMsg)
+
+	returnedError := errors.New("test error msg")
+	mockActivityProvider.EXPECT().NewApplicationError("test-error-type", fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", httpResp.StatusCode, shortError, errors.New(errMsg))).Return(returnedError)
+
+	err = composeHttpError(false, mockActivityProvider, err, httpResp, "test-error-type")
+	if err != nil {
+		return
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, returnedError, err)
+}
+
+func TestComposeHttpError_LocalActivity_NilResponse(t *testing.T) {
+	errMsg := "OK"
+	mockActivityProvider, httpResp, err := createTestComposeHttpErrorInitialState(t, "", errMsg)
+
+	returnedError := errors.New("test error msg")
+	mockActivityProvider.EXPECT().NewApplicationError("1st-attempt-failure", fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", 0, "None", errors.New(errMsg))).Return(returnedError)
+
+	err = composeHttpError(true, mockActivityProvider, err, httpResp, "test-error-type")
+	if err != nil {
+		return
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, returnedError, err)
+}
+
+func TestComposeHttpError_RegularActivity_NilResponse(t *testing.T) {
+	errMsg := "OK"
+	mockActivityProvider, httpResp, err := createTestComposeHttpErrorInitialState(t, "", errMsg)
+
+	returnedError := errors.New("test error msg")
+	mockActivityProvider.EXPECT().NewApplicationError("test-error-type", fmt.Sprintf("statusCode: %v, responseBody: %v, errMsg: %v", 0, "None", errors.New(errMsg))).Return(returnedError)
+
+	err = composeHttpError(false, mockActivityProvider, err, httpResp, "test-error-type")
+	if err != nil {
+		return
+	}
+
+	assert.Error(t, err)
+	assert.Equal(t, returnedError, err)
+}
+
+func createTestComposeHttpErrorInitialState(t *testing.T, httpError string, initialError string) (*MockActivityProvider, *http.Response, error) {
+	ctrl := gomock.NewController(t)
+	mockActivityProvider := NewMockActivityProvider(ctrl)
+
+	var httpResp *http.Response = nil
+	if httpError != "" {
+		httpResp = &http.Response{
+			StatusCode: 400,
+			Body:       io.NopCloser(strings.NewReader(httpError)),
+		}
+	}
+	err := errors.New(initialError)
+	return mockActivityProvider, httpResp, err
 }
