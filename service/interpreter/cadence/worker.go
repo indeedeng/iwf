@@ -1,10 +1,10 @@
 package cadence
 
 import (
+	"github.com/indeedeng/iwf/config"
 	"log"
 
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
@@ -19,7 +19,10 @@ type InterpreterWorker struct {
 	tasklist  string
 }
 
-func NewInterpreterWorker(config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(), unifiedClient uclient.UnifiedClient) *InterpreterWorker {
+func NewInterpreterWorker(
+	config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(),
+	unifiedClient uclient.UnifiedClient,
+) *InterpreterWorker {
 	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist)
 	return &InterpreterWorker{
 		service:   service,

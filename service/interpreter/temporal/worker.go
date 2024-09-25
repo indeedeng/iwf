@@ -1,10 +1,10 @@
 package temporal
 
 import (
+	"github.com/indeedeng/iwf/config"
 	"log"
 
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/client"
@@ -18,7 +18,10 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-func NewInterpreterWorker(config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool, memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient) *InterpreterWorker {
+func NewInterpreterWorker(
+	config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool,
+	memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient,
+) *InterpreterWorker {
 	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue)
 
 	return &InterpreterWorker{

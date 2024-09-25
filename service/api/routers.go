@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/log"
 )
 

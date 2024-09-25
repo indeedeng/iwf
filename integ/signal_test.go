@@ -3,10 +3,10 @@ package integ
 import (
 	"context"
 	"fmt"
+	config2 "github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/signal"
 	"github.com/indeedeng/iwf/service"
-	config2 "github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
 	"net/http"
