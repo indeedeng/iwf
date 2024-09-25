@@ -702,7 +702,8 @@ components:
       type: string
     IDReusePolicy:
       enum:
-      - ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY
+      - ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY # Keeping typo enum for backwards compatibility
+      - ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY
       - ALLOW_IF_NO_RUNNING
       - DISALLOW_REUSE
       - ALLOW_TERMINATE_IF_RUNNING

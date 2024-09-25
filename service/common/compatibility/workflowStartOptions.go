@@ -10,7 +10,8 @@ func GetWorkflowIdReusePolicy(options iwfidl.WorkflowStartOptions) *iwfidl.Workf
 		switch newType {
 		case iwfidl.ALLOW_IF_NO_RUNNING:
 			return iwfidl.ALLOW_DUPLICATE.Ptr()
-		case iwfidl.ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY:
+		case iwfidl.ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY, iwfidl.ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY:
+			// Keeping typo enum for backwards compatibility. Both old and corrected enums return the same result.
 			return iwfidl.ALLOW_DUPLICATE_FAILED_ONLY.Ptr()
 		case iwfidl.DISALLOW_REUSE:
 			return iwfidl.REJECT_DUPLICATE.Ptr()
