@@ -57,7 +57,9 @@ func TestPersistenceLoadingPolicy_NONE(t *testing.T) {
 	}
 }
 
-func doTestPersistenceLoadingPolicy(t *testing.T, backendType service.BackendType, loadingType iwfidl.PersistenceLoadingType, rpcUseMemo bool) {
+func doTestPersistenceLoadingPolicy(
+	t *testing.T, backendType service.BackendType, loadingType iwfidl.PersistenceLoadingType, rpcUseMemo bool,
+) {
 	assertions := assert.New(t)
 
 	wfHandler := persistence_loading_policy.NewHandler()
