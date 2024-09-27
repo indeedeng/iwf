@@ -18,7 +18,7 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 			VerboseDebug:              false,
 			FailAtMemoIncompatibility: !testCfg.DisableFailAtMemoIncompatibility,
 			InterpreterActivityConfig: config.InterpreterActivityConfig{
-				DefaultHeader: testCfg.DefaultHeaders,
+				DefaultHeaders: testCfg.DefaultHeaders,
 			},
 		},
 	}

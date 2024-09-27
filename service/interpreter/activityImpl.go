@@ -33,7 +33,7 @@ func StateApiWaitUntil(
 
 	svcCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeader,
+		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: iwfWorkerBaseUrl,
@@ -90,7 +90,7 @@ func StateApiExecute(
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 	svcCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeader,
+		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: iwfWorkerBaseUrl,
@@ -278,7 +278,7 @@ func DumpWorkflowInternal(
 	apiAddress := config.GetApiServiceAddressWithDefault(env.GetSharedConfig())
 	svcCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeader,
+		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: apiAddress,
