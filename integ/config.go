@@ -1,7 +1,7 @@
 package integ
 
 import (
-	"github.com/indeedeng/iwf/service/common/config"
+	"github.com/indeedeng/iwf/config"
 )
 
 const testWorkflowServerPort = "9714"

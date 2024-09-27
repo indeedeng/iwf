@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/indeedeng/iwf/config"
 	"net/http"
 
 	"github.com/indeedeng/iwf/service"
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"

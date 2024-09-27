@@ -3,10 +3,10 @@ package interpreter
 import (
 	"context"
 	"fmt"
+	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
-	"github.com/indeedeng/iwf/service/common/config"
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
