@@ -29,7 +29,6 @@ func NewPersistenceManager(
 	for _, da := range initDataAttributes {
 		dataAttributes[da.GetKey()] = da
 	}
-	println("lwolczynski test  Upsert initial data attrs")
 	return &PersistenceManager{
 		dataObjects:      dataAttributes,
 		searchAttributes: searchAttributes,
