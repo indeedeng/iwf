@@ -12,6 +12,7 @@ func SetQueryHandlers(
 ) error {
 	err := provider.SetQueryHandler(ctx, service.GetDataAttributesWorkflowQueryType, func(req service.GetDataAttributesQueryRequest) (service.GetDataAttributesQueryResponse, error) {
 		dos := persistenceManager.GetDataObjectsByKey(req)
+		println("lwolczynski test GetDataObjects")
 		return dos, nil
 	})
 	if err != nil {

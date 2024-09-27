@@ -123,6 +123,13 @@ func doTestPersistenceWorkflow(
 	nowTime := time.Now()
 	notTimeNanoStr := fmt.Sprintf("%v", nowTime.UnixNano())
 	nowTimeStr := nowTime.Format(timeparser.DateTimeFormat)
+	expectedDataAttribute := iwfidl.KeyValue{
+		Key: ptr.Any("TestKey"),
+		Value: &iwfidl.EncodedObject{
+			Encoding: ptr.Any("TestEncoding"),
+			Data:     ptr.Any("TestValue"),
+		},
+	}
 	expectedDatetimeSearchAttribute := iwfidl.SearchAttribute{
 		Key:         iwfidl.PtrString("CustomDatetimeField"),
 		ValueType:   ptr.Any(iwfidl.DATETIME),
@@ -148,12 +155,26 @@ func doTestPersistenceWorkflow(
 			SearchAttributes: []iwfidl.SearchAttribute{
 				expectedDatetimeSearchAttribute,
 			},
+			DataAttributes: []iwfidl.KeyValue{
+				expectedDataAttribute,
+			},
 			WorkflowConfigOverride:   config,
 			UseMemoForDataAttributes: ptr.Any(useMemo),
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 	panicAtHttpError(err, httpResp)
+
+	initReqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
+	queryResult, httpResp, err := initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
+		WorkflowId: wfId,
+		Keys: []string{
+			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
+		},
+		UseMemoForDataAttributes: ptr.Any(useMemo),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+	assert.Equal(t, []iwfidl.KeyValue{expectedDataAttribute}, queryResult.GetObjects())
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	wfResponse, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -165,7 +186,7 @@ func doTestPersistenceWorkflow(
 	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			persistence.TestDataObjectKey,
+			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
@@ -232,6 +253,7 @@ func doTestPersistenceWorkflow(
 			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
 			Value: &persistence.TestDataObjectVal2,
 		},
+		expectedDataAttribute,
 	}
 	expected2 := []iwfidl.KeyValue{
 		{
@@ -242,6 +264,7 @@ func doTestPersistenceWorkflow(
 			Key:   iwfidl.PtrString(persistence.TestDataObjectKey2),
 			Value: &persistence.TestDataObjectVal1,
 		},
+		expectedDataAttribute,
 	}
 	assertions.ElementsMatch(expected1, queryResult1.GetObjects())
 	assertions.ElementsMatch(expected2, queryResult2.GetObjects())

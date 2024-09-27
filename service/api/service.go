@@ -81,8 +81,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	} else {
 		workflowConfig = *s.config.Interpreter.DefaultWorkflowConfig
 	}
-
 	var initCustomSAs []iwfidl.SearchAttribute
+	var initCustomDAs []iwfidl.KeyValue
 	// workerUrl is always needed, for optimizing None as persistence loading type
 	workflowOptions.Memo = map[string]interface{}{
 		service.WorkerUrlMemoKey: iwfidl.EncodedObject{
@@ -104,6 +104,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		workflowOptions.SearchAttributes = utils.MergeMap(initialCustomSAInternal, workflowOptions.SearchAttributes)
 
 		initCustomSAs = startOptions.SearchAttributes
+		initCustomDAs = startOptions.DataAttributes
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
@@ -112,6 +113,9 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			workflowOptions.Memo[service.UseMemoForDataAttributesKey] = iwfidl.EncodedObject{
 				// Note: the value is actually not too important, we will check the presence of the key only as today
 				Data: iwfidl.PtrString("true"),
+			}
+			for _, da := range initCustomDAs {
+				workflowOptions.Memo[da.GetKey()] = da.GetValue()
 			}
 		}
 		if startOptions.WorkflowStartDelaySeconds != nil {
@@ -127,6 +131,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		StateInput:                         req.StateInput,
 		StateOptions:                       req.StateOptions,
 		InitSearchAttributes:               initCustomSAs,
+		InitDataAttributes:                 initCustomDAs,
 		Config:                             workflowConfig,
 		UseMemoForDataAttributes:           useMemo,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),

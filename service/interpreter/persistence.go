@@ -19,14 +19,19 @@ type PersistenceManager struct {
 }
 
 func NewPersistenceManager(
-	provider WorkflowProvider, initSearchAttributes []iwfidl.SearchAttribute, useMemo bool,
+	provider WorkflowProvider, initDataAttributes []iwfidl.KeyValue, initSearchAttributes []iwfidl.SearchAttribute, useMemo bool,
 ) *PersistenceManager {
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
 	for _, sa := range initSearchAttributes {
 		searchAttributes[sa.GetKey()] = sa
 	}
+	dataAttributes := make(map[string]iwfidl.KeyValue)
+	for _, da := range initDataAttributes {
+		dataAttributes[da.GetKey()] = da
+	}
+	println("lwolczynski test  Upsert initial data attrs")
 	return &PersistenceManager{
-		dataObjects:      make(map[string]iwfidl.KeyValue),
+		dataObjects:      dataAttributes,
 		searchAttributes: searchAttributes,
 		provider:         provider,
 

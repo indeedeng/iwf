@@ -64,7 +64,7 @@ Or maybe both just for testing to ensure the code works for both Cadence and Tem
 
 ### Option 1: Run with our docker-compose file (Recommended)
 
-Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
+Simply run `docker compose -f docker-compose/integ-dependencies.yml up` will:
 
 * Start both Cadence & Temporal as dependencies
 * Set up required system search attributes

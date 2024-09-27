@@ -82,7 +82,7 @@ func InterpreterImpl(
 	} else {
 		interStateChannel = NewInterStateChannel()
 		stateRequestQueue = NewStateRequestQueue()
-		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes, input.UseMemoForDataAttributes)
+		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
@@ -315,6 +315,8 @@ func InterpreterImpl(
 			input.StateInput = nil
 			input.StateOptions = nil
 			input.StartStateId = nil
+			input.InitDataAttributes = nil
+			input.InitSearchAttributes = nil
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop
