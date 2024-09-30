@@ -167,7 +167,7 @@ func doTestPersistenceWorkflow(
 
 	// Config is only present for continueAsNew tests
 	if config != nil {
-		// TODO: Fix the issue with running queryHandler before new workflow which Continues as New has started
+		// Sleep required to ensure that loading data to the continuedAsNew workflow is completed
 		time.Sleep(time.Millisecond * 1000)
 	}
 

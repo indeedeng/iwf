@@ -95,6 +95,10 @@ func InterpreterImpl(
 	if err != nil {
 		return nil, err
 	}
+	// We intentionally set the query handler after the continueAsNew/dumpInternal activity.
+	// This is to ensure the correctness. If we set the query handler before that,
+	// the query handler could return empty data (since the loading hasn't completed), which will be incorrect response.
+	// We would rather return server errors and let the client retry later.
 	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
 		return nil, err
