@@ -11,6 +11,9 @@ import (
 const (
 	WorkflowType = "headers"
 	State1       = "S1"
+
+	TestHeaderKey   = "integration-test-header"
+	TestHeaderValue = "integration-test-value"
 )
 
 type handler struct {
@@ -28,6 +31,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	headerValue := c.GetHeader(TestHeaderKey)
 	if headerValue != TestHeaderValue {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "test header not found"})
+		return
 	}
 
 	var req iwfidl.WorkflowStateStartRequest
@@ -57,6 +61,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	headerValue := c.GetHeader(TestHeaderKey)
 	if headerValue != TestHeaderValue {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "test header not found"})
+		return
 	}
 
 	var req iwfidl.WorkflowStateDecideRequest
@@ -69,7 +74,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
-			// go to S2
+			// go to S1
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
