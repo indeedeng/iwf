@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/timeparser"
 	"log"
+	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -165,20 +166,25 @@ func doTestPersistenceWorkflow(
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 	panicAtHttpError(err, httpResp)
 
+	initReqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
+
+	queryResult, httpResp, err := getDataAttributes(initReqQry, wfId, expectedDataAttribute, useMemo)
+
+	retryCount := 0
+
 	// Config is only present for continueAsNew tests
 	if config != nil {
-		// Sleep required to ensure that loading data to the continuedAsNew workflow is completed
-		time.Sleep(time.Millisecond * 1000)
+		for {
+			if err == nil || retryCount >= 5 {
+				break
+			}
+			// Loading data to a continuedAsNew workflow might take a few seconds thus retry mechanism is needed
+			time.Sleep(time.Millisecond * 1000)
+			retryCount += 1
+			queryResult, httpResp, err = getDataAttributes(initReqQry, wfId, expectedDataAttribute, useMemo)
+		}
 	}
 
-	initReqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
-	queryResult, httpResp, err := initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
-		WorkflowId: wfId,
-		Keys: []string{
-			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
-		},
-		UseMemoForDataAttributes: ptr.Any(useMemo),
-	}).Execute()
 	panicAtHttpError(err, httpResp)
 
 	assert.Contains(t, queryResult.GetObjects(), expectedDataAttribute)
@@ -394,6 +400,16 @@ func doTestPersistenceWorkflow(
 		// TODO?? research how to use text
 		//assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomKeywordField='%v'", nowTimeStrForSearch, "keyword-value1"), 5, apiClient, assertions)
 	}
+}
+
+func getDataAttributes(initReqQry iwfidl.ApiApiV1WorkflowDataobjectsGetPostRequest, wfId string, expectedDataAttribute iwfidl.KeyValue, useMemo bool) (*iwfidl.WorkflowGetDataObjectsResponse, *http.Response, error) {
+	return initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
+		WorkflowId: wfId,
+		Keys: []string{
+			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
+		},
+		UseMemoForDataAttributes: ptr.Any(useMemo),
+	}).Execute()
 }
 
 func assertSearch(query string, expectedCount int, apiClient *iwfidl.APIClient, assertions *assert.Assertions) {
