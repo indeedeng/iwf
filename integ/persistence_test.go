@@ -165,8 +165,11 @@ func doTestPersistenceWorkflow(
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 	panicAtHttpError(err, httpResp)
 
-	// TODO: Fix the issue with running queryHandler before new workflow which Continues as New has started
-	time.Sleep(time.Millisecond * 10)
+	// Config is only present for continueAsNew tests
+	if config != nil {
+		// TODO: Fix the issue with running queryHandler before new workflow which Continues as New has started
+		time.Sleep(time.Millisecond * 1000)
+	}
 
 	initReqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
 	queryResult, httpResp, err := initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
