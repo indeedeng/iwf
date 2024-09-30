@@ -51,6 +51,7 @@ type StartWorkflowOptions struct {
 	WorkflowIDReusePolicy    *iwfidl.WorkflowIDReusePolicy
 	CronSchedule             *string
 	RetryPolicy              *iwfidl.WorkflowRetryPolicy
+	DataAttributes           map[string]interface{}
 	SearchAttributes         map[string]interface{}
 	Memo                     map[string]interface{}
 	WorkflowStartDelay       *time.Duration

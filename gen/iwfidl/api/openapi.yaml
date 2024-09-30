@@ -672,6 +672,15 @@ components:
         workflowIDReusePolicy: null
         useMemoForDataAttributes: true
         cronSchedule: cronSchedule
+        dataAttributes:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
       properties:
         workflowIDReusePolicy:
           $ref: '#/components/schemas/WorkflowIDReusePolicy'
@@ -685,6 +694,10 @@ components:
         searchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
+          type: array
+        dataAttributes:
+          items:
+            $ref: '#/components/schemas/KeyValue'
           type: array
         workflowConfigOverride:
           $ref: '#/components/schemas/WorkflowConfig'
@@ -702,7 +715,7 @@ components:
       type: string
     IDReusePolicy:
       enum:
-      - ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY # Keeping typo enum for backwards compatibility
+      - ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY
       - ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY
       - ALLOW_IF_NO_RUNNING
       - DISALLOW_REUSE
@@ -891,6 +904,15 @@ components:
           workflowIDReusePolicy: null
           useMemoForDataAttributes: true
           cronSchedule: cronSchedule
+          dataAttributes:
+          - value:
+              data: data
+              encoding: encoding
+            key: key
+          - value:
+              data: data
+              encoding: encoding
+            key: key
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
         stateInput:

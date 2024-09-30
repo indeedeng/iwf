@@ -20,7 +20,7 @@ type IDReusePolicy string
 
 // List of IDReusePolicy
 const (
-	ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY IDReusePolicy = "ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY" // Keeping typo enum for backwards compatibility
+	ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY IDReusePolicy = "ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY"
 	ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY  IDReusePolicy = "ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY"
 	ALLOW_IF_NO_RUNNING                 IDReusePolicy = "ALLOW_IF_NO_RUNNING"
 	DISALLOW_REUSE                      IDReusePolicy = "DISALLOW_REUSE"
@@ -29,7 +29,7 @@ const (
 
 // All allowed values of IDReusePolicy enum
 var AllowedIDReusePolicyEnumValues = []IDReusePolicy{
-	"ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY", // Keeping typo enum for backwards compatibility
+	"ALLOW_IF_PREVIOUS_EXISTS_ABNORMALLY",
 	"ALLOW_IF_PREVIOUS_EXITS_ABNORMALLY",
 	"ALLOW_IF_NO_RUNNING",
 	"DISALLOW_REUSE",
