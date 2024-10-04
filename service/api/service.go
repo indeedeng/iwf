@@ -158,7 +158,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 
 	var workflowId string
 	if req.WaitForKey != nil {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.WaitForKey
+		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateId + "_" + *req.WaitForKey
 	} else {
 		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateExecutionId
 	}
