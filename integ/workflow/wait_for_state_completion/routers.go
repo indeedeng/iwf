@@ -95,7 +95,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: State2,
+							StateId:    State2,
+							WaitForKey: ptr.Any("testKey"),
 						},
 					},
 				},
