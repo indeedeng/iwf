@@ -385,6 +385,8 @@ func (t *temporalClient) SynchronousUpdateWorkflow(
 		RunID:      runID,
 		UpdateName: updateType,
 		Args:       args,
+		// TODO: Must be provided and will only accept "WorkflowUpdateStageCompleted"
+		WaitForStage: client.WorkflowUpdateStageCompleted,
 	}
 	handle, err := t.tClient.UpdateWorkflow(ctx, options)
 	if err != nil {
