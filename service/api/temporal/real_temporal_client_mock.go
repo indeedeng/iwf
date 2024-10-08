@@ -539,7 +539,7 @@ func (mr *MockClientMockRecorder) UpdateWorkflow(ctx, workflowID, workflowRunID,
 }
 
 // UpdateWorkflowWithOptions mocks base method.
-func (m *MockClient) UpdateWorkflowWithOptions(ctx context.Context, request *client.UpdateWorkflowWithOptionsRequest) (client.WorkflowUpdateHandle, error) {
+func (m *MockClient) UpdateWorkflowWithOptions(ctx context.Context, request *client.UpdateWorkflowOptions) (client.WorkflowUpdateHandle, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateWorkflowWithOptions", ctx, request)
 	ret0, _ := ret[0].(client.WorkflowUpdateHandle)

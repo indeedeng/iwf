@@ -140,7 +140,7 @@ func (t *temporalClient) StartInterpreterWorkflow(
 				WorkflowExecutionTimeout: workflowOptions.WorkflowExecutionTimeout,
 				RetryPolicy:              workflowOptions.RetryPolicy,
 				Memo:                     workflowOptions.Memo,
-				SearchAttributes:         workflowOptions.SearchAttributes,
+				TypedSearchAttributes:    workflowOptions.TypedSearchAttributes,
 			},
 		})
 
@@ -273,7 +273,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
-		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().Unix(),
+		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds(),
 	}, err
 }
 
@@ -378,7 +378,15 @@ func (t *temporalClient) GetWorkflowResult(
 func (t *temporalClient) SynchronousUpdateWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
 ) error {
-	handle, err := t.tClient.UpdateWorkflow(ctx, workflowID, runID, updateType, input)
+	var args []interface{}
+	args = append(args, input)
+	options := client.UpdateWorkflowOptions{
+		WorkflowID: workflowID,
+		RunID:      runID,
+		UpdateName: updateType,
+		Args:       args,
+	}
+	handle, err := t.tClient.UpdateWorkflow(ctx, options)
 	if err != nil {
 		return err
 	}
