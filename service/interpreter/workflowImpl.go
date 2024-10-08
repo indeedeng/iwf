@@ -484,9 +484,9 @@ func executeState(
 	isResumeFromContinueAsNew := stateReq.IsResumeRequest()
 
 	options := state.GetStateOptions()
-	skipStart := compatibility.GetSkipStartApi(&options)
-	if skipStart {
-		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
+	skipWaitUntil := compatibility.GetSkipStartApi(&options)
+	if skipWaitUntil {
+		return invokeStateExecute(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 			nil, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 	}
 
@@ -706,11 +706,11 @@ func executeState(
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
-	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
+	return invokeStateExecute(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 		commandRes, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
 
-func executeStateDecide(
+func invokeStateExecute(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
 	basicInfo service.BasicInfo,
@@ -762,16 +762,23 @@ func executeStateDecide(
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
 		// this is not a problem because the signalWithStart will be very fast and highly available
 		unifiedClient := env.GetUnifiedClient()
+
+		var workflowId string
+
+		if state.WaitForKey != nil {
+			workflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + state.StateId + "_" + *state.WaitForKey
+		} else {
+			workflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId
+		}
+
 		err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
 			context.Background(),
 			uclient.StartWorkflowOptions{
-				ID:                       service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId,
+				ID:                       workflowId,
 				TaskQueue:                env.GetTaskQueue(),
 				WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
 			},
-			iwfidl.StateCompletionOutput{
-				CompletedStateExecutionId: *executionContext.StateExecutionId,
-			})
+			iwfidl.StateCompletionOutput{})
 		if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
 			// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
 			// panic will let the workflow task will retry until the signal is sent

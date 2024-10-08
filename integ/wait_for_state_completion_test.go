@@ -74,37 +74,61 @@ func doTestWaitForStateCompletion(
 			WorkflowConfigOverride: config,
 		},
 	}
-	if useStateId {
-		startReq.WaitForCompletionStateIds = []string{"S1"}
-	} else {
-		startReq.WaitForCompletionStateExecutionIds = []string{"S1-1"}
-	}
-	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
-
-	req1 := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background())
-	_, httpResp, err = req1.WorkflowWaitForStateCompletionRequest(
-		iwfidl.WorkflowWaitForStateCompletionRequest{
-			WorkflowId:       wfId,
-			StateExecutionId: ptr.Any("S1-1"),
-			WaitTimeSeconds:  iwfidl.PtrInt32(30),
-		}).Execute()
-	panicAtHttpError(err, httpResp)
 
 	assertions := assert.New(t)
-	assertions.Equal(200, httpResp.StatusCode)
-	// read httpResp body
-	var output iwfidl.WorkflowWaitForStateCompletionResponse
-	defer httpResp.Body.Close()
-	err = json.NewDecoder(httpResp.Body).Decode(&output)
-	if err != nil {
-		log.Fatalf("Failed to decode the response: %v", err)
+
+	if useStateId {
+		startReq.WaitForCompletionStateIds = []string{"S2"}
+
+		_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
+		panicAtHttpError(err, httpResp)
+
+		req := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background())
+		_, httpResp, err = req.WorkflowWaitForStateCompletionRequest(
+			iwfidl.WorkflowWaitForStateCompletionRequest{
+				WorkflowId:      wfId,
+				WaitForKey:      ptr.Any("testKey"),
+				StateId:         ptr.Any("S2"),
+				WaitTimeSeconds: iwfidl.PtrInt32(30),
+			}).Execute()
+		panicAtHttpError(err, httpResp)
+
+		assertions.Equal(200, httpResp.StatusCode)
+		// read httpResp body
+		var output iwfidl.WorkflowWaitForStateCompletionResponse
+		defer httpResp.Body.Close()
+		err = json.NewDecoder(httpResp.Body).Decode(&output)
+		if err != nil {
+			log.Fatalf("Failed to decode the response: %v", err)
+		}
+	} else {
+		startReq.WaitForCompletionStateExecutionIds = []string{"S1-1"}
+
+		_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
+		panicAtHttpError(err, httpResp)
+
+		req := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background())
+		_, httpResp, err = req.WorkflowWaitForStateCompletionRequest(
+			iwfidl.WorkflowWaitForStateCompletionRequest{
+				WorkflowId:       wfId,
+				StateExecutionId: ptr.Any("S1-1"),
+				WaitTimeSeconds:  iwfidl.PtrInt32(30),
+			}).Execute()
+		panicAtHttpError(err, httpResp)
+
+		assertions.Equal(200, httpResp.StatusCode)
+		// read httpResp body
+		var output iwfidl.WorkflowWaitForStateCompletionResponse
+		defer httpResp.Body.Close()
+		err = json.NewDecoder(httpResp.Body).Decode(&output)
+		if err != nil {
+			log.Fatalf("Failed to decode the response: %v", err)
+		}
 	}
-	assertions.Equal("S1-1", output.StateCompletionOutput.CompletedStateExecutionId)
 
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
-	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+	_, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
 	panicAtHttpError(err, httpResp)
