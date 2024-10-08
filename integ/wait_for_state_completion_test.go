@@ -75,6 +75,8 @@ func doTestWaitForStateCompletion(
 		},
 	}
 
+	assertions := assert.New(t)
+
 	if useStateId {
 		startReq.WaitForCompletionStateIds = []string{"S2"}
 
@@ -91,7 +93,6 @@ func doTestWaitForStateCompletion(
 			}).Execute()
 		panicAtHttpError(err, httpResp)
 
-		assertions := assert.New(t)
 		assertions.Equal(200, httpResp.StatusCode)
 		// read httpResp body
 		var output iwfidl.WorkflowWaitForStateCompletionResponse
@@ -115,7 +116,6 @@ func doTestWaitForStateCompletion(
 			}).Execute()
 		panicAtHttpError(err, httpResp)
 
-		assertions := assert.New(t)
 		assertions.Equal(200, httpResp.StatusCode)
 		// read httpResp body
 		var output iwfidl.WorkflowWaitForStateCompletionResponse
@@ -126,8 +126,6 @@ func doTestWaitForStateCompletion(
 		}
 	}
 
-	assertions2 := assert.New(t)
-
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -136,13 +134,13 @@ func doTestWaitForStateCompletion(
 	panicAtHttpError(err, httpResp)
 
 	history, data := wfHandler.GetTestResult()
-	assertions2.Equalf(map[string]int64{
+	assertions.Equalf(map[string]int64{
 		"S1_start":  1,
 		"S1_decide": 1,
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "timer test fail, %v", history)
 	duration := (data["fired_at"]).(int64) - (data["scheduled_at"]).(int64)
-	assertions2.Equal("timer-cmd-id", data["timer_id"])
-	assertions2.True(duration >= 9 && duration <= 11, duration)
+	assertions.Equal("timer-cmd-id", data["timer_id"])
+	assertions.True(duration >= 9 && duration <= 11, duration)
 }
