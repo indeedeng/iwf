@@ -58,6 +58,17 @@ func (srq *StateRequestQueue) GetAllStateStartRequests() []iwfidl.StateMovement 
 	return res
 }
 
+func (srq *StateRequestQueue) GetAllStateResumeStates() []service.StateExecutionResumeInfo {
+	var res []service.StateExecutionResumeInfo
+	for _, r := range srq.queue {
+		if !r.IsResumeRequest() {
+			continue
+		}
+		res = append(res, r.GetStateResumeRequest())
+	}
+	return res
+}
+
 func (srq *StateRequestQueue) AddStateStartRequests(reqs []iwfidl.StateMovement) {
 	for _, r := range reqs {
 		srq.queue = append(srq.queue, NewStateStartRequest(r))

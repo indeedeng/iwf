@@ -117,7 +117,7 @@ OuterLoop:
 		}
 		for _, e := range resp.GetHistory().GetEvents() {
 			if e.GetEventType() == enums.EVENT_TYPE_WORKFLOW_TASK_COMPLETED {
-				if e.GetEventTime().GetSeconds()+int64(e.GetEventTime().GetNanos()) >= earliestTime {
+				if e.GetEventTime().GetSeconds()*1000*1000*1000+int64(e.GetEventTime().GetNanos()) >= earliestTime {
 					decisionFinishID = e.GetEventId()
 					break OuterLoop
 				}

@@ -116,7 +116,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 					ValueType: iwfidl.INT.Ptr(),
 				},
 			}
-			time.Sleep(time.Second * 2)
+			time.Sleep(time.Second * 1)
 			reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 			rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 				WorkflowId: wfId,

@@ -273,7 +273,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
-		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds() + int64(resp.GetWorkflowExecutionInfo().GetStartTime().GetNanos()),
+		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds()*1000*1000*1000 + int64(resp.GetWorkflowExecutionInfo().GetStartTime().GetNanos()),
 	}, err
 }
 
