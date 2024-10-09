@@ -140,7 +140,7 @@ func (t *temporalClient) StartInterpreterWorkflow(
 				WorkflowExecutionTimeout: workflowOptions.WorkflowExecutionTimeout,
 				RetryPolicy:              workflowOptions.RetryPolicy,
 				Memo:                     workflowOptions.Memo,
-				SearchAttributes:         workflowOptions.SearchAttributes,
+				TypedSearchAttributes:    workflowOptions.TypedSearchAttributes,
 			},
 		})
 
@@ -273,7 +273,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
-		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().Unix(),
+		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds()*1000*1000*1000 + int64(resp.GetWorkflowExecutionInfo().GetStartTime().GetNanos()),
 	}, err
 }
 

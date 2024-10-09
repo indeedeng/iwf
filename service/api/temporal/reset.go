@@ -13,7 +13,8 @@ import (
 	"strings"
 )
 
-func getResetEventIDByType(ctx context.Context, resetType iwfidl.WorkflowResetType,
+func getResetEventIDByType(
+	ctx context.Context, resetType iwfidl.WorkflowResetType,
 	namespace, wid, rid string,
 	frontendClient workflowservice.WorkflowServiceClient, converter converter.DataConverter,
 	historyEventId int32, earliestHistoryTimeStr string, stateId, stateExecutionId string,
@@ -51,7 +52,9 @@ func getResetEventIDByType(ctx context.Context, resetType iwfidl.WorkflowResetTy
 	return
 }
 
-func getFirstWorkflowTaskEventID(ctx context.Context, namespace, wid, rid string, frontendClient workflowservice.WorkflowServiceClient) (resetBaseRunID string, workflowTaskEventID int64, err error) {
+func getFirstWorkflowTaskEventID(
+	ctx context.Context, namespace, wid, rid string, frontendClient workflowservice.WorkflowServiceClient,
+) (resetBaseRunID string, workflowTaskEventID int64, err error) {
 	resetBaseRunID = rid
 	req := &workflowservice.GetWorkflowExecutionHistoryRequest{
 		Namespace: namespace,
@@ -117,7 +120,7 @@ OuterLoop:
 		}
 		for _, e := range resp.GetHistory().GetEvents() {
 			if e.GetEventType() == enums.EVENT_TYPE_WORKFLOW_TASK_COMPLETED {
-				if e.GetEventTime().UnixNano() >= earliestTime {
+				if e.GetEventTime().GetSeconds()*1000*1000*1000+int64(e.GetEventTime().GetNanos()) >= earliestTime {
 					decisionFinishID = e.GetEventId()
 					break OuterLoop
 				}
