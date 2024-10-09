@@ -7,7 +7,7 @@ import (
 )
 
 // remove the leading underscore when using it
-func TestNothinButJustRunningTheServiceTemporalWorkerForDebug(t *testing.T) {
+func _TestNothinButJustRunningTheServiceTemporalWorkerForDebug(t *testing.T) {
 	startIwfServiceWithClient(service.BackendTypeTemporal)
 	time.Sleep(time.Hour)
 }
