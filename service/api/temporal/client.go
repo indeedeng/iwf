@@ -273,7 +273,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
-		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds(),
+		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds() + int64(resp.GetWorkflowExecutionInfo().GetStartTime().GetNanos()),
 	}, err
 }
 
@@ -378,15 +378,14 @@ func (t *temporalClient) GetWorkflowResult(
 func (t *temporalClient) SynchronousUpdateWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
 ) error {
-	var args []interface{}
-	args = append(args, input)
+	args := []interface{}{input}
 	options := client.UpdateWorkflowOptions{
 		WorkflowID: workflowID,
 		RunID:      runID,
 		UpdateName: updateType,
 		Args:       args,
-		// TODO: Must be provided and will only accept "WorkflowUpdateStageCompleted"
-		WaitForStage: client.WorkflowUpdateStageCompleted,
+		// TODO: Leaving this as Accepted that was a default value before WaitForStage became required argument, but Completed might be a better choice
+		WaitForStage: client.WorkflowUpdateStageAccepted,
 	}
 	handle, err := t.tClient.UpdateWorkflow(ctx, options)
 	if err != nil {
