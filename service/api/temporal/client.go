@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/utils"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -273,7 +274,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
-		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().GetSeconds()*1000*1000*1000 + int64(resp.GetWorkflowExecutionInfo().GetStartTime().GetNanos()),
+		WorkflowStartedTimestamp: utils.ToNanoSeconds(resp.GetWorkflowExecutionInfo().GetStartTime()),
 	}, err
 }
 
