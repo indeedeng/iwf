@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
 	"time"
 )
@@ -85,4 +86,8 @@ func CheckHttpError(err error, httpResp *http.Response) bool {
 		return true
 	}
 	return false
+}
+
+func ToNanoSeconds(e *timestamppb.Timestamp) int64 {
+	return e.GetSeconds()*1000*1000*1000 + int64(e.GetNanos())
 }

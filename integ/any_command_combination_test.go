@@ -108,7 +108,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	panicAtHttpError(err, httpResp)
 
 	// skip the timer for S1
-	time.Sleep(time.Second * 2) // wait for a second so that timer is ready to be skipped
+	time.Sleep(time.Second * 5) // wait for a few seconds so that timer is ready to be skipped
 	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
