@@ -257,7 +257,6 @@ func InterpreterImpl(
 					errToFailWf = failErr
 					return true
 				}
-				// TODO: Troubleshoot why continueAsNewCounter.IsThresholdMet() is true before state execution
 				return !stateRequestQueue.IsEmpty() || errToFailWf != nil || forceCompleteWf || stateExecutionCounter.GetTotalCurrentlyExecutingCount() == 0 || continueAsNewCounter.IsThresholdMet()
 			})
 			if continueAsNewCounter.IsThresholdMet() {
