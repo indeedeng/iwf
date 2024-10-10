@@ -116,7 +116,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 		for key, state := range c.StateExecutionToResumeMap {
 			localStateExecutionToResumeMap[key] = state
 		}
-		for _, value := range c.stateRequestQueue.GetAllStateResumeStates() {
+		for _, value := range c.stateRequestQueue.GetAllStateResumeRequests() {
 			localStateExecutionToResumeMap[value.StateExecutionId] = value
 		}
 		return &service.ContinueAsNewDumpResponse{

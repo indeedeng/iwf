@@ -58,7 +58,7 @@ func (srq *StateRequestQueue) GetAllStateStartRequests() []iwfidl.StateMovement 
 	return res
 }
 
-func (srq *StateRequestQueue) GetAllStateResumeStates() []service.StateExecutionResumeInfo {
+func (srq *StateRequestQueue) GetAllStateResumeRequests() []service.StateExecutionResumeInfo {
 	var res []service.StateExecutionResumeInfo
 	for _, r := range srq.queue {
 		if !r.IsResumeRequest() {
