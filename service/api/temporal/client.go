@@ -271,6 +271,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 
 	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:                    resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		FirstRunId:               resp.GetWorkflowExecutionInfo().GetFirstRunId(),
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,

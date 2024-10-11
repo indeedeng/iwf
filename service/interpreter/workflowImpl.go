@@ -763,18 +763,31 @@ func invokeStateExecute(
 		// this is not a problem because the signalWithStart will be very fast and highly available
 		unifiedClient := env.GetUnifiedClient()
 
-		var workflowId string
+		var parentWfId, currentWorkflowId, newWorkflowId string
 
-		if state.WaitForKey != nil {
-			workflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + state.StateId + "_" + *state.WaitForKey
-		} else {
-			workflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId
+		response, err := unifiedClient.DescribeWorkflowExecution(context.Background(), executionContext.WorkflowId, "", nil)
+		if err != nil {
+			panic(fmt.Errorf("failed to get workflow execution details %w", err))
 		}
 
-		err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
+		if response.FirstRunId == "" {
+			parentWfId = executionContext.WorkflowId // Cadence
+		} else {
+			parentWfId = response.FirstRunId // Temporal
+		}
+
+		if state.WaitForKey != nil {
+			currentWorkflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + state.StateId + "_" + *state.WaitForKey
+			newWorkflowId = service.IwfSystemConstPrefix + parentWfId + "_" + state.StateId + "_" + *state.WaitForKey
+		} else {
+			currentWorkflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId
+			newWorkflowId = service.IwfSystemConstPrefix + parentWfId + "_" + *executionContext.StateExecutionId
+		}
+
+		err = unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
 			context.Background(),
 			uclient.StartWorkflowOptions{
-				ID:                       workflowId,
+				ID:                       currentWorkflowId,
 				TaskQueue:                env.GetTaskQueue(),
 				WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
 			},
@@ -783,6 +796,23 @@ func invokeStateExecute(
 			// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
 			// panic will let the workflow task will retry until the signal is sent
 			panic(fmt.Errorf("failed to signal on completion %w", err))
+		}
+
+		if response.FirstRunId != "" { // Temporal
+			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
+			err = unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
+				context.Background(),
+				uclient.StartWorkflowOptions{
+					ID:                       newWorkflowId,
+					TaskQueue:                env.GetTaskQueue(),
+					WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
+				},
+				iwfidl.StateCompletionOutput{})
+			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+				// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
+				// panic will let the workflow task will retry until the signal is sent
+				panic(fmt.Errorf("failed to signal on completion %w", err))
+			}
 		}
 	}
 	if err != nil {

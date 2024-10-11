@@ -156,15 +156,30 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 ) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	var workflowId string
-	if req.WaitForKey != nil {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateId + "_" + *req.WaitForKey
+	var parentWfId, currentWorkflowId, _ string
+
+	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
+	if err != nil {
+		return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
+	}
+
+	if response.FirstRunId == "" {
+		parentWfId = req.WorkflowId // Cadence
 	} else {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateExecutionId
+		parentWfId = response.FirstRunId // Temporal
+	}
+
+	if req.WaitForKey != nil {
+		currentWorkflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateId + "_" + *req.WaitForKey
+		_ = service.IwfSystemConstPrefix + parentWfId + "_" + *req.StateId + "_" + *req.WaitForKey
+	} else {
+		currentWorkflowId = service.IwfSystemConstPrefix + parentWfId + "_" + *req.StateExecutionId
+		_ = service.IwfSystemConstPrefix + parentWfId + "_" + *req.StateExecutionId
 	}
 
 	options := uclient.StartWorkflowOptions{
-		ID:        workflowId,
+		// TODO: Switch currentWorkflowId to _ (after renaming) after a short amount of time to ensure backward compatibility
+		ID:        currentWorkflowId,
 		TaskQueue: s.taskQueue,
 		// TODO: https://github.com/indeedeng/iwf-java-sdk/issues/218
 		// it doesn't seem to have a way for SDK to know the timeout at this API
@@ -173,6 +188,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
+
 	if err != nil {
 		return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
 	}
@@ -180,7 +196,8 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds, s.config.Api.MaxWaitSeconds)
 	defer cancFunc()
 	var output service.WaitForStateCompletionWorkflowOutput
-	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
+	// TODO: Switch currentWorkflowId to _ (after renaming) after a short amount of time to ensure backward compatibility
+	getErr := s.client.GetWorkflowResult(subCtx, &output, currentWorkflowId, runId)
 
 	if s.client.IsRequestTimeoutError(getErr) || s.client.IsWorkflowTimeoutError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit

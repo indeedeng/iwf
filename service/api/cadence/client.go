@@ -257,6 +257,7 @@ func (t *cadenceClient) DescribeWorkflowExecution(
 
 	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		FirstRunId:       "", // Cadence does not provide FirstRunId
 		Status:           status,
 		SearchAttributes: searchAttributes,
 		Memos:            memo,
