@@ -183,7 +183,9 @@ ci-temporal-integ-test:
 	$Q go test -v ./integ  -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60
 
 ci-all-tests:
-	$Q go test -v ./... -timeout 15m -cover -coverprofile coverage.out -coverpkg ./service/...
+ 	# Fails CI when used with -coverprofile flag due to tests that panic; see https://go.dev/doc/build-cover#panicprof
+ 	# $Q go test -v ./... -timeout 15m -cover -coverprofile coverage.out -coverpkg ./service/...
+	$Q go test -v ./... -timeout 15m
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false -timeout 15m
