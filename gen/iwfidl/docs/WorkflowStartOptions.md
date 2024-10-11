@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **WorkflowStartDelaySeconds** | Pointer to **int32** |  | [optional] 
 **RetryPolicy** | Pointer to [**WorkflowRetryPolicy**](WorkflowRetryPolicy.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
+**DataAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
 **WorkflowConfigOverride** | Pointer to [**WorkflowConfig**](WorkflowConfig.md) |  | [optional] 
 **IdReusePolicy** | Pointer to [**IDReusePolicy**](IDReusePolicy.md) |  | [optional] 
 **UseMemoForDataAttributes** | Pointer to **bool** |  | [optional] 
@@ -156,6 +157,31 @@ SetSearchAttributes sets SearchAttributes field to given value.
 `func (o *WorkflowStartOptions) HasSearchAttributes() bool`
 
 HasSearchAttributes returns a boolean if a field has been set.
+
+### GetDataAttributes
+
+`func (o *WorkflowStartOptions) GetDataAttributes() []KeyValue`
+
+GetDataAttributes returns the DataAttributes field if non-nil, zero value otherwise.
+
+### GetDataAttributesOk
+
+`func (o *WorkflowStartOptions) GetDataAttributesOk() (*[]KeyValue, bool)`
+
+GetDataAttributesOk returns a tuple with the DataAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDataAttributes
+
+`func (o *WorkflowStartOptions) SetDataAttributes(v []KeyValue)`
+
+SetDataAttributes sets DataAttributes field to given value.
+
+### HasDataAttributes
+
+`func (o *WorkflowStartOptions) HasDataAttributes() bool`
+
+HasDataAttributes returns a boolean if a field has been set.
 
 ### GetWorkflowConfigOverride
 

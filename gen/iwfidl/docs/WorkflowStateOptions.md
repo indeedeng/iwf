@@ -22,6 +22,8 @@ Name | Type | Description | Notes
 **WaitUntilApiFailurePolicy** | Pointer to [**WaitUntilApiFailurePolicy**](WaitUntilApiFailurePolicy.md) |  | [optional] 
 **SkipWaitUntil** | Pointer to **bool** |  | [optional] 
 **DataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**WaitUntilApiDataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**ExecuteApiDataAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 
 ## Methods
 
@@ -491,6 +493,56 @@ SetDataAttributesLoadingPolicy sets DataAttributesLoadingPolicy field to given v
 `func (o *WorkflowStateOptions) HasDataAttributesLoadingPolicy() bool`
 
 HasDataAttributesLoadingPolicy returns a boolean if a field has been set.
+
+### GetWaitUntilApiDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) GetWaitUntilApiDataAttributesLoadingPolicy() PersistenceLoadingPolicy`
+
+GetWaitUntilApiDataAttributesLoadingPolicy returns the WaitUntilApiDataAttributesLoadingPolicy field if non-nil, zero value otherwise.
+
+### GetWaitUntilApiDataAttributesLoadingPolicyOk
+
+`func (o *WorkflowStateOptions) GetWaitUntilApiDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
+
+GetWaitUntilApiDataAttributesLoadingPolicyOk returns a tuple with the WaitUntilApiDataAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitUntilApiDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) SetWaitUntilApiDataAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
+
+SetWaitUntilApiDataAttributesLoadingPolicy sets WaitUntilApiDataAttributesLoadingPolicy field to given value.
+
+### HasWaitUntilApiDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) HasWaitUntilApiDataAttributesLoadingPolicy() bool`
+
+HasWaitUntilApiDataAttributesLoadingPolicy returns a boolean if a field has been set.
+
+### GetExecuteApiDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) GetExecuteApiDataAttributesLoadingPolicy() PersistenceLoadingPolicy`
+
+GetExecuteApiDataAttributesLoadingPolicy returns the ExecuteApiDataAttributesLoadingPolicy field if non-nil, zero value otherwise.
+
+### GetExecuteApiDataAttributesLoadingPolicyOk
+
+`func (o *WorkflowStateOptions) GetExecuteApiDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
+
+GetExecuteApiDataAttributesLoadingPolicyOk returns a tuple with the ExecuteApiDataAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExecuteApiDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) SetExecuteApiDataAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
+
+SetExecuteApiDataAttributesLoadingPolicy sets ExecuteApiDataAttributesLoadingPolicy field to given value.
+
+### HasExecuteApiDataAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) HasExecuteApiDataAttributesLoadingPolicy() bool`
+
+HasExecuteApiDataAttributesLoadingPolicy returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
