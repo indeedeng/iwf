@@ -502,7 +502,7 @@ func executeState(
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
 		saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
-		doLoadingPolicy := compatibility.GetDataObjectsLoadingPolicy(state.StateOptions)
+		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
 
 		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
 			waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
@@ -733,7 +733,7 @@ func executeStateDecide(
 	}
 
 	saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
-	doLoadingPolicy := compatibility.GetDataObjectsLoadingPolicy(state.StateOptions)
+	doLoadingPolicy := compatibility.GetExecuteApiDataObjectsLoadingPolicy(state.StateOptions)
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
