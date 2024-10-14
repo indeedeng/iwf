@@ -158,15 +158,15 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 
 	var parentId, currentWorkflowId, _ string
 
-	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
-	if err != nil {
-		return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
-	}
+	if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
+		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
+		if err != nil {
+			return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
 
-	if response.FirstRunId == "" {
-		parentId = req.WorkflowId // Cadence
-	} else {
-		parentId = response.FirstRunId // Temporal
+		}
+		parentId = response.FirstRunId
+	} else { // Cadence
+		parentId = req.WorkflowId
 	}
 
 	if req.WaitForKey != nil {

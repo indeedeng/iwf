@@ -2,6 +2,7 @@ package uclient
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -33,6 +34,7 @@ type UnifiedClient interface {
 		ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
 	) error
 	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
+	GetBackendType() (backendType service.BackendType)
 }
 
 type errorHandler interface {

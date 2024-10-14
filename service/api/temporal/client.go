@@ -442,3 +442,7 @@ func (t *temporalClient) ResetWorkflow(
 	}
 	return resp.GetRunId(), nil
 }
+
+func (t *temporalClient) GetBackendType() (backendType service.BackendType) {
+	return service.BackendTypeTemporal
+}

@@ -382,3 +382,7 @@ func (t *cadenceClient) ResetWorkflow(
 	}
 	return resp.GetRunId(), nil
 }
+
+func (t *cadenceClient) GetBackendType() (backendType service.BackendType) {
+	return service.BackendTypeCadence
+}
