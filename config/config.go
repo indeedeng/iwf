@@ -136,3 +136,17 @@ func GetApiServiceAddressWithDefault(config Config) string {
 	}
 	return fmt.Sprintf("http://localhost:%v", config.Api.Port)
 }
+
+func GetSignalWithStartOnWithDefault(config Config) string {
+	if config.Api.WaitForStateCompletionMigration.SignalWithStartOn != "" {
+		return config.Api.WaitForStateCompletionMigration.SignalWithStartOn
+	}
+	return "old"
+}
+
+func GetWaitForOnWithDefault(config Config) string {
+	if config.Api.WaitForStateCompletionMigration.WaitForOn != "" {
+		return config.Api.WaitForStateCompletionMigration.WaitForOn
+	}
+	return "old"
+}
