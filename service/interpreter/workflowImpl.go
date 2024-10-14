@@ -770,7 +770,7 @@ func invokeStateExecute(
 		// signalWithStart with legacy workflowId (containing parent workflowId)
 		if provider.GetBackendType() == service.BackendTypeCadence ||
 			(provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "old" || signalWithStartOn == "both")) {
-			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(executionContext.WorkflowId, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
 
 			err = signalWithStart(unifiedClient, workflowId)
 			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
