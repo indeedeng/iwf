@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
 
@@ -768,7 +769,7 @@ func invokeStateExecute(
 		// signalWithStart with legacy workflowId (containing parent workflowId)
 		if provider.GetBackendType() == service.BackendTypeCadence ||
 			(provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "old" || signalWithStartOn == "both")) {
-			workflowId := signalWithStartWorkflowId(state, executionContext.WorkflowId, executionContext)
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, *executionContext.StateExecutionId, *state.WaitForKey, state.StateId)
 
 			err = signalWithStart(unifiedClient, workflowId)
 			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
@@ -780,7 +781,7 @@ func invokeStateExecute(
 
 		// signalWithStart with new workflowId (containing firstRunId)
 		if provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "both" || signalWithStartOn == "new") {
-			workflowId := signalWithStartWorkflowId(state, provider.GetWorkflowInfo(ctx).FirstRunID, executionContext)
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, *executionContext.StateExecutionId, *state.WaitForKey, state.StateId)
 
 			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
 			err = signalWithStart(unifiedClient, workflowId)
@@ -824,14 +825,6 @@ func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) err
 			WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
 		},
 		iwfidl.StateCompletionOutput{})
-}
-
-func signalWithStartWorkflowId(state iwfidl.StateMovement, parentId string, executionContext iwfidl.Context) string {
-	if state.WaitForKey != nil {
-		return service.IwfSystemConstPrefix + parentId + "_" + state.StateId + "_" + *state.WaitForKey
-	} else {
-		return service.IwfSystemConstPrefix + parentId + "_" + *executionContext.StateExecutionId
-	}
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {

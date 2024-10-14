@@ -162,7 +162,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	waitForOn := env.GetSharedConfig().Api.WaitForStateCompletionMigration.WaitForOn
 
 	if waitForOn == "old" {
-		workflowId = WorkflowWaitForStateId(req, req.WorkflowId)
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(req.WorkflowId, *req.StateExecutionId, *req.WaitForKey, *req.StateId)
 	} else { // waitForOn == "new"
 		var parentId string
 		if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
@@ -175,7 +175,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 			parentId = req.WorkflowId
 		}
 
-		workflowId = WorkflowWaitForStateId(req, parentId)
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(parentId, *req.StateExecutionId, *req.WaitForKey, *req.StateId)
 	}
 
 	options := uclient.StartWorkflowOptions{
@@ -213,14 +213,6 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	return &iwfidl.WorkflowWaitForStateCompletionResponse{
 		StateCompletionOutput: &output.StateCompletionOutput,
 	}, nil
-}
-
-func WorkflowWaitForStateId(req iwfidl.WorkflowWaitForStateCompletionRequest, parentId string) string {
-	if req.WaitForKey != nil {
-		return service.IwfSystemConstPrefix + parentId + "_" + *req.StateId + "_" + *req.WaitForKey
-	} else {
-		return service.IwfSystemConstPrefix + parentId + "_" + *req.StateExecutionId
-	}
 }
 
 func (s *serviceImpl) ApiV1WorkflowSignalPost(
