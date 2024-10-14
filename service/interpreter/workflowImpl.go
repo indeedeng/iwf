@@ -763,7 +763,7 @@ func invokeStateExecute(
 		// this is not a problem because the signalWithStart will be very fast and highly available
 		unifiedClient := env.GetUnifiedClient()
 
-		var parentWfId, currentWorkflowId, newWorkflowId string
+		var parentId, currentWorkflowId, newWorkflowId string
 
 		response, err := unifiedClient.DescribeWorkflowExecution(context.Background(), executionContext.WorkflowId, "", nil)
 		if err != nil {
@@ -771,17 +771,17 @@ func invokeStateExecute(
 		}
 
 		if response.FirstRunId == "" {
-			parentWfId = executionContext.WorkflowId // Cadence
+			parentId = executionContext.WorkflowId // Cadence
 		} else {
-			parentWfId = response.FirstRunId // Temporal
+			parentId = response.FirstRunId // Temporal
 		}
 
 		if state.WaitForKey != nil {
 			currentWorkflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + state.StateId + "_" + *state.WaitForKey
-			newWorkflowId = service.IwfSystemConstPrefix + parentWfId + "_" + state.StateId + "_" + *state.WaitForKey
+			newWorkflowId = service.IwfSystemConstPrefix + parentId + "_" + state.StateId + "_" + *state.WaitForKey
 		} else {
 			currentWorkflowId = service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId
-			newWorkflowId = service.IwfSystemConstPrefix + parentWfId + "_" + *executionContext.StateExecutionId
+			newWorkflowId = service.IwfSystemConstPrefix + parentId + "_" + *executionContext.StateExecutionId
 		}
 
 		err = unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(

@@ -156,7 +156,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 ) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	var parentWfId, currentWorkflowId, _ string
+	var parentId, currentWorkflowId, _ string
 
 	response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
 	if err != nil {
@@ -164,17 +164,17 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	}
 
 	if response.FirstRunId == "" {
-		parentWfId = req.WorkflowId // Cadence
+		parentId = req.WorkflowId // Cadence
 	} else {
-		parentWfId = response.FirstRunId // Temporal
+		parentId = response.FirstRunId // Temporal
 	}
 
 	if req.WaitForKey != nil {
 		currentWorkflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateId + "_" + *req.WaitForKey
-		_ = service.IwfSystemConstPrefix + parentWfId + "_" + *req.StateId + "_" + *req.WaitForKey
+		_ = service.IwfSystemConstPrefix + parentId + "_" + *req.StateId + "_" + *req.WaitForKey
 	} else {
-		currentWorkflowId = service.IwfSystemConstPrefix + parentWfId + "_" + *req.StateExecutionId
-		_ = service.IwfSystemConstPrefix + parentWfId + "_" + *req.StateExecutionId
+		currentWorkflowId = service.IwfSystemConstPrefix + parentId + "_" + *req.StateExecutionId
+		_ = service.IwfSystemConstPrefix + parentId + "_" + *req.StateExecutionId
 	}
 
 	options := uclient.StartWorkflowOptions{
