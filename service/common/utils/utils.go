@@ -93,10 +93,10 @@ func ToNanoSeconds(e *timestamppb.Timestamp) int64 {
 	return e.GetSeconds()*1000*1000*1000 + int64(e.GetNanos())
 }
 
-func GetWorkflowIdForWaitForStateExecution(parentId string, stateExeId string, waitForKey string, stateId string) string {
-	if waitForKey == "" {
-		return service.IwfSystemConstPrefix + parentId + "_" + stateExeId
+func GetWorkflowIdForWaitForStateExecution(parentId string, stateExeId *string, waitForKey *string, stateId *string) string {
+	if waitForKey != nil && *waitForKey != "" {
+		return service.IwfSystemConstPrefix + parentId + "_" + *stateId + "_" + *waitForKey
 	} else {
-		return service.IwfSystemConstPrefix + parentId + "_" + stateId + "_" + waitForKey
+		return service.IwfSystemConstPrefix + parentId + "_" + *stateExeId
 	}
 }

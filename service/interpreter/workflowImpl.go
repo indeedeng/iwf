@@ -769,7 +769,7 @@ func invokeStateExecute(
 		// signalWithStart with legacy workflowId (containing parent workflowId)
 		if provider.GetBackendType() == service.BackendTypeCadence ||
 			(provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "old" || signalWithStartOn == "both")) {
-			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, *executionContext.StateExecutionId, *state.WaitForKey, state.StateId)
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
 
 			err = signalWithStart(unifiedClient, workflowId)
 			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
@@ -781,7 +781,7 @@ func invokeStateExecute(
 
 		// signalWithStart with new workflowId (containing firstRunId)
 		if provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "both" || signalWithStartOn == "new") {
-			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, *executionContext.StateExecutionId, *state.WaitForKey, state.StateId)
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
 
 			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
 			err = signalWithStart(unifiedClient, workflowId)

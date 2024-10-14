@@ -162,7 +162,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	waitForOn := env.GetSharedConfig().Api.WaitForStateCompletionMigration.WaitForOn
 
 	if waitForOn == "old" {
-		workflowId = utils.GetWorkflowIdForWaitForStateExecution(req.WorkflowId, *req.StateExecutionId, *req.WaitForKey, *req.StateId)
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(req.WorkflowId, req.StateExecutionId, req.WaitForKey, req.StateId)
 	} else { // waitForOn == "new"
 		var parentId string
 		if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
@@ -175,7 +175,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 			parentId = req.WorkflowId
 		}
 
-		workflowId = utils.GetWorkflowIdForWaitForStateExecution(parentId, *req.StateExecutionId, *req.WaitForKey, *req.StateId)
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(parentId, req.StateExecutionId, req.WaitForKey, req.StateId)
 	}
 
 	options := uclient.StartWorkflowOptions{
