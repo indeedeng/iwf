@@ -56,6 +56,7 @@ type WorkflowInfo struct {
 	WorkflowExecution        WorkflowExecution
 	WorkflowStartTime        time.Time
 	WorkflowExecutionTimeout time.Duration
+	FirstRunID               string
 }
 
 type ActivityOptions struct {

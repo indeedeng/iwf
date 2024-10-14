@@ -765,15 +765,10 @@ func invokeStateExecute(
 
 		var parentId, currentWorkflowId, newWorkflowId string
 
-		response, err := unifiedClient.DescribeWorkflowExecution(context.Background(), executionContext.WorkflowId, "", nil)
-		if err != nil {
-			panic(fmt.Errorf("failed to get workflow execution details %w", err))
-		}
-
-		if response.FirstRunId == "" {
-			parentId = executionContext.WorkflowId // Cadence
+		if provider.GetBackendType() == service.BackendTypeTemporal {
+			parentId = provider.GetWorkflowInfo(ctx).FirstRunID // Temporal
 		} else {
-			parentId = response.FirstRunId // Temporal
+			parentId = executionContext.WorkflowId // Cadence
 		}
 
 		if state.WaitForKey != nil {
@@ -798,7 +793,7 @@ func invokeStateExecute(
 			panic(fmt.Errorf("failed to signal on completion %w", err))
 		}
 
-		if response.FirstRunId != "" { // Temporal
+		if provider.GetBackendType() == service.BackendTypeTemporal {
 			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
 			err = unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
 				context.Background(),
