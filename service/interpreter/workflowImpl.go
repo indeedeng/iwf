@@ -765,29 +765,38 @@ func invokeStateExecute(
 
 		signalWithStartOn := env.GetSharedConfig().Api.WaitForStateCompletionMigration.SignalWithStartOn
 
-		if provider.GetBackendType() == service.BackendTypeTemporal {
-			if signalWithStartOn == "old" || signalWithStartOn == "both" {
-				workflowId := signalWithStartWorkflowId(state, executionContext.WorkflowId, executionContext)
-				localErr := signalWithStart(unifiedClient, workflowId)
-				if localErr != nil {
-					return failOnSignalWithStart(state, provider, err)
-				}
-			}
-			if signalWithStartOn == "both" || signalWithStartOn == "new" {
-				parentId := provider.GetWorkflowInfo(ctx).FirstRunID
-				workflowId := signalWithStartWorkflowId(state, parentId, executionContext)
-				localErr := signalWithStart(unifiedClient, workflowId)
-				if localErr != nil {
-					return failOnSignalWithStart(state, provider, err)
-				}
-			}
-		} else { // Cadence
+		// signalWithStart with legacy workflowId (containing parent workflowId)
+		if provider.GetBackendType() == service.BackendTypeCadence ||
+			(provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "old" || signalWithStartOn == "both")) {
 			workflowId := signalWithStartWorkflowId(state, executionContext.WorkflowId, executionContext)
-			localErr := signalWithStart(unifiedClient, workflowId)
-			if localErr != nil {
-				return failOnSignalWithStart(state, provider, err)
+
+			err = signalWithStart(unifiedClient, workflowId)
+			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+				// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
+				// panic will let the workflow task will retry until the signal is sent
+				panic(fmt.Errorf("failed to signal on completion %w", err))
 			}
 		}
+
+		// signalWithStart with new workflowId (containing firstRunId)
+		if provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "both" || signalWithStartOn == "new") {
+			workflowId := signalWithStartWorkflowId(state, provider.GetWorkflowInfo(ctx).FirstRunID, executionContext)
+
+			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
+			err = signalWithStart(unifiedClient, workflowId)
+			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+				// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
+				// panic will let the workflow task will retry until the signal is sent
+				panic(fmt.Errorf("failed to signal on completion %w", err))
+			}
+		}
+	}
+
+	if err != nil {
+		if shouldProceedOnExecuteApiError(state) {
+			return nil, service.ExecuteApiFailedAndProceed, nil
+		}
+		return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
 	}
 
 	err = persistenceManager.ProcessUpsertSearchAttribute(ctx, decideResponse.GetUpsertSearchAttributes())
@@ -806,11 +815,15 @@ func invokeStateExecute(
 	return &decision, service.CompletedStateExecutionStatus, nil
 }
 
-func failOnSignalWithStart(state iwfidl.StateMovement, provider WorkflowProvider, err error) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
-	if shouldProceedOnExecuteApiError(state) {
-		return nil, service.ExecuteApiFailedAndProceed, nil
-	}
-	return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, err)
+func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) error {
+	return unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
+		context.Background(),
+		uclient.StartWorkflowOptions{
+			ID:                       workflowId,
+			TaskQueue:                env.GetTaskQueue(),
+			WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
+		},
+		iwfidl.StateCompletionOutput{})
 }
 
 func signalWithStartWorkflowId(state iwfidl.StateMovement, parentId string, executionContext iwfidl.Context) string {
@@ -819,23 +832,6 @@ func signalWithStartWorkflowId(state iwfidl.StateMovement, parentId string, exec
 	} else {
 		return service.IwfSystemConstPrefix + parentId + "_" + *executionContext.StateExecutionId
 	}
-}
-
-func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) error {
-	err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
-		context.Background(),
-		uclient.StartWorkflowOptions{
-			ID:                       workflowId,
-			TaskQueue:                env.GetTaskQueue(),
-			WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
-		},
-		iwfidl.StateCompletionOutput{})
-	if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
-		// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
-		// panic will let the workflow task will retry until the signal is sent
-		panic(fmt.Errorf("failed to signal on completion %w", err))
-	}
-	return err
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {
