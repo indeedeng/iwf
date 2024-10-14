@@ -31,6 +31,15 @@ type (
 		// omitRpcInputOutputInHistory is the flag to omit rpc input/output in history
 		// the input/output is only for debugging purpose but could be too expensive to store
 		OmitRpcInputOutputInHistory *bool `yaml:"omitRpcInputOutputInHistory"`
+		// WaitForStateCompletionMigration is used to control naming of the continuedAsNew workflows
+		WaitForStateCompletionMigration WaitForStateCompletionMigration `yaml:"waitForStateCompletionMigration"`
+	}
+
+	WaitForStateCompletionMigration struct {
+		// expected values: old/both/new; defaults to 'old'
+		SignalWithStartOn string `yaml:"signalWithStartOn"`
+		// expected values: old/new; defaults to 'old'
+		WaitForOn string `yaml:"waitForOn"`
 	}
 
 	Interpreter struct {

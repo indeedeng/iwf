@@ -1,5 +1,8 @@
 api:
   port: 8801
+  waitForStateCompletionMigration:
+    signalWithStartOn: old
+    waitForOn: old
 interpreter:
   defaultWorkflowConfig:
     continueAsNewThreshold: 100

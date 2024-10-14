@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
 	"net/http"
@@ -156,30 +157,29 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 ) (wresp *iwfidl.WorkflowWaitForStateCompletionResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	var parentId, currentWorkflowId, _ string
+	var workflowId string
 
-	if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
-		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
-		if err != nil {
-			return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
+	waitForOn := env.GetSharedConfig().Api.WaitForStateCompletionMigration.WaitForOn
 
+	if waitForOn == "old" {
+		workflowId = WorkflowWaitForStateId(req, req.WorkflowId)
+	} else { // waitForOn == "new"
+		var parentId string
+		if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
+			response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
+			if err != nil {
+				return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
+			}
+			parentId = response.FirstRunId
+		} else { // Cadence
+			parentId = req.WorkflowId
 		}
-		parentId = response.FirstRunId
-	} else { // Cadence
-		parentId = req.WorkflowId
-	}
 
-	if req.WaitForKey != nil {
-		currentWorkflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateId + "_" + *req.WaitForKey
-		_ = service.IwfSystemConstPrefix + parentId + "_" + *req.StateId + "_" + *req.WaitForKey
-	} else {
-		currentWorkflowId = service.IwfSystemConstPrefix + parentId + "_" + *req.StateExecutionId
-		_ = service.IwfSystemConstPrefix + parentId + "_" + *req.StateExecutionId
+		workflowId = WorkflowWaitForStateId(req, parentId)
 	}
 
 	options := uclient.StartWorkflowOptions{
-		// TODO: Switch currentWorkflowId to _ (after renaming) after a short amount of time to ensure backward compatibility
-		ID:        currentWorkflowId,
+		ID:        workflowId,
 		TaskQueue: s.taskQueue,
 		// TODO: https://github.com/indeedeng/iwf-java-sdk/issues/218
 		// it doesn't seem to have a way for SDK to know the timeout at this API
@@ -196,8 +196,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	subCtx, cancFunc := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.WaitTimeSeconds, s.config.Api.MaxWaitSeconds)
 	defer cancFunc()
 	var output service.WaitForStateCompletionWorkflowOutput
-	// TODO: Switch currentWorkflowId to _ (after renaming) after a short amount of time to ensure backward compatibility
-	getErr := s.client.GetWorkflowResult(subCtx, &output, currentWorkflowId, runId)
+	getErr := s.client.GetWorkflowResult(subCtx, &output, workflowId, runId)
 
 	if s.client.IsRequestTimeoutError(getErr) || s.client.IsWorkflowTimeoutError(getErr) {
 		// the workflow is still running, but the wait has exceeded limit
@@ -214,6 +213,14 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	return &iwfidl.WorkflowWaitForStateCompletionResponse{
 		StateCompletionOutput: &output.StateCompletionOutput,
 	}, nil
+}
+
+func WorkflowWaitForStateId(req iwfidl.WorkflowWaitForStateCompletionRequest, parentId string) string {
+	if req.WaitForKey != nil {
+		return service.IwfSystemConstPrefix + parentId + "_" + *req.StateId + "_" + *req.WaitForKey
+	} else {
+		return service.IwfSystemConstPrefix + parentId + "_" + *req.StateExecutionId
+	}
 }
 
 func (s *serviceImpl) ApiV1WorkflowSignalPost(

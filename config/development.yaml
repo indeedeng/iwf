@@ -4,6 +4,9 @@ log:
   levelKey: "level"
 api:
   port: 8801
+  waitForStateCompletionMigration:
+    signalWithStartOn: old
+    waitForOn: old
 interpreter:
   temporal:
     hostPort: localhost:7233
