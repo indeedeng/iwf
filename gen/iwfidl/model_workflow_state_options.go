@@ -19,24 +19,28 @@ var _ MappedNullable = &WorkflowStateOptions{}
 
 // WorkflowStateOptions struct for WorkflowStateOptions
 type WorkflowStateOptions struct {
-	SearchAttributesLoadingPolicy        *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
-	DataObjectsLoadingPolicy             *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
-	StartApiTimeoutSeconds               *int32                     `json:"startApiTimeoutSeconds,omitempty"`
-	DecideApiTimeoutSeconds              *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
-	StartApiRetryPolicy                  *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
-	DecideApiRetryPolicy                 *RetryPolicy               `json:"decideApiRetryPolicy,omitempty"`
-	StartApiFailurePolicy                *StartApiFailurePolicy     `json:"startApiFailurePolicy,omitempty"`
-	ExecuteApiFailurePolicy              *ExecuteApiFailurePolicy   `json:"executeApiFailurePolicy,omitempty"`
-	ExecuteApiFailureProceedStateId      *string                    `json:"executeApiFailureProceedStateId,omitempty"`
-	ExecuteApiFailureProceedStateOptions *WorkflowStateOptions      `json:"executeApiFailureProceedStateOptions,omitempty"`
-	SkipStartApi                         *bool                      `json:"skipStartApi,omitempty"`
-	WaitUntilApiTimeoutSeconds           *int32                     `json:"waitUntilApiTimeoutSeconds,omitempty"`
-	ExecuteApiTimeoutSeconds             *int32                     `json:"executeApiTimeoutSeconds,omitempty"`
-	WaitUntilApiRetryPolicy              *RetryPolicy               `json:"waitUntilApiRetryPolicy,omitempty"`
-	ExecuteApiRetryPolicy                *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
-	WaitUntilApiFailurePolicy            *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
-	SkipWaitUntil                        *bool                      `json:"skipWaitUntil,omitempty"`
-	DataAttributesLoadingPolicy          *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
+	SearchAttributesLoadingPolicy             *PersistenceLoadingPolicy  `json:"searchAttributesLoadingPolicy,omitempty"`
+	WaitUntilApiSearchAttributesLoadingPolicy *PersistenceLoadingPolicy  `json:"waitUntilApiSearchAttributesLoadingPolicy,omitempty"`
+	ExecuteApiSearchAttributesLoadingPolicy   *PersistenceLoadingPolicy  `json:"executeApiSearchAttributesLoadingPolicy,omitempty"`
+	DataObjectsLoadingPolicy                  *PersistenceLoadingPolicy  `json:"dataObjectsLoadingPolicy,omitempty"`
+	StartApiTimeoutSeconds                    *int32                     `json:"startApiTimeoutSeconds,omitempty"`
+	DecideApiTimeoutSeconds                   *int32                     `json:"decideApiTimeoutSeconds,omitempty"`
+	StartApiRetryPolicy                       *RetryPolicy               `json:"startApiRetryPolicy,omitempty"`
+	DecideApiRetryPolicy                      *RetryPolicy               `json:"decideApiRetryPolicy,omitempty"`
+	StartApiFailurePolicy                     *StartApiFailurePolicy     `json:"startApiFailurePolicy,omitempty"`
+	ExecuteApiFailurePolicy                   *ExecuteApiFailurePolicy   `json:"executeApiFailurePolicy,omitempty"`
+	ExecuteApiFailureProceedStateId           *string                    `json:"executeApiFailureProceedStateId,omitempty"`
+	ExecuteApiFailureProceedStateOptions      *WorkflowStateOptions      `json:"executeApiFailureProceedStateOptions,omitempty"`
+	SkipStartApi                              *bool                      `json:"skipStartApi,omitempty"`
+	WaitUntilApiTimeoutSeconds                *int32                     `json:"waitUntilApiTimeoutSeconds,omitempty"`
+	ExecuteApiTimeoutSeconds                  *int32                     `json:"executeApiTimeoutSeconds,omitempty"`
+	WaitUntilApiRetryPolicy                   *RetryPolicy               `json:"waitUntilApiRetryPolicy,omitempty"`
+	ExecuteApiRetryPolicy                     *RetryPolicy               `json:"executeApiRetryPolicy,omitempty"`
+	WaitUntilApiFailurePolicy                 *WaitUntilApiFailurePolicy `json:"waitUntilApiFailurePolicy,omitempty"`
+	SkipWaitUntil                             *bool                      `json:"skipWaitUntil,omitempty"`
+	DataAttributesLoadingPolicy               *PersistenceLoadingPolicy  `json:"dataAttributesLoadingPolicy,omitempty"`
+	WaitUntilApiDataAttributesLoadingPolicy   *PersistenceLoadingPolicy  `json:"waitUntilApiDataAttributesLoadingPolicy,omitempty"`
+	ExecuteApiDataAttributesLoadingPolicy     *PersistenceLoadingPolicy  `json:"executeApiDataAttributesLoadingPolicy,omitempty"`
 }
 
 // NewWorkflowStateOptions instantiates a new WorkflowStateOptions object
@@ -86,6 +90,70 @@ func (o *WorkflowStateOptions) HasSearchAttributesLoadingPolicy() bool {
 // SetSearchAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the SearchAttributesLoadingPolicy field.
 func (o *WorkflowStateOptions) SetSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
 	o.SearchAttributesLoadingPolicy = &v
+}
+
+// GetWaitUntilApiSearchAttributesLoadingPolicy returns the WaitUntilApiSearchAttributesLoadingPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetWaitUntilApiSearchAttributesLoadingPolicy() PersistenceLoadingPolicy {
+	if o == nil || IsNil(o.WaitUntilApiSearchAttributesLoadingPolicy) {
+		var ret PersistenceLoadingPolicy
+		return ret
+	}
+	return *o.WaitUntilApiSearchAttributesLoadingPolicy
+}
+
+// GetWaitUntilApiSearchAttributesLoadingPolicyOk returns a tuple with the WaitUntilApiSearchAttributesLoadingPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetWaitUntilApiSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
+	if o == nil || IsNil(o.WaitUntilApiSearchAttributesLoadingPolicy) {
+		return nil, false
+	}
+	return o.WaitUntilApiSearchAttributesLoadingPolicy, true
+}
+
+// HasWaitUntilApiSearchAttributesLoadingPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasWaitUntilApiSearchAttributesLoadingPolicy() bool {
+	if o != nil && !IsNil(o.WaitUntilApiSearchAttributesLoadingPolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitUntilApiSearchAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the WaitUntilApiSearchAttributesLoadingPolicy field.
+func (o *WorkflowStateOptions) SetWaitUntilApiSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
+	o.WaitUntilApiSearchAttributesLoadingPolicy = &v
+}
+
+// GetExecuteApiSearchAttributesLoadingPolicy returns the ExecuteApiSearchAttributesLoadingPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetExecuteApiSearchAttributesLoadingPolicy() PersistenceLoadingPolicy {
+	if o == nil || IsNil(o.ExecuteApiSearchAttributesLoadingPolicy) {
+		var ret PersistenceLoadingPolicy
+		return ret
+	}
+	return *o.ExecuteApiSearchAttributesLoadingPolicy
+}
+
+// GetExecuteApiSearchAttributesLoadingPolicyOk returns a tuple with the ExecuteApiSearchAttributesLoadingPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetExecuteApiSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
+	if o == nil || IsNil(o.ExecuteApiSearchAttributesLoadingPolicy) {
+		return nil, false
+	}
+	return o.ExecuteApiSearchAttributesLoadingPolicy, true
+}
+
+// HasExecuteApiSearchAttributesLoadingPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasExecuteApiSearchAttributesLoadingPolicy() bool {
+	if o != nil && !IsNil(o.ExecuteApiSearchAttributesLoadingPolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetExecuteApiSearchAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the ExecuteApiSearchAttributesLoadingPolicy field.
+func (o *WorkflowStateOptions) SetExecuteApiSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
+	o.ExecuteApiSearchAttributesLoadingPolicy = &v
 }
 
 // GetDataObjectsLoadingPolicy returns the DataObjectsLoadingPolicy field value if set, zero value otherwise.
@@ -632,6 +700,70 @@ func (o *WorkflowStateOptions) SetDataAttributesLoadingPolicy(v PersistenceLoadi
 	o.DataAttributesLoadingPolicy = &v
 }
 
+// GetWaitUntilApiDataAttributesLoadingPolicy returns the WaitUntilApiDataAttributesLoadingPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetWaitUntilApiDataAttributesLoadingPolicy() PersistenceLoadingPolicy {
+	if o == nil || IsNil(o.WaitUntilApiDataAttributesLoadingPolicy) {
+		var ret PersistenceLoadingPolicy
+		return ret
+	}
+	return *o.WaitUntilApiDataAttributesLoadingPolicy
+}
+
+// GetWaitUntilApiDataAttributesLoadingPolicyOk returns a tuple with the WaitUntilApiDataAttributesLoadingPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetWaitUntilApiDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
+	if o == nil || IsNil(o.WaitUntilApiDataAttributesLoadingPolicy) {
+		return nil, false
+	}
+	return o.WaitUntilApiDataAttributesLoadingPolicy, true
+}
+
+// HasWaitUntilApiDataAttributesLoadingPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasWaitUntilApiDataAttributesLoadingPolicy() bool {
+	if o != nil && !IsNil(o.WaitUntilApiDataAttributesLoadingPolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetWaitUntilApiDataAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the WaitUntilApiDataAttributesLoadingPolicy field.
+func (o *WorkflowStateOptions) SetWaitUntilApiDataAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
+	o.WaitUntilApiDataAttributesLoadingPolicy = &v
+}
+
+// GetExecuteApiDataAttributesLoadingPolicy returns the ExecuteApiDataAttributesLoadingPolicy field value if set, zero value otherwise.
+func (o *WorkflowStateOptions) GetExecuteApiDataAttributesLoadingPolicy() PersistenceLoadingPolicy {
+	if o == nil || IsNil(o.ExecuteApiDataAttributesLoadingPolicy) {
+		var ret PersistenceLoadingPolicy
+		return ret
+	}
+	return *o.ExecuteApiDataAttributesLoadingPolicy
+}
+
+// GetExecuteApiDataAttributesLoadingPolicyOk returns a tuple with the ExecuteApiDataAttributesLoadingPolicy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStateOptions) GetExecuteApiDataAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool) {
+	if o == nil || IsNil(o.ExecuteApiDataAttributesLoadingPolicy) {
+		return nil, false
+	}
+	return o.ExecuteApiDataAttributesLoadingPolicy, true
+}
+
+// HasExecuteApiDataAttributesLoadingPolicy returns a boolean if a field has been set.
+func (o *WorkflowStateOptions) HasExecuteApiDataAttributesLoadingPolicy() bool {
+	if o != nil && !IsNil(o.ExecuteApiDataAttributesLoadingPolicy) {
+		return true
+	}
+
+	return false
+}
+
+// SetExecuteApiDataAttributesLoadingPolicy gets a reference to the given PersistenceLoadingPolicy and assigns it to the ExecuteApiDataAttributesLoadingPolicy field.
+func (o *WorkflowStateOptions) SetExecuteApiDataAttributesLoadingPolicy(v PersistenceLoadingPolicy) {
+	o.ExecuteApiDataAttributesLoadingPolicy = &v
+}
+
 func (o WorkflowStateOptions) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -644,6 +776,12 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.SearchAttributesLoadingPolicy) {
 		toSerialize["searchAttributesLoadingPolicy"] = o.SearchAttributesLoadingPolicy
+	}
+	if !IsNil(o.WaitUntilApiSearchAttributesLoadingPolicy) {
+		toSerialize["waitUntilApiSearchAttributesLoadingPolicy"] = o.WaitUntilApiSearchAttributesLoadingPolicy
+	}
+	if !IsNil(o.ExecuteApiSearchAttributesLoadingPolicy) {
+		toSerialize["executeApiSearchAttributesLoadingPolicy"] = o.ExecuteApiSearchAttributesLoadingPolicy
 	}
 	if !IsNil(o.DataObjectsLoadingPolicy) {
 		toSerialize["dataObjectsLoadingPolicy"] = o.DataObjectsLoadingPolicy
@@ -695,6 +833,12 @@ func (o WorkflowStateOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataAttributesLoadingPolicy) {
 		toSerialize["dataAttributesLoadingPolicy"] = o.DataAttributesLoadingPolicy
+	}
+	if !IsNil(o.WaitUntilApiDataAttributesLoadingPolicy) {
+		toSerialize["waitUntilApiDataAttributesLoadingPolicy"] = o.WaitUntilApiDataAttributesLoadingPolicy
+	}
+	if !IsNil(o.ExecuteApiDataAttributesLoadingPolicy) {
+		toSerialize["executeApiDataAttributesLoadingPolicy"] = o.ExecuteApiDataAttributesLoadingPolicy
 	}
 	return toSerialize, nil
 }

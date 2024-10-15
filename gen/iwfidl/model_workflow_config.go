@@ -19,11 +19,11 @@ var _ MappedNullable = &WorkflowConfig{}
 
 // WorkflowConfig struct for WorkflowConfig
 type WorkflowConfig struct {
-	DisableSystemSearchAttribute      *bool  `json:"disableSystemSearchAttribute,omitempty"`
-	EnabledExecutingStateExecutionIds *bool  `json:"enabledExecutingStateExecutionIds,omitempty"`
-	ContinueAsNewThreshold            *int32 `json:"continueAsNewThreshold,omitempty"`
-	ContinueAsNewPageSizeInBytes      *int32 `json:"continueAsNewPageSizeInBytes,omitempty"`
-	OptimizeActivity                  *bool  `json:"optimizeActivity,omitempty"`
+	DisableSystemSearchAttribute *bool   `json:"disableSystemSearchAttribute,omitempty"`
+	ExecutingStateIdMode         *string `json:"executingStateIdMode,omitempty"`
+	ContinueAsNewThreshold       *int32  `json:"continueAsNewThreshold,omitempty"`
+	ContinueAsNewPageSizeInBytes *int32  `json:"continueAsNewPageSizeInBytes,omitempty"`
+	OptimizeActivity             *bool   `json:"optimizeActivity,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -75,36 +75,36 @@ func (o *WorkflowConfig) SetDisableSystemSearchAttribute(v bool) {
 	o.DisableSystemSearchAttribute = &v
 }
 
-// GetEnabledExecutingStateExecutionIds returns the EnabledExecutingStateExecutionIds field value if set, zero value otherwise.
-func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIds() bool {
-	if o == nil || IsNil(o.EnabledExecutingStateExecutionIds) {
-		var ret bool
+// GetExecutingStateIdMode returns the ExecutingStateIdMode field value if set, zero value otherwise.
+func (o *WorkflowConfig) GetExecutingStateIdMode() string {
+	if o == nil || IsNil(o.ExecutingStateIdMode) {
+		var ret string
 		return ret
 	}
-	return *o.EnabledExecutingStateExecutionIds
+	return *o.ExecutingStateIdMode
 }
 
-// GetEnabledExecutingStateExecutionIdsOk returns a tuple with the EnabledExecutingStateExecutionIds field value if set, nil otherwise
+// GetExecutingStateIdModeOk returns a tuple with the ExecutingStateIdMode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIdsOk() (*bool, bool) {
-	if o == nil || IsNil(o.EnabledExecutingStateExecutionIds) {
+func (o *WorkflowConfig) GetExecutingStateIdModeOk() (*string, bool) {
+	if o == nil || IsNil(o.ExecutingStateIdMode) {
 		return nil, false
 	}
-	return o.EnabledExecutingStateExecutionIds, true
+	return o.ExecutingStateIdMode, true
 }
 
-// HasEnabledExecutingStateExecutionIds returns a boolean if a field has been set.
-func (o *WorkflowConfig) HasEnabledExecutingStateExecutionIds() bool {
-	if o != nil && !IsNil(o.EnabledExecutingStateExecutionIds) {
+// HasExecutingStateIdMode returns a boolean if a field has been set.
+func (o *WorkflowConfig) HasExecutingStateIdMode() bool {
+	if o != nil && !IsNil(o.ExecutingStateIdMode) {
 		return true
 	}
 
 	return false
 }
 
-// SetEnabledExecutingStateExecutionIds gets a reference to the given bool and assigns it to the EnabledExecutingStateExecutionIds field.
-func (o *WorkflowConfig) SetEnabledExecutingStateExecutionIds(v bool) {
-	o.EnabledExecutingStateExecutionIds = &v
+// SetExecutingStateIdMode gets a reference to the given string and assigns it to the ExecutingStateIdMode field.
+func (o *WorkflowConfig) SetExecutingStateIdMode(v string) {
+	o.ExecutingStateIdMode = &v
 }
 
 // GetContinueAsNewThreshold returns the ContinueAsNewThreshold field value if set, zero value otherwise.
@@ -216,8 +216,8 @@ func (o WorkflowConfig) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.DisableSystemSearchAttribute) {
 		toSerialize["disableSystemSearchAttribute"] = o.DisableSystemSearchAttribute
 	}
-	if !IsNil(o.EnabledExecutingStateExecutionIds) {
-		toSerialize["enabledExecutingStateExecutionIds"] = o.EnabledExecutingStateExecutionIds
+	if !IsNil(o.ExecutingStateIdMode) {
+		toSerialize["executingStateIdMode"] = o.ExecutingStateIdMode
 	}
 	if !IsNil(o.ContinueAsNewThreshold) {
 		toSerialize["continueAsNewThreshold"] = o.ContinueAsNewThreshold

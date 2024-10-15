@@ -572,6 +572,15 @@ components:
           - partialLoadingKeys
           - partialLoadingKeys
           persistenceLoadingType: null
+        executeApiDataAttributesLoadingPolicy:
+          lockingKeys:
+          - lockingKeys
+          - lockingKeys
+          useKeyAsPrefix: true
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
         decideApiRetryPolicy:
           maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
@@ -580,6 +589,15 @@ components:
           backoffCoefficient: 5.637377
         executeApiFailureProceedStateId: executeApiFailureProceedStateId
         decideApiTimeoutSeconds: 1
+        executeApiSearchAttributesLoadingPolicy:
+          lockingKeys:
+          - lockingKeys
+          - lockingKeys
+          useKeyAsPrefix: true
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
         startApiTimeoutSeconds: 6
         executeApiFailurePolicy: null
         executeApiFailureProceedStateOptions: null
@@ -589,8 +607,26 @@ components:
           initialIntervalSeconds: 5
           maximumIntervalSeconds: 2
           backoffCoefficient: 5.637377
+        waitUntilApiSearchAttributesLoadingPolicy:
+          lockingKeys:
+          - lockingKeys
+          - lockingKeys
+          useKeyAsPrefix: true
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
         skipStartApi: true
         waitUntilApiTimeoutSeconds: 3
+        waitUntilApiDataAttributesLoadingPolicy:
+          lockingKeys:
+          - lockingKeys
+          - lockingKeys
+          useKeyAsPrefix: true
+          partialLoadingKeys:
+          - partialLoadingKeys
+          - partialLoadingKeys
+          persistenceLoadingType: null
         executeApiRetryPolicy:
           maximumAttemptsDurationSeconds: 9
           maximumAttempts: 7
@@ -599,6 +635,10 @@ components:
           backoffCoefficient: 5.637377
       properties:
         searchAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        waitUntilApiSearchAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        executeApiSearchAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
         dataObjectsLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
@@ -634,6 +674,10 @@ components:
           type: boolean
         dataAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        waitUntilApiDataAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
+        executeApiDataAttributesLoadingPolicy:
+          $ref: '#/components/schemas/PersistenceLoadingPolicy'
       type: object
     WorkflowStartOptions:
       example:
@@ -646,8 +690,8 @@ components:
         workflowConfigOverride:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
-          enabledExecutingStateExecutionIds: true
           continueAsNewPageSizeInBytes: 4
+          executingStateIdMode: ENABLED_FOR_ALL
           optimizeActivity: true
         idReusePolicy: null
         searchAttributes:
@@ -842,6 +886,15 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          executeApiDataAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           decideApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -850,6 +903,15 @@ components:
             backoffCoefficient: 5.637377
           executeApiFailureProceedStateId: executeApiFailureProceedStateId
           decideApiTimeoutSeconds: 1
+          executeApiSearchAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           startApiTimeoutSeconds: 6
           executeApiFailurePolicy: null
           executeApiFailureProceedStateOptions: null
@@ -859,8 +921,26 @@ components:
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637377
+          waitUntilApiSearchAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           skipStartApi: true
           waitUntilApiTimeoutSeconds: 3
+          waitUntilApiDataAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           executeApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -878,8 +958,8 @@ components:
           workflowConfigOverride:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 1
-            enabledExecutingStateExecutionIds: true
             continueAsNewPageSizeInBytes: 4
+            executingStateIdMode: ENABLED_FOR_ALL
             optimizeActivity: true
           idReusePolicy: null
           searchAttributes:
@@ -1402,8 +1482,8 @@ components:
         workflowConfig:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
-          enabledExecutingStateExecutionIds: true
           continueAsNewPageSizeInBytes: 4
+          executingStateIdMode: ENABLED_FOR_ALL
           optimizeActivity: true
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -1623,6 +1703,15 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              executeApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               decideApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1631,6 +1720,15 @@ components:
                 backoffCoefficient: 5.637377
               executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
+              executeApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               startApiTimeoutSeconds: 6
               executeApiFailurePolicy: null
               executeApiFailureProceedStateOptions: null
@@ -1640,8 +1738,26 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              waitUntilApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               skipStartApi: true
               waitUntilApiTimeoutSeconds: 3
+              waitUntilApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               executeApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1691,6 +1807,15 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              executeApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               decideApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -1699,6 +1824,15 @@ components:
                 backoffCoefficient: 5.637377
               executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
+              executeApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               startApiTimeoutSeconds: 6
               executeApiFailurePolicy: null
               executeApiFailureProceedStateOptions: null
@@ -1708,8 +1842,26 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              waitUntilApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               skipStartApi: true
               waitUntilApiTimeoutSeconds: 3
+              waitUntilApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               executeApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2081,6 +2233,15 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              executeApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               decideApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2089,6 +2250,15 @@ components:
                 backoffCoefficient: 5.637377
               executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
+              executeApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               startApiTimeoutSeconds: 6
               executeApiFailurePolicy: null
               executeApiFailureProceedStateOptions: null
@@ -2098,8 +2268,26 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              waitUntilApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               skipStartApi: true
               waitUntilApiTimeoutSeconds: 3
+              waitUntilApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               executeApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2149,6 +2337,15 @@ components:
                 - partialLoadingKeys
                 - partialLoadingKeys
                 persistenceLoadingType: null
+              executeApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               decideApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2157,6 +2354,15 @@ components:
                 backoffCoefficient: 5.637377
               executeApiFailureProceedStateId: executeApiFailureProceedStateId
               decideApiTimeoutSeconds: 1
+              executeApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               startApiTimeoutSeconds: 6
               executeApiFailurePolicy: null
               executeApiFailureProceedStateOptions: null
@@ -2166,8 +2372,26 @@ components:
                 initialIntervalSeconds: 5
                 maximumIntervalSeconds: 2
                 backoffCoefficient: 5.637377
+              waitUntilApiSearchAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               skipStartApi: true
               waitUntilApiTimeoutSeconds: 3
+              waitUntilApiDataAttributesLoadingPolicy:
+                lockingKeys:
+                - lockingKeys
+                - lockingKeys
+                useKeyAsPrefix: true
+                partialLoadingKeys:
+                - partialLoadingKeys
+                - partialLoadingKeys
+                persistenceLoadingType: null
               executeApiRetryPolicy:
                 maximumAttemptsDurationSeconds: 9
                 maximumAttempts: 7
@@ -2325,6 +2549,15 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            executeApiDataAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             decideApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2333,6 +2566,15 @@ components:
               backoffCoefficient: 5.637377
             executeApiFailureProceedStateId: executeApiFailureProceedStateId
             decideApiTimeoutSeconds: 1
+            executeApiSearchAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             startApiTimeoutSeconds: 6
             executeApiFailurePolicy: null
             executeApiFailureProceedStateOptions: null
@@ -2342,8 +2584,26 @@ components:
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
               backoffCoefficient: 5.637377
+            waitUntilApiSearchAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             skipStartApi: true
             waitUntilApiTimeoutSeconds: 3
+            waitUntilApiDataAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             executeApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2393,6 +2653,15 @@ components:
               - partialLoadingKeys
               - partialLoadingKeys
               persistenceLoadingType: null
+            executeApiDataAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             decideApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2401,6 +2670,15 @@ components:
               backoffCoefficient: 5.637377
             executeApiFailureProceedStateId: executeApiFailureProceedStateId
             decideApiTimeoutSeconds: 1
+            executeApiSearchAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             startApiTimeoutSeconds: 6
             executeApiFailurePolicy: null
             executeApiFailureProceedStateOptions: null
@@ -2410,8 +2688,26 @@ components:
               initialIntervalSeconds: 5
               maximumIntervalSeconds: 2
               backoffCoefficient: 5.637377
+            waitUntilApiSearchAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             skipStartApi: true
             waitUntilApiTimeoutSeconds: 3
+            waitUntilApiDataAttributesLoadingPolicy:
+              lockingKeys:
+              - lockingKeys
+              - lockingKeys
+              useKeyAsPrefix: true
+              partialLoadingKeys:
+              - partialLoadingKeys
+              - partialLoadingKeys
+              persistenceLoadingType: null
             executeApiRetryPolicy:
               maximumAttemptsDurationSeconds: 9
               maximumAttempts: 7
@@ -2498,6 +2794,15 @@ components:
             - partialLoadingKeys
             - partialLoadingKeys
             persistenceLoadingType: null
+          executeApiDataAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           decideApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -2506,6 +2811,15 @@ components:
             backoffCoefficient: 5.637377
           executeApiFailureProceedStateId: executeApiFailureProceedStateId
           decideApiTimeoutSeconds: 1
+          executeApiSearchAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           startApiTimeoutSeconds: 6
           executeApiFailurePolicy: null
           executeApiFailureProceedStateOptions: null
@@ -2515,8 +2829,26 @@ components:
             initialIntervalSeconds: 5
             maximumIntervalSeconds: 2
             backoffCoefficient: 5.637377
+          waitUntilApiSearchAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           skipStartApi: true
           waitUntilApiTimeoutSeconds: 3
+          waitUntilApiDataAttributesLoadingPolicy:
+            lockingKeys:
+            - lockingKeys
+            - lockingKeys
+            useKeyAsPrefix: true
+            partialLoadingKeys:
+            - partialLoadingKeys
+            - partialLoadingKeys
+            persistenceLoadingType: null
           executeApiRetryPolicy:
             maximumAttemptsDurationSeconds: 9
             maximumAttempts: 7
@@ -2806,14 +3138,18 @@ components:
       example:
         disableSystemSearchAttribute: true
         continueAsNewThreshold: 1
-        enabledExecutingStateExecutionIds: true
         continueAsNewPageSizeInBytes: 4
+        executingStateIdMode: ENABLED_FOR_ALL
         optimizeActivity: true
       properties:
         disableSystemSearchAttribute:
           type: boolean
-        enabledExecutingStateExecutionIds:
-          type: boolean
+        executingStateIdMode:
+          enum:
+          - ENABLED_FOR_ALL
+          - ENABLED_FOR_STATES_WITH_WAIT_UNTIL
+          - DISABLED
+          type: string
         continueAsNewThreshold:
           type: integer
         continueAsNewPageSizeInBytes:

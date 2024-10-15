@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DisableSystemSearchAttribute** | Pointer to **bool** |  | [optional] 
-**EnabledExecutingStateExecutionIds** | Pointer to **bool** |  | [optional] 
+**ExecutingStateIdMode** | Pointer to **string** |  | [optional] 
 **ContinueAsNewThreshold** | Pointer to **int32** |  | [optional] 
 **ContinueAsNewPageSizeInBytes** | Pointer to **int32** |  | [optional] 
 **OptimizeActivity** | Pointer to **bool** |  | [optional] 
@@ -54,30 +54,30 @@ SetDisableSystemSearchAttribute sets DisableSystemSearchAttribute field to given
 
 HasDisableSystemSearchAttribute returns a boolean if a field has been set.
 
-### GetEnabledExecutingStateExecutionIds
+### GetExecutingStateIdMode
 
-`func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIds() bool`
+`func (o *WorkflowConfig) GetExecutingStateIdMode() string`
 
-GetEnabledExecutingStateExecutionIds returns the EnabledExecutingStateExecutionIds field if non-nil, zero value otherwise.
+GetExecutingStateIdMode returns the ExecutingStateIdMode field if non-nil, zero value otherwise.
 
-### GetEnabledExecutingStateExecutionIdsOk
+### GetExecutingStateIdModeOk
 
-`func (o *WorkflowConfig) GetEnabledExecutingStateExecutionIdsOk() (*bool, bool)`
+`func (o *WorkflowConfig) GetExecutingStateIdModeOk() (*string, bool)`
 
-GetEnabledExecutingStateExecutionIdsOk returns a tuple with the EnabledExecutingStateExecutionIds field if it's non-nil, zero value otherwise
+GetExecutingStateIdModeOk returns a tuple with the ExecutingStateIdMode field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEnabledExecutingStateExecutionIds
+### SetExecutingStateIdMode
 
-`func (o *WorkflowConfig) SetEnabledExecutingStateExecutionIds(v bool)`
+`func (o *WorkflowConfig) SetExecutingStateIdMode(v string)`
 
-SetEnabledExecutingStateExecutionIds sets EnabledExecutingStateExecutionIds field to given value.
+SetExecutingStateIdMode sets ExecutingStateIdMode field to given value.
 
-### HasEnabledExecutingStateExecutionIds
+### HasExecutingStateIdMode
 
-`func (o *WorkflowConfig) HasEnabledExecutingStateExecutionIds() bool`
+`func (o *WorkflowConfig) HasExecutingStateIdMode() bool`
 
-HasEnabledExecutingStateExecutionIds returns a boolean if a field has been set.
+HasExecutingStateIdMode returns a boolean if a field has been set.
 
 ### GetContinueAsNewThreshold
 
