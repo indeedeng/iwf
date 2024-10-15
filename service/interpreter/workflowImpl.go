@@ -772,12 +772,7 @@ func invokeStateExecute(
 			(provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "old" || signalWithStartOn == "both")) {
 			workflowId := utils.GetWorkflowIdForWaitForStateExecution(executionContext.WorkflowId, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
 
-			err = signalWithStart(unifiedClient, workflowId)
-			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
-				// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
-				// panic will let the workflow task will retry until the signal is sent
-				panic(fmt.Errorf("failed to signal on completion %w", err))
-			}
+			signalWithStart(unifiedClient, workflowId)
 		}
 
 		// signalWithStart with new workflowId (containing firstRunId)
@@ -785,12 +780,7 @@ func invokeStateExecute(
 			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
 
 			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
-			err = signalWithStart(unifiedClient, workflowId)
-			if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
-				// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
-				// panic will let the workflow task will retry until the signal is sent
-				panic(fmt.Errorf("failed to signal on completion %w", err))
-			}
+			signalWithStart(unifiedClient, workflowId)
 		}
 	}
 
@@ -817,8 +807,8 @@ func invokeStateExecute(
 	return &decision, service.CompletedStateExecutionStatus, nil
 }
 
-func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) error {
-	return unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
+func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) {
+	err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
 		context.Background(),
 		uclient.StartWorkflowOptions{
 			ID:                       workflowId,
@@ -826,6 +816,12 @@ func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) err
 			WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
 		},
 		iwfidl.StateCompletionOutput{})
+
+	if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+		// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
+		// panic will let the workflow task will retry until the signal is sent
+		panic(fmt.Errorf("failed to signal on completion %w", err))
+	}
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {
