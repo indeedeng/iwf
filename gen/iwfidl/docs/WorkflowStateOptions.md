@@ -5,6 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **SearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**WaitUntilApiSearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
+**ExecuteApiSearchAttributesLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **DataObjectsLoadingPolicy** | Pointer to [**PersistenceLoadingPolicy**](PersistenceLoadingPolicy.md) |  | [optional] 
 **StartApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
 **DecideApiTimeoutSeconds** | Pointer to **int32** |  | [optional] 
@@ -68,6 +70,56 @@ SetSearchAttributesLoadingPolicy sets SearchAttributesLoadingPolicy field to giv
 `func (o *WorkflowStateOptions) HasSearchAttributesLoadingPolicy() bool`
 
 HasSearchAttributesLoadingPolicy returns a boolean if a field has been set.
+
+### GetWaitUntilApiSearchAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) GetWaitUntilApiSearchAttributesLoadingPolicy() PersistenceLoadingPolicy`
+
+GetWaitUntilApiSearchAttributesLoadingPolicy returns the WaitUntilApiSearchAttributesLoadingPolicy field if non-nil, zero value otherwise.
+
+### GetWaitUntilApiSearchAttributesLoadingPolicyOk
+
+`func (o *WorkflowStateOptions) GetWaitUntilApiSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
+
+GetWaitUntilApiSearchAttributesLoadingPolicyOk returns a tuple with the WaitUntilApiSearchAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWaitUntilApiSearchAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) SetWaitUntilApiSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
+
+SetWaitUntilApiSearchAttributesLoadingPolicy sets WaitUntilApiSearchAttributesLoadingPolicy field to given value.
+
+### HasWaitUntilApiSearchAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) HasWaitUntilApiSearchAttributesLoadingPolicy() bool`
+
+HasWaitUntilApiSearchAttributesLoadingPolicy returns a boolean if a field has been set.
+
+### GetExecuteApiSearchAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) GetExecuteApiSearchAttributesLoadingPolicy() PersistenceLoadingPolicy`
+
+GetExecuteApiSearchAttributesLoadingPolicy returns the ExecuteApiSearchAttributesLoadingPolicy field if non-nil, zero value otherwise.
+
+### GetExecuteApiSearchAttributesLoadingPolicyOk
+
+`func (o *WorkflowStateOptions) GetExecuteApiSearchAttributesLoadingPolicyOk() (*PersistenceLoadingPolicy, bool)`
+
+GetExecuteApiSearchAttributesLoadingPolicyOk returns a tuple with the ExecuteApiSearchAttributesLoadingPolicy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExecuteApiSearchAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) SetExecuteApiSearchAttributesLoadingPolicy(v PersistenceLoadingPolicy)`
+
+SetExecuteApiSearchAttributesLoadingPolicy sets ExecuteApiSearchAttributesLoadingPolicy field to given value.
+
+### HasExecuteApiSearchAttributesLoadingPolicy
+
+`func (o *WorkflowStateOptions) HasExecuteApiSearchAttributesLoadingPolicy() bool`
+
+HasExecuteApiSearchAttributesLoadingPolicy returns a boolean if a field has been set.
 
 ### GetDataObjectsLoadingPolicy
 

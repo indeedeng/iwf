@@ -501,7 +501,7 @@ func executeState(
 
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
-		saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
+		saLoadingPolicy := compatibility.GetWaitUntilApiSearchAttributesLoadingPolicy(state.StateOptions)
 		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
 
 		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
@@ -732,7 +732,7 @@ func executeStateDecide(
 		activityOptions.RetryPolicy = compatibility.GetDecideApiRetryPolicy(state.StateOptions)
 	}
 
-	saLoadingPolicy := state.GetStateOptions().SearchAttributesLoadingPolicy
+	saLoadingPolicy := compatibility.GetExecuteApiSearchAttributesLoadingPolicy(state.StateOptions)
 	doLoadingPolicy := compatibility.GetExecuteApiDataObjectsLoadingPolicy(state.StateOptions)
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)

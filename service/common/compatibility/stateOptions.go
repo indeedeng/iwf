@@ -77,6 +77,30 @@ func GetExecuteApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOpt
 	return stateOptions.ExecuteApiDataAttributesLoadingPolicy
 }
 
+func GetWaitUntilApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions == nil {
+		return nil
+	}
+
+	if stateOptions.HasSearchAttributesLoadingPolicy() {
+		return stateOptions.SearchAttributesLoadingPolicy
+	}
+
+	return stateOptions.WaitUntilApiSearchAttributesLoadingPolicy
+}
+
+func GetExecuteApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions == nil {
+		return nil
+	}
+
+	if stateOptions.HasSearchAttributesLoadingPolicy() {
+		return stateOptions.SearchAttributesLoadingPolicy
+	}
+
+	return stateOptions.ExecuteApiSearchAttributesLoadingPolicy
+}
+
 func GetStartApiFailurePolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.StartApiFailurePolicy {
 	if stateOptions.HasStartApiFailurePolicy() {
 		return stateOptions.StartApiFailurePolicy
