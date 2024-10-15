@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
 	"net/http"
@@ -157,10 +158,25 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
 	var workflowId string
-	if req.WaitForKey != nil {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateId + "_" + *req.WaitForKey
-	} else {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateExecutionId
+
+	sharedConfig := env.GetSharedConfig()
+	waitForOn := sharedConfig.GetWaitForOnWithDefault()
+
+	if waitForOn == "old" {
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(req.WorkflowId, req.StateExecutionId, req.WaitForKey, req.StateId)
+	} else { // waitForOn == "new"
+		var parentId string
+		if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
+			response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
+			if err != nil {
+				return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
+			}
+			parentId = response.FirstRunId
+		} else { // Cadence
+			parentId = req.WorkflowId
+		}
+
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(parentId, req.StateExecutionId, req.WaitForKey, req.StateId)
 	}
 
 	options := uclient.StartWorkflowOptions{
@@ -173,6 +189,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
+
 	if err != nil {
 		return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
 	}

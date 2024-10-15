@@ -271,6 +271,7 @@ func (t *temporalClient) DescribeWorkflowExecution(
 
 	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:                    resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		FirstRunId:               resp.GetWorkflowExecutionInfo().GetFirstRunId(),
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
@@ -440,4 +441,8 @@ func (t *temporalClient) ResetWorkflow(
 		return "", err
 	}
 	return resp.GetRunId(), nil
+}
+
+func (t *temporalClient) GetBackendType() (backendType service.BackendType) {
+	return service.BackendTypeTemporal
 }
