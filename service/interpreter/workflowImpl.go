@@ -3,7 +3,6 @@ package interpreter
 import (
 	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
@@ -765,7 +764,8 @@ func invokeStateExecute(
 		// this is not a problem because the signalWithStart will be very fast and highly available
 		unifiedClient := env.GetUnifiedClient()
 
-		signalWithStartOn := config.GetSignalWithStartOnWithDefault(env.GetSharedConfig())
+		sharedConfig := env.GetSharedConfig()
+		signalWithStartOn := sharedConfig.GetSignalWithStartOnWithDefault()
 
 		// signalWithStart with legacy workflowId (containing parent workflowId)
 		if provider.GetBackendType() == service.BackendTypeCadence ||

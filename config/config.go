@@ -130,23 +130,23 @@ func NewConfig(configPath string) (*Config, error) {
 	return config, nil
 }
 
-func GetApiServiceAddressWithDefault(config Config) string {
-	if config.Interpreter.InterpreterActivityConfig.ApiServiceAddress != "" {
-		return config.Interpreter.InterpreterActivityConfig.ApiServiceAddress
+func (c Config) GetApiServiceAddressWithDefault() string {
+	if c.Interpreter.InterpreterActivityConfig.ApiServiceAddress != "" {
+		return c.Interpreter.InterpreterActivityConfig.ApiServiceAddress
 	}
-	return fmt.Sprintf("http://localhost:%v", config.Api.Port)
+	return fmt.Sprintf("http://localhost:%v", c.Api.Port)
 }
 
-func GetSignalWithStartOnWithDefault(config Config) string {
-	if config.Api.WaitForStateCompletionMigration.SignalWithStartOn != "" {
-		return config.Api.WaitForStateCompletionMigration.SignalWithStartOn
+func (c Config) GetSignalWithStartOnWithDefault() string {
+	if c.Api.WaitForStateCompletionMigration.SignalWithStartOn != "" {
+		return c.Api.WaitForStateCompletionMigration.SignalWithStartOn
 	}
 	return "old"
 }
 
-func GetWaitForOnWithDefault(config Config) string {
-	if config.Api.WaitForStateCompletionMigration.WaitForOn != "" {
-		return config.Api.WaitForStateCompletionMigration.WaitForOn
+func (c Config) GetWaitForOnWithDefault() string {
+	if c.Api.WaitForStateCompletionMigration.WaitForOn != "" {
+		return c.Api.WaitForStateCompletionMigration.WaitForOn
 	}
 	return "old"
 }

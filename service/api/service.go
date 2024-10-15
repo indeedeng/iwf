@@ -159,7 +159,8 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 
 	var workflowId string
 
-	waitForOn := config.GetWaitForOnWithDefault(env.GetSharedConfig())
+	sharedConfig := env.GetSharedConfig()
+	waitForOn := sharedConfig.GetWaitForOnWithDefault()
 
 	if waitForOn == "old" {
 		workflowId = utils.GetWorkflowIdForWaitForStateExecution(req.WorkflowId, req.StateExecutionId, req.WaitForKey, req.StateId)
