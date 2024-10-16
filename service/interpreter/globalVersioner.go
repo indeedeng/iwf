@@ -62,6 +62,10 @@ func (p *GlobalVersioner) IsAfterVersionOfOptimizedUpsertSearchAttribute() bool 
 	return p.version >= versions.StartingVersionOptimizedUpsertSearchAttribute
 }
 
+func (p *GlobalVersioner) IsAfterVersionOfExecutingStateIdMode() bool {
+	return p.version >= versions.StartingVersionExecutingStateIdMode
+}
+
 func (p *GlobalVersioner) IsAfterVersionOfRenamedStateApi() bool {
 	return p.version >= versions.StartingVersionRenamedStateApi
 }

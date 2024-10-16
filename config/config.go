@@ -107,6 +107,7 @@ type (
 var DefaultWorkflowConfig = &iwfidl.WorkflowConfig{
 	ContinueAsNewThreshold:       iwfidl.PtrInt32(100),
 	DisableSystemSearchAttribute: iwfidl.PtrBool(true),
+	ExecutingStateIdMode:         iwfidl.PtrString("ENABLED_FOR_STATES_WITH_WAIT_UNTIL"),
 }
 
 // NewConfig returns a new decoded Config struct
