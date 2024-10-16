@@ -15,10 +15,9 @@ type StateExecutionCounter struct {
 	continueAsNewCounter *ContinueAsNewCounter
 
 	stateIdCompletedCounts          map[string]int
-	stateIdStartedCounts            map[string]int  // For creating stateExecutionId: count the stateId for how many times that have been executed
-	stateIdCurrentlyExecutingCounts map[string]int  // For system search attributes service.SearchAttributeExecutingStateIds: keep counting the pending stateIds
-	stateIdHasWaitUntil             map[string]bool // For config.GetExecutingStateIdMode() == "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" case; track which states have waitUntil implemented
-	totalCurrentlyExecutingCount    int             // For "dead ends": count the total pending states
+	stateIdStartedCounts            map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
+	stateIdCurrentlyExecutingCounts map[string]int // For system search attributes: keep counting the pending stateIds
+	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
 func NewStateExecutionCounter(
@@ -70,6 +69,8 @@ func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 }
 
 func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRequest) error {
+	config := e.configer.Get()
+
 	needsUpdateSA := false
 	numOfNew := 0
 	for _, sr := range stateReqs {
@@ -77,67 +78,93 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			continue
 		}
 		s := sr.GetStateStartRequest()
-		options := s.GetStateOptions()
-		e.stateIdHasWaitUntil[s.StateId] = !options.GetSkipWaitUntil()
-		numOfNew++
-		e.stateIdCurrentlyExecutingCounts[s.StateId]++
-		if e.stateIdCurrentlyExecutingCounts[s.StateId] == 1 {
-			// first time the stateId show up
-			needsUpdateSA = true
+
+		if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+			switch mode := config.GetExecutingStateIdMode(); mode {
+			case "DISABLED":
+				// do nothing
+			case "ENABLED_FOR_ALL":
+				if e.IncreaseStateIdCurrentlyExecutingCounts(s) {
+					needsUpdateSA = true
+				}
+			default: // "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" or nil or unrecognized enum value
+				options := s.GetStateOptions()
+				if !options.GetSkipWaitUntil() {
+					if e.IncreaseStateIdCurrentlyExecutingCounts(s) {
+						needsUpdateSA = true
+					}
+				}
+			}
+		} else {
+			if !config.GetDisableSystemSearchAttribute() {
+				if e.IncreaseStateIdCurrentlyExecutingCounts(s) {
+					needsUpdateSA = true
+				}
+			}
 		}
+
+		numOfNew++
 	}
 	e.totalCurrentlyExecutingCount += numOfNew
+
 	if needsUpdateSA {
-		return e.updateStateIdSearchAttribute()
+		return e.UpdateStateIdSearchAttribute()
 	}
 	return nil
 }
 
+func (e *StateExecutionCounter) IncreaseStateIdCurrentlyExecutingCounts(s iwfidl.StateMovement) bool {
+	e.stateIdCurrentlyExecutingCounts[s.StateId]++
+	// first time the stateId show up
+	return e.stateIdCurrentlyExecutingCounts[s.StateId] == 1
+}
+
 func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
-	e.stateIdCurrentlyExecutingCounts[state.StateId]--
 	e.totalCurrentlyExecutingCount--
 
 	options := state.GetStateOptions()
 	skipStart := compatibility.GetSkipStartApi(&options)
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
 
-	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {
-		delete(e.stateIdCurrentlyExecutingCounts, state.StateId)
-		e.stateIdHasWaitUntil[state.StateId] = !options.GetSkipWaitUntil()
-		return e.updateStateIdSearchAttribute()
-	}
-	return nil
-}
-
-func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
-	return e.totalCurrentlyExecutingCount
-}
-
-func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
-	var executingStateIds []string
-	for sid := range e.stateIdCurrentlyExecutingCounts {
-		executingStateIds = append(executingStateIds, sid)
-	}
 	config := e.configer.Get()
 
 	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 		switch mode := config.GetExecutingStateIdMode(); mode {
 		case "DISABLED":
 			return nil
-		case "ENABLED_FOR_STATES_WITH_WAIT_UNTIL":
-			var executingStateIdsWithWaitUntil []string
-			for _, stateId := range executingStateIdsWithWaitUntil {
-				if e.stateIdHasWaitUntil[stateId] {
-					executingStateIdsWithWaitUntil = append(executingStateIdsWithWaitUntil, stateId)
-				}
+		case "ENABLED_FOR_ALL":
+			e.DecreaseStateIdCurrentlyExecutingCounts(state)
+		default: // "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" or nil or unrecognized enum value
+			if options.GetSkipWaitUntil() {
+				return nil
+			} else {
+				e.DecreaseStateIdCurrentlyExecutingCounts(state)
 			}
-			executingStateIds = executingStateIdsWithWaitUntil
-		default: // Do nothing
 		}
 	} else {
 		if config.GetDisableSystemSearchAttribute() {
 			return nil
 		}
+	}
+
+	return e.UpdateStateIdSearchAttribute()
+}
+
+func (e *StateExecutionCounter) DecreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
+	e.stateIdCurrentlyExecutingCounts[state.StateId]--
+	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {
+		delete(e.stateIdCurrentlyExecutingCounts, state.StateId)
+	}
+}
+
+func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
+	return e.totalCurrentlyExecutingCount
+}
+
+func (e *StateExecutionCounter) UpdateStateIdSearchAttribute() error {
+	var executingStateIds []string
+	for sid := range e.stateIdCurrentlyExecutingCounts {
+		executingStateIds = append(executingStateIds, sid)
 	}
 
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {
