@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
 	"net/http"
@@ -81,8 +82,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	} else {
 		workflowConfig = *s.config.Interpreter.DefaultWorkflowConfig
 	}
-
 	var initCustomSAs []iwfidl.SearchAttribute
+	var initCustomDAs []iwfidl.KeyValue
 	// workerUrl is always needed, for optimizing None as persistence loading type
 	workflowOptions.Memo = map[string]interface{}{
 		service.WorkerUrlMemoKey: iwfidl.EncodedObject{
@@ -104,6 +105,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		workflowOptions.SearchAttributes = utils.MergeMap(initialCustomSAInternal, workflowOptions.SearchAttributes)
 
 		initCustomSAs = startOptions.SearchAttributes
+		initCustomDAs = startOptions.DataAttributes
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
@@ -112,6 +114,9 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			workflowOptions.Memo[service.UseMemoForDataAttributesKey] = iwfidl.EncodedObject{
 				// Note: the value is actually not too important, we will check the presence of the key only as today
 				Data: iwfidl.PtrString("true"),
+			}
+			for _, da := range initCustomDAs {
+				workflowOptions.Memo[da.GetKey()] = da.GetValue()
 			}
 		}
 		if startOptions.WorkflowStartDelaySeconds != nil {
@@ -127,6 +132,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		StateInput:                         req.StateInput,
 		StateOptions:                       req.StateOptions,
 		InitSearchAttributes:               initCustomSAs,
+		InitDataAttributes:                 initCustomDAs,
 		Config:                             workflowConfig,
 		UseMemoForDataAttributes:           useMemo,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
@@ -152,10 +158,25 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
 	var workflowId string
-	if req.WaitForKey != nil {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.WaitForKey
-	} else {
-		workflowId = service.IwfSystemConstPrefix + req.WorkflowId + "_" + *req.StateExecutionId
+
+	sharedConfig := env.GetSharedConfig()
+	waitForOn := sharedConfig.GetWaitForOnWithDefault()
+
+	if waitForOn == "old" {
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(req.WorkflowId, req.StateExecutionId, req.WaitForKey, req.StateId)
+	} else { // waitForOn == "new"
+		var parentId string
+		if s.client.GetBackendType() == service.BackendTypeTemporal { // Temporal
+			response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
+			if err != nil {
+				return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
+			}
+			parentId = response.FirstRunId
+		} else { // Cadence
+			parentId = req.WorkflowId
+		}
+
+		workflowId = utils.GetWorkflowIdForWaitForStateExecution(parentId, req.StateExecutionId, req.WaitForKey, req.StateId)
 	}
 
 	options := uclient.StartWorkflowOptions{
@@ -168,6 +189,7 @@ func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
 	}
 
 	runId, err := s.client.StartWaitForStateCompletionWorkflow(ctx, options)
+
 	if err != nil {
 		return nil, s.handleError(err, WorkflowWaitForStateCompletionApiPath, req.WorkflowId)
 	}

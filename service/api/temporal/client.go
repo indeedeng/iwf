@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/utils"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -140,7 +141,7 @@ func (t *temporalClient) StartInterpreterWorkflow(
 				WorkflowExecutionTimeout: workflowOptions.WorkflowExecutionTimeout,
 				RetryPolicy:              workflowOptions.RetryPolicy,
 				Memo:                     workflowOptions.Memo,
-				SearchAttributes:         workflowOptions.SearchAttributes,
+				TypedSearchAttributes:    workflowOptions.TypedSearchAttributes,
 			},
 		})
 
@@ -270,10 +271,11 @@ func (t *temporalClient) DescribeWorkflowExecution(
 
 	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:                    resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
+		FirstRunId:               resp.GetWorkflowExecutionInfo().GetFirstRunId(),
 		Status:                   status,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
-		WorkflowStartedTimestamp: resp.GetWorkflowExecutionInfo().GetStartTime().Unix(),
+		WorkflowStartedTimestamp: utils.ToNanoSeconds(resp.GetWorkflowExecutionInfo().GetStartTime()),
 	}, err
 }
 
@@ -378,7 +380,16 @@ func (t *temporalClient) GetWorkflowResult(
 func (t *temporalClient) SynchronousUpdateWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
 ) error {
-	handle, err := t.tClient.UpdateWorkflow(ctx, workflowID, runID, updateType, input)
+	args := []interface{}{input}
+	options := client.UpdateWorkflowOptions{
+		WorkflowID: workflowID,
+		RunID:      runID,
+		UpdateName: updateType,
+		Args:       args,
+		// TODO: Leaving this as Accepted that was a default value before WaitForStage became required argument, but Completed might be a better choice
+		WaitForStage: client.WorkflowUpdateStageAccepted,
+	}
+	handle, err := t.tClient.UpdateWorkflow(ctx, options)
 	if err != nil {
 		return err
 	}
@@ -430,4 +441,8 @@ func (t *temporalClient) ResetWorkflow(
 		return "", err
 	}
 	return resp.GetRunId(), nil
+}
+
+func (t *temporalClient) GetBackendType() (backendType service.BackendType) {
+	return service.BackendTypeTemporal
 }

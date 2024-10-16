@@ -3,7 +3,6 @@ package interpreter
 import (
 	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -31,7 +30,9 @@ func StateApiWaitUntil(
 	logger.Info("StateStartActivity", "input", input)
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 
+	svcCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: iwfWorkerBaseUrl,
@@ -86,7 +87,9 @@ func StateApiExecute(
 	logger.Info("StateDecideActivity", "input", input)
 
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
+	svcCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: iwfWorkerBaseUrl,
@@ -271,9 +274,11 @@ func DumpWorkflowInternal(
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternal", "input", req)
 
-	apiAddress := config.GetApiServiceAddressWithDefault(env.GetSharedConfig())
+	svcCfg := env.GetSharedConfig()
+	apiAddress := svcCfg.GetApiServiceAddressWithDefault()
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: apiAddress,

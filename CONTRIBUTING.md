@@ -64,7 +64,9 @@ Or maybe both just for testing to ensure the code works for both Cadence and Tem
 
 ### Option 1: Run with our docker-compose file (Recommended)
 
-Simply run `docker compose -f docker-compose/integ-dependencies.yml up -` will:
+Start with shutting down already running dependencies: `docker compose -f docker-compose/integ-dependencies.yml down`
+
+Then simply run `docker compose -f docker-compose/integ-dependencies.yml up`. It will:
 
 * Start both Cadence & Temporal as dependencies
 * Set up required system search attributes
@@ -86,20 +88,20 @@ Assuming you are using `default` namespace:
 1. Make sure you have registered system search attributes required by iWF server
 
 ```shell
-  temporal  operator search-attribute  create -name IwfWorkflowType -type Keyword
-  temporal  operator search-attribute  create -name IwfGlobalWorkflowVersion -type Int 
-  temporal  operator search-attribute  create -name IwfExecutingStateIds -type KeywordList 
+  temporal  operator search-attribute  create --name IwfWorkflowType --type Keyword
+  temporal  operator search-attribute  create --name IwfGlobalWorkflowVersion --type Int 
+  temporal  operator search-attribute  create --name IwfExecutingStateIds --type KeywordList 
 ```
 
 2. For `persistence_test.go` integTests, you need to register below custom search attributes.
 
 ```shell
-  temporal  operator search-attribute  create -name CustomKeywordField -type Keyword
-  temporal  operator search-attribute  create -name CustomIntField -type Int
-  temporal  operator search-attribute  create -name CustomBoolField -type Bool
-  temporal  operator search-attribute  create -name CustomDoubleField -type Double
-  temporal  operator search-attribute  create -name CustomDatetimeField -type Datetime
-  temporal  operator search-attribute  create -name CustomStringField -type Text
+  temporal  operator search-attribute  create --name CustomKeywordField --type Keyword
+  temporal  operator search-attribute  create --name CustomIntField --type Int
+  temporal  operator search-attribute  create --name CustomBoolField --type Bool
+  temporal  operator search-attribute  create --name CustomDoubleField --type Double
+  temporal  operator search-attribute  create --name CustomDatetimeField --type Datetime
+  temporal  operator search-attribute  create --name CustomStringField --type Text
 ```
 
 3. If you run into any issues with Search Attributes registration, use the below command to check the existing Search

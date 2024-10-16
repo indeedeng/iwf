@@ -1,38 +1,39 @@
-package wait_for_state_completion
+package headers
 
 import (
-	"github.com/indeedeng/iwf/service/common/ptr"
-	"log"
-	"net/http"
-	"strconv"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
+	"log"
+	"net/http"
 )
 
 const (
-	WorkflowType = "wait_for_state_completion"
+	WorkflowType = "headers"
 	State1       = "S1"
-	State2       = "S2"
+
+	TestHeaderKey   = "integration-test-header"
+	TestHeaderValue = "integration-test-value"
 )
 
 type handler struct {
 	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
 }
 
-func NewHandler() common.WorkflowHandler {
+func NewHandler() *handler {
 	return &handler{
 		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
 	}
 }
 
 // ApiV1WorkflowStartPost - for a workflow
 func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+	headerValue := c.GetHeader(TestHeaderKey)
+	if headerValue != TestHeaderValue {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "test header not found"})
+		return
+	}
+
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -41,28 +42,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		// basic workflow go straight to decide methods without any commands
 		if req.GetWorkflowStateId() == State1 {
-			nowInt, err := strconv.Atoi(req.StateInput.GetData())
-			if err != nil {
-				panic(err)
-			}
-			now := int64(nowInt)
-			h.invokeData["scheduled_at"] = now
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					TimerCommands: []iwfidl.TimerCommand{
-						{
-							CommandId:                  ptr.Any("timer-cmd-id"),
-							FiringUnixTimestampSeconds: iwfidl.PtrInt64(now + 10), // fire after 10s
-						},
-					},
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
-				},
-			})
-			return
-		}
-		if req.GetWorkflowStateId() == State2 {
+			h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -76,6 +58,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+	headerValue := c.GetHeader(TestHeaderKey)
+	if headerValue != TestHeaderValue {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "test header not found"})
+		return
+	}
+
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -86,29 +74,13 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
-			now := time.Now().Unix()
-			h.invokeData["fired_at"] = now
-			timerResults := req.GetCommandResults()
-			timerId := timerResults.GetTimerResults()[0].GetCommandId()
-			h.invokeData["timer_id"] = timerId
+			// go to S1
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId:    State2,
-							WaitForKey: ptr.Any("testKey"),
-						},
-					},
-				},
-			})
-			return
-		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				StateDecision: &iwfidl.StateDecision{
-					NextStates: []iwfidl.StateMovement{
-						{
-							StateId: service.GracefulCompletingWorkflowStateId,
+							StateId:    service.GracefulCompletingWorkflowStateId,
+							StateInput: req.StateInput,
 						},
 					},
 				},
@@ -121,5 +93,5 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	return h.invokeHistory, nil
 }

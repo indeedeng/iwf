@@ -2,6 +2,7 @@ package uclient
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/service"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -33,6 +34,7 @@ type UnifiedClient interface {
 		ctx context.Context, valuePtr interface{}, workflowID, runID, updateType string, input interface{},
 	) error
 	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
+	GetBackendType() (backendType service.BackendType)
 }
 
 type errorHandler interface {
@@ -51,6 +53,7 @@ type StartWorkflowOptions struct {
 	WorkflowIDReusePolicy    *iwfidl.WorkflowIDReusePolicy
 	CronSchedule             *string
 	RetryPolicy              *iwfidl.WorkflowRetryPolicy
+	DataAttributes           map[string]interface{}
 	SearchAttributes         map[string]interface{}
 	Memo                     map[string]interface{}
 	WorkflowStartDelay       *time.Duration
@@ -70,6 +73,7 @@ type ListWorkflowExecutionsResponse struct {
 type DescribeWorkflowExecutionResponse struct {
 	Status                   iwfidl.WorkflowStatus
 	RunId                    string
+	FirstRunId               string
 	SearchAttributes         map[string]iwfidl.SearchAttribute
 	Memos                    map[string]iwfidl.EncodedObject
 	WorkflowStartedTimestamp int64

@@ -168,7 +168,7 @@ integTestsTemporalWithCover: # for local debugging
 	$Q go tool cover -func coverage.out -o coverage.out
 
 integTests:
-	$Q go test -v ./integ
+	$Q go test -v ./integ -timeout 15m
 
 temporalIntegTests:
 	$Q go test -v ./integ -cadence=false
@@ -183,10 +183,12 @@ ci-temporal-integ-test:
 	$Q go test -v ./integ  -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60
 
 ci-all-tests:
-	$Q go test -v ./... -cover -coverprofile coverage.out -coverpkg ./service/...
+ 	# Fails CI when used with -coverprofile flag due to tests that panic; see https://go.dev/doc/build-cover#panicprof
+ 	# $Q go test -v ./... -timeout 15m -cover -coverprofile coverage.out -coverpkg ./service/...
+	$Q go test -v ./... -timeout 15m
 
 integTestsNoSearch:
-	$Q go test -v ./integ -search=false
+	$Q go test -v ./integ -search=false -timeout 15m
 
 stressTestsWithSearch:
 	$Q go test -v ./integ -repeat=10 -intervalMs=100 -searchWaitMs=100 | tee test.log # TODO https://github.com/indeedeng/iwf/issues/134

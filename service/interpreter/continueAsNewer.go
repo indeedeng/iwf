@@ -112,6 +112,13 @@ func LoadInternalsFromPreviousRun(
 
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
 	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryType, func() (*service.ContinueAsNewDumpResponse, error) {
+		localStateExecutionToResumeMap := map[string]service.StateExecutionResumeInfo{}
+		for key, state := range c.StateExecutionToResumeMap {
+			localStateExecutionToResumeMap[key] = state
+		}
+		for _, value := range c.stateRequestQueue.GetAllStateResumeRequests() {
+			localStateExecutionToResumeMap[value.StateExecutionId] = value
+		}
 		return &service.ContinueAsNewDumpResponse{
 			InterStateChannelReceived:  c.interStateChannel.ReadReceived(nil),
 			SignalsReceived:            c.signalReceiver.DumpReceived(nil),
@@ -119,7 +126,7 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 			DataObjects:                c.persistenceManager.GetAllDataObjects(),
 			SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
 			StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
-			StateExecutionsToResume:    c.StateExecutionToResumeMap,
+			StateExecutionsToResume:    localStateExecutionToResumeMap,
 			StateOutputs:               c.outputCollector.GetAll(),
 			StaleSkipTimerSignals:      c.timerProcessor.Dump(),
 		}, nil

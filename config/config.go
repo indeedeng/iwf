@@ -31,6 +31,15 @@ type (
 		// omitRpcInputOutputInHistory is the flag to omit rpc input/output in history
 		// the input/output is only for debugging purpose but could be too expensive to store
 		OmitRpcInputOutputInHistory *bool `yaml:"omitRpcInputOutputInHistory"`
+		// WaitForStateCompletionMigration is used to control naming of the not continuedAsNew workflows
+		WaitForStateCompletionMigration WaitForStateCompletionMigration `yaml:"waitForStateCompletionMigration"`
+	}
+
+	WaitForStateCompletionMigration struct {
+		// expected values: old/both/new; defaults to 'old'
+		SignalWithStartOn string `yaml:"signalWithStartOn"`
+		// expected values: old/new; defaults to 'old'
+		WaitForOn string `yaml:"waitForOn"`
 	}
 
 	Interpreter struct {
@@ -68,6 +77,7 @@ type (
 		// default is http://localhost:ApiConfig.Port
 		ApiServiceAddress                  string                              `json:"serviceAddress"`
 		DumpWorkflowInternalActivityConfig *DumpWorkflowInternalActivityConfig `json:"dumpWorkflowInternalActivityConfig"`
+		DefaultHeaders                     map[string]string                   `json:"defaultHeaders"`
 	}
 
 	DumpWorkflowInternalActivityConfig struct {
@@ -120,9 +130,23 @@ func NewConfig(configPath string) (*Config, error) {
 	return config, nil
 }
 
-func GetApiServiceAddressWithDefault(config Config) string {
-	if config.Interpreter.InterpreterActivityConfig.ApiServiceAddress != "" {
-		return config.Interpreter.InterpreterActivityConfig.ApiServiceAddress
+func (c Config) GetApiServiceAddressWithDefault() string {
+	if c.Interpreter.InterpreterActivityConfig.ApiServiceAddress != "" {
+		return c.Interpreter.InterpreterActivityConfig.ApiServiceAddress
 	}
-	return fmt.Sprintf("http://localhost:%v", config.Api.Port)
+	return fmt.Sprintf("http://localhost:%v", c.Api.Port)
+}
+
+func (c Config) GetSignalWithStartOnWithDefault() string {
+	if c.Api.WaitForStateCompletionMigration.SignalWithStartOn != "" {
+		return c.Api.WaitForStateCompletionMigration.SignalWithStartOn
+	}
+	return "old"
+}
+
+func (c Config) GetWaitForOnWithDefault() string {
+	if c.Api.WaitForStateCompletionMigration.WaitForOn != "" {
+		return c.Api.WaitForStateCompletionMigration.WaitForOn
+	}
+	return "old"
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
 
@@ -82,7 +83,7 @@ func InterpreterImpl(
 	} else {
 		interStateChannel = NewInterStateChannel()
 		stateRequestQueue = NewStateRequestQueue()
-		persistenceManager = NewPersistenceManager(provider, input.InitSearchAttributes, input.UseMemoForDataAttributes)
+		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
@@ -95,6 +96,10 @@ func InterpreterImpl(
 	if err != nil {
 		return nil, err
 	}
+	// We intentionally set the query handler after the continueAsNew/dumpInternal activity.
+	// This is to ensure the correctness. If we set the query handler before that,
+	// the query handler could return empty data (since the loading hasn't completed), which will be incorrect response.
+	// We would rather return server errors and let the client retry later.
 	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
 		return nil, err
@@ -315,6 +320,8 @@ func InterpreterImpl(
 			input.StateInput = nil
 			input.StateOptions = nil
 			input.StartStateId = nil
+			input.InitDataAttributes = nil
+			input.InitSearchAttributes = nil
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop
@@ -478,9 +485,9 @@ func executeState(
 	isResumeFromContinueAsNew := stateReq.IsResumeRequest()
 
 	options := state.GetStateOptions()
-	skipStart := compatibility.GetSkipStartApi(&options)
-	if skipStart {
-		return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
+	skipWaitUntil := compatibility.GetSkipStartApi(&options)
+	if skipWaitUntil {
+		return invokeStateExecute(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 			nil, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 	}
 
@@ -700,11 +707,11 @@ func executeState(
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
 	}
 
-	return executeStateDecide(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
+	return invokeStateExecute(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 		commandRes, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)
 }
 
-func executeStateDecide(
+func invokeStateExecute(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
 	basicInfo service.BasicInfo,
@@ -756,22 +763,27 @@ func executeStateDecide(
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
 		// this is not a problem because the signalWithStart will be very fast and highly available
 		unifiedClient := env.GetUnifiedClient()
-		err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
-			context.Background(),
-			uclient.StartWorkflowOptions{
-				ID:                       service.IwfSystemConstPrefix + executionContext.WorkflowId + "_" + *executionContext.StateExecutionId,
-				TaskQueue:                env.GetTaskQueue(),
-				WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
-			},
-			iwfidl.StateCompletionOutput{
-				CompletedStateExecutionId: *executionContext.StateExecutionId,
-			})
-		if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
-			// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
-			// panic will let the workflow task will retry until the signal is sent
-			panic(fmt.Errorf("failed to signal on completion %w", err))
+
+		sharedConfig := env.GetSharedConfig()
+		signalWithStartOn := sharedConfig.GetSignalWithStartOnWithDefault()
+
+		// signalWithStart with legacy workflowId (containing parent workflowId)
+		if provider.GetBackendType() == service.BackendTypeCadence ||
+			(provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "old" || signalWithStartOn == "both")) {
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(executionContext.WorkflowId, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
+
+			signalWithStart(unifiedClient, workflowId)
+		}
+
+		// signalWithStart with new workflowId (containing firstRunId)
+		if provider.GetBackendType() == service.BackendTypeTemporal && (signalWithStartOn == "both" || signalWithStartOn == "new") {
+			workflowId := utils.GetWorkflowIdForWaitForStateExecution(provider.GetWorkflowInfo(ctx).FirstRunID, executionContext.StateExecutionId, state.WaitForKey, &state.StateId)
+
+			// Start WaitForStateCompletionWorkflow with a new name to ensure smooth transition
+			signalWithStart(unifiedClient, workflowId)
 		}
 	}
+
 	if err != nil {
 		if shouldProceedOnExecuteApiError(state) {
 			return nil, service.ExecuteApiFailedAndProceed, nil
@@ -793,6 +805,23 @@ func executeStateDecide(
 
 	decision := decideResponse.GetStateDecision()
 	return &decision, service.CompletedStateExecutionStatus, nil
+}
+
+func signalWithStart(unifiedClient uclient.UnifiedClient, workflowId string) {
+	err := unifiedClient.SignalWithStartWaitForStateCompletionWorkflow(
+		context.Background(),
+		uclient.StartWorkflowOptions{
+			ID:                       workflowId,
+			TaskQueue:                env.GetTaskQueue(),
+			WorkflowExecutionTimeout: 60 * time.Second, // timeout doesn't matter here as it will complete immediate with the signal
+		},
+		iwfidl.StateCompletionOutput{})
+
+	if err != nil && !unifiedClient.IsWorkflowAlreadyStartedError(err) {
+		// WorkflowAlreadyStartedError is returned when the started workflow is closed and the signal is not sent
+		// panic will let the workflow task will retry until the signal is sent
+		panic(fmt.Errorf("failed to signal on completion %w", err))
+	}
 }
 
 func shouldProceedOnStartApiError(state iwfidl.StateMovement) bool {

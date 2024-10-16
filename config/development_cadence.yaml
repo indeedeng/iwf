@@ -1,5 +1,8 @@
 api:
   port: 8801
+  waitForStateCompletionMigration:
+    signalWithStartOn: old
+    waitForOn: old
 interpreter:
   #  interpreterActivityConfig:
   #    disableSystemSearchAttributes: true # set to true if you don't have advanced visibility in Cadence, see more https://github.com/uber/cadence/issues/5085

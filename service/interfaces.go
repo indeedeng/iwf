@@ -21,6 +21,8 @@ type (
 
 		InitSearchAttributes []iwfidl.SearchAttribute `json:"initSearchAttributes,omitempty"`
 
+		InitDataAttributes []iwfidl.KeyValue `json:"initDataAttributes,omitempty"`
+
 		UseMemoForDataAttributes bool `json:"useMemoForDataAttributes,omitempty"`
 
 		Config iwfidl.WorkflowConfig `json:"config,omitempty"`

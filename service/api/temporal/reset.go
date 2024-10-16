@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/timeparser"
+	"github.com/indeedeng/iwf/service/common/utils"
 	"go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/workflowservice/v1"
@@ -117,7 +118,7 @@ OuterLoop:
 		}
 		for _, e := range resp.GetHistory().GetEvents() {
 			if e.GetEventType() == enums.EVENT_TYPE_WORKFLOW_TASK_COMPLETED {
-				if e.GetEventTime().UnixNano() >= earliestTime {
+				if utils.ToNanoSeconds(e.GetEventTime()) >= earliestTime {
 					decisionFinishID = e.GetEventId()
 					break OuterLoop
 				}

@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/timeparser"
 	"log"
+	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -123,6 +124,13 @@ func doTestPersistenceWorkflow(
 	nowTime := time.Now()
 	notTimeNanoStr := fmt.Sprintf("%v", nowTime.UnixNano())
 	nowTimeStr := nowTime.Format(timeparser.DateTimeFormat)
+	expectedDataAttribute := iwfidl.KeyValue{
+		Key: ptr.Any("TestKey"),
+		Value: &iwfidl.EncodedObject{
+			Encoding: ptr.Any("TestEncoding"),
+			Data:     ptr.Any("TestValue"),
+		},
+	}
 	expectedDatetimeSearchAttribute := iwfidl.SearchAttribute{
 		Key:         iwfidl.PtrString("CustomDatetimeField"),
 		ValueType:   ptr.Any(iwfidl.DATETIME),
@@ -148,12 +156,38 @@ func doTestPersistenceWorkflow(
 			SearchAttributes: []iwfidl.SearchAttribute{
 				expectedDatetimeSearchAttribute,
 			},
+			DataAttributes: []iwfidl.KeyValue{
+				expectedDataAttribute,
+			},
 			WorkflowConfigOverride:   config,
 			UseMemoForDataAttributes: ptr.Any(useMemo),
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 	panicAtHttpError(err, httpResp)
+
+	initReqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
+
+	queryResult, httpResp, err := getDataAttributes(initReqQry, wfId, expectedDataAttribute, useMemo)
+
+	retryCount := 0
+
+	// Config is only present for continueAsNew tests
+	if config != nil {
+		for {
+			if err == nil || retryCount >= 5 {
+				break
+			}
+			// Loading data to a continuedAsNew workflow might take a few seconds thus retry mechanism is needed
+			time.Sleep(time.Millisecond * 1000)
+			retryCount += 1
+			queryResult, httpResp, err = getDataAttributes(initReqQry, wfId, expectedDataAttribute, useMemo)
+		}
+	}
+
+	panicAtHttpError(err, httpResp)
+
+	assert.Contains(t, queryResult.GetObjects(), expectedDataAttribute)
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	wfResponse, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -165,7 +199,7 @@ func doTestPersistenceWorkflow(
 	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			persistence.TestDataObjectKey,
+			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
@@ -232,6 +266,7 @@ func doTestPersistenceWorkflow(
 			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
 			Value: &persistence.TestDataObjectVal2,
 		},
+		expectedDataAttribute,
 	}
 	expected2 := []iwfidl.KeyValue{
 		{
@@ -242,6 +277,7 @@ func doTestPersistenceWorkflow(
 			Key:   iwfidl.PtrString(persistence.TestDataObjectKey2),
 			Value: &persistence.TestDataObjectVal1,
 		},
+		expectedDataAttribute,
 	}
 	assertions.ElementsMatch(expected1, queryResult1.GetObjects())
 	assertions.ElementsMatch(expected2, queryResult2.GetObjects())
@@ -364,6 +400,16 @@ func doTestPersistenceWorkflow(
 		// TODO?? research how to use text
 		//assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomKeywordField='%v'", nowTimeStrForSearch, "keyword-value1"), 5, apiClient, assertions)
 	}
+}
+
+func getDataAttributes(initReqQry iwfidl.ApiApiV1WorkflowDataobjectsGetPostRequest, wfId string, expectedDataAttribute iwfidl.KeyValue, useMemo bool) (*iwfidl.WorkflowGetDataObjectsResponse, *http.Response, error) {
+	return initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
+		WorkflowId: wfId,
+		Keys: []string{
+			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
+		},
+		UseMemoForDataAttributes: ptr.Any(useMemo),
+	}).Execute()
 }
 
 func assertSearch(query string, expectedCount int, apiClient *iwfidl.APIClient, assertions *assert.Assertions) {
