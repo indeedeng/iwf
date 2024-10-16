@@ -11,7 +11,7 @@ import (
 )
 
 /**
- * This test has four states
+ * This test workflow has four states, using REST controller to implement the workflow directly.
  *
  * State1: Creates all Data Attributes keys that will be used in this test
  * 		- da_wait_until1

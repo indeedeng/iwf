@@ -12,7 +12,7 @@ import (
 )
 
 /**
- * This test has four states
+ * This test workflow has four states, using REST controller to implement the workflow directly.
  *
  * State1: Sets values for all Search Attributes used in this test
  * 		- CustomKeywordField
