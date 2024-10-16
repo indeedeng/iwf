@@ -111,13 +111,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	case State3:
 		loadingTypeFromInput := req.GetStateInput()
 		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		// Assert: State3 Execute method loads with expected Data Attributes
 		verifyLoadedDataAttributes(req.GetWorkflowStateId(), req.GetDataObjects(), loadingType)
 		response = getState3DecideResponse(req)
 	case State4:
 		loadingTypeFromInput := req.GetStateInput()
 		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		// Assert: State4 Execute method loads with expected Data Attributes
 		verifyLoadedDataAttributes(req.GetWorkflowStateId(), req.GetDataObjects(), loadingType)
 		response = getState4DecideResponse()
 	}
