@@ -16,7 +16,7 @@ type StateExecutionCounter struct {
 
 	stateIdCompletedCounts          map[string]int
 	stateIdStartedCounts            map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
-	stateIdCurrentlyExecutingCounts map[string]int // For system search attributes: keep counting the pending stateIds
+	stateIdCurrentlyExecutingCounts map[string]int // For system search attribute IwfExecutingStateId: keep counting the stateIds that are executing based on the ExecutingStateIdMode
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
