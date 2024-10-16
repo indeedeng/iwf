@@ -13,19 +13,22 @@ import (
 /**
  * This test has four states
  *
- * State1: Creates all Data Attributes that will be used in this test
+ * State1: Creates all Data Attributes keys that will be used in this test
+ * 		- da_wait_until1
+ * 		- da_execute1
+ *		- da_other_key
  * State2:
- * 		- Starts State with State Options containing WaitUntilApiDataAttributesLoadingPolicy
- * 		- Checks that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Data Attributes
- * 		- Checks that (ApiV1WorkflowStateDecide) Execute method will not load any DataAttributes
+ * 		- Declares State Options containing WaitUntilApiDataAttributesLoadingPolicy
+ * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Data Attributes
+ * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will not load any DataAttributes
  * State3:
- * 		- Starts State with State Options containing ExecuteApiDataAttributesLoadingPolicy
- * 		- Checks that (ApiV1WorkflowStateStart) WaitUntil method will not load any DataAttributes
- * 		- Checks that (ApiV1WorkflowStateDecide) Execute method will load with expected Data Attributes
+ * 		- Declares State Options containing ExecuteApiDataAttributesLoadingPolicy
+ * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will not load any DataAttributes
+ * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will load with expected Data Attributes
  * State4:
- * 		- Starts State with State Options containing DataAttributesLoadingPolicy
- * 		- Checks that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Data Attributes
- * 		- Checks that (ApiV1WorkflowStateDecide) Execute method will load with expected Data Attributes
+ * 		- Declares State Options containing DataAttributesLoadingPolicy
+ * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Data Attributes
+ * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will load with expected Data Attributes
  */
 const (
 	WorkflowType = "state_options_data_attributes_loading"
