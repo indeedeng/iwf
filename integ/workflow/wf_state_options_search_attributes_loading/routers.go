@@ -32,7 +32,7 @@ import (
  * 		- WaitUntil method asserts that expected SearchAttributes are loaded
  * 		- Execute method asserts that expected SearchAttributes are loaded
  * State5:
- * 		- State Options contains SearchAttributesLoadingPolicy and WaitUntilApiSearchAttributesLoadingPolicy
+ * 		- State Options contains AdSearchAttributesLoadingPolicy and WaitUntilApiSearchAttributesLoadingPolicy
  * 		- WaitUntil method asserts that WaitUntilApiSearchAttributesLoadingPolicy are loaded
  * 		- Execute method asserts that SearchAttributesLoadingPolicy are loaded
  */

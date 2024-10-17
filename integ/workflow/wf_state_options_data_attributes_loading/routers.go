@@ -23,13 +23,17 @@ import (
  * 		- WaitUntil method asserts that expected DataAttributes are loaded
  * 		- Execute method asserts that no DataAttributes are loaded
  * State3:
- * 		- State Options contains WaitUntilApiDataAttributesLoadingPolicy
+ * 		- State Options contains ExecuteApiDataAttributesLoadingPolicy
  * 		- WaitUntil method asserts that no DataAttributes are loaded
  * 		- Execute method asserts that expected DataAttributes are loaded
  * State4:
  * 		- State Options contains DataAttributesLoadingPolicy
  * 		- WaitUntil method asserts that expected DataAttributes are loaded
  * 		- Execute method asserts that expected DataAttributes are loaded
+ * State5:
+ * 		- State Options contains DataAttributesLoadingPolicy and WaitUntilApiDataAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that WaitUntilApiDataAttributesLoadingPolicy are loaded
+ * 		- Execute method asserts that DataAttributesLoadingPolicy are loaded
  */
 const (
 	WorkflowType = "state_options_data_attributes_loading"
@@ -37,6 +41,7 @@ const (
 	State2       = "S2"
 	State3       = "S3"
 	State4       = "S4"
+	State5       = "S5"
 )
 
 type handler struct {
@@ -61,14 +66,16 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		return
 	}
 
-	log.Println("state_options_data_attributes_loading: received state decide request, ", req)
+	log.Println("state_options_data_attributes_loading: received state start request, ", req)
 
 	h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
+	currentMethod := "WaitUntil"
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
 	if req.GetWorkflowStateId() == State2 {
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 	}
 
 	if req.GetWorkflowStateId() == State3 {
@@ -76,9 +83,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	}
 
 	if req.GetWorkflowStateId() == State4 {
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+	}
+
+	if req.GetWorkflowStateId() == State5 {
+		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 	}
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -104,8 +113,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 
-	var response iwfidl.WorkflowStateDecideResponse
+	currentMethod := "Execute"
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
+	var response iwfidl.WorkflowStateDecideResponse
 	switch req.GetWorkflowStateId() {
 	case State1:
 		response = getState1DecideResponse(req)
@@ -113,15 +125,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		verifyEmptyDataAttributes(req.GetDataObjects())
 		response = getState2DecideResponse(req)
 	case State3:
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 		response = getState3DecideResponse(req)
 	case State4:
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), req.GetDataObjects(), loadingType)
-		response = getState4DecideResponse()
+		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+		response = getState4DecideResponse(req)
+	case State5:
+		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+		response = getState5DecideResponse()
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -206,7 +217,33 @@ func getState3DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	}
 }
 
-func getState4DecideResponse() iwfidl.WorkflowStateDecideResponse {
+func getState4DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.WorkflowStateDecideResponse {
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
+	return iwfidl.WorkflowStateDecideResponse{
+		StateDecision: &iwfidl.StateDecision{
+			NextStates: []iwfidl.StateMovement{
+				{
+					StateId: State5,
+					StateOptions: &iwfidl.WorkflowStateOptions{
+						WaitUntilApiDataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+							PersistenceLoadingType: &loadingType,
+							PartialLoadingKeys:     []string{"da_wait_until1"},
+						},
+						DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+							PersistenceLoadingType: &loadingType,
+							PartialLoadingKeys:     []string{"da_other_key"},
+						},
+					},
+					StateInput: &loadingTypeFromInput,
+				},
+			},
+		},
+	}
+}
+
+func getState5DecideResponse() iwfidl.WorkflowStateDecideResponse {
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -225,8 +262,8 @@ func verifyEmptyDataAttributes(dataAttributes []iwfidl.KeyValue) {
 	}
 }
 
-func verifyLoadedDataAttributes(stateId string, dataAttributes []iwfidl.KeyValue, loadingType iwfidl.PersistenceLoadingType) {
-	expectedDataAttributes := getExpectedDataAttributes(stateId, loadingType)
+func verifyLoadedDataAttributes(stateId string, method string, dataAttributes []iwfidl.KeyValue, loadingType iwfidl.PersistenceLoadingType) {
+	expectedDataAttributes := getExpectedDataAttributes(stateId, method, loadingType)
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
 		panic("Data attributes should be the same")
 	}
@@ -249,7 +286,7 @@ func getUpsertDataObjects() []iwfidl.KeyValue {
 	}
 }
 
-func getExpectedDataAttributes(stateId string, loadingType iwfidl.PersistenceLoadingType) []iwfidl.KeyValue {
+func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl.PersistenceLoadingType) []iwfidl.KeyValue {
 	if stateId == State2 && (loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING) {
 		return []iwfidl.KeyValue{
 			{
@@ -282,6 +319,31 @@ func getExpectedDataAttributes(stateId string, loadingType iwfidl.PersistenceLoa
 					Data:     iwfidl.PtrString("random-value"),
 				},
 			},
+		}
+	}
+
+	if stateId == State5 && (loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING) {
+		switch method {
+		case "WaitUntil":
+			return []iwfidl.KeyValue{
+				{
+					Key: iwfidl.PtrString("da_wait_until1"),
+					Value: &iwfidl.EncodedObject{
+						Encoding: iwfidl.PtrString("json"),
+						Data:     iwfidl.PtrString("test-data-object-wait-until"),
+					},
+				},
+			}
+		case "Execute":
+			return []iwfidl.KeyValue{
+				{
+					Key: iwfidl.PtrString("da_other_key"),
+					Value: &iwfidl.EncodedObject{
+						Encoding: iwfidl.PtrString("json"),
+						Data:     iwfidl.PtrString("random-value"),
+					},
+				},
+			}
 		}
 	}
 

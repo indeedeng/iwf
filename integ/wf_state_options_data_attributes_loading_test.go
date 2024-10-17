@@ -87,5 +87,7 @@ func doTestWfStateOptionsDataAttributesLoading(
 		"S3_decide": 1,
 		"S4_start":  1,
 		"S4_decide": 1,
+		"S5_start":  1,
+		"S5_decide": 1,
 	}, history, "state options data attributes loading, %v", history)
 }
