@@ -15,6 +15,7 @@ import (
  * This test workflow has four states, using REST controller to implement the workflow directly.
  *
  * State1:
+ *		- WaitUntil method does nothing
  * 		- Execute method sets values for all Search Attributes used in this test
  * 			- CustomKeywordField
  * 			- CustomStringField

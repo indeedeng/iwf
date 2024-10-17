@@ -14,6 +14,7 @@ import (
  * This test workflow has four states, using REST controller to implement the workflow directly.
  *
  * State1:
+ *		- WaitUntil method does nothing
  * 		- Execute method creates all Data Attributes keys that will be used in this test
  * 			- da_wait_until1
  * 			- da_execute1
