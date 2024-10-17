@@ -31,6 +31,10 @@ import (
  * 		- State Options contains SearchAttributesLoadingPolicy
  * 		- WaitUntil method asserts that expected SearchAttributes are loaded
  * 		- Execute method asserts that expected SearchAttributes are loaded
+ * State5:
+ * 		- State Options contains SearchAttributesLoadingPolicy and WaitUntilApiSearchAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that WaitUntilApiSearchAttributesLoadingPolicy are loaded
+ * 		- Execute method asserts that SearchAttributesLoadingPolicy are loaded
  */
 const (
 	WorkflowType = "state_options_search_attributes_loading"
@@ -38,6 +42,7 @@ const (
 	State2       = "S2"
 	State3       = "S3"
 	State4       = "S4"
+	State5       = "S5"
 )
 
 type handler struct {
@@ -66,10 +71,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
+	currentMethod := "WaitUntil"
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
 	if req.GetWorkflowStateId() == State2 {
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), req.GetSearchAttributes(), loadingType)
+		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
 	}
 
 	if req.GetWorkflowStateId() == State3 {
@@ -77,9 +84,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	}
 
 	if req.GetWorkflowStateId() == State4 {
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), req.GetSearchAttributes(), loadingType)
+		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
+	}
+
+	if req.GetWorkflowStateId() == State5 {
+		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
 	}
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -105,8 +114,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 
-	var response iwfidl.WorkflowStateDecideResponse
+	currentMethod := "Execute"
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
+	var response iwfidl.WorkflowStateDecideResponse
 	switch req.GetWorkflowStateId() {
 	case State1:
 		response = getState1DecideResponse(req)
@@ -114,15 +126,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		verifyEmptySearchAttributes(req.GetSearchAttributes())
 		response = getState2DecideResponse(req)
 	case State3:
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), req.GetSearchAttributes(), loadingType)
+		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
 		response = getState3DecideResponse(req)
 	case State4:
-		loadingTypeFromInput := req.GetStateInput()
-		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
-		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), req.GetSearchAttributes(), loadingType)
-		response = getState4DecideResponse()
+		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
+		response = getState4DecideResponse(req)
+	case State5:
+		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
+		response = getState5DecideResponse()
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -207,7 +218,33 @@ func getState3DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	}
 }
 
-func getState4DecideResponse() iwfidl.WorkflowStateDecideResponse {
+func getState4DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.WorkflowStateDecideResponse {
+	loadingTypeFromInput := req.GetStateInput()
+	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
+
+	return iwfidl.WorkflowStateDecideResponse{
+		StateDecision: &iwfidl.StateDecision{
+			NextStates: []iwfidl.StateMovement{
+				{
+					StateId: State5,
+					StateOptions: &iwfidl.WorkflowStateOptions{
+						WaitUntilApiSearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+							PersistenceLoadingType: &loadingType,
+							PartialLoadingKeys:     []string{"CustomKeywordField"},
+						},
+						SearchAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+							PersistenceLoadingType: &loadingType,
+							PartialLoadingKeys:     []string{"CustomBoolField"},
+						},
+					},
+					StateInput: &loadingTypeFromInput,
+				},
+			},
+		},
+	}
+}
+
+func getState5DecideResponse() iwfidl.WorkflowStateDecideResponse {
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -226,8 +263,8 @@ func verifyEmptySearchAttributes(searchAttributes []iwfidl.SearchAttribute) {
 	}
 }
 
-func verifyLoadedSearchAttributes(stateId string, searchAttributes []iwfidl.SearchAttribute, loadingType iwfidl.PersistenceLoadingType) {
-	expectedSearchAttributes := getExpectedSearchAttributes(stateId, loadingType)
+func verifyLoadedSearchAttributes(stateId string, method string, searchAttributes []iwfidl.SearchAttribute, loadingType iwfidl.PersistenceLoadingType) {
+	expectedSearchAttributes := getExpectedSearchAttributes(stateId, method, loadingType)
 	if !assert.ElementsMatch(common.DummyT{}, expectedSearchAttributes, searchAttributes) {
 		panic("Search attributes should be the same")
 	}
@@ -253,7 +290,7 @@ func getUpsertSearchAttributes() []iwfidl.SearchAttribute {
 	}
 }
 
-func getExpectedSearchAttributes(stateId string, loadingType iwfidl.PersistenceLoadingType) []iwfidl.SearchAttribute {
+func getExpectedSearchAttributes(stateId string, method string, loadingType iwfidl.PersistenceLoadingType) []iwfidl.SearchAttribute {
 	if stateId == State2 && (loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING) {
 		return []iwfidl.SearchAttribute{
 			{
@@ -280,6 +317,27 @@ func getExpectedSearchAttributes(stateId string, loadingType iwfidl.PersistenceL
 				ValueType: ptr.Any(iwfidl.BOOL),
 				BoolValue: ptr.Any(true),
 			},
+		}
+	}
+
+	if stateId == State5 && (loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING) {
+		switch method {
+		case "WaitUntil":
+			return []iwfidl.SearchAttribute{
+				{
+					Key:              iwfidl.PtrString("CustomKeywordField"),
+					ValueType:        ptr.Any(iwfidl.KEYWORD_ARRAY),
+					StringArrayValue: []string{"keyword1", "keyword2"},
+				},
+			}
+		case "Execute":
+			return []iwfidl.SearchAttribute{
+				{
+					Key:       iwfidl.PtrString("CustomBoolField"),
+					ValueType: ptr.Any(iwfidl.BOOL),
+					BoolValue: ptr.Any(true),
+				},
+			}
 		}
 	}
 
