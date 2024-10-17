@@ -485,7 +485,7 @@ func executeState(
 	isResumeFromContinueAsNew := stateReq.IsResumeRequest()
 
 	options := state.GetStateOptions()
-	skipWaitUntil := compatibility.GetSkipStartApi(&options)
+	skipWaitUntil := compatibility.GetSkipWaitUntilApi(&options)
 	if skipWaitUntil {
 		return invokeStateExecute(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 			nil, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)

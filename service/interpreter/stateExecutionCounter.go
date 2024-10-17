@@ -91,7 +91,7 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 				fallthrough
 			default:
 				options := s.GetStateOptions()
-				if !options.GetSkipWaitUntil() {
+				if !compatibility.GetSkipWaitUntilApi(&options) {
 					if e.increaseStateIdCurrentlyExecutingCounts(s) {
 						needsUpdateSA = true
 					}
@@ -125,7 +125,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 	e.totalCurrentlyExecutingCount--
 
 	options := state.GetStateOptions()
-	skipStart := compatibility.GetSkipStartApi(&options)
+	skipStart := compatibility.GetSkipWaitUntilApi(&options)
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
 
 	config := e.configer.Get()
@@ -139,7 +139,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 			fallthrough
 		default:
-			if options.GetSkipWaitUntil() {
+			if compatibility.GetSkipWaitUntilApi(&options) {
 				return nil
 			} else {
 				e.decreaseStateIdCurrentlyExecutingCounts(state)
