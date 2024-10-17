@@ -50,15 +50,15 @@ func GetWaitUntilApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateO
 		return nil
 	}
 
-	if stateOptions.HasDataObjectsLoadingPolicy() {
-		return stateOptions.DataObjectsLoadingPolicy
+	if stateOptions.HasWaitUntilApiDataAttributesLoadingPolicy() {
+		return stateOptions.WaitUntilApiDataAttributesLoadingPolicy
 	}
 
 	if stateOptions.HasDataAttributesLoadingPolicy() {
 		return stateOptions.DataAttributesLoadingPolicy
 	}
 
-	return stateOptions.WaitUntilApiDataAttributesLoadingPolicy
+	return stateOptions.DataObjectsLoadingPolicy
 }
 
 func GetExecuteApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
@@ -66,15 +66,15 @@ func GetExecuteApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOpt
 		return nil
 	}
 
-	if stateOptions.HasDataObjectsLoadingPolicy() {
-		return stateOptions.DataObjectsLoadingPolicy
+	if stateOptions.HasExecuteApiDataAttributesLoadingPolicy() {
+		return stateOptions.ExecuteApiDataAttributesLoadingPolicy
 	}
 
 	if stateOptions.HasDataAttributesLoadingPolicy() {
 		return stateOptions.DataAttributesLoadingPolicy
 	}
 
-	return stateOptions.ExecuteApiDataAttributesLoadingPolicy
+	return stateOptions.DataObjectsLoadingPolicy
 }
 
 func GetWaitUntilApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
@@ -82,11 +82,12 @@ func GetWaitUntilApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowS
 		return nil
 	}
 
-	if stateOptions.HasSearchAttributesLoadingPolicy() {
-		return stateOptions.SearchAttributesLoadingPolicy
+	if stateOptions.HasWaitUntilApiSearchAttributesLoadingPolicy() {
+		return stateOptions.WaitUntilApiSearchAttributesLoadingPolicy
+
 	}
 
-	return stateOptions.WaitUntilApiSearchAttributesLoadingPolicy
+	return stateOptions.SearchAttributesLoadingPolicy
 }
 
 func GetExecuteApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
@@ -94,11 +95,12 @@ func GetExecuteApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowSta
 		return nil
 	}
 
-	if stateOptions.HasSearchAttributesLoadingPolicy() {
-		return stateOptions.SearchAttributesLoadingPolicy
+	if stateOptions.HasExecuteApiSearchAttributesLoadingPolicy() {
+		return stateOptions.ExecuteApiSearchAttributesLoadingPolicy
+
 	}
 
-	return stateOptions.ExecuteApiSearchAttributesLoadingPolicy
+	return stateOptions.SearchAttributesLoadingPolicy
 }
 
 func GetStartApiFailurePolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.StartApiFailurePolicy {
