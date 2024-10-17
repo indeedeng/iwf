@@ -84,20 +84,20 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			case "DISABLED":
 				// do nothing
 			case "ENABLED_FOR_ALL":
-				if e.IncreaseStateIdCurrentlyExecutingCounts(s) {
+				if e.increaseStateIdCurrentlyExecutingCounts(s) {
 					needsUpdateSA = true
 				}
 			default: // "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" or nil or unrecognized enum value
 				options := s.GetStateOptions()
 				if !options.GetSkipWaitUntil() {
-					if e.IncreaseStateIdCurrentlyExecutingCounts(s) {
+					if e.increaseStateIdCurrentlyExecutingCounts(s) {
 						needsUpdateSA = true
 					}
 				}
 			}
 		} else {
 			if !config.GetDisableSystemSearchAttribute() {
-				if e.IncreaseStateIdCurrentlyExecutingCounts(s) {
+				if e.increaseStateIdCurrentlyExecutingCounts(s) {
 					needsUpdateSA = true
 				}
 			}
@@ -108,12 +108,12 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	e.totalCurrentlyExecutingCount += numOfNew
 
 	if needsUpdateSA {
-		return e.UpdateStateIdSearchAttribute()
+		return e.updateStateIdSearchAttribute()
 	}
 	return nil
 }
 
-func (e *StateExecutionCounter) IncreaseStateIdCurrentlyExecutingCounts(s iwfidl.StateMovement) bool {
+func (e *StateExecutionCounter) increaseStateIdCurrentlyExecutingCounts(s iwfidl.StateMovement) bool {
 	e.stateIdCurrentlyExecutingCounts[s.StateId]++
 	// first time the stateId show up
 	return e.stateIdCurrentlyExecutingCounts[s.StateId] == 1
@@ -133,26 +133,26 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 		case "DISABLED":
 			return nil
 		case "ENABLED_FOR_ALL":
-			e.DecreaseStateIdCurrentlyExecutingCounts(state)
+			e.decreaseStateIdCurrentlyExecutingCounts(state)
 		default: // "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" or nil or unrecognized enum value
 			if options.GetSkipWaitUntil() {
 				return nil
 			} else {
-				e.DecreaseStateIdCurrentlyExecutingCounts(state)
+				e.decreaseStateIdCurrentlyExecutingCounts(state)
 			}
 		}
 	} else {
 		if config.GetDisableSystemSearchAttribute() {
 			return nil
 		} else {
-			e.DecreaseStateIdCurrentlyExecutingCounts(state)
+			e.decreaseStateIdCurrentlyExecutingCounts(state)
 		}
 	}
 
-	return e.UpdateStateIdSearchAttribute()
+	return e.updateStateIdSearchAttribute()
 }
 
-func (e *StateExecutionCounter) DecreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
+func (e *StateExecutionCounter) decreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
 	e.stateIdCurrentlyExecutingCounts[state.StateId]--
 	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {
 		delete(e.stateIdCurrentlyExecutingCounts, state.StateId)
@@ -163,7 +163,7 @@ func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
 	return e.totalCurrentlyExecutingCount
 }
 
-func (e *StateExecutionCounter) UpdateStateIdSearchAttribute() error {
+func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	var executingStateIds []string
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
