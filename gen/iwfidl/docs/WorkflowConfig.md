@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **DisableSystemSearchAttribute** | Pointer to **bool** |  | [optional] 
-**ExecutingStateIdMode** | Pointer to **string** |  | [optional] 
+**ExecutingStateIdMode** | Pointer to [**ExecutingStateIdMode**](ExecutingStateIdMode.md) |  | [optional] 
 **ContinueAsNewThreshold** | Pointer to **int32** |  | [optional] 
 **ContinueAsNewPageSizeInBytes** | Pointer to **int32** |  | [optional] 
 **OptimizeActivity** | Pointer to **bool** |  | [optional] 
@@ -56,20 +56,20 @@ HasDisableSystemSearchAttribute returns a boolean if a field has been set.
 
 ### GetExecutingStateIdMode
 
-`func (o *WorkflowConfig) GetExecutingStateIdMode() string`
+`func (o *WorkflowConfig) GetExecutingStateIdMode() ExecutingStateIdMode`
 
 GetExecutingStateIdMode returns the ExecutingStateIdMode field if non-nil, zero value otherwise.
 
 ### GetExecutingStateIdModeOk
 
-`func (o *WorkflowConfig) GetExecutingStateIdModeOk() (*string, bool)`
+`func (o *WorkflowConfig) GetExecutingStateIdModeOk() (*ExecutingStateIdMode, bool)`
 
 GetExecutingStateIdModeOk returns a tuple with the ExecutingStateIdMode field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetExecutingStateIdMode
 
-`func (o *WorkflowConfig) SetExecutingStateIdMode(v string)`
+`func (o *WorkflowConfig) SetExecutingStateIdMode(v ExecutingStateIdMode)`
 
 SetExecutingStateIdMode sets ExecutingStateIdMode field to given value.
 

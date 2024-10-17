@@ -81,13 +81,15 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 
 		if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 			switch mode := config.GetExecutingStateIdMode(); mode {
-			case "DISABLED":
+			case iwfidl.DISABLED:
 				// do nothing
-			case "ENABLED_FOR_ALL":
+			case iwfidl.ENABLED_FOR_ALL:
 				if e.increaseStateIdCurrentlyExecutingCounts(s) {
 					needsUpdateSA = true
 				}
-			default: // "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" or nil or unrecognized enum value
+			case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
+				fallthrough
+			default:
 				options := s.GetStateOptions()
 				if !options.GetSkipWaitUntil() {
 					if e.increaseStateIdCurrentlyExecutingCounts(s) {
@@ -130,11 +132,13 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 
 	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 		switch mode := config.GetExecutingStateIdMode(); mode {
-		case "DISABLED":
+		case iwfidl.DISABLED:
 			return nil
-		case "ENABLED_FOR_ALL":
+		case iwfidl.ENABLED_FOR_ALL:
 			e.decreaseStateIdCurrentlyExecutingCounts(state)
-		default: // "ENABLED_FOR_STATES_WITH_WAIT_UNTIL" or nil or unrecognized enum value
+		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
+			fallthrough
+		default:
 			if options.GetSkipWaitUntil() {
 				return nil
 			} else {

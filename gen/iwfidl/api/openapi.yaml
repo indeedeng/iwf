@@ -691,7 +691,7 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
           continueAsNewPageSizeInBytes: 4
-          executingStateIdMode: ENABLED_FOR_ALL
+          executingStateIdMode: null
           optimizeActivity: true
         idReusePolicy: null
         searchAttributes:
@@ -959,7 +959,7 @@ components:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 1
             continueAsNewPageSizeInBytes: 4
-            executingStateIdMode: ENABLED_FOR_ALL
+            executingStateIdMode: null
             optimizeActivity: true
           idReusePolicy: null
           searchAttributes:
@@ -1483,7 +1483,7 @@ components:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
           continueAsNewPageSizeInBytes: 4
-          executingStateIdMode: ENABLED_FOR_ALL
+          executingStateIdMode: null
           optimizeActivity: true
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -3134,22 +3134,24 @@ components:
       required:
       - channelName
       type: object
+    ExecutingStateIdMode:
+      enum:
+      - ENABLED_FOR_ALL
+      - ENABLED_FOR_STATES_WITH_WAIT_UNTIL
+      - DISABLED
+      type: string
     WorkflowConfig:
       example:
         disableSystemSearchAttribute: true
         continueAsNewThreshold: 1
         continueAsNewPageSizeInBytes: 4
-        executingStateIdMode: ENABLED_FOR_ALL
+        executingStateIdMode: null
         optimizeActivity: true
       properties:
         disableSystemSearchAttribute:
           type: boolean
         executingStateIdMode:
-          enum:
-          - ENABLED_FOR_ALL
-          - ENABLED_FOR_STATES_WITH_WAIT_UNTIL
-          - DISABLED
-          type: string
+          $ref: '#/components/schemas/ExecutingStateIdMode'
         continueAsNewThreshold:
           type: integer
         continueAsNewPageSizeInBytes:

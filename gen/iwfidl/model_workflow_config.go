@@ -19,11 +19,11 @@ var _ MappedNullable = &WorkflowConfig{}
 
 // WorkflowConfig struct for WorkflowConfig
 type WorkflowConfig struct {
-	DisableSystemSearchAttribute *bool   `json:"disableSystemSearchAttribute,omitempty"`
-	ExecutingStateIdMode         *string `json:"executingStateIdMode,omitempty"`
-	ContinueAsNewThreshold       *int32  `json:"continueAsNewThreshold,omitempty"`
-	ContinueAsNewPageSizeInBytes *int32  `json:"continueAsNewPageSizeInBytes,omitempty"`
-	OptimizeActivity             *bool   `json:"optimizeActivity,omitempty"`
+	DisableSystemSearchAttribute *bool                 `json:"disableSystemSearchAttribute,omitempty"`
+	ExecutingStateIdMode         *ExecutingStateIdMode `json:"executingStateIdMode,omitempty"`
+	ContinueAsNewThreshold       *int32                `json:"continueAsNewThreshold,omitempty"`
+	ContinueAsNewPageSizeInBytes *int32                `json:"continueAsNewPageSizeInBytes,omitempty"`
+	OptimizeActivity             *bool                 `json:"optimizeActivity,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -76,9 +76,9 @@ func (o *WorkflowConfig) SetDisableSystemSearchAttribute(v bool) {
 }
 
 // GetExecutingStateIdMode returns the ExecutingStateIdMode field value if set, zero value otherwise.
-func (o *WorkflowConfig) GetExecutingStateIdMode() string {
+func (o *WorkflowConfig) GetExecutingStateIdMode() ExecutingStateIdMode {
 	if o == nil || IsNil(o.ExecutingStateIdMode) {
-		var ret string
+		var ret ExecutingStateIdMode
 		return ret
 	}
 	return *o.ExecutingStateIdMode
@@ -86,7 +86,7 @@ func (o *WorkflowConfig) GetExecutingStateIdMode() string {
 
 // GetExecutingStateIdModeOk returns a tuple with the ExecutingStateIdMode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WorkflowConfig) GetExecutingStateIdModeOk() (*string, bool) {
+func (o *WorkflowConfig) GetExecutingStateIdModeOk() (*ExecutingStateIdMode, bool) {
 	if o == nil || IsNil(o.ExecutingStateIdMode) {
 		return nil, false
 	}
@@ -102,8 +102,8 @@ func (o *WorkflowConfig) HasExecutingStateIdMode() bool {
 	return false
 }
 
-// SetExecutingStateIdMode gets a reference to the given string and assigns it to the ExecutingStateIdMode field.
-func (o *WorkflowConfig) SetExecutingStateIdMode(v string) {
+// SetExecutingStateIdMode gets a reference to the given ExecutingStateIdMode and assigns it to the ExecutingStateIdMode field.
+func (o *WorkflowConfig) SetExecutingStateIdMode(v ExecutingStateIdMode) {
 	o.ExecutingStateIdMode = &v
 }
 
