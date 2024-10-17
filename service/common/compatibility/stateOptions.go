@@ -45,14 +45,62 @@ func GetDecideApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.
 	return stateOptions.ExecuteApiRetryPolicy
 }
 
-func GetDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+func GetWaitUntilApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
 	if stateOptions == nil {
 		return nil
 	}
-	if stateOptions.HasDataObjectsLoadingPolicy() {
-		return stateOptions.DataObjectsLoadingPolicy
+
+	if stateOptions.HasWaitUntilApiDataAttributesLoadingPolicy() {
+		return stateOptions.WaitUntilApiDataAttributesLoadingPolicy
 	}
-	return stateOptions.DataAttributesLoadingPolicy
+
+	if stateOptions.HasDataAttributesLoadingPolicy() {
+		return stateOptions.DataAttributesLoadingPolicy
+	}
+
+	return stateOptions.DataObjectsLoadingPolicy
+}
+
+func GetExecuteApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions == nil {
+		return nil
+	}
+
+	if stateOptions.HasExecuteApiDataAttributesLoadingPolicy() {
+		return stateOptions.ExecuteApiDataAttributesLoadingPolicy
+	}
+
+	if stateOptions.HasDataAttributesLoadingPolicy() {
+		return stateOptions.DataAttributesLoadingPolicy
+	}
+
+	return stateOptions.DataObjectsLoadingPolicy
+}
+
+func GetWaitUntilApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions == nil {
+		return nil
+	}
+
+	if stateOptions.HasWaitUntilApiSearchAttributesLoadingPolicy() {
+		return stateOptions.WaitUntilApiSearchAttributesLoadingPolicy
+
+	}
+
+	return stateOptions.SearchAttributesLoadingPolicy
+}
+
+func GetExecuteApiSearchAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+	if stateOptions == nil {
+		return nil
+	}
+
+	if stateOptions.HasExecuteApiSearchAttributesLoadingPolicy() {
+		return stateOptions.ExecuteApiSearchAttributesLoadingPolicy
+
+	}
+
+	return stateOptions.SearchAttributesLoadingPolicy
 }
 
 func GetStartApiFailurePolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.StartApiFailurePolicy {
