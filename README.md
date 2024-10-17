@@ -86,7 +86,8 @@ a version tag.
     * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
     * For Cadence without advancedVisibility enabled,
       set [disableSystemSearchAttributes](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L8)
-      to true
+      to true and [executingStateIdMode](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L9)
+      to DISABLED
 * Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter
   implementation. It requires to have local Temporal setup. See Run with local Temporal.
 * Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below

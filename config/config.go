@@ -105,8 +105,7 @@ type (
 )
 
 var DefaultWorkflowConfig = &iwfidl.WorkflowConfig{
-	ContinueAsNewThreshold:       iwfidl.PtrInt32(100),
-	DisableSystemSearchAttribute: iwfidl.PtrBool(true),
+	ContinueAsNewThreshold: iwfidl.PtrInt32(100),
 }
 
 // NewConfig returns a new decoded Config struct

@@ -16,7 +16,7 @@ type StateExecutionCounter struct {
 
 	stateIdCompletedCounts          map[string]int
 	stateIdStartedCounts            map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
-	stateIdCurrentlyExecutingCounts map[string]int // For system search attributes service.SearchAttributeExecutingStateIds: keep counting the pending stateIds
+	stateIdCurrentlyExecutingCounts map[string]int // For system search attribute IwfExecutingStateId: keep counting the stateIds that are executing based on the ExecutingStateIdMode
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
@@ -69,6 +69,8 @@ func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 }
 
 func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRequest) error {
+	config := e.configer.Get()
+
 	needsUpdateSA := false
 	numOfNew := 0
 	for _, sr := range stateReqs {
@@ -76,33 +78,89 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			continue
 		}
 		s := sr.GetStateStartRequest()
-		numOfNew++
-		e.stateIdCurrentlyExecutingCounts[s.StateId]++
-		if e.stateIdCurrentlyExecutingCounts[s.StateId] == 1 {
-			// first time the stateId show up
-			needsUpdateSA = true
+
+		if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+			switch mode := config.GetExecutingStateIdMode(); mode {
+			case iwfidl.DISABLED:
+				// do nothing
+			case iwfidl.ENABLED_FOR_ALL:
+				if e.increaseStateIdCurrentlyExecutingCounts(s) {
+					needsUpdateSA = true
+				}
+			case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
+				fallthrough
+			default:
+				options := s.GetStateOptions()
+				if !compatibility.GetSkipWaitUntilApi(&options) {
+					if e.increaseStateIdCurrentlyExecutingCounts(s) {
+						needsUpdateSA = true
+					}
+				}
+			}
+		} else {
+			if !config.GetDisableSystemSearchAttribute() {
+				if e.increaseStateIdCurrentlyExecutingCounts(s) {
+					needsUpdateSA = true
+				}
+			}
 		}
+
+		numOfNew++
 	}
 	e.totalCurrentlyExecutingCount += numOfNew
+
 	if needsUpdateSA {
 		return e.updateStateIdSearchAttribute()
 	}
 	return nil
 }
 
+func (e *StateExecutionCounter) increaseStateIdCurrentlyExecutingCounts(s iwfidl.StateMovement) bool {
+	e.stateIdCurrentlyExecutingCounts[s.StateId]++
+	// first time the stateId show up
+	return e.stateIdCurrentlyExecutingCounts[s.StateId] == 1
+}
+
 func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
-	e.stateIdCurrentlyExecutingCounts[state.StateId]--
 	e.totalCurrentlyExecutingCount--
 
 	options := state.GetStateOptions()
-	skipStart := compatibility.GetSkipStartApi(&options)
+	skipStart := compatibility.GetSkipWaitUntilApi(&options)
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
 
+	config := e.configer.Get()
+
+	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+		switch mode := config.GetExecutingStateIdMode(); mode {
+		case iwfidl.DISABLED:
+			return nil
+		case iwfidl.ENABLED_FOR_ALL:
+			e.decreaseStateIdCurrentlyExecutingCounts(state)
+		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
+			fallthrough
+		default:
+			if compatibility.GetSkipWaitUntilApi(&options) {
+				return nil
+			} else {
+				e.decreaseStateIdCurrentlyExecutingCounts(state)
+			}
+		}
+	} else {
+		if config.GetDisableSystemSearchAttribute() {
+			return nil
+		} else {
+			e.decreaseStateIdCurrentlyExecutingCounts(state)
+		}
+	}
+
+	return e.updateStateIdSearchAttribute()
+}
+
+func (e *StateExecutionCounter) decreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
+	e.stateIdCurrentlyExecutingCounts[state.StateId]--
 	if e.stateIdCurrentlyExecutingCounts[state.StateId] == 0 {
 		delete(e.stateIdCurrentlyExecutingCounts, state.StateId)
-		return e.updateStateIdSearchAttribute()
 	}
-	return nil
 }
 
 func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
@@ -114,11 +172,8 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
 	}
-	config := e.configer.Get()
-	if config.GetDisableSystemSearchAttribute() {
-		return nil
-	}
-	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {
+
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && len(executingStateIds) == 0 {
 		// we don't clear search attributes because there are only two possible cases:
 		// 1. there will be another stateId being upsert right after this. So this will avoid calling the upsertSA twice
 		// 2. there will not be another stateId being upsert. Then this will be cleared before the workflow is closed.
@@ -133,10 +188,18 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 // ClearExecutingStateIdsSearchAttributeFinally should only be called at the end of workflow
 func (e *StateExecutionCounter) ClearExecutingStateIdsSearchAttributeFinally() {
 	config := e.configer.Get()
-	if config.GetDisableSystemSearchAttribute() {
-		return
+
+	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+		if config.GetExecutingStateIdMode() == "DISABLED" {
+			return
+		}
+	} else {
+		if config.GetDisableSystemSearchAttribute() {
+			return
+		}
 	}
-	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && e.totalCurrentlyExecutingCount == 0 {
+
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && e.totalCurrentlyExecutingCount == 0 {
 		err := e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 			service.SearchAttributeExecutingStateIds: []string{},
 		})
