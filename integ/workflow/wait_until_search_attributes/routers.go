@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will go to State2
+ * State2:
+ * 		- Waits for TimerCommand with TimerId to expire
+ * 		- Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "wait_until_search_attributes"
 	State1       = "S1"
@@ -50,7 +60,6 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})

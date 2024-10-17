@@ -173,7 +173,7 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 		executingStateIds = append(executingStateIds, sid)
 	}
 
-	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && len(executingStateIds) == 0 {
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && len(executingStateIds) == 0 {
 		// we don't clear search attributes because there are only two possible cases:
 		// 1. there will be another stateId being upsert right after this. So this will avoid calling the upsertSA twice
 		// 2. there will not be another stateId being upsert. Then this will be cleared before the workflow is closed.
@@ -199,7 +199,7 @@ func (e *StateExecutionCounter) ClearExecutingStateIdsSearchAttributeFinally() {
 		}
 	}
 
-	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && e.totalCurrentlyExecutingCount == 0 {
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && e.totalCurrentlyExecutingCount == 0 {
 		err := e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 			service.SearchAttributeExecutingStateIds: []string{},
 		})
