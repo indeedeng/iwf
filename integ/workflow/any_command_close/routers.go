@@ -10,6 +10,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method will wait for SignalName1 or SignalName2
+ *      - Execute method will go to State2
+ * State2:
+ * 		- WaitUntil method does nothing
+ * 		- Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "any_command_close"
 	State1       = "S1"
