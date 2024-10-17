@@ -144,6 +144,8 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 	} else {
 		if config.GetDisableSystemSearchAttribute() {
 			return nil
+		} else {
+			e.DecreaseStateIdCurrentlyExecutingCounts(state)
 		}
 	}
 
