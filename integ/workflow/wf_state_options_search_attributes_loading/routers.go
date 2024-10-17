@@ -14,22 +14,23 @@ import (
 /**
  * This test workflow has four states, using REST controller to implement the workflow directly.
  *
- * State1: Sets values for all Search Attributes used in this test
- * 		- CustomKeywordField
- * 		- CustomStringField
- *		- CustomBoolField
+ * State1:
+ * 		- Execute method sets values for all Search Attributes used in this test
+ * 			- CustomKeywordField
+ * 			- CustomStringField
+ *			- CustomBoolField
  * State2:
- * 		- Declares State Options containing WaitUntilApiSearchAttributesLoadingPolicy
- * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Search Attributes
- * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will not load any SearchAttributes
+ * 		- State Options contains WaitUntilApiSearchAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that expected SearchAttributes are loaded
+ * 		- Execute method asserts that no SearchAttributes are loaded
  * State3:
- * 		- Declares State Options containing ExecuteApiSearchAttributesLoadingPolicy
- * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will not load any SearchAttributes
- * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will load with expected Search Attributes
+ * 		- State Options contains WaitUntilApiSearchAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that no SearchAttributes are loaded
+ * 		- Execute method asserts that expected SearchAttributes are loaded
  * State4:
- * 		- Declares State Options containing SearchAttributesLoadingPolicy
- * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Search Attributes
- * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will load with expected Search Attributes
+ * 		- State Options contains SearchAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that expected SearchAttributes are loaded
+ * 		- Execute method asserts that expected SearchAttributes are loaded
  */
 const (
 	WorkflowType = "state_options_search_attributes_loading"

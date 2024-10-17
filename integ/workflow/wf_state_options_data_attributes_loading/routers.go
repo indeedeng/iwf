@@ -13,22 +13,23 @@ import (
 /**
  * This test workflow has four states, using REST controller to implement the workflow directly.
  *
- * State1: Creates all Data Attributes keys that will be used in this test
- * 		- da_wait_until1
- * 		- da_execute1
- *		- da_other_key
+ * State1:
+ * 		- Execute method creates all Data Attributes keys that will be used in this test
+ * 			- da_wait_until1
+ * 			- da_execute1
+ *			- da_other_key
  * State2:
- * 		- Declares State Options containing WaitUntilApiDataAttributesLoadingPolicy
- * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Data Attributes
- * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will not load any DataAttributes
+ * 		- State Options contains WaitUntilApiDataAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that expected DataAttributes are loaded
+ * 		- Execute method asserts that no DataAttributes are loaded
  * State3:
- * 		- Declares State Options containing ExecuteApiDataAttributesLoadingPolicy
- * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will not load any DataAttributes
- * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will load with expected Data Attributes
+ * 		- State Options contains WaitUntilApiDataAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that no DataAttributes are loaded
+ * 		- Execute method asserts that expected DataAttributes are loaded
  * State4:
- * 		- Declares State Options containing DataAttributesLoadingPolicy
- * 		- Asserts that (ApiV1WorkflowStateStart) WaitUntil method will load with expected Data Attributes
- * 		- Asserts that (ApiV1WorkflowStateDecide) Execute method will load with expected Data Attributes
+ * 		- State Options contains DataAttributesLoadingPolicy
+ * 		- WaitUntil method asserts that expected DataAttributes are loaded
+ * 		- Execute method asserts that expected DataAttributes are loaded
  */
 const (
 	WorkflowType = "state_options_data_attributes_loading"
