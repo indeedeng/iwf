@@ -26,6 +26,9 @@ func (wc *WorkflowConfiger) UpdateByAPI(config iwfidl.WorkflowConfig) {
 	if config.DisableSystemSearchAttribute != nil {
 		wc.config.DisableSystemSearchAttribute = config.DisableSystemSearchAttribute
 	}
+	if config.ExecutingStateIdMode != nil {
+		wc.config.ExecutingStateIdMode = config.ExecutingStateIdMode
+	}
 	if config.ContinueAsNewPageSizeInBytes != nil {
 		wc.config.ContinueAsNewPageSizeInBytes = config.ContinueAsNewPageSizeInBytes
 	}
