@@ -66,6 +66,10 @@ func (p *GlobalVersioner) IsAfterVersionOfRenamedStateApi() bool {
 	return p.version >= versions.StartingVersionRenamedStateApi
 }
 
+func (p *GlobalVersioner) IsAfterVersionOfTemporal26SDK() bool {
+	return p.version >= versions.StartingVersionTemporal26SDK
+}
+
 func (p *GlobalVersioner) UpsertGlobalVersionSearchAttribute() error {
 	if p.OmitVersionMarker {
 		// the search attribute is already set when starting the workflow
