@@ -16,13 +16,14 @@ type WorkflowUpdater struct {
 	configer             *WorkflowConfiger
 	logger               UnifiedLogger
 	basicInfo            service.BasicInfo
+	globalVersioner      *GlobalVersioner
 }
 
 func NewWorkflowUpdater(
 	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
 	stateRequestQueue *StateRequestQueue,
 	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, configer *WorkflowConfiger,
-	interStateChannel *InterStateChannel, basicInfo service.BasicInfo,
+	interStateChannel *InterStateChannel, basicInfo service.BasicInfo, globalVersioner *GlobalVersioner,
 ) (*WorkflowUpdater, error) {
 	updater := &WorkflowUpdater{
 		persistenceManager:   persistenceManager,
@@ -34,10 +35,13 @@ func NewWorkflowUpdater(
 		basicInfo:            basicInfo,
 		provider:             provider,
 		logger:               provider.GetLogger(ctx),
+		globalVersioner:      globalVersioner,
 	}
-	err := provider.SetRpcUpdateHandler(ctx, service.ExecuteOptimisticLockingRpcUpdateType, updater.validator, updater.handler)
-	if err != nil {
-		return nil, err
+	if globalVersioner.IsAfterVersionOfTemporal26SDK() {
+		err := provider.SetRpcUpdateHandler(ctx, service.ExecuteOptimisticLockingRpcUpdateType, updater.validator, updater.handler)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return updater, nil
 }
