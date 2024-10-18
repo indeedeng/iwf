@@ -5,7 +5,6 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"time"
@@ -18,14 +17,15 @@ import (
  *		- Waits on nothing. Will execute momentarily
  *      - Execute method will go to State2
  * State2:
- * 		- Waits for TimerCommand with TimerId to expire
- * 		- Execute method will gracefully complete workflow
+ *		- Waits on nothing. Will execute momentarily
+ *		- Skips wait unit
+ *      - 10-second delay is added before executing state
+ *      - Execute method will gracefully complete workflow
  */
 const (
 	WorkflowType = "wait_until_search_attributes"
 	State1       = "S1"
 	State2       = "S2"
-	TimerId      = "test-timer"
 
 	TestSearchAttributeExecutingStateIdsKey = "IwfExecutingStateIds"
 )
@@ -41,13 +41,6 @@ func NewHandler() common.WorkflowHandler {
 }
 
 func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
-	validTimerCommands := []iwfidl.TimerCommand{
-		{
-			CommandId:                  ptr.Any(TimerId),
-			FiringUnixTimestampSeconds: iwfidl.PtrInt64(time.Now().Unix() + 86400*365), // one year later
-		},
-	}
-
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -68,8 +61,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State2 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
-					TimerCommands:      validTimerCommands,
-					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
+					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})
 			return
@@ -95,12 +87,16 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					NextStates: []iwfidl.StateMovement{
 						{
 							StateId: State2,
+							StateOptions: &iwfidl.WorkflowStateOptions{
+								SkipWaitUntil: iwfidl.PtrBool(true),
+							},
 						},
 					},
 				},
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
+			time.Sleep(time.Second * 10)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

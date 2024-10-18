@@ -32,11 +32,10 @@ func TestWaitUntilSearchAttributesWorkflowTemporal(t *testing.T) {
 		smallWaitForFastTest()
 	}
 
-	// TODO: Rethink how this can be tested
-	// for i := 0; i < *repeatIntegTest; i++ {
-	// doTestWaitUntilSearchAttributes(t, service.BackendTypeTemporal, nil) // defaults to ExecutingStateIdMode: ENABLED_FOR_STATES_WITH_WAIT_UNTIL
-	// smallWaitForFastTest()
-	// }
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestWaitUntilSearchAttributes(t, service.BackendTypeTemporal, nil) // defaults to ExecutingStateIdMode: ENABLED_FOR_STATES_WITH_WAIT_UNTIL
+		smallWaitForFastTest()
+	}
 }
 
 func doTestWaitUntilSearchAttributes(
@@ -86,20 +85,11 @@ func doTestWaitUntilSearchAttributes(
 		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 1, apiClient, assertions)
 	case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		// TODO: Add search attribute assert
+		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
 	case iwfidl.DISABLED:
 		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
 		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
 	}
-
-	time.Sleep(time.Second * 5) // wait for a few seconds so that timer is ready to be skipped
-	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
-	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
-		WorkflowId:               wfId,
-		WorkflowStateExecutionId: fmt.Sprintf("%v-1", wait_until_search_attributes.State2),
-		TimerCommandId:           iwfidl.PtrString(wait_until_search_attributes.TimerId),
-	}).Execute()
-	panicAtHttpError(err, httpResp)
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
