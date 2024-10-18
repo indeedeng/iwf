@@ -189,17 +189,11 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 func (e *StateExecutionCounter) ClearExecutingStateIdsSearchAttributeFinally() {
 	config := e.configer.Get()
 
-	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
-		if config.GetExecutingStateIdMode() == "DISABLED" {
-			return
-		}
-	} else {
+	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && e.totalCurrentlyExecutingCount == 0 {
 		if config.GetDisableSystemSearchAttribute() {
 			return
 		}
-	}
 
-	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && e.totalCurrentlyExecutingCount == 0 {
 		err := e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 			service.SearchAttributeExecutingStateIds: []string{},
 		})
