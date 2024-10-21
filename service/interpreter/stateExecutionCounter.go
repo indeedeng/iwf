@@ -20,6 +20,11 @@ type StateExecutionCounter struct {
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
+type StateTransition struct {
+	current iwfidl.StateMovement
+	next    []iwfidl.StateMovement
+}
+
 func NewStateExecutionCounter(
 	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
 	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
@@ -110,7 +115,7 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	e.totalCurrentlyExecutingCount += numOfNew
 
 	if needsUpdateSA {
-		return e.updateStateIdSearchAttribute()
+		return e.updateStateIdSearchAttribute(nil)
 	}
 	return nil
 }
@@ -121,7 +126,7 @@ func (e *StateExecutionCounter) increaseStateIdCurrentlyExecutingCounts(s iwfidl
 	return e.stateIdCurrentlyExecutingCounts[s.StateId] == 1
 }
 
-func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
+func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement, nextStates []iwfidl.StateMovement) error {
 	e.totalCurrentlyExecutingCount--
 
 	options := state.GetStateOptions()
@@ -136,6 +141,10 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
 			e.decreaseStateIdCurrentlyExecutingCounts(state)
+			return e.updateStateIdSearchAttribute(&StateTransition{
+				current: state,
+				next:    nextStates,
+			})
 		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 			fallthrough
 		default:
@@ -153,7 +162,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 		}
 	}
 
-	return e.updateStateIdSearchAttribute()
+	return e.updateStateIdSearchAttribute(nil)
 }
 
 func (e *StateExecutionCounter) decreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
@@ -167,7 +176,9 @@ func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
 	return e.totalCurrentlyExecutingCount
 }
 
-func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
+// Next states of stateTransition argument will be evaluated. If the next states skip waitUntil, upsertSearchAttributes will not be invoked
+// stateExecuted should be only provided when updateStateIdSearchAttribute is called after decreaseStateIdCurrentlyExecutingCounts
+func (e *StateExecutionCounter) updateStateIdSearchAttribute(stateTransition *StateTransition) error {
 	var executingStateIds []string
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
@@ -180,6 +191,23 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 		// see workflowImpl.go to call ClearExecutingStateIdsSearchAttributeFinally at the end
 		return nil
 	}
+
+	if stateTransition != nil {
+		// UpsertSearchAttributes should be only invoked if when the next states do not skip waitUntil
+		shouldSkipUpsertingSAs := true
+		for _, s := range stateTransition.next {
+			if !s.StateOptions.GetSkipWaitUntil() {
+				shouldSkipUpsertingSAs = false
+				break
+			}
+		}
+
+		if shouldSkipUpsertingSAs {
+			return nil
+		}
+
+	}
+
 	return e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 		service.SearchAttributeExecutingStateIds: executingStateIds,
 	})

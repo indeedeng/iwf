@@ -227,7 +227,7 @@ func InterpreterImpl(
 						}
 
 						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+						err = stateExecutionCounter.MarkStateExecutionCompleted(state, decision.GetNextStates())
 						if err != nil {
 							errToFailWf = err
 						}
@@ -235,7 +235,7 @@ func InterpreterImpl(
 						options := state.GetStateOptions()
 						stateRequestQueue.AddSingleStateStartRequest(options.GetExecuteApiFailureProceedStateId(), state.StateInput, options.ExecuteApiFailureProceedStateOptions)
 						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+						err = stateExecutionCounter.MarkStateExecutionCompleted(state, decision.GetNextStates())
 						if err != nil {
 							errToFailWf = err
 						}
