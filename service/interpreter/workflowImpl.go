@@ -461,10 +461,10 @@ func executeState(
 		executeApi = StateApiExecute
 	}
 
-	info := provider.GetWorkflowInfo(ctx) // TODO use firstRunId instead
+	info := provider.GetWorkflowInfo(ctx)
 	executionContext := iwfidl.Context{
 		WorkflowId:               info.WorkflowExecution.ID,
-		WorkflowRunId:            info.WorkflowExecution.RunID,
+		WorkflowRunId:            info.FirstRunID,
 		WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
 		StateExecutionId:         &stateExeId,
 	}
