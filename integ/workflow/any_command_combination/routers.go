@@ -11,6 +11,18 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method will run for two attempts. The first attempt attempt will wait for an invalid list of commands.
+ * 	      This will be rejected by server can cause a 2nd attempt.
+ *		  The second attempt will wait for a valid list of commands of signals and timers, using ANY_COMMAND_COMBINATION_COMPLETED
+ *      - Execute method will go to State2
+ * State2:
+ * 		- WaitUntil method is similar to State1 to have 2 attempts. But the combination of commands to wait for is different.
+ * 		- Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType     = "any_command_combination"
 	State1           = "S1"
