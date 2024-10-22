@@ -22,11 +22,6 @@ type StateExecutionCounter struct {
 	totalCurrentlyExecutingCount    int            // For "dead ends": count the total pending states
 }
 
-type StateTransition struct {
-	current iwfidl.StateMovement
-	next    []iwfidl.StateMovement
-}
-
 func NewStateExecutionCounter(
 	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
 	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
