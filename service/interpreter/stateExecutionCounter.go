@@ -6,7 +6,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/ptr"
-	"reflect"
+	"slices"
 )
 
 type StateExecutionCounter struct {
@@ -73,6 +73,17 @@ func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRequest) error {
 	config := e.configer.Get()
 
+	sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
+		{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
+			ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
+	})
+	if err != nil {
+		e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
+	}
+
+	// TODO: Address the !ok case
+	currentSAs := sas[service.SearchAttributeExecutingStateIds]
+
 	needsUpdateSA := false
 	numOfNew := 0
 	for _, sr := range stateReqs {
@@ -86,7 +97,8 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			case iwfidl.DISABLED:
 				// do nothing
 			case iwfidl.ENABLED_FOR_ALL:
-				if e.increaseStateIdCurrentlyExecutingCounts(s) {
+				e.increaseStateIdCurrentlyExecutingCounts(s)
+				if !slices.Contains(currentSAs.StringArrayValue, s.StateId) {
 					needsUpdateSA = true
 				}
 			case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
@@ -94,7 +106,8 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			default:
 				options := s.GetStateOptions()
 				if !compatibility.GetSkipWaitUntilApi(&options) {
-					if e.increaseStateIdCurrentlyExecutingCounts(s) {
+					e.increaseStateIdCurrentlyExecutingCounts(s)
+					if !slices.Contains(currentSAs.StringArrayValue, s.StateId) {
 						needsUpdateSA = true
 					}
 				}
@@ -207,22 +220,6 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	var executingStateIds []string
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
-	}
-
-	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
-		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
-			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
-				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
-		})
-		if err != nil {
-			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
-		}
-
-		// Do not upsert SAs when executingStateIds == current SearchAttributeExecutingStateIds based on context
-		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
-		if ok && reflect.DeepEqual(executingStateIds, currentSAs.StringArrayValue) {
-			return nil
-		}
 	}
 
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && len(executingStateIds) == 0 {
