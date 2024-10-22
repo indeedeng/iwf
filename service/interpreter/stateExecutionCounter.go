@@ -84,6 +84,9 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 		}
 		s := sr.GetStateStartRequest()
 
+		// e.provider.GetSearchAttributes()
+		// TODO check if SA in context and decide if need to update
+
 		if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 			switch mode := config.GetExecutingStateIdMode(); mode {
 			case iwfidl.DISABLED:
@@ -135,16 +138,18 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 
 	config := e.configer.Get()
 
+	var stateTransition *StateTransition
+
 	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 		switch mode := config.GetExecutingStateIdMode(); mode {
 		case iwfidl.DISABLED:
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
 			e.decreaseStateIdCurrentlyExecutingCounts(state)
-			return e.updateStateIdSearchAttribute(&StateTransition{
+			stateTransition = &StateTransition{
 				current: state,
 				next:    nextStates,
-			})
+			}
 		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 			fallthrough
 		default:
@@ -152,6 +157,10 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 				return nil
 			} else {
 				e.decreaseStateIdCurrentlyExecutingCounts(state)
+				stateTransition = &StateTransition{
+					current: state,
+					next:    nextStates,
+				}
 			}
 		}
 	} else {
@@ -162,7 +171,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 		}
 	}
 
-	return e.updateStateIdSearchAttribute(nil)
+	return e.updateStateIdSearchAttribute(stateTransition)
 }
 
 func (e *StateExecutionCounter) decreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
@@ -194,6 +203,13 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute(stateTransition *St
 
 	if stateTransition != nil {
 		// UpsertSearchAttributes should be only invoked if when the next states do not skip waitUntil
+		// Or if current and next states are the same
+
+		// State transition loops back to the current state
+		if len(stateTransition.next) == 1 && stateTransition.current.StateId == stateTransition.next[0].StateId {
+			return nil
+		}
+
 		shouldSkipUpsertingSAs := true
 		for _, s := range stateTransition.next {
 			if !s.StateOptions.GetSkipWaitUntil() {
