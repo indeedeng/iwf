@@ -5,6 +5,8 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
+	"github.com/indeedeng/iwf/service/common/ptr"
+	"reflect"
 )
 
 type StateExecutionCounter struct {
@@ -84,9 +86,6 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 		}
 		s := sr.GetStateStartRequest()
 
-		// e.provider.GetSearchAttributes()
-		// TODO check if SA in context and decide if need to update
-
 		if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 			switch mode := config.GetExecutingStateIdMode(); mode {
 			case iwfidl.DISABLED:
@@ -118,7 +117,7 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	e.totalCurrentlyExecutingCount += numOfNew
 
 	if needsUpdateSA {
-		return e.updateStateIdSearchAttribute(nil)
+		return e.updateStateIdSearchAttribute()
 	}
 	return nil
 }
@@ -129,26 +128,24 @@ func (e *StateExecutionCounter) increaseStateIdCurrentlyExecutingCounts(s iwfidl
 	return e.stateIdCurrentlyExecutingCounts[s.StateId] == 1
 }
 
-func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement, nextStates []iwfidl.StateMovement) error {
+func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.StateMovement, nextStates []iwfidl.StateMovement) error {
 	e.totalCurrentlyExecutingCount--
 
-	options := state.GetStateOptions()
+	options := currentState.GetStateOptions()
 	skipStart := compatibility.GetSkipWaitUntilApi(&options)
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
 
 	config := e.configer.Get()
-
-	var stateTransition *StateTransition
 
 	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
 		switch mode := config.GetExecutingStateIdMode(); mode {
 		case iwfidl.DISABLED:
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
-			e.decreaseStateIdCurrentlyExecutingCounts(state)
-			stateTransition = &StateTransition{
-				current: state,
-				next:    nextStates,
+			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
+			shouldSkipUpsert := determineIfShouldSkipUpsert(currentState, nextStates)
+			if shouldSkipUpsert {
+				return nil
 			}
 		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 			fallthrough
@@ -156,10 +153,10 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 			if compatibility.GetSkipWaitUntilApi(&options) {
 				return nil
 			} else {
-				e.decreaseStateIdCurrentlyExecutingCounts(state)
-				stateTransition = &StateTransition{
-					current: state,
-					next:    nextStates,
+				e.decreaseStateIdCurrentlyExecutingCounts(currentState)
+				shouldSkipUpsert := determineIfShouldSkipUpsert(currentState, nextStates)
+				if shouldSkipUpsert {
+					return nil
 				}
 			}
 		}
@@ -167,11 +164,37 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 		if config.GetDisableSystemSearchAttribute() {
 			return nil
 		} else {
-			e.decreaseStateIdCurrentlyExecutingCounts(state)
+			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
 		}
 	}
 
-	return e.updateStateIdSearchAttribute(stateTransition)
+	return e.updateStateIdSearchAttribute()
+}
+
+func determineIfShouldSkipUpsert(currentState iwfidl.StateMovement, nextStates []iwfidl.StateMovement) bool {
+	// Case: State loops back to itself; Outcome: do not upsert SAs
+	if len(nextStates) == 1 && currentState.StateId == nextStates[0].StateId {
+		return true
+	}
+
+	// Check if all nextStates skip waitUntil; omit currentState in case it loops back
+	var nextStagesWithNoCurrent []iwfidl.StateMovement
+	for _, s := range nextStates {
+		if s.StateId != currentState.StateId {
+			nextStagesWithNoCurrent = append(nextStagesWithNoCurrent, s)
+		}
+	}
+
+	shouldSkipUpsertingSAs := true
+
+	for _, s := range nextStagesWithNoCurrent {
+		if !s.StateOptions.GetSkipWaitUntil() {
+			shouldSkipUpsertingSAs = false
+			break
+		}
+	}
+
+	return shouldSkipUpsertingSAs
 }
 
 func (e *StateExecutionCounter) decreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
@@ -185,12 +208,26 @@ func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
 	return e.totalCurrentlyExecutingCount
 }
 
-// Next states of stateTransition argument will be evaluated. If the next states skip waitUntil, upsertSearchAttributes will not be invoked
-// stateExecuted should be only provided when updateStateIdSearchAttribute is called after decreaseStateIdCurrentlyExecutingCounts
-func (e *StateExecutionCounter) updateStateIdSearchAttribute(stateTransition *StateTransition) error {
+func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 	var executingStateIds []string
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
+	}
+
+	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
+			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
+				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
+		})
+		if err != nil {
+			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
+		}
+
+		// Do not upsert SAs when executingStateIds == current SearchAttributeExecutingStateIds based on context
+		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
+		if ok && reflect.DeepEqual(executingStateIds, currentSAs.StringArrayValue) {
+			return nil
+		}
 	}
 
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && len(executingStateIds) == 0 {
@@ -199,29 +236,6 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute(stateTransition *St
 		// 2. there will not be another stateId being upsert. Then this will be cleared before the workflow is closed.
 		// see workflowImpl.go to call ClearExecutingStateIdsSearchAttributeFinally at the end
 		return nil
-	}
-
-	if stateTransition != nil {
-		// UpsertSearchAttributes should be only invoked if when the next states do not skip waitUntil
-		// Or if current and next states are the same
-
-		// State transition loops back to the current state
-		if len(stateTransition.next) == 1 && stateTransition.current.StateId == stateTransition.next[0].StateId {
-			return nil
-		}
-
-		shouldSkipUpsertingSAs := true
-		for _, s := range stateTransition.next {
-			if !s.StateOptions.GetSkipWaitUntil() {
-				shouldSkipUpsertingSAs = false
-				break
-			}
-		}
-
-		if shouldSkipUpsertingSAs {
-			return nil
-		}
-
 	}
 
 	return e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
