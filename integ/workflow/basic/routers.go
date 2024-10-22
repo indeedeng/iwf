@@ -8,6 +8,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ *      - Execute method will go to State2 with some options(api timeout, retry policy)
+ * State2:
+ * 		- WaitUntil method does nothing
+ * 		- Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "basic"
 	State1       = "S1"

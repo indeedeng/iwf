@@ -15,7 +15,7 @@ import (
  * This test workflow has 2 states, using REST controller to implement the workflow directly.
  *
  * State1:
- *		- WaitUntil method will run for two attempts. The first attempt attempt will wait for an invalid list of commands.
+ *		- WaitUntil method will have two attempts. The first attempt attempt will wait for an invalid list of commands.
  * 	      This will be rejected by server can cause a 2nd attempt.
  *		  The second attempt will wait for a valid list of commands of signals and timers, using ANY_COMMAND_COMBINATION_COMPLETED
  *      - Execute method will go to State2

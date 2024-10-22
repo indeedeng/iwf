@@ -9,6 +9,15 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 1 state and a RPC, using REST controller to implement the workflow directly.
+ *
+ * RPC: publish message to internal channel TestChannelName
+ * State1:
+ *		- WaitUntil method: if the input is "use-signal-channel", then wait for TestChannelName signal, otherwise wait for TestChannelName internalChannel
+ *      - Execute method: for the first stateExecution(State1-1), it will wait for 3 seconds to let the channel have a new message.
+ *                        Then it will conditionally go to State1 again using WorkflowConditionalClose, otherwise it will gracefully complete the workflow.
+ */
 const (
 	WorkflowType    = "deadend"
 	RPCTriggerState = "test-RPCTriggerState"
