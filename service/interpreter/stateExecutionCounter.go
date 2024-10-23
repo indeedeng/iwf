@@ -197,7 +197,7 @@ func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, 
 	var nonClosingNextStates []iwfidl.StateMovement
 	for _, s := range nextStates {
 		if _, ok := service.ValidClosingWorkflowStateId[s.GetStateId()]; !ok {
-			// s does not exist is not a ValidClosingWorkflowStateId
+			// s is not a ValidClosingWorkflowStateId
 			nonClosingNextStates = append(nonClosingNextStates, s)
 		}
 	}

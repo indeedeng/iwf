@@ -35,6 +35,7 @@ type UnifiedClient interface {
 	) error
 	ResetWorkflow(ctx context.Context, request iwfidl.WorkflowResetRequest) (runId string, err error)
 	GetBackendType() (backendType service.BackendType)
+	GetApiService() interface{}
 }
 
 type errorHandler interface {

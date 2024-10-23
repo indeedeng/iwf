@@ -386,3 +386,7 @@ func (t *cadenceClient) ResetWorkflow(
 func (t *cadenceClient) GetBackendType() (backendType service.BackendType) {
 	return service.BackendTypeCadence
 }
+
+func (t *cadenceClient) GetApiService() interface{} {
+	return t.cClient
+}
