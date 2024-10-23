@@ -73,14 +73,6 @@ func (e *StateExecutionCounter) CreateNextExecutionId(stateId string) string {
 func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRequest) error {
 	config := e.configer.Get()
 
-	sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
-		{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
-			ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
-	})
-	if err != nil {
-		e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
-	}
-
 	needsUpdateSA := false
 	numOfNew := 0
 	for _, sr := range stateReqs {
@@ -117,17 +109,25 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	}
 	e.totalCurrentlyExecutingCount += numOfNew
 
-	var currentSAsValues []string
-
-	currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
-	if ok {
-		currentSAsValues = currentSAs.StringArrayValue
-	} else {
-		e.provider.GetLogger(e.ctx).Error("search attribute IwfExecutingStateIds is not found", err)
-	}
-
 	// Optimization: don't upsert SAs if currentSAsValues == stateReqs
 	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && needsUpdateSA {
+		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
+			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
+				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
+		})
+		if err != nil {
+			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
+		}
+
+		var currentSAsValues []string
+
+		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
+		if ok {
+			currentSAsValues = currentSAs.StringArrayValue
+		} else {
+			e.provider.GetLogger(e.ctx).Error("search attribute IwfExecutingStateIds is not found", err)
+		}
+
 		switch mode := config.GetExecutingStateIdMode(); mode {
 		// Should never get here, but keeping to address all possible modes
 		case iwfidl.DISABLED:
