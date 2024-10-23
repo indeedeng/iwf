@@ -109,7 +109,7 @@ func InterpreterImpl(
 	var forceCompleteWf bool
 	var shouldGracefulComplete bool
 
-	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
+	// this is for an optimization for StateId Search attribute, see refreshIwfExecutingStateIdSearchAttribute in stateExecutionCounter
 	// Because it will check totalCurrentlyExecutingCount == 0, so it will also work for continueAsNew case
 	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
 
