@@ -124,8 +124,6 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
 		if ok {
 			currentSAsValues = currentSAs.StringArrayValue
-		} else {
-			e.provider.GetLogger(e.ctx).Error("search attribute IwfExecutingStateIds is not found", err)
 		}
 
 		var executingStateIds []string
@@ -176,8 +174,8 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 				return nil
 			} else {
 				e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-				shouldSkipUpsert := determineIfShouldSkipRefreshOnCompleted(nextStates, false)
-				if shouldSkipUpsert {
+				shouldSkipRefresh := determineIfShouldSkipRefreshOnCompleted(nextStates, false)
+				if shouldSkipRefresh {
 					return nil
 				}
 			}
@@ -207,7 +205,8 @@ func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, 
 		}
 	} else {
 		for _, s := range nonClosingNextStates {
-			if !s.StateOptions.GetSkipWaitUntil() {
+			options := s.GetStateOptions()
+			if !compatibility.GetSkipWaitUntilApi(&options) {
 				return true
 			}
 		}
