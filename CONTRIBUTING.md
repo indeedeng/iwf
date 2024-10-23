@@ -34,27 +34,11 @@ Here is the repository layout if you are interested to learn about it:
 
 ## How to update IDL and the generated code
 
-1. Install openapi-generator using Homebrew if you haven't. See
-   more [documentation](https://openapi-generator.tech/docs/installation)
-2. Check out the idl submodule by running the command: `git submodule update --init --recursive`
-3. Run the command `git submodule update --remote --merge` to update IDL to the latest commit
-4. Run `make idl-code-gen` to refresh the generated code. The command requires to have `openapi-generator` CLI.See
+1. Check out the idl submodule by running the command: `git submodule update --init --recursive`
+2. Run the command `git submodule update --remote --merge` to update IDL to the latest commit
+3. Run `make idl-code-gen` to refresh the generated code. The command requires to have `openapi-generator` CLI.See
    the [openapi-generator doc](https://openapi-generator.tech/docs/installation/) for how to install it. And you may
    also need to upgrade it to the latest if it's older than what we are currently using.
-
-An easy way to install openapi-generator CLI is to use Homebrew:
-
-```
-brew install openapi-generator
-
-```
-
-And to upgrade it:
-
-```
-brew update && brew upgrade openapi-generator
-
-```
 
 # How to run server or integration test
 
