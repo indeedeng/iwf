@@ -109,7 +109,7 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	}
 	e.totalCurrentlyExecutingCount += numOfNew
 
-	// Optimization: don't upsert SAs if currentSAsValues == stateReqs
+	// Optimization: don't upsert SAs if currentSAsValues == stateIdCurrentlyExecutingCounts keys
 	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && needsUpdateSA {
 		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
 			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
@@ -128,30 +128,13 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			e.provider.GetLogger(e.ctx).Error("search attribute IwfExecutingStateIds is not found", err)
 		}
 
-		switch mode := config.GetExecutingStateIdMode(); mode {
-		// Should never get here, but keeping to address all possible modes
-		case iwfidl.DISABLED:
-			// noop
-		case iwfidl.ENABLED_FOR_ALL:
-			var stateReqStates []string
-			for _, sr := range stateReqs {
-				stateReqStates = append(stateReqStates, sr.GetStateId())
-			}
-			if reflect.DeepEqual(currentSAsValues, stateReqStates) {
-				needsUpdateSA = false
-			}
-		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
-			fallthrough
-		default:
-			var stateReqStates []string
-			for _, sr := range stateReqs {
-				if !sr.GetStateStartRequest().StateOptions.GetSkipWaitUntil() {
-					stateReqStates = append(stateReqStates, sr.GetStateId())
-				}
-			}
-			if reflect.DeepEqual(currentSAsValues, stateReqStates) {
-				needsUpdateSA = false
-			}
+		var executingStateIds []string
+		for sid := range e.stateIdCurrentlyExecutingCounts {
+			executingStateIds = append(executingStateIds, sid)
+		}
+
+		if reflect.DeepEqual(currentSAsValues, executingStateIds) {
+			needsUpdateSA = false
 		}
 	}
 
@@ -182,7 +165,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
 			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-			shouldSkipUpsert := determineIfShouldSkipRefresh(currentState, nextStates)
+			shouldSkipUpsert := determineIfShouldSkipRefreshOnCompleted(nextStates, true)
 			if shouldSkipUpsert {
 				return nil
 			}
@@ -193,7 +176,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 				return nil
 			} else {
 				e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-				shouldSkipUpsert := determineIfShouldSkipRefresh(currentState, nextStates)
+				shouldSkipUpsert := determineIfShouldSkipRefreshOnCompleted(nextStates, false)
 				if shouldSkipUpsert {
 					return nil
 				}
@@ -210,23 +193,23 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 	return e.refreshIwfExecutingStateIdSearchAttribute()
 }
 
-func determineIfShouldSkipRefresh(currentState iwfidl.StateMovement, nextStates []iwfidl.StateMovement) bool {
-	// Case: State loops back to itself; Outcome: do not upsert SAs
-	if len(nextStates) == 1 && currentState.StateId == nextStates[0].StateId {
-		return true
-	}
-
-	// Check if any of nextStates skips waitUntil; omit currentState in case it loops back
-	var nextStagesWithNoCurrent []iwfidl.StateMovement
+func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, enabledForAll bool) bool {
+	var nonClosingNextStates []iwfidl.StateMovement
 	for _, s := range nextStates {
-		if s.StateId != currentState.StateId {
-			nextStagesWithNoCurrent = append(nextStagesWithNoCurrent, s)
+		if _, ok := service.ValidClosingWorkflowStateId[s.GetStateId()]; !ok {
+			// s does not exist is not a ValidClosingWorkflowStateId
+			nonClosingNextStates = append(nonClosingNextStates, s)
 		}
 	}
-
-	for _, s := range nextStagesWithNoCurrent {
-		if s.StateOptions.GetSkipWaitUntil() {
+	if enabledForAll {
+		if len(nonClosingNextStates) > 0 {
 			return true
+		}
+	} else {
+		for _, s := range nonClosingNextStates {
+			if !s.StateOptions.GetSkipWaitUntil() {
+				return true
+			}
 		}
 	}
 
