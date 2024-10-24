@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"reflect"
+	"slices"
 )
 
 type StateExecutionCounter struct {
@@ -131,6 +132,8 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			executingStateIds = append(executingStateIds, sid)
 		}
 
+		slices.Sort(currentSAsValues)
+		slices.Sort(executingStateIds)
 		if reflect.DeepEqual(currentSAsValues, executingStateIds) {
 			needsUpdateSA = false
 		}
