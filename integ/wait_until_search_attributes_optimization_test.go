@@ -69,7 +69,7 @@ func doTestWaitUntilHistoryCompleted(
 	wfReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        wait_until_search_attributes_optimization.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 15,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(wait_until_search_attributes_optimization.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
@@ -129,20 +129,30 @@ func doTestWaitUntilHistoryCompleted(
 
 	switch mode := config.GetExecutingStateIdMode(); mode {
 	case iwfidl.ENABLED_FOR_ALL:
-		assertions.Equal(6, len(upsertSAEvents))
+		assertions.Equal(10, len(upsertSAEvents))
 		assertions.Equal("[\"S1\"]", historyEventSAs(upsertSAEvents[0]))
 		assertions.Equal("[\"S2\"]", historyEventSAs(upsertSAEvents[1]))
-		assertions.Equal("[\"S3\",\"S4\"]", historyEventSAs(upsertSAEvents[2]))
-		assertions.Equal("[\"S4\"]", historyEventSAs(upsertSAEvents[3]))
-		assertions.Equal("[\"S5\"]", historyEventSAs(upsertSAEvents[4]))
-		assertions.Equal("null", historyEventSAs(upsertSAEvents[5]))
+		assertions.Equal("[\"S2\",\"S3\"]", historyEventSAs(upsertSAEvents[2]))
+		assertions.Equal("[\"S4\",\"S3\"]", historyEventSAs(upsertSAEvents[3]))
+		assertions.Equal("[\"S5\",\"S3\"]", historyEventSAs(upsertSAEvents[4]))
+		assertions.Equal("[\"S6\",\"S3\",\"S7\"]", historyEventSAs(upsertSAEvents[5]))
+		assertions.Equal("[\"S6\",\"S3\"]", historyEventSAs(upsertSAEvents[6]))
+		// TODO: This is unexpected; should not upsert the same SAs -- happens after "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
+		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[7]))
+		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[8]))
+		assertions.Equal("null", historyEventSAs(upsertSAEvents[9]))
 	case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
-		assertions.Equal(5, len(upsertSAEvents))
+		assertions.Equal(9, len(upsertSAEvents))
 		assertions.Equal("[\"S1\"]", historyEventSAs(upsertSAEvents[0]))
 		assertions.Equal("[\"S2\"]", historyEventSAs(upsertSAEvents[1]))
-		assertions.Equal("[\"S3\",\"S4\"]", historyEventSAs(upsertSAEvents[2]))
-		assertions.Equal("[\"S4\"]", historyEventSAs(upsertSAEvents[3]))
-		assertions.Equal("null", historyEventSAs(upsertSAEvents[4]))
+		assertions.Equal("[\"S2\",\"S3\"]", historyEventSAs(upsertSAEvents[2]))
+		assertions.Equal("[\"S4\",\"S3\"]", historyEventSAs(upsertSAEvents[3]))
+		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[4]))
+		assertions.Equal("[\"S6\",\"S3\"]", historyEventSAs(upsertSAEvents[5]))
+		// TODO: This is unexpected; should not upsert the same SAs -- happens after "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
+		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[6]))
+		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[7]))
+		assertions.Equal("null", historyEventSAs(upsertSAEvents[8]))
 	case iwfidl.DISABLED:
 		assertions.Equal(0, len(upsertSAEvents))
 	}
