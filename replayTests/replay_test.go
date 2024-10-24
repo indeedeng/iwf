@@ -25,7 +25,16 @@ var jsonHistoryFiles = []string{
 }
 
 func TestTemporalReplay(t *testing.T) {
-	replayer := worker.NewWorkflowReplayer()
+	worker.EnableVerboseLogging(true)
+
+	replayer, err := worker.NewWorkflowReplayerWithOptions(
+		worker.WorkflowReplayerOptions{
+			EnableLoggingInReplay: true,
+		})
+
+	if err != nil {
+		panic(err)
+	}
 
 	replayer.RegisterWorkflow(temporal.Interpreter)
 
