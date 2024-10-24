@@ -5,6 +5,9 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
+	"github.com/indeedeng/iwf/service/common/ptr"
+	"reflect"
+	"slices"
 )
 
 type StateExecutionCounter struct {
@@ -84,17 +87,15 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 			case iwfidl.DISABLED:
 				// do nothing
 			case iwfidl.ENABLED_FOR_ALL:
-				if e.increaseStateIdCurrentlyExecutingCounts(s) {
-					needsUpdateSA = true
-				}
+				e.increaseStateIdCurrentlyExecutingCounts(s)
+				needsUpdateSA = true
 			case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 				fallthrough
 			default:
 				options := s.GetStateOptions()
 				if !compatibility.GetSkipWaitUntilApi(&options) {
-					if e.increaseStateIdCurrentlyExecutingCounts(s) {
-						needsUpdateSA = true
-					}
+					e.increaseStateIdCurrentlyExecutingCounts(s)
+					needsUpdateSA = true
 				}
 			}
 		} else {
@@ -110,7 +111,7 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	e.totalCurrentlyExecutingCount += numOfNew
 
 	if needsUpdateSA {
-		return e.updateStateIdSearchAttribute()
+		return e.refreshIwfExecutingStateIdSearchAttribute()
 	}
 	return nil
 }
@@ -121,10 +122,10 @@ func (e *StateExecutionCounter) increaseStateIdCurrentlyExecutingCounts(s iwfidl
 	return e.stateIdCurrentlyExecutingCounts[s.StateId] == 1
 }
 
-func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMovement) error {
+func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.StateMovement, nextStates []iwfidl.StateMovement) error {
 	e.totalCurrentlyExecutingCount--
 
-	options := state.GetStateOptions()
+	options := currentState.GetStateOptions()
 	skipStart := compatibility.GetSkipWaitUntilApi(&options)
 	e.continueAsNewCounter.IncExecutedStateExecution(skipStart)
 
@@ -135,25 +136,57 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(state iwfidl.StateMo
 		case iwfidl.DISABLED:
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
-			e.decreaseStateIdCurrentlyExecutingCounts(state)
+			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
+			shouldSkipUpsert := determineIfShouldSkipRefreshOnCompleted(nextStates, true)
+			if shouldSkipUpsert {
+				return nil
+			}
 		case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 			fallthrough
 		default:
 			if compatibility.GetSkipWaitUntilApi(&options) {
 				return nil
 			} else {
-				e.decreaseStateIdCurrentlyExecutingCounts(state)
+				e.decreaseStateIdCurrentlyExecutingCounts(currentState)
+				shouldSkipRefresh := determineIfShouldSkipRefreshOnCompleted(nextStates, false)
+				if shouldSkipRefresh {
+					return nil
+				}
 			}
 		}
 	} else {
 		if config.GetDisableSystemSearchAttribute() {
 			return nil
 		} else {
-			e.decreaseStateIdCurrentlyExecutingCounts(state)
+			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
 		}
 	}
 
-	return e.updateStateIdSearchAttribute()
+	return e.refreshIwfExecutingStateIdSearchAttribute()
+}
+
+func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, enabledForAll bool) bool {
+	var nonClosingNextStates []iwfidl.StateMovement
+	for _, s := range nextStates {
+		if _, ok := service.ValidClosingWorkflowStateId[s.GetStateId()]; !ok {
+			// s is not a ValidClosingWorkflowStateId
+			nonClosingNextStates = append(nonClosingNextStates, s)
+		}
+	}
+	if enabledForAll {
+		if len(nonClosingNextStates) > 0 {
+			return true
+		}
+	} else {
+		for _, s := range nonClosingNextStates {
+			options := s.GetStateOptions()
+			if !compatibility.GetSkipWaitUntilApi(&options) {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (e *StateExecutionCounter) decreaseStateIdCurrentlyExecutingCounts(state iwfidl.StateMovement) {
@@ -167,7 +200,36 @@ func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
 	return e.totalCurrentlyExecutingCount
 }
 
-func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
+func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() error {
+	// Optimization: don't upsert SAs if currentSAsValues == stateIdCurrentlyExecutingCounts keys
+	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
+			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
+				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
+		})
+		if err != nil {
+			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
+		}
+
+		var currentSAsValues []string
+
+		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
+		if ok {
+			currentSAsValues = currentSAs.StringArrayValue
+		}
+
+		var executingStateIds []string
+		for sid := range e.stateIdCurrentlyExecutingCounts {
+			executingStateIds = append(executingStateIds, sid)
+		}
+
+		slices.Sort(currentSAsValues)
+		slices.Sort(executingStateIds)
+		if reflect.DeepEqual(currentSAsValues, executingStateIds) {
+			return nil
+		}
+	}
+
 	var executingStateIds []string
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
@@ -180,6 +242,7 @@ func (e *StateExecutionCounter) updateStateIdSearchAttribute() error {
 		// see workflowImpl.go to call ClearExecutingStateIdsSearchAttributeFinally at the end
 		return nil
 	}
+
 	return e.provider.UpsertSearchAttributes(e.ctx, map[string]interface{}{
 		service.SearchAttributeExecutingStateIds: executingStateIds,
 	})

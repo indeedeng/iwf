@@ -446,3 +446,7 @@ func (t *temporalClient) ResetWorkflow(
 func (t *temporalClient) GetBackendType() (backendType service.BackendType) {
 	return service.BackendTypeTemporal
 }
+
+func (t *temporalClient) GetApiService() interface{} {
+	return t.tClient.WorkflowService()
+}
