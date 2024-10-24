@@ -8,7 +8,9 @@ import (
 	"go.temporal.io/api/enums/v1"
 	history "go.temporal.io/api/history/v1"
 	"go.temporal.io/api/workflowservice/v1"
+	"slices"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -130,35 +132,41 @@ func doTestWaitUntilHistoryCompleted(
 	switch mode := config.GetExecutingStateIdMode(); mode {
 	case iwfidl.ENABLED_FOR_ALL:
 		assertions.Equal(10, len(upsertSAEvents))
-		assertions.Equal("[\"S1\"]", historyEventSAs(upsertSAEvents[0]))
-		assertions.Equal("[\"S2\"]", historyEventSAs(upsertSAEvents[1]))
-		assertions.Equal("[\"S2\",\"S3\"]", historyEventSAs(upsertSAEvents[2]))
-		assertions.Equal("[\"S4\",\"S3\"]", historyEventSAs(upsertSAEvents[3]))
-		assertions.Equal("[\"S5\",\"S3\"]", historyEventSAs(upsertSAEvents[4]))
-		assertions.Equal("[\"S6\",\"S3\",\"S7\"]", historyEventSAs(upsertSAEvents[5]))
-		assertions.Equal("[\"S6\",\"S3\"]", historyEventSAs(upsertSAEvents[6]))
+		assertions.Equal([]string{"S1"}, historyEventSAs(upsertSAEvents[0]))
+		assertions.Equal([]string{"S2"}, historyEventSAs(upsertSAEvents[1]))
+		assertions.Equal([]string{"S2", "S3"}, historyEventSAs(upsertSAEvents[2]))
+		assertions.Equal([]string{"S3", "S4"}, historyEventSAs(upsertSAEvents[3]))
+		assertions.Equal([]string{"S3", "S5"}, historyEventSAs(upsertSAEvents[4]))
+		assertions.Equal([]string{"S3", "S6", "S7"}, historyEventSAs(upsertSAEvents[5]))
+		assertions.Equal([]string{"S3", "S6"}, historyEventSAs(upsertSAEvents[6]))
 		// TODO: This is unexpected; should not upsert the same SAs -- happens after "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
-		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[7]))
-		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[8]))
-		assertions.Equal("null", historyEventSAs(upsertSAEvents[9]))
+		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[7]))
+		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[8]))
+		assertions.Equal([]string{"null"}, historyEventSAs(upsertSAEvents[9]))
 	case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
 		assertions.Equal(9, len(upsertSAEvents))
-		assertions.Equal("[\"S1\"]", historyEventSAs(upsertSAEvents[0]))
-		assertions.Equal("[\"S2\"]", historyEventSAs(upsertSAEvents[1]))
-		assertions.Equal("[\"S2\",\"S3\"]", historyEventSAs(upsertSAEvents[2]))
-		assertions.Equal("[\"S4\",\"S3\"]", historyEventSAs(upsertSAEvents[3]))
-		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[4]))
-		assertions.Equal("[\"S6\",\"S3\"]", historyEventSAs(upsertSAEvents[5]))
+		assertions.Equal([]string{"S1"}, historyEventSAs(upsertSAEvents[0]))
+		assertions.Equal([]string{"S2"}, historyEventSAs(upsertSAEvents[1]))
+		assertions.Equal([]string{"S2", "S3"}, historyEventSAs(upsertSAEvents[2]))
+		assertions.Equal([]string{"S3", "S4"}, historyEventSAs(upsertSAEvents[3]))
+		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[4]))
+		assertions.Equal([]string{"S3", "S6"}, historyEventSAs(upsertSAEvents[5]))
 		// TODO: This is unexpected; should not upsert the same SAs -- happens after "_SYS_GRACEFUL_COMPLETING_WORKFLOW"
-		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[6]))
-		assertions.Equal("[\"S3\"]", historyEventSAs(upsertSAEvents[7]))
-		assertions.Equal("null", historyEventSAs(upsertSAEvents[8]))
+		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[6]))
+		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[7]))
+		assertions.Equal([]string{"null"}, historyEventSAs(upsertSAEvents[8]))
 	case iwfidl.DISABLED:
 		assertions.Equal(0, len(upsertSAEvents))
 	}
 }
 
-func historyEventSAs(e *history.HistoryEvent) string {
+func historyEventSAs(e *history.HistoryEvent) []string {
 	attrs := e.GetAttributes().(*history.HistoryEvent_UpsertWorkflowSearchAttributesEventAttributes)
-	return string(attrs.UpsertWorkflowSearchAttributesEventAttributes.GetSearchAttributes().GetIndexedFields()[service.SearchAttributeExecutingStateIds].GetData())
+	data := string(attrs.UpsertWorkflowSearchAttributesEventAttributes.GetSearchAttributes().GetIndexedFields()[service.SearchAttributeExecutingStateIds].GetData())
+	data = strings.ReplaceAll(data, "[", "")
+	data = strings.ReplaceAll(data, "]", "")
+	data = strings.ReplaceAll(data, "\"", "")
+	dataSlice := strings.Split(data, ",")
+	slices.Sort(dataSlice)
+	return dataSlice
 }
