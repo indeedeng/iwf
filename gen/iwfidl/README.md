@@ -111,6 +111,7 @@ Class | Method | HTTP request | Description
  - [ErrorResponse](docs/ErrorResponse.md)
  - [ErrorSubStatus](docs/ErrorSubStatus.md)
  - [ExecuteApiFailurePolicy](docs/ExecuteApiFailurePolicy.md)
+ - [ExecutingStateIdMode](docs/ExecutingStateIdMode.md)
  - [HealthInfo](docs/HealthInfo.md)
  - [IDReusePolicy](docs/IDReusePolicy.md)
  - [InterStateChannelCommand](docs/InterStateChannelCommand.md)

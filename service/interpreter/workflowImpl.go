@@ -109,7 +109,7 @@ func InterpreterImpl(
 	var forceCompleteWf bool
 	var shouldGracefulComplete bool
 
-	// this is for an optimization for StateId Search attribute, see updateStateIdSearchAttribute in stateExecutionCounter
+	// this is for an optimization for StateId Search attribute, see refreshIwfExecutingStateIdSearchAttribute in stateExecutionCounter
 	// Because it will check totalCurrentlyExecutingCount == 0, so it will also work for continueAsNew case
 	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
 
@@ -227,7 +227,7 @@ func InterpreterImpl(
 						}
 
 						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+						err = stateExecutionCounter.MarkStateExecutionCompleted(state, decision.GetNextStates())
 						if err != nil {
 							errToFailWf = err
 						}
@@ -235,7 +235,7 @@ func InterpreterImpl(
 						options := state.GetStateOptions()
 						stateRequestQueue.AddSingleStateStartRequest(options.GetExecuteApiFailureProceedStateId(), state.StateInput, options.ExecuteApiFailureProceedStateOptions)
 						// finally, mark state completed and may also update system search attribute(IwfExecutingStateIds)
-						err = stateExecutionCounter.MarkStateExecutionCompleted(state)
+						err = stateExecutionCounter.MarkStateExecutionCompleted(state, decision.GetNextStates())
 						if err != nil {
 							errToFailWf = err
 						}
@@ -485,7 +485,7 @@ func executeState(
 	isResumeFromContinueAsNew := stateReq.IsResumeRequest()
 
 	options := state.GetStateOptions()
-	skipWaitUntil := compatibility.GetSkipStartApi(&options)
+	skipWaitUntil := compatibility.GetSkipWaitUntilApi(&options)
 	if skipWaitUntil {
 		return invokeStateExecute(ctx, provider, basicInfo, state, stateExeId, persistenceManager, interStateChannel, executionContext,
 			nil, continueAsNewer, configer, executeApi, stateExecutionLocal, shouldSendSignalOnCompletion)

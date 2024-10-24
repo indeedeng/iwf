@@ -121,7 +121,7 @@ func GetStartApiFailurePolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl
 	return nil
 }
 
-func GetSkipStartApi(stateOptions *iwfidl.WorkflowStateOptions) bool {
+func GetSkipWaitUntilApi(stateOptions *iwfidl.WorkflowStateOptions) bool {
 	if stateOptions.HasSkipStartApi() {
 		return stateOptions.GetSkipStartApi()
 	}
