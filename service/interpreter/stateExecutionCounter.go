@@ -110,35 +110,6 @@ func (e *StateExecutionCounter) MarkStateIdExecutingIfNotYet(stateReqs []StateRe
 	}
 	e.totalCurrentlyExecutingCount += numOfNew
 
-	// Optimization: don't upsert SAs if currentSAsValues == stateIdCurrentlyExecutingCounts keys
-	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && needsUpdateSA {
-		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
-			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
-				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
-		})
-		if err != nil {
-			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
-		}
-
-		var currentSAsValues []string
-
-		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
-		if ok {
-			currentSAsValues = currentSAs.StringArrayValue
-		}
-
-		var executingStateIds []string
-		for sid := range e.stateIdCurrentlyExecutingCounts {
-			executingStateIds = append(executingStateIds, sid)
-		}
-
-		slices.Sort(currentSAsValues)
-		slices.Sort(executingStateIds)
-		if reflect.DeepEqual(currentSAsValues, executingStateIds) {
-			needsUpdateSA = false
-		}
-	}
-
 	if needsUpdateSA {
 		return e.refreshIwfExecutingStateIdSearchAttribute()
 	}
@@ -166,7 +137,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
 			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-			shouldSkipUpsert := e.determineIfShouldSkipRefreshOnCompleted(currentState, nextStates, true)
+			shouldSkipUpsert := determineIfShouldSkipRefreshOnCompleted(nextStates, true)
 			if shouldSkipUpsert {
 				return nil
 			}
@@ -177,7 +148,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 				return nil
 			} else {
 				e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-				shouldSkipRefresh := e.determineIfShouldSkipRefreshOnCompleted(currentState, nextStates, false)
+				shouldSkipRefresh := determineIfShouldSkipRefreshOnCompleted(nextStates, false)
 				if shouldSkipRefresh {
 					return nil
 				}
@@ -194,7 +165,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 	return e.refreshIwfExecutingStateIdSearchAttribute()
 }
 
-func (e *StateExecutionCounter) determineIfShouldSkipRefreshOnCompleted(currentState iwfidl.StateMovement, nextStates []iwfidl.StateMovement, enabledForAll bool) bool {
+func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, enabledForAll bool) bool {
 	var nonClosingNextStates []iwfidl.StateMovement
 	for _, s := range nextStates {
 		if _, ok := service.ValidClosingWorkflowStateId[s.GetStateId()]; !ok {
@@ -215,10 +186,6 @@ func (e *StateExecutionCounter) determineIfShouldSkipRefreshOnCompleted(currentS
 		}
 	}
 
-	if _, ok := e.stateIdCurrentlyExecutingCounts[currentState.StateId]; ok {
-		return true
-	}
-
 	return false
 }
 
@@ -234,6 +201,35 @@ func (e *StateExecutionCounter) GetTotalCurrentlyExecutingCount() int {
 }
 
 func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() error {
+	// Optimization: don't upsert SAs if currentSAsValues == stateIdCurrentlyExecutingCounts keys
+	if e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() {
+		sas, err := e.provider.GetSearchAttributes(e.ctx, []iwfidl.SearchAttributeKeyAndType{
+			{Key: ptr.Any(service.SearchAttributeExecutingStateIds),
+				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY)},
+		})
+		if err != nil {
+			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
+		}
+
+		var currentSAsValues []string
+
+		currentSAs, ok := sas[service.SearchAttributeExecutingStateIds]
+		if ok {
+			currentSAsValues = currentSAs.StringArrayValue
+		}
+
+		var executingStateIds []string
+		for sid := range e.stateIdCurrentlyExecutingCounts {
+			executingStateIds = append(executingStateIds, sid)
+		}
+
+		slices.Sort(currentSAsValues)
+		slices.Sort(executingStateIds)
+		if reflect.DeepEqual(currentSAsValues, executingStateIds) {
+			return nil
+		}
+	}
+
 	var executingStateIds []string
 	for sid := range e.stateIdCurrentlyExecutingCounts {
 		executingStateIds = append(executingStateIds, sid)
