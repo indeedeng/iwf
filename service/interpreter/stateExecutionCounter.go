@@ -166,7 +166,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 			return nil
 		case iwfidl.ENABLED_FOR_ALL:
 			e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-			shouldSkipUpsert := determineIfShouldSkipRefreshOnCompleted(nextStates, true)
+			shouldSkipUpsert := e.determineIfShouldSkipRefreshOnCompleted(currentState, nextStates, true)
 			if shouldSkipUpsert {
 				return nil
 			}
@@ -177,7 +177,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 				return nil
 			} else {
 				e.decreaseStateIdCurrentlyExecutingCounts(currentState)
-				shouldSkipRefresh := determineIfShouldSkipRefreshOnCompleted(nextStates, false)
+				shouldSkipRefresh := e.determineIfShouldSkipRefreshOnCompleted(currentState, nextStates, false)
 				if shouldSkipRefresh {
 					return nil
 				}
@@ -194,7 +194,7 @@ func (e *StateExecutionCounter) MarkStateExecutionCompleted(currentState iwfidl.
 	return e.refreshIwfExecutingStateIdSearchAttribute()
 }
 
-func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, enabledForAll bool) bool {
+func (e *StateExecutionCounter) determineIfShouldSkipRefreshOnCompleted(currentState iwfidl.StateMovement, nextStates []iwfidl.StateMovement, enabledForAll bool) bool {
 	var nonClosingNextStates []iwfidl.StateMovement
 	for _, s := range nextStates {
 		if _, ok := service.ValidClosingWorkflowStateId[s.GetStateId()]; !ok {
@@ -213,6 +213,10 @@ func determineIfShouldSkipRefreshOnCompleted(nextStates []iwfidl.StateMovement, 
 				return true
 			}
 		}
+	}
+
+	if _, ok := e.stateIdCurrentlyExecutingCounts[currentState.StateId]; ok {
+		return true
 	}
 
 	return false
