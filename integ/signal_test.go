@@ -41,6 +41,9 @@ func TestSignalWorkflowCadence(t *testing.T) {
 }
 
 func TestSignalWorkflowNoWorkflowId(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
 	assertions := assert.New(t)
 	_, closeFunc2 := startIwfServiceWithClient(service.BackendTypeTemporal)
 	defer closeFunc2()
