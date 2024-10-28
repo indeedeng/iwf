@@ -679,6 +679,18 @@ components:
         executeApiDataAttributesLoadingPolicy:
           $ref: '#/components/schemas/PersistenceLoadingPolicy'
       type: object
+    WorkflowAlreadyStartedOptions:
+      example:
+        requestId: requestId
+        ignoreAlreadyStartedError: true
+      properties:
+        ignoreAlreadyStartedError:
+          type: boolean
+        requestId:
+          type: string
+      required:
+      - ignoreAlreadyStartedError
+      type: object
     WorkflowStartOptions:
       example:
         workflowStartDelaySeconds: 4
@@ -716,6 +728,9 @@ components:
         workflowIDReusePolicy: null
         useMemoForDataAttributes: true
         cronSchedule: cronSchedule
+        workflowAlreadyStartedOptions:
+          requestId: requestId
+          ignoreAlreadyStartedError: true
         dataAttributes:
         - value:
             data: data
@@ -749,6 +764,8 @@ components:
           $ref: '#/components/schemas/IDReusePolicy'
         useMemoForDataAttributes:
           type: boolean
+        workflowAlreadyStartedOptions:
+          $ref: '#/components/schemas/WorkflowAlreadyStartedOptions'
       type: object
     WorkflowIDReusePolicy:
       enum:
@@ -984,6 +1001,9 @@ components:
           workflowIDReusePolicy: null
           useMemoForDataAttributes: true
           cronSchedule: cronSchedule
+          workflowAlreadyStartedOptions:
+            requestId: requestId
+            ignoreAlreadyStartedError: true
           dataAttributes:
           - value:
               data: data

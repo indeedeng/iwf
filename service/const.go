@@ -47,8 +47,9 @@ const (
 	StateCompletionSignalChannelName      = IwfSystemConstPrefix + "StateCompletion"
 	TriggerContinueAsNewSignalChannelName = IwfSystemConstPrefix + "TriggerContinueAsNew"
 
-	WorkerUrlMemoKey            = IwfSystemConstPrefix + "WorkerUrl"
-	UseMemoForDataAttributesKey = IwfSystemConstPrefix + "UseMemoForDataAttributes"
+	WorkerUrlMemoKey                = IwfSystemConstPrefix + "WorkerUrl"
+	UseMemoForDataAttributesKey     = IwfSystemConstPrefix + "UseMemoForDataAttributes"
+	WorkflowAlreadyStartedRequestId = IwfSystemConstPrefix + "WorkflowAlreadyStartedRequestId"
 )
 
 var ValidIwfSystemSignalNames = map[string]bool{

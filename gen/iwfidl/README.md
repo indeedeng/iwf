@@ -136,6 +136,7 @@ Class | Method | HTTP request | Description
  - [TriggerContinueAsNewRequest](docs/TriggerContinueAsNewRequest.md)
  - [WaitUntilApiFailurePolicy](docs/WaitUntilApiFailurePolicy.md)
  - [WorkerErrorResponse](docs/WorkerErrorResponse.md)
+ - [WorkflowAlreadyStartedOptions](docs/WorkflowAlreadyStartedOptions.md)
  - [WorkflowConditionalClose](docs/WorkflowConditionalClose.md)
  - [WorkflowConditionalCloseType](docs/WorkflowConditionalCloseType.md)
  - [WorkflowConfig](docs/WorkflowConfig.md)

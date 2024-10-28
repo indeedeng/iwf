@@ -52,6 +52,7 @@ func NewApiService(
 	}, nil
 }
 
+// TODO:
 func (s *serviceImpl) ApiV1WorkflowStartPost(
 	ctx context.Context, req iwfidl.WorkflowStartRequest,
 ) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
@@ -91,7 +92,10 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		},
 	}
 
-	useMemo := false
+	ignoreAlreadyStartedError := false
+	var requestId *string
+
+	useMemoForDAs := false
 	if req.WorkflowStartOptions != nil {
 		startOptions := req.WorkflowStartOptions
 		workflowOptions.WorkflowIDReusePolicy = compatibility.GetWorkflowIdReusePolicy(*startOptions)
@@ -109,14 +113,29 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		if startOptions.HasWorkflowConfigOverride() {
 			workflowConfig = startOptions.GetWorkflowConfigOverride()
 		}
+
+		workflowAlreadyStartedOptions := startOptions.WorkflowAlreadyStartedOptions
+
+		if workflowAlreadyStartedOptions != nil {
+			ignoreAlreadyStartedError = req.WorkflowStartOptions.WorkflowAlreadyStartedOptions.IgnoreAlreadyStartedError
+			if workflowAlreadyStartedOptions.RequestId != nil {
+				requestId = workflowAlreadyStartedOptions.RequestId
+			}
+		}
+
 		if startOptions.GetUseMemoForDataAttributes() {
-			useMemo = true
+			useMemoForDAs = true
 			workflowOptions.Memo[service.UseMemoForDataAttributesKey] = iwfidl.EncodedObject{
 				// Note: the value is actually not too important, we will check the presence of the key only as today
 				Data: iwfidl.PtrString("true"),
 			}
 			for _, da := range initCustomDAs {
 				workflowOptions.Memo[da.GetKey()] = da.GetValue()
+			}
+		}
+		if requestId != nil {
+			workflowOptions.Memo[service.WorkflowAlreadyStartedRequestId] = iwfidl.EncodedObject{
+				Data: requestId,
 			}
 		}
 		if startOptions.WorkflowStartDelaySeconds != nil {
@@ -134,7 +153,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		InitSearchAttributes:               initCustomSAs,
 		InitDataAttributes:                 initCustomDAs,
 		Config:                             workflowConfig,
-		UseMemoForDataAttributes:           useMemo,
+		UseMemoForDataAttributes:           useMemoForDAs,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
 		WaitForCompletionStateIds:          req.GetWaitForCompletionStateIds(),
 		OmitVersionMarker:                  s.config.Api.OptimizedVersioning,
@@ -142,12 +161,27 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
-		return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
+		shouldHandleError := true
+
+		if s.client.IsWorkflowAlreadyStartedError(err) && !ignoreAlreadyStartedError {
+			if requestId == nil {
+				shouldHandleError = false
+			} else {
+				// TODO: compare the already started WorkflowAlreadyStartedRequestId with requestId
+			}
+		}
+
+		if shouldHandleError {
+			return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
+		}
 	}
 
-	s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
+	if runId != nil {
+		s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
+	}
 
 	return &iwfidl.WorkflowStartResponse{
+		// TODO: if s.client.IsWorkflowAlreadyStartedError(err): set runId to the already started workflow
 		WorkflowRunId: iwfidl.PtrString(runId),
 	}, nil
 }
