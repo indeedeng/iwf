@@ -133,7 +133,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			}
 		}
 		if requestId != nil {
-			workflowOptions.Memo[service.WorkflowAlreadyStartedRequestId] = iwfidl.EncodedObject{
+			workflowOptions.Memo[service.WorkflowRequestId] = iwfidl.EncodedObject{
 				Data: requestId,
 			}
 		}
