@@ -870,6 +870,10 @@ func (s *serviceImpl) handleError(err error, apiPath string, workflowId string) 
 		status = http.StatusBadRequest
 		subStatus = iwfidl.WORKFLOW_ALREADY_STARTED_SUB_STATUS
 	}
+	if workflowId == "" && status == http.StatusInternalServerError {
+		status = http.StatusBadRequest
+		subStatus = iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS
+	}
 	if status >= 500 {
 		s.logger.Error("encounter server error for API",
 			tag.StatusCode(status), tag.Error(err),
