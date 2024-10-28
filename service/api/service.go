@@ -52,7 +52,6 @@ func NewApiService(
 	}, nil
 }
 
-// TODO:
 func (s *serviceImpl) ApiV1WorkflowStartPost(
 	ctx context.Context, req iwfidl.WorkflowStartRequest,
 ) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
@@ -174,9 +173,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		if shouldHandleError {
 			return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 		}
-	}
-
-	if runId != nil {
+	} else {
 		s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
 	}
 
