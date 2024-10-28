@@ -41,7 +41,7 @@ func TestSignalWorkflowCadence(t *testing.T) {
 }
 
 func TestSignalWorkflowNoWorkflowId(t *testing.T) {
-	if !*cadenceIntegTest {
+	if !*temporalIntegTest {
 		t.Skip()
 	}
 	assertions := assert.New(t)
