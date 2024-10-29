@@ -162,7 +162,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	if err != nil {
 		shouldHandleError := true
 
-		if s.client.IsWorkflowAlreadyStartedError(err) && !ignoreAlreadyStartedError {
+		if s.client.IsWorkflowAlreadyStartedError(err) && ignoreAlreadyStartedError {
 			response, descErr := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
 			if descErr != nil {
 				return nil, s.handleError(err, WorkflowStartApiPath, req.WorkflowId)
