@@ -172,7 +172,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 			if requestId == nil {
 				shouldHandleError = false
-			} else if response.Memos[service.WorkflowRequestId].Data == requestId {
+			} else if *response.Memos[service.WorkflowRequestId].Data == *requestId {
 				shouldHandleError = false
 			}
 		}
