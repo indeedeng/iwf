@@ -163,10 +163,17 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		shouldHandleError := true
 
 		if s.client.IsWorkflowAlreadyStartedError(err) && !ignoreAlreadyStartedError {
+			response, descErr := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
+			if descErr != nil {
+				return nil, s.handleError(err, WorkflowStartApiPath, req.WorkflowId)
+			}
+
+			runId = response.RunId
+
 			if requestId == nil {
 				shouldHandleError = false
-			} else {
-				// TODO: compare the already started WorkflowAlreadyStartedRequestId with requestId
+			} else if response.Memos[service.WorkflowRequestId].Data == requestId {
+				shouldHandleError = false
 			}
 		}
 
@@ -178,7 +185,6 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	}
 
 	return &iwfidl.WorkflowStartResponse{
-		// TODO: if s.client.IsWorkflowAlreadyStartedError(err): set runId to the already started workflow
 		WorkflowRunId: iwfidl.PtrString(runId),
 	}, nil
 }
