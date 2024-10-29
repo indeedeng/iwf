@@ -129,6 +129,7 @@ func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendTyp
 			log.Fatalf("should be error response")
 		}
 		assertions.Equal(iwfidl.WORKFLOW_ALREADY_STARTED_SUB_STATUS, errResp.GetSubStatus())
+		assertions.Equal(400, secondHttpResp.StatusCode)
 	} else {
 		assertions.Equal(nil, err)
 		assertions.Equal(firstRes.GetWorkflowRunId(), secondRes.GetWorkflowRunId())

@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
+	"go.uber.org/cadence/.gen/go/shared"
 	"math"
 	"net/http"
 	"os"
@@ -160,24 +161,26 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
-		shouldHandleError := true
+		shouldReturnError := true
 
 		if s.client.IsWorkflowAlreadyStartedError(err) && ignoreAlreadyStartedError {
-			response, descErr := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), "", nil)
-			if descErr != nil {
-				return nil, s.handleError(err, WorkflowStartApiPath, req.WorkflowId)
-			}
-
-			runId = response.RunId
+			runId = *err.(*shared.WorkflowExecutionAlreadyStartedError).RunId
 
 			if requestId == nil {
-				shouldHandleError = false
-			} else if *response.Memos[service.WorkflowRequestId].Data == *requestId {
-				shouldHandleError = false
+				shouldReturnError = false
+			} else {
+				response, descErr := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), runId, nil)
+				if descErr != nil {
+					return nil, s.handleError(err, WorkflowStartApiPath, req.WorkflowId)
+				}
+
+				if *response.Memos[service.WorkflowRequestId].Data == *requestId {
+					shouldReturnError = false
+				}
 			}
 		}
 
-		if shouldHandleError {
+		if shouldReturnError {
 			return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 		}
 	} else {
