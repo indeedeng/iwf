@@ -12,7 +12,7 @@ import (
 )
 
 /**
- * This test workflow has 5 states, using REST controller to implement the workflow directly.
+ * This test workflow has 7 states, using REST controller to implement the workflow directly.
  *
  * State1:
  *		- Waits one second before executing

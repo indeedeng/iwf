@@ -12,6 +12,13 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
+/**
+ * This test workflow has 1 state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Waits on a timer
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "wf_ignore_already_started"
 	State1       = "S1"
