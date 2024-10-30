@@ -4,14 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/utils"
-
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/retry"
+	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
 	commonpb "go.temporal.io/api/common/v1"
@@ -54,17 +53,32 @@ func (t *temporalClient) IsWorkflowAlreadyStartedError(err error) bool {
 	return realtemporal.IsWorkflowExecutionAlreadyStartedError(err)
 }
 
+func (t *temporalClient) GetRunIdFromWorkflowAlreadyStartedError(err error) (string, bool) {
+	var workflowExecutionAlreadyStarted *serviceerror.WorkflowExecutionAlreadyStarted
+	ok := errors.As(err, &workflowExecutionAlreadyStarted)
+
+	runId := ""
+	if ok {
+		runId = workflowExecutionAlreadyStarted.RunId
+	}
+
+	return runId, ok
+}
+
 func (t *temporalClient) IsNotFoundError(err error) bool {
-	_, ok := err.(*serviceerror.NotFound)
+	var notFound *serviceerror.NotFound
+	ok := errors.As(err, &notFound)
 	return ok
 }
 
 func (t *temporalClient) IsRequestTimeoutError(err error) bool {
-	_, ok := err.(*serviceerror.DeadlineExceeded)
+	var deadlineExceeded *serviceerror.DeadlineExceeded
+	ok := errors.As(err, &deadlineExceeded)
 	if ok {
 		return ok
 	}
-	_, ok = err.(*serviceerror.Canceled)
+	var canceled *serviceerror.Canceled
+	ok = errors.As(err, &canceled)
 	return ok
 }
 

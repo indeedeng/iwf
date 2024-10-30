@@ -2,12 +2,12 @@ package cadence
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
-	"github.com/pkg/errors"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -31,12 +31,24 @@ type cadenceClient struct {
 }
 
 func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
-	_, ok := err.(*shared.WorkflowExecutionAlreadyStartedError)
+	var workflowExecutionAlreadyStartedError *shared.WorkflowExecutionAlreadyStartedError
+	ok := errors.As(err, &workflowExecutionAlreadyStartedError)
 	return ok
 }
 
+func (t *cadenceClient) GetRunIdFromWorkflowAlreadyStartedError(err error) (string, bool) {
+	var res *shared.WorkflowExecutionAlreadyStartedError
+	ok := errors.As(err, &res)
+	runId := ""
+	if ok {
+		runId = *res.RunId
+	}
+	return runId, ok
+}
+
 func (t *cadenceClient) IsNotFoundError(err error) bool {
-	_, ok := err.(*shared.EntityNotExistsError)
+	var entityNotExistsError *shared.EntityNotExistsError
+	ok := errors.As(err, &entityNotExistsError)
 	return ok
 }
 
@@ -49,7 +61,8 @@ func (t *cadenceClient) IsRequestTimeoutError(err error) bool {
 }
 
 func (t *cadenceClient) GetApplicationErrorTypeIfIsApplicationError(err error) string {
-	cErr, ok := err.(*realcadence.CustomError)
+	var cErr *realcadence.CustomError
+	ok := errors.As(err, &cErr)
 	if ok {
 		return cErr.Reason()
 	}
@@ -57,7 +70,8 @@ func (t *cadenceClient) GetApplicationErrorTypeIfIsApplicationError(err error) s
 }
 
 func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interface{}) error {
-	cErr, ok := err.(*realcadence.CustomError)
+	var cErr *realcadence.CustomError
+	ok := errors.As(err, &cErr)
 	if ok {
 		if cErr.HasDetails() {
 			return cErr.Details(detailsPtr)

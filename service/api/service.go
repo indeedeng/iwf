@@ -4,13 +4,10 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/json"
-	errs "errors"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
-	"go.temporal.io/api/serviceerror"
-	"go.uber.org/cadence/.gen/go/shared"
 	"math"
 	"net/http"
 	"os"
@@ -166,13 +163,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		shouldReturnError := true
 
 		if s.client.IsWorkflowAlreadyStartedError(err) && ignoreAlreadyStartedError {
-			if s.client.GetBackendType() == service.BackendTypeTemporal {
-				var workflowExecutionAlreadyStarted *serviceerror.WorkflowExecutionAlreadyStarted
-				errs.As(err, &workflowExecutionAlreadyStarted)
-				runId = workflowExecutionAlreadyStarted.RunId
-			} else { // Cadence
-				runId = *err.(*shared.WorkflowExecutionAlreadyStartedError).RunId
-			}
+			alreadyRunningRunId, _ := s.client.GetRunIdFromWorkflowAlreadyStartedError(err)
+			runId = alreadyRunningRunId
 
 			if requestId == nil {
 				shouldReturnError = false

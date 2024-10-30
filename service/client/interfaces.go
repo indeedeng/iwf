@@ -42,6 +42,7 @@ type errorHandler interface {
 	GetApplicationErrorTypeIfIsApplicationError(err error) string
 	GetApplicationErrorDetails(err error, detailsPtr interface{}) error
 	IsWorkflowAlreadyStartedError(error) bool
+	GetRunIdFromWorkflowAlreadyStartedError(error) (string, bool)
 	IsNotFoundError(error) bool
 	IsRequestTimeoutError(error) bool
 	IsWorkflowTimeoutError(error) bool
