@@ -19,15 +19,16 @@ var _ MappedNullable = &WorkflowStartOptions{}
 
 // WorkflowStartOptions struct for WorkflowStartOptions
 type WorkflowStartOptions struct {
-	WorkflowIDReusePolicy     *WorkflowIDReusePolicy `json:"workflowIDReusePolicy,omitempty"`
-	CronSchedule              *string                `json:"cronSchedule,omitempty"`
-	WorkflowStartDelaySeconds *int32                 `json:"workflowStartDelaySeconds,omitempty"`
-	RetryPolicy               *WorkflowRetryPolicy   `json:"retryPolicy,omitempty"`
-	SearchAttributes          []SearchAttribute      `json:"searchAttributes,omitempty"`
-	DataAttributes            []KeyValue             `json:"dataAttributes,omitempty"`
-	WorkflowConfigOverride    *WorkflowConfig        `json:"workflowConfigOverride,omitempty"`
-	IdReusePolicy             *IDReusePolicy         `json:"idReusePolicy,omitempty"`
-	UseMemoForDataAttributes  *bool                  `json:"useMemoForDataAttributes,omitempty"`
+	WorkflowIDReusePolicy         *WorkflowIDReusePolicy         `json:"workflowIDReusePolicy,omitempty"`
+	CronSchedule                  *string                        `json:"cronSchedule,omitempty"`
+	WorkflowStartDelaySeconds     *int32                         `json:"workflowStartDelaySeconds,omitempty"`
+	RetryPolicy                   *WorkflowRetryPolicy           `json:"retryPolicy,omitempty"`
+	SearchAttributes              []SearchAttribute              `json:"searchAttributes,omitempty"`
+	DataAttributes                []KeyValue                     `json:"dataAttributes,omitempty"`
+	WorkflowConfigOverride        *WorkflowConfig                `json:"workflowConfigOverride,omitempty"`
+	IdReusePolicy                 *IDReusePolicy                 `json:"idReusePolicy,omitempty"`
+	UseMemoForDataAttributes      *bool                          `json:"useMemoForDataAttributes,omitempty"`
+	WorkflowAlreadyStartedOptions *WorkflowAlreadyStartedOptions `json:"workflowAlreadyStartedOptions,omitempty"`
 }
 
 // NewWorkflowStartOptions instantiates a new WorkflowStartOptions object
@@ -335,6 +336,38 @@ func (o *WorkflowStartOptions) SetUseMemoForDataAttributes(v bool) {
 	o.UseMemoForDataAttributes = &v
 }
 
+// GetWorkflowAlreadyStartedOptions returns the WorkflowAlreadyStartedOptions field value if set, zero value otherwise.
+func (o *WorkflowStartOptions) GetWorkflowAlreadyStartedOptions() WorkflowAlreadyStartedOptions {
+	if o == nil || IsNil(o.WorkflowAlreadyStartedOptions) {
+		var ret WorkflowAlreadyStartedOptions
+		return ret
+	}
+	return *o.WorkflowAlreadyStartedOptions
+}
+
+// GetWorkflowAlreadyStartedOptionsOk returns a tuple with the WorkflowAlreadyStartedOptions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowStartOptions) GetWorkflowAlreadyStartedOptionsOk() (*WorkflowAlreadyStartedOptions, bool) {
+	if o == nil || IsNil(o.WorkflowAlreadyStartedOptions) {
+		return nil, false
+	}
+	return o.WorkflowAlreadyStartedOptions, true
+}
+
+// HasWorkflowAlreadyStartedOptions returns a boolean if a field has been set.
+func (o *WorkflowStartOptions) HasWorkflowAlreadyStartedOptions() bool {
+	if o != nil && !IsNil(o.WorkflowAlreadyStartedOptions) {
+		return true
+	}
+
+	return false
+}
+
+// SetWorkflowAlreadyStartedOptions gets a reference to the given WorkflowAlreadyStartedOptions and assigns it to the WorkflowAlreadyStartedOptions field.
+func (o *WorkflowStartOptions) SetWorkflowAlreadyStartedOptions(v WorkflowAlreadyStartedOptions) {
+	o.WorkflowAlreadyStartedOptions = &v
+}
+
 func (o WorkflowStartOptions) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -371,6 +404,9 @@ func (o WorkflowStartOptions) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UseMemoForDataAttributes) {
 		toSerialize["useMemoForDataAttributes"] = o.UseMemoForDataAttributes
+	}
+	if !IsNil(o.WorkflowAlreadyStartedOptions) {
+		toSerialize["workflowAlreadyStartedOptions"] = o.WorkflowAlreadyStartedOptions
 	}
 	return toSerialize, nil
 }

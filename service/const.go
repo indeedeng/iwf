@@ -49,6 +49,7 @@ const (
 
 	WorkerUrlMemoKey            = IwfSystemConstPrefix + "WorkerUrl"
 	UseMemoForDataAttributesKey = IwfSystemConstPrefix + "UseMemoForDataAttributes"
+	WorkflowRequestId           = IwfSystemConstPrefix + "WorkflowRequestId"
 )
 
 var ValidIwfSystemSignalNames = map[string]bool{

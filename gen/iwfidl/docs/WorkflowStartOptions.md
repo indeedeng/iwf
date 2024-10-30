@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **WorkflowConfigOverride** | Pointer to [**WorkflowConfig**](WorkflowConfig.md) |  | [optional] 
 **IdReusePolicy** | Pointer to [**IDReusePolicy**](IDReusePolicy.md) |  | [optional] 
 **UseMemoForDataAttributes** | Pointer to **bool** |  | [optional] 
+**WorkflowAlreadyStartedOptions** | Pointer to [**WorkflowAlreadyStartedOptions**](WorkflowAlreadyStartedOptions.md) |  | [optional] 
 
 ## Methods
 
@@ -257,6 +258,31 @@ SetUseMemoForDataAttributes sets UseMemoForDataAttributes field to given value.
 `func (o *WorkflowStartOptions) HasUseMemoForDataAttributes() bool`
 
 HasUseMemoForDataAttributes returns a boolean if a field has been set.
+
+### GetWorkflowAlreadyStartedOptions
+
+`func (o *WorkflowStartOptions) GetWorkflowAlreadyStartedOptions() WorkflowAlreadyStartedOptions`
+
+GetWorkflowAlreadyStartedOptions returns the WorkflowAlreadyStartedOptions field if non-nil, zero value otherwise.
+
+### GetWorkflowAlreadyStartedOptionsOk
+
+`func (o *WorkflowStartOptions) GetWorkflowAlreadyStartedOptionsOk() (*WorkflowAlreadyStartedOptions, bool)`
+
+GetWorkflowAlreadyStartedOptionsOk returns a tuple with the WorkflowAlreadyStartedOptions field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWorkflowAlreadyStartedOptions
+
+`func (o *WorkflowStartOptions) SetWorkflowAlreadyStartedOptions(v WorkflowAlreadyStartedOptions)`
+
+SetWorkflowAlreadyStartedOptions sets WorkflowAlreadyStartedOptions field to given value.
+
+### HasWorkflowAlreadyStartedOptions
+
+`func (o *WorkflowStartOptions) HasWorkflowAlreadyStartedOptions() bool`
+
+HasWorkflowAlreadyStartedOptions returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
