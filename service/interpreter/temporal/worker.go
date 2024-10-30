@@ -18,6 +18,10 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
+type StartOptions struct {
+	DisableStickyCache bool
+}
+
 func NewInterpreterWorker(
 	config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool,
 	memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient,
@@ -35,7 +39,7 @@ func (iw *InterpreterWorker) Close() {
 	iw.worker.Stop()
 }
 
-func (iw *InterpreterWorker) Start() {
+func (iw *InterpreterWorker) Start(startOptions StartOptions) {
 	config := env.GetSharedConfig()
 	options := worker.Options{
 		MaxConcurrentActivityTaskPollers: 10,
@@ -48,6 +52,10 @@ func (iw *InterpreterWorker) Start() {
 	}
 	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
+
+	if startOptions.DisableStickyCache {
+		worker.SetStickyWorkflowCacheSize(0)
+	}
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)

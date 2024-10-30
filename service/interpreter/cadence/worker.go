@@ -19,6 +19,10 @@ type InterpreterWorker struct {
 	tasklist  string
 }
 
+type StartOptions struct {
+	DisableStickyCache bool
+}
+
 func NewInterpreterWorker(
 	config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(),
 	unifiedClient uclient.UnifiedClient,
@@ -37,12 +41,17 @@ func (iw *InterpreterWorker) Close() {
 	iw.worker.Stop()
 }
 
-func (iw *InterpreterWorker) Start() {
+func (iw *InterpreterWorker) Start(startOptions StartOptions) {
 	config := env.GetSharedConfig()
 	options := worker.Options{
 		MaxConcurrentActivityTaskPollers: 10,
 		MaxConcurrentDecisionTaskPollers: 10,
 	}
+
+	if startOptions.DisableStickyCache {
+		options.DisableStickyExecution = true
+	}
+
 	if config.Interpreter.Cadence != nil && config.Interpreter.Cadence.WorkerOptions != nil {
 		options = *config.Interpreter.Cadence.WorkerOptions
 	}

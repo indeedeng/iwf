@@ -19,3 +19,5 @@ var searchWaitTimeIntegTest = flag.Int("searchWaitMs", 2000, "the amount of time
 var temporalHostPort = flag.String("temporalHostPort", "", "temporal host port")
 
 var dependencyWaitSeconds = flag.Int("dependencyWaitSeconds", 60, "the number of seconds waiting for dependencies to be up(Cadence/Temporal)")
+
+var disableStickyCache = flag.Bool("disableStickyCache", false, "disable Temporal/Cadence sticky execution")
