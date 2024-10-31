@@ -177,10 +177,18 @@ cadenceIntegTests:
 	$Q go test -v ./integ -temporal=false
 
 ci-cadence-integ-test:
+ifeq (${startsWith},)
 	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=180 -disableStickyCache=true
+else
+	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -search=false -temporal=false -dependencyWaitSeconds=180 -disableStickyCache=true
+endif
 
 ci-temporal-integ-test:
-	$Q go test -v ./integ  -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
+ifeq (${startsWith},)
+	$Q go test -v ./integ -run -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
+else
+	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
+endif
 
 ci-all-tests:
  	# Fails CI when used with -coverprofile flag due to tests that panic; see https://go.dev/doc/build-cover#panicprof

@@ -13,12 +13,19 @@ jobs:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
       contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        test-subset:
+          - "a-m"
+          - "n-z"
+
     steps:
       - uses: actions/checkout@v3
       - name: "Set up temporal environment"
         run: docker compose -f docker-compose/ci-temporal-dependencies.yml up -d
       - name: "Test against temporal"
-        run: make ci-temporal-integ-test
+        run: make ci-temporal-integ-test startsWith=${{ matrix['test-subset'] }}
       - name: Dump docker logs
         if: always()
         uses: jwalton/gh-docker-logs@v2
