@@ -185,7 +185,7 @@ endif
 
 ci-temporal-integ-test:
 ifeq (${startsWith},)
-	$Q go test -v ./integ -run -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
+	$Q go test -v ./integ -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
 else
 	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
 endif
