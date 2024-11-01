@@ -19,11 +19,6 @@ type InterpreterWorker struct {
 	tasklist  string
 }
 
-type StartOptions struct {
-	// When DisableStickyCache is true it can harm performance; should not be used in production environment
-	DisableStickyCache bool
-}
-
 func NewInterpreterWorker(
 	config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(),
 	unifiedClient uclient.UnifiedClient,
@@ -43,28 +38,23 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	var options StartOptions
-
-	// default options
-	options.DisableStickyCache = false
-
-	iw.StartWithOptions(options)
-}
-
-func (iw *InterpreterWorker) StartWithOptions(startOptions StartOptions) {
 	config := env.GetSharedConfig()
-	options := worker.Options{
-		MaxConcurrentActivityTaskPollers: 10,
-		MaxConcurrentDecisionTaskPollers: 10,
-	}
-
-	if startOptions.DisableStickyCache {
-		options.DisableStickyExecution = true
-	}
+	var options worker.Options
 
 	if config.Interpreter.Cadence != nil && config.Interpreter.Cadence.WorkerOptions != nil {
 		options = *config.Interpreter.Cadence.WorkerOptions
 	}
+
+	// override default
+	if options.MaxConcurrentActivityTaskPollers == 0 {
+		options.MaxConcurrentActivityTaskPollers = 10
+	}
+
+	// override default
+	if options.MaxConcurrentDecisionTaskPollers == 0 {
+		options.MaxConcurrentDecisionTaskPollers = 10
+	}
+
 	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, options)
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 

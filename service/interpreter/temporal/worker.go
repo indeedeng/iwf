@@ -18,11 +18,6 @@ type InterpreterWorker struct {
 	taskQueue      string
 }
 
-type StartOptions struct {
-	// When DisableStickyCache is true it can harm performance; should not be used in production environment
-	DisableStickyCache bool
-}
-
 func NewInterpreterWorker(
 	config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool,
 	memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient,
@@ -41,27 +36,23 @@ func (iw *InterpreterWorker) Close() {
 }
 
 func (iw *InterpreterWorker) Start() {
-	var options StartOptions
-
-	// default options
-	options.DisableStickyCache = false
-
-	iw.StartWithOptions(options)
-}
-
-func (iw *InterpreterWorker) StartWithOptions(startOptions StartOptions) {
 	config := env.GetSharedConfig()
-	options := worker.Options{
-		MaxConcurrentActivityTaskPollers: 10,
-		// TODO: this cannot be too small otherwise the persistence_test for continueAsNew will fail, probably a bug in Temporal goSDK.
-		// It seems work as "parallelism" of something... need to report a bug ticket...
-		MaxConcurrentWorkflowTaskPollers: 10,
-	}
+	var options worker.Options
+
 	if config.Interpreter.Temporal != nil && config.Interpreter.Temporal.WorkerOptions != nil {
 		options = *config.Interpreter.Temporal.WorkerOptions
 	}
-	if startOptions.DisableStickyCache {
-		worker.SetStickyWorkflowCacheSize(0)
+
+	// override default
+	if options.MaxConcurrentActivityTaskPollers == 0 {
+		options.MaxConcurrentActivityTaskPollers = 10
+	}
+
+	// override default
+	if options.MaxConcurrentWorkflowTaskPollers == 0 {
+		// TODO: this cannot be too small otherwise the persistence_test for continueAsNew will fail, probably a bug in Temporal goSDK.
+		// It seems work as "parallelism" of something... need to report a bug ticket...
+		options.MaxConcurrentWorkflowTaskPollers = 10
 	}
 
 	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
