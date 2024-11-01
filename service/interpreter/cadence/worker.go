@@ -41,7 +41,16 @@ func (iw *InterpreterWorker) Close() {
 	iw.worker.Stop()
 }
 
-func (iw *InterpreterWorker) Start(startOptions StartOptions) {
+func (iw *InterpreterWorker) Start() {
+	var options StartOptions
+
+	// default options
+	options.DisableStickyCache = false
+
+	iw.StartWithOptions(options)
+}
+
+func (iw *InterpreterWorker) StartWithOptions(startOptions StartOptions) {
 	config := env.GetSharedConfig()
 	options := worker.Options{
 		MaxConcurrentActivityTaskPollers: 10,

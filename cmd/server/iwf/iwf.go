@@ -171,7 +171,7 @@ func launchTemporalService(
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
 		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient)
-		interpreter.Start(temporal.StartOptions{DisableStickyCache: false})
+		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
 	}
@@ -192,7 +192,7 @@ func launchCadenceService(
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
 		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient)
-		interpreter.Start(cadence.StartOptions{DisableStickyCache: false})
+		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
 	}
