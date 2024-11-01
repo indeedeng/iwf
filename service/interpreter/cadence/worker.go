@@ -39,13 +39,22 @@ func (iw *InterpreterWorker) Close() {
 
 func (iw *InterpreterWorker) Start() {
 	config := env.GetSharedConfig()
-	options := worker.Options{
-		MaxConcurrentActivityTaskPollers: 10,
-		MaxConcurrentDecisionTaskPollers: 10,
-	}
+	var options worker.Options
+
 	if config.Interpreter.Cadence != nil && config.Interpreter.Cadence.WorkerOptions != nil {
 		options = *config.Interpreter.Cadence.WorkerOptions
 	}
+
+	// override default
+	if options.MaxConcurrentActivityTaskPollers == 0 {
+		options.MaxConcurrentActivityTaskPollers = 10
+	}
+
+	// override default
+	if options.MaxConcurrentDecisionTaskPollers == 0 {
+		options.MaxConcurrentDecisionTaskPollers = 10
+	}
+
 	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, options)
 	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
