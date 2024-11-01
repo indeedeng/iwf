@@ -35,7 +35,15 @@ func (iw *InterpreterWorker) Close() {
 	iw.worker.Stop()
 }
 
+func (iw *InterpreterWorker) StartWithStickyCacheDisabledForTest() {
+	iw.start(true)
+}
+
 func (iw *InterpreterWorker) Start() {
+	iw.start(false)
+}
+
+func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	config := env.GetSharedConfig()
 	var options worker.Options
 
@@ -53,6 +61,11 @@ func (iw *InterpreterWorker) Start() {
 		// TODO: this cannot be too small otherwise the persistence_test for continueAsNew will fail, probably a bug in Temporal goSDK.
 		// It seems work as "parallelism" of something... need to report a bug ticket...
 		options.MaxConcurrentWorkflowTaskPollers = 10
+	}
+
+	// When DisableStickyCache is true it can harm performance; should not be used in production environment
+	if disableStickyCache {
+		worker.SetStickyWorkflowCacheSize(0)
 	}
 
 	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)

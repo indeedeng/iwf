@@ -37,7 +37,15 @@ func (iw *InterpreterWorker) Close() {
 	iw.worker.Stop()
 }
 
+func (iw *InterpreterWorker) StartWithStickyCacheDisabledForTest() {
+	iw.start(true)
+}
+
 func (iw *InterpreterWorker) Start() {
+	iw.start(false)
+}
+
+func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	config := env.GetSharedConfig()
 	var options worker.Options
 
@@ -53,6 +61,11 @@ func (iw *InterpreterWorker) Start() {
 	// override default
 	if options.MaxConcurrentDecisionTaskPollers == 0 {
 		options.MaxConcurrentDecisionTaskPollers = 10
+	}
+
+	// When DisableStickyCache is true it can harm performance; should not be used in production environment
+	if disableStickyCache {
+		options.DisableStickyExecution = true
 	}
 
 	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, options)
