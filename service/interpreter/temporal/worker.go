@@ -60,12 +60,12 @@ func (iw *InterpreterWorker) StartWithOptions(startOptions StartOptions) {
 	if config.Interpreter.Temporal != nil && config.Interpreter.Temporal.WorkerOptions != nil {
 		options = *config.Interpreter.Temporal.WorkerOptions
 	}
-	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
-	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
-
 	if startOptions.DisableStickyCache {
 		worker.SetStickyWorkflowCacheSize(0)
 	}
+
+	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
+	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
