@@ -180,13 +180,13 @@ ci-cadence-integ-test:
 	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=180
 
 ci-cadence-integ-test-disable-sticky:
-	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -search=false -temporal=false -dependencyWaitSeconds=180
+	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -search=false -temporal=false -dependencyWaitSeconds=180 -disableStickyCache
 
 ci-temporal-integ-test:
-	$Q go test -v ./integ -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
+	$Q go test -v ./integ -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60
 
 ci-temporal-integ-test-disable-sticky:
-	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache=true
+	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache
 
 ci-all-tests:
  	# Fails CI when used with -coverprofile flag due to tests that panic; see https://go.dev/doc/build-cover#panicprof
