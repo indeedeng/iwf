@@ -19,6 +19,7 @@ type InterpreterWorker struct {
 }
 
 type StartOptions struct {
+	// When DisableStickyCache is true it can harm performance; should not be used in production environment
 	DisableStickyCache bool
 }
 
