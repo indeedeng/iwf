@@ -7,7 +7,7 @@ on:
 
 jobs:
   tests:
-    name: "Integration testing"
+    name: "Integration testing with sticky cache disabled"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

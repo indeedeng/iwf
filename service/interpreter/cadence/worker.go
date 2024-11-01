@@ -1,6 +1,7 @@
 package cadence
 
 import (
+	"fmt"
 	"github.com/indeedeng/iwf/config"
 	"log"
 
@@ -66,6 +67,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	// When DisableStickyCache is true it can harm performance; should not be used in production environment
 	if disableStickyCache {
 		options.DisableStickyExecution = true
+		fmt.Println("Cadence worker: Sticky cache disabled")
 	}
 
 	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, options)

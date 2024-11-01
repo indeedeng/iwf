@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"fmt"
 	"github.com/indeedeng/iwf/config"
 	"log"
 
@@ -66,6 +67,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	// When DisableStickyCache is true it can harm performance; should not be used in production environment
 	if disableStickyCache {
 		worker.SetStickyWorkflowCacheSize(0)
+		fmt.Println("Temporal worker: Sticky cache disabled")
 	}
 
 	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
