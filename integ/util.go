@@ -124,7 +124,11 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		// start iwf interpreter worker
 		interpreter := temporal.NewInterpreterWorker(createTestConfig(config), temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient)
-		interpreter.Start()
+		if *disableStickyCache {
+			interpreter.StartWithStickyCacheDisabledForTest()
+		} else {
+			interpreter.Start()
+		}
 		return uclient, func() {
 			iwfServer.Close()
 			interpreter.Close()
@@ -155,7 +159,11 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		// start iwf interpreter worker
 		interpreter := cadence.NewInterpreterWorker(createTestConfig(config), serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient)
-		interpreter.Start()
+		if *disableStickyCache {
+			interpreter.StartWithStickyCacheDisabledForTest()
+		} else {
+			interpreter.Start()
+		}
 		return uclient, func() {
 			iwfServer.Close()
 			interpreter.Close()
