@@ -402,6 +402,19 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 	}, nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowSetQueryAttributesPost(
+	ctx context.Context, req iwfidl.WorkflowSetDataObjectsRequest) (retError *errors.ErrorAndStatus) {
+	sigVal := service.ExecuteRpcSignalRequest{
+		UpsertDataObjects: req.Objects,
+	}
+
+	err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+	if err != nil {
+		return s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
+	}
+	return nil
+}
+
 func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(
 	ctx context.Context, req iwfidl.WorkflowGetSearchAttributesRequest,
 ) (wresp *iwfidl.WorkflowGetSearchAttributesResponse, retError *errors.ErrorAndStatus) {
@@ -423,6 +436,18 @@ func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(
 	return &iwfidl.WorkflowGetSearchAttributesResponse{
 		SearchAttributes: searchAttributes,
 	}, nil
+}
+
+func (s *serviceImpl) ApiV1WorkflowSetSearchAttributesPost(ctx context.Context, req iwfidl.WorkflowSetSearchAttributesRequest) (retError *errors.ErrorAndStatus) {
+	sigVal := service.ExecuteRpcSignalRequest{
+		UpsertSearchAttributes: req.SearchAttributes,
+	}
+
+	err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+	if err != nil {
+		return s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
+	}
+	return nil
 }
 
 func (s *serviceImpl) ApiV1WorkflowGetPost(

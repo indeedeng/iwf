@@ -67,6 +67,8 @@ docs/WorkflowRpcResponse.md
 docs/WorkflowSearchRequest.md
 docs/WorkflowSearchResponse.md
 docs/WorkflowSearchResponseEntry.md
+docs/WorkflowSetDataObjectsRequest.md
+docs/WorkflowSetSearchAttributesRequest.md
 docs/WorkflowSignalRequest.md
 docs/WorkflowSkipTimerRequest.md
 docs/WorkflowStartOptions.md
@@ -147,6 +149,8 @@ model_workflow_rpc_response.go
 model_workflow_search_request.go
 model_workflow_search_response.go
 model_workflow_search_response_entry.go
+model_workflow_set_data_objects_request.go
+model_workflow_set_search_attributes_request.go
 model_workflow_signal_request.go
 model_workflow_skip_timer_request.go
 model_workflow_start_options.go

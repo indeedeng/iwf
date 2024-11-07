@@ -5,7 +5,8 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**ApiV1WorkflowConfigUpdatePost**](DefaultApi.md#ApiV1WorkflowConfigUpdatePost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
-[**ApiV1WorkflowDataobjectsGetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsGetPost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
+[**ApiV1WorkflowDataobjectsGetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsGetPost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects aka data attributes
+[**ApiV1WorkflowDataobjectsSetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsSetPost) | **Post** /api/v1/workflow/dataobjects/set | set workflow data objects aka data attributes
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 [**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 [**ApiV1WorkflowInternalDumpPost**](DefaultApi.md#ApiV1WorkflowInternalDumpPost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
@@ -13,6 +14,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowRpcPost**](DefaultApi.md#ApiV1WorkflowRpcPost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 [**ApiV1WorkflowSearchattributesGetPost**](DefaultApi.md#ApiV1WorkflowSearchattributesGetPost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
+[**ApiV1WorkflowSearchattributesSetPost**](DefaultApi.md#ApiV1WorkflowSearchattributesSetPost) | **Post** /api/v1/workflow/searchattributes/set | set workflow search attributes
 [**ApiV1WorkflowSignalPost**](DefaultApi.md#ApiV1WorkflowSignalPost) | **Post** /api/v1/workflow/signal | signal a workflow
 [**ApiV1WorkflowStartPost**](DefaultApi.md#ApiV1WorkflowStartPost) | **Post** /api/v1/workflow/start | start a workflow
 [**ApiV1WorkflowStateDecidePost**](DefaultApi.md#ApiV1WorkflowStateDecidePost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
@@ -92,7 +94,7 @@ No authorization required
 
 > WorkflowGetDataObjectsResponse ApiV1WorkflowDataobjectsGetPost(ctx).WorkflowGetDataObjectsRequest(workflowGetDataObjectsRequest).Execute()
 
-get workflow data objects
+get workflow data objects aka data attributes
 
 ### Example
 
@@ -137,6 +139,68 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowGetDataObjectsResponse**](WorkflowGetDataObjectsResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowDataobjectsSetPost
+
+> ApiV1WorkflowDataobjectsSetPost(ctx).WorkflowSetDataObjectsRequest(workflowSetDataObjectsRequest).Execute()
+
+set workflow data objects aka data attributes
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    workflowSetDataObjectsRequest := *openapiclient.NewWorkflowSetDataObjectsRequest("WorkflowId_example") // WorkflowSetDataObjectsRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    r, err := apiClient.DefaultApi.ApiV1WorkflowDataobjectsSetPost(context.Background()).WorkflowSetDataObjectsRequest(workflowSetDataObjectsRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowDataobjectsSetPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowDataobjectsSetPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowSetDataObjectsRequest** | [**WorkflowSetDataObjectsRequest**](WorkflowSetDataObjectsRequest.md) |  | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 
@@ -585,6 +649,68 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowGetSearchAttributesResponse**](WorkflowGetSearchAttributesResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowSearchattributesSetPost
+
+> ApiV1WorkflowSearchattributesSetPost(ctx).WorkflowSetSearchAttributesRequest(workflowSetSearchAttributesRequest).Execute()
+
+set workflow search attributes
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    workflowSetSearchAttributesRequest := *openapiclient.NewWorkflowSetSearchAttributesRequest("WorkflowId_example") // WorkflowSetSearchAttributesRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    r, err := apiClient.DefaultApi.ApiV1WorkflowSearchattributesSetPost(context.Background()).WorkflowSetSearchAttributesRequest(workflowSetSearchAttributesRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowSearchattributesSetPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowSearchattributesSetPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **workflowSetSearchAttributesRequest** | [**WorkflowSetSearchAttributesRequest**](WorkflowSetSearchAttributesRequest.md) |  | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 

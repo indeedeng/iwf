@@ -78,7 +78,8 @@ All URIs are relative to *http://petstore.swagger.io/v2*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**ApiV1WorkflowConfigUpdatePost**](docs/DefaultApi.md#apiv1workflowconfigupdatepost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
-*DefaultApi* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultApi.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects
+*DefaultApi* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultApi.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects aka data attributes
+*DefaultApi* | [**ApiV1WorkflowDataobjectsSetPost**](docs/DefaultApi.md#apiv1workflowdataobjectssetpost) | **Post** /api/v1/workflow/dataobjects/set | set workflow data objects aka data attributes
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 *DefaultApi* | [**ApiV1WorkflowInternalDumpPost**](docs/DefaultApi.md#apiv1workflowinternaldumppost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
@@ -86,6 +87,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowRpcPost**](docs/DefaultApi.md#apiv1workflowrpcpost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
 *DefaultApi* | [**ApiV1WorkflowSearchPost**](docs/DefaultApi.md#apiv1workflowsearchpost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
 *DefaultApi* | [**ApiV1WorkflowSearchattributesGetPost**](docs/DefaultApi.md#apiv1workflowsearchattributesgetpost) | **Post** /api/v1/workflow/searchattributes/get | get workflow search attributes
+*DefaultApi* | [**ApiV1WorkflowSearchattributesSetPost**](docs/DefaultApi.md#apiv1workflowsearchattributessetpost) | **Post** /api/v1/workflow/searchattributes/set | set workflow search attributes
 *DefaultApi* | [**ApiV1WorkflowSignalPost**](docs/DefaultApi.md#apiv1workflowsignalpost) | **Post** /api/v1/workflow/signal | signal a workflow
 *DefaultApi* | [**ApiV1WorkflowStartPost**](docs/DefaultApi.md#apiv1workflowstartpost) | **Post** /api/v1/workflow/start | start a workflow
 *DefaultApi* | [**ApiV1WorkflowStateDecidePost**](docs/DefaultApi.md#apiv1workflowstatedecidepost) | **Post** /api/v1/workflowState/decide | for invoking WorkflowState.decide API
@@ -160,6 +162,8 @@ Class | Method | HTTP request | Description
  - [WorkflowSearchRequest](docs/WorkflowSearchRequest.md)
  - [WorkflowSearchResponse](docs/WorkflowSearchResponse.md)
  - [WorkflowSearchResponseEntry](docs/WorkflowSearchResponseEntry.md)
+ - [WorkflowSetDataObjectsRequest](docs/WorkflowSetDataObjectsRequest.md)
+ - [WorkflowSetSearchAttributesRequest](docs/WorkflowSetSearchAttributesRequest.md)
  - [WorkflowSignalRequest](docs/WorkflowSignalRequest.md)
  - [WorkflowSkipTimerRequest](docs/WorkflowSkipTimerRequest.md)
  - [WorkflowStartOptions](docs/WorkflowStartOptions.md)

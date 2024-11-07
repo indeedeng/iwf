@@ -32,7 +32,7 @@ type DefaultApi interface {
 	ApiV1WorkflowConfigUpdatePostExecute(r ApiApiV1WorkflowConfigUpdatePostRequest) (*http.Response, error)
 
 	/*
-		ApiV1WorkflowDataobjectsGetPost get workflow data objects
+		ApiV1WorkflowDataobjectsGetPost get workflow data objects aka data attributes
 
 		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 		@return ApiApiV1WorkflowDataobjectsGetPostRequest
@@ -42,6 +42,17 @@ type DefaultApi interface {
 	// ApiV1WorkflowDataobjectsGetPostExecute executes the request
 	//  @return WorkflowGetDataObjectsResponse
 	ApiV1WorkflowDataobjectsGetPostExecute(r ApiApiV1WorkflowDataobjectsGetPostRequest) (*WorkflowGetDataObjectsResponse, *http.Response, error)
+
+	/*
+		ApiV1WorkflowDataobjectsSetPost set workflow data objects aka data attributes
+
+		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+		@return ApiApiV1WorkflowDataobjectsSetPostRequest
+	*/
+	ApiV1WorkflowDataobjectsSetPost(ctx context.Context) ApiApiV1WorkflowDataobjectsSetPostRequest
+
+	// ApiV1WorkflowDataobjectsSetPostExecute executes the request
+	ApiV1WorkflowDataobjectsSetPostExecute(r ApiApiV1WorkflowDataobjectsSetPostRequest) (*http.Response, error)
 
 	/*
 		ApiV1WorkflowGetPost get a workflow's status and results(if completed & requested)
@@ -126,6 +137,17 @@ type DefaultApi interface {
 	// ApiV1WorkflowSearchattributesGetPostExecute executes the request
 	//  @return WorkflowGetSearchAttributesResponse
 	ApiV1WorkflowSearchattributesGetPostExecute(r ApiApiV1WorkflowSearchattributesGetPostRequest) (*WorkflowGetSearchAttributesResponse, *http.Response, error)
+
+	/*
+		ApiV1WorkflowSearchattributesSetPost set workflow search attributes
+
+		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+		@return ApiApiV1WorkflowSearchattributesSetPostRequest
+	*/
+	ApiV1WorkflowSearchattributesSetPost(ctx context.Context) ApiApiV1WorkflowSearchattributesSetPostRequest
+
+	// ApiV1WorkflowSearchattributesSetPostExecute executes the request
+	ApiV1WorkflowSearchattributesSetPostExecute(r ApiApiV1WorkflowSearchattributesSetPostRequest) (*http.Response, error)
 
 	/*
 		ApiV1WorkflowSignalPost signal a workflow
@@ -367,7 +389,7 @@ func (r ApiApiV1WorkflowDataobjectsGetPostRequest) Execute() (*WorkflowGetDataOb
 }
 
 /*
-ApiV1WorkflowDataobjectsGetPost get workflow data objects
+ApiV1WorkflowDataobjectsGetPost get workflow data objects aka data attributes
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiApiV1WorkflowDataobjectsGetPostRequest
@@ -465,6 +487,110 @@ func (a *DefaultApiService) ApiV1WorkflowDataobjectsGetPostExecute(r ApiApiV1Wor
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiApiV1WorkflowDataobjectsSetPostRequest struct {
+	ctx                           context.Context
+	ApiService                    DefaultApi
+	workflowSetDataObjectsRequest *WorkflowSetDataObjectsRequest
+}
+
+func (r ApiApiV1WorkflowDataobjectsSetPostRequest) WorkflowSetDataObjectsRequest(workflowSetDataObjectsRequest WorkflowSetDataObjectsRequest) ApiApiV1WorkflowDataobjectsSetPostRequest {
+	r.workflowSetDataObjectsRequest = &workflowSetDataObjectsRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowDataobjectsSetPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.ApiV1WorkflowDataobjectsSetPostExecute(r)
+}
+
+/*
+ApiV1WorkflowDataobjectsSetPost set workflow data objects aka data attributes
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowDataobjectsSetPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowDataobjectsSetPost(ctx context.Context) ApiApiV1WorkflowDataobjectsSetPostRequest {
+	return ApiApiV1WorkflowDataobjectsSetPostRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultApiService) ApiV1WorkflowDataobjectsSetPostExecute(r ApiApiV1WorkflowDataobjectsSetPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowDataobjectsSetPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/dataobjects/set"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowSetDataObjectsRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
 }
 
 type ApiApiV1WorkflowGetPostRequest struct {
@@ -1310,6 +1436,110 @@ func (a *DefaultApiService) ApiV1WorkflowSearchattributesGetPostExecute(r ApiApi
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiApiV1WorkflowSearchattributesSetPostRequest struct {
+	ctx                                context.Context
+	ApiService                         DefaultApi
+	workflowSetSearchAttributesRequest *WorkflowSetSearchAttributesRequest
+}
+
+func (r ApiApiV1WorkflowSearchattributesSetPostRequest) WorkflowSetSearchAttributesRequest(workflowSetSearchAttributesRequest WorkflowSetSearchAttributesRequest) ApiApiV1WorkflowSearchattributesSetPostRequest {
+	r.workflowSetSearchAttributesRequest = &workflowSetSearchAttributesRequest
+	return r
+}
+
+func (r ApiApiV1WorkflowSearchattributesSetPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.ApiV1WorkflowSearchattributesSetPostExecute(r)
+}
+
+/*
+ApiV1WorkflowSearchattributesSetPost set workflow search attributes
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowSearchattributesSetPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowSearchattributesSetPost(ctx context.Context) ApiApiV1WorkflowSearchattributesSetPostRequest {
+	return ApiApiV1WorkflowSearchattributesSetPostRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+func (a *DefaultApiService) ApiV1WorkflowSearchattributesSetPostExecute(r ApiApiV1WorkflowSearchattributesSetPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowSearchattributesSetPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/searchattributes/set"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.workflowSetSearchAttributesRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
 }
 
 type ApiApiV1WorkflowSignalPostRequest struct {

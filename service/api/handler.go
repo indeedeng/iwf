@@ -221,6 +221,23 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	return
 }
 
+func (h *handler) apiV1WorkflowSetDataObjects(c *gin.Context) {
+	var req iwfidl.WorkflowSetDataObjectsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+
+	errResp := h.svc.ApiV1WorkflowSetQueryAttributesPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, struct{}{})
+	return
+}
+
 func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 	var req iwfidl.WorkflowGetSearchAttributesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -235,6 +252,23 @@ func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, resp)
+	return
+}
+
+func (h *handler) apiV1WorkflowSetSearchAttributes(c *gin.Context) {
+	var req iwfidl.WorkflowSetSearchAttributesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+
+	errResp := h.svc.ApiV1WorkflowSetSearchAttributesPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, struct{}{})
 	return
 }
 
