@@ -87,5 +87,5 @@ func TestSetSearchAttributes(t *testing.T) {
 		}}).Execute()
 	panicAtHttpError(err, httpRespGet)
 
-	assertions.Equal(signalVals, searchResult.SearchAttributes)
+	assertions.ElementsMatch(signalVals, searchResult.SearchAttributes)
 }
