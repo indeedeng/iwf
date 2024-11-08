@@ -20,6 +20,11 @@ func TestSetQueryAttributes(t *testing.T) {
 	}
 	assertions := assert.New(t)
 
+	// start test workflow server
+	wfHandler := signal.NewHandler()
+	closeFunc1 := startWorkflowWorker(wfHandler)
+	defer closeFunc1()
+
 	_, closeFunc2 := startIwfServiceWithClient(service.BackendTypeTemporal)
 	defer closeFunc2()
 
