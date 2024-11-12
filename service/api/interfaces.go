@@ -23,9 +23,13 @@ type ApiService interface {
 	ApiV1WorkflowGetQueryAttributesPost(
 		ctx context.Context, request iwfidl.WorkflowGetDataObjectsRequest,
 	) (*iwfidl.WorkflowGetDataObjectsResponse, *errors.ErrorAndStatus)
+	ApiV1WorkflowSetQueryAttributesPost(
+		ctx context.Context, request iwfidl.WorkflowSetDataObjectsRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowGetSearchAttributesPost(
 		ctx context.Context, request iwfidl.WorkflowGetSearchAttributesRequest,
 	) (*iwfidl.WorkflowGetSearchAttributesResponse, *errors.ErrorAndStatus)
+	ApiV1WorkflowSetSearchAttributesPost(
+		ctx context.Context, request iwfidl.WorkflowSetSearchAttributesRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowGetPost(
 		ctx context.Context, request iwfidl.WorkflowGetRequest,
 	) (*iwfidl.WorkflowGetResponse, *errors.ErrorAndStatus)

@@ -86,7 +86,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
-      summary: get workflow data objects
+      summary: get workflow data objects aka data attributes
+  /api/v1/workflow/dataobjects/set:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSetDataObjectsRequest'
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: set workflow data objects aka data attributes
   /api/v1/workflow/searchattributes/get:
     post:
       requestBody:
@@ -108,6 +126,24 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: get workflow search attributes
+  /api/v1/workflow/searchattributes/set:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSetSearchAttributesRequest'
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: set workflow search attributes
   /api/v1/workflow/get:
     post:
       requestBody:
@@ -1140,6 +1176,31 @@ components:
             $ref: '#/components/schemas/KeyValue'
           type: array
       type: object
+    WorkflowSetDataObjectsRequest:
+      example:
+        objects:
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        - value:
+            data: data
+            encoding: encoding
+          key: key
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        objects:
+          items:
+            $ref: '#/components/schemas/KeyValue'
+          type: array
+      required:
+      - workflowId
+      type: object
     WorkflowGetSearchAttributesRequest:
       example:
         keys:
@@ -1187,6 +1248,41 @@ components:
           items:
             $ref: '#/components/schemas/SearchAttribute'
           type: array
+      type: object
+    WorkflowSetSearchAttributesRequest:
+      example:
+        searchAttributes:
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 6
+          boolValue: true
+          doubleValue: 7.457744773683766
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        - stringValue: stringValue
+          valueType: null
+          integerValue: 6
+          boolValue: true
+          doubleValue: 7.457744773683766
+          stringArrayValue:
+          - stringArrayValue
+          - stringArrayValue
+          key: key
+        workflowRunId: workflowRunId
+        workflowId: workflowId
+      properties:
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
+      required:
+      - workflowId
       type: object
     WorkflowGetRequest:
       example:

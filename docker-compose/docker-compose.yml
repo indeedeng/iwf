@@ -58,7 +58,7 @@ services:
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: temporalio/admin-tools:${TEMPORAL_VERSION}
+    image: temporalio/admin-tools:${TEMPORAL_ADMIN_TOOLS_VERSION}
     networks:
       - temporal-network
     stdin_open: true

@@ -11,7 +11,9 @@ const WorkflowStartApiPath = "/api/v1/workflow/start"
 const WorkflowWaitForStateCompletionApiPath = "/api/v1/workflow/waitForStateCompletion"
 const WorkflowSignalApiPath = "/api/v1/workflow/signal"
 const WorkflowGetDataObjectsApiPath = "/api/v1/workflow/dataobjects/get"
+const WorkflowSetDataObjectsApiPath = "/api/v1/workflow/dataobjects/set"
 const WorkflowGetSearchAttributesApiPath = "/api/v1/workflow/searchattributes/get"
+const WorkflowSetSearchAttributesApiPath = "/api/v1/workflow/searchattributes/set"
 const WorkflowGetApiPath = "/api/v1/workflow/get"
 const WorkflowGetWithWaitApiPath = "/api/v1/workflow/getWithWait"
 const WorkflowSearchApiPath = "/api/v1/workflow/search"
@@ -35,7 +37,9 @@ func NewService(config config.Config, client uclient.UnifiedClient, logger log.L
 	router.POST(WorkflowWaitForStateCompletionApiPath, handler.apiV1WorkflowWaitForStateCompletion)
 	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignal)
 	router.POST(WorkflowGetDataObjectsApiPath, handler.apiV1WorkflowGetDataObjects)
+	router.POST(WorkflowSetDataObjectsApiPath, handler.apiV1WorkflowSetDataObjects)
 	router.POST(WorkflowGetSearchAttributesApiPath, handler.apiV1WorkflowGetSearchAttributes)
+	router.POST(WorkflowSetSearchAttributesApiPath, handler.apiV1WorkflowSetSearchAttributes)
 	router.POST(WorkflowGetApiPath, handler.apiV1WorkflowGet)
 	router.POST(WorkflowGetWithWaitApiPath, handler.apiV1WorkflowGetWithWait)
 	router.POST(WorkflowSearchApiPath, handler.apiV1WorkflowSearch)
