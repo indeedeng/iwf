@@ -1,5 +1,7 @@
 package service
 
+import "github.com/indeedeng/iwf/gen/iwfidl"
+
 type (
 	BackendType string
 )
@@ -7,7 +9,10 @@ type (
 const (
 	EnvNameDebugMode = "DEBUG_MODE"
 
+	// Defaults for WorkflowConfig excluding booleans
 	DefaultContinueAsNewPageSizeInBytes = 1024 * 1024
+	DefaultContinueAsNewThreshold       = 100
+	DefaultExecutingStateIdMode         = iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL
 
 	// below are special unofficial code for special use case
 

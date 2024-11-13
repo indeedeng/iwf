@@ -110,7 +110,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		initCustomSAs = startOptions.SearchAttributes
 		initCustomDAs = startOptions.DataAttributes
 		if startOptions.HasWorkflowConfigOverride() {
-			workflowConfig = startOptions.GetWorkflowConfigOverride()
+			configOverride := startOptions.GetWorkflowConfigOverride()
+			overrideWorkflowConfig(configOverride, workflowConfig)
 		}
 
 		workflowAlreadyStartedOptions := startOptions.WorkflowAlreadyStartedOptions
@@ -190,6 +191,34 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	return &iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
 	}, nil
+}
+
+func overrideWorkflowConfig(configOverride iwfidl.WorkflowConfig, workflowConfig iwfidl.WorkflowConfig) {
+	if configOverride.ExecutingStateIdMode == nil {
+		workflowConfig.ExecutingStateIdMode = ptr.Any(service.DefaultExecutingStateIdMode)
+	} else {
+		workflowConfig.ExecutingStateIdMode = configOverride.ExecutingStateIdMode
+	}
+	if configOverride.ContinueAsNewThreshold == nil {
+		workflowConfig.ContinueAsNewThreshold = iwfidl.PtrInt32(service.DefaultContinueAsNewThreshold)
+	} else {
+		workflowConfig.ContinueAsNewThreshold = configOverride.ContinueAsNewThreshold
+	}
+	if configOverride.ContinueAsNewPageSizeInBytes == nil {
+		workflowConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(service.DefaultContinueAsNewPageSizeInBytes)
+	} else {
+		workflowConfig.ContinueAsNewPageSizeInBytes = configOverride.ContinueAsNewPageSizeInBytes
+	}
+	if configOverride.DisableSystemSearchAttribute == nil {
+		workflowConfig.DisableSystemSearchAttribute = iwfidl.PtrBool(false)
+	} else {
+		workflowConfig.DisableSystemSearchAttribute = configOverride.DisableSystemSearchAttribute
+	}
+	if configOverride.OptimizeActivity == nil {
+		workflowConfig.OptimizeActivity = iwfidl.PtrBool(false)
+	} else {
+		workflowConfig.OptimizeActivity = configOverride.OptimizeActivity
+	}
 }
 
 func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(
