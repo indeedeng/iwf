@@ -111,7 +111,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		initCustomDAs = startOptions.DataAttributes
 		if startOptions.HasWorkflowConfigOverride() {
 			configOverride := startOptions.GetWorkflowConfigOverride()
-			overrideWorkflowConfig(configOverride, workflowConfig)
+			overrideWorkflowConfig(configOverride, &workflowConfig)
 		}
 
 		workflowAlreadyStartedOptions := startOptions.WorkflowAlreadyStartedOptions
@@ -122,6 +122,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 				requestId = workflowAlreadyStartedOptions.RequestId
 			}
 		}
+
+		fmt.Print(workflowConfig)
 
 		if startOptions.GetUseMemoForDataAttributes() {
 			useMemoForDAs = true
@@ -193,7 +195,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	}, nil
 }
 
-func overrideWorkflowConfig(configOverride iwfidl.WorkflowConfig, workflowConfig iwfidl.WorkflowConfig) {
+func overrideWorkflowConfig(configOverride iwfidl.WorkflowConfig, workflowConfig *iwfidl.WorkflowConfig) {
 	if configOverride.ExecutingStateIdMode == nil {
 		workflowConfig.ExecutingStateIdMode = ptr.Any(service.DefaultExecutingStateIdMode)
 	} else {
