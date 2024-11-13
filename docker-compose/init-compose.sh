@@ -19,7 +19,9 @@ for run in {1..60}; do
   sleep 0.1 
   temporal  operator search-attribute  create --name IwfExecutingStateIds --type KeywordList
   sleep 0.1
-  if checkExists "IwfWorkflowType" ] && checkExists "IwfGlobalWorkflowVersion" && checkExists "IwfExecutingStateIds" ] ; then
+  temporal  operator search-attribute  create --name CustomKeywordArrayField --type KeywordList
+  sleep 0.1
+  if checkExists "IwfWorkflowType" ] && checkExists "IwfGlobalWorkflowVersion" && checkExists "IwfExecutingStateIds" && checkExists "CustomKeywordArrayField" ] ; then
       echo "All search attributes are registered"
       break
     fi

@@ -60,6 +60,11 @@ func TestSetSearchAttributes(t *testing.T) {
 			Key:         iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
 			ValueType:   ptr.Any(iwfidl.KEYWORD),
 			StringValue: iwfidl.PtrString(persistence.TestSearchAttributeKeywordValue1),
+		},
+		iwfidl.SearchAttribute{
+			Key:              iwfidl.PtrString(persistence.TestSearchAttributeKeywordArrayKey),
+			ValueType:        ptr.Any(iwfidl.KEYWORD_ARRAY),
+			StringArrayValue: []string{persistence.TestSearchAttributeKeywordValue2, persistence.TestSearchAttributeKeywordValue1},
 		})
 
 	setReq := apiClient.DefaultApi.ApiV1WorkflowSearchattributesSetPost(context.Background())
@@ -83,6 +88,10 @@ func TestSetSearchAttributes(t *testing.T) {
 			{
 				Key:       iwfidl.PtrString(persistence.TestSearchAttributeKeywordKey),
 				ValueType: ptr.Any(iwfidl.KEYWORD),
+			},
+			{
+				Key:       iwfidl.PtrString(persistence.TestSearchAttributeKeywordArrayKey),
+				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY),
 			},
 		}}).Execute()
 	panicAtHttpError(err, httpRespGet)
