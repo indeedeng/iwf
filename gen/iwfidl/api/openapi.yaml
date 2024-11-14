@@ -3303,3 +3303,35 @@ components:
       - workflowRunId
       - workflowStartedTimestamp
       type: object
+    EventType:
+      enum:
+      - WORKFLOW_START_EVENT
+      - WORKFLOW_COMPLETE_EVENT
+      - WORKFLOW_FAIL_EVENT
+      type: string
+    IwfEvent:
+      properties:
+        eventType:
+          $ref: '#/components/schemas/EventType'
+        workflowType:
+          type: string
+        workflowId:
+          type: string
+        workflowRunId:
+          type: string
+        stateId:
+          type: string
+        stateExecutionId:
+          type: string
+        startTimestamp:
+          format: int64
+          type: integer
+        endTimestamp:
+          format: int64
+          type: integer
+      required:
+      - eventType
+      - workflowId
+      - workflowRunId
+      - workflowType
+      type: object
