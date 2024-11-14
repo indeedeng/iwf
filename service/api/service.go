@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/common/logevent"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
@@ -186,6 +187,12 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		}
 	} else {
 		s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.START_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
 	}
 
 	return &iwfidl.WorkflowStartResponse{
@@ -518,6 +525,13 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 	}
 
 	if getErr == nil {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.COMPLETE_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
+
 		return &iwfidl.WorkflowGetResponse{
 			WorkflowRunId:  descResp.RunId,
 			WorkflowStatus: status,
@@ -555,6 +569,14 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		if errMsg != "" {
 			errMsgPtr = iwfidl.PtrString(errMsg)
 		}
+
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.FAIL_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
+
 		return &iwfidl.WorkflowGetResponse{
 			WorkflowRunId:  descResp.RunId,
 			WorkflowStatus: iwfidl.FAILED,
@@ -578,6 +600,13 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		}
 
 		if descResp.Status == iwfidl.FAILED {
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:     iwfidl.FAIL_EVENT,
+				WorkflowType:  "",
+				WorkflowId:    "",
+				WorkflowRunId: "",
+			})
+
 			errMsg = "unknown workflow failure from interpreter implementation"
 			s.logger.Error(errMsg, tag.WorkflowID(req.GetWorkflowId()), tag.WorkflowRunID(descResp.RunId))
 		}
