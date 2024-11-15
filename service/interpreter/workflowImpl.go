@@ -21,13 +21,13 @@ func InterpreterImpl(
 	var err error
 	globalVersioner, err := NewGlobalVersioner(provider, input.OmitVersionMarker != nil && *input.OmitVersionMarker, ctx)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
 		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
-			return nil, err
+			panic(err)
 		}
 	}
 
@@ -38,7 +38,7 @@ func InterpreterImpl(
 				service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
 			})
 			if err != nil {
-				return nil, err
+				panic(err)
 			}
 		}
 	}
@@ -63,7 +63,7 @@ func InterpreterImpl(
 		config := workflowConfiger.Get()
 		previous, err := LoadInternalsFromPreviousRun(ctx, provider, canInput.PreviousInternalRunId, config.GetContinueAsNewPageSizeInBytes())
 		if err != nil {
-			return nil, err
+			panic(err)
 		}
 
 		// The below initialization order should be the same as for non-continueAsNew
@@ -102,7 +102,7 @@ func InterpreterImpl(
 	// We would rather return server errors and let the client retry later.
 	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
@@ -137,7 +137,7 @@ func InterpreterImpl(
 			return !stateRequestQueue.IsEmpty() || failWorkflowByClient || shouldGracefulComplete
 		})
 		if err != nil {
-			return nil, err
+			panic(err)
 		}
 		failWorkflowByClient, failErr := signalReceiver.IsFailWorkflowRequested()
 		if failWorkflowByClient {
