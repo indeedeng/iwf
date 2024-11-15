@@ -23,6 +23,12 @@ const (
 	RPCNameGetInternalChannelInfo = "RPCNameGetInternalChannelInfo"
 )
 
+var StateOptionsForLargeDataAttributes = iwfidl.WorkflowStateOptions{
+	DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
+		PersistenceLoadingType: ptr.Any(iwfidl.NONE),
+	},
+}
+
 type handler struct {
 	invokeHistory map[string]int64
 	invokeData    map[string]interface{}
@@ -148,7 +154,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: State2,
+							StateId:      State2,
+							StateOptions: &StateOptionsForLargeDataAttributes,
 						},
 					},
 				},

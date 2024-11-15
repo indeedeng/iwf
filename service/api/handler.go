@@ -48,7 +48,7 @@ func (h *handler) apiV1WorkflowStart(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowStartPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -65,7 +65,7 @@ func (h *handler) apiV1WorkflowWaitForStateCompletion(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowWaitForStateCompletion(c.Request.Context(), req)
 	if errResp != nil {
@@ -82,7 +82,7 @@ func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	errResp := h.svc.ApiV1WorkflowSignalPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -99,7 +99,7 @@ func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	errResp := h.svc.ApiV1WorkflowStopPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -116,7 +116,7 @@ func (h *handler) apiV1WorkflowInternalDump(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowDumpPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -133,7 +133,7 @@ func (h *handler) apiV1WorkflowConfigUpdate(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	errResp := h.svc.ApiV1WorkflowConfigUpdate(c.Request.Context(), req)
 	if errResp != nil {
@@ -150,7 +150,7 @@ func (h *handler) apiV1WorkflowTriggerContinueAsNew(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	errResp := h.svc.ApiV1WorkflowTriggerContinueAsNew(c.Request.Context(), req)
 	if errResp != nil {
@@ -167,7 +167,7 @@ func (h *handler) apiV1WorkflowSearch(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowSearchPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -184,7 +184,7 @@ func (h *handler) apiV1WorkflowRpc(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowRpcPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -210,7 +210,7 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowGetQueryAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -227,7 +227,7 @@ func (h *handler) apiV1WorkflowSetDataObjects(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	errResp := h.svc.ApiV1WorkflowSetQueryAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -244,7 +244,7 @@ func (h *handler) apiV1WorkflowGetSearchAttributes(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowGetSearchAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -261,7 +261,7 @@ func (h *handler) apiV1WorkflowSetSearchAttributes(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	errResp := h.svc.ApiV1WorkflowSetSearchAttributesPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -286,7 +286,7 @@ func (h *handler) doApiV1WorkflowGetPost(c *gin.Context, waitIfStillRunning bool
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	var resp *iwfidl.WorkflowGetResponse
 	var errResp *errors.ErrorAndStatus
@@ -310,7 +310,7 @@ func (h *handler) apiV1WorkflowReset(c *gin.Context) {
 		invalidRequestSchema(c)
 		return
 	}
-	h.logger.Debug("received API request", tag.Value(h.toJson(req)))
+	h.logger.Debug("received API request", tag.Value(h.toJsonLogging(req)))
 
 	resp, errResp := h.svc.ApiV1WorkflowResetPost(c.Request.Context(), req)
 	if errResp != nil {
@@ -346,8 +346,11 @@ func (h *handler) processError(c *gin.Context, resp *errors.ErrorAndStatus) {
 	c.JSON(resp.StatusCode, resp.Error)
 }
 
-func (h *handler) toJson(req any) string {
+func (h *handler) toJsonLogging(req any) string {
 	str, err := json.Marshal(req)
+	if len(str) > 1000 {
+		str = str[0:1000]
+	}
 	if err != nil {
 		h.logger.Error("error when serializing request", tag.Error(err), tag.DefaultValue(req))
 		return ""

@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func TestSetQueryAttributes(t *testing.T) {
+func TestSetDataAttributesTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -50,20 +50,21 @@ func TestSetQueryAttributes(t *testing.T) {
 
 	assertions.Equal(httpResp.StatusCode, http.StatusOK)
 
-	var signalVals []iwfidl.KeyValue
-	signalVals = append(signalVals, iwfidl.KeyValue{
-		Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
-		Value: &persistence.TestDataObjectVal1,
-	},
-		iwfidl.KeyValue{
+	smallDataObjects := []iwfidl.KeyValue{
+		{
+			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
+			Value: &persistence.TestDataObjectVal1,
+		},
+		{
 			Key:   iwfidl.PtrString(persistence.TestDataObjectKey2),
 			Value: &persistence.TestDataObjectVal2,
-		})
+		},
+	}
 
 	setReq := apiClient.DefaultApi.ApiV1WorkflowDataobjectsSetPost(context.Background())
 	httpResp2, err := setReq.WorkflowSetDataObjectsRequest(iwfidl.WorkflowSetDataObjectsRequest{
 		WorkflowId: wfId,
-		Objects:    signalVals,
+		Objects:    smallDataObjects,
 	}).Execute()
 
 	panicAtHttpError(err, httpResp2)
@@ -71,12 +72,12 @@ func TestSetQueryAttributes(t *testing.T) {
 	time.Sleep(time.Second)
 
 	getReq := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
-	searchResult, httpRespGet, err := getReq.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
+	getResult, httpRespGet, err := getReq.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
 			persistence.TestDataObjectKey, persistence.TestDataObjectKey2,
 		}}).Execute()
 	panicAtHttpError(err, httpRespGet)
 
-	assertions.ElementsMatch(signalVals, searchResult.Objects)
+	assertions.ElementsMatch(smallDataObjects, getResult.Objects)
 }

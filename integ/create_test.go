@@ -85,8 +85,8 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 	panicAtHttpError(err, httpResp)
 
 	// workflow shouldn't executed any state
-	var dump service.ContinueAsNewDumpResponse
-	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.ContinueAsNewDumpQueryType)
+	var dump service.DebugDumpResponse
+	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		panic(err)
 	}
@@ -94,7 +94,7 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 		StateIdStartedCount:            make(map[string]int),
 		StateIdCurrentlyExecutingCount: make(map[string]int),
 		TotalCurrentlyExecutingCount:   0,
-	}, dump.StateExecutionCounterInfo)
+	}, dump.Snapshot.StateExecutionCounterInfo)
 
 	// invoke an RPC to trigger the state execution
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
