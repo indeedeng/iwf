@@ -187,6 +187,12 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		}
 	} else {
 		s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.WORKFLOW_START_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
 	}
 
 	return &iwfidl.WorkflowStartResponse{
@@ -519,13 +525,6 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 	}
 
 	if getErr == nil {
-		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.WORKFLOW_COMPLETE_EVENT,
-			WorkflowType:  "",
-			WorkflowId:    "",
-			WorkflowRunId: "",
-		})
-
 		return &iwfidl.WorkflowGetResponse{
 			WorkflowRunId:  descResp.RunId,
 			WorkflowStatus: status,

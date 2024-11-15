@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/logevent"
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
@@ -325,6 +326,23 @@ func InterpreterImpl(
 			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
 		}
 	} // end main loop
+
+	// send metrics for the workflow result
+	if errToFailWf == nil {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.WORKFLOW_COMPLETE_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
+	} else {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.WORKFLOW_FAIL_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
+	}
 
 	// gracefully complete workflow when all states are executed to dead ends
 	return &service.InterpreterWorkflowOutput{
