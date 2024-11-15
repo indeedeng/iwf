@@ -12,11 +12,14 @@ yes | cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_ty
 yes | cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
 
 
-# see https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md#option-3-run-with-your-own-cadence-service
-echo "now sleep for 60s so that all the search attributes can take effect"
+for run in {1..60}; do
+  sleep 1
+  echo "now trying to register domain in Cadence..."
+  if cadence --do default domain register | grep -q 'Domain default already registered'; then
+    break
+  fi
+done
 
-sleep 70
 
-cadence --do default domain register
 
 tail -f /dev/null
