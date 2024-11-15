@@ -18,7 +18,7 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 			},
 			QueryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicy{
 				InitialIntervalSeconds: 1,
-				MaximumAttempts:        5,
+				MaximumAttempts:        10,
 			},
 		},
 		Interpreter: config.Interpreter{
