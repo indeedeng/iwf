@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
+	"github.com/indeedeng/iwf/service/common/logevent"
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
@@ -50,12 +51,24 @@ func StateApiWaitUntil(
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
 			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
 	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
 		return nil, composeStartApiRespError(provider, err, resp)
 	}
 
@@ -65,6 +78,13 @@ func StateApiWaitUntil(
 	if activityInfo.IsLocalActivity {
 		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
 	}
+
+	logevent.Log(iwfidl.IwfEvent{
+		EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_SUCC_EVENT,
+		WorkflowType:  "",
+		WorkflowId:    "",
+		WorkflowRunId: "",
+	})
 	return resp, nil
 }
 
@@ -107,12 +127,24 @@ func StateApiExecute(
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
 			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
 	}
 
 	if err = checkStateDecisionFromResponse(resp); err != nil {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
+			WorkflowType:  "",
+			WorkflowId:    "",
+			WorkflowRunId: "",
+		})
 		return nil, composeExecuteApiRespError(provider, err, resp)
 	}
 
@@ -123,6 +155,12 @@ func StateApiExecute(
 		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
 	}
 
+	logevent.Log(iwfidl.IwfEvent{
+		EventType:     iwfidl.STATE_EXECUTE_ATTEMPT_SUCC_EVENT,
+		WorkflowType:  "",
+		WorkflowId:    "",
+		WorkflowRunId: "",
+	})
 	return resp, nil
 }
 
