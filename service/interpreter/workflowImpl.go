@@ -94,7 +94,7 @@ func InterpreterImpl(
 
 	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, interStateChannel, basicInfo, globalVersioner)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	// We intentionally set the query handler after the continueAsNew/dumpInternal activity.
 	// This is to ensure the correctness. If we set the query handler before that,
@@ -154,7 +154,7 @@ func InterpreterImpl(
 				statesToExecute = stateRequestQueue.TakeAll()
 				err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
 				if err != nil {
-					return nil, err
+					panic(err)
 				}
 			}
 
