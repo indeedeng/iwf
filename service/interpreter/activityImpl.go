@@ -26,6 +26,12 @@ func StateStart(
 func StateApiWaitUntil(
 	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
 ) (*iwfidl.WorkflowStateStartResponse, error) {
+	logevent.Log(iwfidl.IwfEvent{
+		EventType:     iwfidl.STATE_WAIT_UNTIL_E2_E_START_EVENT,
+		WorkflowType:  "",
+		WorkflowId:    "",
+		WorkflowRunId: "",
+	})
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateStartActivity", "input", input)
@@ -52,10 +58,18 @@ func StateApiWaitUntil(
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			EventType:     iwfidl.STATE_WAIT_UNTIL_E2_E_FAIL_EVENT,
 			WorkflowType:  "",
 			WorkflowId:    "",
 			WorkflowRunId: "",
+		})
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:      iwfidl.STATE_WAIT_UNTIL_E2_E_COMPLETE_EVENT,
+			WorkflowType:   "",
+			WorkflowId:     "",
+			WorkflowRunId:  "",
+			StartTimestamp: "",
+			EndTimestamp:   "",
 		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
@@ -64,10 +78,12 @@ func StateApiWaitUntil(
 
 	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
 		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
-			WorkflowType:  "",
-			WorkflowId:    "",
-			WorkflowRunId: "",
+			EventType:      iwfidl.STATE_WAIT_UNTIL_E2_E_COMPLETE_EVENT,
+			WorkflowType:   "",
+			WorkflowId:     "",
+			WorkflowRunId:  "",
+			StartTimestamp: "",
+			EndTimestamp:   "",
 		})
 		return nil, composeStartApiRespError(provider, err, resp)
 	}
@@ -80,10 +96,12 @@ func StateApiWaitUntil(
 	}
 
 	logevent.Log(iwfidl.IwfEvent{
-		EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_SUCC_EVENT,
-		WorkflowType:  "",
-		WorkflowId:    "",
-		WorkflowRunId: "",
+		EventType:      iwfidl.STATE_WAIT_UNTIL_E2_E_COMPLETE_EVENT,
+		WorkflowType:   "",
+		WorkflowId:     "",
+		WorkflowRunId:  "",
+		StartTimestamp: "",
+		EndTimestamp:   "",
 	})
 	return resp, nil
 }
@@ -102,6 +120,12 @@ func StateApiExecute(
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
+	logevent.Log(iwfidl.IwfEvent{
+		EventType:     iwfidl.STATE_EXECUTE_E2_E_START_EVENT,
+		WorkflowType:  "",
+		WorkflowId:    "",
+		WorkflowRunId: "",
+	})
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateDecideActivity", "input", input)
@@ -128,7 +152,15 @@ func StateApiExecute(
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
+			EventType:      iwfidl.STATE_EXECUTE_E2_E_COMPLETE_EVENT,
+			WorkflowType:   "",
+			WorkflowId:     "",
+			WorkflowRunId:  "",
+			StartTimestamp: "",
+			EndTimestamp:   "",
+		})
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:     iwfidl.STATE_EXECUTE_E2_E_FAIL_EVENT,
 			WorkflowType:  "",
 			WorkflowId:    "",
 			WorkflowRunId: "",
@@ -140,10 +172,12 @@ func StateApiExecute(
 
 	if err = checkStateDecisionFromResponse(resp); err != nil {
 		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
-			WorkflowType:  "",
-			WorkflowId:    "",
-			WorkflowRunId: "",
+			EventType:      iwfidl.STATE_EXECUTE_E2_E_COMPLETE_EVENT,
+			WorkflowType:   "",
+			WorkflowId:     "",
+			WorkflowRunId:  "",
+			StartTimestamp: "",
+			EndTimestamp:   "",
 		})
 		return nil, composeExecuteApiRespError(provider, err, resp)
 	}
@@ -156,10 +190,12 @@ func StateApiExecute(
 	}
 
 	logevent.Log(iwfidl.IwfEvent{
-		EventType:     iwfidl.STATE_EXECUTE_ATTEMPT_SUCC_EVENT,
-		WorkflowType:  "",
-		WorkflowId:    "",
-		WorkflowRunId: "",
+		EventType:      iwfidl.STATE_EXECUTE_E2_E_COMPLETE_EVENT,
+		WorkflowType:   "",
+		WorkflowId:     "",
+		WorkflowRunId:  "",
+		StartTimestamp: "",
+		EndTimestamp:   "",
 	})
 	return resp, nil
 }

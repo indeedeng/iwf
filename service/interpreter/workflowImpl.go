@@ -330,10 +330,12 @@ func InterpreterImpl(
 	// send metrics for the workflow result
 	if errToFailWf == nil {
 		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.WORKFLOW_COMPLETE_EVENT,
-			WorkflowType:  "",
-			WorkflowId:    "",
-			WorkflowRunId: "",
+			EventType:      iwfidl.WORKFLOW_COMPLETE_EVENT,
+			WorkflowType:   "",
+			WorkflowId:     "",
+			WorkflowRunId:  "",
+			StartTimestamp: "",
+			EndTimestamp:   "",
 		})
 	} else {
 		logevent.Log(iwfidl.IwfEvent{
