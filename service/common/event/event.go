@@ -1,4 +1,4 @@
-package handleevent
+package event
 
 import "github.com/indeedeng/iwf/gen/iwfidl"
 

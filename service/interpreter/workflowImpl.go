@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
-	"github.com/indeedeng/iwf/service/common/handleevent"
+	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
@@ -24,7 +24,7 @@ func InterpreterImpl(
 		if !provider.IsReplaying(ctx) {
 			// send metrics for the workflow result
 			if retErr == nil {
-				handleevent.Handle(iwfidl.IwfEvent{
+				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.WORKFLOW_COMPLETE_EVENT,
 					WorkflowType:       input.IwfWorkflowType,
 					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -33,7 +33,7 @@ func InterpreterImpl(
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 				})
 			} else if provider.IsApplicationError(retErr) {
-				handleevent.Handle(iwfidl.IwfEvent{
+				event.Handle(iwfidl.IwfEvent{
 					EventType:     iwfidl.WORKFLOW_FAIL_EVENT,
 					WorkflowType:  input.IwfWorkflowType,
 					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -147,7 +147,7 @@ func InterpreterImpl(
 
 	if !input.IsResumeFromContinueAsNew {
 		if !provider.IsReplaying(ctx) {
-			handleevent.Handle(iwfidl.IwfEvent{
+			event.Handle(iwfidl.IwfEvent{
 				EventType:     iwfidl.WORKFLOW_START_EVENT,
 				WorkflowType:  input.IwfWorkflowType,
 				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -561,7 +561,7 @@ func processStateExecution(
 		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
 
 		if !provider.IsReplaying(ctx) {
-			handleevent.Handle(iwfidl.IwfEvent{
+			event.Handle(iwfidl.IwfEvent{
 				EventType:     iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
 				WorkflowType:  basicInfo.IwfWorkflowType,
 				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -583,14 +583,14 @@ func processStateExecution(
 			})
 		if !provider.IsReplaying(ctx) {
 			if errStartApi == nil {
-				handleevent.Handle(iwfidl.IwfEvent{
+				event.Handle(iwfidl.IwfEvent{
 					EventType:     iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
 					WorkflowType:  basicInfo.IwfWorkflowType,
 					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
 					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 				})
 			} else {
-				handleevent.Handle(iwfidl.IwfEvent{
+				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_COMPLETE_EVENT,
 					WorkflowType:       basicInfo.IwfWorkflowType,
 					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -824,7 +824,7 @@ func invokeStateExecute(
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
 
 	if !provider.IsReplaying(ctx) {
-		handleevent.Handle(iwfidl.IwfEvent{
+		event.Handle(iwfidl.IwfEvent{
 			EventType:        iwfidl.STATE_EXECUTE_EE_START_EVENT,
 			WorkflowType:     basicInfo.IwfWorkflowType,
 			WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -850,7 +850,7 @@ func invokeStateExecute(
 		})
 	if !provider.IsReplaying(ctx) {
 		if err == nil {
-			handleevent.Handle(iwfidl.IwfEvent{
+			event.Handle(iwfidl.IwfEvent{
 				EventType:          iwfidl.STATE_EXECUTE_EE_COMPLETE_EVENT,
 				WorkflowType:       basicInfo.IwfWorkflowType,
 				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
@@ -861,7 +861,7 @@ func invokeStateExecute(
 				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 			})
 		} else {
-			handleevent.Handle(iwfidl.IwfEvent{
+			event.Handle(iwfidl.IwfEvent{
 				EventType:        iwfidl.STATE_EXECUTE_EE_FAIL_EVENT,
 				WorkflowType:     basicInfo.IwfWorkflowType,
 				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
