@@ -31,5 +31,9 @@ func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.Acti
 		ScheduledTime:   info.ScheduledTimestamp,
 		Attempt:         info.Attempt + 1, // NOTE increase by one to match Temporal
 		IsLocalActivity: false,            // TODO cadence doesn't support this yet
+		WorkflowExecution: interpreter.WorkflowExecution{
+			ID:    info.WorkflowExecution.ID,
+			RunID: info.WorkflowExecution.RunID,
+		},
 	}
 }

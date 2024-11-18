@@ -28,5 +28,9 @@ func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.Acti
 		ScheduledTime:   info.ScheduledTime,
 		Attempt:         info.Attempt,
 		IsLocalActivity: info.IsLocalActivity,
+		WorkflowExecution: interpreter.WorkflowExecution{
+			ID:    info.WorkflowExecution.ID,
+			RunID: info.WorkflowExecution.RunID,
+		},
 	}
 }

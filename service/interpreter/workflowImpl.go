@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/event"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
@@ -17,17 +19,43 @@ import (
 
 func InterpreterImpl(
 	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
-) (*service.InterpreterWorkflowOutput, error) {
+) (output *service.InterpreterWorkflowOutput, retErr error) {
+	defer func() {
+		if !provider.IsReplaying(ctx) {
+			// send metrics for the workflow result
+			if retErr == nil {
+				event.Handle(iwfidl.IwfEvent{
+					EventType:          iwfidl.WORKFLOW_COMPLETE_EVENT,
+					WorkflowType:       input.IwfWorkflowType,
+					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				})
+			} else if provider.IsApplicationError(retErr) {
+				event.Handle(iwfidl.IwfEvent{
+					EventType:     iwfidl.WORKFLOW_FAIL_EVENT,
+					WorkflowType:  input.IwfWorkflowType,
+					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				})
+			}
+		}
+	}()
+
 	var err error
+
 	globalVersioner, err := NewGlobalVersioner(provider, input.OmitVersionMarker != nil && *input.OmitVersionMarker, ctx)
 	if err != nil {
-		return nil, err
+		retErr = err
+		return
 	}
 
 	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
 		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
-			return nil, err
+			retErr = err
+			return
 		}
 	}
 
@@ -38,7 +66,8 @@ func InterpreterImpl(
 				service.SearchAttributeIwfWorkflowType: input.IwfWorkflowType,
 			})
 			if err != nil {
-				return nil, err
+				retErr = err
+				return
 			}
 		}
 	}
@@ -63,7 +92,8 @@ func InterpreterImpl(
 		config := workflowConfiger.Get()
 		previous, err := LoadInternalsFromPreviousRun(ctx, provider, canInput.PreviousInternalRunId, config.GetContinueAsNewPageSizeInBytes())
 		if err != nil {
-			return nil, err
+			retErr = err
+			return
 		}
 
 		// The below initialization order should be the same as for non-continueAsNew
@@ -94,7 +124,8 @@ func InterpreterImpl(
 
 	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, interStateChannel, basicInfo, globalVersioner)
 	if err != nil {
-		return nil, err
+		retErr = err
+		return
 	}
 	// We intentionally set the query handler after the continueAsNew/dumpInternal activity.
 	// This is to ensure the correctness. If we set the query handler before that,
@@ -102,7 +133,8 @@ func InterpreterImpl(
 	// We would rather return server errors and let the client retry later.
 	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
-		return nil, err
+		retErr = err
+		return
 	}
 
 	var errToFailWf error // Note that today different errors could overwrite each other, we only support last one wins. we may use multiError to improve.
@@ -114,6 +146,14 @@ func InterpreterImpl(
 	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
 
 	if !input.IsResumeFromContinueAsNew {
+		if !provider.IsReplaying(ctx) {
+			event.Handle(iwfidl.IwfEvent{
+				EventType:     iwfidl.WORKFLOW_START_EVENT,
+				WorkflowType:  input.IwfWorkflowType,
+				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			})
+		}
 		// it's possible that a workflow is started without any starting state
 		// it will wait for a new state coming in (by RPC results)
 		if input.StartStateId != nil {
@@ -137,11 +177,13 @@ func InterpreterImpl(
 			return !stateRequestQueue.IsEmpty() || failWorkflowByClient || shouldGracefulComplete
 		})
 		if err != nil {
-			return nil, err
+			retErr = err
+			return
 		}
 		failWorkflowByClient, failErr := signalReceiver.IsFailWorkflowRequested()
 		if failWorkflowByClient {
-			return nil, failErr
+			retErr = failErr
+			return
 		}
 		if shouldGracefulComplete && stateRequestQueue.IsEmpty() {
 			break
@@ -154,7 +196,8 @@ func InterpreterImpl(
 				statesToExecute = stateRequestQueue.TakeAll()
 				err = stateExecutionCounter.MarkStateIdExecutingIfNotYet(statesToExecute)
 				if err != nil {
-					return nil, err
+					retErr = err
+					return
 				}
 			}
 
@@ -187,7 +230,7 @@ func InterpreterImpl(
 						slices.Contains(input.WaitForCompletionStateExecutionIds, stateExeId) ||
 							slices.Contains(input.WaitForCompletionStateIds, state.GetStateId())
 
-					decision, stateExecStatus, err := executeState(
+					decision, stateExecStatus, err := processStateExecution(
 						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
 						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, workflowConfiger, shouldSendSignalOnCompletion)
 					if err != nil {
@@ -269,9 +312,11 @@ func InterpreterImpl(
 			}
 
 			if errToFailWf != nil || forceCompleteWf {
-				return &service.InterpreterWorkflowOutput{
+				output = &service.InterpreterWorkflowOutput{
 					StateCompletionOutputs: outputCollector.GetAll(),
-				}, errToFailWf
+				}
+				retErr = errToFailWf
+				return
 			}
 
 			if awaitError != nil {
@@ -292,7 +337,6 @@ func InterpreterImpl(
 				errToFailWf = err
 				break
 			}
-
 			// NOTE: This must be the last thing before continueAsNew!!!
 			// Otherwise, there could be signals unhandled
 			signalReceiver.DrainAllUnreceivedSignals(ctx)
@@ -301,9 +345,11 @@ func InterpreterImpl(
 			// last fail workflow signal, return the workflow so that we don't carry over the fail request
 			failByApi, failErr := signalReceiver.IsFailWorkflowRequested()
 			if failByApi {
-				return &service.InterpreterWorkflowOutput{
+				output = &service.InterpreterWorkflowOutput{
 					StateCompletionOutputs: outputCollector.GetAll(),
-				}, failErr
+				}
+				retErr = failErr
+				return
 			}
 			if stateRequestQueue.IsEmpty() && !continueAsNewer.HasAnyStateExecutionToResume() && shouldGracefulComplete {
 				// if it is empty and no stateExecutionsToResume and request a graceful complete just complete the loop
@@ -311,7 +357,7 @@ func InterpreterImpl(
 				break
 			}
 			// last update config, do it here because we use input to carry over config, not continueAsNewer query
-			input.Config = workflowConfiger.Get() // update config to the lastest before continueAsNew to carry over
+			input.Config = workflowConfiger.Get() // update config to the latest before continueAsNew to carry over
 			input.IsResumeFromContinueAsNew = true
 			input.ContinueAsNewInput = &service.ContinueAsNewInput{
 				PreviousInternalRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
@@ -322,14 +368,17 @@ func InterpreterImpl(
 			input.StartStateId = nil
 			input.InitDataAttributes = nil
 			input.InitSearchAttributes = nil
-			return nil, provider.NewInterpreterContinueAsNewError(ctx, input)
+			retErr = provider.NewInterpreterContinueAsNewError(ctx, input)
+			return
 		}
 	} // end main loop
 
 	// gracefully complete workflow when all states are executed to dead ends
-	return &service.InterpreterWorkflowOutput{
+	output = &service.InterpreterWorkflowOutput{
 		StateCompletionOutputs: outputCollector.GetAll(),
-	}, errToFailWf
+	}
+	retErr = errToFailWf
+	return
 }
 
 func checkClosingWorkflow(
@@ -438,7 +487,7 @@ func checkClosingWorkflow(
 	return
 }
 
-func executeState(
+func processStateExecution(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
 	globalVersioner *GlobalVersioner,
@@ -511,6 +560,15 @@ func executeState(
 		saLoadingPolicy := compatibility.GetWaitUntilApiSearchAttributesLoadingPolicy(state.StateOptions)
 		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
 
+		if !provider.IsReplaying(ctx) {
+			event.Handle(iwfidl.IwfEvent{
+				EventType:     iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
+				WorkflowType:  basicInfo.IwfWorkflowType,
+				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			})
+		}
+		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
 		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
 			waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
 				IwfWorkerUrl: basicInfo.IwfWorkerUrl,
@@ -523,6 +581,26 @@ func executeState(
 					DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 				},
 			})
+		if !provider.IsReplaying(ctx) {
+			if errStartApi == nil {
+				event.Handle(iwfidl.IwfEvent{
+					EventType:     iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
+					WorkflowType:  basicInfo.IwfWorkflowType,
+					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				})
+			} else {
+				event.Handle(iwfidl.IwfEvent{
+					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_COMPLETE_EVENT,
+					WorkflowType:       basicInfo.IwfWorkflowType,
+					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				})
+			}
+		}
+
 		persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 		if errStartApi != nil && !shouldProceedOnStartApiError(state) {
 			return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
@@ -744,6 +822,18 @@ func invokeStateExecute(
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
+
+	if !provider.IsReplaying(ctx) {
+		event.Handle(iwfidl.IwfEvent{
+			EventType:        iwfidl.STATE_EXECUTE_EE_START_EVENT,
+			WorkflowType:     basicInfo.IwfWorkflowType,
+			WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+			WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			StateId:          ptr.Any(state.StateId),
+			StateExecutionId: ptr.Any(stateExeId),
+		})
+	}
+	stateExecuteApiStartTime := provider.Now(ctx).UnixMilli()
 	err = provider.ExecuteActivity(&decideResponse, configer.ShouldOptimizeActivity(), ctx,
 		executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
 			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
@@ -758,6 +848,30 @@ func invokeStateExecute(
 				StateInput:       state.StateInput,
 			},
 		})
+	if !provider.IsReplaying(ctx) {
+		if err == nil {
+			event.Handle(iwfidl.IwfEvent{
+				EventType:          iwfidl.STATE_EXECUTE_EE_COMPLETE_EVENT,
+				WorkflowType:       basicInfo.IwfWorkflowType,
+				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:            ptr.Any(state.StateId),
+				StateExecutionId:   ptr.Any(stateExeId),
+				StartTimestampInMs: ptr.Any(stateExecuteApiStartTime),
+				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+			})
+		} else {
+			event.Handle(iwfidl.IwfEvent{
+				EventType:        iwfidl.STATE_EXECUTE_EE_FAIL_EVENT,
+				WorkflowType:     basicInfo.IwfWorkflowType,
+				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:          ptr.Any(state.StateId),
+				StateExecutionId: ptr.Any(stateExeId),
+			})
+		}
+	}
+
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation
