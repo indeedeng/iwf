@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
-	"github.com/indeedeng/iwf/service/common/logevent"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
@@ -187,12 +186,6 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		}
 	} else {
 		s.logger.Info("Started workflow", tag.WorkflowID(req.WorkflowId), tag.WorkflowRunID(runId))
-		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.WORKFLOW_START_EVENT,
-			WorkflowType:  "",
-			WorkflowId:    "",
-			WorkflowRunId: "",
-		})
 	}
 
 	return &iwfidl.WorkflowStartResponse{

@@ -10,8 +10,8 @@ Name | Type | Description | Notes
 **WorkflowRunId** | **string** |  | 
 **StateId** | Pointer to **string** |  | [optional] 
 **StateExecutionId** | Pointer to **string** |  | [optional] 
-**StartTimestamp** | Pointer to **int64** |  | [optional] 
-**EndTimestamp** | Pointer to **int64** |  | [optional] 
+**StartTimestampInMs** | Pointer to **int64** |  | [optional] 
+**EndTimestampInMs** | Pointer to **int64** |  | [optional] 
 
 ## Methods
 
@@ -162,55 +162,55 @@ SetStateExecutionId sets StateExecutionId field to given value.
 
 HasStateExecutionId returns a boolean if a field has been set.
 
-### GetStartTimestamp
+### GetStartTimestampInMs
 
-`func (o *IwfEvent) GetStartTimestamp() int64`
+`func (o *IwfEvent) GetStartTimestampInMs() int64`
 
-GetStartTimestamp returns the StartTimestamp field if non-nil, zero value otherwise.
+GetStartTimestampInMs returns the StartTimestampInMs field if non-nil, zero value otherwise.
 
-### GetStartTimestampOk
+### GetStartTimestampInMsOk
 
-`func (o *IwfEvent) GetStartTimestampOk() (*int64, bool)`
+`func (o *IwfEvent) GetStartTimestampInMsOk() (*int64, bool)`
 
-GetStartTimestampOk returns a tuple with the StartTimestamp field if it's non-nil, zero value otherwise
+GetStartTimestampInMsOk returns a tuple with the StartTimestampInMs field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetStartTimestamp
+### SetStartTimestampInMs
 
-`func (o *IwfEvent) SetStartTimestamp(v int64)`
+`func (o *IwfEvent) SetStartTimestampInMs(v int64)`
 
-SetStartTimestamp sets StartTimestamp field to given value.
+SetStartTimestampInMs sets StartTimestampInMs field to given value.
 
-### HasStartTimestamp
+### HasStartTimestampInMs
 
-`func (o *IwfEvent) HasStartTimestamp() bool`
+`func (o *IwfEvent) HasStartTimestampInMs() bool`
 
-HasStartTimestamp returns a boolean if a field has been set.
+HasStartTimestampInMs returns a boolean if a field has been set.
 
-### GetEndTimestamp
+### GetEndTimestampInMs
 
-`func (o *IwfEvent) GetEndTimestamp() int64`
+`func (o *IwfEvent) GetEndTimestampInMs() int64`
 
-GetEndTimestamp returns the EndTimestamp field if non-nil, zero value otherwise.
+GetEndTimestampInMs returns the EndTimestampInMs field if non-nil, zero value otherwise.
 
-### GetEndTimestampOk
+### GetEndTimestampInMsOk
 
-`func (o *IwfEvent) GetEndTimestampOk() (*int64, bool)`
+`func (o *IwfEvent) GetEndTimestampInMsOk() (*int64, bool)`
 
-GetEndTimestampOk returns a tuple with the EndTimestamp field if it's non-nil, zero value otherwise
+GetEndTimestampInMsOk returns a tuple with the EndTimestampInMs field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEndTimestamp
+### SetEndTimestampInMs
 
-`func (o *IwfEvent) SetEndTimestamp(v int64)`
+`func (o *IwfEvent) SetEndTimestampInMs(v int64)`
 
-SetEndTimestamp sets EndTimestamp field to given value.
+SetEndTimestampInMs sets EndTimestampInMs field to given value.
 
-### HasEndTimestamp
+### HasEndTimestampInMs
 
-`func (o *IwfEvent) HasEndTimestamp() bool`
+`func (o *IwfEvent) HasEndTimestampInMs() bool`
 
-HasEndTimestamp returns a boolean if a field has been set.
+HasEndTimestampInMs returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

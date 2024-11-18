@@ -5,6 +5,7 @@ import (
 	"fmt"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/logevent"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"time"
@@ -115,6 +116,14 @@ func InterpreterImpl(
 	defer stateExecutionCounter.ClearExecutingStateIdsSearchAttributeFinally()
 
 	if !input.IsResumeFromContinueAsNew {
+		if !provider.IsReplaying(ctx) {
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:     iwfidl.WORKFLOW_START_EVENT,
+				WorkflowType:  input.IwfWorkflowType,
+				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			})
+		}
 		// it's possible that a workflow is started without any starting state
 		// it will wait for a new state coming in (by RPC results)
 		if input.StartStateId != nil {
@@ -188,7 +197,7 @@ func InterpreterImpl(
 						slices.Contains(input.WaitForCompletionStateExecutionIds, stateExeId) ||
 							slices.Contains(input.WaitForCompletionStateIds, state.GetStateId())
 
-					decision, stateExecStatus, err := executeState(
+					decision, stateExecStatus, err := processStateExecution(
 						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
 						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, workflowConfiger, shouldSendSignalOnCompletion)
 					if err != nil {
@@ -327,23 +336,26 @@ func InterpreterImpl(
 		}
 	} // end main loop
 
-	// send metrics for the workflow result
-	if errToFailWf == nil {
-		logevent.Log(iwfidl.IwfEvent{
-			EventType:      iwfidl.WORKFLOW_COMPLETE_EVENT,
-			WorkflowType:   "",
-			WorkflowId:     "",
-			WorkflowRunId:  "",
-			StartTimestamp: "",
-			EndTimestamp:   "",
-		})
-	} else {
-		logevent.Log(iwfidl.IwfEvent{
-			EventType:     iwfidl.WORKFLOW_FAIL_EVENT,
-			WorkflowType:  "",
-			WorkflowId:    "",
-			WorkflowRunId: "",
-		})
+	if !provider.IsReplaying(ctx) {
+		// send metrics for the workflow result
+		if errToFailWf == nil {
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:          iwfidl.WORKFLOW_COMPLETE_EVENT,
+				WorkflowType:       input.IwfWorkflowType,
+				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
+				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+			})
+		} else {
+			// TODO: there is more return statements in this loop where wf could fail -- add metric logging there
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:     iwfidl.WORKFLOW_FAIL_EVENT,
+				WorkflowType:  input.IwfWorkflowType,
+				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			})
+		}
 	}
 
 	// gracefully complete workflow when all states are executed to dead ends
@@ -458,7 +470,7 @@ func checkClosingWorkflow(
 	return
 }
 
-func executeState(
+func processStateExecution(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
 	globalVersioner *GlobalVersioner,
@@ -531,6 +543,15 @@ func executeState(
 		saLoadingPolicy := compatibility.GetWaitUntilApiSearchAttributesLoadingPolicy(state.StateOptions)
 		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
 
+		if !provider.IsReplaying(ctx) {
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:     iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
+				WorkflowType:  basicInfo.IwfWorkflowType,
+				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			})
+		}
+		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
 		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
 			waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
 				IwfWorkerUrl: basicInfo.IwfWorkerUrl,
@@ -543,6 +564,26 @@ func executeState(
 					DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 				},
 			})
+		if !provider.IsReplaying(ctx) {
+			if errStartApi == nil {
+				logevent.Log(iwfidl.IwfEvent{
+					EventType:     iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
+					WorkflowType:  basicInfo.IwfWorkflowType,
+					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				})
+			} else {
+				logevent.Log(iwfidl.IwfEvent{
+					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_COMPLETE_EVENT,
+					WorkflowType:       basicInfo.IwfWorkflowType,
+					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				})
+			}
+		}
+
 		persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 		if errStartApi != nil && !shouldProceedOnStartApiError(state) {
 			return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
@@ -764,6 +805,18 @@ func invokeStateExecute(
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
+
+	if !provider.IsReplaying(ctx) {
+		logevent.Log(iwfidl.IwfEvent{
+			EventType:        iwfidl.STATE_EXECUTE_EE_START_EVENT,
+			WorkflowType:     basicInfo.IwfWorkflowType,
+			WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+			WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			StateId:          ptr.Any(state.StateId),
+			StateExecutionId: ptr.Any(stateExeId),
+		})
+	}
+	stateExecuteApiStartTime := provider.Now(ctx).UnixMilli()
 	err = provider.ExecuteActivity(&decideResponse, configer.ShouldOptimizeActivity(), ctx,
 		executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
 			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
@@ -778,6 +831,30 @@ func invokeStateExecute(
 				StateInput:       state.StateInput,
 			},
 		})
+	if !provider.IsReplaying(ctx) {
+		if err == nil {
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:          iwfidl.STATE_EXECUTE_EE_COMPLETE_EVENT,
+				WorkflowType:       basicInfo.IwfWorkflowType,
+				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:            ptr.Any(state.StateId),
+				StateExecutionId:   ptr.Any(stateExeId),
+				StartTimestampInMs: ptr.Any(stateExecuteApiStartTime),
+				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+			})
+		} else {
+			logevent.Log(iwfidl.IwfEvent{
+				EventType:        iwfidl.STATE_EXECUTE_EE_FAIL_EVENT,
+				WorkflowType:     basicInfo.IwfWorkflowType,
+				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:          ptr.Any(state.StateId),
+				StateExecutionId: ptr.Any(stateExeId),
+			})
+		}
+	}
+
 	persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
 	if err == nil && shouldSendSignalOnCompletion && !provider.IsReplaying(ctx) {
 		// NOTE: here uses NOT IsReplaying to signalWithStart, to save an activity for this operation

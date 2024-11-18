@@ -19,14 +19,14 @@ var _ MappedNullable = &IwfEvent{}
 
 // IwfEvent struct for IwfEvent
 type IwfEvent struct {
-	EventType        EventType `json:"eventType"`
-	WorkflowType     string    `json:"workflowType"`
-	WorkflowId       string    `json:"workflowId"`
-	WorkflowRunId    string    `json:"workflowRunId"`
-	StateId          *string   `json:"stateId,omitempty"`
-	StateExecutionId *string   `json:"stateExecutionId,omitempty"`
-	StartTimestamp   *int64    `json:"startTimestamp,omitempty"`
-	EndTimestamp     *int64    `json:"endTimestamp,omitempty"`
+	EventType          EventType `json:"eventType"`
+	WorkflowType       string    `json:"workflowType"`
+	WorkflowId         string    `json:"workflowId"`
+	WorkflowRunId      string    `json:"workflowRunId"`
+	StateId            *string   `json:"stateId,omitempty"`
+	StateExecutionId   *string   `json:"stateExecutionId,omitempty"`
+	StartTimestampInMs *int64    `json:"startTimestampInMs,omitempty"`
+	EndTimestampInMs   *int64    `json:"endTimestampInMs,omitempty"`
 }
 
 // NewIwfEvent instantiates a new IwfEvent object
@@ -210,68 +210,68 @@ func (o *IwfEvent) SetStateExecutionId(v string) {
 	o.StateExecutionId = &v
 }
 
-// GetStartTimestamp returns the StartTimestamp field value if set, zero value otherwise.
-func (o *IwfEvent) GetStartTimestamp() int64 {
-	if o == nil || IsNil(o.StartTimestamp) {
+// GetStartTimestampInMs returns the StartTimestampInMs field value if set, zero value otherwise.
+func (o *IwfEvent) GetStartTimestampInMs() int64 {
+	if o == nil || IsNil(o.StartTimestampInMs) {
 		var ret int64
 		return ret
 	}
-	return *o.StartTimestamp
+	return *o.StartTimestampInMs
 }
 
-// GetStartTimestampOk returns a tuple with the StartTimestamp field value if set, nil otherwise
+// GetStartTimestampInMsOk returns a tuple with the StartTimestampInMs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IwfEvent) GetStartTimestampOk() (*int64, bool) {
-	if o == nil || IsNil(o.StartTimestamp) {
+func (o *IwfEvent) GetStartTimestampInMsOk() (*int64, bool) {
+	if o == nil || IsNil(o.StartTimestampInMs) {
 		return nil, false
 	}
-	return o.StartTimestamp, true
+	return o.StartTimestampInMs, true
 }
 
-// HasStartTimestamp returns a boolean if a field has been set.
-func (o *IwfEvent) HasStartTimestamp() bool {
-	if o != nil && !IsNil(o.StartTimestamp) {
+// HasStartTimestampInMs returns a boolean if a field has been set.
+func (o *IwfEvent) HasStartTimestampInMs() bool {
+	if o != nil && !IsNil(o.StartTimestampInMs) {
 		return true
 	}
 
 	return false
 }
 
-// SetStartTimestamp gets a reference to the given int64 and assigns it to the StartTimestamp field.
-func (o *IwfEvent) SetStartTimestamp(v int64) {
-	o.StartTimestamp = &v
+// SetStartTimestampInMs gets a reference to the given int64 and assigns it to the StartTimestampInMs field.
+func (o *IwfEvent) SetStartTimestampInMs(v int64) {
+	o.StartTimestampInMs = &v
 }
 
-// GetEndTimestamp returns the EndTimestamp field value if set, zero value otherwise.
-func (o *IwfEvent) GetEndTimestamp() int64 {
-	if o == nil || IsNil(o.EndTimestamp) {
+// GetEndTimestampInMs returns the EndTimestampInMs field value if set, zero value otherwise.
+func (o *IwfEvent) GetEndTimestampInMs() int64 {
+	if o == nil || IsNil(o.EndTimestampInMs) {
 		var ret int64
 		return ret
 	}
-	return *o.EndTimestamp
+	return *o.EndTimestampInMs
 }
 
-// GetEndTimestampOk returns a tuple with the EndTimestamp field value if set, nil otherwise
+// GetEndTimestampInMsOk returns a tuple with the EndTimestampInMs field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IwfEvent) GetEndTimestampOk() (*int64, bool) {
-	if o == nil || IsNil(o.EndTimestamp) {
+func (o *IwfEvent) GetEndTimestampInMsOk() (*int64, bool) {
+	if o == nil || IsNil(o.EndTimestampInMs) {
 		return nil, false
 	}
-	return o.EndTimestamp, true
+	return o.EndTimestampInMs, true
 }
 
-// HasEndTimestamp returns a boolean if a field has been set.
-func (o *IwfEvent) HasEndTimestamp() bool {
-	if o != nil && !IsNil(o.EndTimestamp) {
+// HasEndTimestampInMs returns a boolean if a field has been set.
+func (o *IwfEvent) HasEndTimestampInMs() bool {
+	if o != nil && !IsNil(o.EndTimestampInMs) {
 		return true
 	}
 
 	return false
 }
 
-// SetEndTimestamp gets a reference to the given int64 and assigns it to the EndTimestamp field.
-func (o *IwfEvent) SetEndTimestamp(v int64) {
-	o.EndTimestamp = &v
+// SetEndTimestampInMs gets a reference to the given int64 and assigns it to the EndTimestampInMs field.
+func (o *IwfEvent) SetEndTimestampInMs(v int64) {
+	o.EndTimestampInMs = &v
 }
 
 func (o IwfEvent) MarshalJSON() ([]byte, error) {
@@ -294,11 +294,11 @@ func (o IwfEvent) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.StateExecutionId) {
 		toSerialize["stateExecutionId"] = o.StateExecutionId
 	}
-	if !IsNil(o.StartTimestamp) {
-		toSerialize["startTimestamp"] = o.StartTimestamp
+	if !IsNil(o.StartTimestampInMs) {
+		toSerialize["startTimestampInMs"] = o.StartTimestampInMs
 	}
-	if !IsNil(o.EndTimestamp) {
-		toSerialize["endTimestamp"] = o.EndTimestamp
+	if !IsNil(o.EndTimestampInMs) {
+		toSerialize["endTimestampInMs"] = o.EndTimestampInMs
 	}
 	return toSerialize, nil
 }
