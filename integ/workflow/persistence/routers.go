@@ -23,13 +23,14 @@ const (
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
 	TestSearchAttributeKeywordValue2 = "keyword-value2"
 
-	TestSearchAttributeIntKey      = "CustomIntField"
-	TestSearchAttributeBoolKey     = "CustomBoolField"
-	TestSearchAttributeDoubleKey   = "CustomDoubleField"
-	TestSearchAttributeDatetimeKey = "CustomDatetimeField"
-	TestSearchAttributeTextKey     = "CustomStringField"
-	TestSearchAttributeIntValue1   = 1
-	TestSearchAttributeIntValue2   = 2
+	TestSearchAttributeKeywordArrayKey = "CustomKeywordArrayField"
+	TestSearchAttributeIntKey          = "CustomIntField"
+	TestSearchAttributeBoolKey         = "CustomBoolField"
+	TestSearchAttributeDoubleKey       = "CustomDoubleField"
+	TestSearchAttributeDatetimeKey     = "CustomDatetimeField"
+	TestSearchAttributeTextKey         = "CustomStringField"
+	TestSearchAttributeIntValue1       = 1
+	TestSearchAttributeIntValue2       = 2
 )
 
 var TestDataObjectVal1 = iwfidl.EncodedObject{
