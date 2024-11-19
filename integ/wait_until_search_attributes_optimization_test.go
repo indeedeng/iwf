@@ -151,7 +151,7 @@ func doTestWaitUntilHistoryCompleted(
 		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[8]))
 		assertions.Equal([]string{"null"}, historyEventSAs(upsertSAEvents[9]))
 	case iwfidl.DISABLED:
-		assertions.Equal(0, len(upsertSAEvents))
+		assertions.Equal(2, len(upsertSAEvents))
 	}
 }
 
