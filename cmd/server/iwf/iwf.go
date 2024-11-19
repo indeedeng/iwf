@@ -23,6 +23,8 @@ package iwf
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
+	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	rawLog "log"
 	"strings"
 	"sync"
@@ -30,8 +32,6 @@ import (
 
 	isvc "github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
-	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
-	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"

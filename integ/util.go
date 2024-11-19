@@ -1,6 +1,8 @@
 package integ
 
 import (
+	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
+	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	"log"
 	"net/http"
 	"time"
@@ -11,8 +13,6 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
-	cadenceapi "github.com/indeedeng/iwf/service/api/cadence"
-	temporalapi "github.com/indeedeng/iwf/service/api/temporal"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/log/loggerimpl"
 	"github.com/indeedeng/iwf/service/interpreter/cadence"
