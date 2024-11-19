@@ -106,9 +106,8 @@ func doTestPersistenceWorkflow(
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
-		BackendType:         backendType,
-		MemoEncryption:      memoEncryption,
-		OptimizedVersioning: ptr.Any(true),
+		BackendType:    backendType,
+		MemoEncryption: memoEncryption,
 	})
 	defer closeFunc2()
 
@@ -402,7 +401,10 @@ func doTestPersistenceWorkflow(
 	}
 }
 
-func getDataAttributes(initReqQry iwfidl.ApiApiV1WorkflowDataobjectsGetPostRequest, wfId string, expectedDataAttribute iwfidl.KeyValue, useMemo bool) (*iwfidl.WorkflowGetDataObjectsResponse, *http.Response, error) {
+func getDataAttributes(
+	initReqQry iwfidl.ApiApiV1WorkflowDataobjectsGetPostRequest, wfId string, expectedDataAttribute iwfidl.KeyValue,
+	useMemo bool,
+) (*iwfidl.WorkflowGetDataObjectsResponse, *http.Response, error) {
 	return initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{

@@ -45,7 +45,7 @@ func InterpreterImpl(
 
 	var err error
 
-	globalVersioner, err := NewGlobalVersioner(provider, input.OmitVersionMarker != nil && *input.OmitVersionMarker, ctx)
+	globalVersioner, err := NewGlobalVersioner(provider, ctx)
 	if err != nil {
 		retErr = err
 		return

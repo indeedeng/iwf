@@ -52,8 +52,7 @@ func doTestWaitUntilHistoryCompleted(
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
-		BackendType:         backendType,
-		OptimizedVersioning: ptr.Any(true),
+		BackendType: backendType,
 	})
 	defer closeFunc2()
 

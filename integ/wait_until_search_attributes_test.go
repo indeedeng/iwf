@@ -47,8 +47,7 @@ func doTestWaitUntilSearchAttributes(
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
-		BackendType:         backendType,
-		OptimizedVersioning: ptr.Any(true),
+		BackendType: backendType,
 	})
 	defer closeFunc2()
 

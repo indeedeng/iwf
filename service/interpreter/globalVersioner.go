@@ -1,13 +1,18 @@
 package interpreter
 
 import (
-	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/common/ptr"
-	"github.com/indeedeng/iwf/service/interpreter/versions"
 )
 
 const globalChangeId = "global"
+
+const StartingVersionUsingGlobalVersioning = 1
+const StartingVersionOptimizedUpsertSearchAttribute = 2
+const StartingVersionRenamedStateApi = 3
+const StartingVersionContinueAsNewOnNoStates = 4
+const StartingVersionTemporal26SDK = 5
+const StartingVersionExecutingStateIdMode = 6
+const MaxOfAllVersions = StartingVersionExecutingStateIdMode
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
@@ -18,60 +23,39 @@ type GlobalVersioner struct {
 }
 
 func NewGlobalVersioner(
-	workflowProvider WorkflowProvider, omitVersionMarker bool, ctx UnifiedContext,
+	workflowProvider WorkflowProvider, ctx UnifiedContext,
 ) (*GlobalVersioner, error) {
-	sas, err := workflowProvider.GetSearchAttributes(ctx, []iwfidl.SearchAttributeKeyAndType{
-		{Key: ptr.Any(service.SearchAttributeGlobalVersion),
-			ValueType: ptr.Any(iwfidl.INT)},
-	})
-	if err != nil {
-		return nil, err
-	}
-	version := 0
-	if omitVersionMarker {
-		// TODO: future improvement https://github.com/indeedeng/iwf/issues/369
-		attribute, ok := sas[service.SearchAttributeGlobalVersion]
-		if !ok {
-			panic("search attribute global version is not found")
-		}
-		version = int(attribute.GetIntegerValue())
-		if versions.MaxOfAllVersions < version {
-			panic("requesting for a version that is not supported, panic to retry in next workflow task")
-		}
-	} else {
-		version = workflowProvider.GetVersion(ctx, globalChangeId, 0, versions.MaxOfAllVersions)
-	}
+	version := workflowProvider.GetVersion(ctx, globalChangeId, 0, MaxOfAllVersions)
 
 	return &GlobalVersioner{
-		workflowProvider:  workflowProvider,
-		ctx:               ctx,
-		version:           version,
-		OmitVersionMarker: omitVersionMarker,
+		workflowProvider: workflowProvider,
+		ctx:              ctx,
+		version:          version,
 	}, nil
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfContinueAsNewOnNoStates() bool {
-	return p.version >= versions.StartingVersionContinueAsNewOnNoStates
+	return p.version >= StartingVersionContinueAsNewOnNoStates
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfUsingGlobalVersioning() bool {
-	return p.version >= versions.StartingVersionUsingGlobalVersioning
+	return p.version >= StartingVersionUsingGlobalVersioning
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfOptimizedUpsertSearchAttribute() bool {
-	return p.version >= versions.StartingVersionOptimizedUpsertSearchAttribute
+	return p.version >= StartingVersionOptimizedUpsertSearchAttribute
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfExecutingStateIdMode() bool {
-	return p.version >= versions.StartingVersionExecutingStateIdMode
+	return p.version >= StartingVersionExecutingStateIdMode
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfRenamedStateApi() bool {
-	return p.version >= versions.StartingVersionRenamedStateApi
+	return p.version >= StartingVersionRenamedStateApi
 }
 
 func (p *GlobalVersioner) IsAfterVersionOfTemporal26SDK() bool {
-	return p.version >= versions.StartingVersionTemporal26SDK
+	return p.version >= StartingVersionTemporal26SDK
 }
 
 func (p *GlobalVersioner) UpsertGlobalVersionSearchAttribute() error {
@@ -83,7 +67,7 @@ func (p *GlobalVersioner) UpsertGlobalVersionSearchAttribute() error {
 	// https://github.com/uber-go/cadence-client/issues/1198
 	if p.workflowProvider.GetBackendType() != service.BackendTypeCadence {
 		return p.workflowProvider.UpsertSearchAttributes(p.ctx, map[string]interface{}{
-			service.SearchAttributeGlobalVersion: versions.MaxOfAllVersions,
+			service.SearchAttributeGlobalVersion: MaxOfAllVersions,
 		})
 	}
 	return nil

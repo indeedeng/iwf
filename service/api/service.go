@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/interpreter/env"
-	"github.com/indeedeng/iwf/service/interpreter/versions"
 	"math"
 	"net/http"
 	"os"
@@ -57,16 +56,8 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 ) (wresp *iwfidl.WorkflowStartResponse, retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
 
-	var sysSAs map[string]interface{}
-	if s.config.Api.OptimizedVersioning != nil && *s.config.Api.OptimizedVersioning {
-		sysSAs = map[string]interface{}{
-			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
-			service.SearchAttributeGlobalVersion:   versions.MaxOfAllVersions,
-		}
-	} else {
-		sysSAs = map[string]interface{}{
-			service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
-		}
+	sysSAs := map[string]interface{}{
+		service.SearchAttributeIwfWorkflowType: req.IwfWorkflowType,
 	}
 
 	workflowOptions := uclient.StartWorkflowOptions{
@@ -156,7 +147,6 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		UseMemoForDataAttributes:           useMemoForDAs,
 		WaitForCompletionStateExecutionIds: req.GetWaitForCompletionStateExecutionIds(),
 		WaitForCompletionStateIds:          req.GetWaitForCompletionStateIds(),
-		OmitVersionMarker:                  s.config.Api.OptimizedVersioning,
 	}
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
@@ -422,7 +412,8 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 }
 
 func (s *serviceImpl) ApiV1WorkflowSetQueryAttributesPost(
-	ctx context.Context, req iwfidl.WorkflowSetDataObjectsRequest) (retError *errors.ErrorAndStatus) {
+	ctx context.Context, req iwfidl.WorkflowSetDataObjectsRequest,
+) (retError *errors.ErrorAndStatus) {
 	sigVal := service.ExecuteRpcSignalRequest{
 		UpsertDataObjects: req.Objects,
 	}
@@ -457,7 +448,9 @@ func (s *serviceImpl) ApiV1WorkflowGetSearchAttributesPost(
 	}, nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowSetSearchAttributesPost(ctx context.Context, req iwfidl.WorkflowSetSearchAttributesRequest) (retError *errors.ErrorAndStatus) {
+func (s *serviceImpl) ApiV1WorkflowSetSearchAttributesPost(
+	ctx context.Context, req iwfidl.WorkflowSetSearchAttributesRequest,
+) (retError *errors.ErrorAndStatus) {
 	sigVal := service.ExecuteRpcSignalRequest{
 		UpsertSearchAttributes: req.SearchAttributes,
 	}

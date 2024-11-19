@@ -66,7 +66,6 @@ type IwfServiceTestConfig struct {
 	BackendType                      service.BackendType
 	MemoEncryption                   bool
 	DisableFailAtMemoIncompatibility bool // default to false so that we will fail at test
-	OptimizedVersioning              *bool
 	DefaultHeaders                   map[string]string
 }
 
