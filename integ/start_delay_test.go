@@ -33,8 +33,7 @@ func doTestStartDelay(t *testing.T, backendType service.BackendType, config *iwf
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
-		BackendType:         backendType,
-		OptimizedVersioning: ptr.Any(false),
+		BackendType: backendType,
 	})
 	defer closeFunc2()
 
