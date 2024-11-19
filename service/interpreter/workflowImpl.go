@@ -51,7 +51,7 @@ func InterpreterImpl(
 		return
 	}
 
-	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() {
+	if globalVersioner.IsAfterVersionOfUsingGlobalVersioning() && !globalVersioner.IsAfterVersionOfNoIwfGlobalVersionSearchAttribute() {
 		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
 		if err != nil {
 			retErr = err
