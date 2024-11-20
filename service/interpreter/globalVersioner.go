@@ -35,6 +35,8 @@ func NewGlobalVersioner(
 	}, nil
 }
 
+// methods checking version number
+
 func (p *GlobalVersioner) IsAfterVersionOfContinueAsNewOnNoStates() bool {
 	return p.version >= StartingVersionContinueAsNewOnNoStates
 }
@@ -61,6 +63,12 @@ func (p *GlobalVersioner) IsAfterVersionOfTemporal26SDK() bool {
 
 func (p *GlobalVersioner) IsAfterVersionOfNoIwfGlobalVersionSearchAttribute() bool {
 	return p.version >= StartingVersionNoIwfGlobalVersionSearchAttribute
+}
+
+// methods checking feature/functionality availability
+
+func (p *GlobalVersioner) IsUsingGlobalVersionSearchAttribute() bool {
+	return p.version >= StartingVersionUsingGlobalVersioning && p.version < StartingVersionNoIwfGlobalVersionSearchAttribute
 }
 
 func (p *GlobalVersioner) UpsertGlobalVersionSearchAttribute() error {
