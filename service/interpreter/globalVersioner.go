@@ -12,7 +12,8 @@ const StartingVersionRenamedStateApi = 3
 const StartingVersionContinueAsNewOnNoStates = 4
 const StartingVersionTemporal26SDK = 5
 const StartingVersionExecutingStateIdMode = 6
-const MaxOfAllVersions = StartingVersionExecutingStateIdMode
+const StartingVersionNoIwfGlobalVersionSearchAttribute = 7
+const MaxOfAllVersions = StartingVersionNoIwfGlobalVersionSearchAttribute
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
@@ -33,6 +34,8 @@ func NewGlobalVersioner(
 		version:          version,
 	}, nil
 }
+
+// methods checking version number
 
 func (p *GlobalVersioner) IsAfterVersionOfContinueAsNewOnNoStates() bool {
 	return p.version >= StartingVersionContinueAsNewOnNoStates
@@ -56,6 +59,16 @@ func (p *GlobalVersioner) IsAfterVersionOfRenamedStateApi() bool {
 
 func (p *GlobalVersioner) IsAfterVersionOfTemporal26SDK() bool {
 	return p.version >= StartingVersionTemporal26SDK
+}
+
+func (p *GlobalVersioner) IsAfterVersionOfNoIwfGlobalVersionSearchAttribute() bool {
+	return p.version >= StartingVersionNoIwfGlobalVersionSearchAttribute
+}
+
+// methods checking feature/functionality availability
+
+func (p *GlobalVersioner) IsUsingGlobalVersionSearchAttribute() bool {
+	return p.version >= StartingVersionUsingGlobalVersioning && p.version < StartingVersionNoIwfGlobalVersionSearchAttribute
 }
 
 func (p *GlobalVersioner) UpsertGlobalVersionSearchAttribute() error {

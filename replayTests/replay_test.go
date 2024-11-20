@@ -24,6 +24,7 @@ var jsonHistoryFiles = []string{
 	"v5-basic.json",
 	"v6-search-attributes-optimization-enabled-for-all.json",
 	"v6-search-attributes-optimization-default.json",
+	"v7-no-global-version-search-attribute.json",
 }
 
 func TestTemporalReplay(t *testing.T) {
