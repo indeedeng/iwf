@@ -1428,6 +1428,7 @@ components:
         skipSignalReapply: true
         workflowRunId: workflowRunId
         workflowId: workflowId
+        skipUpdateReapply: true
         stateExecutionId: stateExecutionId
       properties:
         workflowId:
@@ -1447,6 +1448,8 @@ components:
         stateExecutionId:
           type: string
         skipSignalReapply:
+          type: boolean
+        skipUpdateReapply:
           type: boolean
       required:
       - resetType

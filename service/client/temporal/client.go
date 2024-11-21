@@ -434,9 +434,12 @@ func (t *temporalClient) ResetWorkflow(
 	}
 
 	requestId := uuid.New().String()
-	resetReapplyType := enums.RESET_REAPPLY_TYPE_SIGNAL
+	var resetReapplyExcludeTypes []enums.ResetReapplyExcludeType
 	if request.GetSkipSignalReapply() {
-		resetReapplyType = enums.RESET_REAPPLY_TYPE_NONE
+		resetReapplyExcludeTypes = append(resetReapplyExcludeTypes, enums.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL)
+	}
+	if request.GetSkipUpdateReapply() {
+		resetReapplyExcludeTypes = append(resetReapplyExcludeTypes, enums.RESET_REAPPLY_EXCLUDE_TYPE_UPDATE)
 	}
 
 	resp, err := t.tClient.ResetWorkflowExecution(ctx, &workflowservice.ResetWorkflowExecutionRequest{
@@ -448,7 +451,7 @@ func (t *temporalClient) ResetWorkflow(
 		Reason:                    request.GetReason(),
 		WorkflowTaskFinishEventId: resetEventId,
 		RequestId:                 requestId,
-		ResetReapplyType:          resetReapplyType,
+		ResetReapplyExcludeTypes:  resetReapplyExcludeTypes,
 	})
 
 	if err != nil {
