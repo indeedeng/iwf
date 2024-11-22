@@ -239,7 +239,8 @@ func (sr *SignalReceiver) DumpReceived(channelNames []string) map[string][]*iwfi
 	return data
 }
 
-// DrainAllUnreceivedSignals will process all the signals
+// DrainAllReceivedButUnprocessedSignals will process all the signals that are received but not processed in the current
+// workflow task.
 // There are two cases this is needed:
 // 1. ContinueAsNew:
 // retrieve signals that after signal handler threads are stopped,
@@ -247,7 +248,7 @@ func (sr *SignalReceiver) DumpReceived(channelNames []string) map[string][]*iwfi
 // This includes both regular user signals and system signals
 // 2. Conditional close/complete workflow on signal/internal channel:
 // retrieve all signal/internal channel messages before checking the signal/internal channels
-func (sr *SignalReceiver) DrainAllUnreceivedSignals(ctx UnifiedContext) {
+func (sr *SignalReceiver) DrainAllReceivedButUnprocessedSignals(ctx UnifiedContext) {
 	unhandledSigs := sr.provider.GetUnhandledSignalNames(ctx)
 	if len(unhandledSigs) == 0 {
 		return
