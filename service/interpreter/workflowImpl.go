@@ -562,10 +562,12 @@ func processStateExecution(
 
 		if !provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:     iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
-				WorkflowType:  basicInfo.IwfWorkflowType,
-				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				EventType:        iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
+				WorkflowType:     basicInfo.IwfWorkflowType,
+				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:          ptr.Any(state.StateId),
+				StateExecutionId: ptr.Any(stateExeId),
 			})
 		}
 		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
@@ -584,19 +586,23 @@ func processStateExecution(
 		if !provider.IsReplaying(ctx) {
 			if errStartApi == nil {
 				event.Handle(iwfidl.IwfEvent{
-					EventType:     iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
-					WorkflowType:  basicInfo.IwfWorkflowType,
-					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-				})
-			} else {
-				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_COMPLETE_EVENT,
 					WorkflowType:       basicInfo.IwfWorkflowType,
 					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
 					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StateId:            ptr.Any(state.StateId),
+					StateExecutionId:   ptr.Any(stateExeId),
 					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				})
+			} else {
+				event.Handle(iwfidl.IwfEvent{
+					EventType:        iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
+					WorkflowType:     basicInfo.IwfWorkflowType,
+					WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StateId:          ptr.Any(state.StateId),
+					StateExecutionId: ptr.Any(stateExeId),
 				})
 			}
 		}
