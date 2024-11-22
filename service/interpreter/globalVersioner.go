@@ -13,14 +13,14 @@ const StartingVersionContinueAsNewOnNoStates = 4
 const StartingVersionTemporal26SDK = 5
 const StartingVersionExecutingStateIdMode = 6
 const StartingVersionNoIwfGlobalVersionSearchAttribute = 7
-const MaxOfAllVersions = StartingVersionNoIwfGlobalVersionSearchAttribute
+const StartingVersionYieldOnConditionalComplete = 8
+const MaxOfAllVersions = StartingVersionYieldOnConditionalComplete
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
-	workflowProvider  WorkflowProvider
-	ctx               UnifiedContext
-	version           int
-	OmitVersionMarker bool // indicate the version marker and upsertSearchAttribute is already set at the start of the workflow
+	workflowProvider WorkflowProvider
+	ctx              UnifiedContext
+	version          int
 }
 
 func NewGlobalVersioner(
@@ -65,6 +65,10 @@ func (p *GlobalVersioner) IsAfterVersionOfNoIwfGlobalVersionSearchAttribute() bo
 	return p.version >= StartingVersionNoIwfGlobalVersionSearchAttribute
 }
 
+func (p *GlobalVersioner) IsAfterVersionOfYieldOnConditionalComplete() bool {
+	return p.version >= StartingVersionYieldOnConditionalComplete
+}
+
 // methods checking feature/functionality availability
 
 func (p *GlobalVersioner) IsUsingGlobalVersionSearchAttribute() bool {
@@ -72,13 +76,11 @@ func (p *GlobalVersioner) IsUsingGlobalVersionSearchAttribute() bool {
 }
 
 func (p *GlobalVersioner) UpsertGlobalVersionSearchAttribute() error {
-	if p.OmitVersionMarker {
-		// the search attribute is already set when starting the workflow
-		return nil
-	}
-	// TODO this bug in Cadence SDK may cause concurrent writes
-	// https://github.com/uber-go/cadence-client/issues/1198
-	if p.workflowProvider.GetBackendType() != service.BackendTypeCadence {
+	if p.IsUsingGlobalVersionSearchAttribute() &&
+		p.workflowProvider.GetBackendType() != service.BackendTypeCadence {
+		// Note that there was bug in Cadence SDK may cause concurrent writes hence we never upsert for Cadence
+		// https://github.com/uber-go/cadence-client/issues/1198
+
 		return p.workflowProvider.UpsertSearchAttributes(p.ctx, map[string]interface{}{
 			service.SearchAttributeGlobalVersion: MaxOfAllVersions,
 		})

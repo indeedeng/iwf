@@ -143,8 +143,14 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 	history, _ := wfHandler.GetTestResult()
 
 	expectMap := map[string]int64{
-		"S1_start":  3,
-		"S1_decide": 3,
+		"S1_start":  4,
+		"S1_decide": 4,
+	}
+	if useSignalChannel {
+		expectMap = map[string]int64{
+			"S1_start":  3,
+			"S1_decide": 3,
+		}
 	}
 	if !useSignalChannel {
 		expectMap[conditionalClose.RpcPublishInternalChannel] = 3
@@ -153,9 +159,17 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
 	assertions.Equal(1, len(resp2.GetResults()))
-	assertions.Equal(iwfidl.StateCompletionOutput{
+	expectedOutput := iwfidl.StateCompletionOutput{
 		CompletedStateId:          "S1",
-		CompletedStateExecutionId: "S1-3",
+		CompletedStateExecutionId: "S1-4",
 		CompletedStateOutput:      &conditionalClose.TestInput,
-	}, resp2.GetResults()[0])
+	}
+	if useSignalChannel {
+		expectedOutput = iwfidl.StateCompletionOutput{
+			CompletedStateId:          "S1",
+			CompletedStateExecutionId: "S1-3",
+			CompletedStateOutput:      &conditionalClose.TestInput,
+		}
+	}
+	assertions.Equal(expectedOutput, resp2.GetResults()[0])
 }
