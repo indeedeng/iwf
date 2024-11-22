@@ -22,12 +22,18 @@ import (
 	"go.uber.org/cadence/encoded"
 )
 
+type QueryWorkflowFailedRetryPolicy struct {
+	InitialIntervalSeconds int
+	MaximumAttempts        int
+}
+
 type cadenceClient struct {
-	domain        string
-	cClient       client.Client
-	closeFunc     func()
-	serviceClient workflowserviceclient.Interface
-	converter     encoded.DataConverter
+	domain                         string
+	cClient                        client.Client
+	closeFunc                      func()
+	serviceClient                  workflowserviceclient.Interface
+	converter                      encoded.DataConverter
+	queryWorkflowFailedRetryPolicy QueryWorkflowFailedRetryPolicy
 }
 
 func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
@@ -49,6 +55,12 @@ func (t *cadenceClient) GetRunIdFromWorkflowAlreadyStartedError(err error) (stri
 func (t *cadenceClient) IsNotFoundError(err error) bool {
 	var entityNotExistsError *shared.EntityNotExistsError
 	ok := errors.As(err, &entityNotExistsError)
+	return ok
+}
+
+func (t *cadenceClient) isQueryFailedError(err error) bool {
+	var serviceError *shared.QueryFailedError
+	ok := errors.As(err, &serviceError)
 	return ok
 }
 
@@ -83,14 +95,15 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 
 func NewCadenceClient(
 	domain string, cClient client.Client, serviceClient workflowserviceclient.Interface,
-	converter encoded.DataConverter, closeFunc func(),
+	converter encoded.DataConverter, closeFunc func(), retryPolicy QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
 	return &cadenceClient{
-		domain:        domain,
-		cClient:       cClient,
-		closeFunc:     closeFunc,
-		serviceClient: serviceClient,
-		converter:     converter,
+		domain:                         domain,
+		cClient:                        cClient,
+		closeFunc:                      closeFunc,
+		serviceClient:                  serviceClient,
+		converter:                      converter,
+		queryWorkflowFailedRetryPolicy: retryPolicy,
 	}
 }
 
@@ -227,9 +240,24 @@ func (t *cadenceClient) ListWorkflow(
 func (t *cadenceClient) QueryWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{},
 ) error {
-	qres, err := queryWorkflowWithStrongConsistency(t, ctx, workflowID, runID, queryType, args)
-	if err != nil {
-		return err
+	var qres encoded.Value
+	var err error
+
+	attempt := 1
+	for attempt <= t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
+		qres, err = queryWorkflowWithStrongConsistency(t, ctx, workflowID, runID, queryType, args)
+		if err != nil {
+			if t.isQueryFailedError(err) {
+				if attempt == t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
+					return err
+				} else {
+					time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
+					attempt++
+					continue
+				}
+			}
+			return err
+		}
 	}
 	return qres.Get(valuePtr)
 }

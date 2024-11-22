@@ -20,23 +20,31 @@ import (
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	realtemporal "go.temporal.io/sdk/temporal"
+	"time"
 )
 
+type QueryWorkflowFailedRetryPolicy struct {
+	InitialIntervalSeconds int
+	MaximumAttempts        int
+}
+
 type temporalClient struct {
-	tClient        client.Client
-	namespace      string
-	dataConverter  converter.DataConverter
-	memoEncryption bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
+	tClient                        client.Client
+	namespace                      string
+	dataConverter                  converter.DataConverter
+	memoEncryption                 bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
+	queryWorkflowFailedRetryPolicy QueryWorkflowFailedRetryPolicy
 }
 
 func NewTemporalClient(
-	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool,
+	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool, retryPolicy QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
 	return &temporalClient{
-		tClient:        tClient,
-		namespace:      namespace,
-		dataConverter:  dataConverter,
-		memoEncryption: memoEncryption,
+		tClient:                        tClient,
+		namespace:                      namespace,
+		dataConverter:                  dataConverter,
+		memoEncryption:                 memoEncryption,
+		queryWorkflowFailedRetryPolicy: retryPolicy,
 	}
 }
 
@@ -68,6 +76,12 @@ func (t *temporalClient) GetRunIdFromWorkflowAlreadyStartedError(err error) (str
 func (t *temporalClient) IsNotFoundError(err error) bool {
 	var notFound *serviceerror.NotFound
 	ok := errors.As(err, &notFound)
+	return ok
+}
+
+func (t *temporalClient) isQueryFailedError(err error) bool {
+	var serviceError *serviceerror.QueryFailed
+	ok := errors.As(err, &serviceError)
 	return ok
 }
 
@@ -257,9 +271,24 @@ func (t *temporalClient) ListWorkflow(
 func (t *temporalClient) QueryWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{},
 ) error {
-	qres, err := t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
-	if err != nil {
-		return err
+	var qres converter.EncodedValue
+	var err error
+
+	attempt := 1
+	for attempt <= t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
+		qres, err = t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
+		if err != nil {
+			if t.isQueryFailedError(err) {
+				if attempt == t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
+					return err
+				} else {
+					time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
+					attempt++
+					continue
+				}
+			}
+			return err
+		}
 	}
 	return qres.Get(valuePtr)
 }

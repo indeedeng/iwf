@@ -124,7 +124,11 @@ func start(c *cli.Context) {
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter(), false)
+		retryPolicy := temporalapi.QueryWorkflowFailedRetryPolicy{
+			InitialIntervalSeconds: config.GetInitialIntervalSecondsWithDefault(),
+			MaximumAttempts:        config.GetMaximumAttemptsWithDefault(),
+		}
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter(), false, retryPolicy)
 
 		for _, svcName := range services {
 			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger)
@@ -146,7 +150,13 @@ func start(c *cli.Context) {
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Cadence because of error %v", err)
 		}
-		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc)
+
+		retryPolicy := cadenceapi.QueryWorkflowFailedRetryPolicy{
+			InitialIntervalSeconds: config.GetInitialIntervalSecondsWithDefault(),
+			MaximumAttempts:        config.GetMaximumAttemptsWithDefault(),
+		}
+
+		unifiedClient = cadenceapi.NewCadenceClient(domain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, retryPolicy)
 
 		for _, svcName := range services {
 			go launchCadenceService(svcName, *config, unifiedClient, serviceClient, domain, closeFunc, logger)

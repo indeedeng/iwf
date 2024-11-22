@@ -16,6 +16,10 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 				SignalWithStartOn: "old",
 				WaitForOn:         "old",
 			},
+			QueryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicy{
+				InitialIntervalSeconds: 1,
+				MaximumAttempts:        5,
+			},
 		},
 		Interpreter: config.Interpreter{
 			VerboseDebug:              false,
