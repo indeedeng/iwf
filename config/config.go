@@ -155,17 +155,3 @@ func (c Config) GetWaitForOnWithDefault() string {
 	}
 	return "old"
 }
-
-func (c Config) GetInitialIntervalSecondsWithDefault() int {
-	if c.Api.QueryWorkflowFailedRetryPolicy.InitialIntervalSeconds != 0 {
-		return c.Api.QueryWorkflowFailedRetryPolicy.InitialIntervalSeconds
-	}
-	return 1
-}
-
-func (c Config) GetMaximumAttemptsWithDefault() int {
-	if c.Api.QueryWorkflowFailedRetryPolicy.MaximumAttempts != 0 {
-		return c.Api.QueryWorkflowFailedRetryPolicy.MaximumAttempts
-	}
-	return 5
-}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	uclient "github.com/indeedeng/iwf/service/client"
@@ -37,14 +38,28 @@ type temporalClient struct {
 }
 
 func NewTemporalClient(
-	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool, retryPolicy QueryWorkflowFailedRetryPolicy,
+	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool, retryPolicy *config.QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
+	var rp QueryWorkflowFailedRetryPolicy
+
+	if retryPolicy.InitialIntervalSeconds == 0 {
+		rp.InitialIntervalSeconds = 1
+	} else {
+		rp.InitialIntervalSeconds = retryPolicy.InitialIntervalSeconds
+	}
+
+	if retryPolicy.MaximumAttempts == 0 {
+		rp.MaximumAttempts = 5
+	} else {
+		rp.MaximumAttempts = retryPolicy.MaximumAttempts
+	}
+
 	return &temporalClient{
 		tClient:                        tClient,
 		namespace:                      namespace,
 		dataConverter:                  dataConverter,
 		memoEncryption:                 memoEncryption,
-		queryWorkflowFailedRetryPolicy: retryPolicy,
+		queryWorkflowFailedRetryPolicy: rp,
 	}
 }
 

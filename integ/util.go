@@ -112,12 +112,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 
-		retryPolicy := temporalapi.QueryWorkflowFailedRetryPolicy{
-			InitialIntervalSeconds: testCfg.GetInitialIntervalSecondsWithDefault(),
-			MaximumAttempts:        testCfg.GetMaximumAttemptsWithDefault(),
-		}
-
-		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, retryPolicy)
+		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
 		iwfService := api.NewService(testCfg, uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
@@ -155,12 +150,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 
-		retryPolicy := cadenceapi.QueryWorkflowFailedRetryPolicy{
-			InitialIntervalSeconds: testCfg.GetInitialIntervalSecondsWithDefault(),
-			MaximumAttempts:        testCfg.GetMaximumAttemptsWithDefault(),
-		}
-
-		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, retryPolicy)
+		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
 		iwfService := api.NewService(createTestConfig(config), uclient, logger)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,

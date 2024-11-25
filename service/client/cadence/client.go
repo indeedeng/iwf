@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/indeedeng/iwf/config"
 	"time"
 
 	"github.com/indeedeng/iwf/service"
@@ -95,15 +96,29 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 
 func NewCadenceClient(
 	domain string, cClient client.Client, serviceClient workflowserviceclient.Interface,
-	converter encoded.DataConverter, closeFunc func(), retryPolicy QueryWorkflowFailedRetryPolicy,
+	converter encoded.DataConverter, closeFunc func(), retryPolicy *config.QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
+	var rp QueryWorkflowFailedRetryPolicy
+
+	if retryPolicy.InitialIntervalSeconds == 0 {
+		rp.InitialIntervalSeconds = 1
+	} else {
+		rp.InitialIntervalSeconds = retryPolicy.InitialIntervalSeconds
+	}
+
+	if retryPolicy.MaximumAttempts == 0 {
+		rp.MaximumAttempts = 5
+	} else {
+		rp.MaximumAttempts = retryPolicy.MaximumAttempts
+	}
+
 	return &cadenceClient{
 		domain:                         domain,
 		cClient:                        cClient,
 		closeFunc:                      closeFunc,
 		serviceClient:                  serviceClient,
 		converter:                      converter,
-		queryWorkflowFailedRetryPolicy: retryPolicy,
+		queryWorkflowFailedRetryPolicy: rp,
 	}
 }
 
