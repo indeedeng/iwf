@@ -279,16 +279,15 @@ func (t *temporalClient) QueryWorkflow(
 		qres, err = t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
 		if err != nil {
 			if t.isQueryFailedError(err) {
-				if attempt == t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
-					return err
-				} else {
-					time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
-					attempt++
-					continue
-				}
+				time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
+				attempt++
+				continue
 			}
 			return err
 		}
+	}
+	if err != nil {
+		return err
 	}
 	return qres.Get(valuePtr)
 }
