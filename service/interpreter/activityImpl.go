@@ -55,10 +55,12 @@ func StateApiWaitUntil(
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
 		event.Handle(iwfidl.IwfEvent{
-			EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
-			WorkflowType:  input.Request.WorkflowType,
-			WorkflowId:    activityInfo.WorkflowExecution.ID,
-			WorkflowRunId: activityInfo.WorkflowExecution.RunID,
+			EventType:        iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			WorkflowType:     input.Request.WorkflowType,
+			WorkflowId:       activityInfo.WorkflowExecution.ID,
+			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
+			StateId:          ptr.Any(input.Request.WorkflowStateId),
+			StateExecutionId: ptr.Any(input.Request.Context.GetStateExecutionId()),
 		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
@@ -67,10 +69,12 @@ func StateApiWaitUntil(
 
 	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
 		event.Handle(iwfidl.IwfEvent{
-			EventType:     iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
-			WorkflowType:  input.Request.WorkflowType,
-			WorkflowId:    activityInfo.WorkflowExecution.ID,
-			WorkflowRunId: activityInfo.WorkflowExecution.RunID,
+			EventType:        iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			WorkflowType:     input.Request.WorkflowType,
+			WorkflowId:       activityInfo.WorkflowExecution.ID,
+			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
+			StateId:          ptr.Any(input.Request.WorkflowStateId),
+			StateExecutionId: ptr.Any(input.Request.Context.GetStateExecutionId()),
 		})
 		return nil, composeStartApiRespError(provider, err, resp)
 	}
@@ -87,6 +91,8 @@ func StateApiWaitUntil(
 		WorkflowType:       input.Request.WorkflowType,
 		WorkflowId:         activityInfo.WorkflowExecution.ID,
 		WorkflowRunId:      activityInfo.WorkflowExecution.RunID,
+		StateId:            ptr.Any(input.Request.WorkflowStateId),
+		StateExecutionId:   ptr.Any(input.Request.Context.GetStateExecutionId()),
 		StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 	})

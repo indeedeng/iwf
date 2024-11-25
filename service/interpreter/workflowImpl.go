@@ -51,12 +51,10 @@ func InterpreterImpl(
 		return
 	}
 
-	if globalVersioner.IsUsingGlobalVersionSearchAttribute() {
-		err = globalVersioner.UpsertGlobalVersionSearchAttribute()
-		if err != nil {
-			retErr = err
-			return
-		}
+	err = globalVersioner.UpsertGlobalVersionSearchAttribute()
+	if err != nil {
+		retErr = err
+		return
 	}
 
 	if !input.Config.GetDisableSystemSearchAttribute() {
@@ -244,7 +242,7 @@ func InterpreterImpl(
 						// NOTE: decision is only available on this CompletedStateExecutionStatus
 
 						canGoNext, gracefulComplete, forceComplete, forceFail, output, err :=
-							checkClosingWorkflow(ctx, provider, decision, state.GetStateId(), stateExeId, interStateChannel, signalReceiver)
+							checkClosingWorkflow(ctx, provider, globalVersioner, decision, state.GetStateId(), stateExeId, interStateChannel, signalReceiver)
 						if err != nil {
 							errToFailWf = err
 							// no return so that it can fall through to call MarkStateExecutionCompleted
@@ -339,7 +337,7 @@ func InterpreterImpl(
 			}
 			// NOTE: This must be the last thing before continueAsNew!!!
 			// Otherwise, there could be signals unhandled
-			signalReceiver.DrainAllUnreceivedSignals(ctx)
+			signalReceiver.DrainAllReceivedButUnprocessedSignals(ctx)
 
 			// after draining signals, there could be some changes
 			// last fail workflow signal, return the workflow so that we don't carry over the fail request
@@ -382,7 +380,7 @@ func InterpreterImpl(
 }
 
 func checkClosingWorkflow(
-	ctx UnifiedContext, provider WorkflowProvider, decision *iwfidl.StateDecision,
+	ctx UnifiedContext, provider WorkflowProvider, versioner *GlobalVersioner, decision *iwfidl.StateDecision,
 	currentStateId, currentStateExeId string,
 	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
@@ -391,12 +389,13 @@ func checkClosingWorkflow(
 		if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY ||
 			conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY {
 			// trigger a signal draining so that all the signal/internal channel messages are processed
-			// TODO https://github.com/indeedeng/iwf/issues/289
-			// https://github.com/indeedeng/iwf/issues/290
-			// if a messages from internal channel is published via State execution,
-			// we don't do any draining here yet, so the conditional completion could still lose the messages
-			// to workaround, user code will have to use persistence locking
-			signalReceiver.DrainAllUnreceivedSignals(ctx)
+			signalReceiver.DrainAllReceivedButUnprocessedSignals(ctx)
+			// Messages of internal channels could be published via State executions, within the same workflow task.
+			// If we don't do any draining and process them, the conditional completion could lose the messages
+			err = DrainReceivedButUnprocessedInternalChannelsFromStateApis(ctx, provider, versioner)
+			if err != nil {
+				return
+			}
 
 			conditionMet := false
 			if conditionClose.GetConditionalCloseType() == iwfidl.FORCE_COMPLETE_ON_INTERNAL_CHANNEL_EMPTY &&
@@ -487,6 +486,23 @@ func checkClosingWorkflow(
 	return
 }
 
+func DrainReceivedButUnprocessedInternalChannelsFromStateApis(
+	ctx UnifiedContext, provider WorkflowProvider, versioner *GlobalVersioner,
+) error {
+	if versioner.IsAfterVersionOfYieldOnConditionalComplete() {
+		// Just yield, by waiting on an empty lambda, nothing else.
+		// It will let other workflow threads/coroutines to run.
+		// This will drain the messages published from state APIs.
+		// NOTE that this is extremely tricky in Cadence/Temporal programming model.
+		// Read more: https://stackoverflow.com/questions/71356668/how-does-multi-threading-works-in-cadence-temporal-workflow
+		//https://docs.temporal.io/encyclopedia/go-sdk-multithreading
+		return provider.Await(ctx, func() bool {
+			return true
+		})
+	}
+	return nil
+}
+
 func processStateExecution(
 	ctx UnifiedContext,
 	provider WorkflowProvider,
@@ -562,10 +578,12 @@ func processStateExecution(
 
 		if !provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:     iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
-				WorkflowType:  basicInfo.IwfWorkflowType,
-				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				EventType:        iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
+				WorkflowType:     basicInfo.IwfWorkflowType,
+				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:          ptr.Any(state.StateId),
+				StateExecutionId: ptr.Any(stateExeId),
 			})
 		}
 		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
@@ -584,19 +602,23 @@ func processStateExecution(
 		if !provider.IsReplaying(ctx) {
 			if errStartApi == nil {
 				event.Handle(iwfidl.IwfEvent{
-					EventType:     iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
-					WorkflowType:  basicInfo.IwfWorkflowType,
-					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-				})
-			} else {
-				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_COMPLETE_EVENT,
 					WorkflowType:       basicInfo.IwfWorkflowType,
 					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
 					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StateId:            ptr.Any(state.StateId),
+					StateExecutionId:   ptr.Any(stateExeId),
 					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				})
+			} else {
+				event.Handle(iwfidl.IwfEvent{
+					EventType:        iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
+					WorkflowType:     basicInfo.IwfWorkflowType,
+					WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StateId:          ptr.Any(state.StateId),
+					StateExecutionId: ptr.Any(stateExeId),
 				})
 			}
 		}

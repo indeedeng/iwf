@@ -109,10 +109,19 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 
+			var internalChanPub []iwfidl.InterStateChannelPublishing
 			context := req.GetContext()
 			if context.GetStateExecutionId() == "S1-1" {
 				// wait for 3 seconds so that the channel can have a new message
 				time.Sleep(time.Second * 3)
+			} else if context.GetStateExecutionId() == "S1-3" {
+				// send internal channel message within the state execution
+				// and expecting the messages are processed by the conditional check
+				internalChanPub = []iwfidl.InterStateChannelPublishing{
+					{
+						ChannelName: TestChannelName,
+						Value:       &TestInput,
+					}}
 			}
 
 			conditionalClose := &iwfidl.WorkflowConditionalClose{
@@ -131,6 +140,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			}
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				PublishToInterStateChannel: internalChanPub,
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
