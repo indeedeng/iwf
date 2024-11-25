@@ -290,9 +290,12 @@ func (t *temporalClient) QueryWorkflow(
 	var err error
 
 	attempt := 1
+	// Only QueryFailed error causes retry; all other errors make the loop to finish immediately
 	for attempt <= t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
 		qres, err = t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
-		if err != nil {
+		if err == nil {
+			break
+		} else {
 			if t.isQueryFailedError(err) {
 				time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
 				attempt++

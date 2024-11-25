@@ -259,20 +259,22 @@ func (t *cadenceClient) QueryWorkflow(
 	var err error
 
 	attempt := 1
+	// Only QueryFailed error causes retry; all other errors make the loop to finish immediately
 	for attempt <= t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
-		qres, err = queryWorkflowWithStrongConsistency(t, ctx, workflowID, runID, queryType, args)
-		if err != nil {
+		qres, err = t.cClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
+		if err == nil {
+			break
+		} else {
 			if t.isQueryFailedError(err) {
-				if attempt == t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
-					return err
-				} else {
-					time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
-					attempt++
-					continue
-				}
+				time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
+				attempt++
+				continue
 			}
 			return err
 		}
+	}
+	if err != nil {
+		return err
 	}
 	return qres.Get(valuePtr)
 }
