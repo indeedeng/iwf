@@ -15,13 +15,13 @@ type SignalReceiver struct {
 	provider                   WorkflowProvider
 	timerProcessor             *TimerProcessor
 	workflowConfiger           *WorkflowConfiger
-	interStateChannel          *InterStateChannel
+	interStateChannel          *InternalChannel
 	stateRequestQueue          *StateRequestQueue
 	persistenceManager         *PersistenceManager
 }
 
 func NewSignalReceiver(
-	ctx UnifiedContext, provider WorkflowProvider, interStateChannel *InterStateChannel,
+	ctx UnifiedContext, provider WorkflowProvider, interStateChannel *InternalChannel,
 	stateRequestQueue *StateRequestQueue,
 	persistenceManager *PersistenceManager, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter,
 	workflowConfiger *WorkflowConfiger,
@@ -224,19 +224,17 @@ func (sr *SignalReceiver) Retrieve(channelName string) *iwfidl.EncodedObject {
 	}
 	sigVal := l[0]
 	l = l[1:]
-	sr.receivedSignals[channelName] = l
+	if len(l) == 0 {
+		delete(sr.receivedSignals, channelName)
+	} else {
+		sr.receivedSignals[channelName] = l
+	}
+
 	return sigVal
 }
 
-func (sr *SignalReceiver) DumpReceived(channelNames []string) map[string][]*iwfidl.EncodedObject {
-	if len(channelNames) == 0 {
-		return sr.receivedSignals
-	}
-	data := make(map[string][]*iwfidl.EncodedObject)
-	for _, n := range channelNames {
-		data[n] = sr.receivedSignals[n]
-	}
-	return data
+func (sr *SignalReceiver) DumpReceived() map[string][]*iwfidl.EncodedObject {
+	return sr.receivedSignals
 }
 
 // DrainAllReceivedButUnprocessedSignals will process all the signals that are received but not processed in the current

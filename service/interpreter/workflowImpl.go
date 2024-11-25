@@ -76,7 +76,7 @@ func InterpreterImpl(
 		IwfWorkerUrl:    input.IwfWorkerUrl,
 	}
 
-	var interStateChannel *InterStateChannel
+	var interStateChannel *InternalChannel
 	var stateRequestQueue *StateRequestQueue
 	var persistenceManager *PersistenceManager
 	var timerProcessor *TimerProcessor
@@ -382,7 +382,7 @@ func InterpreterImpl(
 func checkClosingWorkflow(
 	ctx UnifiedContext, provider WorkflowProvider, versioner *GlobalVersioner, decision *iwfidl.StateDecision,
 	currentStateId, currentStateExeId string,
-	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
+	internalChannel *InternalChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	if decision.HasConditionalClose() {
 		conditionClose := decision.ConditionalClose
@@ -511,7 +511,7 @@ func processStateExecution(
 	stateReq StateRequest,
 	stateExeId string,
 	persistenceManager *PersistenceManager,
-	interStateChannel *InterStateChannel,
+	interStateChannel *InternalChannel,
 	signalReceiver *SignalReceiver,
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
@@ -818,7 +818,7 @@ func invokeStateExecute(
 	state iwfidl.StateMovement,
 	stateExeId string,
 	persistenceManager *PersistenceManager,
-	interStateChannel *InterStateChannel,
+	interStateChannel *InternalChannel,
 	executionContext iwfidl.Context,
 	commandRes *iwfidl.CommandResults,
 	continueAsNewer *ContinueAsNewer,
