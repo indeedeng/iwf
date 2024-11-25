@@ -16,7 +16,9 @@ func NewOutputCollector(initOutputs []iwfidl.StateCompletionOutput) *OutputColle
 }
 
 func (o *OutputCollector) Add(output iwfidl.StateCompletionOutput) {
-	o.outputs = append(o.outputs, output)
+	if output.CompletedStateOutput != nil {
+		o.outputs = append(o.outputs, output)
+	}
 }
 
 func (o *OutputCollector) GetAll() []iwfidl.StateCompletionOutput {
