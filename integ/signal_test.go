@@ -110,7 +110,6 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	panicAtHttpError(err, httpResp)
 
 	// test update config
-	time.Sleep(time.Second)
 	var debugDump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
@@ -134,7 +133,6 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(time.Second)
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		panic(err)
@@ -154,7 +152,6 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(time.Second)
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		panic(err)
