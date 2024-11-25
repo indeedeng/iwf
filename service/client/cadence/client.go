@@ -98,6 +98,17 @@ func NewCadenceClient(
 	domain string, cClient client.Client, serviceClient workflowserviceclient.Interface,
 	converter encoded.DataConverter, closeFunc func(), retryPolicy *config.QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
+	return &cadenceClient{
+		domain:                         domain,
+		cClient:                        cClient,
+		closeFunc:                      closeFunc,
+		serviceClient:                  serviceClient,
+		converter:                      converter,
+		queryWorkflowFailedRetryPolicy: queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
+	}
+}
+
+func queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy *config.QueryWorkflowFailedRetryPolicy) QueryWorkflowFailedRetryPolicy {
 	var rp QueryWorkflowFailedRetryPolicy
 
 	if retryPolicy.InitialIntervalSeconds == 0 {
@@ -111,15 +122,7 @@ func NewCadenceClient(
 	} else {
 		rp.MaximumAttempts = retryPolicy.MaximumAttempts
 	}
-
-	return &cadenceClient{
-		domain:                         domain,
-		cClient:                        cClient,
-		closeFunc:                      closeFunc,
-		serviceClient:                  serviceClient,
-		converter:                      converter,
-		queryWorkflowFailedRetryPolicy: rp,
-	}
+	return rp
 }
 
 func (t *cadenceClient) Close() {

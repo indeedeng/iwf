@@ -40,6 +40,16 @@ type temporalClient struct {
 func NewTemporalClient(
 	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool, retryPolicy *config.QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
+	return &temporalClient{
+		tClient:                        tClient,
+		namespace:                      namespace,
+		dataConverter:                  dataConverter,
+		memoEncryption:                 memoEncryption,
+		queryWorkflowFailedRetryPolicy: queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
+	}
+}
+
+func queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy *config.QueryWorkflowFailedRetryPolicy) QueryWorkflowFailedRetryPolicy {
 	var rp QueryWorkflowFailedRetryPolicy
 
 	if retryPolicy.InitialIntervalSeconds == 0 {
@@ -53,14 +63,7 @@ func NewTemporalClient(
 	} else {
 		rp.MaximumAttempts = retryPolicy.MaximumAttempts
 	}
-
-	return &temporalClient{
-		tClient:                        tClient,
-		namespace:                      namespace,
-		dataConverter:                  dataConverter,
-		memoEncryption:                 memoEncryption,
-		queryWorkflowFailedRetryPolicy: rp,
-	}
+	return rp
 }
 
 func (t *temporalClient) Close() {
