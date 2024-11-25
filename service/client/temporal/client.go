@@ -24,17 +24,12 @@ import (
 	"time"
 )
 
-type QueryWorkflowFailedRetryPolicy struct {
-	InitialIntervalSeconds int
-	MaximumAttempts        int
-}
-
 type temporalClient struct {
 	tClient                        client.Client
 	namespace                      string
 	dataConverter                  converter.DataConverter
 	memoEncryption                 bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
-	queryWorkflowFailedRetryPolicy QueryWorkflowFailedRetryPolicy
+	queryWorkflowFailedRetryPolicy config.QueryWorkflowFailedRetryPolicy
 }
 
 func NewTemporalClient(
@@ -45,25 +40,8 @@ func NewTemporalClient(
 		namespace:                      namespace,
 		dataConverter:                  dataConverter,
 		memoEncryption:                 memoEncryption,
-		queryWorkflowFailedRetryPolicy: queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
+		queryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
 	}
-}
-
-func queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy *config.QueryWorkflowFailedRetryPolicy) QueryWorkflowFailedRetryPolicy {
-	var rp QueryWorkflowFailedRetryPolicy
-
-	if retryPolicy.InitialIntervalSeconds == 0 {
-		rp.InitialIntervalSeconds = 1
-	} else {
-		rp.InitialIntervalSeconds = retryPolicy.InitialIntervalSeconds
-	}
-
-	if retryPolicy.MaximumAttempts == 0 {
-		rp.MaximumAttempts = 5
-	} else {
-		rp.MaximumAttempts = retryPolicy.MaximumAttempts
-	}
-	return rp
 }
 
 func (t *temporalClient) Close() {

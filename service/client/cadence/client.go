@@ -23,18 +23,13 @@ import (
 	"go.uber.org/cadence/encoded"
 )
 
-type QueryWorkflowFailedRetryPolicy struct {
-	InitialIntervalSeconds int
-	MaximumAttempts        int
-}
-
 type cadenceClient struct {
 	domain                         string
 	cClient                        client.Client
 	closeFunc                      func()
 	serviceClient                  workflowserviceclient.Interface
 	converter                      encoded.DataConverter
-	queryWorkflowFailedRetryPolicy QueryWorkflowFailedRetryPolicy
+	queryWorkflowFailedRetryPolicy config.QueryWorkflowFailedRetryPolicy
 }
 
 func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
@@ -104,25 +99,8 @@ func NewCadenceClient(
 		closeFunc:                      closeFunc,
 		serviceClient:                  serviceClient,
 		converter:                      converter,
-		queryWorkflowFailedRetryPolicy: queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
+		queryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
 	}
-}
-
-func queryWorkflowFailedRetryPolicyWithDefaults(retryPolicy *config.QueryWorkflowFailedRetryPolicy) QueryWorkflowFailedRetryPolicy {
-	var rp QueryWorkflowFailedRetryPolicy
-
-	if retryPolicy.InitialIntervalSeconds == 0 {
-		rp.InitialIntervalSeconds = 1
-	} else {
-		rp.InitialIntervalSeconds = retryPolicy.InitialIntervalSeconds
-	}
-
-	if retryPolicy.MaximumAttempts == 0 {
-		rp.MaximumAttempts = 5
-	} else {
-		rp.MaximumAttempts = retryPolicy.MaximumAttempts
-	}
-	return rp
 }
 
 func (t *cadenceClient) Close() {
