@@ -3,6 +3,9 @@ api:
   waitForStateCompletionMigration:
     signalWithStartOn: old
     waitForOn: old
+  queryWorkflowFailedRetryPolicy:
+    initialIntervalSeconds: 1
+    maximumAttempts: 5
 interpreter:
   defaultWorkflowConfig:
     continueAsNewThreshold: 100

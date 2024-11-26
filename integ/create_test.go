@@ -84,8 +84,6 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	time.Sleep(time.Second * 2)
-
 	// workflow shouldn't executed any state
 	var dump service.ContinueAsNewDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.ContinueAsNewDumpQueryType)

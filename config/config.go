@@ -31,6 +31,14 @@ type (
 		OmitRpcInputOutputInHistory *bool `yaml:"omitRpcInputOutputInHistory"`
 		// WaitForStateCompletionMigration is used to control workflowId of the WaitForStateCompletion system/internal workflows
 		WaitForStateCompletionMigration WaitForStateCompletionMigration `yaml:"waitForStateCompletionMigration"`
+		QueryWorkflowFailedRetryPolicy  QueryWorkflowFailedRetryPolicy  `yaml:"queryWorkflowFailedRetryPolicy"`
+	}
+
+	QueryWorkflowFailedRetryPolicy struct {
+		// defaults to 1
+		InitialIntervalSeconds int `yaml:"initialIntervalSeconds"`
+		// defaults to 5
+		MaximumAttempts int `yaml:"maximumAttempts"`
 	}
 
 	WaitForStateCompletionMigration struct {
@@ -146,4 +154,22 @@ func (c Config) GetWaitForOnWithDefault() string {
 		return c.Api.WaitForStateCompletionMigration.WaitForOn
 	}
 	return "old"
+}
+
+func QueryWorkflowFailedRetryPolicyWithDefaults(retryPolicy *QueryWorkflowFailedRetryPolicy) QueryWorkflowFailedRetryPolicy {
+	var rp QueryWorkflowFailedRetryPolicy
+
+	if retryPolicy != nil && retryPolicy.InitialIntervalSeconds != 0 {
+		rp.InitialIntervalSeconds = retryPolicy.InitialIntervalSeconds
+	} else {
+		rp.InitialIntervalSeconds = 1
+	}
+
+	if retryPolicy != nil && retryPolicy.MaximumAttempts != 0 {
+		rp.MaximumAttempts = retryPolicy.MaximumAttempts
+	} else {
+		rp.MaximumAttempts = 5
+	}
+
+	return rp
 }
