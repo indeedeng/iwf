@@ -7,19 +7,19 @@ type InternalChannel struct {
 	receivedData map[string][]*iwfidl.EncodedObject
 }
 
-func NewInterStateChannel() *InternalChannel {
+func NewInternalChannel() *InternalChannel {
 	return &InternalChannel{
 		receivedData: map[string][]*iwfidl.EncodedObject{},
 	}
 }
 
-func RebuildInterStateChannel(refill map[string][]*iwfidl.EncodedObject) *InternalChannel {
+func RebuildInternalChannel(refill map[string][]*iwfidl.EncodedObject) *InternalChannel {
 	return &InternalChannel{
 		receivedData: refill,
 	}
 }
 
-func (i *InternalChannel) DumpReceived() map[string][]*iwfidl.EncodedObject {
+func (i *InternalChannel) GetAllReceived() map[string][]*iwfidl.EncodedObject {
 	return i.receivedData
 }
 

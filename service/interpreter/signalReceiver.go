@@ -233,7 +233,7 @@ func (sr *SignalReceiver) Retrieve(channelName string) *iwfidl.EncodedObject {
 	return sigVal
 }
 
-func (sr *SignalReceiver) DumpReceived() map[string][]*iwfidl.EncodedObject {
+func (sr *SignalReceiver) GetAllReceived() map[string][]*iwfidl.EncodedObject {
 	return sr.receivedSignals
 }
 

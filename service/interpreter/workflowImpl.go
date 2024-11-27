@@ -96,7 +96,7 @@ func InterpreterImpl(
 
 		// The below initialization order should be the same as for non-continueAsNew
 
-		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
+		interStateChannel = RebuildInternalChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
@@ -109,7 +109,7 @@ func InterpreterImpl(
 		outputCollector = NewOutputCollector(previous.StateOutputs)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
-		interStateChannel = NewInterStateChannel()
+		interStateChannel = NewInternalChannel()
 		stateRequestQueue = NewStateRequestQueue()
 		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)

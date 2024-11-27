@@ -120,8 +120,8 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 			localStateExecutionToResumeMap[value.StateExecutionId] = value
 		}
 		return &service.ContinueAsNewDumpResponse{
-			InterStateChannelReceived:  c.interStateChannel.DumpReceived(),
-			SignalsReceived:            c.signalReceiver.DumpReceived(),
+			InterStateChannelReceived:  c.interStateChannel.GetAllReceived(),
+			SignalsReceived:            c.signalReceiver.GetAllReceived(),
 			StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
 			DataObjects:                c.persistenceManager.GetAllDataObjects(),
 			SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
