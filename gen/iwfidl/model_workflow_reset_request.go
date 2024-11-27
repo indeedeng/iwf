@@ -28,6 +28,7 @@ type WorkflowResetRequest struct {
 	StateId           *string           `json:"stateId,omitempty"`
 	StateExecutionId  *string           `json:"stateExecutionId,omitempty"`
 	SkipSignalReapply *bool             `json:"skipSignalReapply,omitempty"`
+	SkipUpdateReapply *bool             `json:"skipUpdateReapply,omitempty"`
 }
 
 // NewWorkflowResetRequest instantiates a new WorkflowResetRequest object
@@ -321,6 +322,38 @@ func (o *WorkflowResetRequest) SetSkipSignalReapply(v bool) {
 	o.SkipSignalReapply = &v
 }
 
+// GetSkipUpdateReapply returns the SkipUpdateReapply field value if set, zero value otherwise.
+func (o *WorkflowResetRequest) GetSkipUpdateReapply() bool {
+	if o == nil || IsNil(o.SkipUpdateReapply) {
+		var ret bool
+		return ret
+	}
+	return *o.SkipUpdateReapply
+}
+
+// GetSkipUpdateReapplyOk returns a tuple with the SkipUpdateReapply field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowResetRequest) GetSkipUpdateReapplyOk() (*bool, bool) {
+	if o == nil || IsNil(o.SkipUpdateReapply) {
+		return nil, false
+	}
+	return o.SkipUpdateReapply, true
+}
+
+// HasSkipUpdateReapply returns a boolean if a field has been set.
+func (o *WorkflowResetRequest) HasSkipUpdateReapply() bool {
+	if o != nil && !IsNil(o.SkipUpdateReapply) {
+		return true
+	}
+
+	return false
+}
+
+// SetSkipUpdateReapply gets a reference to the given bool and assigns it to the SkipUpdateReapply field.
+func (o *WorkflowResetRequest) SetSkipUpdateReapply(v bool) {
+	o.SkipUpdateReapply = &v
+}
+
 func (o WorkflowResetRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -353,6 +386,9 @@ func (o WorkflowResetRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SkipSignalReapply) {
 		toSerialize["skipSignalReapply"] = o.SkipSignalReapply
+	}
+	if !IsNil(o.SkipUpdateReapply) {
+		toSerialize["skipUpdateReapply"] = o.SkipUpdateReapply
 	}
 	return toSerialize, nil
 }

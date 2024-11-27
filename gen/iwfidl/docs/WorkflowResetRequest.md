@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **StateId** | Pointer to **string** |  | [optional] 
 **StateExecutionId** | Pointer to **string** |  | [optional] 
 **SkipSignalReapply** | Pointer to **bool** |  | [optional] 
+**SkipUpdateReapply** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -247,6 +248,31 @@ SetSkipSignalReapply sets SkipSignalReapply field to given value.
 `func (o *WorkflowResetRequest) HasSkipSignalReapply() bool`
 
 HasSkipSignalReapply returns a boolean if a field has been set.
+
+### GetSkipUpdateReapply
+
+`func (o *WorkflowResetRequest) GetSkipUpdateReapply() bool`
+
+GetSkipUpdateReapply returns the SkipUpdateReapply field if non-nil, zero value otherwise.
+
+### GetSkipUpdateReapplyOk
+
+`func (o *WorkflowResetRequest) GetSkipUpdateReapplyOk() (*bool, bool)`
+
+GetSkipUpdateReapplyOk returns a tuple with the SkipUpdateReapply field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSkipUpdateReapply
+
+`func (o *WorkflowResetRequest) SetSkipUpdateReapply(v bool)`
+
+SetSkipUpdateReapply sets SkipUpdateReapply field to given value.
+
+### HasSkipUpdateReapply
+
+`func (o *WorkflowResetRequest) HasSkipUpdateReapply() bool`
+
+HasSkipUpdateReapply returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
