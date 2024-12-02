@@ -3,6 +3,9 @@ api:
   waitForStateCompletionMigration:
     signalWithStartOn: old
     waitForOn: old
+  queryWorkflowFailedRetryPolicy:
+    initialIntervalSeconds: 1
+    maximumAttempts: 5
 interpreter:
   #  interpreterActivityConfig:
   #  disableSystemSearchAttributes: true # (deprecated) set to true if you don't have advanced visibility in Cadence, see more https://github.com/uber/cadence/issues/5085

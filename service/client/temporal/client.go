@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	uclient "github.com/indeedeng/iwf/service/client"
@@ -20,23 +21,26 @@ import (
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	realtemporal "go.temporal.io/sdk/temporal"
+	"time"
 )
 
 type temporalClient struct {
-	tClient        client.Client
-	namespace      string
-	dataConverter  converter.DataConverter
-	memoEncryption bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
+	tClient                        client.Client
+	namespace                      string
+	dataConverter                  converter.DataConverter
+	memoEncryption                 bool // this is a workaround for https://github.com/temporalio/sdk-go/issues/1045
+	queryWorkflowFailedRetryPolicy config.QueryWorkflowFailedRetryPolicy
 }
 
 func NewTemporalClient(
-	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool,
+	tClient client.Client, namespace string, dataConverter converter.DataConverter, memoEncryption bool, retryPolicy *config.QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
 	return &temporalClient{
-		tClient:        tClient,
-		namespace:      namespace,
-		dataConverter:  dataConverter,
-		memoEncryption: memoEncryption,
+		tClient:                        tClient,
+		namespace:                      namespace,
+		dataConverter:                  dataConverter,
+		memoEncryption:                 memoEncryption,
+		queryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
 	}
 }
 
@@ -68,6 +72,12 @@ func (t *temporalClient) GetRunIdFromWorkflowAlreadyStartedError(err error) (str
 func (t *temporalClient) IsNotFoundError(err error) bool {
 	var notFound *serviceerror.NotFound
 	ok := errors.As(err, &notFound)
+	return ok
+}
+
+func (t *temporalClient) isQueryFailedError(err error) bool {
+	var serviceError *serviceerror.QueryFailed
+	ok := errors.As(err, &serviceError)
 	return ok
 }
 
@@ -257,7 +267,24 @@ func (t *temporalClient) ListWorkflow(
 func (t *temporalClient) QueryWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{},
 ) error {
-	qres, err := t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
+	var qres converter.EncodedValue
+	var err error
+
+	attempt := 1
+	// Only QueryFailed error causes retry; all other errors make the loop to finish immediately
+	for attempt <= t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
+		qres, err = t.tClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
+		if err == nil {
+			break
+		} else {
+			if t.isQueryFailedError(err) {
+				time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
+				attempt++
+				continue
+			}
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}
@@ -434,9 +461,12 @@ func (t *temporalClient) ResetWorkflow(
 	}
 
 	requestId := uuid.New().String()
-	resetReapplyType := enums.RESET_REAPPLY_TYPE_SIGNAL
+	var resetReapplyExcludeTypes []enums.ResetReapplyExcludeType
 	if request.GetSkipSignalReapply() {
-		resetReapplyType = enums.RESET_REAPPLY_TYPE_NONE
+		resetReapplyExcludeTypes = append(resetReapplyExcludeTypes, enums.RESET_REAPPLY_EXCLUDE_TYPE_SIGNAL)
+	}
+	if request.GetSkipUpdateReapply() {
+		resetReapplyExcludeTypes = append(resetReapplyExcludeTypes, enums.RESET_REAPPLY_EXCLUDE_TYPE_UPDATE)
 	}
 
 	resp, err := t.tClient.ResetWorkflowExecution(ctx, &workflowservice.ResetWorkflowExecutionRequest{
@@ -448,7 +478,7 @@ func (t *temporalClient) ResetWorkflow(
 		Reason:                    request.GetReason(),
 		WorkflowTaskFinishEventId: resetEventId,
 		RequestId:                 requestId,
-		ResetReapplyType:          resetReapplyType,
+		ResetReapplyExcludeTypes:  resetReapplyExcludeTypes,
 	})
 
 	if err != nil {

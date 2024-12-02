@@ -183,9 +183,6 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	panicAtHttpError(err, httpResp)
 
-	if config != nil {
-		time.Sleep(time.Second * 2)
-	}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
 	if err != nil {
 		log.Fatalf("Fail to invoke query %v", err)

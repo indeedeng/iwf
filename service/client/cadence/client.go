@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/indeedeng/iwf/config"
 	"time"
 
 	"github.com/indeedeng/iwf/service"
@@ -23,11 +24,12 @@ import (
 )
 
 type cadenceClient struct {
-	domain        string
-	cClient       client.Client
-	closeFunc     func()
-	serviceClient workflowserviceclient.Interface
-	converter     encoded.DataConverter
+	domain                         string
+	cClient                        client.Client
+	closeFunc                      func()
+	serviceClient                  workflowserviceclient.Interface
+	converter                      encoded.DataConverter
+	queryWorkflowFailedRetryPolicy config.QueryWorkflowFailedRetryPolicy
 }
 
 func (t *cadenceClient) IsWorkflowAlreadyStartedError(err error) bool {
@@ -49,6 +51,12 @@ func (t *cadenceClient) GetRunIdFromWorkflowAlreadyStartedError(err error) (stri
 func (t *cadenceClient) IsNotFoundError(err error) bool {
 	var entityNotExistsError *shared.EntityNotExistsError
 	ok := errors.As(err, &entityNotExistsError)
+	return ok
+}
+
+func (t *cadenceClient) isQueryFailedError(err error) bool {
+	var serviceError *shared.QueryFailedError
+	ok := errors.As(err, &serviceError)
 	return ok
 }
 
@@ -83,14 +91,15 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 
 func NewCadenceClient(
 	domain string, cClient client.Client, serviceClient workflowserviceclient.Interface,
-	converter encoded.DataConverter, closeFunc func(),
+	converter encoded.DataConverter, closeFunc func(), retryPolicy *config.QueryWorkflowFailedRetryPolicy,
 ) uclient.UnifiedClient {
 	return &cadenceClient{
-		domain:        domain,
-		cClient:       cClient,
-		closeFunc:     closeFunc,
-		serviceClient: serviceClient,
-		converter:     converter,
+		domain:                         domain,
+		cClient:                        cClient,
+		closeFunc:                      closeFunc,
+		serviceClient:                  serviceClient,
+		converter:                      converter,
+		queryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
 	}
 }
 
@@ -227,7 +236,24 @@ func (t *cadenceClient) ListWorkflow(
 func (t *cadenceClient) QueryWorkflow(
 	ctx context.Context, valuePtr interface{}, workflowID string, runID string, queryType string, args ...interface{},
 ) error {
-	qres, err := queryWorkflowWithStrongConsistency(t, ctx, workflowID, runID, queryType, args)
+	var qres encoded.Value
+	var err error
+
+	attempt := 1
+	// Only QueryFailed error causes retry; all other errors make the loop to finish immediately
+	for attempt <= t.queryWorkflowFailedRetryPolicy.MaximumAttempts {
+		qres, err = t.cClient.QueryWorkflow(ctx, workflowID, runID, queryType, args...)
+		if err == nil {
+			break
+		} else {
+			if t.isQueryFailedError(err) {
+				time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
+				attempt++
+				continue
+			}
+			return err
+		}
+	}
 	if err != nil {
 		return err
 	}

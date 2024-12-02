@@ -83,7 +83,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	startReq := iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        locking.WorkflowType,
-		WorkflowTimeoutSeconds: 100,
+		WorkflowTimeoutSeconds: 300,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(locking.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
@@ -245,4 +245,76 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		},
 	}
 	assertions.ElementsMatch(expected1, queryResult1.GetObjects())
+
+	//reset here with reapply and compare counter
+	resetReq := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
+	_, httpResp, err = resetReq.WorkflowResetRequest(iwfidl.WorkflowResetRequest{
+		WorkflowId: wfId,
+		ResetType:  iwfidl.BEGINNING,
+		//SkipSignalReapply: ptr.Any(true),
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	time.Sleep(time.Second * 20)
+	req2Reset := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	resp2Reset, httpResp, err := req2Reset.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: wfId,
+	}).Execute()
+	panicAtHttpError(err, httpResp)
+
+	assertions.Equal(iwfidl.COMPLETED, resp2Reset.GetWorkflowStatus())
+
+	//TODO: There is a bug in the Temporal go SDK where only the first update method is actually executed. When that is fixed the following code can be uncommented to test resetting update methods.
+	//time.Sleep(time.Second * 10)
+	//reqRpcReset := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+	//_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+	//	WorkflowId: wfId,
+	//	RpcName:    locking.RPCName,
+	//	Input:      locking.UnblockValue,
+	//}).Execute()
+	//panicAtHttpError(err, httpResp)
+
+	//time.Sleep(time.Second * 20)
+	//req2Reset := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	//resp2Reset, httpResp, err := req2Reset.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+	//	WorkflowId: wfId,
+	//}).Execute()
+	//panicAtHttpError(err, httpResp)
+
+	//s2StartsDecides := locking.InParallelS2 + rpcIncrease // locking.InParallelS2 original state executions, and a new trigger from rpc
+	//finalCounterValue := int64(locking.InParallelS2 + 2*rpcIncrease)
+	//stateCompletionCount := locking.InParallelS2 + rpcIncrease + 1
+	//resetHistory, _ := wfHandler.GetTestResult()
+	//assertions.Equalf(map[string]int64{
+	//	"S1_start":            1,
+	//	"S1_decide":           1,
+	//	"StateWaiting_start":  1,
+	//	"StateWaiting_decide": 1,
+	//	"S2_start":            int64(s2StartsDecides),
+	//	"S2_decide":           int64(s2StartsDecides),
+	//}, resetHistory, "locking.test fail, %v", history)
+	//
+	//assertions.Equal(iwfidl.COMPLETED, resp2Reset.GetWorkflowStatus())
+	//assertions.Equal(stateCompletionCount, len(resp2Reset.GetResults()))
+	//
+	//reqSearchReset := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
+	//searchResultReset, httpResp, err := reqSearchReset.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
+	//	WorkflowId: wfId,
+	//	Keys: []iwfidl.SearchAttributeKeyAndType{
+	//		{
+	//			Key:       iwfidl.PtrString(locking.TestSearchAttributeIntKey),
+	//			ValueType: ptr.Any(iwfidl.INT),
+	//		},
+	//	},
+	//}).Execute()
+	//panicAtHttpError(err, httpResp)
+	//
+	//expectedSearchAttributeIntReset := iwfidl.SearchAttribute{
+	//	Key:          iwfidl.PtrString(locking.TestSearchAttributeIntKey),
+	//	ValueType:    ptr.Any(iwfidl.INT),
+	//	IntegerValue: iwfidl.PtrInt64(finalCounterValue),
+	//}
+	//assertions.Equal([]iwfidl.SearchAttribute{expectedSearchAttributeIntReset}, searchResultReset.GetSearchAttributes())
+
+	//reset here without update reapply and counter should be less
 }
