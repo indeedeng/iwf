@@ -178,6 +178,12 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 	}
 }
 
+func panicAError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func panicAtHttpError(err error, httpResp *http.Response) {
 	if err != nil {
 		panic(err)

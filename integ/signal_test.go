@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	config2 "github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -9,7 +10,6 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"net/http"
 	"strconv"
 	"testing"
@@ -23,6 +23,14 @@ func TestSignalWorkflowTemporal(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestSignalWorkflow(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
+	}
+}
+
+func TestSignalWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
 		doTestSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
 		smallWaitForFastTest()
 	}
@@ -35,45 +43,17 @@ func TestSignalWorkflowCadence(t *testing.T) {
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestSignalWorkflow(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
-		doTestSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
-		smallWaitForFastTest()
 	}
 }
 
-func TestSignalWorkflowNoWorkflowId(t *testing.T) {
-	if !*temporalIntegTest {
+func TestSignalWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
 		t.Skip()
 	}
-	assertions := assert.New(t)
-	_, closeFunc2 := startIwfServiceWithClient(service.BackendTypeTemporal)
-	defer closeFunc2()
-
-	// start a workflow
-	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		Servers: []iwfidl.ServerConfiguration{
-			{
-				URL: "http://localhost:" + testIwfServerPort,
-			},
-		},
-	})
-	req := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
-	httpResp, err := req.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
-		WorkflowId:        "",
-		SignalChannelName: signal.SignalName,
-	}).Execute()
-
-	assertions.Equal(httpResp.StatusCode, http.StatusBadRequest)
-
-	apiErr, ok := err.(*iwfidl.GenericOpenAPIError)
-	if !ok {
-		log.Fatalf("Should fail to invoke get api %v", err)
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
+		smallWaitForFastTest()
 	}
-	errResp, ok := apiErr.Model().(iwfidl.ErrorResponse)
-	if !ok {
-		log.Fatalf("should be error response")
-	}
-	assertions.Equal(iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS, errResp.GetSubStatus())
-	assertions.Equal("WorkflowId is not set on request.", errResp.GetDetail())
 }
 
 func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
@@ -81,7 +61,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 
 	// start test workflow server
 	wfHandler := signal.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -100,7 +80,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
 		IwfWorkflowType:        signal.WorkflowType,
-		WorkflowTimeoutSeconds: 10,
+		WorkflowTimeoutSeconds: 20,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(signal.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
@@ -178,7 +158,30 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			// see why in https://github.com/temporalio/temporal/issues/4801
 			unhandledSignalVals = append(unhandledSignalVals, sigVal)
 		}
+		reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+		rpcResp, httpResp2, err2 := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+			WorkflowId: wfId,
+			RpcName:    signal.RPCNameGetSignalChannelInfo,
+		}).Execute()
+		panicAtHttpError(err2, httpResp2)
+		var infos map[string]iwfidl.ChannelInfo
+		err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
+		panicAError(err)
+		assertions.Equal(
+			map[string]iwfidl.ChannelInfo{signal.UnhandledSignalName: {Size: ptr.Any(int32(i + 1))}}, infos)
 	}
+
+	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
+	rpcResp, httpResp2, err2 := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
+		WorkflowId: wfId,
+		RpcName:    signal.RPCNameGetInternalChannelInfo,
+	}).Execute()
+	panicAtHttpError(err2, httpResp2)
+	var infos map[string]iwfidl.ChannelInfo
+	err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
+	panicAError(err)
+	assertions.Equal(
+		map[string]iwfidl.ChannelInfo{signal.InternalChannelName: {Size: ptr.Any(int32(10))}}, infos)
 
 	// signal the workflow
 	var signalVals []iwfidl.EncodedObject

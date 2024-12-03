@@ -1,6 +1,7 @@
 package signal
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -12,11 +13,14 @@ import (
 )
 
 const (
-	WorkflowType        = "signal"
-	State1              = "S1"
-	State2              = "S2"
-	SignalName          = "test-signal-name"
-	UnhandledSignalName = "test-unhandled-signal-name"
+	WorkflowType                  = "signal"
+	State1                        = "S1"
+	State2                        = "S2"
+	SignalName                    = "test-signal-name"
+	InternalChannelName           = "test-internal-channel-name"
+	UnhandledSignalName           = "test-unhandled-signal-name"
+	RPCNameGetSignalChannelInfo   = "RPCNameGetSignalChannelInfo"
+	RPCNameGetInternalChannelInfo = "RPCNameGetInternalChannelInfo"
 )
 
 type handler struct {
@@ -24,7 +28,48 @@ type handler struct {
 	invokeData    map[string]interface{}
 }
 
-func NewHandler() common.WorkflowHandler {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+	var req iwfidl.WorkflowWorkerRpcRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if req.RpcName == RPCNameGetSignalChannelInfo {
+		signalInfos := req.SignalChannelInfos
+		data, err := json.Marshal(signalInfos)
+		if err != nil {
+			panic(err)
+		}
+		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+			PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+				{
+					ChannelName: InternalChannelName,
+				},
+			},
+			Output: &iwfidl.EncodedObject{
+				Data: ptr.Any(string(data)),
+			},
+		})
+		return
+	}
+	if req.RpcName == RPCNameGetInternalChannelInfo {
+		icInfos := req.InternalChannelInfos
+		data, err := json.Marshal(icInfos)
+		if err != nil {
+			panic(err)
+		}
+		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
+			Output: &iwfidl.EncodedObject{
+				Data: ptr.Any(string(data)),
+			},
+		})
+		return
+	}
+	c.JSON(http.StatusBadRequest, gin.H{})
+	return
+}
+
+func NewHandler() common.WorkflowHandlerWithRpc {
 	return &handler{
 		invokeHistory: make(map[string]int64),
 		invokeData:    make(map[string]interface{}),
