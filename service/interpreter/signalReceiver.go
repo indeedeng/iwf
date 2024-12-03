@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"strings"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -235,6 +236,16 @@ func (sr *SignalReceiver) Retrieve(channelName string) *iwfidl.EncodedObject {
 
 func (sr *SignalReceiver) GetAllReceived() map[string][]*iwfidl.EncodedObject {
 	return sr.receivedSignals
+}
+
+func (sr *SignalReceiver) GetInfos() map[string]iwfidl.ChannelInfo {
+	infos := map[string]iwfidl.ChannelInfo{}
+	for name, l := range sr.receivedSignals {
+		infos[name] = iwfidl.ChannelInfo{
+			Size: ptr.Any(int32(len(l))),
+		}
+	}
+	return infos
 }
 
 // DrainAllReceivedButUnprocessedSignals will process all the signals that are received but not processed in the current

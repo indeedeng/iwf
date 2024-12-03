@@ -83,6 +83,8 @@ type (
 		WorkflowStartedTimestamp int64
 		IwfWorkflowType          string
 		IwfWorkerUrl             string
+		SignalChannelInfo        map[string]iwfidl.ChannelInfo
+		InternalChannelInfo      map[string]iwfidl.ChannelInfo
 	}
 
 	ExecuteRpcSignalRequest struct {

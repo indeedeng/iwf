@@ -1689,14 +1689,12 @@ components:
         internalChannelInfos:
           key:
             size: 0
-            name: name
         input:
           data: data
           encoding: encoding
         signalChannelInfos:
           key:
             size: 0
-            name: name
         context:
           firstAttemptTimestamp: 6
           workflowStartedTimestamp: 0
@@ -1767,10 +1765,7 @@ components:
     ChannelInfo:
       example:
         size: 0
-        name: name
       properties:
-        name:
-          type: string
         size:
           type: integer
       type: object

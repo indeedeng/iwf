@@ -7,6 +7,7 @@ import (
 
 func SetQueryHandlers(
 	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
+	internalChannel *InternalChannel, signalReceiver *SignalReceiver,
 	continueAsNewer *ContinueAsNewer,
 	workflowConfiger *WorkflowConfiger, basicInfo service.BasicInfo,
 ) error {
@@ -45,6 +46,8 @@ func SetQueryHandlers(
 			WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
 			IwfWorkflowType:          basicInfo.IwfWorkflowType,
 			IwfWorkerUrl:             basicInfo.IwfWorkerUrl,
+			SignalChannelInfo:        signalReceiver.GetInfos(),
+			InternalChannelInfo:      internalChannel.GetInfos(),
 		}, nil
 	})
 	if err != nil {

@@ -1,6 +1,9 @@
 package interpreter
 
-import "github.com/indeedeng/iwf/gen/iwfidl"
+import (
+	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/service/common/ptr"
+)
 
 type InternalChannel struct {
 	// key is channel name
@@ -21,6 +24,16 @@ func RebuildInternalChannel(refill map[string][]*iwfidl.EncodedObject) *Internal
 
 func (i *InternalChannel) GetAllReceived() map[string][]*iwfidl.EncodedObject {
 	return i.receivedData
+}
+
+func (i *InternalChannel) GetInfos() map[string]iwfidl.ChannelInfo {
+	infos := map[string]iwfidl.ChannelInfo{}
+	for name, l := range i.receivedData {
+		infos[name] = iwfidl.ChannelInfo{
+			Size: ptr.Any(int32(len(l))),
+		}
+	}
+	return infos
 }
 
 func (i *InternalChannel) HasData(channelName string) bool {

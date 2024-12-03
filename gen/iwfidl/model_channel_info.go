@@ -19,8 +19,7 @@ var _ MappedNullable = &ChannelInfo{}
 
 // ChannelInfo struct for ChannelInfo
 type ChannelInfo struct {
-	Name *string `json:"name,omitempty"`
-	Size *int32  `json:"size,omitempty"`
+	Size *int32 `json:"size,omitempty"`
 }
 
 // NewChannelInfo instantiates a new ChannelInfo object
@@ -38,38 +37,6 @@ func NewChannelInfo() *ChannelInfo {
 func NewChannelInfoWithDefaults() *ChannelInfo {
 	this := ChannelInfo{}
 	return &this
-}
-
-// GetName returns the Name field value if set, zero value otherwise.
-func (o *ChannelInfo) GetName() string {
-	if o == nil || IsNil(o.Name) {
-		var ret string
-		return ret
-	}
-	return *o.Name
-}
-
-// GetNameOk returns a tuple with the Name field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *ChannelInfo) GetNameOk() (*string, bool) {
-	if o == nil || IsNil(o.Name) {
-		return nil, false
-	}
-	return o.Name, true
-}
-
-// HasName returns a boolean if a field has been set.
-func (o *ChannelInfo) HasName() bool {
-	if o != nil && !IsNil(o.Name) {
-		return true
-	}
-
-	return false
-}
-
-// SetName gets a reference to the given string and assigns it to the Name field.
-func (o *ChannelInfo) SetName(v string) {
-	o.Name = &v
 }
 
 // GetSize returns the Size field value if set, zero value otherwise.
@@ -114,9 +81,6 @@ func (o ChannelInfo) MarshalJSON() ([]byte, error) {
 
 func (o ChannelInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Name) {
-		toSerialize["name"] = o.Name
-	}
 	if !IsNil(o.Size) {
 		toSerialize["size"] = o.Size
 	}
