@@ -29,6 +29,8 @@ const (
 
 	InParallelS2 = 10
 
+	NumUnusedSignals = 4
+
 	UnusedSignalChannelName   = "test-unused-signal-channel"
 	UnusedInternalChannelName = "test-unused-internal-channel"
 )
@@ -113,7 +115,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	}
 
 	signalChannelInfo := (*req.SignalChannelInfos)[UnusedSignalChannelName]
-	if signalChannelInfo.GetSize() != 4 {
+	if signalChannelInfo.GetSize() != NumUnusedSignals {
 		// the 4 messages are sent from the beginning of "locking_test"
 		panic("incorrect signal channel size")
 	}

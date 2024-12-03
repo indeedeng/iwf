@@ -93,7 +93,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	panicAtHttpError(err, httpResp)
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < locking.NumUnusedSignals; i++ {
 		// send 4 unused signals at the beginning to validate the ChannelInfo feature
 		reqSignal := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 		httpResp, err = reqSignal.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
