@@ -28,6 +28,9 @@ const (
 	ShouldUnblockStateWaiting = "shouldUnblockStateWaiting"
 
 	InParallelS2 = 10
+
+	UnusedSignalChannelName   = "test-unused-signal-channel"
+	UnusedInternalChannelName = "test-unused-internal-channel"
 )
 
 var TestValue = &iwfidl.EncodedObject{
@@ -71,6 +74,7 @@ var state2Movement = iwfidl.StateMovement{
 type handler struct {
 	invokeHistory map[string]int64
 	invokeData    map[string]interface{}
+	rpcInvokes    int32
 }
 
 func NewHandler() common.WorkflowHandlerWithRpc {
@@ -107,6 +111,19 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		})
 		return
 	}
+
+	signalChannelInfo := (*req.SignalChannelInfos)[UnusedSignalChannelName]
+	if signalChannelInfo.GetSize() != 4 {
+		panic("incorrect signal channel size")
+	}
+	if h.rpcInvokes > 0 {
+		internalChannelInfo := (*req.InternalChannelInfos)[UnusedInternalChannelName]
+		if h.rpcInvokes != internalChannelInfo.GetSize() {
+			panic("incorrect internal channel size")
+		}
+	}
+	h.rpcInvokes++
+	
 	// this RPC will increase both SA and DA
 	time.Sleep(time.Millisecond)
 
@@ -176,6 +193,12 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 			{
 				Key:   iwfidl.PtrString("test-key"),
 				Value: TestValue,
+			},
+		},
+		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+			{
+				ChannelName: UnusedInternalChannelName,
+				Value:       TestValue,
 			},
 		},
 	}
