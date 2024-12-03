@@ -11,7 +11,7 @@ type WorkflowUpdater struct {
 	provider             WorkflowProvider
 	continueAsNewer      *ContinueAsNewer
 	continueAsNewCounter *ContinueAsNewCounter
-	interStateChannel    *InterStateChannel
+	interStateChannel    *InternalChannel
 	stateRequestQueue    *StateRequestQueue
 	configer             *WorkflowConfiger
 	logger               UnifiedLogger
@@ -23,7 +23,7 @@ func NewWorkflowUpdater(
 	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
 	stateRequestQueue *StateRequestQueue,
 	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, configer *WorkflowConfiger,
-	interStateChannel *InterStateChannel, basicInfo service.BasicInfo, globalVersioner *GlobalVersioner,
+	interStateChannel *InternalChannel, basicInfo service.BasicInfo, globalVersioner *GlobalVersioner,
 ) (*WorkflowUpdater, error) {
 	updater := &WorkflowUpdater{
 		persistenceManager:   persistenceManager,

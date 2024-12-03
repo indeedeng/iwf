@@ -16,7 +16,7 @@ type ContinueAsNewer struct {
 	inflightUpdateOperations  int
 
 	stateRequestQueue     *StateRequestQueue
-	interStateChannel     *InterStateChannel
+	interStateChannel     *InternalChannel
 	stateExecutionCounter *StateExecutionCounter
 	persistenceManager    *PersistenceManager
 	signalReceiver        *SignalReceiver
@@ -26,7 +26,7 @@ type ContinueAsNewer struct {
 
 func NewContinueAsNewer(
 	provider WorkflowProvider,
-	interStateChannel *InterStateChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
+	interStateChannel *InternalChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
 	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector,
 	timerProcessor *TimerProcessor,
 ) *ContinueAsNewer {
@@ -120,8 +120,8 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 			localStateExecutionToResumeMap[value.StateExecutionId] = value
 		}
 		return &service.ContinueAsNewDumpResponse{
-			InterStateChannelReceived:  c.interStateChannel.ReadReceived(nil),
-			SignalsReceived:            c.signalReceiver.DumpReceived(nil),
+			InterStateChannelReceived:  c.interStateChannel.GetAllReceived(),
+			SignalsReceived:            c.signalReceiver.GetAllReceived(),
 			StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
 			DataObjects:                c.persistenceManager.GetAllDataObjects(),
 			SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),

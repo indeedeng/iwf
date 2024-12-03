@@ -76,7 +76,7 @@ func InterpreterImpl(
 		IwfWorkerUrl:    input.IwfWorkerUrl,
 	}
 
-	var interStateChannel *InterStateChannel
+	var interStateChannel *InternalChannel
 	var stateRequestQueue *StateRequestQueue
 	var persistenceManager *PersistenceManager
 	var timerProcessor *TimerProcessor
@@ -96,7 +96,7 @@ func InterpreterImpl(
 
 		// The below initialization order should be the same as for non-continueAsNew
 
-		interStateChannel = RebuildInterStateChannel(previous.InterStateChannelReceived)
+		interStateChannel = RebuildInternalChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
@@ -109,7 +109,7 @@ func InterpreterImpl(
 		outputCollector = NewOutputCollector(previous.StateOutputs)
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
-		interStateChannel = NewInterStateChannel()
+		interStateChannel = NewInternalChannel()
 		stateRequestQueue = NewStateRequestQueue()
 		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
@@ -382,7 +382,7 @@ func InterpreterImpl(
 func checkClosingWorkflow(
 	ctx UnifiedContext, provider WorkflowProvider, versioner *GlobalVersioner, decision *iwfidl.StateDecision,
 	currentStateId, currentStateExeId string,
-	internalChannel *InterStateChannel, signalReceiver *SignalReceiver,
+	internalChannel *InternalChannel, signalReceiver *SignalReceiver,
 ) (canGoNext, gracefulComplete, forceComplete, forceFail bool, completeOutput *iwfidl.StateCompletionOutput, err error) {
 	if decision.HasConditionalClose() {
 		conditionClose := decision.ConditionalClose
@@ -511,7 +511,7 @@ func processStateExecution(
 	stateReq StateRequest,
 	stateExeId string,
 	persistenceManager *PersistenceManager,
-	interStateChannel *InterStateChannel,
+	interStateChannel *InternalChannel,
 	signalReceiver *SignalReceiver,
 	timerProcessor *TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
@@ -818,7 +818,7 @@ func invokeStateExecute(
 	state iwfidl.StateMovement,
 	stateExeId string,
 	persistenceManager *PersistenceManager,
-	interStateChannel *InterStateChannel,
+	interStateChannel *InternalChannel,
 	executionContext iwfidl.Context,
 	commandRes *iwfidl.CommandResults,
 	continueAsNewer *ContinueAsNewer,
