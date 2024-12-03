@@ -120,7 +120,7 @@ func InterpreterImpl(
 		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
 
-	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, interStateChannel, basicInfo, globalVersioner)
+	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, interStateChannel, signalReceiver, basicInfo, globalVersioner)
 	if err != nil {
 		retErr = err
 		return
@@ -129,7 +129,7 @@ func InterpreterImpl(
 	// This is to ensure the correctness. If we set the query handler before that,
 	// the query handler could return empty data (since the loading hasn't completed), which will be incorrect response.
 	// We would rather return server errors and let the client retry later.
-	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
+	err = SetQueryHandlers(ctx, provider, persistenceManager, interStateChannel, signalReceiver, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
 		retErr = err
 		return
