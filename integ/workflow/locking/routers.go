@@ -114,6 +114,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 
 	signalChannelInfo := (*req.SignalChannelInfos)[UnusedSignalChannelName]
 	if signalChannelInfo.GetSize() != 4 {
+		// the 4 messages are sent from the beginning of "locking_test"
 		panic("incorrect signal channel size")
 	}
 	if h.rpcInvokes > 0 {
