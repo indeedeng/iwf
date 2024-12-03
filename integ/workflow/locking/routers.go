@@ -123,7 +123,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		}
 	}
 	h.rpcInvokes++
-	
+
 	// this RPC will increase both SA and DA
 	time.Sleep(time.Millisecond)
 
