@@ -10,6 +10,8 @@ Name | Type | Description | Notes
 **Input** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 **DataAttributes** | Pointer to [**[]KeyValue**](KeyValue.md) |  | [optional] 
+**SignalChannelInfos** | Pointer to [**map[string]ChannelInfo**](ChannelInfo.md) |  | [optional] 
+**InternalChannelInfos** | Pointer to [**map[string]ChannelInfo**](ChannelInfo.md) |  | [optional] 
 
 ## Methods
 
@@ -164,6 +166,56 @@ SetDataAttributes sets DataAttributes field to given value.
 `func (o *WorkflowWorkerRpcRequest) HasDataAttributes() bool`
 
 HasDataAttributes returns a boolean if a field has been set.
+
+### GetSignalChannelInfos
+
+`func (o *WorkflowWorkerRpcRequest) GetSignalChannelInfos() map[string]ChannelInfo`
+
+GetSignalChannelInfos returns the SignalChannelInfos field if non-nil, zero value otherwise.
+
+### GetSignalChannelInfosOk
+
+`func (o *WorkflowWorkerRpcRequest) GetSignalChannelInfosOk() (*map[string]ChannelInfo, bool)`
+
+GetSignalChannelInfosOk returns a tuple with the SignalChannelInfos field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSignalChannelInfos
+
+`func (o *WorkflowWorkerRpcRequest) SetSignalChannelInfos(v map[string]ChannelInfo)`
+
+SetSignalChannelInfos sets SignalChannelInfos field to given value.
+
+### HasSignalChannelInfos
+
+`func (o *WorkflowWorkerRpcRequest) HasSignalChannelInfos() bool`
+
+HasSignalChannelInfos returns a boolean if a field has been set.
+
+### GetInternalChannelInfos
+
+`func (o *WorkflowWorkerRpcRequest) GetInternalChannelInfos() map[string]ChannelInfo`
+
+GetInternalChannelInfos returns the InternalChannelInfos field if non-nil, zero value otherwise.
+
+### GetInternalChannelInfosOk
+
+`func (o *WorkflowWorkerRpcRequest) GetInternalChannelInfosOk() (*map[string]ChannelInfo, bool)`
+
+GetInternalChannelInfosOk returns a tuple with the InternalChannelInfos field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetInternalChannelInfos
+
+`func (o *WorkflowWorkerRpcRequest) SetInternalChannelInfos(v map[string]ChannelInfo)`
+
+SetInternalChannelInfos sets InternalChannelInfos field to given value.
+
+### HasInternalChannelInfos
+
+`func (o *WorkflowWorkerRpcRequest) HasInternalChannelInfos() bool`
+
+HasInternalChannelInfos returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

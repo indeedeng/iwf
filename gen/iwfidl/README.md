@@ -102,6 +102,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ChannelInfo](docs/ChannelInfo.md)
  - [ChannelRequestStatus](docs/ChannelRequestStatus.md)
  - [CommandCombination](docs/CommandCombination.md)
  - [CommandRequest](docs/CommandRequest.md)
