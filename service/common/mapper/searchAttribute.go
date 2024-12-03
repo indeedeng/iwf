@@ -45,7 +45,8 @@ func MapToInternalSearchAttributes(attributes []iwfidl.SearchAttribute) (map[str
 
 func MapCadenceToIwfSearchAttributes(searchAttributes *shared.SearchAttributes, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (map[string]iwfidl.SearchAttribute, error) {
 	if searchAttributes == nil || len(requestedSearchAttributes) == 0 {
-		return nil, nil
+		// return empty map rather than nil
+		return make(map[string]iwfidl.SearchAttribute), nil
 	}
 
 	result := make(map[string]iwfidl.SearchAttribute, len(requestedSearchAttributes))
@@ -74,7 +75,8 @@ func MapCadenceToIwfSearchAttributes(searchAttributes *shared.SearchAttributes, 
 
 func MapTemporalToIwfSearchAttributes(searchAttributes *common.SearchAttributes, requestedSearchAttributes []iwfidl.SearchAttributeKeyAndType) (map[string]iwfidl.SearchAttribute, error) {
 	if searchAttributes == nil || len(requestedSearchAttributes) == 0 {
-		return nil, nil
+		// return empty map rather than nil
+		return make(map[string]iwfidl.SearchAttribute), nil
 	}
 
 	result := make(map[string]iwfidl.SearchAttribute, len(requestedSearchAttributes))
