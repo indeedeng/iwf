@@ -10,7 +10,7 @@ require (
 	github.com/uber-go/tally/v4 v4.1.1
 	github.com/uber/cadence-idl v0.0.0-20220713235846-fda89e95df1e
 	github.com/urfave/cli v1.22.5
-	go.temporal.io/sdk v1.29.1
+	go.temporal.io/sdk v1.30.0
 	go.temporal.io/sdk/contrib/tally v0.1.0
 	go.temporal.io/sdk/contrib/tools/workflowcheck v0.0.0-20220331154559-fd0d1eb548eb
 	go.uber.org/cadence v0.17.1-0.20230105221902-f50f452a8eae // pin to pick GetUnhandledSignalNames API
@@ -19,14 +19,12 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require (
-	github.com/pkg/errors v0.9.1
-	go.temporal.io/api v1.39.0
-)
+require go.temporal.io/api v1.40.0
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
-	github.com/nexus-rpc/sdk-go v0.0.10 // indirect
+	github.com/nexus-rpc/sdk-go v0.0.11 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
