@@ -178,7 +178,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 	}
 }
 
-func panicAError(err error) {
+func panicAtError(err error) {
 	if err != nil {
 		panic(err)
 	}

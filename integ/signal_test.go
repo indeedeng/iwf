@@ -166,7 +166,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		panicAtHttpError(err2, httpResp2)
 		var infos map[string]iwfidl.ChannelInfo
 		err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
-		panicAError(err)
+		panicAtError(err)
 		assertions.Equal(
 			map[string]iwfidl.ChannelInfo{signal.UnhandledSignalName: {Size: ptr.Any(int32(i + 1))}}, infos)
 	}
@@ -179,7 +179,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	panicAtHttpError(err2, httpResp2)
 	var infos map[string]iwfidl.ChannelInfo
 	err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
-	panicAError(err)
+	panicAtError(err)
 	assertions.Equal(
 		map[string]iwfidl.ChannelInfo{signal.InternalChannelName: {Size: ptr.Any(int32(10))}}, infos)
 
