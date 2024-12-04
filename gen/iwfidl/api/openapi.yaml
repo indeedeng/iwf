@@ -1686,9 +1686,15 @@ components:
       type: object
     WorkflowWorkerRpcRequest:
       example:
+        internalChannelInfos:
+          key:
+            size: 0
         input:
           data: data
           encoding: encoding
+        signalChannelInfos:
+          key:
+            size: 0
         context:
           firstAttemptTimestamp: 6
           workflowStartedTimestamp: 0
@@ -1743,10 +1749,25 @@ components:
           items:
             $ref: '#/components/schemas/KeyValue'
           type: array
+        signalChannelInfos:
+          additionalProperties:
+            $ref: '#/components/schemas/ChannelInfo'
+          type: object
+        internalChannelInfos:
+          additionalProperties:
+            $ref: '#/components/schemas/ChannelInfo'
+          type: object
       required:
       - context
       - rpcName
       - workflowType
+      type: object
+    ChannelInfo:
+      example:
+        size: 0
+      properties:
+        size:
+          type: integer
       type: object
     WorkflowWorkerRpcResponse:
       example:

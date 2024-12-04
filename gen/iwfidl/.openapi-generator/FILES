@@ -6,6 +6,7 @@ api/openapi.yaml
 api_default.go
 client.go
 configuration.go
+docs/ChannelInfo.md
 docs/ChannelRequestStatus.md
 docs/CommandCombination.md
 docs/CommandRequest.md
@@ -91,6 +92,7 @@ docs/WorkflowWorkerRpcResponse.md
 git_push.sh
 go.mod
 go.sum
+model_channel_info.go
 model_channel_request_status.go
 model_command_combination.go
 model_command_request.go

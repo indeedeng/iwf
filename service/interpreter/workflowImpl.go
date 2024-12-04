@@ -76,7 +76,7 @@ func InterpreterImpl(
 		IwfWorkerUrl:    input.IwfWorkerUrl,
 	}
 
-	var interStateChannel *InternalChannel
+	var internalChannel *InternalChannel
 	var stateRequestQueue *StateRequestQueue
 	var persistenceManager *PersistenceManager
 	var timerProcessor *TimerProcessor
@@ -96,31 +96,31 @@ func InterpreterImpl(
 
 		// The below initialization order should be the same as for non-continueAsNew
 
-		interStateChannel = RebuildInternalChannel(previous.InterStateChannelReceived)
+		internalChannel = RebuildInternalChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
+		signalReceiver = NewSignalReceiver(ctx, provider, internalChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider, globalVersioner,
 			counterInfo.StateIdStartedCount, counterInfo.StateIdCurrentlyExecutingCount, counterInfo.TotalCurrentlyExecutingCount,
 			workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(previous.StateOutputs)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
+		continueAsNewer = NewContinueAsNewer(provider, internalChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	} else {
-		interStateChannel = NewInternalChannel()
+		internalChannel = NewInternalChannel()
 		stateRequestQueue = NewStateRequestQueue()
 		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
 		timerProcessor = NewTimerProcessor(ctx, provider, nil)
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
-		signalReceiver = NewSignalReceiver(ctx, provider, interStateChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
+		signalReceiver = NewSignalReceiver(ctx, provider, internalChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, globalVersioner, workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
-		continueAsNewer = NewContinueAsNewer(provider, interStateChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
+		continueAsNewer = NewContinueAsNewer(provider, internalChannel, signalReceiver, stateExecutionCounter, persistenceManager, stateRequestQueue, outputCollector, timerProcessor)
 	}
 
-	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, interStateChannel, basicInfo, globalVersioner)
+	_, err = NewWorkflowUpdater(ctx, provider, persistenceManager, stateRequestQueue, continueAsNewer, continueAsNewCounter, workflowConfiger, internalChannel, signalReceiver, basicInfo, globalVersioner)
 	if err != nil {
 		retErr = err
 		return
@@ -129,7 +129,7 @@ func InterpreterImpl(
 	// This is to ensure the correctness. If we set the query handler before that,
 	// the query handler could return empty data (since the loading hasn't completed), which will be incorrect response.
 	// We would rather return server errors and let the client retry later.
-	err = SetQueryHandlers(ctx, provider, persistenceManager, continueAsNewer, workflowConfiger, basicInfo)
+	err = SetQueryHandlers(ctx, provider, persistenceManager, internalChannel, signalReceiver, continueAsNewer, workflowConfiger, basicInfo)
 	if err != nil {
 		retErr = err
 		return
@@ -229,7 +229,7 @@ func InterpreterImpl(
 							slices.Contains(input.WaitForCompletionStateIds, state.GetStateId())
 
 					decision, stateExecStatus, err := processStateExecution(
-						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, interStateChannel,
+						ctx, provider, globalVersioner, basicInfo, stateReq, stateExeId, persistenceManager, internalChannel,
 						signalReceiver, timerProcessor, continueAsNewer, continueAsNewCounter, workflowConfiger, shouldSendSignalOnCompletion)
 					if err != nil {
 						// this is the case where stateExecStatus == FailureStateExecutionStatus
@@ -242,7 +242,7 @@ func InterpreterImpl(
 						// NOTE: decision is only available on this CompletedStateExecutionStatus
 
 						canGoNext, gracefulComplete, forceComplete, forceFail, output, err :=
-							checkClosingWorkflow(ctx, provider, globalVersioner, decision, state.GetStateId(), stateExeId, interStateChannel, signalReceiver)
+							checkClosingWorkflow(ctx, provider, globalVersioner, decision, state.GetStateId(), stateExeId, internalChannel, signalReceiver)
 						if err != nil {
 							errToFailWf = err
 							// no return so that it can fall through to call MarkStateExecutionCompleted

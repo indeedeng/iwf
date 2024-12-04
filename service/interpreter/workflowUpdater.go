@@ -11,7 +11,8 @@ type WorkflowUpdater struct {
 	provider             WorkflowProvider
 	continueAsNewer      *ContinueAsNewer
 	continueAsNewCounter *ContinueAsNewCounter
-	interStateChannel    *InternalChannel
+	internalChannel      *InternalChannel
+	signalReceiver       *SignalReceiver
 	stateRequestQueue    *StateRequestQueue
 	configer             *WorkflowConfiger
 	logger               UnifiedLogger
@@ -23,13 +24,15 @@ func NewWorkflowUpdater(
 	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
 	stateRequestQueue *StateRequestQueue,
 	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, configer *WorkflowConfiger,
-	interStateChannel *InternalChannel, basicInfo service.BasicInfo, globalVersioner *GlobalVersioner,
+	internalChannel *InternalChannel, signalReceiver *SignalReceiver, basicInfo service.BasicInfo,
+	globalVersioner *GlobalVersioner,
 ) (*WorkflowUpdater, error) {
 	updater := &WorkflowUpdater{
 		persistenceManager:   persistenceManager,
 		continueAsNewer:      continueAsNewer,
 		continueAsNewCounter: continueAsNewCounter,
-		interStateChannel:    interStateChannel,
+		internalChannel:      internalChannel,
+		signalReceiver:       signalReceiver,
 		stateRequestQueue:    stateRequestQueue,
 		configer:             configer,
 		basicInfo:            basicInfo,
@@ -61,6 +64,8 @@ func (u *WorkflowUpdater) handler(
 		WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
 		IwfWorkflowType:          u.basicInfo.IwfWorkflowType,
 		IwfWorkerUrl:             u.basicInfo.IwfWorkerUrl,
+		SignalChannelInfo:        u.signalReceiver.GetInfos(),
+		InternalChannelInfo:      u.internalChannel.GetInfos(),
 	}
 
 	activityOptions := ActivityOptions{
@@ -91,7 +96,7 @@ func (u *WorkflowUpdater) handler(
 		u.continueAsNewCounter.IncSyncUpdateReceived()
 		_ = u.persistenceManager.ProcessUpsertDataObject(ctx, rpcOutput.UpsertDataAttributes)
 		_ = u.persistenceManager.ProcessUpsertSearchAttribute(ctx, rpcOutput.UpsertSearchAttributes)
-		u.interStateChannel.ProcessPublishing(rpcOutput.PublishToInterStateChannel)
+		u.internalChannel.ProcessPublishing(rpcOutput.PublishToInterStateChannel)
 		if rpcOutput.StateDecision != nil {
 			u.stateRequestQueue.AddStateStartRequests(rpcOutput.StateDecision.NextStates)
 		}

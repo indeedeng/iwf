@@ -19,12 +19,14 @@ var _ MappedNullable = &WorkflowWorkerRpcRequest{}
 
 // WorkflowWorkerRpcRequest struct for WorkflowWorkerRpcRequest
 type WorkflowWorkerRpcRequest struct {
-	Context          Context           `json:"context"`
-	WorkflowType     string            `json:"workflowType"`
-	RpcName          string            `json:"rpcName"`
-	Input            *EncodedObject    `json:"input,omitempty"`
-	SearchAttributes []SearchAttribute `json:"searchAttributes,omitempty"`
-	DataAttributes   []KeyValue        `json:"dataAttributes,omitempty"`
+	Context              Context                 `json:"context"`
+	WorkflowType         string                  `json:"workflowType"`
+	RpcName              string                  `json:"rpcName"`
+	Input                *EncodedObject          `json:"input,omitempty"`
+	SearchAttributes     []SearchAttribute       `json:"searchAttributes,omitempty"`
+	DataAttributes       []KeyValue              `json:"dataAttributes,omitempty"`
+	SignalChannelInfos   *map[string]ChannelInfo `json:"signalChannelInfos,omitempty"`
+	InternalChannelInfos *map[string]ChannelInfo `json:"internalChannelInfos,omitempty"`
 }
 
 // NewWorkflowWorkerRpcRequest instantiates a new WorkflowWorkerRpcRequest object
@@ -215,6 +217,70 @@ func (o *WorkflowWorkerRpcRequest) SetDataAttributes(v []KeyValue) {
 	o.DataAttributes = v
 }
 
+// GetSignalChannelInfos returns the SignalChannelInfos field value if set, zero value otherwise.
+func (o *WorkflowWorkerRpcRequest) GetSignalChannelInfos() map[string]ChannelInfo {
+	if o == nil || IsNil(o.SignalChannelInfos) {
+		var ret map[string]ChannelInfo
+		return ret
+	}
+	return *o.SignalChannelInfos
+}
+
+// GetSignalChannelInfosOk returns a tuple with the SignalChannelInfos field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowWorkerRpcRequest) GetSignalChannelInfosOk() (*map[string]ChannelInfo, bool) {
+	if o == nil || IsNil(o.SignalChannelInfos) {
+		return nil, false
+	}
+	return o.SignalChannelInfos, true
+}
+
+// HasSignalChannelInfos returns a boolean if a field has been set.
+func (o *WorkflowWorkerRpcRequest) HasSignalChannelInfos() bool {
+	if o != nil && !IsNil(o.SignalChannelInfos) {
+		return true
+	}
+
+	return false
+}
+
+// SetSignalChannelInfos gets a reference to the given map[string]ChannelInfo and assigns it to the SignalChannelInfos field.
+func (o *WorkflowWorkerRpcRequest) SetSignalChannelInfos(v map[string]ChannelInfo) {
+	o.SignalChannelInfos = &v
+}
+
+// GetInternalChannelInfos returns the InternalChannelInfos field value if set, zero value otherwise.
+func (o *WorkflowWorkerRpcRequest) GetInternalChannelInfos() map[string]ChannelInfo {
+	if o == nil || IsNil(o.InternalChannelInfos) {
+		var ret map[string]ChannelInfo
+		return ret
+	}
+	return *o.InternalChannelInfos
+}
+
+// GetInternalChannelInfosOk returns a tuple with the InternalChannelInfos field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowWorkerRpcRequest) GetInternalChannelInfosOk() (*map[string]ChannelInfo, bool) {
+	if o == nil || IsNil(o.InternalChannelInfos) {
+		return nil, false
+	}
+	return o.InternalChannelInfos, true
+}
+
+// HasInternalChannelInfos returns a boolean if a field has been set.
+func (o *WorkflowWorkerRpcRequest) HasInternalChannelInfos() bool {
+	if o != nil && !IsNil(o.InternalChannelInfos) {
+		return true
+	}
+
+	return false
+}
+
+// SetInternalChannelInfos gets a reference to the given map[string]ChannelInfo and assigns it to the InternalChannelInfos field.
+func (o *WorkflowWorkerRpcRequest) SetInternalChannelInfos(v map[string]ChannelInfo) {
+	o.InternalChannelInfos = &v
+}
+
 func (o WorkflowWorkerRpcRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -236,6 +302,12 @@ func (o WorkflowWorkerRpcRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.DataAttributes) {
 		toSerialize["dataAttributes"] = o.DataAttributes
+	}
+	if !IsNil(o.SignalChannelInfos) {
+		toSerialize["signalChannelInfos"] = o.SignalChannelInfos
+	}
+	if !IsNil(o.InternalChannelInfos) {
+		toSerialize["internalChannelInfos"] = o.InternalChannelInfos
 	}
 	return toSerialize, nil
 }

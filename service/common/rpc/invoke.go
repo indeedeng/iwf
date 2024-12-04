@@ -13,7 +13,9 @@ import (
 	"net/http"
 )
 
-func InvokeWorkerRpc(ctx context.Context, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest, apiMaxSeconds int64) (*iwfidl.WorkflowWorkerRpcResponse, *errors.ErrorAndStatus) {
+func InvokeWorkerRpc(
+	ctx context.Context, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest, apiMaxSeconds int64,
+) (*iwfidl.WorkflowWorkerRpcResponse, *errors.ErrorAndStatus) {
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(rpcPrep.IwfWorkerUrl)
 	// invoke worker rpc
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
@@ -33,11 +35,13 @@ func InvokeWorkerRpc(ctx context.Context, rpcPrep *service.PrepareRpcQueryRespon
 			WorkflowRunId:            rpcPrep.WorkflowRunId,
 			WorkflowStartedTimestamp: rpcPrep.WorkflowStartedTimestamp,
 		},
-		WorkflowType:     rpcPrep.IwfWorkflowType,
-		RpcName:          req.RpcName,
-		Input:            req.Input,
-		SearchAttributes: rpcPrep.SearchAttributes,
-		DataAttributes:   rpcPrep.DataObjects,
+		WorkflowType:         rpcPrep.IwfWorkflowType,
+		RpcName:              req.RpcName,
+		Input:                req.Input,
+		SearchAttributes:     rpcPrep.SearchAttributes,
+		DataAttributes:       rpcPrep.DataObjects,
+		SignalChannelInfos:   &rpcPrep.SignalChannelInfo,
+		InternalChannelInfos: &rpcPrep.InternalChannelInfo,
 	}
 	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
 	if utils.CheckHttpError(err, httpResp) {
