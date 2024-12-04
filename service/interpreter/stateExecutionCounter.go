@@ -209,6 +209,7 @@ func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() erro
 		})
 		if err != nil {
 			e.provider.GetLogger(e.ctx).Error("error for GetSearchAttributes", err)
+			return err
 		}
 
 		var currentSAsValues []string
