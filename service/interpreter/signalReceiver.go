@@ -239,7 +239,7 @@ func (sr *SignalReceiver) GetAllReceived() map[string][]*iwfidl.EncodedObject {
 }
 
 func (sr *SignalReceiver) GetInfos() map[string]iwfidl.ChannelInfo {
-	infos := map[string]iwfidl.ChannelInfo{}
+	infos := make(map[string]iwfidl.ChannelInfo, len(sr.receivedSignals))
 	for name, l := range sr.receivedSignals {
 		infos[name] = iwfidl.ChannelInfo{
 			Size: ptr.Any(int32(len(l))),
