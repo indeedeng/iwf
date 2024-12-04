@@ -154,6 +154,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 						NextStates: []iwfidl.StateMovement{
 							{
 								StateId: State2,
+								StateOptions: &iwfidl.WorkflowStateOptions{
+									SkipWaitUntil: iwfidl.PtrBool(true),
+								},
 							},
 						},
 					},
@@ -192,6 +195,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 						NextStates: []iwfidl.StateMovement{
 							{
 								StateId: State2,
+								StateOptions: &iwfidl.WorkflowStateOptions{
+									SkipWaitUntil: iwfidl.PtrBool(true),
+								},
 							},
 							{
 								StateId: State3,
