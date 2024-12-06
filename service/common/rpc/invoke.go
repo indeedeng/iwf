@@ -29,6 +29,23 @@ func InvokeWorkerRpc(
 	rpcCtx, cancel := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.TimeoutSeconds, apiMaxSeconds)
 	defer cancel()
 	workerReq := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(rpcCtx)
+
+	// creating empty maps for signalChannelInfos & internalChannelInfos instead of passing in nils
+	// using nil causes problems when converting to map model defined with OpenAPI
+	var signalChannelInfos map[string]iwfidl.ChannelInfo
+	if rpcPrep.SignalChannelInfo == nil {
+		signalChannelInfos = make(map[string]iwfidl.ChannelInfo)
+	} else {
+		signalChannelInfos = rpcPrep.SignalChannelInfo
+	}
+
+	var internalChannelInfos map[string]iwfidl.ChannelInfo
+	if rpcPrep.InternalChannelInfo == nil {
+		internalChannelInfos = make(map[string]iwfidl.ChannelInfo)
+	} else {
+		internalChannelInfos = rpcPrep.InternalChannelInfo
+	}
+
 	workerRequest := iwfidl.WorkflowWorkerRpcRequest{
 		Context: iwfidl.Context{
 			WorkflowId:               req.WorkflowId,
@@ -40,8 +57,8 @@ func InvokeWorkerRpc(
 		Input:                req.Input,
 		SearchAttributes:     rpcPrep.SearchAttributes,
 		DataAttributes:       rpcPrep.DataObjects,
-		SignalChannelInfos:   &rpcPrep.SignalChannelInfo,
-		InternalChannelInfos: &rpcPrep.InternalChannelInfo,
+		SignalChannelInfos:   &signalChannelInfos,
+		InternalChannelInfos: &internalChannelInfos,
 	}
 	resp, httpResp, err := workerReq.WorkflowWorkerRpcRequest(workerRequest).Execute()
 	if utils.CheckHttpError(err, httpResp) {
