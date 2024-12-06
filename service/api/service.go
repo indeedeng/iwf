@@ -623,28 +623,12 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 
 	var rpcPrep *service.PrepareRpcQueryResponse
 
-	saPolicy := req.GetSearchAttributesLoadingPolicy()
-	daPolicy := req.GetDataAttributesLoadingPolicy()
-
-	if req.GetUseMemoForDataAttributes() ||
-		(daPolicy.GetPersistenceLoadingType() == iwfidl.NONE &&
-			(saPolicy.GetPersistenceLoadingType() == iwfidl.NONE || len(req.GetSearchAttributes()) == 0)) {
-		rpcPrep, retError = s.tryPrepareRPCbyDescribe(ctx, req)
-		if retError != nil {
-			return nil, retError
-		}
-		// Note that rpcPrep could be nil here
-	}
-
-	if rpcPrep == nil {
-		// use query to load, this is expensive. So it tries to avoid if possible
-		err := s.client.QueryWorkflow(ctx, &rpcPrep, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
-			DataObjectsLoadingPolicy:      req.DataAttributesLoadingPolicy,
-			SearchAttributesLoadingPolicy: req.SearchAttributesLoadingPolicy,
-		})
-		if err != nil {
-			return nil, s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
-		}
+	err := s.client.QueryWorkflow(ctx, &rpcPrep, req.GetWorkflowId(), req.GetWorkflowRunId(), service.PrepareRpcQueryType, service.PrepareRpcQueryRequest{
+		DataObjectsLoadingPolicy:      req.DataAttributesLoadingPolicy,
+		SearchAttributesLoadingPolicy: req.SearchAttributesLoadingPolicy,
+	})
+	if err != nil {
+		return nil, s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
 	}
 
 	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds)
