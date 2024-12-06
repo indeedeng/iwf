@@ -62,6 +62,10 @@ func MapCadenceToIwfSearchAttributes(searchAttributes *shared.SearchAttributes, 
 		if err != nil {
 			return nil, err
 		}
+		// when SAs are nil, skip calling mapToIwfSearchAttribute
+		if object == nil {
+			continue
+		}
 		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, true)
 		if err != nil {
 			return nil, err
@@ -94,6 +98,10 @@ func MapTemporalToIwfSearchAttributes(searchAttributes *common.SearchAttributes,
 		}
 		// TODO we should also call UseNumber here for JSON decoder for Temporal
 		// see https://github.com/temporalio/sdk-go/issues/942
+		// when SAs are nil, skip calling mapToIwfSearchAttribute
+		if object == nil {
+			continue
+		}
 		rv, err := mapToIwfSearchAttribute(key, sa.GetValueType(), object, false)
 		if err != nil {
 			return nil, err

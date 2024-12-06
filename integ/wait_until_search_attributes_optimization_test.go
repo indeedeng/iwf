@@ -140,18 +140,19 @@ func doTestWaitUntilHistoryCompleted(
 		assertions.Equal([]string{"S3", "S6"}, historyEventSAs(upsertSAEvents[7]))
 		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[8]))
 		assertions.Equal([]string{"null"}, historyEventSAs(upsertSAEvents[9]))
+	case iwfidl.DISABLED:
+		assertions.Equal(1, len(upsertSAEvents))
 	case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
+	default:
 		assertions.Equal(9, len(upsertSAEvents))
 		assertions.Equal([]string{"S1"}, historyEventSAs(upsertSAEvents[1]))
-		assertions.Equal([]string{"S2"}, historyEventSAs(upsertSAEvents[2]))
-		assertions.Equal([]string{"S2", "S3"}, historyEventSAs(upsertSAEvents[3]))
+		assertions.Equal([]string{"null"}, historyEventSAs(upsertSAEvents[2]))
+		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[3]))
 		assertions.Equal([]string{"S3", "S4"}, historyEventSAs(upsertSAEvents[4]))
 		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[5]))
 		assertions.Equal([]string{"S3", "S6"}, historyEventSAs(upsertSAEvents[6]))
 		assertions.Equal([]string{"S3"}, historyEventSAs(upsertSAEvents[7]))
 		assertions.Equal([]string{"null"}, historyEventSAs(upsertSAEvents[8]))
-	case iwfidl.DISABLED:
-		assertions.Equal(1, len(upsertSAEvents))
 	}
 }
 
