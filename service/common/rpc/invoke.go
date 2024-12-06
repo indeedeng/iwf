@@ -30,6 +30,8 @@ func InvokeWorkerRpc(
 	defer cancel()
 	workerReq := apiClient.DefaultApi.ApiV1WorkflowWorkerRpcPost(rpcCtx)
 
+	// creating empty maps for signalChannelInfos & internalChannelInfos instead of passing in nils
+	// using nil causes problems when converting to map model defined with OpenAPI
 	var signalChannelInfos map[string]iwfidl.ChannelInfo
 	if rpcPrep.SignalChannelInfo == nil {
 		signalChannelInfos = make(map[string]iwfidl.ChannelInfo)
