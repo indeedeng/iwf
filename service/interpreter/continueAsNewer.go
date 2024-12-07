@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"math"
 	"strings"
@@ -135,7 +136,7 @@ func (c *ContinueAsNewer) GetSnapshot() service.ContinueAsNewDumpResponse {
 }
 
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
-	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryType,
+	err := c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryType,
 		func(request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
 			wholeSnapshot := c.GetSnapshot()
 			wholeData, err := json.Marshal(wholeSnapshot)
@@ -163,6 +164,12 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 				JsonData:   string(wholeData[start:end]),
 			}, nil
 		})
+	if err != nil {
+		return err
+	}
+	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryTypeForCadence, func() (*service.ContinueAsNewDumpResponse, error) {
+		return ptr.Any(c.GetSnapshot()), nil
+	}
 }
 
 func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(
