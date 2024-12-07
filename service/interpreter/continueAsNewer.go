@@ -167,9 +167,10 @@ func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) e
 	if err != nil {
 		return err
 	}
-	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryTypeForCadence, func() (*service.ContinueAsNewDumpResponse, error) {
-		return ptr.Any(c.GetSnapshot()), nil
-	}
+	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryTypeForCadence,
+		func() (*service.ContinueAsNewDumpResponse, error) {
+			return ptr.Any(c.GetSnapshot()), nil
+		})
 }
 
 func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(

@@ -868,7 +868,7 @@ func (s *serviceImpl) ApiV1WorkflowDumpPost(
 	ctx context.Context, request iwfidl.WorkflowDumpRequest,
 ) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
 	if s.config.Interpreter.Cadence != nil {
-		// TODO Cadence doesn't work with the new continueAsNew type...
+		// TODO Cadence doesn't work with moving the pagination to query handler
 		// local is fine but CI is failing .... :(
 		var internals service.ContinueAsNewDumpResponse
 
