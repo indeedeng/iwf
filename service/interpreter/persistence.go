@@ -159,14 +159,6 @@ func (am *PersistenceManager) LoadDataObjects(
 
 func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
 	var res []iwfidl.SearchAttribute
-	if am.provider.GetBackendType() == service.BackendTypeCadence {
-		// TODO not sure why cadence doesn't work for this in CI(local is fine)
-		for _, value := range am.searchAttributes {
-			res = append(res, value)
-		}
-		return res
-	}
-
 	// NOTE: using DeterministicKeys so that the JSON snapshot for continueAsNew is stable for pagination
 	// TODO: we should use DeterministicKeys for every map iteration in interpreter for safety
 	// https://github.com/indeedeng/iwf/issues/510
@@ -178,13 +170,6 @@ func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute 
 
 func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 	var res []iwfidl.KeyValue
-	if am.provider.GetBackendType() == service.BackendTypeCadence {
-		// TODO not sure why cadence doesn't work for this in CI(local is fine)
-		for _, value := range am.dataObjects {
-			res = append(res, value)
-		}
-		return res
-	}
 
 	// NOTE: using DeterministicKeys so that the JSON snapshot for continueAsNew is stable for pagination
 	// TODO: we should use DeterministicKeys for every map iteration in interpreter for safety

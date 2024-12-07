@@ -20,6 +20,9 @@ for run in {1..60}; do
   fi
 done
 
-
+echo "After registering, it may take up 60s because of this issue. for Cadence to load the new search attributes." 
+echo "If run the test too early, you may see error: \"IwfWorkflowType is not a valid search attribute key\""
+echo "and the test would fail with: unknown decision DecisionType: Activity, ID: 0, possible causes are nondeterministic workflow definition code or incompatible change in the workflow definition"
+sleep 60
 
 tail -f /dev/null
