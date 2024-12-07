@@ -160,7 +160,7 @@ func (am *PersistenceManager) LoadDataObjects(
 func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
 	var res []iwfidl.SearchAttribute
 	if am.provider.GetBackendType() == service.BackendTypeCadence {
-		// TODO not sure why cadence doesn't work for this
+		// TODO not sure why cadence doesn't work for this in CI(local is fine)
 		for _, value := range am.searchAttributes {
 			res = append(res, value)
 		}
@@ -179,7 +179,7 @@ func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute 
 func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 	var res []iwfidl.KeyValue
 	if am.provider.GetBackendType() == service.BackendTypeCadence {
-		// TODO not sure why cadence doesn't work for this
+		// TODO not sure why cadence doesn't work for this in CI(local is fine)
 		for _, value := range am.dataObjects {
 			res = append(res, value)
 		}
