@@ -32,17 +32,25 @@ func TestAnyCommandCloseWorkflowTemporalContinueAsNew(t *testing.T) {
 	}
 }
 
-// TODO not sure why it's broken in CI
-// but running in local is fine...
-//func TestAnyCommandCloseWorkflowCadence(t *testing.T) {
-//	if !*cadenceIntegTest {
-//		t.Skip()
-//	}
-//	for i := 0; i < *repeatIntegTest; i++ {
-//		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
-//		smallWaitForFastTest()
-//	}
-//}
+func TestAnyCommandCloseWorkflowCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+	}
+}
+
+func TestAnyCommandCloseWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(true))
+		smallWaitForFastTest()
+	}
+}
 
 func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server

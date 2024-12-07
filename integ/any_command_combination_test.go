@@ -35,6 +35,26 @@ func TestAnyCommandCombinationWorkflowTemporalContinueAsNew(t *testing.T) {
 	}
 }
 
+func TestAnyCommandCombinationWorkflowCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+	}
+}
+
+func TestAnyCommandCombinationWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyCommandCloseWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
+		smallWaitForFastTest()
+	}
+}
+
 func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	// start test workflow server
