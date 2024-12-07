@@ -13,11 +13,11 @@ yes | cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
 
 
 for run in {1..60}; do
-  sleep 1
   echo "now trying to register domain in Cadence..."
   if cadence --do default domain register | grep -q 'Domain default already registered'; then
     break
   fi
+  sleep 1
 done
 
 echo "After registering, it may take up 60s because of this issue. for Cadence to load the new search attributes." 
