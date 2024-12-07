@@ -18,12 +18,6 @@ echo "and the test would fail with: unknown decision DecisionType: Activity, ID:
 sleep 65
 
 echo "now register the domain to tell the tests that Cadence is ready"
-for run in {1..60}; do
-  echo "now trying to register domain in Cadence..."
-  if cadence --do default domain register | grep -q 'Domain default already registered'; then
-    break
-  fi
-  sleep 1
-done
+cadence --do default domain register
 
 tail -f /dev/null
