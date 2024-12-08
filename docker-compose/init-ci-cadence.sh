@@ -12,11 +12,12 @@ yes | cadence adm cl asa --search_attr_key IwfExecutingStateIds --search_attr_ty
 yes | cadence adm cl asa --search_attr_key IwfWorkflowType --search_attr_type 1
 
 
-# see https://github.com/indeedeng/iwf/blob/main/CONTRIBUTING.md#option-3-run-with-your-own-cadence-service
-echo "now sleep for 60s so that all the search attributes can take effect"
+echo "After registering, it may take up 60s because of this issue. for Cadence to load the new search attributes." 
+echo "If run the test too early, you may see error: \"IwfWorkflowType is not a valid search attribute key\""
+echo "and the test would fail with: unknown decision DecisionType: Activity, ID: 0, possible causes are nondeterministic workflow definition code or incompatible change in the workflow definition"
+sleep 65
 
-sleep 70
-
+echo "now register the domain to tell the tests that Cadence is ready"
 cadence --do default domain register
 
 tail -f /dev/null

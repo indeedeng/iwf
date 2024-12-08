@@ -3,14 +3,13 @@ package temporal
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/config"
-	"log"
-
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	"go.temporal.io/sdk/worker"
+	"log"
 )
 
 type InterpreterWorker struct {

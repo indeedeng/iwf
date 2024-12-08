@@ -133,7 +133,8 @@ type (
 	}
 
 	DebugDumpResponse struct {
-		Config iwfidl.WorkflowConfig
+		Config   iwfidl.WorkflowConfig
+		Snapshot ContinueAsNewDumpResponse
 	}
 
 	StateExecutionCounterInfo struct {

@@ -99,9 +99,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	if config != nil {
 		expectedConfig = *config
 	}
-	assertions.Equal(service.DebugDumpResponse{
-		Config: expectedConfig,
-	}, debugDump)
+	assertions.Equal(expectedConfig, debugDump.Config)
 
 	// update the disable system SA
 	reqUpdateConfig := apiClient.DefaultApi.ApiV1WorkflowConfigUpdatePost(context.Background())
@@ -118,16 +116,14 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		panic(err)
 	}
 	expectedConfig.DisableSystemSearchAttribute = iwfidl.PtrBool(true)
-	assertions.Equal(service.DebugDumpResponse{
-		Config: expectedConfig,
-	}, debugDump)
+	assertions.Equal(expectedConfig, debugDump.Config)
 
 	// update the pagination size
 	reqUpdateConfig = apiClient.DefaultApi.ApiV1WorkflowConfigUpdatePost(context.Background())
 	httpResp, err = reqUpdateConfig.WorkflowConfigUpdateRequest(iwfidl.WorkflowConfigUpdateRequest{
 		WorkflowId: wfId,
 		WorkflowConfig: iwfidl.WorkflowConfig{
-			ContinueAsNewPageSizeInBytes: iwfidl.PtrInt32(300),
+			ContinueAsNewPageSizeInBytes: iwfidl.PtrInt32(3000000),
 		},
 	}).Execute()
 	panicAtHttpError(err, httpResp)
@@ -136,10 +132,8 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	if err != nil {
 		panic(err)
 	}
-	expectedConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(300)
-	assertions.Equal(service.DebugDumpResponse{
-		Config: expectedConfig,
-	}, debugDump)
+	expectedConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(3000000)
+	assertions.Equal(expectedConfig, debugDump.Config)
 
 	// signal for testing unhandled signals
 	var unhandledSignalVals []*iwfidl.EncodedObject
@@ -225,12 +219,12 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		assertions.Equal(signalVals[i], data[fmt.Sprintf("signalValue%v", i)])
 	}
 
-	var dump service.ContinueAsNewDumpResponse
-	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.ContinueAsNewDumpQueryType)
+	var dump service.DebugDumpResponse
+	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		panic(err)
 	}
-	assertions.Equal(unhandledSignalVals, dump.SignalsReceived[signal.UnhandledSignalName])
+	assertions.Equal(unhandledSignalVals, dump.Snapshot.SignalsReceived[signal.UnhandledSignalName])
 	assertions.True(len(unhandledSignalVals) > 0)
 
 	if config == nil {

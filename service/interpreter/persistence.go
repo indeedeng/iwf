@@ -19,7 +19,8 @@ type PersistenceManager struct {
 }
 
 func NewPersistenceManager(
-	provider WorkflowProvider, initDataAttributes []iwfidl.KeyValue, initSearchAttributes []iwfidl.SearchAttribute, useMemo bool,
+	provider WorkflowProvider, initDataAttributes []iwfidl.KeyValue, initSearchAttributes []iwfidl.SearchAttribute,
+	useMemo bool,
 ) *PersistenceManager {
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
 	for _, sa := range initSearchAttributes {
@@ -158,16 +159,23 @@ func (am *PersistenceManager) LoadDataObjects(
 
 func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute {
 	var res []iwfidl.SearchAttribute
-	for _, value := range am.searchAttributes {
-		res = append(res, value)
+	// NOTE: using DeterministicKeys so that the JSON snapshot for continueAsNew is stable for pagination
+	// TODO: we should use DeterministicKeys for every map iteration in interpreter for safety
+	// https://github.com/indeedeng/iwf/issues/510
+	for _, k := range DeterministicKeys(am.searchAttributes) {
+		res = append(res, am.searchAttributes[k])
 	}
 	return res
 }
 
 func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 	var res []iwfidl.KeyValue
-	for _, value := range am.dataObjects {
-		res = append(res, value)
+
+	// NOTE: using DeterministicKeys so that the JSON snapshot for continueAsNew is stable for pagination
+	// TODO: we should use DeterministicKeys for every map iteration in interpreter for safety
+	// https://github.com/indeedeng/iwf/issues/510
+	for _, k := range DeterministicKeys(am.dataObjects) {
+		res = append(res, am.dataObjects[k])
 	}
 	return res
 }
