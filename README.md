@@ -15,7 +15,7 @@ It offers an orchestration **coding framework** with abstractions for durable ti
 KV storage,  RPC, and message queues. You will build long-running reliable processes faster than ever.
 
 
-# What is [iWF](https://github.com/indeedeng/iwf/wiki)
+# What is iWF
 
 ## Use case study/examples
 * [SAGA pattern](https://medium.com/@qlong/saga-pattern-deep-dive-with-indeed-workflow-engine-b7e82c59e51f?sk=672abd70b0e092d4cda7788276c5a241)
@@ -31,10 +31,7 @@ KV storage,  RPC, and message queues. You will build long-running reliable proce
 * [RPC](https://github.com/indeedeng/iwf/wiki/RPC)
 * [Persistence](https://github.com/indeedeng/iwf/wiki/Persistence)
 
-## Advanced concepts
-* [WorkflowOptions](https://github.com/indeedeng/iwf/wiki/WorkflowOptions)
-* [WorkflowStateOptions](https://github.com/indeedeng/iwf/wiki/WorkflowStateOptions)
-* [Persistence Caching](https://github.com/indeedeng/iwf/wiki/Persistence-Caching)
+See more in [iWF wiki](https://github.com/indeedeng/iwf/wiki).
 
 # How to use
 
@@ -44,55 +41,34 @@ As a coding framework, iWF provides three SDKs to use with:
 * [iWF Golang SDK](https://github.com/indeedeng/iwf-golang-sdk) and [samples](https://github.com/indeedeng/iwf-golang-samples)
 * [iWF Python SDK](https://github.com/indeedeng/iwf-python-sdk) and [samples](https://github.com/indeedeng/iwf-python-samples)
 
-The iWF SDKs required to run with the server:
+The iWF SDKs required a server to run against. See below options to run the server locally. See [iWF wiki](https://github.com/indeedeng/iwf/wiki) for production 
 
 ## Using all-in-one docker image
+
+This is the simplest option to run the server locally for development.
 
 Run the docker command to start the container for:
 * IWF service: http://localhost:8801/
 * Temporal WebUI: http://localhost:8233/
 * Temporal service: localhost:7233
 ```shell
-docker run -p 8801:8801 -p 7233:7233 -p 8233:8233 -e AUTO_FIX_WORKER_URL=host.docker.internal --add-host host.docker.internal:host-gateway -it iworkflowio/iwf-server-lite:latest
+docker pull iworkflowio/iwf-server-lite:latest && docker run -p 8801:8801 -p 7233:7233 -p 8233:8233 -e AUTO_FIX_WORKER_URL=host.docker.internal --add-host host.docker.internal:host-gateway -it iworkflowio/iwf-server-lite:latest
 ```
-
-To update the server version, use `docker pull iworkflowio/iwf-server-lite:latest` to get the latest image. Or change `latest` to specify a version tag.
 
 ## Using docker image & docker-compose
 
-This is the simpler(preferred) option to run the server locally for development.
+This option runs Temporal in separate container with slightly more power (more search attributes allowed).
 
-Checkout this repo, go to the docker-compose folder and run it:
+Checkout this repo, and run:
 
 ```shell
-cd docker-compose && docker-compose up
+docker pull iworkflowio/iwf-server:latest && docker-compose -f ./docker-compose/docker-compose.yml up
 ```
 
 This by default will run Temporal server with it, again:
 * IWF service: http://localhost:8801/
 * Temporal WebUI: http://localhost:8233/
 * Temporal service: localhost:7233
-
-To update the server version, use `docker pull iworkflowio/iwf-server:latest` to get the latest image. Or update the docker-compose file to specify
-a version tag.
-
-## How to build & run locally
-
-* Run `make bins` to build the binary `iwf-server`
-* Make sure you have registered the system search attributes required by iWF server:
-    * Keyword: IwfWorkflowType
-    * Int: IwfGlobalWorkflowVersion
-    * Keyword: IwfExecutingStateIds
-    * See [Contribution](./CONTRIBUTING.md) for more detailed commands.
-    * For Cadence without advancedVisibility enabled,
-      set [disableSystemSearchAttributes](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L8)
-      to true and [executingStateIdMode](https://github.com/indeedeng/iwf/blob/main/config/development_cadence.yaml#L9)
-      to DISABLED
-* Then run  `./iwf-server start` to run the service . This defaults to serve workflows APIs with Temporal interpreter
-  implementation. It requires to have local Temporal setup. See Run with local Temporal.
-* Alternatively, run `./iwf-server --config config/development_cadence.yaml start` to run with local Cadence. See below
-  instructions for setting up local Cadence.
-
 
 # Support
 
