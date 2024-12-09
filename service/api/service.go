@@ -864,13 +864,13 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(
 func (s *serviceImpl) ApiV1WorkflowDumpPost(
 	ctx context.Context, request iwfidl.WorkflowDumpRequest,
 ) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
-	var pageOfSnapshot *iwfidl.WorkflowDumpResponse
+	var pageOfSnapshot iwfidl.WorkflowDumpResponse
 
-	err := s.client.QueryWorkflow(ctx, &pageOfSnapshot, request.GetWorkflowId(), request.GetWorkflowRunId(), service.ContinueAsNewDumpQueryType, request)
+	err := s.client.QueryWorkflow(ctx, &pageOfSnapshot, request.GetWorkflowId(), request.GetWorkflowRunId(), service.ContinueAsNewDumpByPageQueryType, request)
 	if err != nil {
 		return nil, s.handleError(err, WorkflowInternalDumpApiPath, request.GetWorkflowId())
 	}
-	return pageOfSnapshot, nil
+	return &pageOfSnapshot, nil
 }
 
 func (s *serviceImpl) ApiInfoHealth(ctx context.Context) *iwfidl.HealthInfo {

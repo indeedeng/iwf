@@ -135,7 +135,8 @@ func (c *ContinueAsNewer) GetSnapshot() service.ContinueAsNewDumpResponse {
 }
 
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
-	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryType,
+	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpByPageQueryType,
+		// return the current page of the whole snapshot
 		func(request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
 			wholeSnapshot := c.GetSnapshot()
 			wholeData, err := json.Marshal(wholeSnapshot)
