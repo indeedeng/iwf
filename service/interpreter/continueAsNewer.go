@@ -1,10 +1,13 @@
 package interpreter
 
 import (
+	"crypto/md5"
 	"encoding/json"
+	"fmt"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/interpreter/env"
+	"math"
 	"strings"
 	"time"
 )
@@ -87,9 +90,9 @@ func LoadInternalsFromPreviousRun(
 		if lastChecksum != "" && lastChecksum != resp.Checksum {
 			// reset to start from beginning
 			pageNum = 0
-			lastChecksum = ""
 			sb.Reset()
 			provider.GetLogger(ctx).Error("checksum has changed during the loading", lastChecksum, resp.Checksum)
+			lastChecksum = ""
 			continue
 		} else {
 			lastChecksum = resp.Checksum
@@ -110,27 +113,57 @@ func LoadInternalsFromPreviousRun(
 	return &resp, nil
 }
 
+func (c *ContinueAsNewer) GetSnapshot() service.ContinueAsNewDumpResponse {
+	localStateExecutionToResumeMap := map[string]service.StateExecutionResumeInfo{}
+	for key, state := range c.StateExecutionToResumeMap {
+		localStateExecutionToResumeMap[key] = state
+	}
+	for _, value := range c.stateRequestQueue.GetAllStateResumeRequests() {
+		localStateExecutionToResumeMap[value.StateExecutionId] = value
+	}
+	return service.ContinueAsNewDumpResponse{
+		InterStateChannelReceived:  c.interStateChannel.GetAllReceived(),
+		SignalsReceived:            c.signalReceiver.GetAllReceived(),
+		StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
+		DataObjects:                c.persistenceManager.GetAllDataObjects(),
+		SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
+		StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
+		StateExecutionsToResume:    localStateExecutionToResumeMap,
+		StateOutputs:               c.outputCollector.GetAll(),
+		StaleSkipTimerSignals:      c.timerProcessor.Dump(),
+	}
+}
+
 func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
-	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpQueryType, func() (*service.ContinueAsNewDumpResponse, error) {
-		localStateExecutionToResumeMap := map[string]service.StateExecutionResumeInfo{}
-		for key, state := range c.StateExecutionToResumeMap {
-			localStateExecutionToResumeMap[key] = state
-		}
-		for _, value := range c.stateRequestQueue.GetAllStateResumeRequests() {
-			localStateExecutionToResumeMap[value.StateExecutionId] = value
-		}
-		return &service.ContinueAsNewDumpResponse{
-			InterStateChannelReceived:  c.interStateChannel.GetAllReceived(),
-			SignalsReceived:            c.signalReceiver.GetAllReceived(),
-			StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
-			DataObjects:                c.persistenceManager.GetAllDataObjects(),
-			SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
-			StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
-			StateExecutionsToResume:    localStateExecutionToResumeMap,
-			StateOutputs:               c.outputCollector.GetAll(),
-			StaleSkipTimerSignals:      c.timerProcessor.Dump(),
-		}, nil
-	})
+	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpByPageQueryType,
+		// return the current page of the whole snapshot
+		func(request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
+			wholeSnapshot := c.GetSnapshot()
+			wholeData, err := json.Marshal(wholeSnapshot)
+			if err != nil {
+				return nil, err
+			}
+			checksum := md5.Sum(wholeData)
+			pageSize := int32(service.DefaultContinueAsNewPageSizeInBytes)
+			if request.PageSizeInBytes > 0 {
+				pageSize = request.PageSizeInBytes
+			}
+			lenInDouble := float64(len(wholeData))
+			totalPages := int32(math.Ceil(lenInDouble / float64(pageSize)))
+			if request.PageNum >= totalPages {
+				return nil, fmt.Errorf("wrong pageNum, request %v but max is %v , shouldn't happen", request.PageNum, totalPages-1)
+			}
+			start := pageSize * request.PageNum
+			end := start + pageSize
+			if end > int32(len(wholeData)) {
+				end = int32(len(wholeData))
+			}
+			return &iwfidl.WorkflowDumpResponse{
+				Checksum:   string(checksum[:]),
+				TotalPages: totalPages,
+				JsonData:   string(wholeData[start:end]),
+			}, nil
+		})
 }
 
 func (c *ContinueAsNewer) AddPotentialStateExecutionToResume(

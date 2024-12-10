@@ -2,12 +2,9 @@ package api
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/interpreter/env"
-	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -867,39 +864,13 @@ func (s *serviceImpl) ApiV1WorkflowSkipTimerPost(
 func (s *serviceImpl) ApiV1WorkflowDumpPost(
 	ctx context.Context, request iwfidl.WorkflowDumpRequest,
 ) (*iwfidl.WorkflowDumpResponse, *errors.ErrorAndStatus) {
-	var internals service.ContinueAsNewDumpResponse
+	var pageOfSnapshot iwfidl.WorkflowDumpResponse
 
-	err := s.client.QueryWorkflow(ctx, &internals, request.GetWorkflowId(), request.GetWorkflowRunId(), service.ContinueAsNewDumpQueryType)
+	err := s.client.QueryWorkflow(ctx, &pageOfSnapshot, request.GetWorkflowId(), request.GetWorkflowRunId(), service.ContinueAsNewDumpByPageQueryType, request)
 	if err != nil {
 		return nil, s.handleError(err, WorkflowInternalDumpApiPath, request.GetWorkflowId())
 	}
-
-	data, err := json.Marshal(internals)
-	if err != nil {
-		return nil, s.handleError(err, WorkflowInternalDumpApiPath, request.GetWorkflowId())
-	}
-	checksum := md5.Sum(data)
-	pageSize := int32(service.DefaultContinueAsNewPageSizeInBytes)
-	if request.PageSizeInBytes > 0 {
-		pageSize = request.PageSizeInBytes
-	}
-	lenInDouble := float64(len(data))
-	totalPages := int32(math.Ceil(lenInDouble / float64(pageSize)))
-	if request.PageNum >= totalPages {
-		return nil, s.handleError(
-			fmt.Errorf("wrong pageNum, max is %v", totalPages-1),
-			WorkflowInternalDumpApiPath, request.GetWorkflowId())
-	}
-	start := pageSize * request.PageNum
-	end := start + pageSize
-	if end > int32(len(data)) {
-		end = int32(len(data))
-	}
-	return &iwfidl.WorkflowDumpResponse{
-		Checksum:   string(checksum[:]),
-		TotalPages: totalPages,
-		JsonData:   string(data[start:end]),
-	}, nil
+	return &pageOfSnapshot, nil
 }
 
 func (s *serviceImpl) ApiInfoHealth(ctx context.Context) *iwfidl.HealthInfo {

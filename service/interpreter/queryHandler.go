@@ -30,7 +30,8 @@ func SetQueryHandlers(
 	}
 	err = provider.SetQueryHandler(ctx, service.DebugDumpQueryType, func() (*service.DebugDumpResponse, error) {
 		return &service.DebugDumpResponse{
-			Config: workflowConfiger.Get(),
+			Config:   workflowConfiger.Get(),
+			Snapshot: continueAsNewer.GetSnapshot(),
 		}, nil
 	})
 	if err != nil {

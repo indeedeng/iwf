@@ -25,7 +25,7 @@ const (
 	GetDataAttributesWorkflowQueryType   = "GetDataAttributes"
 	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"
 	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
-	ContinueAsNewDumpQueryType           = "ContinueAsNewDump"
+	ContinueAsNewDumpByPageQueryType     = "ContinueAsNewDumpByPage"
 	DebugDumpQueryType                   = "DebugNewDump"
 	PrepareRpcQueryType                  = "PrepareRpcQueryType"
 
