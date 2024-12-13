@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/event"
+	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
@@ -31,7 +32,7 @@ func StateApiWaitUntil(
 	stateApiWaitUntilStartTime := time.Now().UnixMilli()
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("StateStartActivity", "input", input)
+	logger.Info("StateStartActivity", "input", log.ToJsonAndTruncateForLogging(input))
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 
 	svcCfg := env.GetSharedConfig()
@@ -116,7 +117,7 @@ func StateApiExecute(
 	stateApiExecuteStartTime := time.Now().UnixMilli()
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("StateDecideActivity", "input", input)
+	logger.Info("StateDecideActivity", "input", log.ToJsonAndTruncateForLogging(input))
 
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 	svcCfg := env.GetSharedConfig()
@@ -330,7 +331,7 @@ func DumpWorkflowInternal(
 ) (*iwfidl.WorkflowDumpResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("DumpWorkflowInternal", "input", req)
+	logger.Info("DumpWorkflowInternal", "input", log.ToJsonAndTruncateForLogging(req))
 
 	svcCfg := env.GetSharedConfig()
 	apiAddress := svcCfg.GetApiServiceAddressWithDefault()
@@ -359,7 +360,7 @@ func InvokeWorkerRpc(
 ) (*InvokeRpcActivityOutput, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("invoke worker RPC by activity", "input", req)
+	logger.Info("invoke worker RPC by activity", "input", log.ToJsonAndTruncateForLogging(req))
 
 	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
 
