@@ -32,7 +32,7 @@ func StateApiWaitUntil(
 	stateApiWaitUntilStartTime := time.Now().UnixMilli()
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("StateStartActivity", "input", log.ToJsonAndTruncateForLogging(input))
+	logger.Info("StateWaitUntilActivity", "input", log.ToJsonAndTruncateForLogging(input))
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 
 	svcCfg := env.GetSharedConfig()
@@ -117,7 +117,7 @@ func StateApiExecute(
 	stateApiExecuteStartTime := time.Now().UnixMilli()
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("StateDecideActivity", "input", log.ToJsonAndTruncateForLogging(input))
+	logger.Info("StateExecuteActivity", "input", log.ToJsonAndTruncateForLogging(input))
 
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 	svcCfg := env.GetSharedConfig()
@@ -331,7 +331,7 @@ func DumpWorkflowInternal(
 ) (*iwfidl.WorkflowDumpResponse, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("DumpWorkflowInternal", "input", log.ToJsonAndTruncateForLogging(req))
+	logger.Info("DumpWorkflowInternalActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
 	svcCfg := env.GetSharedConfig()
 	apiAddress := svcCfg.GetApiServiceAddressWithDefault()
@@ -360,7 +360,7 @@ func InvokeWorkerRpc(
 ) (*InvokeRpcActivityOutput, error) {
 	provider := getActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
-	logger.Info("invoke worker RPC by activity", "input", log.ToJsonAndTruncateForLogging(req))
+	logger.Info("InvokeWorkerRpcActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
 	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
 
