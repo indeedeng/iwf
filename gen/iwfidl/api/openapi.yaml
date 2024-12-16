@@ -3342,6 +3342,7 @@ components:
       - WORKFLOW_COMPLETE_EVENT
       - WORKFLOW_FAIL_EVENT
       - WORKFLOW_START_EVENT
+      - RPC_EXECUTION_EVENT
       type: string
     IwfEvent:
       properties:
@@ -3356,6 +3357,8 @@ components:
         stateId:
           type: string
         stateExecutionId:
+          type: string
+        rpcName:
           type: string
         startTimestampInMs:
           format: int64

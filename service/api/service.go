@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"net/http"
 	"os"
@@ -612,7 +613,9 @@ func (s *serviceImpl) ApiV1WorkflowSearchPost(
 func (s *serviceImpl) ApiV1WorkflowRpcPost(
 	ctx context.Context, req iwfidl.WorkflowRpcRequest,
 ) (wresp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
-	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+	defer func() {
+		log.CapturePanic(recover(), s.logger, &retError)
+	}()
 
 	if needLocking(req) {
 		return s.handleRpcBySynchronousUpdate(ctx, req)
@@ -627,6 +630,15 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 	if err != nil {
 		return nil, s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
 	}
+
+	defer func() {
+		event.Handle(iwfidl.IwfEvent{
+			EventType:    iwfidl.RPC_EXECUTION_EVENT,
+			RpcName:      &req.RpcName,
+			WorkflowType: rpcPrep.IwfWorkflowType,
+			WorkflowId:   req.GetWorkflowId(),
+		})
+	}()
 
 	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds)
 	if retError != nil {

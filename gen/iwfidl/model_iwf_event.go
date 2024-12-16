@@ -25,6 +25,7 @@ type IwfEvent struct {
 	WorkflowRunId      string    `json:"workflowRunId"`
 	StateId            *string   `json:"stateId,omitempty"`
 	StateExecutionId   *string   `json:"stateExecutionId,omitempty"`
+	RpcName            *string   `json:"rpcName,omitempty"`
 	StartTimestampInMs *int64    `json:"startTimestampInMs,omitempty"`
 	EndTimestampInMs   *int64    `json:"endTimestampInMs,omitempty"`
 }
@@ -210,6 +211,38 @@ func (o *IwfEvent) SetStateExecutionId(v string) {
 	o.StateExecutionId = &v
 }
 
+// GetRpcName returns the RpcName field value if set, zero value otherwise.
+func (o *IwfEvent) GetRpcName() string {
+	if o == nil || IsNil(o.RpcName) {
+		var ret string
+		return ret
+	}
+	return *o.RpcName
+}
+
+// GetRpcNameOk returns a tuple with the RpcName field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *IwfEvent) GetRpcNameOk() (*string, bool) {
+	if o == nil || IsNil(o.RpcName) {
+		return nil, false
+	}
+	return o.RpcName, true
+}
+
+// HasRpcName returns a boolean if a field has been set.
+func (o *IwfEvent) HasRpcName() bool {
+	if o != nil && !IsNil(o.RpcName) {
+		return true
+	}
+
+	return false
+}
+
+// SetRpcName gets a reference to the given string and assigns it to the RpcName field.
+func (o *IwfEvent) SetRpcName(v string) {
+	o.RpcName = &v
+}
+
 // GetStartTimestampInMs returns the StartTimestampInMs field value if set, zero value otherwise.
 func (o *IwfEvent) GetStartTimestampInMs() int64 {
 	if o == nil || IsNil(o.StartTimestampInMs) {
@@ -293,6 +326,9 @@ func (o IwfEvent) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.StateExecutionId) {
 		toSerialize["stateExecutionId"] = o.StateExecutionId
+	}
+	if !IsNil(o.RpcName) {
+		toSerialize["rpcName"] = o.RpcName
 	}
 	if !IsNil(o.StartTimestampInMs) {
 		toSerialize["startTimestampInMs"] = o.StartTimestampInMs

@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **WorkflowRunId** | **string** |  | 
 **StateId** | Pointer to **string** |  | [optional] 
 **StateExecutionId** | Pointer to **string** |  | [optional] 
+**RpcName** | Pointer to **string** |  | [optional] 
 **StartTimestampInMs** | Pointer to **int64** |  | [optional] 
 **EndTimestampInMs** | Pointer to **int64** |  | [optional] 
 
@@ -161,6 +162,31 @@ SetStateExecutionId sets StateExecutionId field to given value.
 `func (o *IwfEvent) HasStateExecutionId() bool`
 
 HasStateExecutionId returns a boolean if a field has been set.
+
+### GetRpcName
+
+`func (o *IwfEvent) GetRpcName() string`
+
+GetRpcName returns the RpcName field if non-nil, zero value otherwise.
+
+### GetRpcNameOk
+
+`func (o *IwfEvent) GetRpcNameOk() (*string, bool)`
+
+GetRpcNameOk returns a tuple with the RpcName field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRpcName
+
+`func (o *IwfEvent) SetRpcName(v string)`
+
+SetRpcName sets RpcName field to given value.
+
+### HasRpcName
+
+`func (o *IwfEvent) HasRpcName() bool`
+
+HasRpcName returns a boolean if a field has been set.
 
 ### GetStartTimestampInMs
 
