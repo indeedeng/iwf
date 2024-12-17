@@ -33,6 +33,7 @@ const (
 	WORKFLOW_COMPLETE_EVENT             EventType = "WORKFLOW_COMPLETE_EVENT"
 	WORKFLOW_FAIL_EVENT                 EventType = "WORKFLOW_FAIL_EVENT"
 	WORKFLOW_START_EVENT                EventType = "WORKFLOW_START_EVENT"
+	RPC_EXECUTION_EVENT                 EventType = "RPC_EXECUTION_EVENT"
 )
 
 // All allowed values of EventType enum
@@ -50,6 +51,7 @@ var AllowedEventTypeEnumValues = []EventType{
 	"WORKFLOW_COMPLETE_EVENT",
 	"WORKFLOW_FAIL_EVENT",
 	"WORKFLOW_START_EVENT",
+	"RPC_EXECUTION_EVENT",
 }
 
 func (v *EventType) UnmarshalJSON(src []byte) error {

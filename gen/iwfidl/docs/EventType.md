@@ -29,6 +29,8 @@
 
 * `WORKFLOW_START_EVENT` (value: `"WORKFLOW_START_EVENT"`)
 
+* `RPC_EXECUTION_EVENT` (value: `"RPC_EXECUTION_EVENT"`)
+
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -3,6 +3,7 @@ package interpreter
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/event"
 	"time"
 )
 
@@ -52,11 +53,22 @@ func NewWorkflowUpdater(
 func (u *WorkflowUpdater) handler(
 	ctx UnifiedContext, input iwfidl.WorkflowRpcRequest,
 ) (output *HandlerOutput, err error) {
-
 	u.continueAsNewer.IncreaseInflightOperation()
 	defer u.continueAsNewer.DecreaseInflightOperation()
 
 	info := u.provider.GetWorkflowInfo(ctx)
+
+	defer func() {
+		if !u.provider.IsReplaying(ctx) {
+			event.Handle(iwfidl.IwfEvent{
+				EventType:    iwfidl.RPC_EXECUTION_EVENT,
+				RpcName:      &input.RpcName,
+				WorkflowType: u.basicInfo.IwfWorkflowType,
+				WorkflowId:   info.WorkflowExecution.ID,
+			})
+		}
+	}()
+
 	rpcPrep := service.PrepareRpcQueryResponse{
 		DataObjects:              u.persistenceManager.LoadDataObjects(ctx, input.DataAttributesLoadingPolicy),
 		SearchAttributes:         u.persistenceManager.LoadSearchAttributes(ctx, input.SearchAttributesLoadingPolicy),
@@ -88,6 +100,7 @@ func (u *WorkflowUpdater) handler(
 	handlerOutput := &HandlerOutput{
 		StatusError: activityOutput.StatusError,
 	}
+
 	rpcOutput := activityOutput.RpcOutput
 	if rpcOutput != nil {
 		handlerOutput.RpcOutput = &iwfidl.WorkflowRpcResponse{
