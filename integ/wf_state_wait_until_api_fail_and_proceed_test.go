@@ -13,8 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TODO: Fix
-func _TestStateApiFailAndProceedTemporal(t *testing.T) {
+func TestStateApiFailAndProceedTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -103,11 +102,7 @@ func doTestStateApiFailAndProceed(t *testing.T, backendType service.BackendType,
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.COMPLETED,
-		Results: []iwfidl.StateCompletionOutput{
-			{
-				CompletedStateId:          wf_state_api_fail_and_proceed.State1,
-				CompletedStateExecutionId: wf_state_api_fail_and_proceed.State1 + "-1",
-			},
-		},
+		// State completions with empty output are ignored
+		Results: []iwfidl.StateCompletionOutput(nil),
 	}, resp, "response not expected")
 }

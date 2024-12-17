@@ -16,8 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TODO: Fix
-func _TestLockingWorkflowTemporal(t *testing.T) {
+func TestLockingWorkflowTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -27,8 +26,7 @@ func _TestLockingWorkflowTemporal(t *testing.T) {
 	}
 }
 
-// TODO: Fix
-func _TestLockingWorkflowTemporalContinueAsNew(t *testing.T) {
+func TestLockingWorkflowTemporalContinueAsNew(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -200,7 +198,6 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	s2StartsDecides := locking.InParallelS2 + rpcIncrease // locking.InParallelS2 original state executions, and a new trigger from rpc
 	finalCounterValue := int64(locking.InParallelS2 + 2*rpcIncrease)
-	stateCompletionCount := locking.InParallelS2 + rpcIncrease + 1
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
 		"S1_start":            1,
@@ -212,7 +209,8 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	}, history, "locking.test fail, %v", history)
 
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus())
-	assertions.Equal(stateCompletionCount, len(resp2.GetResults()))
+	// State completions with empty output are ignored
+	assertions.Equal(0, len(resp2.GetResults()))
 
 	reqSearch := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
 	searchResult2, httpResp, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{

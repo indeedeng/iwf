@@ -7,22 +7,11 @@ type OutputCollector struct {
 }
 
 func NewOutputCollector(initOutputs []iwfidl.StateCompletionOutput) *OutputCollector {
-	filteredOutputs := []iwfidl.StateCompletionOutput{}
-
 	if initOutputs == nil {
-		return &OutputCollector{
-			outputs: filteredOutputs,
-		}
-	} else {
-		for _, output := range initOutputs {
-			if output.CompletedStateOutput != nil {
-				filteredOutputs = append(filteredOutputs, output)
-			}
-		}
-
-		return &OutputCollector{
-			outputs: filteredOutputs,
-		}
+		initOutputs = []iwfidl.StateCompletionOutput{}
+	}
+	return &OutputCollector{
+		outputs: initOutputs,
 	}
 }
 
