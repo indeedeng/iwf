@@ -6,13 +6,30 @@ import (
 
 const globalChangeId = "global"
 
+// StartingVersionUsingGlobalVersioning First global version
 const StartingVersionUsingGlobalVersioning = 1
+
+// StartingVersionOptimizedUpsertSearchAttribute Optimized upserting SAs
 const StartingVersionOptimizedUpsertSearchAttribute = 2
+
+// StartingVersionRenamedStateApi Renamed state API
+// see: https://github.com/indeedeng/iwf/pull/242/files
 const StartingVersionRenamedStateApi = 3
+
+// StartingVersionContinueAsNewOnNoStates Fix ContinueAsNew bug
 const StartingVersionContinueAsNewOnNoStates = 4
+
+// StartingVersionTemporal26SDK Upgraded Temporal SDK version which brought changes to update handler
+// see: https://github.com/indeedeng/iwf/releases/tag/v1.11.0
 const StartingVersionTemporal26SDK = 5
+
+// StartingVersionExecutingStateIdMode Changed default rule of upserting SAs
 const StartingVersionExecutingStateIdMode = 6
+
+// StartingVersionNoIwfGlobalVersionSearchAttribute Removed upserting IwfGlobalWorkflowVersion SA
 const StartingVersionNoIwfGlobalVersionSearchAttribute = 7
+
+// StartingVersionYieldOnConditionalComplete Bug fix to where published messages could be lost
 const StartingVersionYieldOnConditionalComplete = 8
 const MaxOfAllVersions = StartingVersionYieldOnConditionalComplete
 
