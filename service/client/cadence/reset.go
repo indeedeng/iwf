@@ -167,9 +167,10 @@ func getDecisionEventIDByStateOrStateExecutionId(
 			if e.GetEventType() == shared.EventTypeDecisionTaskCompleted {
 				decisionFinishID = e.GetEventId()
 			}
+			//TODO: Add check for local activity. (IWF-403)
 			if e.GetEventType() == shared.EventTypeActivityTaskScheduled {
 				typeName := e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName()
-				if strings.Contains(typeName, "StateStart") || strings.Contains(typeName, "StateApiWaitUntil") {
+				if strings.Contains(typeName, "StateApiExecute") || strings.Contains(typeName, "StateApiWaitUntil") {
 					var backendType service.BackendType
 					var input service.StateStartActivityInput
 					err = converter.FromData(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)

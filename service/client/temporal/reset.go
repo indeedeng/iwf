@@ -162,9 +162,10 @@ func getDecisionEventIDByStateOrStateExecutionId(
 			if e.GetEventType() == enums.EVENT_TYPE_WORKFLOW_TASK_COMPLETED {
 				decisionFinishID = e.GetEventId()
 			}
+			//TODO: Add check for local activity. (IWF-403)
 			if e.GetEventType() == enums.EVENT_TYPE_ACTIVITY_TASK_SCHEDULED {
 				typeName := e.GetActivityTaskScheduledEventAttributes().GetActivityType().GetName()
-				if strings.Contains(typeName, "StateStart") || strings.Contains(typeName, "StateApiWaitUntil") {
+				if strings.Contains(typeName, "StateApiExecute") || strings.Contains(typeName, "StateApiWaitUntil") {
 					var backendType service.BackendType
 					var input service.StateStartActivityInput
 					err = converter.FromPayloads(e.GetActivityTaskScheduledEventAttributes().Input, &backendType, &input)
