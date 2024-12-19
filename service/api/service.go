@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/interpreter/env"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"net/http"
 	"os"
 	"strings"
@@ -13,15 +14,13 @@ import (
 
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/compatibility"
-	"github.com/indeedeng/iwf/service/common/rpc"
-	"github.com/indeedeng/iwf/service/common/utils"
-	"github.com/indeedeng/iwf/service/interpreter"
-
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/log"
 	"github.com/indeedeng/iwf/service/common/log/tag"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/common/rpc"
+	"github.com/indeedeng/iwf/service/common/utils"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -802,7 +801,7 @@ func (s *serviceImpl) handleRpcBySynchronousUpdate(
 	ctx context.Context, req iwfidl.WorkflowRpcRequest,
 ) (resp *iwfidl.WorkflowRpcResponse, retError *errors.ErrorAndStatus) {
 	req.TimeoutSeconds = ptr.Any(utils.TrimRpcTimeoutSeconds(ctx, req))
-	var output interpreter.HandlerOutput
+	var output interfaces.HandlerOutput
 	err := s.client.SynchronousUpdateWorkflow(ctx, &output, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteOptimisticLockingRpcUpdateType, req)
 	if err != nil {
 		errType := s.client.GetApplicationErrorTypeIfIsApplicationError(err)

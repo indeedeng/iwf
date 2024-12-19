@@ -6,6 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -195,9 +196,9 @@ func TestComposeHttpError_RegularActivity_NilResponse(t *testing.T) {
 	assert.Equal(t, returnedError, err)
 }
 
-func createTestComposeHttpErrorInitialState(t *testing.T, httpError string, initialError string) (*MockActivityProvider, *http.Response, error) {
+func createTestComposeHttpErrorInitialState(t *testing.T, httpError string, initialError string) (*interfaces.MockActivityProvider, *http.Response, error) {
 	ctrl := gomock.NewController(t)
-	mockActivityProvider := NewMockActivityProvider(ctrl)
+	mockActivityProvider := interfaces.NewMockActivityProvider(ctrl)
 
 	var httpResp *http.Response = nil
 	if httpError != "" {

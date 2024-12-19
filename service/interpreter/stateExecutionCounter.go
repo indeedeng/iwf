@@ -6,13 +6,14 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"reflect"
 	"slices"
 )
 
 type StateExecutionCounter struct {
-	ctx                  UnifiedContext
-	provider             WorkflowProvider
+	ctx                  interfaces.UnifiedContext
+	provider             interfaces.WorkflowProvider
 	configer             *WorkflowConfiger
 	globalVersioner      *GlobalVersioner
 	continueAsNewCounter *ContinueAsNewCounter
@@ -24,7 +25,7 @@ type StateExecutionCounter struct {
 }
 
 func NewStateExecutionCounter(
-	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, globalVersioner *GlobalVersioner,
 	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{
@@ -40,7 +41,7 @@ func NewStateExecutionCounter(
 }
 
 func RebuildStateExecutionCounter(
-	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, globalVersioner *GlobalVersioner,
 	stateIdStartedCounts map[string]int, stateIdCurrentlyExecutingCounts map[string]int,
 	totalCurrentlyExecutingCount int,
 	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,

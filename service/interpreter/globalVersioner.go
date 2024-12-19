@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 )
 
 const globalChangeId = "global"
@@ -35,13 +36,13 @@ const MaxOfAllVersions = StartingVersionYieldOnConditionalComplete
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
-	workflowProvider WorkflowProvider
-	ctx              UnifiedContext
+	workflowProvider interfaces.WorkflowProvider
+	ctx              interfaces.UnifiedContext
 	version          int
 }
 
 func NewGlobalVersioner(
-	workflowProvider WorkflowProvider, ctx UnifiedContext,
+	workflowProvider interfaces.WorkflowProvider, ctx interfaces.UnifiedContext,
 ) (*GlobalVersioner, error) {
 	version := workflowProvider.GetVersion(ctx, globalChangeId, 0, MaxOfAllVersions)
 

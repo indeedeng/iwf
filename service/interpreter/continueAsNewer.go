@@ -7,13 +7,14 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/interpreter/env"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"math"
 	"strings"
 	"time"
 )
 
 type ContinueAsNewer struct {
-	provider WorkflowProvider
+	provider interfaces.WorkflowProvider
 
 	StateExecutionToResumeMap map[string]service.StateExecutionResumeInfo // stateExeId to StateExecutionResumeInfo
 	inflightUpdateOperations  int
@@ -24,14 +25,14 @@ type ContinueAsNewer struct {
 	persistenceManager    *PersistenceManager
 	signalReceiver        *SignalReceiver
 	outputCollector       *OutputCollector
-	timerProcessor        *TimerProcessor
+	timerProcessor        interfaces.TimerProcessor
 }
 
 func NewContinueAsNewer(
-	provider WorkflowProvider,
+	provider interfaces.WorkflowProvider,
 	interStateChannel *InternalChannel, signalReceiver *SignalReceiver, stateExecutionCounter *StateExecutionCounter,
 	persistenceManager *PersistenceManager, stateRequestQueue *StateRequestQueue, collector *OutputCollector,
-	timerProcessor *TimerProcessor,
+	timerProcessor interfaces.TimerProcessor,
 ) *ContinueAsNewer {
 	return &ContinueAsNewer{
 		provider: provider,
@@ -49,9 +50,9 @@ func NewContinueAsNewer(
 }
 
 func LoadInternalsFromPreviousRun(
-	ctx UnifiedContext, provider WorkflowProvider, previousRunId string, continueAsNewPageSizeInBytes int32,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, previousRunId string, continueAsNewPageSizeInBytes int32,
 ) (*service.ContinueAsNewDumpResponse, error) {
-	activityOptions := ActivityOptions{
+	activityOptions := interfaces.ActivityOptions{
 		StartToCloseTimeout: 5 * time.Second,
 		RetryPolicy: &iwfidl.RetryPolicy{
 			MaximumIntervalSeconds: iwfidl.PtrInt32(5),
@@ -134,7 +135,7 @@ func (c *ContinueAsNewer) GetSnapshot() service.ContinueAsNewDumpResponse {
 	}
 }
 
-func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx UnifiedContext) error {
+func (c *ContinueAsNewer) SetQueryHandlersForContinueAsNew(ctx interfaces.UnifiedContext) error {
 	return c.provider.SetQueryHandler(ctx, service.ContinueAsNewDumpByPageQueryType,
 		// return the current page of the whole snapshot
 		func(request iwfidl.WorkflowDumpRequest) (*iwfidl.WorkflowDumpResponse, error) {
@@ -192,7 +193,7 @@ func (c *ContinueAsNewer) RemoveStateExecutionToResume(stateExecutionId string) 
 	delete(c.StateExecutionToResumeMap, stateExecutionId)
 }
 
-func (c *ContinueAsNewer) DrainThreads(ctx UnifiedContext) error {
+func (c *ContinueAsNewer) DrainThreads(ctx interfaces.UnifiedContext) error {
 	// TODO: add metric for before and after Await to monitor stuck
 	// NOTE: consider using AwaitWithTimeout to get an alert when workflow stuck due to a bug in the draining logic for continueAsNew
 
@@ -222,7 +223,7 @@ var inMemoryContinueAsNewMonitor = make(map[string]time.Time)
 const warnThreshold = time.Second * 5
 const errThreshold = time.Second * 15
 
-func (c *ContinueAsNewer) allThreadsDrained(ctx UnifiedContext) bool {
+func (c *ContinueAsNewer) allThreadsDrained(ctx interfaces.UnifiedContext) bool {
 	runId := c.provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID
 
 	remainingThreadCount := c.provider.GetThreadCount()

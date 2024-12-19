@@ -1,23 +1,24 @@
-package interpreter
+package timers
 
 import (
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 )
 
-type TimerProcessor struct {
+type SimpleTimerProcessor struct {
 	stateExecutionCurrentTimerInfos map[string][]*service.TimerInfo
 	staleSkipTimerSignals           []service.StaleSkipTimerSignal
-	provider                        WorkflowProvider
-	logger                          UnifiedLogger
+	provider                        interfaces.WorkflowProvider
+	logger                          interfaces.UnifiedLogger
 }
 
-func NewTimerProcessor(
-	ctx UnifiedContext, provider WorkflowProvider, staleSkipTimerSignals []service.StaleSkipTimerSignal,
-) *TimerProcessor {
-	tp := &TimerProcessor{
+func NewSimpleTimerProcessor(
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, staleSkipTimerSignals []service.StaleSkipTimerSignal,
+) *SimpleTimerProcessor {
+	tp := &SimpleTimerProcessor{
 		provider:                        provider,
 		stateExecutionCurrentTimerInfos: map[string][]*service.TimerInfo{},
 		logger:                          provider.GetLogger(ctx),
@@ -35,16 +36,16 @@ func NewTimerProcessor(
 	return tp
 }
 
-func (t *TimerProcessor) Dump() []service.StaleSkipTimerSignal {
+func (t *SimpleTimerProcessor) Dump() []service.StaleSkipTimerSignal {
 	return t.staleSkipTimerSignals
 }
 
-func (t *TimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
+func (t *SimpleTimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
 	return t.stateExecutionCurrentTimerInfos
 }
 
 // SkipTimer will attempt to skip a timer, return false if no valid timer found
-func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) bool {
+func (t *SimpleTimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) bool {
 	timer, valid := service.ValidateTimerSkipRequest(t.stateExecutionCurrentTimerInfos, stateExeId, timerId, timerIdx)
 	if !valid {
 		// since we have checked it before sending signals, this should only happen in some vary rare cases for racing condition
@@ -61,7 +62,7 @@ func (t *TimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) boo
 	return true
 }
 
-func (t *TimerProcessor) RetryStaleSkipTimer() bool {
+func (t *SimpleTimerProcessor) RetryStaleSkipTimer() bool {
 	for i, staleSkip := range t.staleSkipTimerSignals {
 		found := t.SkipTimer(staleSkip.StateExecutionId, staleSkip.TimerCommandId, staleSkip.TimerCommandIndex)
 		if found {
@@ -81,8 +82,8 @@ func removeElement(s []service.StaleSkipTimerSignal, i int) []service.StaleSkipT
 // WaitForTimerFiredOrSkipped waits for timer completed(fired or skipped),
 // return true when the timer is fired or skipped
 // return false if the waitingCommands is canceled by cancelWaiting bool pointer(when the trigger type is completed, or continueAsNew)
-func (t *TimerProcessor) WaitForTimerFiredOrSkipped(
-	ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool,
+func (t *SimpleTimerProcessor) WaitForTimerFiredOrSkipped(
+	ctx interfaces.UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool,
 ) service.InternalTimerStatus {
 	timerInfos := t.stateExecutionCurrentTimerInfos[stateExeId]
 	if len(timerInfos) == 0 {
@@ -122,11 +123,11 @@ func (t *TimerProcessor) WaitForTimerFiredOrSkipped(
 }
 
 // RemovePendingTimersOfState is for when a state is completed, remove all its pending timers
-func (t *TimerProcessor) RemovePendingTimersOfState(stateExeId string) {
+func (t *SimpleTimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)
 }
 
-func (t *TimerProcessor) AddTimers(
+func (t *SimpleTimerProcessor) AddTimers(
 	stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]service.InternalTimerStatus,
 ) {
 	timers := make([]*service.TimerInfo, len(commands))

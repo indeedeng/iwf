@@ -5,12 +5,13 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/common/utils"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 )
 
 type PersistenceManager struct {
 	dataObjects      map[string]iwfidl.KeyValue
 	searchAttributes map[string]iwfidl.SearchAttribute
-	provider         WorkflowProvider
+	provider         interfaces.WorkflowProvider
 
 	lockedDataObjectKeys      map[string]bool
 	lockedSearchAttributeKeys map[string]bool
@@ -19,7 +20,7 @@ type PersistenceManager struct {
 }
 
 func NewPersistenceManager(
-	provider WorkflowProvider, initDataAttributes []iwfidl.KeyValue, initSearchAttributes []iwfidl.SearchAttribute,
+	provider interfaces.WorkflowProvider, initDataAttributes []iwfidl.KeyValue, initSearchAttributes []iwfidl.SearchAttribute,
 	useMemo bool,
 ) *PersistenceManager {
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
@@ -43,7 +44,7 @@ func NewPersistenceManager(
 }
 
 func RebuildPersistenceManager(
-	provider WorkflowProvider,
+	provider interfaces.WorkflowProvider,
 	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
 	useMemo bool,
 ) *PersistenceManager {
@@ -89,7 +90,7 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataAttribu
 }
 
 func (am *PersistenceManager) LoadSearchAttributes(
-	ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
+	ctx interfaces.UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
 ) []iwfidl.SearchAttribute {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
@@ -127,7 +128,7 @@ func (am *PersistenceManager) LoadSearchAttributes(
 }
 
 func (am *PersistenceManager) LoadDataObjects(
-	ctx UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
+	ctx interfaces.UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
 ) []iwfidl.KeyValue {
 	var loadingType iwfidl.PersistenceLoadingType
 	var partialLoadingKeys []string
@@ -181,7 +182,7 @@ func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
 }
 
 func (am *PersistenceManager) ProcessUpsertSearchAttribute(
-	ctx UnifiedContext, attributes []iwfidl.SearchAttribute,
+	ctx interfaces.UnifiedContext, attributes []iwfidl.SearchAttribute,
 ) error {
 	if len(attributes) == 0 {
 		return nil
@@ -197,7 +198,7 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(
 	return am.provider.UpsertSearchAttributes(ctx, attrsToUpsert)
 }
 
-func (am *PersistenceManager) ProcessUpsertDataObject(ctx UnifiedContext, attributes []iwfidl.KeyValue) error {
+func (am *PersistenceManager) ProcessUpsertDataObject(ctx interfaces.UnifiedContext, attributes []iwfidl.KeyValue) error {
 	if len(attributes) == 0 {
 		return nil
 	}
@@ -228,7 +229,7 @@ func (am *PersistenceManager) checkKeysAreUnlocked(lockedKeys map[string]bool, k
 	return true
 }
 
-func (am *PersistenceManager) awaitAndLockForKeys(ctx UnifiedContext, lockedKeys map[string]bool, keysToLock []string) {
+func (am *PersistenceManager) awaitAndLockForKeys(ctx interfaces.UnifiedContext, lockedKeys map[string]bool, keysToLock []string) {
 	// wait until all keys are not locked
 	err := am.provider.Await(ctx, func() bool {
 		for _, k := range keysToLock {
