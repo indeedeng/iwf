@@ -3,10 +3,11 @@ package interpreter
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 )
 
 func SetQueryHandlers(
-	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, persistenceManager *PersistenceManager,
 	internalChannel *InternalChannel, signalReceiver *SignalReceiver,
 	continueAsNewer *ContinueAsNewer,
 	workflowConfiger *WorkflowConfiger, basicInfo service.BasicInfo,

@@ -12,6 +12,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/rpc"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"io"
 	"net/http"
 	"os"
@@ -30,7 +31,7 @@ func StateApiWaitUntil(
 	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
 ) (*iwfidl.WorkflowStateStartResponse, error) {
 	stateApiWaitUntilStartTime := time.Now().UnixMilli()
-	provider := getActivityProviderByType(backendType)
+	provider := interfaces.GetActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateWaitUntilActivity", "input", log.ToJsonAndTruncateForLogging(input))
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
@@ -115,7 +116,7 @@ func StateApiExecute(
 	input service.StateDecideActivityInput,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	stateApiExecuteStartTime := time.Now().UnixMilli()
-	provider := getActivityProviderByType(backendType)
+	provider := interfaces.GetActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("StateExecuteActivity", "input", log.ToJsonAndTruncateForLogging(input))
 
@@ -197,20 +198,20 @@ func checkStateDecisionFromResponse(resp *iwfidl.WorkflowStateDecideResponse) er
 	return nil
 }
 
-func printDebugMsg(logger UnifiedLogger, err error, url string) {
+func printDebugMsg(logger interfaces.UnifiedLogger, err error, url string) {
 	debugMode := os.Getenv(service.EnvNameDebugMode)
 	if debugMode != "" {
 		logger.Info("check error at http request", err, url)
 	}
 }
 
-func composeStartApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
+func composeStartApiRespError(provider interfaces.ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
 	respStr, _ := resp.MarshalJSON()
 	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
 		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))
 }
 
-func composeExecuteApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateDecideResponse) error {
+func composeExecuteApiRespError(provider interfaces.ActivityProvider, err error, resp *iwfidl.WorkflowStateDecideResponse) error {
 	respStr, _ := resp.MarshalJSON()
 	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
 		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))
@@ -224,7 +225,7 @@ func checkHttpError(err error, httpResp *http.Response) bool {
 }
 
 func composeHttpError(
-	isLocalActivity bool, provider ActivityProvider, err error, httpResp *http.Response, errType string,
+	isLocalActivity bool, provider interfaces.ActivityProvider, err error, httpResp *http.Response, errType string,
 ) error {
 	responseBody := "None"
 	var statusCode int
@@ -329,7 +330,7 @@ func listTimerSignalInternalChannelCommandIds(commandReq *iwfidl.CommandRequest)
 func DumpWorkflowInternal(
 	ctx context.Context, backendType service.BackendType, req iwfidl.WorkflowDumpRequest,
 ) (*iwfidl.WorkflowDumpResponse, error) {
-	provider := getActivityProviderByType(backendType)
+	provider := interfaces.GetActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternalActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
@@ -357,15 +358,15 @@ func DumpWorkflowInternal(
 func InvokeWorkerRpc(
 	ctx context.Context, backendType service.BackendType, rpcPrep *service.PrepareRpcQueryResponse,
 	req iwfidl.WorkflowRpcRequest,
-) (*InvokeRpcActivityOutput, error) {
-	provider := getActivityProviderByType(backendType)
+) (*interfaces.InvokeRpcActivityOutput, error) {
+	provider := interfaces.GetActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("InvokeWorkerRpcActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
 	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
 
 	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds)
-	return &InvokeRpcActivityOutput{
+	return &interfaces.InvokeRpcActivityOutput{
 		RpcOutput:   resp,
 		StatusError: statusErr,
 	}, nil
