@@ -122,9 +122,12 @@ services:
       - "ES_VERSION=v7"
       - "KAFKA_SEEDS=kafka"
     depends_on:
-      - cassandra
-      - kafka
-      - elasticsearch
+      cassandra:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
     networks:
       - testing-network
   cadence-admin-tools:
