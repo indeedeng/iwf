@@ -88,6 +88,11 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"kafka-topics.sh","--zookeeper","zookeeper:2181","--list" ]
+      interval: 1s
+      timeout: 60s
+      retries: 60
     networks:
       - testing-network
   cadence:
@@ -110,9 +115,12 @@ services:
       - "ES_VERSION=v7"
       - "KAFKA_SEEDS=kafka"
     depends_on:
-      - cassandra
-      - kafka
-      - elasticsearch
+      cassandra:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
     networks:
       - testing-network
   cadence-admin-tools:
