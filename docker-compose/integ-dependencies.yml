@@ -78,10 +78,16 @@ services:
       - "2181:2181"
     networks:
       - testing-network
+    healthcheck:
+      test: [ "CMD-SHELL", "echo ruok | nc -w 2 zookeeper 2181" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
   kafka:
     image: wurstmeister/kafka:2.12-2.1.1
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     ports:
       - "9092:9092"
     environment:
@@ -90,6 +96,12 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     networks:
       - testing-network
+    healthcheck:
+      test:
+        [ "CMD", "kafka-topics.sh", "--list", "--zookeeper", "zookeeper:2181" ]
+      interval: 1s
+      timeout: 60s
+      retries: 60
   cadence:
     image: ubercadence/server:0.24.0-auto-setup
     ports:
