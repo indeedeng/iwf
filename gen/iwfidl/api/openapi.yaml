@@ -738,6 +738,7 @@ components:
         workflowConfigOverride:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
+          optimizeTimer: true
           continueAsNewPageSizeInBytes: 4
           executingStateIdMode: null
           optimizeActivity: true
@@ -1011,6 +1012,7 @@ components:
           workflowConfigOverride:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 1
+            optimizeTimer: true
             continueAsNewPageSizeInBytes: 4
             executingStateIdMode: null
             optimizeActivity: true
@@ -1601,6 +1603,7 @@ components:
         workflowConfig:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
+          optimizeTimer: true
           continueAsNewPageSizeInBytes: 4
           executingStateIdMode: null
           optimizeActivity: true
@@ -3284,6 +3287,7 @@ components:
       example:
         disableSystemSearchAttribute: true
         continueAsNewThreshold: 1
+        optimizeTimer: true
         continueAsNewPageSizeInBytes: 4
         executingStateIdMode: null
         optimizeActivity: true
@@ -3297,6 +3301,8 @@ components:
         continueAsNewPageSizeInBytes:
           type: integer
         optimizeActivity:
+          type: boolean
+        optimizeTimer:
           type: boolean
       type: object
     Context:
