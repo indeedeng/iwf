@@ -108,7 +108,11 @@ func InterpreterImpl(
 		internalChannel = RebuildInternalChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes, input.UseMemoForDataAttributes)
-		timerProcessor = timers.NewSimpleTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
+		if input.Config.GetOptimizeTimer() {
+			timerProcessor = timers.NewGreedyTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
+		} else {
+			timerProcessor = timers.NewSimpleTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
+		}
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, internalChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
@@ -121,7 +125,11 @@ func InterpreterImpl(
 		internalChannel = NewInternalChannel()
 		stateRequestQueue = NewStateRequestQueue()
 		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
-		timerProcessor = timers.NewSimpleTimerProcessor(ctx, provider, nil)
+		if input.Config.GetOptimizeTimer() {
+			timerProcessor = timers.NewGreedyTimerProcessor(ctx, provider, nil)
+		} else {
+			timerProcessor = timers.NewSimpleTimerProcessor(ctx, provider, nil)
+		}
 		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, internalChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, globalVersioner, workflowConfiger, continueAsNewCounter)

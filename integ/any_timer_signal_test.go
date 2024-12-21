@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// TODO: crate greedy tests for cancelling timer early
 func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
@@ -51,6 +52,8 @@ func TestAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
 		smallWaitForFastTest()
 	}
 }
+
+// TODO: crate greedy tests for cancelling timer early
 
 func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
