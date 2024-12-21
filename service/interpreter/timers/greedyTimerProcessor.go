@@ -1,6 +1,7 @@
 package timers
 
 import (
+	"github.com/indeedeng/iwf/service/interpreter/cont"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"time"
 
@@ -23,7 +24,10 @@ type GreedyTimerProcessor struct {
 }
 
 func NewGreedyTimerProcessor(
-	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, staleSkipTimerSignals []service.StaleSkipTimerSignal,
+	ctx interfaces.UnifiedContext,
+	provider interfaces.WorkflowProvider,
+	continueAsNewCounter *cont.ContinueAsNewCounter,
+	staleSkipTimerSignals []service.StaleSkipTimerSignal,
 ) *GreedyTimerProcessor {
 
 	tp := &GreedyTimerProcessor{
@@ -35,7 +39,7 @@ func NewGreedyTimerProcessor(
 	}
 
 	// start some single thread that manages timers
-	tp.createGreedyTimerScheduler(ctx)
+	tp.createGreedyTimerScheduler(ctx, continueAsNewCounter)
 
 	err := provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
 		return service.GetCurrentTimerInfosQueryResponse{
@@ -57,6 +61,10 @@ func (t *sortedTimers) addTimer(toAdd *service.TimerInfo) {
 	insertIndex := 0
 	for i, timer := range t.timers {
 		if toAdd.FiringUnixTimestampSeconds >= timer.FiringUnixTimestampSeconds {
+			// don't want dupes. Makes remove simpler
+			if toAdd == timer {
+				return
+			}
 			insertIndex = i
 			break
 		}
@@ -65,6 +73,15 @@ func (t *sortedTimers) addTimer(toAdd *service.TimerInfo) {
 	t.timers = append(
 		t.timers[:insertIndex],
 		append([]*service.TimerInfo{toAdd}, t.timers[insertIndex:]...)...)
+}
+
+func (t *sortedTimers) removeTimer(toRemove *service.TimerInfo) {
+	for i, timer := range t.timers {
+		if toRemove == timer {
+			t.timers = append(t.timers[:i], t.timers[i+1:]...)
+			return
+		}
+	}
 }
 
 func (t *sortedTimers) pruneToNextTimer(pruneTo int64) *service.TimerInfo {
@@ -86,7 +103,9 @@ func (t *sortedTimers) pruneToNextTimer(pruneTo int64) *service.TimerInfo {
 	return t.timers[index-1]
 }
 
-func (t *GreedyTimerProcessor) createGreedyTimerScheduler(ctx interfaces.UnifiedContext) {
+func (t *GreedyTimerProcessor) createGreedyTimerScheduler(
+	ctx interfaces.UnifiedContext,
+	continueAsNewCounter *cont.ContinueAsNewCounter) {
 
 	t.provider.GoNamed(ctx, "greedy-timer-scheduler", func(ctx interfaces.UnifiedContext) {
 		// NOTE: next timer to fire is at the end of the slice
@@ -102,8 +121,12 @@ func (t *GreedyTimerProcessor) createGreedyTimerScheduler(ctx interfaces.Unified
 					}
 				}
 				next := t.pendingTimers.pruneToNextTimer(now)
-				return next != nil && (len(createdTimers) == 0 || next.FiringUnixTimestampSeconds < createdTimers[len(createdTimers)-1])
+				return (next != nil && (len(createdTimers) == 0 || next.FiringUnixTimestampSeconds < createdTimers[len(createdTimers)-1])) || continueAsNewCounter.IsThresholdMet()
 			})
+
+			if continueAsNewCounter.IsThresholdMet() {
+				break
+			}
 
 			now := t.provider.Now(ctx).Unix()
 			next := t.pendingTimers.pruneToNextTimer(now)
@@ -194,10 +217,12 @@ func (t *GreedyTimerProcessor) WaitForTimerFiredOrSkipped(
 	}
 
 	if timer.FiringUnixTimestampSeconds >= t.provider.Now(ctx).Unix() {
+		timer.Status = service.TimerFired
 		return service.TimerFired
 	}
 
 	// otherwise *cancelWaiting should return false to indicate that this timer isn't completed(fired or skipped)
+	t.pendingTimers.removeTimer(timer)
 	return service.TimerPending
 }
 
@@ -207,7 +232,7 @@ func (t *GreedyTimerProcessor) RemovePendingTimersOfState(stateExeId string) {
 	timers := t.stateExecutionCurrentTimerInfos[stateExeId]
 
 	for _, timer := range timers {
-		timer.Status = service.TimerSkipped
+		t.pendingTimers.removeTimer(timer)
 	}
 
 	delete(t.stateExecutionCurrentTimerInfos, stateExeId)

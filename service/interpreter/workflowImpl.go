@@ -7,6 +7,8 @@ import (
 	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/common/utils"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/cont"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"github.com/indeedeng/iwf/service/interpreter/timers"
@@ -72,7 +74,7 @@ func InterpreterImpl(
 		}
 	}
 
-	workflowConfiger := NewWorkflowConfiger(input.Config)
+	workflowConfiger := config.NewWorkflowConfiger(input.Config)
 	basicInfo := service.BasicInfo{
 		IwfWorkflowType: input.IwfWorkflowType,
 		IwfWorkerUrl:    input.IwfWorkerUrl,
@@ -82,7 +84,7 @@ func InterpreterImpl(
 	var stateRequestQueue *StateRequestQueue
 	var persistenceManager *PersistenceManager
 	var timerProcessor interfaces.TimerProcessor
-	var continueAsNewCounter *ContinueAsNewCounter
+	var continueAsNewCounter *cont.ContinueAsNewCounter
 	var signalReceiver *SignalReceiver
 	var stateExecutionCounter *StateExecutionCounter
 	var outputCollector *OutputCollector
@@ -101,12 +103,12 @@ func InterpreterImpl(
 		internalChannel = RebuildInternalChannel(previous.InterStateChannelReceived)
 		stateRequestQueue = NewStateRequestQueueWithResumeRequests(previous.StatesToStartFromBeginning, previous.StateExecutionsToResume)
 		persistenceManager = RebuildPersistenceManager(provider, previous.DataObjects, previous.SearchAttributes, input.UseMemoForDataAttributes)
+		continueAsNewCounter = cont.NewContinueAsCounter(workflowConfiger, ctx, provider)
 		if input.Config.GetOptimizeTimer() {
-			timerProcessor = timers.NewGreedyTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
+			timerProcessor = timers.NewGreedyTimerProcessor(ctx, provider, continueAsNewCounter, previous.StaleSkipTimerSignals)
 		} else {
 			timerProcessor = timers.NewSimpleTimerProcessor(ctx, provider, previous.StaleSkipTimerSignals)
 		}
-		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, internalChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, previous.SignalsReceived)
 		counterInfo := previous.StateExecutionCounterInfo
 		stateExecutionCounter = RebuildStateExecutionCounter(ctx, provider, globalVersioner,
@@ -118,12 +120,12 @@ func InterpreterImpl(
 		internalChannel = NewInternalChannel()
 		stateRequestQueue = NewStateRequestQueue()
 		persistenceManager = NewPersistenceManager(provider, input.InitDataAttributes, input.InitSearchAttributes, input.UseMemoForDataAttributes)
+		continueAsNewCounter = cont.NewContinueAsCounter(workflowConfiger, ctx, provider)
 		if input.Config.GetOptimizeTimer() {
-			timerProcessor = timers.NewGreedyTimerProcessor(ctx, provider, nil)
+			timerProcessor = timers.NewGreedyTimerProcessor(ctx, provider, continueAsNewCounter, nil)
 		} else {
 			timerProcessor = timers.NewSimpleTimerProcessor(ctx, provider, nil)
 		}
-		continueAsNewCounter = NewContinueAsCounter(workflowConfiger, ctx, provider)
 		signalReceiver = NewSignalReceiver(ctx, provider, internalChannel, stateRequestQueue, persistenceManager, timerProcessor, continueAsNewCounter, workflowConfiger, nil)
 		stateExecutionCounter = NewStateExecutionCounter(ctx, provider, globalVersioner, workflowConfiger, continueAsNewCounter)
 		outputCollector = NewOutputCollector(nil)
@@ -525,8 +527,8 @@ func processStateExecution(
 	signalReceiver *SignalReceiver,
 	timerProcessor interfaces.TimerProcessor,
 	continueAsNewer *ContinueAsNewer,
-	continueAsNewCounter *ContinueAsNewCounter,
-	configer *WorkflowConfiger,
+	continueAsNewCounter *cont.ContinueAsNewCounter,
+	configer *config.WorkflowConfiger,
 	shouldSendSignalOnCompletion bool,
 ) (*iwfidl.StateDecision, service.StateExecutionStatus, error) {
 	waitUntilApi := StateStart
@@ -832,7 +834,7 @@ func invokeStateExecute(
 	executionContext iwfidl.Context,
 	commandRes *iwfidl.CommandResults,
 	continueAsNewer *ContinueAsNewer,
-	configer *WorkflowConfiger,
+	configer *config.WorkflowConfiger,
 	executeApi interface{},
 	stateExecutionLocal []iwfidl.KeyValue,
 	shouldSendSignalOnCompletion bool,
