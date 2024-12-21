@@ -2,6 +2,8 @@ package interpreter
 
 import (
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/cont"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"strings"
 
@@ -16,7 +18,7 @@ type SignalReceiver struct {
 	reasonFailWorkflowByClient *string
 	provider                   interfaces.WorkflowProvider
 	timerProcessor             interfaces.TimerProcessor
-	workflowConfiger           *WorkflowConfiger
+	workflowConfiger           *config.WorkflowConfiger
 	interStateChannel          *InternalChannel
 	stateRequestQueue          *StateRequestQueue
 	persistenceManager         *PersistenceManager
@@ -25,8 +27,8 @@ type SignalReceiver struct {
 func NewSignalReceiver(
 	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, interStateChannel *InternalChannel,
 	stateRequestQueue *StateRequestQueue,
-	persistenceManager *PersistenceManager, tp interfaces.TimerProcessor, continueAsNewCounter *ContinueAsNewCounter,
-	workflowConfiger *WorkflowConfiger,
+	persistenceManager *PersistenceManager, tp interfaces.TimerProcessor, continueAsNewCounter *cont.ContinueAsNewCounter,
+	workflowConfiger *config.WorkflowConfiger,
 	initReceivedSignals map[string][]*iwfidl.EncodedObject,
 ) *SignalReceiver {
 	if initReceivedSignals == nil {

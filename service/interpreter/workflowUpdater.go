@@ -4,6 +4,8 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/event"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/cont"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"time"
 )
@@ -12,11 +14,11 @@ type WorkflowUpdater struct {
 	persistenceManager   *PersistenceManager
 	provider             interfaces.WorkflowProvider
 	continueAsNewer      *ContinueAsNewer
-	continueAsNewCounter *ContinueAsNewCounter
+	continueAsNewCounter *cont.ContinueAsNewCounter
 	internalChannel      *InternalChannel
 	signalReceiver       *SignalReceiver
 	stateRequestQueue    *StateRequestQueue
-	configer             *WorkflowConfiger
+	configer             *config.WorkflowConfiger
 	logger               interfaces.UnifiedLogger
 	basicInfo            service.BasicInfo
 	globalVersioner      *GlobalVersioner
@@ -25,7 +27,7 @@ type WorkflowUpdater struct {
 func NewWorkflowUpdater(
 	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, persistenceManager *PersistenceManager,
 	stateRequestQueue *StateRequestQueue,
-	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, configer *WorkflowConfiger,
+	continueAsNewer *ContinueAsNewer, continueAsNewCounter *cont.ContinueAsNewCounter, configer *config.WorkflowConfiger,
 	internalChannel *InternalChannel, signalReceiver *SignalReceiver, basicInfo service.BasicInfo,
 	globalVersioner *GlobalVersioner,
 ) (*WorkflowUpdater, error) {
