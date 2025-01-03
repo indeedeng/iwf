@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TODO: create greedy tests by copying these 4 tests and pass in OptimizeTimer: true
 func TestTimerWorkflowTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
@@ -54,6 +55,8 @@ func TestTimerWorkflowCadenceContinueAsNew(t *testing.T) {
 		smallWaitForFastTest()
 	}
 }
+
+// TODO: create greedy tests by copying these 4 tests and pass in OptimizeTimer: true
 
 func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server

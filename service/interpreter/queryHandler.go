@@ -3,13 +3,15 @@ package interpreter
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 )
 
 func SetQueryHandlers(
-	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, persistenceManager *PersistenceManager,
 	internalChannel *InternalChannel, signalReceiver *SignalReceiver,
 	continueAsNewer *ContinueAsNewer,
-	workflowConfiger *WorkflowConfiger, basicInfo service.BasicInfo,
+	workflowConfiger *config.WorkflowConfiger, basicInfo service.BasicInfo,
 ) error {
 	err := provider.SetQueryHandler(ctx, service.GetDataAttributesWorkflowQueryType, func(req service.GetDataAttributesQueryRequest) (service.GetDataAttributesQueryResponse, error) {
 		dos := persistenceManager.GetDataObjectsByKey(req)

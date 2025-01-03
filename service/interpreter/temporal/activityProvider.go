@@ -3,7 +3,7 @@ package temporal
 import (
 	"context"
 	"github.com/indeedeng/iwf/service"
-	"github.com/indeedeng/iwf/service/interpreter"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/temporal"
 )
@@ -11,10 +11,10 @@ import (
 type activityProvider struct{}
 
 func init() {
-	interpreter.RegisterActivityProvider(service.BackendTypeTemporal, &activityProvider{})
+	interfaces.RegisterActivityProvider(service.BackendTypeTemporal, &activityProvider{})
 }
 
-func (a *activityProvider) GetLogger(ctx context.Context) interpreter.UnifiedLogger {
+func (a *activityProvider) GetLogger(ctx context.Context) interfaces.UnifiedLogger {
 	return activity.GetLogger(ctx)
 }
 
@@ -22,13 +22,13 @@ func (a *activityProvider) NewApplicationError(errType string, details interface
 	return temporal.NewApplicationError("", errType, details)
 }
 
-func (a *activityProvider) GetActivityInfo(ctx context.Context) interpreter.ActivityInfo {
+func (a *activityProvider) GetActivityInfo(ctx context.Context) interfaces.ActivityInfo {
 	info := activity.GetInfo(ctx)
-	return interpreter.ActivityInfo{
+	return interfaces.ActivityInfo{
 		ScheduledTime:   info.ScheduledTime,
 		Attempt:         info.Attempt,
 		IsLocalActivity: info.IsLocalActivity,
-		WorkflowExecution: interpreter.WorkflowExecution{
+		WorkflowExecution: interfaces.WorkflowExecution{
 			ID:    info.WorkflowExecution.ID,
 			RunID: info.WorkflowExecution.RunID,
 		},
