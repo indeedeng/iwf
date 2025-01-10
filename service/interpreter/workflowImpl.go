@@ -650,6 +650,7 @@ func processStateExecution(
 				continue
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
+			//Start timer in a new thread
 			provider.GoNamed(cmdCtx, getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
@@ -675,6 +676,7 @@ func processStateExecution(
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
+			//Process signal in new thread
 			provider.GoNamed(cmdCtx, getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
 				if !ok {
@@ -707,6 +709,7 @@ func processStateExecution(
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
+			//Process interstate channel command in a new thread.
 			provider.GoNamed(cmdCtx, getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx), func(ctx UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
 				if !ok {
