@@ -255,6 +255,7 @@ func (w *workflowProvider) ExecuteActivity(
 	valuePtr interface{}, optimizeByLocalActivity bool,
 	ctx interpreter.UnifiedContext, activity interface{}, args ...interface{},
 ) (err error) {
+	logger := w.GetLogger(ctx)
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {
 		panic("cannot convert to temporal workflow context")
@@ -264,12 +265,20 @@ func (w *workflowProvider) ExecuteActivity(
 		err = f.Get(wfCtx, valuePtr)
 		if err != nil {
 			f = workflow.ExecuteActivity(wfCtx, activity, args...)
-			return f.Get(wfCtx, valuePtr)
+			err = f.Get(wfCtx, valuePtr)
+			if err != nil {
+				logger.Info("activity failed!!!!!!!!!!!!!!!!")
+			}
+			return
 		}
 		return err
 	}
 	f := workflow.ExecuteActivity(wfCtx, activity, args...)
-	return f.Get(wfCtx, valuePtr)
+	err = f.Get(wfCtx, valuePtr)
+	if err != nil {
+		logger.Info("activity failed!!!!!!!!!!!!!!!!")
+	}
+	return
 }
 
 func (w *workflowProvider) Now(ctx interpreter.UnifiedContext) time.Time {
