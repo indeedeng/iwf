@@ -57,6 +57,45 @@ func TestTimerWorkflowCadenceContinueAsNew(t *testing.T) {
 }
 
 // TODO: create greedy tests by copying these 4 tests and pass in OptimizeTimer: true
+func TestGreedyTimerWorkflowTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumGreedyTimerConfig(true, false))
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyTimerWorkflowCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeCadence, minimumGreedyTimerConfig(true, false))
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyTimerWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfigV0())
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyTimerWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfigV0())
+		smallWaitForFastTest()
+	}
+}
 
 func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server

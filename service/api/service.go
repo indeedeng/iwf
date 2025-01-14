@@ -196,6 +196,9 @@ func overrideWorkflowConfig(configOverride iwfidl.WorkflowConfig, workflowConfig
 	if configOverride.OptimizeActivity != nil {
 		workflowConfig.OptimizeActivity = configOverride.OptimizeActivity
 	}
+	if configOverride.OptimizeTimer != nil {
+		workflowConfig.OptimizeTimer = configOverride.OptimizeTimer
+	}
 }
 
 func (s *serviceImpl) ApiV1WorkflowWaitForStateCompletion(

@@ -229,6 +229,19 @@ func minimumContinueAsNewConfig(optimizeActivity bool) *iwfidl.WorkflowConfig {
 	}
 }
 
+func minimumGreedyTimerConfig(optimizeTimer bool, continueAsNew bool) *iwfidl.WorkflowConfig {
+	if continueAsNew {
+		return &iwfidl.WorkflowConfig{
+			ContinueAsNewThreshold: iwfidl.PtrInt32(1),
+			OptimizeTimer:          iwfidl.PtrBool(optimizeTimer),
+		}
+	}
+
+	return &iwfidl.WorkflowConfig{
+		OptimizeTimer: iwfidl.PtrBool(optimizeTimer),
+	}
+}
+
 func minimumContinueAsNewConfigV0() *iwfidl.WorkflowConfig {
 	return minimumContinueAsNewConfig(false)
 }
