@@ -42,6 +42,10 @@ func NewSignalReceiver(
 		persistenceManager:   persistenceManager,
 	}
 
+	//The thread waits until a FailWorkflowSignalChannelName signal has been
+	//received or a continueAsNew run is triggered. When a signal has been received it sets
+	//SignalReceiver.failWorkflowByClient to true and sets SignalReceiver.reasonFailWorkflowByClient to the reason
+	//given in the signal's value. If continueIsNew is triggered, the thread completes after all signals have been processed.
 	provider.GoNamed(ctx, "fail-workflow-system-signal-handler", func(ctx UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChannelName)
@@ -67,6 +71,9 @@ func NewSignalReceiver(
 		}
 	})
 
+	//The thread waits until a SkipTimerSignalChannelName signal has been
+	//received or a continueAsNew run is triggered. When a signal has been received it skips the specific timer
+	//described in the signal's value. If continueIsNew is triggered, the thread completes after all signals have been processed.
 	provider.GoNamed(ctx, "skip-timer-system-signal-handler", func(ctx UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
@@ -91,6 +98,9 @@ func NewSignalReceiver(
 		}
 	})
 
+	//The thread waits until a UpdateConfigSignalChannelName signal has been
+	//received or a continueAsNew run is triggered. When a signal has been received it updates the workflow config
+	//defined in the signal's value. If continueIsNew is triggered, the thread completes after all signals have been processed.
 	provider.GoNamed(ctx, "update-config-system-signal-handler", func(ctx UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.UpdateConfigSignalChannelName)
@@ -115,6 +125,9 @@ func NewSignalReceiver(
 		}
 	})
 
+	//The thread waits until a TriggerContinueAsNewSignalChannelName signal has
+	//been received or a continueAsNew run is triggered. When a signal has been received it triggers a continueAsNew run.
+	//Since this thread is triggering a continueAsNew run it doesn't need to wait for signals to drain from the channel.
 	provider.GoNamed(ctx, "trigger-continue-as-new-handler", func(ctx UnifiedContext) {
 		// NOTE: unlike other signal channels, this one doesn't need to drain during continueAsNew
 		// because if there is a continueAsNew, this signal is not needed anymore
@@ -135,6 +148,11 @@ func NewSignalReceiver(
 		return
 	})
 
+	//The thread waits until a ExecuteRpcSignalChannelName signal has been
+	//received or a continueAsNew run is triggered. When a signal has been received it upserts data objects
+	//(if they exist in the signal value), upserts search attributes (if they exist in the signal value),
+	//and/or publishes a message to an internal channel (if InterStateChannelPublishing is set in the signal value).
+	//If continueIsNew is triggered, the thread completes after all signals have been processed.
 	provider.GoNamed(ctx, "execute-rpc-signal-handler", func(ctx UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.ExecuteRpcSignalChannelName)
@@ -164,6 +182,9 @@ func NewSignalReceiver(
 		}
 	})
 
+	//The thread waits until a signal has been received that is not an IWF
+	//system signal name or a continueAsNew run is triggered. When a signal has been received it processes the
+	//external signal. If continueIsNew is triggered, the thread completes after all signals have been processed.
 	provider.GoNamed(ctx, "user-signal-receiver-handler", func(ctx UnifiedContext) {
 		for {
 			var toProcess []string
