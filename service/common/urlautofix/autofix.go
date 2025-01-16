@@ -28,6 +28,7 @@ func DefaultFixWorkerUrlFunc(url string) string {
 		envVal := os.Getenv(autofixPortEnv)
 		url = strings.Replace(url, "$"+autofixPortEnv+"$", envVal, 1)
 	}
+	url = strings.TrimRight(url, "/")
 
 	return url
 }
