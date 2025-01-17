@@ -12,6 +12,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has two states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil waits until 4 signals are received
+ * 		- Execute method publishes the 4 signals & moves to State2
+ * State2:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType                  = "signal"
 	State1                        = "S1"

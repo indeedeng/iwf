@@ -10,6 +10,19 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has three states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method will update DA, SA, & SL
+ * 		- Execute method will move to State2 with partially loaded data
+ * State2:
+ * 		- WaitUntil method will store attribute data
+ * 		- Execute method will move to State3 with partially loaded data
+ * State3:
+ * 		- WaitUntil method performs some attribute checks
+ * 		- Execute method performs checks on the attribute data and then gracefully completes the workflow
+ */
 const (
 	WorkflowType       = "persistence"
 	State1             = "S1"

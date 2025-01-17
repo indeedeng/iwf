@@ -12,6 +12,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has two states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil skipped
+ * 		- Execute method verifies the loaded attributes then moves to a dead-end.
+ * State2:
+ * 		- WaitUntil method verifies the loaded attributes
+ * 		- Execute method verifies the loaded attributes then gracefully completes the workflow
+ */
 const (
 	WorkflowType = "persistence_loading_policy"
 	State1       = "S1"

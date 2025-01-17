@@ -10,6 +10,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has two states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil updates attribute data and data objects and then waits until the channel has been published to
+ * 		- Execute method moves to State2
+ * State2:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType              = "rpc"
 	State1                    = "S1"

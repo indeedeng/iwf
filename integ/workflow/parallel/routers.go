@@ -10,6 +10,34 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has eight states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ * 		- Execute method delays 1s then moves to State11, State12, & State13
+ * State11:
+ *		- WaitUntil method does nothing
+ * 		- Execute method delays 2s then moves to State111 & State112
+ * State12:
+ *		- WaitUntil method does nothing
+ * 		- Execute method delays 2s then moves to State121 & State122
+ * State13:
+ *		- WaitUntil method does nothing
+ *      - Execute method will delay 1s then gracefully complete workflow
+ * State111:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ * State112:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ * State121:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ * State122:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "parallel"
 	State1       = "S1"

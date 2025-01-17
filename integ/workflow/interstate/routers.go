@@ -20,8 +20,8 @@ import (
  * 		- WaitUntil will proceed once channel1 has been published to
  * 		- Execute method will move to State31:
  * State22:
- * 		- WaitUntil delays 2 seconds then publishes on the first channel
- *      - Execute method will delay 2s publish on channel2 & end in a dead-end
+ * 		- WaitUntil will delay 2s then publish on channel1
+ *      - Execute method will delay 2s then publish on channel2 & end in a dead-end
  * State31:
  * 		- WaitUntil will proceed once channel2 has been published to
  *      - Execute method will gracefully complete workflow
@@ -111,7 +111,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 
-		// Wait 2 seconds then publish on the first channel
+		// Wait 2 seconds then publish on channel1
 		if req.GetWorkflowStateId() == State22 {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{

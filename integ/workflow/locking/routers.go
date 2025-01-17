@@ -13,6 +13,19 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has three states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ * 		- Execute method will move to State Waiting, and 10 instances of State 2
+ * State2:
+ * 		- WaitUntil update SA
+ * 		- Execute method will update data objects and will gracefully complete workflow
+ * StateWaiting:
+ * 		- WaitUntil will proceed once the internal channel has been published to
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType                  = "locking"
 	State1                        = "S1"
