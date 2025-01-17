@@ -8,6 +8,12 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- The state will fail and exit
+ */
 const (
 	WorkflowType = "wf_state_api_fail"
 	State1       = "S1"

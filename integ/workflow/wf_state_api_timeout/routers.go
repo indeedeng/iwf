@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Timeout is set for 10s
+ *      - Waits for 30s to invoke a timeout exception
+ */
 const (
 	WorkflowType = "wf_state_api_timeout"
 	State1       = "S1"

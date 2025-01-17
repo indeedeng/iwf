@@ -10,6 +10,15 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/common"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method is skipped
+ *      - Execute method will intentionally fail
+ * StateRecover:
+ *		- Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType      = "wf_execute_api_fail_and_proceed"
 	State1            = "S1"

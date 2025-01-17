@@ -9,6 +9,13 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ *      - Execute method will intentionally force-fail
+ */
 const (
 	WorkflowType = "wf_force_fail"
 	State1       = "S1"

@@ -13,6 +13,16 @@ import (
 	"github.com/indeedeng/iwf/service"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Has 3 timers (10s, 1d, 1y) before executing state
+ *      - Execute method will go to State2
+ * State2:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "timer"
 	State1       = "S1"

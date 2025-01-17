@@ -8,6 +8,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Wait until is skipped.
+ *      - Execute method will go to State2
+ * State2:
+ *		- Wait until is skipped.
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "skipstart"
 	State1       = "S1"
