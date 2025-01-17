@@ -9,6 +9,17 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 3 states, using REST controller to implement the workflow directly.
+ *
+ * RPCWriteData:
+ *		- WaitUntil will upsert data attributes
+ * RPCTriggerState:
+ *		- WaitUntil will move to State1
+ * State1:
+ *		- WaitUntil is skipped
+ *      - Execute method will put the state into a dead-end.
+ */
 const (
 	WorkflowType    = "deadend"
 	RPCTriggerState = "test-RPCTriggerState"

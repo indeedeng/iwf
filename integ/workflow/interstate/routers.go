@@ -10,6 +10,22 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has four states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ * 		- Execute method will move to State21 & State22:
+ * State21:
+ * 		- WaitUntil will proceed once channel1 has been published to
+ * 		- Execute method will move to State31:
+ * State22:
+ * 		- WaitUntil delays 2 seconds then publishes on the first channel
+ *      - Execute method will delay 2s publish on channel2 & end in a dead-end
+ * State31:
+ * 		- WaitUntil will proceed once channel2 has been published to
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "interstate"
 	State1       = "S1"

@@ -12,7 +12,7 @@ import (
 )
 
 /**
- * This test workflow has four states, using REST controller to implement the workflow directly.
+ * This test workflow has five states, using REST controller to implement the workflow directly.
  *
  * State1:
  *		- WaitUntil method does nothing

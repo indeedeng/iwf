@@ -10,6 +10,14 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 1 state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil will proceed when the channel or signal is published to
+ *      - Execute method will continuously retry State1 until the 3rd attempt which will send a message to the channel or
+ *        signal, making the state empty and force-complete.
+ */
 const (
 	WorkflowType              = "conditional_close"
 	RpcPublishInternalChannel = "publish_internal_channel"

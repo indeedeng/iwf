@@ -8,6 +8,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will move to State2
+ * State2:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "basic"
 	State1       = "S1"

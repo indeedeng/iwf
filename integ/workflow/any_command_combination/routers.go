@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil will fail its first attempt and then retry which will proceed when a combination is completed
+ *      - Execute method will invoke the combination and move the State2
+ * State2:
+ *		- WaitUntil will fail its first attempt and then retry which will proceed when a combination is completed
+ *      - Execute method will invoke the combination and gracefully complete workflow
+ */
 const (
 	WorkflowType     = "any_command_combination"
 	State1           = "S1"
@@ -90,7 +100,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
 		if req.GetWorkflowStateId() == State1 {
-			// If the state has already retried an invalid command, return trigger signals and completion metrics
+			// If the state has already retried an invalid command, proceed on combination completed
 			if h.hasS1RetriedForInvalidCommandId {
 				startResp := iwfidl.WorkflowStateStartResponse{
 					CommandRequest: &iwfidl.CommandRequest{
@@ -198,7 +208,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// Fire signals and move to completion
+			// Trigger data and move to completion
 			h.invokeData["s2_commandResults"] = req.GetCommandResults()
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{

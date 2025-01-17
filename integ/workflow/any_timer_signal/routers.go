@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil will wait for the signals to trigger.
+ *      - Execute method will trigger signals and retry State1 once, then trigger signals and move the State2
+ * State2:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "any_timer_signal"
 	State1       = "S1"
