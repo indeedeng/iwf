@@ -46,7 +46,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	}
 
 	if req.RpcName == RPCTriggerState {
-		// Move to first state
+		// Move to State 1
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
 				{

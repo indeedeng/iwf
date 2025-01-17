@@ -67,10 +67,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
-		// Starting the first state
 		if req.GetWorkflowStateId() == State1 {
-
-			// Return channel name
+			// Proceed when channel is published to
 			cmdReq := &iwfidl.CommandRequest{
 				InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 					{
@@ -81,8 +79,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			}
 			input := req.GetStateInput()
 
-			// Return signal instead
 			if input.GetData() == "use-signal-channel" {
+				// Proceed when signal is published to
 				cmdReq = &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
 						{
@@ -121,7 +119,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				// Wait for 3 seconds so that the channel can have a new message
 				time.Sleep(time.Second * 3)
 			} else if context.GetStateExecutionId() == "S1-3" {
-				// send internal channel message within the state execution
+				// Send internal channel message within the state execution
 				// and expecting the messages are processed by the conditional check
 				internalChanPub = []iwfidl.InterStateChannelPublishing{
 					{

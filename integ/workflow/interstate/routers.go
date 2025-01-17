@@ -128,7 +128,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
-			// First state requires no pre-reqs
+			// State 1 requires no pre-reqs
 			// Move to state 21 & 22:
 			// 21 - Will wait for channel 1
 			// 22 - Will wait 3 seconds then publish to channel 1

@@ -89,7 +89,6 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
-		// Starting the first state
 		if req.GetWorkflowStateId() == State1 {
 			// If the state has already retried an invalid command, return trigger signals and completion metrics
 			if h.hasS1RetriedForInvalidCommandId {
@@ -130,7 +129,6 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 
-		// Starting the second state
 		if req.GetWorkflowStateId() == State2 {
 			// If the state has already retried an invalid command, return signals and completion metrics
 			if h.hasS2RetriedForInvalidCommandId {
@@ -185,7 +183,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 
-		// Trigger signals and move to next state
+		// Trigger signals and move to State 2
 		if req.GetWorkflowStateId() == State1 {
 			h.invokeData["s1_commandResults"] = req.GetCommandResults()
 
