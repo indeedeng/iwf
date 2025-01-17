@@ -42,6 +42,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Empty response
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{})
 			return
 		}
@@ -60,7 +61,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType && req.GetWorkflowStateId() == State1 {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
-		// go to complete
+		// Force fail
 		c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 			StateDecision: &iwfidl.StateDecision{
 				NextStates: []iwfidl.StateMovement{

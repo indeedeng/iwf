@@ -45,6 +45,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	log.Println("received workflow worker rpc request, ", req)
 	h.invokeHistory[req.RpcName]++
 
+	// Return channel name
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
 			{
@@ -65,8 +66,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
+		// Starting the first state
 		if req.GetWorkflowStateId() == State1 {
 
+			// Return channel name
 			cmdReq := &iwfidl.CommandRequest{
 				InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
 					{
@@ -76,8 +80,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
 			}
 			input := req.GetStateInput()
+
+			// Return signal instead
 			if input.GetData() == "use-signal-channel" {
-				// use signal
 				cmdReq = &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
 						{
@@ -87,6 +92,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					CommandWaitingType: ptr.Any(iwfidl.ANY_COMPLETED),
 				}
 			}
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: cmdReq,
 			})
@@ -112,7 +118,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			var internalChanPub []iwfidl.InterStateChannelPublishing
 			context := req.GetContext()
 			if context.GetStateExecutionId() == "S1-1" {
-				// wait for 3 seconds so that the channel can have a new message
+				// Wait for 3 seconds so that the channel can have a new message
 				time.Sleep(time.Second * 3)
 			} else if context.GetStateExecutionId() == "S1-3" {
 				// send internal channel message within the state execution
@@ -130,8 +136,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				CloseInput:           &TestInput,
 			}
 			input := req.GetStateInput()
+
+			// Use signal instead
 			if input.GetData() == "use-signal-channel" {
-				// use signal
 				conditionalClose = &iwfidl.WorkflowConditionalClose{
 					ConditionalCloseType: iwfidl.FORCE_COMPLETE_ON_SIGNAL_CHANNEL_EMPTY.Ptr(),
 					ChannelName:          iwfidl.PtrString(TestChannelName),

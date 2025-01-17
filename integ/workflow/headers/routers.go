@@ -42,7 +42,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		// basic workflow go straight to decide methods without any commands
+		// Basic workflow to go straight to the decide methods without any commands
 		if req.GetWorkflowStateId() == State1 {
 			h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -74,7 +74,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
-			// go to S1
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

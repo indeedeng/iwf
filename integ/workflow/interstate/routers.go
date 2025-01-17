@@ -55,6 +55,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
+		// Go straight to the decide methods without any commands
 		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -63,6 +64,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+		// Will proceed once channel 1 has been published to
 		if req.GetWorkflowStateId() == State21 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -77,6 +79,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+		// Will proceed once channel 2 has been published to
 		if req.GetWorkflowStateId() == State31 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -92,6 +95,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 
+		// Wait 2 seconds then publish on the first channel
 		if req.GetWorkflowStateId() == State22 {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -124,6 +128,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
+			// First state requires no pre-reqs
+			// Move to state 21 & 22:
+			// 21 - Will wait for channel 1
+			// 22 - Will wait 3 seconds then publish to channel 1
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -143,6 +151,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			results := req.GetCommandResults()
 			h.invokeData[State21+"received"] = results.GetInterStateChannelResults()[0].GetValue()
 
+			// Move to state 31, which will wait for channel 2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -159,6 +168,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			results := req.GetCommandResults()
 			h.invokeData[State31+"received"] = results.GetInterStateChannelResults()[0].GetValue()
 
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -174,7 +184,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		if req.GetWorkflowStateId() == State22 {
 			time.Sleep(time.Second * 2)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-				// real new dead end
+				// Move to the dead-end state and publish on channel 2 (to unlock State 31)
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{

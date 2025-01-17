@@ -43,6 +43,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
+		// Go straight to the decide methods without any commands
 		c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 			CommandRequest: &iwfidl.CommandRequest{
 				DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -67,9 +69,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		var nextStates []iwfidl.StateMovement
 		switch req.GetWorkflowStateId() {
 		case State1:
-			// cause graceful complete to wait
+			// Cause graceful complete to wait
 			time.Sleep(time.Second * 1)
 
+			// Move to 3 states (which will all move to this decide method without commands)
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: State11,
@@ -82,9 +85,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 			}
 		case State11:
-			// cause graceful complete to wait
+			// Cause graceful complete to wait
 			time.Sleep(time.Second * 2)
 
+			// Move to 2 states (which will all move to this decide method without commands)
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: State111,
@@ -94,8 +98,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 			}
 		case State12:
-			// cause graceful complete to wait
+			// Cause graceful complete to wait
 			time.Sleep(time.Second * 2)
+
+			// Move to 2 states (which will all move to this decide method without commands)
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: State121,
@@ -105,8 +111,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 			}
 		case State13:
-			// cause graceful complete to wait
+			// Cause graceful complete to wait
 			time.Sleep(time.Second * 1)
+
+			// Move to completion after updating the state input
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: service.GracefulCompletingWorkflowStateId,
@@ -116,7 +124,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					},
 				},
 			}
-		case State112, State121, State122, State111:
+		case State111, State112, State121, State122:
+			// Move to completion after updating the state input
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: service.GracefulCompletingWorkflowStateId,
@@ -127,6 +136,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 			}
 		default:
+			// Fail workflow due to unknown or unexpected state
 			nextStates = []iwfidl.StateMovement{
 				{
 					StateId: service.ForceFailingWorkflowStateId,

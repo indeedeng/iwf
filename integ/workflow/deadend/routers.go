@@ -46,6 +46,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	}
 
 	if req.RpcName == RPCTriggerState {
+		// Move to first state
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
 				{
@@ -57,6 +58,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 			}},
 		})
 	} else if req.RpcName == RPCWriteData {
+		// Upsert data attributes
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			UpsertDataAttributes: []iwfidl.KeyValue{
 				{
@@ -88,6 +90,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+
+		// Move to the dead-end state
 		if req.GetWorkflowStateId() == State1 {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{

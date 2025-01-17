@@ -49,6 +49,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			}
 			now := int64(nowInt)
 			h.invokeData["scheduled_at"] = now
+			// Proceed after 10s
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
@@ -62,6 +63,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+
+		// Go straight to the decide methods without any commands
 		if req.GetWorkflowStateId() == State2 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -91,6 +94,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			timerResults := req.GetCommandResults()
 			timerId := timerResults.GetTimerResults()[0].GetCommandId()
 			h.invokeData["timer_id"] = timerId
+			// Move to State 2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -103,7 +107,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

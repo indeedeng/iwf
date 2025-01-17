@@ -37,7 +37,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Sleep for longer than the timeout
 			time.Sleep(time.Second * 30)
+			// Bad Request response
 			c.JSON(http.StatusBadRequest, iwfidl.WorkflowStateStartResponse{})
 			return
 		}

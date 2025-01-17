@@ -57,6 +57,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	}
 	if req.WorkflowStateId == StateRecover {
 		if input.GetData() == InputData && input.GetEncoding() == InputDataEncoding {
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

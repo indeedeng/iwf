@@ -41,9 +41,13 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
+		// Starting the first state
 		if req.GetWorkflowStateId() == State1 {
 			var timerCommands []iwfidl.TimerCommand
 			context := req.GetContext()
+
+			// Fire timer after 1s on first start attempt
 			if context.GetStateExecutionId() == State1+"-"+"1" {
 				now := time.Now().Unix()
 				timerCommands = []iwfidl.TimerCommand{
@@ -67,6 +71,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+
+		// Starting the second state, return "all completed"
 		if req.GetWorkflowStateId() == State2 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -95,12 +101,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			var movements []iwfidl.StateMovement
 
 			context := req.GetContext()
+			// On first state attempt, trigger signals and stay on the first state
 			if context.GetStateExecutionId() == State1+"-"+"1" {
 				h.invokeData["signalChannelName1"] = signalResults.SignalResults[0].GetSignalChannelName()
 				h.invokeData["signalCommandId1"] = signalResults.SignalResults[0].GetCommandId()
 				h.invokeData["signalStatus1"] = signalResults.SignalResults[0].GetSignalRequestStatus()
 				movements = []iwfidl.StateMovement{{StateId: State1}}
 			} else {
+				// After the first state attempt, trigger signals and move to next state
 				h.invokeData["signalChannelName2"] = signalResults.SignalResults[0].GetSignalChannelName()
 				h.invokeData["signalCommandId2"] = signalResults.SignalResults[0].GetCommandId()
 				h.invokeData["signalStatus2"] = signalResults.SignalResults[0].GetSignalRequestStatus()
@@ -115,7 +123,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
