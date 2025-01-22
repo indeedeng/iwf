@@ -69,23 +69,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
-		if req.GetWorkflowStateId() == State1 {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
-				},
-			})
-			return
-		}
-		if req.GetWorkflowStateId() == State2 {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
-				},
-			})
-			return
-		}
-		if req.GetWorkflowStateId() == State3 {
+		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State2 || req.GetWorkflowStateId() == State3 ||
+			req.GetWorkflowStateId() == State5 || req.GetWorkflowStateId() == State6 || req.GetWorkflowStateId() == State7 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -94,6 +80,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State4 {
+			// Proceed after signal is received
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -103,30 +90,6 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 							SignalChannelName: SignalName,
 						},
 					},
-				},
-			})
-			return
-		}
-		if req.GetWorkflowStateId() == State5 {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
-				},
-			})
-			return
-		}
-		if req.GetWorkflowStateId() == State6 {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
-				},
-			})
-			return
-		}
-		if req.GetWorkflowStateId() == State7 {
-			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
-				CommandRequest: &iwfidl.CommandRequest{
-					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
 				},
 			})
 			return
@@ -149,6 +112,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		if req.GetWorkflowStateId() == State1 {
 			context := req.GetContext()
 			if context.GetStateExecutionId() == "S1-5" {
+				// Move to State 2
 				c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 					StateDecision: &iwfidl.StateDecision{
 						NextStates: []iwfidl.StateMovement{
@@ -162,6 +126,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					},
 				})
 			} else {
+				// Repeat State 1 (5 times)
 				time.Sleep(time.Second * 1)
 				c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 					StateDecision: &iwfidl.StateDecision{
@@ -177,6 +142,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		} else if req.GetWorkflowStateId() == State2 {
 			context := req.GetContext()
 			if context.GetStateExecutionId() == "S2-2" {
+				// Move to State 3 & 4
 				c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 					StateDecision: &iwfidl.StateDecision{
 						NextStates: []iwfidl.StateMovement{
@@ -190,6 +156,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					},
 				})
 			} else {
+				// Repeat State 2 and Move to State 3
 				c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 					StateDecision: &iwfidl.StateDecision{
 						NextStates: []iwfidl.StateMovement{
@@ -209,6 +176,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		} else if req.GetWorkflowStateId() == State3 {
 			time.Sleep(time.Second * 8)
+			// Move to Completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -220,6 +188,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State4 {
+			// Move to State 5, skipping wait until
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -234,6 +203,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State5 {
+			// Move to State 6 and State 7 skipping wait until for 7
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -252,6 +222,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		} else if req.GetWorkflowStateId() == State6 {
 			time.Sleep(time.Second * 4)
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -263,6 +234,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State7 {
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

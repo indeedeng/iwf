@@ -9,6 +9,13 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ *      - Execute method will intentionally force-fail
+ */
 const (
 	WorkflowType = "wf_force_fail"
 	State1       = "S1"
@@ -42,6 +49,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Empty response
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{})
 			return
 		}
@@ -60,7 +68,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType && req.GetWorkflowStateId() == State1 {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
-		// go to complete
+		// Force fail
 		c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 			StateDecision: &iwfidl.StateDecision{
 				NextStates: []iwfidl.StateMovement{

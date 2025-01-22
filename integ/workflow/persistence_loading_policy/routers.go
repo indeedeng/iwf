@@ -12,6 +12,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has two states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil skipped
+ * 		- Execute method verifies the loaded attributes then moves to a dead-end.
+ * State2:
+ * 		- WaitUntil method verifies the loaded attributes
+ * 		- Execute method verifies the loaded attributes then gracefully completes the workflow
+ */
 const (
 	WorkflowType = "persistence_loading_policy"
 	State1       = "S1"
@@ -45,14 +55,14 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
 	if req.GetWorkflowStateId() == State2 {
-		// dynamically get the loadingType from input
+		// Dynamically get the loadingType from input
 		loadingTypeFromInput := req.GetStateInput()
 		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
 		verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
 	}
 
-	// go straight to decide methods without any commands
+	// Go straight to the decide methods without any commands
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 		CommandRequest: &iwfidl.CommandRequest{
 			DeciderTriggerType: iwfidl.ANY_COMMAND_COMPLETED.Ptr(),
@@ -75,7 +85,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 
-	// dynamically get the loadingType from input
+	// Dynamically get the loadingType from input
 	loadingTypeFromInput := req.GetStateInput()
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
@@ -86,7 +96,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	var upsertSearchAttributes []iwfidl.SearchAttribute
 	var upsertDataObjects []iwfidl.KeyValue
 
-	// set search attributes and data attributes in State1
+	// Set search attributes and data attributes in State1
 	if req.GetWorkflowStateId() == State1 {
 		upsertSearchAttributes = []iwfidl.SearchAttribute{
 			{
@@ -119,6 +129,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		}
 	}
 
+	// Move to dead-end (state 1) or completion (state 2)
 	var nextStateId string
 	if req.GetWorkflowStateId() == State1 {
 		nextStateId = service.DeadEndWorkflowStateId

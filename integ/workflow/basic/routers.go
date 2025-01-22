@@ -8,6 +8,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will move to State2
+ * State2:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "basic"
 	State1       = "S1"
@@ -39,7 +49,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	}
 
 	if req.GetWorkflowType() == WorkflowType {
-		// basic workflow go straight to decide methods without any commands
+		// Basic workflow go straight to decide methods without any commands
 		if req.GetWorkflowStateId() == State1 || req.GetWorkflowStateId() == State2 {
 			h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -68,8 +78,9 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+
 		if req.GetWorkflowStateId() == State1 {
-			// go to S2
+			// Move to next state
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -98,7 +109,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

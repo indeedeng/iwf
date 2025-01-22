@@ -18,7 +18,7 @@ import (
  *      - Execute method will go to State2
  * State2:
  *		- Waits on nothing. Will execute momentarily
- *		- Skips wait unit
+ *		- Skips wait until
  *      - 10-second delay is added before executing state
  *      - Execute method will gracefully complete workflow
  */
@@ -51,6 +51,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -59,6 +60,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -82,6 +84,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Move to State 2, skipping wait until
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -97,6 +100,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		} else if req.GetWorkflowStateId() == State2 {
 			time.Sleep(time.Second * 10)
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil will fail its first attempt and then retry which will proceed when a combination is completed
+ *      - Execute method will invoke the combination and move the State2
+ * State2:
+ *		- WaitUntil will fail its first attempt and then retry which will proceed when a combination is completed
+ *      - Execute method will invoke the combination and gracefully complete workflow
+ */
 const (
 	WorkflowType     = "any_command_combination"
 	State1           = "S1"
@@ -88,7 +98,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
 		if req.GetWorkflowStateId() == State1 {
+			// If the state has already retried an invalid command, proceed on combination completed
 			if h.hasS1RetriedForInvalidCommandId {
 				startResp := iwfidl.WorkflowStateStartResponse{
 					CommandRequest: &iwfidl.CommandRequest{
@@ -112,6 +124,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 				c.JSON(http.StatusOK, startResp)
 			} else {
+				// If the state has not already retried an invalid command, return invalid trigger signals, which will fail
+				// and cause a retry
 				startResp := iwfidl.WorkflowStateStartResponse{
 					CommandRequest: &iwfidl.CommandRequest{
 						SignalCommands:     validSignalCommands,
@@ -124,7 +138,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			}
 			return
 		}
+
 		if req.GetWorkflowStateId() == State2 {
+			// If the state has already retried an invalid command, return signals and completion metrics
 			if h.hasS2RetriedForInvalidCommandId {
 				startResp := iwfidl.WorkflowStateStartResponse{
 					CommandRequest: &iwfidl.CommandRequest{
@@ -148,6 +164,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 				c.JSON(http.StatusOK, startResp)
 			} else {
+				// If the state has not already retried an invalid command, return invalid trigger signals, which will fail
+				// and cause a retry
 				startResp := iwfidl.WorkflowStateStartResponse{
 					CommandRequest: &iwfidl.CommandRequest{
 						SignalCommands:     invalidSignalCommands,
@@ -174,6 +192,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+
+		// Trigger signals and move to State 2
 		if req.GetWorkflowStateId() == State1 {
 			h.invokeData["s1_commandResults"] = req.GetCommandResults()
 
@@ -188,9 +208,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
+			// Trigger data and move to completion
 			h.invokeData["s2_commandResults"] = req.GetCommandResults()
-
-			// go to complete
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

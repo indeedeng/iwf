@@ -8,6 +8,12 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- The state will fail and exit
+ */
 const (
 	WorkflowType = "wf_state_api_fail"
 	State1       = "S1"
@@ -36,6 +42,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Bad Request response
 			c.JSON(http.StatusBadRequest, iwfidl.WorkflowStateStartResponse{})
 			return
 		}

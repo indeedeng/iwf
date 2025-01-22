@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil will wait for the signals to trigger.
+ *      - Execute method will trigger signals and retry State1 once, then trigger signals and move the State2
+ * State2:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "any_timer_signal"
 	State1       = "S1"
@@ -41,9 +51,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
 		if req.GetWorkflowStateId() == State1 {
 			var timerCommands []iwfidl.TimerCommand
 			context := req.GetContext()
+
+			// Fire timer after 1s on first start attempt
 			if context.GetStateExecutionId() == State1+"-"+"1" {
 				now := time.Now().Unix()
 				timerCommands = []iwfidl.TimerCommand{
@@ -67,7 +80,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+
 		if req.GetWorkflowStateId() == State2 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -95,12 +110,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			var movements []iwfidl.StateMovement
 
 			context := req.GetContext()
+			// On first State 1 attempt, trigger signals and stay on the first state
 			if context.GetStateExecutionId() == State1+"-"+"1" {
 				h.invokeData["signalChannelName1"] = signalResults.SignalResults[0].GetSignalChannelName()
 				h.invokeData["signalCommandId1"] = signalResults.SignalResults[0].GetCommandId()
 				h.invokeData["signalStatus1"] = signalResults.SignalResults[0].GetSignalRequestStatus()
 				movements = []iwfidl.StateMovement{{StateId: State1}}
 			} else {
+				// After the first State 1 attempt, trigger signals and move to next state
 				h.invokeData["signalChannelName2"] = signalResults.SignalResults[0].GetSignalChannelName()
 				h.invokeData["signalCommandId2"] = signalResults.SignalResults[0].GetCommandId()
 				h.invokeData["signalStatus2"] = signalResults.SignalResults[0].GetSignalRequestStatus()
@@ -115,7 +132,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

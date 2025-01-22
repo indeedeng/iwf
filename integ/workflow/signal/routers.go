@@ -12,6 +12,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has two states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil waits until 4 signals are received
+ * 		- Execute method publishes the 4 signals & moves to State2
+ * State2:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType                  = "signal"
 	State1                        = "S1"
@@ -94,6 +104,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Proceed when 4 signals are received
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
@@ -118,6 +129,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -142,6 +154,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 			signalResults := req.GetCommandResults()
+
+			// Publish 4 signals
 			for i := 0; i < 4; i++ {
 				signalId := signalResults.SignalResults[i].GetCommandId()
 				signalValue := signalResults.SignalResults[i].GetSignalValue()
@@ -150,6 +164,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				h.invokeData[fmt.Sprintf("signalValue%v", i)] = signalValue
 			}
 
+			// Move to State 2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -162,7 +177,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

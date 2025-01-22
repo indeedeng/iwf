@@ -10,6 +10,19 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has three states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method will update DA, SA, & SL
+ * 		- Execute method will move to State2 with partially loaded data
+ * State2:
+ * 		- WaitUntil method will store attribute data
+ * 		- Execute method will move to State3 with partially loaded data
+ * State3:
+ * 		- WaitUntil method performs some attribute checks
+ * 		- Execute method performs checks on the attribute data and then gracefully completes the workflow
+ */
 const (
 	WorkflowType       = "persistence"
 	State1             = "S1"
@@ -103,6 +116,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				},
 			}
 
+			// Go to the decide methods after updating DA, SA, & SL
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -129,6 +143,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		}
 		if req.GetWorkflowStateId() == State2 {
 			sas := req.GetSearchAttributes()
+
+			// Determine how many keywords and ints are found in the search attributes
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
@@ -144,6 +160,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			h.invokeData["S2_start_kwSaFounds"] = kwSaFounds
 			h.invokeData["S2_start_intSaFounds"] = intSaFounds
 
+			// Determine if the attribute is found in the request
 			queryAttFound := false
 			queryAtts := req.GetDataObjects()
 			for _, queryAtt := range queryAtts {
@@ -157,6 +174,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			}
 			h.invokeData["S2_start_queryAttFound"] = queryAttFound
 
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -166,6 +184,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		}
 		if req.GetWorkflowStateId() == State3 {
 			sas := req.GetSearchAttributes()
+
+			// Determine if the INT attribute is found in the request
 			found := false
 			for _, sa := range sas {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
@@ -194,6 +214,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				panic("missing query attribute requested by partial loading keys")
 			}
 
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -218,6 +239,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 		if req.GetWorkflowStateId() == State1 {
 			sas := req.GetSearchAttributes()
+
+			// Determine how many keywords and ints are found in the search attributes
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
@@ -236,6 +259,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			queryAttFound := 0
 			queryAtts := req.GetDataObjects()
 
+			// Determine how many query attributes are found
 			for _, queryAtt := range queryAtts {
 				value := queryAtt.GetValue()
 				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
@@ -247,6 +271,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			}
 			h.invokeData["S1_decide_queryAttFound"] = queryAttFound
 
+			// Determine if local attribute is found
 			localAttFound := false
 			localAtt := req.GetStateLocals()[0]
 			value := localAtt.GetValue()
@@ -269,6 +294,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				},
 			}
 
+			// Move to state 2 with set options after updating values
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -303,6 +329,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		} else if req.GetWorkflowStateId() == State2 {
 			sas := req.GetSearchAttributes()
+
+			// Determine how many keywords and ints are found in the search attributes
 			kwSaFounds := 0
 			intSaFounds := 0
 			for _, sa := range sas {
@@ -320,6 +348,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 			queryAttFound := false
 			queryAtts := req.GetDataObjects()
+
+			// Determine how many query attributes are found
 			for _, queryAtt := range queryAtts {
 				value := queryAtt.GetValue()
 				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
@@ -332,6 +362,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 			h.invokeData["S2_decide_queryAttFound"] = queryAttFound
 
+			// Move to state 3 after with set options
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -359,6 +390,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		} else if req.GetWorkflowStateId() == State3 {
 			sas := req.GetSearchAttributes()
+
+			// Determine if the INT attribute is found in the request
 			found := false
 			for _, sa := range sas {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
@@ -375,6 +408,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 			queryAttFound := 0
 			queryAtts := req.GetDataObjects()
+
+			// Determine how many query attributes are found
 			for _, queryAtt := range queryAtts {
 				if queryAtt.GetKey() == TestDataObjectKey {
 					queryAttFound++
@@ -387,6 +422,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				panic("missing query attribute requested by partial loading keys")
 			}
 
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

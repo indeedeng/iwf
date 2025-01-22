@@ -10,6 +10,15 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/common"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method is skipped
+ *      - Execute method will intentionally fail
+ * StateRecover:
+ *		- Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType      = "wf_execute_api_fail_and_proceed"
 	State1            = "S1"
@@ -57,6 +66,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	}
 	if req.WorkflowStateId == StateRecover {
 		if input.GetData() == InputData && input.GetEncoding() == InputDataEncoding {
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

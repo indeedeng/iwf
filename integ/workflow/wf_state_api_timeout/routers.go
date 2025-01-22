@@ -9,6 +9,13 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- Timeout is set for 10s
+ *      - Waits for 30s to invoke a timeout exception
+ */
 const (
 	WorkflowType = "wf_state_api_timeout"
 	State1       = "S1"
@@ -37,7 +44,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Sleep for longer than the timeout
 			time.Sleep(time.Second * 30)
+			// Bad Request response
 			c.JSON(http.StatusBadRequest, iwfidl.WorkflowStateStartResponse{})
 			return
 		}

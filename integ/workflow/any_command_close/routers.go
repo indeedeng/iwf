@@ -10,6 +10,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 2 states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil wait until a signal is received
+ *      - Execute method will fire the signal and move the State2
+ * State2:
+ *		- Waits on nothing. Will execute momentarily
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType = "any_command_close"
 	State1       = "S1"
@@ -41,7 +51,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+
 		if req.GetWorkflowStateId() == State1 {
+			// Proceed after either signal is received
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					SignalCommands: []iwfidl.SignalCommand{
@@ -60,6 +72,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -82,10 +95,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+
 		if req.GetWorkflowStateId() == State1 {
 			signalResults := req.GetCommandResults()
 			h.invokeData["signalCommandResultsLength"] = len(signalResults.SignalResults)
 
+			// Trigger signals
 			h.invokeData["signalChannelName0"] = signalResults.SignalResults[0].GetSignalChannelName()
 			h.invokeData["signalCommandId0"] = signalResults.SignalResults[0].GetCommandId()
 			h.invokeData["signalStatus0"] = signalResults.SignalResults[0].GetSignalRequestStatus()
@@ -95,6 +110,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			h.invokeData["signalStatus1"] = signalResults.SignalResults[1].GetSignalRequestStatus()
 			h.invokeData["signalValue1"] = signalResults.SignalResults[1].GetSignalValue()
 
+			// Move to State 2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -106,7 +122,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

@@ -10,6 +10,12 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/common"
 )
 
+/**
+ * This test workflow has one state, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- The state will fail and proceed to StateRecover which will gracefully complete workflow
+ */
 const (
 	WorkflowType = "wf_state_api_fail_and_proceed"
 	State1       = "S1"
@@ -38,6 +44,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 		if req.GetWorkflowStateId() == State1 {
+			// Bad Request response
 			c.JSON(http.StatusBadRequest, iwfidl.WorkflowStateStartResponse{})
 			return
 		}
@@ -61,6 +68,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
 	}
+	// Move to completion
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{

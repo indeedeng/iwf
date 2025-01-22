@@ -9,6 +9,17 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has 3 states, using REST controller to implement the workflow directly.
+ *
+ * RPCWriteData:
+ *		- WaitUntil will upsert data attributes
+ * RPCTriggerState:
+ *		- WaitUntil will move to State1
+ * State1:
+ *		- WaitUntil is skipped
+ *      - Execute method will put the state into a dead-end.
+ */
 const (
 	WorkflowType    = "deadend"
 	RPCTriggerState = "test-RPCTriggerState"
@@ -46,6 +57,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	}
 
 	if req.RpcName == RPCTriggerState {
+		// Move to State 1
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
 				{
@@ -57,6 +69,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 			}},
 		})
 	} else if req.RpcName == RPCWriteData {
+		// Upsert data attributes
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			UpsertDataAttributes: []iwfidl.KeyValue{
 				{
@@ -88,6 +101,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+
+		// Move to the dead-end state
 		if req.GetWorkflowStateId() == State1 {
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{

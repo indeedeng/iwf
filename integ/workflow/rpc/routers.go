@@ -10,6 +10,16 @@ import (
 	"net/http"
 )
 
+/**
+ * This test workflow has two states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil updates attribute data and data objects and then waits until the channel has been published to
+ * 		- Execute method moves to State2
+ * State2:
+ *		- WaitUntil method does nothing
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType              = "rpc"
 	State1                    = "S1"
@@ -124,6 +134,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		},
 	}
 
+	// Proceed with State 2 after setting the attributes
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		Output: &TestOutput,
 		StateDecision: &iwfidl.StateDecision{NextStates: []iwfidl.StateMovement{
@@ -183,6 +194,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				},
 			}
 
+			// Proceed after attributes and data objects have been updated and channel has been published to
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
@@ -203,6 +215,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
+			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -233,6 +246,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			}
 			h.invokeData[TestInterStateChannelName] = res.Value
 
+			// Move to state 2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -244,7 +258,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		} else if req.GetWorkflowStateId() == State2 {
-			// go to complete
+			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{

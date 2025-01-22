@@ -12,7 +12,7 @@ import (
 )
 
 /**
- * This test workflow has four states, using REST controller to implement the workflow directly.
+ * This test workflow has five states, using REST controller to implement the workflow directly.
  *
  * State1:
  *		- WaitUntil method does nothing
@@ -76,7 +76,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	loadingTypeFromInput := req.GetStateInput()
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
-	if req.GetWorkflowStateId() == State2 {
+	if req.GetWorkflowStateId() == State2 || req.GetWorkflowStateId() == State4 || req.GetWorkflowStateId() == State5 {
 		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
 	}
 
@@ -84,14 +84,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		verifyEmptySearchAttributes(req.GetSearchAttributes())
 	}
 
-	if req.GetWorkflowStateId() == State4 {
-		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
-	}
-
-	if req.GetWorkflowStateId() == State5 {
-		verifyLoadedSearchAttributes(req.GetWorkflowStateId(), currentMethod, req.GetSearchAttributes(), loadingType)
-	}
-
+	// Go straight to the decide methods without any commands
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 		CommandRequest: &iwfidl.CommandRequest{
 			DeciderTriggerType: iwfidl.ANY_COMMAND_COMPLETED.Ptr(),
@@ -149,6 +142,7 @@ func getState1DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 	noneLoadingType := iwfidl.NONE
 
+	// Move to State 2 with the provided options & input after updating data objects
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -176,6 +170,7 @@ func getState2DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 	noneLoadingType := iwfidl.NONE
 
+	// Move to State 3 with the provided options & input
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -201,6 +196,7 @@ func getState3DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	loadingTypeFromInput := req.GetStateInput()
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
+	// Move to State 4 with the provided options & input
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -223,6 +219,7 @@ func getState4DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	loadingTypeFromInput := req.GetStateInput()
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
+	// Move to State 5 with the provided options & input
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -246,6 +243,7 @@ func getState4DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 }
 
 func getState5DecideResponse() iwfidl.WorkflowStateDecideResponse {
+	// Move to completion
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{

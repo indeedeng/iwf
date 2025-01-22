@@ -13,6 +13,19 @@ import (
 	"time"
 )
 
+/**
+ * This test workflow has three states, using REST controller to implement the workflow directly.
+ *
+ * State1:
+ *		- WaitUntil method does nothing
+ * 		- Execute method will move to State Waiting, and 10 instances of State 2
+ * State2:
+ * 		- WaitUntil update SA
+ * 		- Execute method will update data objects and will gracefully complete workflow
+ * StateWaiting:
+ * 		- WaitUntil will proceed once the internal channel has been published to
+ *      - Execute method will gracefully complete workflow
+ */
 const (
 	WorkflowType                  = "locking"
 	State1                        = "S1"
@@ -102,6 +115,8 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	if input.GetEncoding() != TestValue.GetEncoding() {
 		panic("input is incorrect")
 	}
+
+	// Publish to internal channel
 	if input.GetData() == ShouldUnblockStateWaiting {
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
@@ -127,9 +142,9 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	}
 	h.rpcInvokes++
 
-	// this RPC will increase both SA and DA
 	time.Sleep(time.Millisecond)
 
+	// This RPC will increase both SA and DA
 	saInt := int64(0)
 	for _, sa := range req.GetSearchAttributes() {
 		if sa.GetKey() == TestSearchAttributeIntKey {
@@ -221,6 +236,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	if req.GetWorkflowType() == WorkflowType {
 		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
 
+		// Go straight to the decide methods without any commands
 		if req.GetWorkflowStateId() == State1 {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -229,6 +245,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			})
 			return
 		}
+		// Will proceed once the internal channel has been published to
 		if req.GetWorkflowStateId() == StateWaiting {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
@@ -244,7 +261,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 		}
 		if req.GetWorkflowStateId() == State2 {
-			// this state API is to increase SA
+			// This state API is to increase SA
 			time.Sleep(time.Second)
 			saInt := int64(0)
 			for _, sa := range req.GetSearchAttributes() {
@@ -269,6 +286,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				},
 			}
 
+			// Go straight to the decide methods after updating SA
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
@@ -303,6 +321,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				stms = append(stms, state2Movement)
 			}
 
+			// Move to State Waiting, and 10 instances of State 2
+			// State Waiting will not complete until the internal channel has been published to
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: stms,
@@ -310,6 +330,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			})
 			return
 		}
+		// Move to completion
 		if req.GetWorkflowStateId() == StateWaiting {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
@@ -323,7 +344,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			return
 		}
 		if req.GetWorkflowStateId() == State2 {
-			// this API is to increase DA
+			// This API is to increase DA
 			time.Sleep(time.Second)
 			daInt := 0
 			for _, da := range req.DataObjects {
@@ -341,6 +362,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			}
 			daInt++
 			context := req.GetContext()
+
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
@@ -359,6 +381,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					},
 				},
 
+				// Move to completion
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
