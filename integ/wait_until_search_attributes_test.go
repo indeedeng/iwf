@@ -80,14 +80,14 @@ func doTestWaitUntilSearchAttributes(
 
 	switch mode := config.GetExecutingStateIdMode(); mode {
 	case iwfidl.ENABLED_FOR_ALL:
-		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 1, apiClient, assertions)
 	case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
-		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
 	case iwfidl.DISABLED:
-		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
 	}
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())

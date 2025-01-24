@@ -94,7 +94,7 @@ func TestSetSearchAttributes(t *testing.T) {
 				ValueType: ptr.Any(iwfidl.KEYWORD_ARRAY),
 			},
 		}}).Execute()
-	panicAtHttpError(err, httpRespGet)
+	panicAtHttpError(err, httpRespGet, t)
 
 	assertions.ElementsMatch(signalVals, searchResult.SearchAttributes)
 }
