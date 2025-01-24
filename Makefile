@@ -189,9 +189,7 @@ ci-temporal-integ-test-disable-sticky:
 	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache
 
 ci-all-tests:
- 	# Fails CI when used with -coverprofile flag due to tests that panic; see https://go.dev/doc/build-cover#panicprof
- 	# $Q go test -v ./... -timeout 15m -cover -coverprofile coverage.out -coverpkg ./service/...
-	$Q go test -v ./... -timeout 15m
+	$Q go test -v ./... -timeout 15m -cover -coverprofile coverage.out -coverpkg ./service/...
 
 integTestsNoSearch:
 	$Q go test -v ./integ -search=false -timeout 15m
