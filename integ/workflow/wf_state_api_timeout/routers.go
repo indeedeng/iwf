@@ -6,6 +6,7 @@ import (
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"log"
 	"net/http"
+	"testing"
 	"time"
 )
 
@@ -33,7 +34,7 @@ func NewHandler() common.WorkflowHandler {
 	}
 }
 
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -52,11 +53,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		}
 	}
 
-	panic("should not get here")
+	t.Fatal("should not get here")
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
-	panic("should not get here")
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
+	t.Fatal("should not get here")
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

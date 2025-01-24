@@ -22,7 +22,7 @@ func TestSetSearchAttributes(t *testing.T) {
 
 	// start test workflow server
 	wfHandler := signal.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceWithClient(service.BackendTypeTemporal)

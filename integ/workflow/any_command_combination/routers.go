@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func NewHandler() common.WorkflowHandler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -180,10 +181,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		}
 	}
 
-	panic("invalid workflow type")
+	t.Fatal("invalid workflow type")
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		panic(err)
@@ -223,7 +224,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		}
 	}
 
-	panic("invalid workflow type")
+	t.Fatal("invalid workflow type")
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

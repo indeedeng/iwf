@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -38,7 +39,7 @@ func NewHandler() common.WorkflowHandler {
 	}
 }
 
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -58,7 +59,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	panic("should not get here")
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -82,7 +83,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		return
 	}
 
-	panic("should not get here")
+	t.Fatal("should not get here")
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

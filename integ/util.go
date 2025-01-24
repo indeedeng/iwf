@@ -5,6 +5,7 @@ import (
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	"log"
 	"net/http"
+	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,19 +37,25 @@ func createTemporalClient(dataConverter converter.DataConverter) client.Client {
 	return temporalClient
 }
 
-func startWorkflowWorkerWithRpc(handler common.WorkflowHandlerWithRpc) (closeFunc func()) {
+func startWorkflowWorkerWithRpc(handler common.WorkflowHandlerWithRpc, t *testing.T) (closeFunc func()) {
 	router := gin.Default()
-	router.POST(service.WorkflowWorkerRpcApi, handler.ApiV1WorkflowWorkerRpc)
-	return doStartWorkflowWorker(handler, router)
+	router.POST(service.WorkflowWorkerRpcApi, func(c *gin.Context) {
+		handler.ApiV1WorkflowWorkerRpc(c, t)
+	})
+	return doStartWorkflowWorker(handler, t, router)
 }
 
-func startWorkflowWorker(handler common.WorkflowHandler) (closeFunc func()) {
+func startWorkflowWorker(handler common.WorkflowHandler, t *testing.T) (closeFunc func()) {
 	router := gin.Default()
-	return doStartWorkflowWorker(handler, router)
+	return doStartWorkflowWorker(handler, t, router)
 }
-func doStartWorkflowWorker(handler common.WorkflowHandler, router *gin.Engine) (closeFunc func()) {
-	router.POST(service.StateStartApi, handler.ApiV1WorkflowStateStart)
-	router.POST(service.StateDecideApi, handler.ApiV1WorkflowStateDecide)
+func doStartWorkflowWorker(handler common.WorkflowHandler, t *testing.T, router *gin.Engine) (closeFunc func()) {
+	router.POST(service.StateStartApi, func(c *gin.Context) {
+		handler.ApiV1WorkflowStateStart(c, t)
+	})
+	router.POST(service.StateDecideApi, func(c *gin.Context) {
+		handler.ApiV1WorkflowStateDecide(c, t)
+	})
 
 	wfServer := &http.Server{
 		Addr:    ":" + testWorkflowServerPort,
@@ -178,33 +185,32 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 	}
 }
 
-func panicAtError(err error) {
+func panicAtError(err error, t *testing.T) {
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 }
 
-func panicAtHttpError(err error, httpResp *http.Response) {
+func panicAtHttpError(err error, httpResp *http.Response, t *testing.T) {
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
-		panic("Status not success" + httpResp.Status)
+		t.Fatal("Status not success" + httpResp.Status)
 	}
 }
 
-func panicAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, resp *iwfidl.WorkflowGetResponse) {
+func panicAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, resp *iwfidl.WorkflowGetResponse, t *testing.T) {
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
-		panic("Status not success" + httpResp.Status)
+		t.Fatalf("Status not success: %v", httpResp.Status)
 	}
 	if resp.WorkflowStatus != iwfidl.COMPLETED {
-		panic("Workflow uncompleted:" + resp.WorkflowStatus)
+		t.Fatalf("Workflow uncompleted: %v", resp.WorkflowStatus)
 	}
 }
-
 func smallWaitForFastTest() {
 	du := time.Millisecond * time.Duration(*repeatInterval)
 	if *repeatIntegTest == 0 {

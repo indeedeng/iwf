@@ -63,7 +63,7 @@ func doTestPersistenceLoadingPolicy(
 	assertions := assert.New(t)
 
 	wfHandler := persistence_loading_policy.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
@@ -100,7 +100,7 @@ func doTestPersistenceLoadingPolicy(
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	if rpcUseMemo && backendType == service.BackendTypeCadence {
 		if err == nil {
-			panic("err should not be nil when Memo is not supported with Cadence")
+			t.Fatal("err should not be nil when Memo is not supported with Cadence")
 		}
 		return
 	}
@@ -140,7 +140,7 @@ func doTestPersistenceLoadingPolicy(
 	_, httpResp, err = reqRpc.WorkflowRpcRequest(rpcReq).Execute()
 	if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK && backendType == service.BackendTypeCadence {
 		if err == nil {
-			panic("err should not be nil when Locking is not supported with Cadence")
+			t.Fatal("err should not be nil when Locking is not supported with Cadence")
 		}
 		return
 	}

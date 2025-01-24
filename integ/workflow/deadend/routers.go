@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -40,7 +41,7 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 	}
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowWorkerRpcRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -50,10 +51,10 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 
 	wfCtx := req.Context
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
-		panic("invalid context in the request")
+		t.Fatal("invalid context in the request")
 	}
 	if req.WorkflowType != WorkflowType {
-		panic("invalid workflow type")
+		t.Fatal("invalid workflow type")
 	}
 
 	if req.RpcName == RPCTriggerState {
@@ -82,16 +83,16 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 			},
 		})
 	} else {
-		panic("invalid rpc name:" + req.RpcName)
+		t.Fatal("invalid rpc name:" + req.RpcName)
 	}
 }
 
 // ApiV1WorkflowStateStart - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
-	panic("should not be called")
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
+	t.Fatal("should not be called")
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

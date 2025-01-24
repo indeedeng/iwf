@@ -55,7 +55,7 @@ func TestAnyCommandCloseWorkflowCadenceContinueAsNew(t *testing.T) {
 func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := anycommandclose.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	closeFunc2 := startIwfService(backendType)

@@ -66,7 +66,7 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := conditionalClose.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceWithClient(backendType)

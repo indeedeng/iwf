@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -55,7 +56,7 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 	}
 }
 
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -76,11 +77,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
 	if req.GetWorkflowStateId() == State2 || req.GetWorkflowStateId() == State4 || req.GetWorkflowStateId() == State5 {
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(t, req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 	}
 
 	if req.GetWorkflowStateId() == State3 {
-		verifyEmptyDataAttributes(req.GetDataObjects())
+		verifyEmptyDataAttributes(t, req.GetDataObjects())
 	}
 
 	// Go straight to the decide methods without any commands
@@ -91,7 +92,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -116,23 +117,23 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	case State1:
 		response = getState1DecideResponse(req)
 	case State2:
-		verifyEmptyDataAttributes(req.GetDataObjects())
+		verifyEmptyDataAttributes(t, req.GetDataObjects())
 		response = getState2DecideResponse(req)
 	case State3:
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(t, req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 		response = getState3DecideResponse(req)
 	case State4:
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(t, req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 		response = getState4DecideResponse(req)
 	case State5:
-		verifyLoadedDataAttributes(req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
+		verifyLoadedDataAttributes(t, req.GetWorkflowStateId(), currentMethod, req.GetDataObjects(), loadingType)
 		response = getState5DecideResponse()
 	}
 
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
@@ -254,17 +255,17 @@ func getState5DecideResponse() iwfidl.WorkflowStateDecideResponse {
 	}
 }
 
-func verifyEmptyDataAttributes(dataAttributes []iwfidl.KeyValue) {
+func verifyEmptyDataAttributes(t *testing.T, dataAttributes []iwfidl.KeyValue) {
 	var expectedDataAttributes []iwfidl.KeyValue
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
-		panic("Data attributes should be empty")
+		t.Fatal("Data attributes should be empty")
 	}
 }
 
-func verifyLoadedDataAttributes(stateId string, method string, dataAttributes []iwfidl.KeyValue, loadingType iwfidl.PersistenceLoadingType) {
+func verifyLoadedDataAttributes(t *testing.T, stateId string, method string, dataAttributes []iwfidl.KeyValue, loadingType iwfidl.PersistenceLoadingType) {
 	expectedDataAttributes := getExpectedDataAttributes(stateId, method, loadingType)
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
-		panic("Data attributes should be the same")
+		t.Fatal("Data attributes should be the same")
 	}
 }
 

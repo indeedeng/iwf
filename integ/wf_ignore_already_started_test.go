@@ -91,7 +91,7 @@ func TestIgnoreAlreadyStartedWorkflowCadence(t *testing.T) {
 func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendType, firstReqConfig *iwfidl.WorkflowAlreadyStartedOptions, secondReqConfig *iwfidl.WorkflowAlreadyStartedOptions, errorExpected bool) {
 	// start test workflow server
 	wfHandler := wf_ignore_already_started.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{

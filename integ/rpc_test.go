@@ -100,7 +100,7 @@ func doTestRpcWorkflow(
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{

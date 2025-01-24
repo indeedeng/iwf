@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"testing"
 )
 
 /**
@@ -37,11 +38,11 @@ func NewHandler() *handler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
-	panic("No start call is expected.")
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
+	t.Fatal("No start call is expected.")
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("start of decide")
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -51,7 +52,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	log.Println("received state decide request, ", req)
 	context := req.GetContext()
 	if context.GetAttempt() <= 0 || context.GetFirstAttemptTimestamp() <= 0 {
-		panic("attempt and firstAttemptTimestamp should be greater than zero")
+		t.Fatal("attempt and firstAttemptTimestamp should be greater than zero")
 	}
 
 	if req.GetWorkflowType() == WorkflowType {

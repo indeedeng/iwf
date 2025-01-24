@@ -43,7 +43,7 @@ func doTestWaitUntilSearchAttributes(
 ) {
 	assertions := assert.New(t)
 	wfHandler := wait_until_search_attributes.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{

@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -74,7 +75,7 @@ func NewHandler() common.WorkflowHandler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -84,12 +85,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	initSas := req.GetSearchAttributes()
 	if len(initSas) < 1 {
-		panic("should have at least one init search attribute")
+		t.Fatal("should have at least one init search attribute")
 	}
 	for _, sa := range initSas {
 		if sa.GetKey() == "CustomDatetimeField" {
 			if sa.GetValueType() != iwfidl.DATETIME {
-				panic("key and value type not match")
+				t.Fatal("key and value type not match")
 			}
 		}
 	}
@@ -169,7 +170,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					queryAttFound = true
 				}
 				if queryAtt.GetKey() == TestDataObjectKey2 {
-					panic("should not load key that is not included in partial loading")
+					t.Fatal("should not load key that is not included in partial loading")
 				}
 			}
 			h.invokeData["S2_start_queryAttFound"] = queryAttFound
@@ -189,7 +190,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			found := false
 			for _, sa := range sas {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
-					panic("should not load key that is not included in partial loading")
+					t.Fatal("should not load key that is not included in partial loading")
 				}
 				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
 					sa.GetValueType() == iwfidl.INT {
@@ -197,7 +198,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				}
 			}
 			if !found {
-				panic("should see the requested partial loading key")
+				t.Fatal("should see the requested partial loading key")
 			}
 
 			queryAttFound := 0
@@ -211,7 +212,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				}
 			}
 			if queryAttFound != 2 {
-				panic("missing query attribute requested by partial loading keys")
+				t.Fatal("missing query attribute requested by partial loading keys")
 			}
 
 			// Go straight to the decide methods without any commands
@@ -227,7 +228,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -356,7 +357,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					queryAttFound = true
 				}
 				if queryAtt.GetKey() == TestDataObjectKey2 {
-					panic("should not load key that is not included in partial loading")
+					t.Fatal("should not load key that is not included in partial loading")
 				}
 			}
 
@@ -395,7 +396,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			found := false
 			for _, sa := range sas {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
-					panic("should not load key that is not included in partial loading")
+					t.Fatal("should not load key that is not included in partial loading")
 				}
 				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
 					sa.GetValueType() == iwfidl.INT {
@@ -403,7 +404,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				}
 			}
 			if !found {
-				panic("should see the requested partial loading key")
+				t.Fatal("should see the requested partial loading key")
 			}
 
 			queryAttFound := 0
@@ -419,7 +420,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				}
 			}
 			if queryAttFound != 2 {
-				panic("missing query attribute requested by partial loading keys")
+				t.Fatal("missing query attribute requested by partial loading keys")
 			}
 
 			// Move to completion

@@ -59,7 +59,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := anycommandconbination.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	closeFunc2 := startIwfService(backendType)
@@ -189,7 +189,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"\"stateStartApiSucceeded\":true}"
 	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	s2ResultsJsonStr := "{\"signalResults\":[" +
 		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
@@ -201,7 +201,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"\"stateStartApiSucceeded\":true}"
 	err = json.Unmarshal([]byte(s2ResultsJsonStr), &s2CommandResults)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	expectedData := map[string]interface{}{
 		"s1_commandResults": s1CommandResults,

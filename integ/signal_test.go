@@ -61,7 +61,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 
 	// start test workflow server
 	wfHandler := signal.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -93,7 +93,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	var debugDump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	expectedConfig := *config2.DefaultWorkflowConfig
 	if config != nil {
@@ -116,7 +116,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	}
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	expectedConfig.DisableSystemSearchAttribute = iwfidl.PtrBool(true)
 	assertions.Equal(expectedConfig, debugDump.Config)
@@ -133,7 +133,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	expectedConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(3000000)
 	assertions.Equal(expectedConfig, debugDump.Config)
@@ -225,7 +225,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	var dump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	assertions.Equal(unhandledSignalVals, dump.Snapshot.SignalsReceived[signal.UnhandledSignalName])
 	assertions.True(len(unhandledSignalVals) > 0)

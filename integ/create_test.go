@@ -55,7 +55,7 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -88,7 +88,7 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 	var dump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	assertions.Equal(service.StateExecutionCounterInfo{
 		StateIdStartedCount:            make(map[string]int),

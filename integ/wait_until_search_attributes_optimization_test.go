@@ -48,7 +48,7 @@ func doTestWaitUntilHistoryCompleted(
 ) {
 	assertions := assert.New(t)
 	wfHandler := wait_until_search_attributes_optimization.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -117,7 +117,7 @@ func doTestWaitUntilHistoryCompleted(
 	}
 	eventHistory, err := api.GetWorkflowExecutionHistory(context.Background(), reqHistory)
 	if err != nil {
-		panic("couldn't load eventHistory")
+		t.Fatal("couldn't load eventHistory")
 	}
 
 	var upsertSAEvents []*history.HistoryEvent
