@@ -78,7 +78,7 @@ func doTestWaitUntilHistoryCompleted(
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 5)
 
@@ -94,19 +94,19 @@ func doTestWaitUntilHistoryCompleted(
 		SignalValue:       &signalValue,
 	}).Execute()
 
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for workflow to complete
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 	api := uclient.GetApiService().(workflowservice.WorkflowServiceClient)
 	reqHistory := &workflowservice.GetWorkflowExecutionHistoryRequest{

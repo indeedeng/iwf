@@ -85,7 +85,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	signalValue := iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
@@ -99,13 +99,13 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// skip the timer for S1
 	time.Sleep(time.Second * 5) // wait for a few seconds so that timer is ready to be skipped
@@ -115,7 +115,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		WorkflowStateExecutionId: "S1-1",
 		TimerCommandId:           iwfidl.PtrString(anycommandconbination.TimerId1),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// now it should be running at S2
 	// Future: we can check it is already done S1
@@ -126,7 +126,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait and check the workflow, it should be still running
 	time.Sleep(time.Second)
@@ -134,7 +134,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 	assertions.Equal(iwfidl.RUNNING, descResp.GetWorkflowStatus())
 
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
@@ -142,7 +142,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId3,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// send 2nd signal for s2
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
@@ -150,7 +150,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId2,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// workflow should be completed now
 	if config == nil {
@@ -158,14 +158,14 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		panicAtHttpError(err, httpResp, t)
 		assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
 	} else {
 		reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
+		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait, t)
 	}
 
 	history, data := wfHandler.GetTestResult()

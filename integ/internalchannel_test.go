@@ -65,13 +65,13 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType, con
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)

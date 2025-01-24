@@ -82,7 +82,7 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// workflow shouldn't executed any state
 	var dump service.DebugDumpResponse
@@ -110,14 +110,14 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 		},
 		TimeoutSeconds: iwfidl.PtrInt32(2),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
+	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

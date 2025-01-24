@@ -46,7 +46,7 @@ func TestSetSearchAttributes(t *testing.T) {
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
 		StartStateId:           ptr.Any(signal.State1),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	assertions.Equal(httpResp.StatusCode, http.StatusOK)
 
@@ -73,7 +73,7 @@ func TestSetSearchAttributes(t *testing.T) {
 		SearchAttributes: signalVals,
 	}).Execute()
 
-	panicAtHttpError(err, httpResp2)
+	panicAtHttpError(err, httpResp2, t)
 
 	time.Sleep(time.Second)
 

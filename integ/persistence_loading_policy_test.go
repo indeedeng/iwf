@@ -104,7 +104,7 @@ func doTestPersistenceLoadingPolicy(
 		}
 		return
 	}
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 2)
 
@@ -144,7 +144,7 @@ func doTestPersistenceLoadingPolicy(
 		}
 		return
 	}
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 2)
 

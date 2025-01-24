@@ -87,7 +87,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// test update config
 	var debugDump service.DebugDumpResponse
@@ -109,7 +109,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			DisableSystemSearchAttribute: iwfidl.PtrBool(true),
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	if config != nil {
 		time.Sleep(2 * time.Second)
@@ -129,7 +129,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			ContinueAsNewPageSizeInBytes: iwfidl.PtrInt32(3000000),
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
@@ -160,10 +160,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			WorkflowId: wfId,
 			RpcName:    signal.RPCNameGetSignalChannelInfo,
 		}).Execute()
-		panicAtHttpError(err2, httpResp2)
+		panicAtHttpError(err2, httpResp2, t)
 		var infos map[string]iwfidl.ChannelInfo
 		err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
-		panicAtError(err)
+		panicAtError(err, t)
 		assertions.Equal(
 			map[string]iwfidl.ChannelInfo{signal.UnhandledSignalName: {Size: ptr.Any(int32(i + 1))}}, infos)
 	}
@@ -173,10 +173,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		WorkflowId: wfId,
 		RpcName:    signal.RPCNameGetInternalChannelInfo,
 	}).Execute()
-	panicAtHttpError(err2, httpResp2)
+	panicAtHttpError(err2, httpResp2, t)
 	var infos map[string]iwfidl.ChannelInfo
 	err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
-	panicAtError(err)
+	panicAtError(err, t)
 	assertions.Equal(
 		map[string]iwfidl.ChannelInfo{signal.InternalChannelName: {Size: ptr.Any(int32(10))}}, infos)
 
@@ -196,7 +196,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			SignalValue:       &signalVal,
 		}).Execute()
 
-		panicAtHttpError(err, httpResp2)
+		panicAtHttpError(err, httpResp2, t)
 	}
 
 	// wait for the workflow
@@ -204,7 +204,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
@@ -240,13 +240,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			WorkflowId: wfId,
 			ResetType:  iwfidl.BEGINNING,
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		panicAtHttpError(err, httpResp, t)
 
 		reqWait = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 		// reset to STATE_EXECUTION_ID
 		req4 = apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
@@ -255,13 +255,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			ResetType:        iwfidl.STATE_EXECUTION_ID,
 			StateExecutionId: iwfidl.PtrString("S2-1"),
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		panicAtHttpError(err, httpResp, t)
 
 		reqWait = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 		// reset to STATE_ID
 		req4 = apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
@@ -270,13 +270,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			ResetType:  iwfidl.STATE_ID,
 			StateId:    iwfidl.PtrString("S2"),
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		panicAtHttpError(err, httpResp, t)
 
 		reqWait = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 	}
 
 }

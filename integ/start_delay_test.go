@@ -89,14 +89,14 @@ func doTestStartDelay(t *testing.T, backendType service.BackendType, config *iwf
 
 	timeSentReq := time.Now()
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	time.Sleep(5 * time.Second)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// here the delay is startDelay + execution time period, and the execution time period is negligible
 	delay := time.Since(timeSentReq)

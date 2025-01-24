@@ -83,7 +83,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for 3 secs and send the signal
 	time.Sleep(time.Second * 3)
@@ -97,14 +97,14 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 		SignalChannelName: anytimersignal.SignalName,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)

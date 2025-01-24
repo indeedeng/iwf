@@ -86,21 +86,21 @@ func doTestWorkflowCanceled(t *testing.T, backendType service.BackendType, confi
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
 		WorkflowId: wfId,
 		StopType:   iwfidl.CANCEL.Ptr(),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	assertions := assert.New(t)
 
@@ -142,7 +142,7 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 		},
 	}
 	startResp, httpResp, err := req.WorkflowStartRequest(request).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	assertions := assert.New(t)
 	// start it again should return already started error
@@ -152,27 +152,27 @@ func doTestWorkflowTerminated(t *testing.T, backendType service.BackendType, con
 	// using terminate if running should go through
 	request.WorkflowStartOptions.WorkflowIDReusePolicy = iwfidl.TERMINATE_IF_RUNNING.Ptr()
 	_, httpResp, err = req.WorkflowStartRequest(request).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// using the compatibility
 	request.WorkflowStartOptions.WorkflowIDReusePolicy = nil
 	request.WorkflowStartOptions.IdReusePolicy = iwfidl.ALLOW_TERMINATE_IF_RUNNING.Ptr()
 	startResp, httpResp, err = req.WorkflowStartRequest(request).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
 		WorkflowId: wfId,
 		StopType:   iwfidl.TERMINATE.Ptr(),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
@@ -211,7 +211,7 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType, config *i
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
@@ -219,14 +219,14 @@ func doTestWorkflowFail(t *testing.T, backendType service.BackendType, config *i
 		StopType:   iwfidl.FAIL.Ptr(),
 		Reason:     iwfidl.PtrString("fail reason"),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	assertions := assert.New(t)
 

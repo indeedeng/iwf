@@ -72,7 +72,7 @@ func doTestWfStateOptionsSearchAttributesLoading(
 	}
 
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
+	panicAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 2)
 
