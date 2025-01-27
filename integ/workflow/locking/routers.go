@@ -131,12 +131,11 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 		return
 	}
 
-	// TODO: See issue - https://github.com/indeedeng/iwf/issues/536
-	//signalChannelInfo := (*req.SignalChannelInfos)[UnusedSignalChannelName]
-	//if signalChannelInfo.GetSize() != NumUnusedSignals {
-	//	// the 4 messages are sent from the beginning of "locking_test"
-	//	helpers.FailTestWithErrorMessage("incorrect signal channel size", t)
-	//}
+	signalChannelInfo := (*req.SignalChannelInfos)[UnusedSignalChannelName]
+	if signalChannelInfo.GetSize() != NumUnusedSignals {
+		// the 4 messages are sent from the beginning of "locking_test"
+		helpers.FailTestWithErrorMessage("incorrect signal channel size", t)
+	}
 
 	if h.rpcInvokes > 0 {
 		internalChannelInfo := (*req.InternalChannelInfos)[UnusedInternalChannelName]

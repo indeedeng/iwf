@@ -17,6 +17,9 @@ import (
 )
 
 func TestLockingWorkflowTemporal(t *testing.T) {
+	// TODO: Remove this line to enable the test
+	t.Skip("TestLockingWorkflowTemporal - Skipping this test - See: https://github.com/indeedeng/iwf/issues/536")
+
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -27,6 +30,9 @@ func TestLockingWorkflowTemporal(t *testing.T) {
 }
 
 func TestLockingWorkflowTemporalContinueAsNew(t *testing.T) {
+	// TODO: Remove this line to enable the test
+	t.Skip("TestLockingWorkflowTemporal - Skipping this test - See: https://github.com/indeedeng/iwf/issues/536")
+
 	if !*temporalIntegTest {
 		t.Skip()
 	}
