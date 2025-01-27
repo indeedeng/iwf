@@ -62,7 +62,7 @@ func doTestStartWorkflowWithoutStartOptions(t *testing.T, backendType service.Ba
 		StateInput:             wfInput,
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	requestedSAs := []iwfidl.SearchAttributeKeyAndType{
 		{

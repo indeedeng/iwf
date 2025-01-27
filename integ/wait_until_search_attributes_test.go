@@ -73,7 +73,7 @@ func doTestWaitUntilSearchAttributes(
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the search attribute index to be ready in ElasticSearch
 	time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
@@ -94,11 +94,11 @@ func doTestWaitUntilSearchAttributes(
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for workflow to complete
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
+	failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 }

@@ -105,7 +105,7 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 	}
 
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for a second so that query handler is ready for executing PRC
 	time.Sleep(time.Second)
@@ -126,7 +126,7 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 			}).Execute()
 		}
 
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 		if i == 0 {
 			// wait for a second so that the workflow is in execute state
 			time.Sleep(time.Second)
@@ -138,7 +138,7 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	config2 "github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/signal"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -87,13 +88,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// test update config
 	var debugDump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	expectedConfig := *config2.DefaultWorkflowConfig
 	if config != nil {
@@ -109,14 +110,14 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			DisableSystemSearchAttribute: iwfidl.PtrBool(true),
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	if config != nil {
 		time.Sleep(2 * time.Second)
 	}
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	expectedConfig.DisableSystemSearchAttribute = iwfidl.PtrBool(true)
 	assertions.Equal(expectedConfig, debugDump.Config)
@@ -129,11 +130,11 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			ContinueAsNewPageSizeInBytes: iwfidl.PtrInt32(3000000),
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	expectedConfig.ContinueAsNewPageSizeInBytes = iwfidl.PtrInt32(3000000)
 	assertions.Equal(expectedConfig, debugDump.Config)
@@ -160,10 +161,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			WorkflowId: wfId,
 			RpcName:    signal.RPCNameGetSignalChannelInfo,
 		}).Execute()
-		panicAtHttpError(err2, httpResp2, t)
+		failTestAtHttpError(err2, httpResp2, t)
 		var infos map[string]iwfidl.ChannelInfo
 		err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
-		panicAtError(err, t)
+		failTestAtError(err, t)
 		assertions.Equal(
 			map[string]iwfidl.ChannelInfo{signal.UnhandledSignalName: {Size: ptr.Any(int32(i + 1))}}, infos)
 	}
@@ -173,10 +174,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		WorkflowId: wfId,
 		RpcName:    signal.RPCNameGetInternalChannelInfo,
 	}).Execute()
-	panicAtHttpError(err2, httpResp2, t)
+	failTestAtHttpError(err2, httpResp2, t)
 	var infos map[string]iwfidl.ChannelInfo
 	err = json.Unmarshal([]byte(rpcResp.Output.GetData()), &infos)
-	panicAtError(err, t)
+	failTestAtError(err, t)
 	assertions.Equal(
 		map[string]iwfidl.ChannelInfo{signal.InternalChannelName: {Size: ptr.Any(int32(10))}}, infos)
 
@@ -196,7 +197,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			SignalValue:       &signalVal,
 		}).Execute()
 
-		panicAtHttpError(err, httpResp2, t)
+		failTestAtHttpError(err, httpResp2, t)
 	}
 
 	// wait for the workflow
@@ -204,7 +205,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
@@ -225,7 +226,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	var dump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	assertions.Equal(unhandledSignalVals, dump.Snapshot.SignalsReceived[signal.UnhandledSignalName])
 	assertions.True(len(unhandledSignalVals) > 0)
@@ -240,13 +241,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			WorkflowId: wfId,
 			ResetType:  iwfidl.BEGINNING,
 		}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		reqWait = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 		// reset to STATE_EXECUTION_ID
 		req4 = apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
@@ -255,13 +256,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			ResetType:        iwfidl.STATE_EXECUTION_ID,
 			StateExecutionId: iwfidl.PtrString("S2-1"),
 		}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		reqWait = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 		// reset to STATE_ID
 		req4 = apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
@@ -270,13 +271,13 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			ResetType:  iwfidl.STATE_ID,
 			StateId:    iwfidl.PtrString("S2"),
 		}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		reqWait = apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 	}
 
 }

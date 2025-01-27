@@ -1,8 +1,10 @@
 package rpc
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -97,11 +99,11 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 
 	wfCtx := req.Context
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
-		t.Fatal("invalid context in the request")
+		helpers.FailTestWithErrorMessage("invalid context in the request", t)
 	}
 	if req.WorkflowType != WorkflowType ||
 		(req.RpcName != RPCName && req.RpcName != RPCNameReadOnly && req.RpcName != RPCNameError) {
-		t.Fatal("invalid rpc name:" + req.RpcName)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("invalid rpc name: %s", req.RpcName), t)
 	}
 
 	h.invokeData[req.RpcName+"-input"] = req.Input
@@ -243,7 +245,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			commandRes := req.GetCommandResults()
 			res := commandRes.GetInterStateChannelResults()[0]
 			if res.GetRequestStatus() != iwfidl.RECEIVED || res.GetChannelName() != TestInterStateChannelName {
-				t.Fatal("the signal should be received")
+				helpers.FailTestWithErrorMessage("the signal should be received", t)
 			}
 			h.invokeData[TestInterStateChannelName] = res.Value
 

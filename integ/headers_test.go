@@ -84,13 +84,13 @@ func doTestWorkflowWithHeaders(t *testing.T, backendType service.BackendType, co
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp2, err2 := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err2, httpResp2, t)
+	failTestAtHttpError(err2, httpResp2, t)
 
 	assertions := assert.New(t)
 

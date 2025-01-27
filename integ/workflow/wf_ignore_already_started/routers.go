@@ -1,6 +1,7 @@
 package wf_ignore_already_started
 
 import (
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
@@ -50,7 +51,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 		if req.GetWorkflowStateId() == State1 {
 			nowInt, err := strconv.Atoi(req.StateInput.GetData())
 			if err != nil {
-				t.Fatal(err)
+				helpers.FailTestWithError(err, t)
 			}
 			now := int64(nowInt)
 			h.invokeData["scheduled_at"] = now

@@ -84,14 +84,14 @@ func doTestStateExecuteApiFailAndProceed(t *testing.T, backendType service.Backe
 			Encoding: ptr.Any(wf_execute_api_fail_and_proceed.InputDataEncoding),
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)

@@ -3,6 +3,7 @@ package wf_state_options_data_attributes_loading
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
@@ -258,14 +259,14 @@ func getState5DecideResponse() iwfidl.WorkflowStateDecideResponse {
 func verifyEmptyDataAttributes(t *testing.T, dataAttributes []iwfidl.KeyValue) {
 	var expectedDataAttributes []iwfidl.KeyValue
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
-		t.Fatal("Data attributes should be empty")
+		helpers.FailTestWithErrorMessage("Data attributes should be empty", t)
 	}
 }
 
 func verifyLoadedDataAttributes(t *testing.T, stateId string, method string, dataAttributes []iwfidl.KeyValue, loadingType iwfidl.PersistenceLoadingType) {
 	expectedDataAttributes := getExpectedDataAttributes(stateId, method, loadingType)
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
-		t.Fatal("Data attributes should be the same")
+		helpers.FailTestWithErrorMessage("Data attributes should be the same", t)
 	}
 }
 

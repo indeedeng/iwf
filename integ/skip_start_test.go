@@ -91,7 +91,7 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	assertions := assert.New(t)
 
@@ -99,7 +99,7 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

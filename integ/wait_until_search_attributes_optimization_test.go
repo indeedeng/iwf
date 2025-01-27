@@ -2,6 +2,7 @@ package integ
 
 import (
 	"context"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/wait_until_search_attributes_optimization"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/api/common/v1"
@@ -78,7 +79,7 @@ func doTestWaitUntilHistoryCompleted(
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 5)
 
@@ -94,19 +95,19 @@ func doTestWaitUntilHistoryCompleted(
 		SignalValue:       &signalValue,
 	}).Execute()
 
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for workflow to complete
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
+	failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 	api := uclient.GetApiService().(workflowservice.WorkflowServiceClient)
 	reqHistory := &workflowservice.GetWorkflowExecutionHistoryRequest{
@@ -117,7 +118,7 @@ func doTestWaitUntilHistoryCompleted(
 	}
 	eventHistory, err := api.GetWorkflowExecutionHistory(context.Background(), reqHistory)
 	if err != nil {
-		t.Fatal("couldn't load eventHistory")
+		helpers.FailTestWithErrorMessage("couldn't load eventHistory", t)
 	}
 
 	var upsertSAEvents []*history.HistoryEvent

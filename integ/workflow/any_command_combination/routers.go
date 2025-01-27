@@ -3,6 +3,7 @@ package anycommandcombination
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -180,8 +181,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 			return
 		}
 	}
-
-	t.Fatal("invalid workflow type")
+	helpers.FailTestWithErrorMessage("invalid workflow type", t)
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
@@ -224,7 +224,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		}
 	}
 
-	t.Fatal("invalid workflow type")
+	helpers.FailTestWithErrorMessage("invalid workflow type", t)
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

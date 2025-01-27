@@ -107,7 +107,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// start it again should return already started error
 	_, _, err = req.WorkflowStartRequest(startReq).Execute()
@@ -126,7 +126,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// use a wrong workflowId to test the error case
 	_, _, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{

@@ -81,7 +81,7 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	signalValue := iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
@@ -94,14 +94,14 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 		SignalChannelName: anycommandclose.SignalName2,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)

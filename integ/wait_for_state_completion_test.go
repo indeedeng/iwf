@@ -81,7 +81,7 @@ func doTestWaitForStateCompletion(
 		startReq.WaitForCompletionStateIds = []string{"S2"}
 
 		_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		req := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background())
 		_, httpResp, err = req.WorkflowWaitForStateCompletionRequest(
@@ -91,7 +91,7 @@ func doTestWaitForStateCompletion(
 				StateId:         ptr.Any("S2"),
 				WaitTimeSeconds: iwfidl.PtrInt32(30),
 			}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		assertions.Equal(200, httpResp.StatusCode)
 		// read httpResp body
@@ -105,7 +105,7 @@ func doTestWaitForStateCompletion(
 		startReq.WaitForCompletionStateExecutionIds = []string{"S1-1"}
 
 		_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		req := apiClient.DefaultApi.ApiV1WorkflowWaitForStateCompletionPost(context.Background())
 		_, httpResp, err = req.WorkflowWaitForStateCompletionRequest(
@@ -114,7 +114,7 @@ func doTestWaitForStateCompletion(
 				StateExecutionId: ptr.Any("S1-1"),
 				WaitTimeSeconds:  iwfidl.PtrInt32(30),
 			}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 
 		assertions.Equal(200, httpResp.StatusCode)
 		// read httpResp body
@@ -131,7 +131,7 @@ func doTestWaitForStateCompletion(
 	_, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

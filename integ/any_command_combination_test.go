@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"encoding/json"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
@@ -85,7 +86,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	signalValue := iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
@@ -99,13 +100,13 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// skip the timer for S1
 	time.Sleep(time.Second * 5) // wait for a few seconds so that timer is ready to be skipped
@@ -115,7 +116,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		WorkflowStateExecutionId: "S1-1",
 		TimerCommandId:           iwfidl.PtrString(anycommandconbination.TimerId1),
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// now it should be running at S2
 	// Future: we can check it is already done S1
@@ -126,7 +127,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait and check the workflow, it should be still running
 	time.Sleep(time.Second)
@@ -134,7 +135,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 	assertions.Equal(iwfidl.RUNNING, descResp.GetWorkflowStatus())
 
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
@@ -142,7 +143,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId3,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// send 2nd signal for s2
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
@@ -150,7 +151,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		SignalChannelName: anycommandconbination.SignalNameAndId2,
 		SignalValue:       &signalValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	// workflow should be completed now
 	if config == nil {
@@ -158,14 +159,14 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 		assertions.Equal(iwfidl.COMPLETED, descResp.GetWorkflowStatus())
 	} else {
 		reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 		respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait, t)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait, t)
 	}
 
 	history, data := wfHandler.GetTestResult()
@@ -189,7 +190,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"\"stateStartApiSucceeded\":true}"
 	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	s2ResultsJsonStr := "{\"signalResults\":[" +
 		"{\"commandId\":\"test-signal-name1\",\"signalChannelName\":\"test-signal-name1\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}, " +
@@ -201,7 +202,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"\"stateStartApiSucceeded\":true}"
 	err = json.Unmarshal([]byte(s2ResultsJsonStr), &s2CommandResults)
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	expectedData := map[string]interface{}{
 		"s1_commandResults": s1CommandResults,

@@ -1,8 +1,10 @@
 package deadend
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"log"
@@ -51,10 +53,10 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 
 	wfCtx := req.Context
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
-		t.Fatal("invalid context in the request")
+		helpers.FailTestWithErrorMessage("invalid context in the request", t)
 	}
 	if req.WorkflowType != WorkflowType {
-		t.Fatal("invalid workflow type")
+		helpers.FailTestWithErrorMessage("invalid workflow type", t)
 	}
 
 	if req.RpcName == RPCTriggerState {
@@ -83,13 +85,13 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 			},
 		})
 	} else {
-		t.Fatal("invalid rpc name:" + req.RpcName)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("invalid rpc name: %s", req.RpcName), t)
 	}
 }
 
 // ApiV1WorkflowStateStart - for a workflow
 func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
-	t.Fatal("should not be called")
+	helpers.FailTestWithErrorMessage("should not be called", t)
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {

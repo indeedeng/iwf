@@ -113,7 +113,7 @@ func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendTyp
 	firstReq := createReq(wfId, firstReqConfig)
 
 	firstRes, firstHttpResp, err := req.WorkflowStartRequest(firstReq).Execute()
-	panicAtHttpError(err, firstHttpResp, t)
+	failTestAtHttpError(err, firstHttpResp, t)
 
 	secondReq := createReq(wfId, secondReqConfig)
 	secondRes, secondHttpResp, err := req.WorkflowStartRequest(secondReq).Execute()

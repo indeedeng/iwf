@@ -1,6 +1,7 @@
 package wf_state_api_fail_and_proceed
 
 import (
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
@@ -51,7 +52,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 		}
 	}
 
-	t.Fatal("should not get here")
+	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
@@ -63,7 +64,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetCommandResults().StateStartApiSucceeded == nil || *req.GetCommandResults().StateStartApiSucceeded {
-		t.Fatal("stateStartApiSucceeded should be false")
+		helpers.FailTestWithErrorMessage("stateStartApiSucceeded should be false", t)
 	}
 
 	if req.GetWorkflowType() == WorkflowType {

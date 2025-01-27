@@ -3,6 +3,7 @@ package basic
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
@@ -46,7 +47,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 
 	context := req.GetContext()
 	if context.GetAttempt() <= 0 || context.GetFirstAttemptTimestamp() <= 0 {
-		t.Fatal("attempt and firstAttemptTimestamp should be greater than zero")
+		helpers.FailTestWithErrorMessage("attempt and firstAttemptTimestamp should be greater than zero", t)
 	}
 
 	if req.GetWorkflowType() == WorkflowType {
@@ -74,7 +75,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 	context := req.GetContext()
 	if context.GetAttempt() <= 0 || context.GetFirstAttemptTimestamp() <= 0 {
-		t.Fatal("attempt and firstAttemptTimestamp should be greater than zero")
+		helpers.FailTestWithErrorMessage("attempt and firstAttemptTimestamp should be greater than zero", t)
 	}
 
 	if req.GetWorkflowType() == WorkflowType {

@@ -3,6 +3,7 @@ package wf_state_api_fail
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"log"
 	"net/http"
@@ -49,11 +50,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 		}
 	}
 
-	t.Fatal("should not get here")
+	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
-	t.Fatal("should not get here")
+	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

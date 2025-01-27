@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -55,7 +56,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 		signalInfos := req.SignalChannelInfos
 		data, err := json.Marshal(signalInfos)
 		if err != nil {
-			t.Fatal(err)
+			helpers.FailTestWithError(err, t)
 		}
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
@@ -73,7 +74,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 		icInfos := req.InternalChannelInfos
 		data, err := json.Marshal(icInfos)
 		if err != nil {
-			t.Fatal(err)
+			helpers.FailTestWithError(err, t)
 		}
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			Output: &iwfidl.EncodedObject{

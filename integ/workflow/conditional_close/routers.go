@@ -3,6 +3,7 @@ package conditional_close
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
@@ -107,7 +108,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 		}
 	}
 
-	t.Fatal("error request")
+	helpers.FailTestWithErrorMessage("error request", t)
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
@@ -169,7 +170,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		}
 	}
 
-	t.Fatal("error request")
+	helpers.FailTestWithErrorMessage("error request", t)
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

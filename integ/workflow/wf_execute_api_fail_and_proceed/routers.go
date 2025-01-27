@@ -1,6 +1,7 @@
 package wf_execute_api_fail_and_proceed
 
 import (
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
@@ -41,7 +42,7 @@ func NewHandler() common.WorkflowHandler {
 }
 
 func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
-	t.Fatal("should not get here")
+	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
 func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
@@ -60,7 +61,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		if input.GetData() == InputData && input.GetEncoding() == InputDataEncoding {
 			c.JSON(http.StatusBadRequest, map[string]string{"error": "test-error"})
 		} else {
-			t.Fatal("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
+			helpers.FailTestWithErrorMessage("input is not correct: "+input.GetData()+", "+input.GetEncoding(), t)
 		}
 
 		return
@@ -78,12 +79,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 				},
 			})
 		} else {
-			t.Fatal("input is not correct: " + input.GetData() + ", " + input.GetEncoding())
+			helpers.FailTestWithErrorMessage("input is not correct: "+input.GetData()+", "+input.GetEncoding(), t)
 		}
 		return
 	}
 
-	t.Fatal("should not get here")
+	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

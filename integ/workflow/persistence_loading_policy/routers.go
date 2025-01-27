@@ -3,6 +3,7 @@ package persistence_loading_policy
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/integ/workflow/persistence"
 	"github.com/indeedeng/iwf/service"
@@ -239,11 +240,11 @@ func verifyLoadedAttributes(
 	// use ElementsMatch so that the order won't be a problem.
 	// Internally the SAs are stored as a map and as a result, Golang return it without ordering guarantee
 	if !assert.ElementsMatch(common.DummyT{}, expectedSearchAttributes, searchAttributes) {
-		t.Fatal("Search attributes should be the same")
+		helpers.FailTestWithErrorMessage("Search attributes should be the same", t)
 	}
 
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
-		t.Fatal("Data attributes should be the same")
+		helpers.FailTestWithErrorMessage("Data attributes should be the same", t)
 	}
 }
 

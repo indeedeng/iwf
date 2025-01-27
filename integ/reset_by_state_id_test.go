@@ -84,7 +84,7 @@ func doTestResetByStatIdWorkflow(t *testing.T, backendType service.BackendType, 
 		},
 	}
 	startResp, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	assertions := assert.New(t)
 
@@ -92,7 +92,7 @@ func doTestResetByStatIdWorkflow(t *testing.T, backendType service.BackendType, 
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	//expect no starts in history as WaitUntil api is skipped.
@@ -115,13 +115,13 @@ func doTestResetByStatIdWorkflow(t *testing.T, backendType service.BackendType, 
 		ResetType:     iwfidl.STATE_ID,
 		StateId:       iwfidl.PtrString(reset.State2),
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	req3 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp3, httpResp, err := req3.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	resetHistory, _ := wfHandler.GetTestResult()
 	//expect no starts in history as WaitUntil api is skipped.
@@ -144,13 +144,13 @@ func doTestResetByStatIdWorkflow(t *testing.T, backendType service.BackendType, 
 		ResetType:        iwfidl.STATE_EXECUTION_ID,
 		StateExecutionId: iwfidl.PtrString(reset.State2 + "-4"),
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	req4 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp4, httpResp, err := req4.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	reset2History, _ := wfHandler.GetTestResult()
 	//expect no starts in history as WaitUntil api is skipped.

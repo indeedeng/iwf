@@ -91,7 +91,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	for i := 0; i < locking.NumUnusedSignals; i++ {
 		// send 4 unused signals at the beginning to validate the ChannelInfo feature
@@ -101,7 +101,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 			SignalChannelName: locking.UnusedSignalChannelName,
 			SignalValue:       nil,
 		}).Execute()
-		panicAtHttpError(err, httpResp, t)
+		failTestAtHttpError(err, httpResp, t)
 	}
 
 	assertions := assert.New(t)
@@ -168,7 +168,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 					rpcLockingFailure++
 					continue
 				} else {
-					panicAtHttpError(err, httpResp, t)
+					failTestAtHttpError(err, httpResp, t)
 				}
 			}
 			fmt.Println("rpc execution succeeded")
@@ -187,14 +187,14 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		RpcName:    locking.RPCName,
 		Input:      locking.UnblockValue,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 20)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	s2StartsDecides := locking.InParallelS2 + rpcIncrease // locking.InParallelS2 original state executions, and a new trigger from rpc
 	finalCounterValue := int64(locking.InParallelS2 + 2*rpcIncrease)
@@ -222,7 +222,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 			},
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	expectedSearchAttributeInt := iwfidl.SearchAttribute{
 		Key:          iwfidl.PtrString(locking.TestSearchAttributeIntKey),
@@ -244,7 +244,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	expected1 := []iwfidl.KeyValue{
 		{
@@ -264,14 +264,14 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		ResetType:  iwfidl.BEGINNING,
 		//SkipSignalReapply: ptr.Any(true),
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 20)
 	req2Reset := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2Reset, httpResp, err := req2Reset.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp, t)
+	failTestAtHttpError(err, httpResp, t)
 
 	assertions.Equal(iwfidl.COMPLETED, resp2Reset.GetWorkflowStatus())
 
@@ -283,14 +283,14 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	//	RpcName:    locking.RPCName,
 	//	Input:      locking.UnblockValue,
 	//}).Execute()
-	//panicAtHttpError(err, httpResp, t)
+	//failTestAtHttpError(err, httpResp, t)
 
 	//time.Sleep(time.Second * 20)
 	//req2Reset := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	//resp2Reset, httpResp, err := req2Reset.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 	//	WorkflowId: wfId,
 	//}).Execute()
-	//panicAtHttpError(err, httpResp, t)
+	//failTestAtHttpError(err, httpResp, t)
 
 	//s2StartsDecides := locking.InParallelS2 + rpcIncrease // locking.InParallelS2 original state executions, and a new trigger from rpc
 	//finalCounterValue := int64(locking.InParallelS2 + 2*rpcIncrease)
@@ -318,7 +318,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	//		},
 	//	},
 	//}).Execute()
-	//panicAtHttpError(err, httpResp, t)
+	//failTestAtHttpError(err, httpResp, t)
 	//
 	//expectedSearchAttributeIntReset := iwfidl.SearchAttribute{
 	//	Key:          iwfidl.PtrString(locking.TestSearchAttributeIntKey),

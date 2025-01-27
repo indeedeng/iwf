@@ -1,6 +1,8 @@
 package integ
 
 import (
+	"fmt"
+	"github.com/indeedeng/iwf/helpers"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	"log"
@@ -185,32 +187,33 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 	}
 }
 
-func panicAtError(err error, t *testing.T) {
+func failTestAtError(err error, t *testing.T) {
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 }
 
-func panicAtHttpError(err error, httpResp *http.Response, t *testing.T) {
+func failTestAtHttpError(err error, httpResp *http.Response, t *testing.T) {
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	if httpResp.StatusCode != http.StatusOK {
-		t.Fatal("Status not success" + httpResp.Status)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("HTTP status not success: %v", httpResp.Status), t)
 	}
 }
 
-func panicAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, resp *iwfidl.WorkflowGetResponse, t *testing.T) {
+func failTestAtHttpErrorOrWorkflowUncompleted(err error, httpResp *http.Response, resp *iwfidl.WorkflowGetResponse, t *testing.T) {
 	if err != nil {
-		t.Fatal(err)
+		helpers.FailTestWithError(err, t)
 	}
 	if httpResp.StatusCode != http.StatusOK {
-		t.Fatalf("Status not success: %v", httpResp.Status)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("HTTP status not success: %v", httpResp.Status), t)
 	}
 	if resp.WorkflowStatus != iwfidl.COMPLETED {
-		t.Fatalf("Workflow uncompleted: %v", resp.WorkflowStatus)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("Workflow uncompleted: %v", resp.WorkflowStatus), t)
 	}
 }
+
 func smallWaitForFastTest() {
 	du := time.Millisecond * time.Duration(*repeatInterval)
 	if *repeatIntegTest == 0 {
