@@ -3,7 +3,7 @@ package basic
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"

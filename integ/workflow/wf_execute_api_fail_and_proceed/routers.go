@@ -1,7 +1,7 @@
 package wf_execute_api_fail_and_proceed
 
 import (
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"

@@ -2,7 +2,7 @@ package integ
 
 import (
 	"context"
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/wait_until_search_attributes_optimization"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"go.temporal.io/api/common/v1"

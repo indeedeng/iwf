@@ -1,7 +1,7 @@
 package timer
 
 import (
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"

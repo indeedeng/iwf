@@ -3,7 +3,7 @@ package integ
 import (
 	"context"
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/persistence"
 	"github.com/indeedeng/iwf/integ/workflow/persistence_loading_policy"
 	"github.com/indeedeng/iwf/service"

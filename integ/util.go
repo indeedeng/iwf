@@ -2,7 +2,7 @@ package integ
 
 import (
 	"fmt"
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	"log"

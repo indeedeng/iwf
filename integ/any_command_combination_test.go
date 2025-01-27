@@ -3,7 +3,7 @@ package integ
 import (
 	"context"
 	"encoding/json"
-	"github.com/indeedeng/iwf/helpers"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"strconv"
 	"testing"
