@@ -260,9 +260,9 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	//reset here with reapply and compare counter
 	resetReq := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
 	_, httpResp, err = resetReq.WorkflowResetRequest(iwfidl.WorkflowResetRequest{
-		WorkflowId: wfId,
-		ResetType:  iwfidl.BEGINNING,
-		//SkipSignalReapply: ptr.Any(true),
+		WorkflowId:        wfId,
+		ResetType:         iwfidl.BEGINNING,
+		SkipSignalReapply: ptr.Any(false),
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
