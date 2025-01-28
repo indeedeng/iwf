@@ -54,8 +54,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 			return
 		}
 	}
-	fmt.Println(
-		fmt.Sprintf("WorkflowType: %v", req.GetWorkflowType()),
+	fmt.Printf(
+		"WorkflowType: %v", req.GetWorkflowType(),
 	)
 	helpers.FailTestWithErrorMessage("should not get here", t)
 }
