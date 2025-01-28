@@ -135,6 +135,13 @@ func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendTyp
 		assertions.Equal(firstRes.GetWorkflowRunId(), secondRes.GetWorkflowRunId())
 		assertions.Equal(200, secondHttpResp.StatusCode)
 	}
+
+	// Terminate the workflow once tests completed
+	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
+	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
+		WorkflowId: wfId,
+		StopType:   iwfidl.TERMINATE.Ptr(),
+	}).Execute()
 }
 
 func createReq(wfId string, options *iwfidl.WorkflowAlreadyStartedOptions) iwfidl.WorkflowStartRequest {
