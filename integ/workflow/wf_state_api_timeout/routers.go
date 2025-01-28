@@ -1,6 +1,7 @@
 package wf_state_api_timeout
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/integ/helpers"
@@ -53,7 +54,9 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 			return
 		}
 	}
-
+	fmt.Println(
+		fmt.Sprintf("WorkflowType: %v", req.GetWorkflowType()),
+	)
 	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
