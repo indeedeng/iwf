@@ -50,6 +50,17 @@ func NewGreedyTimerProcessor(
 	if err != nil {
 		panic("cannot set query handler")
 	}
+
+	err = provider.SetQueryHandler(ctx, service.GetScheduledGreedyTimerTimesQueryType, func() (service.GetScheduledGreedyTimerTimesQueryResponse, error) {
+		return service.GetScheduledGreedyTimerTimesQueryResponse{
+			ScheduledGreedyTimerTimes: tp.timerManger.ScheduledTimerTimes,
+			PendingScheduled:          tp.timerManger.PendingScheduling,
+		}, nil
+	})
+	if err != nil {
+		panic("cannot set query handler")
+	}
+
 	return tp
 }
 
@@ -86,12 +97,26 @@ func (t *TimerManager) removeTimer(toRemove *service.TimerInfo) {
 }
 
 func (t *TimerManager) pruneToNextTimer(pruneTo int64) *service.TimerInfo {
+	index := len(t.ScheduledTimerTimes)
+	for i := len(t.ScheduledTimerTimes) - 1; i >= 0; i-- {
+		timerTime := t.ScheduledTimerTimes[i]
+		if timerTime > pruneTo {
+			break
+		}
+		index = i
+	}
+	// If index is 0, it means all times are in the past
+	if index == 0 {
+		t.ScheduledTimerTimes = nil
+	} else {
+		t.ScheduledTimerTimes = t.ScheduledTimerTimes[:index]
+	}
 
 	if len(t.PendingScheduling) == 0 {
 		return nil
 	}
 
-	index := len(t.PendingScheduling)
+	index = len(t.PendingScheduling)
 
 	for i := len(t.PendingScheduling) - 1; i >= 0; i-- {
 		timer := t.PendingScheduling[i]
@@ -119,14 +144,7 @@ func (t *GreedyTimerProcessor) createGreedyTimerScheduler(
 	t.provider.GoNamed(ctx, "greedy-timer-scheduler", func(ctx interfaces.UnifiedContext) {
 		for {
 			_ = t.provider.Await(ctx, func() bool {
-				// remove fired PendingScheduling
 				now := t.provider.Now(ctx).Unix()
-				for i := len(t.timerManger.ScheduledTimerTimes) - 1; i >= 0; i-- {
-					if t.timerManger.ScheduledTimerTimes[i] > now {
-						t.timerManger.ScheduledTimerTimes = t.timerManger.ScheduledTimerTimes[:i+1]
-						break
-					}
-				}
 				next := t.timerManger.pruneToNextTimer(now)
 				return (next != nil && (len(t.timerManger.ScheduledTimerTimes) == 0 || next.FiringUnixTimestampSeconds < t.timerManger.ScheduledTimerTimes[len(t.timerManger.ScheduledTimerTimes)-1])) || continueAsNewCounter.IsThresholdMet()
 			})
@@ -151,10 +169,6 @@ func (t *GreedyTimerProcessor) createGreedyTimerScheduler(
 
 func (t *GreedyTimerProcessor) Dump() []service.StaleSkipTimerSignal {
 	return t.staleSkipTimerSignals
-}
-
-func (t *GreedyTimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
-	return t.stateExecutionCurrentTimerInfos
 }
 
 // SkipTimer will attempt to skip a timer, return false if no valid timer found

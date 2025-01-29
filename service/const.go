@@ -22,12 +22,13 @@ const (
 	StateDecideApi       = "/api/v1/workflowState/decide"
 	WorkflowWorkerRpcApi = "/api/v1/workflowWorker/rpc"
 
-	GetDataAttributesWorkflowQueryType   = "GetDataAttributes"
-	GetSearchAttributesWorkflowQueryType = "GetSearchAttributes"
-	GetCurrentTimerInfosQueryType        = "GetCurrentTimerInfos"
-	ContinueAsNewDumpByPageQueryType     = "ContinueAsNewDumpByPage"
-	DebugDumpQueryType                   = "DebugNewDump"
-	PrepareRpcQueryType                  = "PrepareRpcQueryType"
+	GetDataAttributesWorkflowQueryType    = "GetDataAttributes"
+	GetSearchAttributesWorkflowQueryType  = "GetSearchAttributes"
+	GetCurrentTimerInfosQueryType         = "GetCurrentTimerInfos"
+	GetScheduledGreedyTimerTimesQueryType = "GetScheduledGreedyTimerTimes"
+	ContinueAsNewDumpByPageQueryType      = "ContinueAsNewDumpByPage"
+	DebugDumpQueryType                    = "DebugNewDump"
+	PrepareRpcQueryType                   = "PrepareRpcQueryType"
 
 	ExecuteOptimisticLockingRpcUpdateType = "ExecuteOptimisticLockingRpcUpdate"
 

@@ -86,7 +86,6 @@ func NewUnifiedContext(ctx interface{}) UnifiedContext {
 
 type TimerProcessor interface {
 	Dump() []service.StaleSkipTimerSignal
-	GetCurrentTimerInfos() map[string][]*service.TimerInfo
 	SkipTimer(stateExeId string, timerId string, timerIdx int) bool
 	RetryStaleSkipTimer() bool
 	WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) service.InternalTimerStatus

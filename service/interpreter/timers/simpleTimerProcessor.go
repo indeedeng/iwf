@@ -40,10 +40,6 @@ func (t *SimpleTimerProcessor) Dump() []service.StaleSkipTimerSignal {
 	return t.staleSkipTimerSignals
 }
 
-func (t *SimpleTimerProcessor) GetCurrentTimerInfos() map[string][]*service.TimerInfo {
-	return t.stateExecutionCurrentTimerInfos
-}
-
 // SkipTimer will attempt to skip a timer, return false if no valid timer found
 func (t *SimpleTimerProcessor) SkipTimer(stateExeId, timerId string, timerIdx int) bool {
 	timer, valid := service.ValidateTimerSkipRequest(t.stateExecutionCurrentTimerInfos, stateExeId, timerId, timerIdx)

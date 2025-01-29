@@ -101,6 +101,11 @@ type (
 		StateExecutionCurrentTimerInfos map[string][]*TimerInfo // key is stateExecutionId
 	}
 
+	GetScheduledGreedyTimerTimesQueryResponse struct {
+		ScheduledGreedyTimerTimes []int64
+		PendingScheduled          []*TimerInfo
+	}
+
 	TimerInfo struct {
 		CommandId                  *string
 		FiringUnixTimestampSeconds int64
