@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -44,7 +46,7 @@ type handler struct {
 	invokeData    map[string]interface{}
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowWorkerRpcRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -54,7 +56,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		signalInfos := req.SignalChannelInfos
 		data, err := json.Marshal(signalInfos)
 		if err != nil {
-			panic(err)
+			helpers.FailTestWithError(err, t)
 		}
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
@@ -72,7 +74,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 		icInfos := req.InternalChannelInfos
 		data, err := json.Marshal(icInfos)
 		if err != nil {
-			panic(err)
+			helpers.FailTestWithError(err, t)
 		}
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			Output: &iwfidl.EncodedObject{
@@ -93,7 +95,7 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -142,7 +144,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

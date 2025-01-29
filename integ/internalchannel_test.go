@@ -39,7 +39,7 @@ func TestInterStateWorkflowCadence(t *testing.T) {
 func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := interstate.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	closeFunc2 := startIwfService(backendType)
@@ -65,13 +65,13 @@ func doTestInterStateWorkflow(t *testing.T, backendType service.BackendType, con
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions := assert.New(t)

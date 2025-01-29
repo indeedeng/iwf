@@ -3,9 +3,11 @@ package skipstart
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -35,11 +37,11 @@ func NewHandler() *handler {
 }
 
 // ApiV1WorkflowStateStart - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
-	panic("start API should be skipped")
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
+	helpers.FailTestWithErrorMessage("start API should be skipped", t)
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

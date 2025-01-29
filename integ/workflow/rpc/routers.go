@@ -1,13 +1,16 @@
 package rpc
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -86,7 +89,7 @@ var TestInterstateChannelValue = iwfidl.EncodedObject{
 	Data:     iwfidl.PtrString("test-interstatechannel-value"),
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowWorkerRpcRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -96,11 +99,11 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 
 	wfCtx := req.Context
 	if wfCtx.WorkflowId == "" || wfCtx.WorkflowRunId == "" {
-		panic("invalid context in the request")
+		helpers.FailTestWithErrorMessage("invalid context in the request", t)
 	}
 	if req.WorkflowType != WorkflowType ||
 		(req.RpcName != RPCName && req.RpcName != RPCNameReadOnly && req.RpcName != RPCNameError) {
-		panic("invalid rpc name:" + req.RpcName)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("invalid rpc name: %s", req.RpcName), t)
 	}
 
 	h.invokeData[req.RpcName+"-input"] = req.Input
@@ -165,7 +168,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -228,7 +231,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -242,7 +245,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			commandRes := req.GetCommandResults()
 			res := commandRes.GetInterStateChannelResults()[0]
 			if res.GetRequestStatus() != iwfidl.RECEIVED || res.GetChannelName() != TestInterStateChannelName {
-				panic("the signal should be received")
+				helpers.FailTestWithErrorMessage("the signal should be received", t)
 			}
 			h.invokeData[TestInterStateChannelName] = res.Value
 

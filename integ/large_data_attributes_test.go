@@ -33,7 +33,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 
 	// start test workflow server
 	wfHandler := signal.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -63,7 +63,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	assertions.Equal(httpResp.StatusCode, http.StatusOK)
 
@@ -90,7 +90,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 			},
 		}).Execute()
 
-		panicAtHttpError(err, httpResp2)
+		failTestAtHttpError(err, httpResp2, t)
 	}
 
 	// signal the workflow to complete
@@ -107,7 +107,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 			SignalValue:       &signalVal,
 		}).Execute()
 
-		panicAtHttpError(err, httpResp2)
+		failTestAtHttpError(err, httpResp2, t)
 	}
 
 	// wait for the workflow
@@ -115,5 +115,5 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 }

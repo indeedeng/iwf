@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/rpc"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
@@ -55,7 +56,7 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -82,13 +83,13 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// workflow shouldn't executed any state
 	var dump service.DebugDumpResponse
 	err = uclient.QueryWorkflow(context.Background(), &dump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
-		panic(err)
+		helpers.FailTestWithError(err, t)
 	}
 	assertions.Equal(service.StateExecutionCounterInfo{
 		StateIdStartedCount:            make(map[string]int),
@@ -110,14 +111,14 @@ func doTestCreateWithoutStartingState(t *testing.T, backendType service.BackendT
 		},
 		TimeoutSeconds: iwfidl.PtrInt32(2),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
+	failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

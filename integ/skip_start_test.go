@@ -56,7 +56,7 @@ func TestSkipStartWorkflowCadenceContinueAsNew(t *testing.T) {
 func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := skipstart.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	closeFunc2 := startIwfService(backendType)
@@ -91,7 +91,7 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	assertions := assert.New(t)
 
@@ -99,7 +99,7 @@ func doTestSkipStartWorkflow(t *testing.T, backendType service.BackendType, conf
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

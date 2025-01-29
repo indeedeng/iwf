@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/persistence"
 	"github.com/indeedeng/iwf/integ/workflow/persistence_loading_policy"
 	"github.com/indeedeng/iwf/service"
@@ -63,7 +64,7 @@ func doTestPersistenceLoadingPolicy(
 	assertions := assert.New(t)
 
 	wfHandler := persistence_loading_policy.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
@@ -100,11 +101,11 @@ func doTestPersistenceLoadingPolicy(
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	if rpcUseMemo && backendType == service.BackendTypeCadence {
 		if err == nil {
-			panic("err should not be nil when Memo is not supported with Cadence")
+			helpers.FailTestWithErrorMessage("err should not be nil when Memo is not supported with Cadence", t)
 		}
 		return
 	}
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 2)
 
@@ -140,11 +141,11 @@ func doTestPersistenceLoadingPolicy(
 	_, httpResp, err = reqRpc.WorkflowRpcRequest(rpcReq).Execute()
 	if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK && backendType == service.BackendTypeCadence {
 		if err == nil {
-			panic("err should not be nil when Locking is not supported with Cadence")
+			helpers.FailTestWithErrorMessage("err should not be nil when Locking is not supported with Cadence", t)
 		}
 		return
 	}
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 2)
 

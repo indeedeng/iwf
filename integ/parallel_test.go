@@ -39,7 +39,7 @@ func TestParallelWorkflowCadence(t *testing.T) {
 func doTestParallelWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := parallel.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	closeFunc2 := startIwfService(backendType)
@@ -65,14 +65,14 @@ func doTestParallelWorkflow(t *testing.T, backendType service.BackendType, confi
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions := assert.New(t)

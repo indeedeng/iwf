@@ -91,7 +91,7 @@ func TestIgnoreAlreadyStartedWorkflowCadence(t *testing.T) {
 func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendType, firstReqConfig *iwfidl.WorkflowAlreadyStartedOptions, secondReqConfig *iwfidl.WorkflowAlreadyStartedOptions, errorExpected bool) {
 	// start test workflow server
 	wfHandler := wf_ignore_already_started.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -113,7 +113,7 @@ func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendTyp
 	firstReq := createReq(wfId, firstReqConfig)
 
 	firstRes, firstHttpResp, err := req.WorkflowStartRequest(firstReq).Execute()
-	panicAtHttpError(err, firstHttpResp)
+	failTestAtHttpError(err, firstHttpResp, t)
 
 	secondReq := createReq(wfId, secondReqConfig)
 	secondRes, secondHttpResp, err := req.WorkflowStartRequest(secondReq).Execute()
@@ -135,6 +135,13 @@ func doIgnoreAlreadyStartedWorkflow(t *testing.T, backendType service.BackendTyp
 		assertions.Equal(firstRes.GetWorkflowRunId(), secondRes.GetWorkflowRunId())
 		assertions.Equal(200, secondHttpResp.StatusCode)
 	}
+
+	// Terminate the workflow once tests completed
+	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
+	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
+		WorkflowId: wfId,
+		StopType:   iwfidl.TERMINATE.Ptr(),
+	}).Execute()
 }
 
 func createReq(wfId string, options *iwfidl.WorkflowAlreadyStartedOptions) iwfidl.WorkflowStartRequest {

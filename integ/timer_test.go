@@ -58,7 +58,7 @@ func TestTimerWorkflowCadenceContinueAsNew(t *testing.T) {
 func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := timer.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -88,7 +88,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 1)
 	timerInfos := service.GetCurrentTimerInfosQueryResponse{}
@@ -128,7 +128,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 		WorkflowStateExecutionId: "S1-1",
 		TimerCommandId:           iwfidl.PtrString("timer-cmd-id-2"),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 1)
 	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
@@ -145,7 +145,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 		WorkflowStateExecutionId: "S1-1",
 		TimerCommandIndex:        iwfidl.PtrInt32(2),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 1)
 	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
@@ -161,7 +161,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
@@ -181,7 +181,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 		WorkflowId: wfId,
 		ResetType:  iwfidl.BEGINNING,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
 	if err != nil {
@@ -195,7 +195,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	resp, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+	failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 }
 
 func assertTimerQueryResponseEqual(

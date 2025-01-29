@@ -1,9 +1,11 @@
 package wf_state_api_fail_and_proceed
 
 import (
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
+	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -33,7 +35,7 @@ func NewHandler() common.WorkflowHandler {
 	}
 }
 
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -50,10 +52,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		}
 	}
 
-	panic("should not get here")
+	helpers.FailTestWithErrorMessage("should not get here", t)
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -62,7 +64,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetCommandResults().StateStartApiSucceeded == nil || *req.GetCommandResults().StateStartApiSucceeded {
-		panic("stateStartApiSucceeded should be false")
+		helpers.FailTestWithErrorMessage("stateStartApiSucceeded should be false", t)
 	}
 
 	if req.GetWorkflowType() == WorkflowType {

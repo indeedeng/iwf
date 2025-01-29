@@ -3,11 +3,13 @@ package persistence
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -74,7 +76,7 @@ func NewHandler() common.WorkflowHandler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -84,12 +86,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 
 	initSas := req.GetSearchAttributes()
 	if len(initSas) < 1 {
-		panic("should have at least one init search attribute")
+		helpers.FailTestWithErrorMessage("should have at least one init search attribute", t)
 	}
 	for _, sa := range initSas {
 		if sa.GetKey() == "CustomDatetimeField" {
 			if sa.GetValueType() != iwfidl.DATETIME {
-				panic("key and value type not match")
+				helpers.FailTestWithErrorMessage("key and value type not match", t)
 			}
 		}
 	}
@@ -169,7 +171,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 					queryAttFound = true
 				}
 				if queryAtt.GetKey() == TestDataObjectKey2 {
-					panic("should not load key that is not included in partial loading")
+					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 			}
 			h.invokeData["S2_start_queryAttFound"] = queryAttFound
@@ -189,7 +191,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			found := false
 			for _, sa := range sas {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
-					panic("should not load key that is not included in partial loading")
+					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
 					sa.GetValueType() == iwfidl.INT {
@@ -197,7 +199,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				}
 			}
 			if !found {
-				panic("should see the requested partial loading key")
+				helpers.FailTestWithErrorMessage("should see the requested partial loading key", t)
 			}
 
 			queryAttFound := 0
@@ -211,7 +213,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 				}
 			}
 			if queryAttFound != 2 {
-				panic("missing query attribute requested by partial loading keys")
+				helpers.FailTestWithErrorMessage("missing query attribute requested by partial loading keys", t)
 			}
 
 			// Go straight to the decide methods without any commands
@@ -227,7 +229,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -356,7 +358,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					queryAttFound = true
 				}
 				if queryAtt.GetKey() == TestDataObjectKey2 {
-					panic("should not load key that is not included in partial loading")
+					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 			}
 
@@ -395,7 +397,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 			found := false
 			for _, sa := range sas {
 				if sa.GetKey() == TestSearchAttributeKeywordKey {
-					panic("should not load key that is not included in partial loading")
+					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 				if sa.GetKey() == TestSearchAttributeIntKey && sa.GetIntegerValue() == TestSearchAttributeIntValue2 &&
 					sa.GetValueType() == iwfidl.INT {
@@ -403,7 +405,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				}
 			}
 			if !found {
-				panic("should see the requested partial loading key")
+				helpers.FailTestWithErrorMessage("should see the requested partial loading key", t)
 			}
 
 			queryAttFound := 0
@@ -419,7 +421,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 				}
 			}
 			if queryAttFound != 2 {
-				panic("missing query attribute requested by partial loading keys")
+				helpers.FailTestWithErrorMessage("missing query attribute requested by partial loading keys", t)
 			}
 
 			// Move to completion

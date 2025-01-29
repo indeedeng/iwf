@@ -33,7 +33,7 @@ func doTestStartWorkflowWithoutStartOptions(t *testing.T, backendType service.Ba
 	}
 
 	wfHandler := basic.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	client, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -62,7 +62,7 @@ func doTestStartWorkflowWithoutStartOptions(t *testing.T, backendType service.Ba
 		StateInput:             wfInput,
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	requestedSAs := []iwfidl.SearchAttributeKeyAndType{
 		{

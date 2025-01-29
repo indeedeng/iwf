@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
 	"strconv"
+	"testing"
 )
 
 /**
@@ -37,11 +39,11 @@ func NewHandler() *handler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
-	panic("No start call is expected.")
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
+	helpers.FailTestWithErrorMessage("No start call is expected.", t)
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("start of decide")
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -51,7 +53,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	log.Println("received state decide request, ", req)
 	context := req.GetContext()
 	if context.GetAttempt() <= 0 || context.GetFirstAttemptTimestamp() <= 0 {
-		panic("attempt and firstAttemptTimestamp should be greater than zero")
+		helpers.FailTestWithErrorMessage("attempt and firstAttemptTimestamp should be greater than zero", t)
 	}
 
 	if req.GetWorkflowType() == WorkflowType {

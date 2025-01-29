@@ -3,11 +3,13 @@ package anycommandcombination
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 	"time"
 )
 
@@ -49,7 +51,7 @@ func NewHandler() common.WorkflowHandler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -179,11 +181,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 			return
 		}
 	}
-
-	panic("invalid workflow type")
+	helpers.FailTestWithErrorMessage("invalid workflow type", t)
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		panic(err)
@@ -223,7 +224,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		}
 	}
 
-	panic("invalid workflow type")
+	helpers.FailTestWithErrorMessage("invalid workflow type", t)
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

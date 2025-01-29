@@ -43,7 +43,7 @@ func doTestWaitUntilSearchAttributes(
 ) {
 	assertions := assert.New(t)
 	wfHandler := wait_until_search_attributes.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -73,32 +73,32 @@ func doTestWaitUntilSearchAttributes(
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the search attribute index to be ready in ElasticSearch
 	time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
 	switch mode := config.GetExecutingStateIdMode(); mode {
 	case iwfidl.ENABLED_FOR_ALL:
-		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 1, apiClient, assertions)
 	case iwfidl.ENABLED_FOR_STATES_WITH_WAIT_UNTIL:
-		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
 	case iwfidl.DISABLED:
-		assertSearch(fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
-		assertSearch(fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v'", wfId), 1, apiClient, assertions)
+		assertSearch(t, fmt.Sprintf("WorkflowId='%v' AND %v='%v'", wfId, wait_until_search_attributes.TestSearchAttributeExecutingStateIdsKey, wait_until_search_attributes.State2), 0, apiClient, assertions)
 	}
 
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for workflow to complete
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+	failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 }

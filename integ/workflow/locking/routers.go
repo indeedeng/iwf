@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"strconv"
+	"testing"
 	"time"
 )
 
@@ -99,7 +101,7 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 	}
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowWorkerRpcRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -108,12 +110,12 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	log.Println("received workflow worker rpc request, ", req)
 
 	if req.WorkflowType != WorkflowType || (req.RpcName != RPCName) {
-		panic("invalid rpc name:" + req.RpcName)
+		helpers.FailTestWithErrorMessage(fmt.Sprintf("invalid rpc name: %s", req.RpcName), t)
 	}
 
 	input := req.Input
 	if input.GetEncoding() != TestValue.GetEncoding() {
-		panic("input is incorrect")
+		helpers.FailTestWithErrorMessage("input is incorrect", t)
 	}
 
 	// Publish to internal channel
@@ -132,12 +134,13 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	signalChannelInfo := (*req.SignalChannelInfos)[UnusedSignalChannelName]
 	if signalChannelInfo.GetSize() != NumUnusedSignals {
 		// the 4 messages are sent from the beginning of "locking_test"
-		panic("incorrect signal channel size")
+		helpers.FailTestWithErrorMessage("incorrect signal channel size", t)
 	}
+
 	if h.rpcInvokes > 0 {
 		internalChannelInfo := (*req.InternalChannelInfos)[UnusedInternalChannelName]
 		if h.rpcInvokes != internalChannelInfo.GetSize() {
-			panic("incorrect internal channel size")
+			helpers.FailTestWithErrorMessage("incorrect internal channel size", t)
 		}
 	}
 	h.rpcInvokes++
@@ -175,7 +178,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 			if data != "" {
 				i, err := strconv.ParseInt(data, 10, 32)
 				if err != nil {
-					panic(err)
+					helpers.FailTestWithError(err, t)
 				}
 				daInt = int(i)
 			}
@@ -225,7 +228,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 }
 
 // ApiV1WorkflowStateStart - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -300,7 +303,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -354,7 +357,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 					if data != "" {
 						i, err := strconv.ParseInt(data, 10, 32)
 						if err != nil {
-							panic(err)
+							helpers.FailTestWithError(err, t)
 						}
 						daInt = int(i)
 					}

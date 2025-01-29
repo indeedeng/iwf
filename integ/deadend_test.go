@@ -55,7 +55,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := deadend.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -82,7 +82,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 
@@ -93,7 +93,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 			WorkflowId: wfId,
 			RpcName:    deadend.RPCWriteData,
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 	}
 
 	if config != nil {
@@ -101,7 +101,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 		descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 		assertions.True(startResp.GetWorkflowRunId() != descResp.GetWorkflowRunId())
 	}
 
@@ -112,7 +112,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 			WorkflowId: wfId,
 			RpcName:    deadend.RPCTriggerState,
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 	}
 
 	time.Sleep(time.Second * 2)
@@ -121,7 +121,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{

@@ -102,7 +102,7 @@ func doTestPersistenceWorkflow(
 ) {
 	assertions := assert.New(t)
 	wfHandler := persistence.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	uclient, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -163,7 +163,7 @@ func doTestPersistenceWorkflow(
 		},
 	}
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	initReqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
 
@@ -184,7 +184,7 @@ func doTestPersistenceWorkflow(
 		}
 	}
 
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	assert.Contains(t, queryResult.GetObjects(), expectedDataAttribute)
 
@@ -192,7 +192,7 @@ func doTestPersistenceWorkflow(
 	wfResponse, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	reqQry := apiClient.DefaultApi.ApiV1WorkflowDataobjectsGetPost(context.Background())
 	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
@@ -202,13 +202,13 @@ func doTestPersistenceWorkflow(
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	queryResult2, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId:               wfId,
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	reqSearch := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
 	searchResult1, httpResp, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
@@ -221,7 +221,7 @@ func doTestPersistenceWorkflow(
 			},
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	searchResult2, httpResp, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
 		WorkflowId:    wfId,
@@ -233,7 +233,7 @@ func doTestPersistenceWorkflow(
 			},
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// assertion
 	history, data := wfHandler.GetTestResult()
@@ -330,7 +330,7 @@ func doTestPersistenceWorkflow(
 		}
 
 		_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 
 		wfReq.WorkflowId = firstWfId + "-2"
 		newSa = iwfidl.SearchAttribute{
@@ -341,7 +341,7 @@ func doTestPersistenceWorkflow(
 		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
 
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 
 		wfReq.WorkflowId = firstWfId + "-3"
 		newSa = iwfidl.SearchAttribute{
@@ -351,7 +351,7 @@ func doTestPersistenceWorkflow(
 		}
 		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 
 		wfReq.WorkflowId = firstWfId + "-4"
 		newSa = iwfidl.SearchAttribute{
@@ -361,39 +361,39 @@ func doTestPersistenceWorkflow(
 		}
 		wfReq.WorkflowStartOptions.SearchAttributes = append(wfReq.WorkflowStartOptions.SearchAttributes, newSa)
 		_, httpResp, err = reqStart.WorkflowStartRequest(wfReq).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 
 		// wait for all completed
 		resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: firstWfId + "-1",
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: firstWfId + "-2",
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: firstWfId + "-3",
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 		resp, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: firstWfId + "-4",
 		}).Execute()
-		panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp)
+		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
 		// wait for the search attribute index to be ready in ElasticSearch
 		time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
 		if config != nil {
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStr), 15, apiClient, assertions)
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStr, "Quanzheng"), 3, apiClient, assertions)
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStr, "0.01"), 9, apiClient, assertions)
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStr, "true"), 0, apiClient, assertions) // Note that the bool field got changed during WF execution
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStr), 15, apiClient, assertions)
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStr, "Quanzheng"), 3, apiClient, assertions)
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStr, "0.01"), 9, apiClient, assertions)
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStr, "true"), 0, apiClient, assertions) // Note that the bool field got changed during WF execution
 		} else {
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStr), 5, apiClient, assertions)
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStr, "Quanzheng"), 1, apiClient, assertions)
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStr, "0.01"), 3, apiClient, assertions)
-			assertSearch(fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStr, "true"), 0, apiClient, assertions) // Note that the bool field got changed during WF execution
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v'", nowTimeStr), 5, apiClient, assertions)
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v' AND CustomStringField='%v'", nowTimeStr, "Quanzheng"), 1, apiClient, assertions)
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v' AND CustomDoubleField='%v'", nowTimeStr, "0.01"), 3, apiClient, assertions)
+			assertSearch(t, fmt.Sprintf("CustomDatetimeField='%v' AND CustomBoolField='%v'", nowTimeStr, "true"), 0, apiClient, assertions) // Note that the bool field got changed during WF execution
 		}
 
 		// TODO?? research how to use text
@@ -414,7 +414,7 @@ func getDataAttributes(
 	}).Execute()
 }
 
-func assertSearch(query string, expectedCount int, apiClient *iwfidl.APIClient, assertions *assert.Assertions) {
+func assertSearch(t *testing.T, query string, expectedCount int, apiClient *iwfidl.APIClient, assertions *assert.Assertions) {
 	// search through all wfs using search API with pagination
 	search := apiClient.DefaultApi.ApiV1WorkflowSearchPost(context.Background())
 
@@ -426,7 +426,7 @@ func assertSearch(query string, expectedCount int, apiClient *iwfidl.APIClient, 
 			PageSize:      iwfidl.PtrInt32(2),
 			NextPageToken: &nextPageToken,
 		}).Execute()
-		panicAtHttpError(err, httpResp)
+		failTestAtHttpError(err, httpResp, t)
 
 		currentCount += len(searchResp.WorkflowExecutions)
 		if currentCount < expectedCount {
@@ -444,7 +444,7 @@ func assertSearch(query string, expectedCount int, apiClient *iwfidl.APIClient, 
 					PageSize:      iwfidl.PtrInt32(2),
 					NextPageToken: &nextPageToken,
 				}).Execute()
-				panicAtHttpError(err, httpResp)
+				failTestAtHttpError(err, httpResp, t)
 				assertions.Equal(0, len(searchResp.WorkflowExecutions))
 				assertions.True(len(searchResp.GetNextPageToken()) == 0)
 			}

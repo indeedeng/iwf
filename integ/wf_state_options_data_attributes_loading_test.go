@@ -40,7 +40,7 @@ func doTestWfStateOptionsDataAttributesLoading(
 	assertions := assert.New(t)
 
 	wfHandler := wf_state_options_data_attributes_loading.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 	closeFunc2 := startIwfService(backendType)
 	defer closeFunc2()
@@ -72,7 +72,7 @@ func doTestWfStateOptionsDataAttributesLoading(
 	}
 
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 2)
 

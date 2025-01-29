@@ -1,10 +1,12 @@
 package wf_ignore_already_started
 
 import (
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
 	"strconv"
+	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +38,7 @@ func NewHandler() *handler {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -49,7 +51,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		if req.GetWorkflowStateId() == State1 {
 			nowInt, err := strconv.Atoi(req.StateInput.GetData())
 			if err != nil {
-				panic(err)
+				helpers.FailTestWithError(err, t)
 			}
 			now := int64(nowInt)
 			h.invokeData["scheduled_at"] = now
@@ -71,7 +73,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	c.JSON(http.StatusBadRequest, struct{}{})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

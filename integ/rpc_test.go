@@ -100,7 +100,7 @@ func doTestRpcWorkflow(
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := rpc.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -132,7 +132,7 @@ func doTestRpcWorkflow(
 			UseMemoForDataAttributes: ptr.Any(useMemo),
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	allSearchAttributes := []iwfidl.SearchAttributeKeyAndType{
 		{
@@ -164,7 +164,7 @@ func doTestRpcWorkflow(
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 		SearchAttributes:         allSearchAttributes,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	reqRpc = apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
@@ -210,14 +210,14 @@ func doTestRpcWorkflow(
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 		SearchAttributes:         allSearchAttributes,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// wait for the workflow
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait)
+	failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, respWait, t)
 
 	history, data := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
@@ -287,7 +287,7 @@ func doTestRpcWorkflow(
 	allDos, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	reqSearch := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
 	allSAs, httpResp, err := reqSearch.WorkflowGetSearchAttributesRequest(iwfidl.WorkflowGetSearchAttributesRequest{
@@ -307,7 +307,7 @@ func doTestRpcWorkflow(
 			},
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	assertions.Equalf([]iwfidl.KeyValue{
 		{

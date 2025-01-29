@@ -3,10 +3,12 @@ package conditional_close
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"testing"
 	"time"
 )
 
@@ -44,7 +46,7 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 	}
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowWorkerRpcRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -64,7 +66,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 }
 
 // ApiV1WorkflowStateStart - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -106,10 +108,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		}
 	}
 
-	panic("error request")
+	helpers.FailTestWithErrorMessage("error request", t)
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -168,7 +170,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 		}
 	}
 
-	panic("error request")
+	helpers.FailTestWithErrorMessage("error request", t)
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

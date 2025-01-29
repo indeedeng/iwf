@@ -47,7 +47,7 @@ func TestBasicWorkflowCadence(t *testing.T) {
 func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := basic.NewHandler()
-	closeFunc1 := startWorkflowWorker(wfHandler)
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
 	_, closeFunc2 := startIwfServiceByConfig(IwfServiceTestConfig{
@@ -107,7 +107,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 		},
 	}
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// start it again should return already started error
 	_, _, err = req.WorkflowStartRequest(startReq).Execute()
@@ -126,7 +126,7 @@ func doTestBasicWorkflow(t *testing.T, backendType service.BackendType, config *
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	// use a wrong workflowId to test the error case
 	_, _, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{

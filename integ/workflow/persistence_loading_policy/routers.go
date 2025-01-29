@@ -3,6 +3,7 @@ package persistence_loading_policy
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
+	"github.com/indeedeng/iwf/integ/helpers"
 	"github.com/indeedeng/iwf/integ/workflow/common"
 	"github.com/indeedeng/iwf/integ/workflow/persistence"
 	"github.com/indeedeng/iwf/service"
@@ -10,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
+	"testing"
 )
 
 /**
@@ -39,7 +41,7 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 }
 
 // ApiV1WorkflowStartPost - for a workflow
-func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateStartRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -59,7 +61,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 		loadingTypeFromInput := req.GetStateInput()
 		loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
-		verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
+		verifyLoadedAttributes(t, req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
 	}
 
 	// Go straight to the decide methods without any commands
@@ -70,7 +72,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context) {
 	})
 }
 
-func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
+func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowStateDecideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -90,7 +92,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
 	if req.GetWorkflowStateId() == State2 {
-		verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
+		verifyLoadedAttributes(t, req.GetSearchAttributes(), req.GetDataObjects(), loadingType)
 	}
 
 	var upsertSearchAttributes []iwfidl.SearchAttribute
@@ -144,7 +146,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context) {
 	})
 }
 
-func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
+func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 	var req iwfidl.WorkflowWorkerRpcRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -163,7 +165,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context) {
 	loadingTypeFromInput := req.GetInput()
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 
-	verifyLoadedAttributes(req.GetSearchAttributes(), req.GetDataAttributes(), loadingType)
+	verifyLoadedAttributes(t, req.GetSearchAttributes(), req.GetDataAttributes(), loadingType)
 
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 		StateDecision: getStateDecision(State2, loadingTypeFromInput, loadingType),
@@ -176,6 +178,7 @@ func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
 }
 
 func verifyLoadedAttributes(
+	t *testing.T,
 	searchAttributes []iwfidl.SearchAttribute,
 	dataAttributes []iwfidl.KeyValue,
 	loadingType iwfidl.PersistenceLoadingType) {
@@ -237,11 +240,11 @@ func verifyLoadedAttributes(
 	// use ElementsMatch so that the order won't be a problem.
 	// Internally the SAs are stored as a map and as a result, Golang return it without ordering guarantee
 	if !assert.ElementsMatch(common.DummyT{}, expectedSearchAttributes, searchAttributes) {
-		panic("Search attributes should be the same")
+		helpers.FailTestWithErrorMessage("Search attributes should be the same", t)
 	}
 
 	if !assert.ElementsMatch(common.DummyT{}, expectedDataAttributes, dataAttributes) {
-		panic("Data attributes should be the same")
+		helpers.FailTestWithErrorMessage("Data attributes should be the same", t)
 	}
 }
 
