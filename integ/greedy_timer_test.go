@@ -65,7 +65,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	assertions := assert.New(t)
 	// start test workflow server
 	wfHandler := greedy_timer.NewHandler()
-	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler)
+	closeFunc1 := startWorkflowWorkerWithRpc(wfHandler, t)
 	defer closeFunc1()
 
 	uClient, closeFunc2 := startIwfServiceWithClient(backendType)
@@ -102,7 +102,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 			WorkflowConfigOverride: config,
 		},
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 1)
 
@@ -115,7 +115,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	assertions.Equal(1, len(timers.ScheduledGreedyTimerTimes))
 	singleTimerScheduled := timers.ScheduledGreedyTimerTimes[0]
 
-	scheduleTimerAndAssertExpectedScheduled(assertions, apiClient, uClient, wfId, 20, 1)
+	scheduleTimerAndAssertExpectedScheduled(t, apiClient, uClient, wfId, 20, 1)
 
 	// skip next timer for state: schedule-1
 	skipReq := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
@@ -124,7 +124,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 		WorkflowStateExecutionId: greedy_timer.ScheduleTimerState + "-1",
 		TimerCommandId:           iwfidl.PtrString("duration-15"),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 1)
 
@@ -137,14 +137,14 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	assertions.Equal(1, len(timers.ScheduledGreedyTimerTimes))
 	// LessOrEqual due to continue as new workflow scheduling the next, not skipped timer
 	assertions.LessOrEqual(singleTimerScheduled, timers.ScheduledGreedyTimerTimes[0])
-	scheduleTimerAndAssertExpectedScheduled(assertions, apiClient, uClient, wfId, 5, 2)
+	scheduleTimerAndAssertExpectedScheduled(t, apiClient, uClient, wfId, 5, 2)
 
 	// wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 	assertions.Equalf(map[string]int64{
@@ -154,13 +154,14 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 }
 
 func scheduleTimerAndAssertExpectedScheduled(
-	assertions *assert.Assertions,
+	t *testing.T,
 	apiClient *iwfidl.APIClient,
 	uClient uclient.UnifiedClient,
 	wfId string,
 	duration int64,
 	noMoreThan int) {
 
+	assertions := assert.New(t)
 	input := greedy_timer.Input{Durations: []int64{duration}}
 	inputData, _ := json.Marshal(input)
 
@@ -174,7 +175,7 @@ func scheduleTimerAndAssertExpectedScheduled(
 		},
 		TimeoutSeconds: iwfidl.PtrInt32(2),
 	}).Execute()
-	panicAtHttpError(err, httpResp)
+	failTestAtHttpError(err, httpResp, t)
 
 	time.Sleep(time.Second * 1)
 
