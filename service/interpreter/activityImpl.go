@@ -65,7 +65,7 @@ func StateApiWaitUntil(
 		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
-			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
+			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_ERROR_TYPE))
 	}
 
 	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
@@ -150,7 +150,7 @@ func StateApiExecute(
 		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
-			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE))
+			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_ERROR_TYPE))
 	}
 
 	if err = checkStateDecisionFromResponse(resp); err != nil {
@@ -206,13 +206,13 @@ func printDebugMsg(logger UnifiedLogger, err error, url string) {
 
 func composeStartApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateStartResponse) error {
 	respStr, _ := resp.MarshalJSON()
-	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
+	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_ERROR_TYPE),
 		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))
 }
 
 func composeExecuteApiRespError(provider ActivityProvider, err error, resp *iwfidl.WorkflowStateDecideResponse) error {
 	respStr, _ := resp.MarshalJSON()
-	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
+	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_ERROR_TYPE),
 		fmt.Sprintf("err msg: %v, response: %v", err, string(respStr)))
 }
 

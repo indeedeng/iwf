@@ -990,7 +990,7 @@ func convertStateApiActivityError(provider WorkflowProvider, err error) error {
 	if provider.IsApplicationError(err) {
 		return err
 	}
-	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE), err.Error())
+	return provider.NewApplicationError(string(iwfidl.STATE_API_FAIL_ERROR_TYPE), err.Error())
 }
 
 func getCommandThreadName(prefix string, stateExecId, cmdId string, idx int) string {

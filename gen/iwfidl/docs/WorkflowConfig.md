@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **ContinueAsNewThreshold** | Pointer to **int32** |  | [optional] 
 **ContinueAsNewPageSizeInBytes** | Pointer to **int32** |  | [optional] 
 **OptimizeActivity** | Pointer to **bool** |  | [optional] 
+**OptimizeTimer** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -153,6 +154,31 @@ SetOptimizeActivity sets OptimizeActivity field to given value.
 `func (o *WorkflowConfig) HasOptimizeActivity() bool`
 
 HasOptimizeActivity returns a boolean if a field has been set.
+
+### GetOptimizeTimer
+
+`func (o *WorkflowConfig) GetOptimizeTimer() bool`
+
+GetOptimizeTimer returns the OptimizeTimer field if non-nil, zero value otherwise.
+
+### GetOptimizeTimerOk
+
+`func (o *WorkflowConfig) GetOptimizeTimerOk() (*bool, bool)`
+
+GetOptimizeTimerOk returns a tuple with the OptimizeTimer field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetOptimizeTimer
+
+`func (o *WorkflowConfig) SetOptimizeTimer(v bool)`
+
+SetOptimizeTimer sets OptimizeTimer field to given value.
+
+### HasOptimizeTimer
+
+`func (o *WorkflowConfig) HasOptimizeTimer() bool`
+
+HasOptimizeTimer returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

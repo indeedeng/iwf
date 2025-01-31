@@ -91,7 +91,7 @@ func doTestStateApiTimeout(t *testing.T, backendType service.BackendType, config
 	assertions.Equalf(&iwfidl.WorkflowGetResponse{
 		WorkflowRunId:  startResp.GetWorkflowRunId(),
 		WorkflowStatus: iwfidl.FAILED,
-		ErrorType:      ptr.Any(iwfidl.STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE),
+		ErrorType:      ptr.Any(iwfidl.STATE_API_FAIL_ERROR_TYPE),
 		ErrorMessage:   resp.ErrorMessage,
 	}, resp, "response not expected")
 }
