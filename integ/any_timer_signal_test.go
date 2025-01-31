@@ -12,13 +12,22 @@ import (
 	"time"
 )
 
-// TODO: crate greedy tests for cancelling timer early
 func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, nil)
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyAnyTimerSignalWorkflowTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, minimumGreedyTimerConfig())
 		smallWaitForFastTest()
 	}
 }
@@ -33,12 +42,32 @@ func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
 	}
 }
 
+func TestGreedyAnyTimerSignalWorkflowCadence(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, minimumGreedyTimerConfig())
+		smallWaitForFastTest()
+	}
+}
+
 func TestAnyTimerSignalWorkflowTemporalContinueAsNew(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, minimumContinueAsNewConfig(true))
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyAnyTimerSignalWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, greedyTimerConfig(true))
 		smallWaitForFastTest()
 	}
 }
@@ -53,7 +82,15 @@ func TestAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
 	}
 }
 
-// TODO: crate greedy tests for cancelling timer early
+func TestGreedyAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, greedyTimerConfig(true))
+		smallWaitForFastTest()
+	}
+}
 
 func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
