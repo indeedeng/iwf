@@ -43,7 +43,7 @@ func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
 }
 
 func TestGreedyAnyTimerSignalWorkflowCadence(t *testing.T) {
-	if !*temporalIntegTest {
+	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
@@ -83,7 +83,7 @@ func TestAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
 }
 
 func TestGreedyAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
-	if !*temporalIntegTest {
+	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
