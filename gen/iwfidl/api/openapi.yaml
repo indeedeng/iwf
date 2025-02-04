@@ -738,6 +738,7 @@ components:
         workflowConfigOverride:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
+          optimizeTimer: true
           continueAsNewPageSizeInBytes: 4
           executingStateIdMode: null
           optimizeActivity: true
@@ -1011,6 +1012,7 @@ components:
           workflowConfigOverride:
             disableSystemSearchAttribute: true
             continueAsNewThreshold: 1
+            optimizeTimer: true
             continueAsNewPageSizeInBytes: 4
             executingStateIdMode: null
             optimizeActivity: true
@@ -1341,6 +1343,7 @@ components:
       - STATE_DECISION_FAILING_WORKFLOW_ERROR_TYPE
       - CLIENT_API_FAILING_WORKFLOW_ERROR_TYPE
       - STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE
+      - STATE_API_FAIL_ERROR_TYPE
       - INVALID_USER_WORKFLOW_CODE_ERROR_TYPE
       - RPC_ACQUIRE_LOCK_FAILURE
       - SERVER_INTERNAL_ERROR_TYPE
@@ -1601,6 +1604,7 @@ components:
         workflowConfig:
           disableSystemSearchAttribute: true
           continueAsNewThreshold: 1
+          optimizeTimer: true
           continueAsNewPageSizeInBytes: 4
           executingStateIdMode: null
           optimizeActivity: true
@@ -3284,6 +3288,7 @@ components:
       example:
         disableSystemSearchAttribute: true
         continueAsNewThreshold: 1
+        optimizeTimer: true
         continueAsNewPageSizeInBytes: 4
         executingStateIdMode: null
         optimizeActivity: true
@@ -3297,6 +3302,8 @@ components:
         continueAsNewPageSizeInBytes:
           type: integer
         optimizeActivity:
+          type: boolean
+        optimizeTimer:
           type: boolean
       type: object
     Context:

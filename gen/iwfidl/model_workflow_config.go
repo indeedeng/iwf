@@ -24,6 +24,7 @@ type WorkflowConfig struct {
 	ContinueAsNewThreshold       *int32                `json:"continueAsNewThreshold,omitempty"`
 	ContinueAsNewPageSizeInBytes *int32                `json:"continueAsNewPageSizeInBytes,omitempty"`
 	OptimizeActivity             *bool                 `json:"optimizeActivity,omitempty"`
+	OptimizeTimer                *bool                 `json:"optimizeTimer,omitempty"`
 }
 
 // NewWorkflowConfig instantiates a new WorkflowConfig object
@@ -203,6 +204,38 @@ func (o *WorkflowConfig) SetOptimizeActivity(v bool) {
 	o.OptimizeActivity = &v
 }
 
+// GetOptimizeTimer returns the OptimizeTimer field value if set, zero value otherwise.
+func (o *WorkflowConfig) GetOptimizeTimer() bool {
+	if o == nil || IsNil(o.OptimizeTimer) {
+		var ret bool
+		return ret
+	}
+	return *o.OptimizeTimer
+}
+
+// GetOptimizeTimerOk returns a tuple with the OptimizeTimer field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowConfig) GetOptimizeTimerOk() (*bool, bool) {
+	if o == nil || IsNil(o.OptimizeTimer) {
+		return nil, false
+	}
+	return o.OptimizeTimer, true
+}
+
+// HasOptimizeTimer returns a boolean if a field has been set.
+func (o *WorkflowConfig) HasOptimizeTimer() bool {
+	if o != nil && !IsNil(o.OptimizeTimer) {
+		return true
+	}
+
+	return false
+}
+
+// SetOptimizeTimer gets a reference to the given bool and assigns it to the OptimizeTimer field.
+func (o *WorkflowConfig) SetOptimizeTimer(v bool) {
+	o.OptimizeTimer = &v
+}
+
 func (o WorkflowConfig) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -227,6 +260,9 @@ func (o WorkflowConfig) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.OptimizeActivity) {
 		toSerialize["optimizeActivity"] = o.OptimizeActivity
+	}
+	if !IsNil(o.OptimizeTimer) {
+		toSerialize["optimizeTimer"] = o.OptimizeTimer
 	}
 	return toSerialize, nil
 }
