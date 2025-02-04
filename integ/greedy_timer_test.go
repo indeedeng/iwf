@@ -51,9 +51,8 @@ func TestGreedyTimerWorkflowBaseCadenceContinueAsNew(t *testing.T) {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		// TODO: provide durations
 		doTestGreedyTimerWorkflowCustomConfig(t, service.BackendTypeCadence, greedyTimerConfig(true))
-		// TODO: test stuff
+		smallWaitForFastTest()
 	}
 }
 

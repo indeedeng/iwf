@@ -44,7 +44,7 @@ func NewGreedyTimerProcessor(
 
 	err = provider.SetQueryHandler(ctx, service.GetScheduledGreedyTimerTimesQueryType, func() (service.GetScheduledGreedyTimerTimesQueryResponse, error) {
 		return service.GetScheduledGreedyTimerTimesQueryResponse{
-			ScheduledGreedyTimerTimes: tp.timerManager.scheduledTimerTimes,
+			ScheduledGreedyTimerTimes: tp.timerManager.providerScheduledTimerUnixTs,
 			PendingScheduled:          tp.timerManager.pendingScheduling,
 		}, nil
 	})

@@ -11,7 +11,7 @@ type timerScheduler struct {
 	// Timers requested by the workflow in desc order
 	pendingScheduling []*service.TimerInfo
 	// timers created through the workflow provider that are going to fire in desc order
-	scheduledTimerTimes []int64
+	providerScheduledTimerUnixTs []int64
 }
 
 func (t *timerScheduler) addTimer(toAdd *service.TimerInfo) {
@@ -53,9 +53,9 @@ func (t *timerScheduler) removeTimer(toRemove *service.TimerInfo) {
 }
 
 func (t *timerScheduler) pruneToNextTimer(pruneTo int64) *service.TimerInfo {
-	index := len(t.scheduledTimerTimes)
-	for i := len(t.scheduledTimerTimes) - 1; i >= 0; i-- {
-		timerTime := t.scheduledTimerTimes[i]
+	index := len(t.providerScheduledTimerUnixTs)
+	for i := len(t.providerScheduledTimerUnixTs) - 1; i >= 0; i-- {
+		timerTime := t.providerScheduledTimerUnixTs[i]
 		if timerTime > pruneTo {
 			break
 		}
@@ -63,9 +63,9 @@ func (t *timerScheduler) pruneToNextTimer(pruneTo int64) *service.TimerInfo {
 	}
 	// If index is 0, it means all times are in the past
 	if index == 0 {
-		t.scheduledTimerTimes = nil
+		t.providerScheduledTimerUnixTs = nil
 	} else {
-		t.scheduledTimerTimes = t.scheduledTimerTimes[:index]
+		t.providerScheduledTimerUnixTs = t.providerScheduledTimerUnixTs[:index]
 	}
 
 	if len(t.pendingScheduling) == 0 {
@@ -104,7 +104,7 @@ func startGreedyTimerScheduler(
 			_ = provider.Await(ctx, func() bool {
 				now := provider.Now(ctx).Unix()
 				next := t.pruneToNextTimer(now)
-				return (next != nil && (len(t.scheduledTimerTimes) == 0 || next.FiringUnixTimestampSeconds < t.scheduledTimerTimes[len(t.scheduledTimerTimes)-1])) || continueAsNewCounter.IsThresholdMet()
+				return (next != nil && (len(t.providerScheduledTimerUnixTs) == 0 || next.FiringUnixTimestampSeconds < t.providerScheduledTimerUnixTs[len(t.providerScheduledTimerUnixTs)-1])) || continueAsNewCounter.IsThresholdMet()
 			})
 
 			if continueAsNewCounter.IsThresholdMet() {
@@ -120,7 +120,7 @@ func startGreedyTimerScheduler(
 			//   there is a goroutines awaiting some condition(some time has past) to continue,
 			//   see WaitForTimerFiredOrSkipped.
 			provider.NewTimer(ctx, duration)
-			t.scheduledTimerTimes = append(t.scheduledTimerTimes, fireAt)
+			t.providerScheduledTimerUnixTs = append(t.providerScheduledTimerUnixTs, fireAt)
 		}
 	})
 
