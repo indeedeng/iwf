@@ -61,10 +61,11 @@ func (u *WorkflowUpdater) handler(
 	defer func() {
 		if !u.provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:    iwfidl.RPC_EXECUTION_EVENT,
-				RpcName:      &input.RpcName,
-				WorkflowType: u.basicInfo.IwfWorkflowType,
-				WorkflowId:   info.WorkflowExecution.ID,
+				EventType:        iwfidl.RPC_EXECUTION_EVENT,
+				RpcName:          &input.RpcName,
+				WorkflowType:     u.basicInfo.IwfWorkflowType,
+				WorkflowId:       info.WorkflowExecution.ID,
+				SearchAttributes: u.persistenceManager.GetAllSearchAttributes(),
 			})
 		}
 	}()

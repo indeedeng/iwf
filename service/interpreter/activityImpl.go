@@ -21,13 +21,13 @@ import (
 
 // StateStart is Deprecated, will be removed in next release
 func StateStart(
-	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
+	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput, searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateStartResponse, error) {
-	return StateApiWaitUntil(ctx, backendType, input)
+	return StateApiWaitUntil(ctx, backendType, input, searchAttributes)
 }
 
 func StateApiWaitUntil(
-	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput,
+	ctx context.Context, backendType service.BackendType, input service.StateStartActivityInput, searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateStartResponse, error) {
 	stateApiWaitUntilStartTime := time.Now().UnixMilli()
 	provider := getActivityProviderByType(backendType)
@@ -62,6 +62,7 @@ func StateApiWaitUntil(
 			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
 			StateId:          ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId: ptr.Any(input.Request.Context.GetStateExecutionId()),
+			SearchAttributes: searchAttributes,
 		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
@@ -76,6 +77,7 @@ func StateApiWaitUntil(
 			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
 			StateId:          ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId: ptr.Any(input.Request.Context.GetStateExecutionId()),
+			SearchAttributes: searchAttributes,
 		})
 		return nil, composeStartApiRespError(provider, err, resp)
 	}
@@ -96,6 +98,7 @@ func StateApiWaitUntil(
 		StateExecutionId:   ptr.Any(input.Request.Context.GetStateExecutionId()),
 		StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
+		SearchAttributes:   searchAttributes,
 	})
 	return resp, nil
 }
@@ -105,14 +108,16 @@ func StateDecide(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
+	searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input)
+	return StateApiExecute(ctx, backendType, input, searchAttributes)
 }
 
 func StateApiExecute(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
+	searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	stateApiExecuteStartTime := time.Now().UnixMilli()
 	provider := getActivityProviderByType(backendType)
@@ -147,6 +152,7 @@ func StateApiExecute(
 			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
 			StateId:          ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId: input.Request.Context.StateExecutionId,
+			SearchAttributes: searchAttributes,
 		})
 		return nil, composeHttpError(
 			activityInfo.IsLocalActivity,
@@ -161,6 +167,7 @@ func StateApiExecute(
 			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
 			StateId:          ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId: input.Request.Context.StateExecutionId,
+			SearchAttributes: searchAttributes,
 		})
 		return nil, composeExecuteApiRespError(provider, err, resp)
 	}
@@ -181,6 +188,7 @@ func StateApiExecute(
 		StateExecutionId:   input.Request.Context.StateExecutionId,
 		StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
+		SearchAttributes:   searchAttributes,
 	})
 	return resp, nil
 }
