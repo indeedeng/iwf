@@ -10,6 +10,7 @@ import (
 
 type SimpleTimerProcessor struct {
 	stateExecutionCurrentTimerInfos map[string][]*service.TimerInfo
+	awaitingTimers                  []int64
 	staleSkipTimerSignals           []service.StaleSkipTimerSignal
 	provider                        interfaces.WorkflowProvider
 	logger                          interfaces.UnifiedLogger
@@ -25,19 +26,19 @@ func NewSimpleTimerProcessor(
 		staleSkipTimerSignals:           staleSkipTimerSignals,
 	}
 
-	err := provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
-		return service.GetCurrentTimerInfosQueryResponse{
-			StateExecutionCurrentTimerInfos: tp.stateExecutionCurrentTimerInfos,
-		}, nil
-	})
-	if err != nil {
-		panic("cannot set query handler")
-	}
 	return tp
 }
 
 func (t *SimpleTimerProcessor) Dump() []service.StaleSkipTimerSignal {
 	return t.staleSkipTimerSignals
+}
+
+func (t *SimpleTimerProcessor) GetTimerInfos() map[string][]*service.TimerInfo {
+	return t.stateExecutionCurrentTimerInfos
+}
+
+func (t *SimpleTimerProcessor) GetTimerStartedUnixTimestamps() []int64 {
+	return t.awaitingTimers
 }
 
 // SkipTimer will attempt to skip a timer, return false if no valid timer found
@@ -100,9 +101,11 @@ func (t *SimpleTimerProcessor) WaitForTimerFiredOrSkipped(
 	fireAt := timer.FiringUnixTimestampSeconds
 	duration := time.Duration(fireAt-now) * time.Second
 	future := t.provider.NewTimer(ctx, duration)
+	t.awaitingTimers = append(t.awaitingTimers, fireAt)
 	_ = t.provider.Await(ctx, func() bool {
 		return future.IsReady() || timer.Status == service.TimerSkipped || *cancelWaiting
 	})
+	t.awaitingTimers = removeSingleTime(t.awaitingTimers, fireAt)
 	if timer.Status == service.TimerSkipped {
 		return service.TimerSkipped
 	}
@@ -111,6 +114,15 @@ func (t *SimpleTimerProcessor) WaitForTimerFiredOrSkipped(
 	}
 	// otherwise *cancelWaiting should return false to indicate that this timer isn't completed(fired or skipped)
 	return service.TimerPending
+}
+
+func removeSingleTime(timers []int64, at int64) []int64 {
+	for i, t := range timers {
+		if t == at {
+			return append(timers[:i], timers[i+1:]...)
+		}
+	}
+	return timers
 }
 
 // RemovePendingTimersOfState is for when a state is completed, remove all its pending timers

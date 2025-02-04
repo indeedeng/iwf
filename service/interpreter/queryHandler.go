@@ -8,10 +8,15 @@ import (
 )
 
 func SetQueryHandlers(
-	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, persistenceManager *PersistenceManager,
-	internalChannel *InternalChannel, signalReceiver *SignalReceiver,
+	ctx interfaces.UnifiedContext,
+	provider interfaces.WorkflowProvider,
+	timerProcessor interfaces.TimerProcessor,
+	persistenceManager *PersistenceManager,
+	internalChannel *InternalChannel,
+	signalReceiver *SignalReceiver,
 	continueAsNewer *ContinueAsNewer,
-	workflowConfiger *config.WorkflowConfiger, basicInfo service.BasicInfo,
+	workflowConfiger *config.WorkflowConfiger,
+	basicInfo service.BasicInfo,
 ) error {
 	err := provider.SetQueryHandler(ctx, service.GetDataAttributesWorkflowQueryType, func(req service.GetDataAttributesQueryRequest) (service.GetDataAttributesQueryResponse, error) {
 		dos := persistenceManager.GetDataObjectsByKey(req)
@@ -32,8 +37,9 @@ func SetQueryHandlers(
 	}
 	err = provider.SetQueryHandler(ctx, service.DebugDumpQueryType, func() (*service.DebugDumpResponse, error) {
 		return &service.DebugDumpResponse{
-			Config:   workflowConfiger.Get(),
-			Snapshot: continueAsNewer.GetSnapshot(),
+			Config:                     workflowConfiger.Get(),
+			Snapshot:                   continueAsNewer.GetSnapshot(),
+			FiringTimersUnixTimestamps: timerProcessor.GetTimerStartedUnixTimestamps(),
 		}, nil
 	})
 	if err != nil {
@@ -56,5 +62,16 @@ func SetQueryHandlers(
 	if err != nil {
 		return err
 	}
+
+	err = provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
+		return service.GetCurrentTimerInfosQueryResponse{
+			StateExecutionCurrentTimerInfos: timerProcessor.GetTimerInfos(),
+		}, nil
+	})
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

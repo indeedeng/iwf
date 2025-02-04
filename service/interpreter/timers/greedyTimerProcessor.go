@@ -33,30 +33,19 @@ func NewGreedyTimerProcessor(
 		staleSkipTimerSignals:           staleSkipTimerSignals,
 	}
 
-	err := provider.SetQueryHandler(ctx, service.GetCurrentTimerInfosQueryType, func() (service.GetCurrentTimerInfosQueryResponse, error) {
-		return service.GetCurrentTimerInfosQueryResponse{
-			StateExecutionCurrentTimerInfos: tp.stateExecutionCurrentTimerInfos,
-		}, nil
-	})
-	if err != nil {
-		panic("cannot set query handler")
-	}
-
-	err = provider.SetQueryHandler(ctx, service.GetScheduledGreedyTimerTimesQueryType, func() (service.GetScheduledGreedyTimerTimesQueryResponse, error) {
-		return service.GetScheduledGreedyTimerTimesQueryResponse{
-			ScheduledGreedyTimerTimes: tp.timerManager.providerScheduledTimerUnixTs,
-			PendingScheduled:          tp.timerManager.pendingScheduling,
-		}, nil
-	})
-	if err != nil {
-		panic("cannot set query handler")
-	}
-
 	return tp
 }
 
 func (t *GreedyTimerProcessor) Dump() []service.StaleSkipTimerSignal {
 	return t.staleSkipTimerSignals
+}
+
+func (t *GreedyTimerProcessor) GetTimerInfos() map[string][]*service.TimerInfo {
+	return t.stateExecutionCurrentTimerInfos
+}
+
+func (t *GreedyTimerProcessor) GetTimerStartedUnixTimestamps() []int64 {
+	return t.timerManager.providerScheduledTimerUnixTs
 }
 
 // SkipTimer will attempt to skip a timer, return false if no valid timer found

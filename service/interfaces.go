@@ -102,8 +102,7 @@ type (
 	}
 
 	GetScheduledGreedyTimerTimesQueryResponse struct {
-		ScheduledGreedyTimerTimes []int64
-		PendingScheduled          []*TimerInfo
+		PendingScheduled []*TimerInfo
 	}
 
 	TimerInfo struct {
@@ -138,8 +137,9 @@ type (
 	}
 
 	DebugDumpResponse struct {
-		Config   iwfidl.WorkflowConfig
-		Snapshot ContinueAsNewDumpResponse
+		Config                     iwfidl.WorkflowConfig
+		Snapshot                   ContinueAsNewDumpResponse
+		FiringTimersUnixTimestamps []int64
 	}
 
 	StateExecutionCounterInfo struct {

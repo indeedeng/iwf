@@ -106,13 +106,13 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	time.Sleep(time.Second * 1)
 
 	// assertions
-	timers := service.GetScheduledGreedyTimerTimesQueryResponse{}
-	err = uClient.QueryWorkflow(context.Background(), &timers, wfId, "", service.GetScheduledGreedyTimerTimesQueryType)
+	debug := service.DebugDumpResponse{}
+	err = uClient.QueryWorkflow(context.Background(), &debug, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		log.Fatalf("Fail to invoke query %v", err)
 	}
-	assertions.Equal(1, len(timers.ScheduledGreedyTimerTimes))
-	singleTimerScheduled := timers.ScheduledGreedyTimerTimes[0]
+	assertions.Equal(1, len(debug.FiringTimersUnixTimestamps))
+	singleTimerScheduled := debug.FiringTimersUnixTimestamps[0]
 
 	scheduleTimerAndAssertExpectedScheduled(t, apiClient, uClient, wfId, 20, 1)
 
@@ -127,15 +127,15 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 
 	time.Sleep(time.Second * 1)
 
-	err = uClient.QueryWorkflow(context.Background(), &timers, wfId, "", service.GetScheduledGreedyTimerTimesQueryType)
+	err = uClient.QueryWorkflow(context.Background(), &debug, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		log.Fatalf("Fail to invoke query %v", err)
 	}
 
 	// no second timer started
-	assertions.Equal(1, len(timers.ScheduledGreedyTimerTimes))
+	assertions.Equal(1, len(debug.FiringTimersUnixTimestamps))
 	// LessOrEqual due to continue as new workflow scheduling the next, not skipped timer
-	assertions.LessOrEqual(singleTimerScheduled, timers.ScheduledGreedyTimerTimes[0])
+	assertions.LessOrEqual(singleTimerScheduled, debug.FiringTimersUnixTimestamps[0])
 	scheduleTimerAndAssertExpectedScheduled(t, apiClient, uClient, wfId, 5, 2)
 
 	// wait for the workflow
@@ -178,11 +178,11 @@ func scheduleTimerAndAssertExpectedScheduled(
 
 	time.Sleep(time.Second * 1)
 
-	timers := service.GetScheduledGreedyTimerTimesQueryResponse{}
-	err = uClient.QueryWorkflow(context.Background(), &timers, wfId, "", service.GetScheduledGreedyTimerTimesQueryType)
+	debug := service.DebugDumpResponse{}
+	err = uClient.QueryWorkflow(context.Background(), &debug, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		log.Fatalf("Fail to invoke query %v", err)
 	}
 
-	assertions.LessOrEqual(len(timers.ScheduledGreedyTimerTimes), noMoreThan)
+	assertions.LessOrEqual(len(debug.FiringTimersUnixTimestamps), noMoreThan)
 }

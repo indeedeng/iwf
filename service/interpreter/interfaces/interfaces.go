@@ -91,6 +91,8 @@ type TimerProcessor interface {
 	WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) service.InternalTimerStatus
 	RemovePendingTimersOfState(stateExeId string)
 	AddTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]service.InternalTimerStatus)
+	GetTimerInfos() map[string][]*service.TimerInfo
+	GetTimerStartedUnixTimestamps() []int64
 }
 
 type WorkflowProvider interface {
