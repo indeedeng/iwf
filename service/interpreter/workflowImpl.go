@@ -26,7 +26,7 @@ func InterpreterImpl(
 		if !provider.IsReplaying(ctx) {
 			var sas []iwfidl.SearchAttribute
 			if persistenceManager != nil {
-				persistenceManager.GetAllSearchAttributes()
+				sas = persistenceManager.GetAllSearchAttributes()
 			}
 			// send metrics for the workflow result
 			if retErr == nil {
