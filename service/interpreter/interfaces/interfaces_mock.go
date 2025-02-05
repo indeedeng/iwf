@@ -2,7 +2,7 @@
 // Source: /Users/lwolczynski/indeedeng/iwf-server/service/interpreter/interfaces.go
 
 // Package interpreter is a generated GoMock package.
-package interpreter
+package interfaces
 
 import (
 	context "context"

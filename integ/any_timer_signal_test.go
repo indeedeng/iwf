@@ -22,12 +22,32 @@ func TestAnyTimerSignalWorkflowTemporal(t *testing.T) {
 	}
 }
 
+func TestGreedyAnyTimerSignalWorkflowTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, minimumGreedyTimerConfig())
+		smallWaitForFastTest()
+	}
+}
+
 func TestAnyTimerSignalWorkflowCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, nil)
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyAnyTimerSignalWorkflowCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, minimumGreedyTimerConfig())
 		smallWaitForFastTest()
 	}
 }
@@ -42,12 +62,32 @@ func TestAnyTimerSignalWorkflowTemporalContinueAsNew(t *testing.T) {
 	}
 }
 
+func TestGreedyAnyTimerSignalWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeTemporal, greedyTimerConfig(true))
+		smallWaitForFastTest()
+	}
+}
+
 func TestAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
 		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, minimumContinueAsNewConfig(false))
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyAnyTimerSignalWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestAnyTimerSignalWorkflow(t, service.BackendTypeCadence, greedyTimerConfig(true))
 		smallWaitForFastTest()
 	}
 }

@@ -1,4 +1,4 @@
-package interpreter
+package interfaces
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func RegisterActivityProvider(backendType service.BackendType, provider Activity
 	activityProviderRegistry[backendType] = provider
 }
 
-func getActivityProviderByType(backendType service.BackendType) ActivityProvider {
+func GetActivityProviderByType(backendType service.BackendType) ActivityProvider {
 	provider := activityProviderRegistry[backendType]
 	if provider == nil {
 		panic("not supported yet: " + backendType)
@@ -82,6 +82,17 @@ func NewUnifiedContext(ctx interface{}) UnifiedContext {
 	return &contextHolder{
 		ctx: ctx,
 	}
+}
+
+type TimerProcessor interface {
+	Dump() []service.StaleSkipTimerSignal
+	SkipTimer(stateExeId string, timerId string, timerIdx int) bool
+	RetryStaleSkipTimer() bool
+	WaitForTimerFiredOrSkipped(ctx UnifiedContext, stateExeId string, timerIdx int, cancelWaiting *bool) service.InternalTimerStatus
+	RemovePendingTimersOfState(stateExeId string)
+	AddTimers(stateExeId string, commands []iwfidl.TimerCommand, completedTimerCmds map[int]service.InternalTimerStatus)
+	GetTimerInfos() map[string][]*service.TimerInfo
+	GetTimerStartedUnixTimestamps() []int64
 }
 
 type WorkflowProvider interface {

@@ -2,6 +2,9 @@ package interpreter
 
 import (
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/cont"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"strings"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -13,19 +16,19 @@ type SignalReceiver struct {
 	receivedSignals            map[string][]*iwfidl.EncodedObject
 	failWorkflowByClient       bool
 	reasonFailWorkflowByClient *string
-	provider                   WorkflowProvider
-	timerProcessor             *TimerProcessor
-	workflowConfiger           *WorkflowConfiger
+	provider                   interfaces.WorkflowProvider
+	timerProcessor             interfaces.TimerProcessor
+	workflowConfiger           *config.WorkflowConfiger
 	interStateChannel          *InternalChannel
 	stateRequestQueue          *StateRequestQueue
 	persistenceManager         *PersistenceManager
 }
 
 func NewSignalReceiver(
-	ctx UnifiedContext, provider WorkflowProvider, interStateChannel *InternalChannel,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, interStateChannel *InternalChannel,
 	stateRequestQueue *StateRequestQueue,
-	persistenceManager *PersistenceManager, tp *TimerProcessor, continueAsNewCounter *ContinueAsNewCounter,
-	workflowConfiger *WorkflowConfiger,
+	persistenceManager *PersistenceManager, tp interfaces.TimerProcessor, continueAsNewCounter *cont.ContinueAsNewCounter,
+	workflowConfiger *config.WorkflowConfiger,
 	initReceivedSignals map[string][]*iwfidl.EncodedObject,
 ) *SignalReceiver {
 	if initReceivedSignals == nil {
@@ -46,7 +49,7 @@ func NewSignalReceiver(
 	//received or a continueAsNew run is triggered. When a signal has been received it sets
 	//SignalReceiver.failWorkflowByClient to true and sets SignalReceiver.reasonFailWorkflowByClient to the reason
 	//given in the signal's value. If continueIsNew is triggered, the thread completes after all signals have been processed.
-	provider.GoNamed(ctx, "fail-workflow-system-signal-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "fail-workflow-system-signal-handler", func(ctx interfaces.UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.FailWorkflowSignalChannelName)
 
@@ -74,7 +77,7 @@ func NewSignalReceiver(
 	//The thread waits until a SkipTimerSignalChannelName signal has been
 	//received or a continueAsNew run is triggered. When a signal has been received it skips the specific timer
 	//described in the signal's value. If continueIsNew is triggered, the thread completes after all signals have been processed.
-	provider.GoNamed(ctx, "skip-timer-system-signal-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "skip-timer-system-signal-handler", func(ctx interfaces.UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.SkipTimerSignalChannelName)
 			val := service.SkipTimerSignalRequest{}
@@ -101,7 +104,7 @@ func NewSignalReceiver(
 	//The thread waits until a UpdateConfigSignalChannelName signal has been
 	//received or a continueAsNew run is triggered. When a signal has been received it updates the workflow config
 	//defined in the signal's value. If continueIsNew is triggered, the thread completes after all signals have been processed.
-	provider.GoNamed(ctx, "update-config-system-signal-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "update-config-system-signal-handler", func(ctx interfaces.UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.UpdateConfigSignalChannelName)
 			val := iwfidl.WorkflowConfigUpdateRequest{}
@@ -128,7 +131,7 @@ func NewSignalReceiver(
 	//The thread waits until a TriggerContinueAsNewSignalChannelName signal has
 	//been received or a continueAsNew run is triggered. When a signal has been received it triggers a continueAsNew run.
 	//Since this thread is triggering a continueAsNew run it doesn't need to wait for signals to drain from the channel.
-	provider.GoNamed(ctx, "trigger-continue-as-new-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "trigger-continue-as-new-handler", func(ctx interfaces.UnifiedContext) {
 		// NOTE: unlike other signal channels, this one doesn't need to drain during continueAsNew
 		// because if there is a continueAsNew, this signal is not needed anymore
 		ch := provider.GetSignalChannel(ctx, service.TriggerContinueAsNewSignalChannelName)
@@ -153,7 +156,7 @@ func NewSignalReceiver(
 	//(if they exist in the signal value), upserts search attributes (if they exist in the signal value),
 	//and/or publishes a message to an internal channel (if InterStateChannelPublishing is set in the signal value).
 	//If continueIsNew is triggered, the thread completes after all signals have been processed.
-	provider.GoNamed(ctx, "execute-rpc-signal-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "execute-rpc-signal-handler", func(ctx interfaces.UnifiedContext) {
 		for {
 			ch := provider.GetSignalChannel(ctx, service.ExecuteRpcSignalChannelName)
 			var val service.ExecuteRpcSignalRequest
@@ -185,7 +188,7 @@ func NewSignalReceiver(
 	//The thread waits until a signal has been received that is not an IWF
 	//system signal name or a continueAsNew run is triggered. When a signal has been received it processes the
 	//external signal. If continueIsNew is triggered, the thread completes after all signals have been processed.
-	provider.GoNamed(ctx, "user-signal-receiver-handler", func(ctx UnifiedContext) {
+	provider.GoNamed(ctx, "user-signal-receiver-handler", func(ctx interfaces.UnifiedContext) {
 		for {
 			var toProcess []string
 			err := provider.Await(ctx, func() bool {
@@ -221,7 +224,7 @@ func NewSignalReceiver(
 	return sr
 }
 
-func (sr *SignalReceiver) receiveSignal(ctx UnifiedContext, sigName string) {
+func (sr *SignalReceiver) receiveSignal(ctx interfaces.UnifiedContext, sigName string) {
 	ch := sr.provider.GetSignalChannel(ctx, sigName)
 	for {
 		var sigVal iwfidl.EncodedObject
@@ -278,7 +281,7 @@ func (sr *SignalReceiver) GetInfos() map[string]iwfidl.ChannelInfo {
 // This includes both regular user signals and system signals
 // 2. Conditional close/complete workflow on signal/internal channel:
 // retrieve all signal/internal channel messages before checking the signal/internal channels
-func (sr *SignalReceiver) DrainAllReceivedButUnprocessedSignals(ctx UnifiedContext) {
+func (sr *SignalReceiver) DrainAllReceivedButUnprocessedSignals(ctx interfaces.UnifiedContext) {
 	unhandledSigs := sr.provider.GetUnhandledSignalNames(ctx)
 	if len(unhandledSigs) == 0 {
 		return

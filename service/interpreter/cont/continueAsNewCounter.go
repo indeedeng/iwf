@@ -1,4 +1,9 @@
-package interpreter
+package cont
+
+import (
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
+)
 
 type ContinueAsNewCounter struct {
 	executedStateApis  int32
@@ -6,13 +11,13 @@ type ContinueAsNewCounter struct {
 	syncUpdateReceived int32
 	triggeredByAPI     bool
 
-	configer *WorkflowConfiger
-	rootCtx  UnifiedContext
-	provider WorkflowProvider
+	configer *config.WorkflowConfiger
+	rootCtx  interfaces.UnifiedContext
+	provider interfaces.WorkflowProvider
 }
 
 func NewContinueAsCounter(
-	configer *WorkflowConfiger, rootCtx UnifiedContext, provider WorkflowProvider,
+	configer *config.WorkflowConfiger, rootCtx interfaces.UnifiedContext, provider interfaces.WorkflowProvider,
 ) *ContinueAsNewCounter {
 	return &ContinueAsNewCounter{
 		configer: configer,

@@ -4,27 +4,30 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/event"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/cont"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"time"
 )
 
 type WorkflowUpdater struct {
 	persistenceManager   *PersistenceManager
-	provider             WorkflowProvider
+	provider             interfaces.WorkflowProvider
 	continueAsNewer      *ContinueAsNewer
-	continueAsNewCounter *ContinueAsNewCounter
+	continueAsNewCounter *cont.ContinueAsNewCounter
 	internalChannel      *InternalChannel
 	signalReceiver       *SignalReceiver
 	stateRequestQueue    *StateRequestQueue
-	configer             *WorkflowConfiger
-	logger               UnifiedLogger
+	configer             *config.WorkflowConfiger
+	logger               interfaces.UnifiedLogger
 	basicInfo            service.BasicInfo
 	globalVersioner      *GlobalVersioner
 }
 
 func NewWorkflowUpdater(
-	ctx UnifiedContext, provider WorkflowProvider, persistenceManager *PersistenceManager,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, persistenceManager *PersistenceManager,
 	stateRequestQueue *StateRequestQueue,
-	continueAsNewer *ContinueAsNewer, continueAsNewCounter *ContinueAsNewCounter, configer *WorkflowConfiger,
+	continueAsNewer *ContinueAsNewer, continueAsNewCounter *cont.ContinueAsNewCounter, configer *config.WorkflowConfiger,
 	internalChannel *InternalChannel, signalReceiver *SignalReceiver, basicInfo service.BasicInfo,
 	globalVersioner *GlobalVersioner,
 ) (*WorkflowUpdater, error) {
@@ -51,8 +54,8 @@ func NewWorkflowUpdater(
 }
 
 func (u *WorkflowUpdater) handler(
-	ctx UnifiedContext, input iwfidl.WorkflowRpcRequest,
-) (output *HandlerOutput, err error) {
+	ctx interfaces.UnifiedContext, input iwfidl.WorkflowRpcRequest,
+) (output *interfaces.HandlerOutput, err error) {
 	u.continueAsNewer.IncreaseInflightOperation()
 	defer u.continueAsNewer.DecreaseInflightOperation()
 
@@ -81,7 +84,7 @@ func (u *WorkflowUpdater) handler(
 		InternalChannelInfo:      u.internalChannel.GetInfos(),
 	}
 
-	activityOptions := ActivityOptions{
+	activityOptions := interfaces.ActivityOptions{
 		StartToCloseTimeout: 5 * time.Second,
 		RetryPolicy: &iwfidl.RetryPolicy{
 			MaximumAttemptsDurationSeconds: input.TimeoutSeconds,
@@ -89,7 +92,7 @@ func (u *WorkflowUpdater) handler(
 		},
 	}
 	ctx = u.provider.WithActivityOptions(ctx, activityOptions)
-	var activityOutput InvokeRpcActivityOutput
+	var activityOutput interfaces.InvokeRpcActivityOutput
 	err = u.provider.ExecuteActivity(&activityOutput, u.configer.ShouldOptimizeActivity(), ctx,
 		InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input)
 	u.persistenceManager.UnlockPersistence(input.SearchAttributesLoadingPolicy, input.DataAttributesLoadingPolicy)
@@ -98,7 +101,7 @@ func (u *WorkflowUpdater) handler(
 		return nil, u.provider.NewApplicationError(string(iwfidl.SERVER_INTERNAL_ERROR_TYPE), "activity invocation failure:"+err.Error())
 	}
 
-	handlerOutput := &HandlerOutput{
+	handlerOutput := &interfaces.HandlerOutput{
 		StatusError: activityOutput.StatusError,
 	}
 
@@ -119,7 +122,7 @@ func (u *WorkflowUpdater) handler(
 	return handlerOutput, nil
 }
 
-func (u *WorkflowUpdater) validator(_ UnifiedContext, input iwfidl.WorkflowRpcRequest) error {
+func (u *WorkflowUpdater) validator(_ interfaces.UnifiedContext, input iwfidl.WorkflowRpcRequest) error {
 	var daKeys, saKeys []string
 	if input.HasDataAttributesLoadingPolicy() {
 		daKeys = input.DataAttributesLoadingPolicy.LockingKeys

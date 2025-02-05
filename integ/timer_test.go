@@ -55,6 +55,47 @@ func TestTimerWorkflowCadenceContinueAsNew(t *testing.T) {
 	}
 }
 
+// NOTE: greedy timers should have the same result in these timer tests
+func TestGreedyTimerWorkflowTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeTemporal, minimumGreedyTimerConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyTimerWorkflowCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeCadence, minimumGreedyTimerConfig())
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyTimerWorkflowTemporalContinueAsNew(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeTemporal, greedyTimerConfig(true))
+		smallWaitForFastTest()
+	}
+}
+
+func TestGreedyTimerWorkflowCadenceContinueAsNew(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	for i := 0; i < *repeatIntegTest; i++ {
+		doTestTimerWorkflow(t, service.BackendTypeCadence, greedyTimerConfig(true))
+		smallWaitForFastTest()
+	}
+}
+
 func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// start test workflow server
 	wfHandler := timer.NewHandler()

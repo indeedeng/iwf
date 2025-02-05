@@ -101,6 +101,10 @@ type (
 		StateExecutionCurrentTimerInfos map[string][]*TimerInfo // key is stateExecutionId
 	}
 
+	GetScheduledGreedyTimerTimesQueryResponse struct {
+		PendingScheduled []*TimerInfo
+	}
+
 	TimerInfo struct {
 		CommandId                  *string
 		FiringUnixTimestampSeconds int64
@@ -133,8 +137,9 @@ type (
 	}
 
 	DebugDumpResponse struct {
-		Config   iwfidl.WorkflowConfig
-		Snapshot ContinueAsNewDumpResponse
+		Config                     iwfidl.WorkflowConfig
+		Snapshot                   ContinueAsNewDumpResponse
+		FiringTimersUnixTimestamps []int64
 	}
 
 	StateExecutionCounterInfo struct {

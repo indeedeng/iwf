@@ -1,4 +1,4 @@
-package interpreter
+package config
 
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"

@@ -6,16 +6,19 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"github.com/indeedeng/iwf/service/common/ptr"
+	"github.com/indeedeng/iwf/service/interpreter/config"
+	"github.com/indeedeng/iwf/service/interpreter/cont"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"reflect"
 	"slices"
 )
 
 type StateExecutionCounter struct {
-	ctx                  UnifiedContext
-	provider             WorkflowProvider
-	configer             *WorkflowConfiger
+	ctx                  interfaces.UnifiedContext
+	provider             interfaces.WorkflowProvider
+	configer             *config.WorkflowConfiger
 	globalVersioner      *GlobalVersioner
-	continueAsNewCounter *ContinueAsNewCounter
+	continueAsNewCounter *cont.ContinueAsNewCounter
 
 	stateIdCompletedCounts          map[string]int
 	stateIdStartedCounts            map[string]int // For creating stateExecutionId: count the stateId for how many times that have been executed
@@ -24,8 +27,8 @@ type StateExecutionCounter struct {
 }
 
 func NewStateExecutionCounter(
-	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
-	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, globalVersioner *GlobalVersioner,
+	configer *config.WorkflowConfiger, continueAsNewCounter *cont.ContinueAsNewCounter,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                             ctx,
@@ -40,10 +43,10 @@ func NewStateExecutionCounter(
 }
 
 func RebuildStateExecutionCounter(
-	ctx UnifiedContext, provider WorkflowProvider, globalVersioner *GlobalVersioner,
+	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, globalVersioner *GlobalVersioner,
 	stateIdStartedCounts map[string]int, stateIdCurrentlyExecutingCounts map[string]int,
 	totalCurrentlyExecutingCount int,
-	configer *WorkflowConfiger, continueAsNewCounter *ContinueAsNewCounter,
+	configer *config.WorkflowConfiger, continueAsNewCounter *cont.ContinueAsNewCounter,
 ) *StateExecutionCounter {
 	return &StateExecutionCounter{
 		ctx:                             ctx,
