@@ -158,6 +158,13 @@ func doTestPersistenceLoadingPolicy(
 		"S2_start":  1,
 		"S2_decide": 1,
 	}, history, "persistence loading policy test fail, %v", history)
+
+	// Terminate the workflow once tests completed
+	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
+	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
+		WorkflowId: wfId,
+		StopType:   iwfidl.TERMINATE.Ptr(),
+	}).Execute()
 }
 
 func getSearchAttributesToGetFromMemo(loadingType iwfidl.PersistenceLoadingType) []iwfidl.SearchAttributeKeyAndType {

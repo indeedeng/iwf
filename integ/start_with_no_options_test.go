@@ -74,4 +74,11 @@ func doTestStartWorkflowWithoutStartOptions(t *testing.T, backendType service.Ba
 	assertions := assert.New(t)
 	attribute := response.SearchAttributes[service.SearchAttributeIwfWorkflowType]
 	assertions.Equal(basic.WorkflowType, attribute.GetStringValue())
+
+	// Terminate the workflow once tests completed
+	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
+	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
+		WorkflowId: wfId,
+		StopType:   iwfidl.TERMINATE.Ptr(),
+	}).Execute()
 }
