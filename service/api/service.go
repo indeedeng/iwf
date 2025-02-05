@@ -633,12 +633,15 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 		return nil, s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
 	}
 
+	stateApiExecuteStartTime := time.Now().UnixMilli()
+
 	defer func() {
 		event.Handle(iwfidl.IwfEvent{
-			EventType:    iwfidl.RPC_EXECUTION_EVENT,
-			RpcName:      &req.RpcName,
-			WorkflowType: rpcPrep.IwfWorkflowType,
-			WorkflowId:   req.GetWorkflowId(),
+			EventType:          iwfidl.RPC_EXECUTION_EVENT,
+			RpcName:            &req.RpcName,
+			WorkflowType:       rpcPrep.IwfWorkflowType,
+			WorkflowId:         req.GetWorkflowId(),
+			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			// search attributes are not available at this time
 		})
 	}()
