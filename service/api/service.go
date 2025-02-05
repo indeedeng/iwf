@@ -637,6 +637,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 			RpcName:      &req.RpcName,
 			WorkflowType: rpcPrep.IwfWorkflowType,
 			WorkflowId:   req.GetWorkflowId(),
+			// search attributes are not available at this time
 		})
 	}()
 

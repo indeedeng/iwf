@@ -19,15 +19,16 @@ var _ MappedNullable = &IwfEvent{}
 
 // IwfEvent struct for IwfEvent
 type IwfEvent struct {
-	EventType          EventType `json:"eventType"`
-	WorkflowType       string    `json:"workflowType"`
-	WorkflowId         string    `json:"workflowId"`
-	WorkflowRunId      string    `json:"workflowRunId"`
-	StateId            *string   `json:"stateId,omitempty"`
-	StateExecutionId   *string   `json:"stateExecutionId,omitempty"`
-	RpcName            *string   `json:"rpcName,omitempty"`
-	StartTimestampInMs *int64    `json:"startTimestampInMs,omitempty"`
-	EndTimestampInMs   *int64    `json:"endTimestampInMs,omitempty"`
+	EventType          EventType         `json:"eventType"`
+	WorkflowType       string            `json:"workflowType"`
+	WorkflowId         string            `json:"workflowId"`
+	WorkflowRunId      string            `json:"workflowRunId"`
+	StateId            *string           `json:"stateId,omitempty"`
+	StateExecutionId   *string           `json:"stateExecutionId,omitempty"`
+	RpcName            *string           `json:"rpcName,omitempty"`
+	StartTimestampInMs *int64            `json:"startTimestampInMs,omitempty"`
+	EndTimestampInMs   *int64            `json:"endTimestampInMs,omitempty"`
+	SearchAttributes   []SearchAttribute `json:"searchAttributes,omitempty"`
 }
 
 // NewIwfEvent instantiates a new IwfEvent object
@@ -307,6 +308,38 @@ func (o *IwfEvent) SetEndTimestampInMs(v int64) {
 	o.EndTimestampInMs = &v
 }
 
+// GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
+func (o *IwfEvent) GetSearchAttributes() []SearchAttribute {
+	if o == nil || IsNil(o.SearchAttributes) {
+		var ret []SearchAttribute
+		return ret
+	}
+	return o.SearchAttributes
+}
+
+// GetSearchAttributesOk returns a tuple with the SearchAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *IwfEvent) GetSearchAttributesOk() ([]SearchAttribute, bool) {
+	if o == nil || IsNil(o.SearchAttributes) {
+		return nil, false
+	}
+	return o.SearchAttributes, true
+}
+
+// HasSearchAttributes returns a boolean if a field has been set.
+func (o *IwfEvent) HasSearchAttributes() bool {
+	if o != nil && !IsNil(o.SearchAttributes) {
+		return true
+	}
+
+	return false
+}
+
+// SetSearchAttributes gets a reference to the given []SearchAttribute and assigns it to the SearchAttributes field.
+func (o *IwfEvent) SetSearchAttributes(v []SearchAttribute) {
+	o.SearchAttributes = v
+}
+
 func (o IwfEvent) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -335,6 +368,9 @@ func (o IwfEvent) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.EndTimestampInMs) {
 		toSerialize["endTimestampInMs"] = o.EndTimestampInMs
+	}
+	if !IsNil(o.SearchAttributes) {
+		toSerialize["searchAttributes"] = o.SearchAttributes
 	}
 	return toSerialize, nil
 }

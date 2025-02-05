@@ -3373,6 +3373,10 @@ components:
         endTimestampInMs:
           format: int64
           type: integer
+        searchAttributes:
+          items:
+            $ref: '#/components/schemas/SearchAttribute'
+          type: array
       required:
       - eventType
       - workflowId

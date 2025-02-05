@@ -20,8 +20,14 @@ import (
 func InterpreterImpl(
 	ctx UnifiedContext, provider WorkflowProvider, input service.InterpreterWorkflowInput,
 ) (output *service.InterpreterWorkflowOutput, retErr error) {
+	var persistenceManager *PersistenceManager
+
 	defer func() {
 		if !provider.IsReplaying(ctx) {
+			var sas []iwfidl.SearchAttribute
+			if persistenceManager != nil {
+				sas = persistenceManager.GetAllSearchAttributes()
+			}
 			// send metrics for the workflow result
 			if retErr == nil {
 				event.Handle(iwfidl.IwfEvent{
@@ -31,13 +37,15 @@ func InterpreterImpl(
 					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 					StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+					SearchAttributes:   sas,
 				})
 			} else if provider.IsApplicationError(retErr) {
 				event.Handle(iwfidl.IwfEvent{
-					EventType:     iwfidl.WORKFLOW_FAIL_EVENT,
-					WorkflowType:  input.IwfWorkflowType,
-					WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-					WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					EventType:        iwfidl.WORKFLOW_FAIL_EVENT,
+					WorkflowType:     input.IwfWorkflowType,
+					WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					SearchAttributes: sas,
 				})
 			}
 		}
@@ -78,7 +86,6 @@ func InterpreterImpl(
 
 	var internalChannel *InternalChannel
 	var stateRequestQueue *StateRequestQueue
-	var persistenceManager *PersistenceManager
 	var timerProcessor *TimerProcessor
 	var continueAsNewCounter *ContinueAsNewCounter
 	var signalReceiver *SignalReceiver
@@ -146,10 +153,11 @@ func InterpreterImpl(
 	if !input.IsResumeFromContinueAsNew {
 		if !provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:     iwfidl.WORKFLOW_START_EVENT,
-				WorkflowType:  input.IwfWorkflowType,
-				WorkflowId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-				WorkflowRunId: provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				EventType:        iwfidl.WORKFLOW_START_EVENT,
+				WorkflowType:     input.IwfWorkflowType,
+				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				SearchAttributes: persistenceManager.GetAllSearchAttributes(),
 			})
 		}
 		// it's possible that a workflow is started without any starting state
@@ -584,6 +592,7 @@ func processStateExecution(
 				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 				StateId:          ptr.Any(state.StateId),
 				StateExecutionId: ptr.Any(stateExeId),
+				SearchAttributes: persistenceManager.GetAllSearchAttributes(),
 			})
 		}
 		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
@@ -598,7 +607,8 @@ func processStateExecution(
 					SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
 					DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 				},
-			})
+			},
+			persistenceManager.GetAllSearchAttributes())
 		if !provider.IsReplaying(ctx) {
 			if errStartApi == nil {
 				event.Handle(iwfidl.IwfEvent{
@@ -610,6 +620,7 @@ func processStateExecution(
 					StateExecutionId:   ptr.Any(stateExeId),
 					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+					SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 				})
 			} else {
 				event.Handle(iwfidl.IwfEvent{
@@ -619,6 +630,7 @@ func processStateExecution(
 					WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 					StateId:          ptr.Any(state.StateId),
 					StateExecutionId: ptr.Any(stateExeId),
+					SearchAttributes: persistenceManager.GetAllSearchAttributes(),
 				})
 			}
 		}
@@ -856,6 +868,7 @@ func invokeStateExecute(
 			WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 			StateId:          ptr.Any(state.StateId),
 			StateExecutionId: ptr.Any(stateExeId),
+			SearchAttributes: persistenceManager.GetAllSearchAttributes(),
 		})
 	}
 	stateExecuteApiStartTime := provider.Now(ctx).UnixMilli()
@@ -872,7 +885,7 @@ func invokeStateExecute(
 				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
 				StateInput:       state.StateInput,
 			},
-		})
+		}, persistenceManager.GetAllSearchAttributes())
 	if !provider.IsReplaying(ctx) {
 		if err == nil {
 			event.Handle(iwfidl.IwfEvent{
@@ -884,6 +897,7 @@ func invokeStateExecute(
 				StateExecutionId:   ptr.Any(stateExeId),
 				StartTimestampInMs: ptr.Any(stateExecuteApiStartTime),
 				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 			})
 		} else {
 			event.Handle(iwfidl.IwfEvent{
@@ -893,6 +907,7 @@ func invokeStateExecute(
 				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 				StateId:          ptr.Any(state.StateId),
 				StateExecutionId: ptr.Any(stateExeId),
+				SearchAttributes: persistenceManager.GetAllSearchAttributes(),
 			})
 		}
 	}
