@@ -64,6 +64,7 @@ func StateApiWaitUntil(
 			StateId:            ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId:   ptr.Any(input.Request.Context.GetStateExecutionId()),
 			StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
 		})
 		return nil, composeHttpError(
@@ -80,6 +81,7 @@ func StateApiWaitUntil(
 			StateId:            ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId:   ptr.Any(input.Request.Context.GetStateExecutionId()),
 			StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
 		})
 		return nil, composeStartApiRespError(provider, err, resp)
@@ -156,6 +158,7 @@ func StateApiExecute(
 			StateId:            ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId:   input.Request.Context.StateExecutionId,
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
 		})
 		return nil, composeHttpError(
@@ -172,6 +175,7 @@ func StateApiExecute(
 			StateId:            ptr.Any(input.Request.WorkflowStateId),
 			StateExecutionId:   input.Request.Context.StateExecutionId,
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
 		})
 		return nil, composeExecuteApiRespError(provider, err, resp)

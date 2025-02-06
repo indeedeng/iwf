@@ -51,6 +51,7 @@ func InterpreterImpl(
 					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 					SearchAttributes:   sas,
 					StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 				})
 			}
 		}
@@ -646,6 +647,7 @@ func processStateExecution(
 					StateId:            ptr.Any(state.StateId),
 					StateExecutionId:   ptr.Any(stateExeId),
 					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 					SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 				})
 			}
@@ -924,6 +926,7 @@ func invokeStateExecute(
 				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
 				StateId:            ptr.Any(state.StateId),
 				StartTimestampInMs: ptr.Any(stateExecuteApiStartTime),
+				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 				StateExecutionId:   ptr.Any(stateExeId),
 				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 			})
