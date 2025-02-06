@@ -80,4 +80,11 @@ func TestSetDataAttributesTemporal(t *testing.T) {
 	failTestAtHttpError(err, httpRespGet, t)
 
 	assertions.ElementsMatch(smallDataObjects, getResult.Objects)
+
+	// Terminate the workflow once tests completed
+	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
+	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
+		WorkflowId: wfId,
+		StopType:   iwfidl.TERMINATE.Ptr(),
+	}).Execute()
 }
