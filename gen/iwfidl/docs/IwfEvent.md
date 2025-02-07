@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **RpcName** | Pointer to **string** |  | [optional] 
 **StartTimestampInMs** | Pointer to **int64** |  | [optional] 
 **EndTimestampInMs** | Pointer to **int64** |  | [optional] 
+**Error** | Pointer to [**IwfEventError**](IwfEventError.md) |  | [optional] 
 **SearchAttributes** | Pointer to [**[]SearchAttribute**](SearchAttribute.md) |  | [optional] 
 
 ## Methods
@@ -238,6 +239,31 @@ SetEndTimestampInMs sets EndTimestampInMs field to given value.
 `func (o *IwfEvent) HasEndTimestampInMs() bool`
 
 HasEndTimestampInMs returns a boolean if a field has been set.
+
+### GetError
+
+`func (o *IwfEvent) GetError() IwfEventError`
+
+GetError returns the Error field if non-nil, zero value otherwise.
+
+### GetErrorOk
+
+`func (o *IwfEvent) GetErrorOk() (*IwfEventError, bool)`
+
+GetErrorOk returns a tuple with the Error field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetError
+
+`func (o *IwfEvent) SetError(v IwfEventError)`
+
+SetError sets Error field to given value.
+
+### HasError
+
+`func (o *IwfEvent) HasError() bool`
+
+HasError returns a boolean if a field has been set.
 
 ### GetSearchAttributes
 

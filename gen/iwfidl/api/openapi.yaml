@@ -3373,6 +3373,8 @@ components:
         endTimestampInMs:
           format: int64
           type: integer
+        error:
+          $ref: '#/components/schemas/IwfEvent_error'
         searchAttributes:
           items:
             $ref: '#/components/schemas/SearchAttribute'
@@ -3382,4 +3384,11 @@ components:
       - workflowId
       - workflowRunId
       - workflowType
+      type: object
+    IwfEvent_error:
+      properties:
+        type:
+          type: string
+        details:
+          type: string
       type: object
