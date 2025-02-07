@@ -45,11 +45,13 @@ func InterpreterImpl(
 				})
 			} else if provider.IsApplicationError(retErr) {
 				event.Handle(iwfidl.IwfEvent{
-					EventType:        iwfidl.WORKFLOW_FAIL_EVENT,
-					WorkflowType:     input.IwfWorkflowType,
-					WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-					WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-					SearchAttributes: sas,
+					EventType:          iwfidl.WORKFLOW_FAIL_EVENT,
+					WorkflowType:       input.IwfWorkflowType,
+					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					SearchAttributes:   sas,
+					StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 				})
 			}
 		}
@@ -165,11 +167,12 @@ func InterpreterImpl(
 	if !input.IsResumeFromContinueAsNew {
 		if !provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:        iwfidl.WORKFLOW_START_EVENT,
-				WorkflowType:     input.IwfWorkflowType,
-				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-				SearchAttributes: persistenceManager.GetAllSearchAttributes(),
+				EventType:          iwfidl.WORKFLOW_START_EVENT,
+				WorkflowType:       input.IwfWorkflowType,
+				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
+				StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
 			})
 		}
 		// it's possible that a workflow is started without any starting state
@@ -596,18 +599,19 @@ func processStateExecution(
 		saLoadingPolicy := compatibility.GetWaitUntilApiSearchAttributesLoadingPolicy(state.StateOptions)
 		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
 
+		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
 		if !provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:        iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
-				WorkflowType:     basicInfo.IwfWorkflowType,
-				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-				StateId:          ptr.Any(state.StateId),
-				StateExecutionId: ptr.Any(stateExeId),
-				SearchAttributes: persistenceManager.GetAllSearchAttributes(),
+				EventType:          iwfidl.STATE_WAIT_UNTIL_EE_START_EVENT,
+				WorkflowType:       basicInfo.IwfWorkflowType,
+				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:            ptr.Any(state.StateId),
+				StateExecutionId:   ptr.Any(stateExeId),
+				StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
+				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 			})
 		}
-		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
 		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
 			waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
 				IwfWorkerUrl: basicInfo.IwfWorkerUrl,
@@ -636,13 +640,15 @@ func processStateExecution(
 				})
 			} else {
 				event.Handle(iwfidl.IwfEvent{
-					EventType:        iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
-					WorkflowType:     basicInfo.IwfWorkflowType,
-					WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-					WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-					StateId:          ptr.Any(state.StateId),
-					StateExecutionId: ptr.Any(stateExeId),
-					SearchAttributes: persistenceManager.GetAllSearchAttributes(),
+					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
+					WorkflowType:       basicInfo.IwfWorkflowType,
+					WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+					WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+					StateId:            ptr.Any(state.StateId),
+					StateExecutionId:   ptr.Any(stateExeId),
+					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
+					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+					SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 				})
 			}
 		}
@@ -872,18 +878,19 @@ func invokeStateExecute(
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
 
+	stateExecuteApiStartTime := provider.Now(ctx).UnixMilli()
 	if !provider.IsReplaying(ctx) {
 		event.Handle(iwfidl.IwfEvent{
-			EventType:        iwfidl.STATE_EXECUTE_EE_START_EVENT,
-			WorkflowType:     basicInfo.IwfWorkflowType,
-			WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-			WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-			StateId:          ptr.Any(state.StateId),
-			StateExecutionId: ptr.Any(stateExeId),
-			SearchAttributes: persistenceManager.GetAllSearchAttributes(),
+			EventType:          iwfidl.STATE_EXECUTE_EE_START_EVENT,
+			WorkflowType:       basicInfo.IwfWorkflowType,
+			WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+			WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+			StateId:            ptr.Any(state.StateId),
+			StateExecutionId:   ptr.Any(stateExeId),
+			StartTimestampInMs: ptr.Any(stateExecuteApiStartTime),
+			SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 		})
 	}
-	stateExecuteApiStartTime := provider.Now(ctx).UnixMilli()
 	err = provider.ExecuteActivity(&decideResponse, configer.ShouldOptimizeActivity(), ctx,
 		executeApi, provider.GetBackendType(), service.StateDecideActivityInput{
 			IwfWorkerUrl: basicInfo.IwfWorkerUrl,
@@ -913,13 +920,15 @@ func invokeStateExecute(
 			})
 		} else {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:        iwfidl.STATE_EXECUTE_EE_FAIL_EVENT,
-				WorkflowType:     basicInfo.IwfWorkflowType,
-				WorkflowId:       provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
-				WorkflowRunId:    provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
-				StateId:          ptr.Any(state.StateId),
-				StateExecutionId: ptr.Any(stateExeId),
-				SearchAttributes: persistenceManager.GetAllSearchAttributes(),
+				EventType:          iwfidl.STATE_EXECUTE_EE_FAIL_EVENT,
+				WorkflowType:       basicInfo.IwfWorkflowType,
+				WorkflowId:         provider.GetWorkflowInfo(ctx).WorkflowExecution.ID,
+				WorkflowRunId:      provider.GetWorkflowInfo(ctx).WorkflowExecution.RunID,
+				StateId:            ptr.Any(state.StateId),
+				StartTimestampInMs: ptr.Any(stateExecuteApiStartTime),
+				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+				StateExecutionId:   ptr.Any(stateExeId),
+				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 			})
 		}
 	}
