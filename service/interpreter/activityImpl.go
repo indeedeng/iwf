@@ -62,13 +62,15 @@ func StateApiWaitUntil(
 		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateStartErr)
 
 		event.Handle(iwfidl.IwfEvent{
-			EventType:        iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
-			WorkflowType:     input.Request.WorkflowType,
-			WorkflowId:       activityInfo.WorkflowExecution.ID,
-			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
-			StateId:          ptr.Any(input.Request.WorkflowStateId),
-			StateExecutionId: ptr.Any(input.Request.Context.GetStateExecutionId()),
-			SearchAttributes: searchAttributes,
+			EventType:          iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			WorkflowType:       input.Request.WorkflowType,
+			WorkflowId:         activityInfo.WorkflowExecution.ID,
+			WorkflowRunId:      activityInfo.WorkflowExecution.RunID,
+			StateId:            ptr.Any(input.Request.WorkflowStateId),
+			StateExecutionId:   ptr.Any(input.Request.Context.GetStateExecutionId()),
+			StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
+			SearchAttributes:   searchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -82,13 +84,15 @@ func StateApiWaitUntil(
 		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateStartErr)
 
 		event.Handle(iwfidl.IwfEvent{
-			EventType:        iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
-			WorkflowType:     input.Request.WorkflowType,
-			WorkflowId:       activityInfo.WorkflowExecution.ID,
-			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
-			StateId:          ptr.Any(input.Request.WorkflowStateId),
-			StateExecutionId: ptr.Any(input.Request.Context.GetStateExecutionId()),
-			SearchAttributes: searchAttributes,
+			EventType:          iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
+			WorkflowType:       input.Request.WorkflowType,
+			WorkflowId:         activityInfo.WorkflowExecution.ID,
+			WorkflowRunId:      activityInfo.WorkflowExecution.RunID,
+			StateId:            ptr.Any(input.Request.WorkflowStateId),
+			StateExecutionId:   ptr.Any(input.Request.Context.GetStateExecutionId()),
+			StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
+			SearchAttributes:   searchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -167,13 +171,15 @@ func StateApiExecute(
 		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateApiExecuteErr)
 
 		event.Handle(iwfidl.IwfEvent{
-			EventType:        iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
-			WorkflowType:     input.Request.WorkflowType,
-			WorkflowId:       activityInfo.WorkflowExecution.ID,
-			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
-			StateId:          ptr.Any(input.Request.WorkflowStateId),
-			StateExecutionId: input.Request.Context.StateExecutionId,
-			SearchAttributes: searchAttributes,
+			EventType:          iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
+			WorkflowType:       input.Request.WorkflowType,
+			WorkflowId:         activityInfo.WorkflowExecution.ID,
+			WorkflowRunId:      activityInfo.WorkflowExecution.RunID,
+			StateId:            ptr.Any(input.Request.WorkflowStateId),
+			StateExecutionId:   input.Request.Context.StateExecutionId,
+			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
+			SearchAttributes:   searchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -187,13 +193,15 @@ func StateApiExecute(
 		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateApiExecuteErr)
 
 		event.Handle(iwfidl.IwfEvent{
-			EventType:        iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
-			WorkflowType:     input.Request.WorkflowType,
-			WorkflowId:       activityInfo.WorkflowExecution.ID,
-			WorkflowRunId:    activityInfo.WorkflowExecution.RunID,
-			StateId:          ptr.Any(input.Request.WorkflowStateId),
-			StateExecutionId: input.Request.Context.StateExecutionId,
-			SearchAttributes: searchAttributes,
+			EventType:          iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
+			WorkflowType:       input.Request.WorkflowType,
+			WorkflowId:         activityInfo.WorkflowExecution.ID,
+			WorkflowRunId:      activityInfo.WorkflowExecution.RunID,
+			StateId:            ptr.Any(input.Request.WorkflowStateId),
+			StateExecutionId:   input.Request.Context.StateExecutionId,
+			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
+			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
+			SearchAttributes:   searchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,

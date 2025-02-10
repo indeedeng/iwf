@@ -4,6 +4,7 @@ import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/event"
+	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/indeedeng/iwf/service/interpreter/config"
 	"github.com/indeedeng/iwf/service/interpreter/cont"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
@@ -61,14 +62,17 @@ func (u *WorkflowUpdater) handler(
 
 	info := u.provider.GetWorkflowInfo(ctx)
 
+	rpcExecutionStartTime := u.provider.Now(ctx).UnixMilli()
+
 	defer func() {
 		if !u.provider.IsReplaying(ctx) {
 			event.Handle(iwfidl.IwfEvent{
-				EventType:        iwfidl.RPC_EXECUTION_EVENT,
-				RpcName:          &input.RpcName,
-				WorkflowType:     u.basicInfo.IwfWorkflowType,
-				WorkflowId:       info.WorkflowExecution.ID,
-				SearchAttributes: u.persistenceManager.GetAllSearchAttributes(),
+				EventType:          iwfidl.RPC_EXECUTION_EVENT,
+				RpcName:            &input.RpcName,
+				WorkflowType:       u.basicInfo.IwfWorkflowType,
+				WorkflowId:         info.WorkflowExecution.ID,
+				StartTimestampInMs: ptr.Any(rpcExecutionStartTime),
+				SearchAttributes:   u.persistenceManager.GetAllSearchAttributes(),
 			})
 		}
 	}()
