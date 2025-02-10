@@ -43,7 +43,6 @@ func NewTemporalClient(
 		queryWorkflowFailedRetryPolicy: config.QueryWorkflowFailedRetryPolicyWithDefaults(retryPolicy),
 	}
 }
-
 func (t *temporalClient) Close() {
 	t.tClient.Close()
 }
@@ -117,14 +116,38 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 	return fmt.Errorf("application error doesn't have details. Critical code bug")
 }
 
+func (t *temporalClient) GetApplicationErrorDetailsTst(err error, detailsPtr *interface{}) error {
+	var applicationError *realtemporal.ApplicationError
+	isAppErr := errors.As(err, &applicationError)
+	if !isAppErr {
+		return fmt.Errorf("not an application error. Critical code bug")
+	}
+	if applicationError.HasDetails() {
+		err := applicationError.Details(detailsPtr)
+		if err != nil {
+			return err
+		}
+	}
+
+	det := *detailsPtr
+
+	s, ok := det.(string)
+	if ok {
+		return applicationError.Details(s)
+	}
+
+	return fmt.Errorf("application error doesn't have details. Critical code bug")
+}
+
 func (t *temporalClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
 	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
-	var errDetails string
-	detailErr := t.GetApplicationErrorDetails(err, &errDetails)
+	var errDetails interface{}
+	detailErr := t.GetApplicationErrorDetailsTst(err, &errDetails)
 	if detailErr != nil {
 		errDetails = detailErr.Error()
 	}
-	return errType, errDetails
+	s, _ := errDetails.(string)
+	return errType, s
 }
 
 func (t *temporalClient) StartInterpreterWorkflow(
