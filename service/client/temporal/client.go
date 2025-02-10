@@ -117,6 +117,16 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 	return fmt.Errorf("application error doesn't have details. Critical code bug")
 }
 
+func (t *temporalClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
+	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
+	var errDetails string
+	detailErr := t.GetApplicationErrorDetails(err, &errDetails)
+	if detailErr != nil {
+		errDetails = detailErr.Error()
+	}
+	return errType, errDetails
+}
+
 func (t *temporalClient) StartInterpreterWorkflow(
 	ctx context.Context, options uclient.StartWorkflowOptions, args ...interface{},
 ) (runId string, err error) {
