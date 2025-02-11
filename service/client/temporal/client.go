@@ -119,7 +119,7 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 
 func (t *temporalClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
 	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
-	// TODO: Error Details will be added under IWF-511
+	// TODO: Error Details will be added under IWF-567
 	return errType, ""
 }
 

@@ -91,7 +91,7 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 
 func (t *cadenceClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
 	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
-	// TODO: Error Details will be added under IWF-511
+	// TODO: Error Details will be added under IWF-567
 	return errType, ""
 }
 
