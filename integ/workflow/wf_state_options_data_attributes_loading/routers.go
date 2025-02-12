@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
+	"sync"
 	"testing"
 )
 
@@ -48,12 +49,12 @@ const (
 )
 
 type handler struct {
-	invokeHistory map[string]int64
+	invokeHistory sync.Map
 }
 
 func NewHandler() common.WorkflowHandlerWithRpc {
 	return &handler{
-		invokeHistory: make(map[string]int64),
+		invokeHistory: sync.Map{},
 	}
 }
 
@@ -71,7 +72,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 
 	log.Println("state_options_data_attributes_loading: received state start request, ", req)
 
-	h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+	if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_start"); ok {
+		h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", value.(int64)+1)
+	} else {
+		h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", int64(1))
+	}
 
 	currentMethod := "WaitUntil"
 	loadingTypeFromInput := req.GetStateInput()
@@ -107,7 +112,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 
 	log.Println("state_options_data_attributes_loading: received state decide request, ", req)
 
-	h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+	if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+		h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+	} else {
+		h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+	}
 
 	currentMethod := "Execute"
 	loadingTypeFromInput := req.GetStateInput()
@@ -352,5 +361,10 @@ func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, nil
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	return invokeHistory, nil
 }

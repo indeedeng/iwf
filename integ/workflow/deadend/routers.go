@@ -9,6 +9,7 @@ import (
 	"github.com/indeedeng/iwf/service"
 	"log"
 	"net/http"
+	"sync"
 	"testing"
 )
 
@@ -32,14 +33,12 @@ const (
 )
 
 type handler struct {
-	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
+	invokeHistory sync.Map
 }
 
 func NewHandler() common.WorkflowHandlerWithRpc {
 	return &handler{
-		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
+		invokeHistory: sync.Map{},
 	}
 }
 
@@ -103,7 +102,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
 
 		// Move to the dead-end state
 		if req.GetWorkflowStateId() == State1 {
@@ -125,5 +128,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	return invokeHistory, nil
 }

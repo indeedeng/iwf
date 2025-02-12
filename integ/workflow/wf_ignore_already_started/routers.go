@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"testing"
 	"time"
 
@@ -27,13 +28,13 @@ const (
 )
 
 type handler struct {
-	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
+	invokeHistory sync.Map
+	invokeData    sync.Map
 }
 
 func NewHandler() *handler {
 	return &handler{
-		invokeHistory: make(map[string]int64),
+		invokeHistory: sync.Map{},
 	}
 }
 
@@ -47,14 +48,19 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_start"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 			nowInt, err := strconv.Atoi(req.StateInput.GetData())
 			if err != nil {
 				helpers.FailTestWithError(err, t)
 			}
 			now := int64(nowInt)
-			h.invokeData["scheduled_at"] = now
+			h.invokeData.Store("scheduled_at", now)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
@@ -82,13 +88,18 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 			now := time.Now().Unix()
-			h.invokeData["fired_at"] = now
+			h.invokeData.Store("fired_at", now)
 			timerResults := req.GetCommandResults()
 			timerId := timerResults.GetTimerResults()[0].GetCommandId()
-			h.invokeData["timer_id"] = timerId
+			h.invokeData.Store("timer_id", timerId)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -106,5 +117,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	invokeData := make(map[string]interface{})
+	h.invokeData.Range(func(key, value interface{}) bool {
+		invokeData[key.(string)] = value
+		return true
+	})
+	return invokeHistory, invokeData
 }

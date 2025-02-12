@@ -195,10 +195,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	result := make(map[string]int64)
+	invokeHistory := make(map[string]int64)
 	h.invokeHistory.Range(func(key, value interface{}) bool {
-		result[key.(string)] = value.(int64)
+		invokeHistory[key.(string)] = value.(int64)
 		return true
 	})
-	return result, nil
+	return invokeHistory, nil
 }

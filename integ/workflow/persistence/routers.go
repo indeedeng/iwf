@@ -9,6 +9,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"sync"
 	"testing"
 )
 
@@ -64,14 +65,14 @@ var testStateLocalVal = iwfidl.EncodedObject{
 }
 
 type handler struct {
-	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
+	invokeHistory sync.Map
+	invokeData    sync.Map
 }
 
 func NewHandler() common.WorkflowHandler {
 	return &handler{
-		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
+		invokeHistory: sync.Map{},
+		invokeData:    sync.Map{},
 	}
 }
 
