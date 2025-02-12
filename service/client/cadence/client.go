@@ -89,6 +89,12 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 	return fmt.Errorf("not an application error. Critical code bug")
 }
 
+func (t *cadenceClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
+	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
+	// TODO: Error Details will be added under IWF-567
+	return errType, ""
+}
+
 func NewCadenceClient(
 	domain string, cClient client.Client, serviceClient workflowserviceclient.Interface,
 	converter encoded.DataConverter, closeFunc func(), retryPolicy *config.QueryWorkflowFailedRetryPolicy,

@@ -41,6 +41,7 @@ type UnifiedClient interface {
 type errorHandler interface {
 	GetApplicationErrorTypeIfIsApplicationError(err error) string
 	GetApplicationErrorDetails(err error, detailsPtr interface{}) error
+	GetApplicationErrorTypeAndDetails(err error) (string, string)
 	IsWorkflowAlreadyStartedError(error) bool
 	GetRunIdFromWorkflowAlreadyStartedError(error) (string, bool)
 	IsNotFoundError(error) bool

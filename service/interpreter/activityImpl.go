@@ -56,6 +56,11 @@ func StateApiWaitUntil(
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
+		stateStartErr := composeHttpError(
+			activityInfo.IsLocalActivity,
+			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_ERROR_TYPE))
+		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateStartErr)
+
 		event.Handle(iwfidl.IwfEvent{
 			EventType:          iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
 			WorkflowType:       input.Request.WorkflowType,
@@ -66,13 +71,18 @@ func StateApiWaitUntil(
 			StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
+			Error: &iwfidl.IwfEventError{
+				Type:    &errType,
+				Details: &errDetails,
+			},
 		})
-		return nil, composeHttpError(
-			activityInfo.IsLocalActivity,
-			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_ERROR_TYPE))
+		return nil, stateStartErr
 	}
 
 	if err := checkCommandRequestFromWaitUntilResponse(resp); err != nil {
+		stateStartErr := composeStartApiRespError(provider, err, resp)
+		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateStartErr)
+
 		event.Handle(iwfidl.IwfEvent{
 			EventType:          iwfidl.STATE_WAIT_UNTIL_ATTEMPT_FAIL_EVENT,
 			WorkflowType:       input.Request.WorkflowType,
@@ -83,8 +93,12 @@ func StateApiWaitUntil(
 			StartTimestampInMs: ptr.Any(stateApiWaitUntilStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
+			Error: &iwfidl.IwfEventError{
+				Type:    &errType,
+				Details: &errDetails,
+			},
 		})
-		return nil, composeStartApiRespError(provider, err, resp)
+		return nil, stateStartErr
 	}
 
 	// Before returning successful results, check if it's local activity then compose some info for debug purpose
@@ -150,6 +164,12 @@ func StateApiExecute(
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
 	if checkHttpError(err, httpResp) {
+		stateApiExecuteErr := composeHttpError(
+			activityInfo.IsLocalActivity,
+			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_ERROR_TYPE))
+
+		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateApiExecuteErr)
+
 		event.Handle(iwfidl.IwfEvent{
 			EventType:          iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
 			WorkflowType:       input.Request.WorkflowType,
@@ -160,13 +180,18 @@ func StateApiExecute(
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
+			Error: &iwfidl.IwfEventError{
+				Type:    &errType,
+				Details: &errDetails,
+			},
 		})
-		return nil, composeHttpError(
-			activityInfo.IsLocalActivity,
-			provider, err, httpResp, string(iwfidl.STATE_API_FAIL_ERROR_TYPE))
+		return nil, stateApiExecuteErr
 	}
 
 	if err = checkStateDecisionFromResponse(resp); err != nil {
+		stateApiExecuteErr := composeExecuteApiRespError(provider, err, resp)
+		errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(stateApiExecuteErr)
+
 		event.Handle(iwfidl.IwfEvent{
 			EventType:          iwfidl.STATE_EXECUTE_ATTEMPT_FAIL_EVENT,
 			WorkflowType:       input.Request.WorkflowType,
@@ -177,8 +202,12 @@ func StateApiExecute(
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 			SearchAttributes:   searchAttributes,
+			Error: &iwfidl.IwfEventError{
+				Type:    &errType,
+				Details: &errDetails,
+			},
 		})
-		return nil, composeExecuteApiRespError(provider, err, resp)
+		return nil, stateApiExecuteErr
 	}
 
 	// Before returning successful results, check if it's local activity then compose some info for debug purpose
