@@ -98,7 +98,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	}
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_start"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 			var sa []iwfidl.SearchAttribute
 			sa = []iwfidl.SearchAttribute{
@@ -160,8 +165,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 					intSaFounds++
 				}
 			}
-			h.invokeData["S2_start_kwSaFounds"] = kwSaFounds
-			h.invokeData["S2_start_intSaFounds"] = intSaFounds
+			h.invokeData.Store("S2_start_kwSaFounds", kwSaFounds)
+			h.invokeData.Store("S2_start_intSaFounds", intSaFounds)
 
 			// Determine if the attribute is found in the request
 			queryAttFound := false
@@ -175,7 +180,7 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 			}
-			h.invokeData["S2_start_queryAttFound"] = queryAttFound
+			h.invokeData.Store("S2_start_queryAttFound", queryAttFound)
 
 			// Go straight to the decide methods without any commands
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
@@ -239,7 +244,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 			sas := req.GetSearchAttributes()
 
@@ -256,8 +266,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 					intSaFounds++
 				}
 			}
-			h.invokeData["S1_decide_kwSaFounds"] = kwSaFounds
-			h.invokeData["S1_decide_intSaFounds"] = intSaFounds
+			h.invokeData.Store("S1_decide_kwSaFounds", kwSaFounds)
+			h.invokeData.Store("S1_decide_intSaFounds", intSaFounds)
 
 			queryAttFound := 0
 			queryAtts := req.GetDataObjects()
@@ -272,7 +282,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 					queryAttFound++
 				}
 			}
-			h.invokeData["S1_decide_queryAttFound"] = queryAttFound
+			h.invokeData.Store("S1_decide_queryAttFound", queryAttFound)
 
 			// Determine if local attribute is found
 			localAttFound := false
@@ -281,7 +291,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			if localAtt.GetKey() == TestStateLocalKey && value.GetData() == testStateLocalVal.GetData() && value.GetEncoding() == testStateLocalVal.GetEncoding() {
 				localAttFound = true
 			}
-			h.invokeData["S1_decide_localAttFound"] = localAttFound
+			h.invokeData.Store("S1_decide_localAttFound", localAttFound)
 
 			var sa []iwfidl.SearchAttribute
 			sa = []iwfidl.SearchAttribute{
@@ -346,8 +356,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 					intSaFounds++
 				}
 			}
-			h.invokeData["S2_decide_kwSaFounds"] = kwSaFounds
-			h.invokeData["S2_decide_intSaFounds"] = intSaFounds
+			h.invokeData.Store("S2_decide_kwSaFounds", kwSaFounds)
+			h.invokeData.Store("S2_decide_intSaFounds", intSaFounds)
 
 			queryAttFound := false
 			queryAtts := req.GetDataObjects()
@@ -363,7 +373,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 				}
 			}
 
-			h.invokeData["S2_decide_queryAttFound"] = queryAttFound
+			h.invokeData.Store("S2_decide_queryAttFound", queryAttFound)
 
 			// Move to state 3 after with set options
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -444,5 +454,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	invokeData := make(map[string]interface{})
+	h.invokeData.Range(func(key, value interface{}) bool {
+		invokeData[key.(string)] = value
+		return true
+	})
+	return invokeHistory, invokeData
 }
