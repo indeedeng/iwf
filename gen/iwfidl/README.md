@@ -122,6 +122,7 @@ Class | Method | HTTP request | Description
  - [InterStateChannelPublishing](docs/InterStateChannelPublishing.md)
  - [InterStateChannelResult](docs/InterStateChannelResult.md)
  - [IwfEvent](docs/IwfEvent.md)
+ - [IwfEventError](docs/IwfEventError.md)
  - [KeyValue](docs/KeyValue.md)
  - [PersistenceLoadingPolicy](docs/PersistenceLoadingPolicy.md)
  - [PersistenceLoadingType](docs/PersistenceLoadingType.md)

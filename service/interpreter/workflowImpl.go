@@ -44,6 +44,8 @@ func InterpreterImpl(
 					SearchAttributes:   sas,
 				})
 			} else if provider.IsApplicationError(retErr) {
+				errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(retErr)
+
 				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.WORKFLOW_FAIL_EVENT,
 					WorkflowType:       input.IwfWorkflowType,
@@ -52,6 +54,10 @@ func InterpreterImpl(
 					SearchAttributes:   sas,
 					StartTimestampInMs: ptr.Any(provider.GetWorkflowInfo(ctx).WorkflowStartTime.UnixMilli()),
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
+					Error: &iwfidl.IwfEventError{
+						Type:    &errType,
+						Details: &errDetails,
+					},
 				})
 			}
 		}
@@ -639,6 +645,8 @@ func processStateExecution(
 					SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 				})
 			} else {
+				errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(errStartApi)
+
 				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
 					WorkflowType:       basicInfo.IwfWorkflowType,
@@ -649,6 +657,10 @@ func processStateExecution(
 					StartTimestampInMs: ptr.Any(stateWaitUntilApiStartTime),
 					EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 					SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
+					Error: &iwfidl.IwfEventError{
+						Type:    &errType,
+						Details: &errDetails,
+					},
 				})
 			}
 		}
@@ -919,6 +931,8 @@ func invokeStateExecute(
 				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 			})
 		} else {
+			errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(err)
+
 			event.Handle(iwfidl.IwfEvent{
 				EventType:          iwfidl.STATE_EXECUTE_EE_FAIL_EVENT,
 				WorkflowType:       basicInfo.IwfWorkflowType,
@@ -929,6 +943,10 @@ func invokeStateExecute(
 				EndTimestampInMs:   ptr.Any(provider.Now(ctx).UnixMilli()),
 				StateExecutionId:   ptr.Any(stateExeId),
 				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
+				Error: &iwfidl.IwfEventError{
+					Type:    &errType,
+					Details: &errDetails,
+				},
 			})
 		}
 	}

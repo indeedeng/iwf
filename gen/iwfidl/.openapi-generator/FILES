@@ -27,6 +27,7 @@ docs/InterStateChannelCommand.md
 docs/InterStateChannelPublishing.md
 docs/InterStateChannelResult.md
 docs/IwfEvent.md
+docs/IwfEventError.md
 docs/KeyValue.md
 docs/PersistenceLoadingPolicy.md
 docs/PersistenceLoadingType.md
@@ -112,6 +113,7 @@ model_inter_state_channel_command.go
 model_inter_state_channel_publishing.go
 model_inter_state_channel_result.go
 model_iwf_event.go
+model_iwf_event_error.go
 model_key_value.go
 model_persistence_loading_policy.go
 model_persistence_loading_type.go

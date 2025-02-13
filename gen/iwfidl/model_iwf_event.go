@@ -28,6 +28,7 @@ type IwfEvent struct {
 	RpcName            *string           `json:"rpcName,omitempty"`
 	StartTimestampInMs *int64            `json:"startTimestampInMs,omitempty"`
 	EndTimestampInMs   *int64            `json:"endTimestampInMs,omitempty"`
+	Error              *IwfEventError    `json:"error,omitempty"`
 	SearchAttributes   []SearchAttribute `json:"searchAttributes,omitempty"`
 }
 
@@ -308,6 +309,38 @@ func (o *IwfEvent) SetEndTimestampInMs(v int64) {
 	o.EndTimestampInMs = &v
 }
 
+// GetError returns the Error field value if set, zero value otherwise.
+func (o *IwfEvent) GetError() IwfEventError {
+	if o == nil || IsNil(o.Error) {
+		var ret IwfEventError
+		return ret
+	}
+	return *o.Error
+}
+
+// GetErrorOk returns a tuple with the Error field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *IwfEvent) GetErrorOk() (*IwfEventError, bool) {
+	if o == nil || IsNil(o.Error) {
+		return nil, false
+	}
+	return o.Error, true
+}
+
+// HasError returns a boolean if a field has been set.
+func (o *IwfEvent) HasError() bool {
+	if o != nil && !IsNil(o.Error) {
+		return true
+	}
+
+	return false
+}
+
+// SetError gets a reference to the given IwfEventError and assigns it to the Error field.
+func (o *IwfEvent) SetError(v IwfEventError) {
+	o.Error = &v
+}
+
 // GetSearchAttributes returns the SearchAttributes field value if set, zero value otherwise.
 func (o *IwfEvent) GetSearchAttributes() []SearchAttribute {
 	if o == nil || IsNil(o.SearchAttributes) {
@@ -368,6 +401,9 @@ func (o IwfEvent) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.EndTimestampInMs) {
 		toSerialize["endTimestampInMs"] = o.EndTimestampInMs
+	}
+	if !IsNil(o.Error) {
+		toSerialize["error"] = o.Error
 	}
 	if !IsNil(o.SearchAttributes) {
 		toSerialize["searchAttributes"] = o.SearchAttributes
