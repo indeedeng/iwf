@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 )
@@ -35,14 +36,14 @@ var TestInput = iwfidl.EncodedObject{
 }
 
 type handler struct {
-	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
+	invokeHistory sync.Map
+	invokeData    sync.Map
 }
 
 func NewHandler() common.WorkflowHandlerWithRpc {
 	return &handler{
-		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
+		invokeHistory: sync.Map{},
+		invokeData:    sync.Map{},
 	}
 }
 
@@ -53,7 +54,11 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 		return
 	}
 	log.Println("received workflow worker rpc request, ", req)
-	h.invokeHistory[req.RpcName]++
+	if value, ok := h.invokeHistory.Load(req.RpcName); ok {
+		h.invokeHistory.Store(req.RpcName, value.(int64)+1)
+	} else {
+		h.invokeHistory.Store(req.RpcName, int64(1))
+	}
 
 	// Return channel name
 	c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
@@ -75,7 +80,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_start"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", int64(1))
+		}
 
 		if req.GetWorkflowStateId() == State1 {
 			// Proceed when channel is published to
@@ -120,7 +129,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 
 			var internalChanPub []iwfidl.InterStateChannelPublishing
@@ -174,5 +188,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	invokeData := make(map[string]interface{})
+	h.invokeData.Range(func(key, value interface{}) bool {
+		invokeData[key.(string)] = value
+		return true
+	})
+	return invokeHistory, invokeData
 }

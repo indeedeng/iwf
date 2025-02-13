@@ -8,6 +8,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 )
@@ -30,14 +31,14 @@ const (
 )
 
 type handler struct {
-	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
+	invokeHistory sync.Map
+	invokeData    sync.Map
 }
 
 func NewHandler() common.WorkflowHandler {
 	return &handler{
-		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
+		invokeHistory: sync.Map{},
+		invokeData:    sync.Map{},
 	}
 }
 
@@ -51,7 +52,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_start"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", int64(1))
+		}
 
 		if req.GetWorkflowStateId() == State1 {
 			var timerCommands []iwfidl.TimerCommand
@@ -105,7 +110,11 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
 		if req.GetWorkflowStateId() == State1 {
 			signalResults := req.GetCommandResults()
 			var movements []iwfidl.StateMovement
@@ -113,16 +122,16 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			context := req.GetContext()
 			// On first State 1 attempt, trigger signals and stay on the first state
 			if context.GetStateExecutionId() == State1+"-"+"1" {
-				h.invokeData["signalChannelName1"] = signalResults.SignalResults[0].GetSignalChannelName()
-				h.invokeData["signalCommandId1"] = signalResults.SignalResults[0].GetCommandId()
-				h.invokeData["signalStatus1"] = signalResults.SignalResults[0].GetSignalRequestStatus()
+				h.invokeData.Store("signalChannelName1", signalResults.SignalResults[0].GetSignalChannelName())
+				h.invokeData.Store("signalCommandId1", signalResults.SignalResults[0].GetCommandId())
+				h.invokeData.Store("signalStatus1", signalResults.SignalResults[0].GetSignalRequestStatus())
 				movements = []iwfidl.StateMovement{{StateId: State1}}
 			} else {
 				// After the first State 1 attempt, trigger signals and move to next state
-				h.invokeData["signalChannelName2"] = signalResults.SignalResults[0].GetSignalChannelName()
-				h.invokeData["signalCommandId2"] = signalResults.SignalResults[0].GetCommandId()
-				h.invokeData["signalStatus2"] = signalResults.SignalResults[0].GetSignalRequestStatus()
-				h.invokeData["signalValue2"] = signalResults.SignalResults[0].GetSignalValue()
+				h.invokeData.Store("signalChannelName2", signalResults.SignalResults[0].GetSignalChannelName())
+				h.invokeData.Store("signalCommandId2", signalResults.SignalResults[0].GetCommandId())
+				h.invokeData.Store("signalStatus2", signalResults.SignalResults[0].GetSignalRequestStatus())
+				h.invokeData.Store("signalValue2", signalResults.SignalResults[0].GetSignalValue())
 				movements = []iwfidl.StateMovement{{StateId: State2}}
 			}
 
@@ -151,5 +160,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	invokeData := make(map[string]interface{})
+	h.invokeData.Range(func(key, value interface{}) bool {
+		invokeData[key.(string)] = value
+		return true
+	})
+	return invokeHistory, invokeData
 }

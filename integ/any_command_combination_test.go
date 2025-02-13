@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	anycommandconbination "github.com/indeedeng/iwf/integ/workflow/any_command_combination"
+	anycommandcombination "github.com/indeedeng/iwf/integ/workflow/any_command_combination"
 	"github.com/indeedeng/iwf/service"
 	"github.com/stretchr/testify/assert"
 )
@@ -59,7 +59,7 @@ func TestAnyCommandCombinationWorkflowCadenceContinueAsNew(t *testing.T) {
 func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	assertions := assert.New(t)
 	// start test workflow server
-	wfHandler := anycommandconbination.NewHandler()
+	wfHandler := anycommandcombination.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
@@ -74,14 +74,14 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 			},
 		},
 	})
-	wfId := anycommandconbination.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := anycommandcombination.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        anycommandconbination.WorkflowType,
+		IwfWorkflowType:        anycommandcombination.WorkflowType,
 		WorkflowTimeoutSeconds: 40,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           ptr.Any(anycommandconbination.State1),
+		StartStateId:           ptr.Any(anycommandcombination.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},
@@ -97,13 +97,13 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	req2 := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
-		SignalChannelName: anycommandconbination.SignalNameAndId1,
+		SignalChannelName: anycommandcombination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
-		SignalChannelName: anycommandconbination.SignalNameAndId1,
+		SignalChannelName: anycommandcombination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
@@ -114,7 +114,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
 		WorkflowStateExecutionId: "S1-1",
-		TimerCommandId:           iwfidl.PtrString(anycommandconbination.TimerId1),
+		TimerCommandId:           iwfidl.PtrString(anycommandcombination.TimerId1),
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
@@ -124,7 +124,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	// send first signal for s2
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
-		SignalChannelName: anycommandconbination.SignalNameAndId1,
+		SignalChannelName: anycommandcombination.SignalNameAndId1,
 		SignalValue:       &signalValue,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
@@ -140,7 +140,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
-		SignalChannelName: anycommandconbination.SignalNameAndId3,
+		SignalChannelName: anycommandcombination.SignalNameAndId3,
 		SignalValue:       &signalValue,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
@@ -148,7 +148,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	// send 2nd signal for s2
 	httpResp, err = req2.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
 		WorkflowId:        wfId,
-		SignalChannelName: anycommandconbination.SignalNameAndId2,
+		SignalChannelName: anycommandcombination.SignalNameAndId2,
 		SignalValue:       &signalValue,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
@@ -176,7 +176,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"S1_decide": 1,
 		"S2_start":  2,
 		"S2_decide": 1,
-	}, history, "anycommandconbination test fail, %v", history)
+	}, history, "anycommandcombination test fail, %v", history)
 
 	var s1CommandResults iwfidl.CommandResults
 	var s2CommandResults iwfidl.CommandResults

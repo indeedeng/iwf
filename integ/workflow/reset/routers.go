@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"testing"
 )
 
@@ -29,12 +30,12 @@ const (
 )
 
 type handler struct {
-	invokeHistory map[string]int64
+	invokeHistory sync.Map
 }
 
 func NewHandler() *handler {
 	return &handler{
-		invokeHistory: make(map[string]int64),
+		invokeHistory: sync.Map{},
 	}
 }
 
@@ -57,7 +58,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	}
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 			// go to S2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -119,5 +125,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, nil
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	return invokeHistory, nil
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"log"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 )
@@ -49,14 +50,14 @@ var TestVal2 = iwfidl.EncodedObject{
 }
 
 type handler struct {
-	invokeHistory map[string]int64
-	invokeData    map[string]interface{}
+	invokeHistory sync.Map
+	invokeData    sync.Map
 }
 
 func NewHandler() *handler {
 	return &handler{
-		invokeHistory: make(map[string]int64),
-		invokeData:    make(map[string]interface{}),
+		invokeHistory: sync.Map{},
+		invokeData:    sync.Map{},
 	}
 }
 
@@ -70,7 +71,11 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	log.Println("received state start request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_start"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_start"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_start", int64(1))
+		}
 
 		// Go straight to the decide methods without any commands
 		if req.GetWorkflowStateId() == State1 {
@@ -143,7 +148,12 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	log.Println("received state decide request, ", req)
 
 	if req.GetWorkflowType() == WorkflowType {
-		h.invokeHistory[req.GetWorkflowStateId()+"_decide"]++
+		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)
+		} else {
+			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", int64(1))
+		}
+
 		if req.GetWorkflowStateId() == State1 {
 			// State 1 requires no pre-reqs
 			// Move to state 21 & 22:
@@ -166,7 +176,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 
 		if req.GetWorkflowStateId() == State21 {
 			results := req.GetCommandResults()
-			h.invokeData[State21+"received"] = results.GetInterStateChannelResults()[0].GetValue()
+			h.invokeData.Store(State21+"received", results.GetInterStateChannelResults()[0].GetValue())
 
 			// Move to state 31, which will wait for channel 2
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -183,7 +193,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 
 		if req.GetWorkflowStateId() == State31 {
 			results := req.GetCommandResults()
-			h.invokeData[State31+"received"] = results.GetInterStateChannelResults()[0].GetValue()
+			h.invokeData.Store(State31+"received", results.GetInterStateChannelResults()[0].GetValue())
 
 			// Move to completion
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -224,5 +234,15 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
-	return h.invokeHistory, h.invokeData
+	invokeHistory := make(map[string]int64)
+	h.invokeHistory.Range(func(key, value interface{}) bool {
+		invokeHistory[key.(string)] = value.(int64)
+		return true
+	})
+	invokeData := make(map[string]interface{})
+	h.invokeData.Range(func(key, value interface{}) bool {
+		invokeData[key.(string)] = value
+		return true
+	})
+	return invokeHistory, invokeData
 }
