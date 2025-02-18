@@ -367,7 +367,7 @@
           "encodedAttributes": null,
           "cause": null,
           "applicationFailureInfo": {
-            "type": "STATE_API_FAIL_ERROR_TYPE",
+            "type": "STATE_API_FAIL_MAX_OUT_RETRY_ERROR_TYPE",
             "nonRetryable": false,
             "details": {
               "payloads": [
