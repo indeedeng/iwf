@@ -67,43 +67,45 @@ services:
       - ./init-ci-temporal.sh:/etc/temporal/init-ci-temporal.sh
     entrypoint: sh -c "/etc/temporal/init-ci-temporal.sh"
   cassandra:
-    image: cassandra:3.11
+    image: cassandra:${CASSANDRA_VERSION}
     ports:
       - "9042:9042"
-    networks:
-      - testing-network
-  zookeeper:
-    image: wurstmeister/zookeeper:latest
-    ports:
-      - "2181:2181"
-    networks:
-      - testing-network
     healthcheck:
-      test: [ "CMD-SHELL", "echo ruok | nc -w 2 zookeeper 2181" ]
-      interval: 5s
-      timeout: 10s
-      retries: 3
+      test: [ "CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces" ]
+      interval: 15s
+      timeout: 30s
+      retries: 10
+    networks:
+      - testing-network
   kafka:
-    image: wurstmeister/kafka:2.12-2.1.1
-    depends_on:
-      zookeeper:
-        condition: service_healthy
+    image: docker.io/bitnami/kafka:3.7
+    hostname: kafka
+    container_name: kafka
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # KRaft settings
+      - "KAFKA_CFG_NODE_ID=0"
+      - "KAFKA_CFG_PROCESS_ROLES=controller,broker"
+      - "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093"
+      # Listeners
+      - "KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093"
+      - "KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092"
+      - "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      - "KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER"
+      - "KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT"
+      # Topic settings
+      - "KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true"
     networks:
       - testing-network
     healthcheck:
       test:
-        [ "CMD", "kafka-topics.sh", "--list", "--zookeeper", "zookeeper:2181" ]
+        [ "CMD", "kafka-topics.sh", "--list", '--bootstrap-server', 'kafka:9092']
       interval: 1s
       timeout: 60s
       retries: 60
   cadence:
-    image: ubercadence/server:0.24.0-auto-setup
+    image: ubercadence/server:v1.2.16-auto-setup
     ports:
       - "8000:8000"
       - "8001:8001"
@@ -114,6 +116,7 @@ services:
       - "7935:7935"
       - "7939:7939"
       - "7833:7833"
+      - "7936:7936"
     environment:
       - "CASSANDRA_SEEDS=cassandra"
       - "DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development_es.yaml"
@@ -123,7 +126,7 @@ services:
       - "KAFKA_SEEDS=kafka"
     depends_on:
       cassandra:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_healthy
       elasticsearch:
@@ -136,7 +139,7 @@ services:
       - cadence
     environment:
       - CADENCE_CLI_ADDRESS=cadence:7933
-    image: ubercadence/cli:0.24.0
+    image: ubercadence/cli:v1.2.16
     networks:
       - testing-network
     stdin_open: true
@@ -145,9 +148,10 @@ services:
       - ./init-ci-cadence.sh:/etc/cadence/init-ci-cadence.sh
     entrypoint: sh -c "/etc/cadence/init-ci-cadence.sh"
   cadence-web:
-    image: ubercadence/web:v3.29.6
+    image: ubercadence/web:v4.0.0
     environment:
       - "CADENCE_TCHANNEL_PEERS=cadence:7933"
+      - "CADENCE_GRPC_PEERS=cadence:7833"
     ports:
       - "8088:8088"
     depends_on:

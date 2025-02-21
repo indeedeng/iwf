@@ -1,2 +1,4 @@
 frontend.enableUpdateWorkflowExecution:
   - value: true
+frontend.enableQueryAttributeValidation:
+  - value: false
