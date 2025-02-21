@@ -148,7 +148,10 @@ func doTestRpcWorkflow(
 			ValueType: iwfidl.BOOL.Ptr(),
 		},
 	}
+
+	// Wait for state to store the attributes
 	time.Sleep(time.Second * 1)
+
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	rpcRespReadOnly, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 		WorkflowId: wfId,

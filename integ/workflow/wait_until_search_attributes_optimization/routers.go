@@ -26,7 +26,7 @@ import (
  *		- Waits 8 seconds
  *      - Execute method will gracefully complete workflow
  * State4:
- *		- Waits on command trigger
+ *		- Waits on command trigger (signal)
  *      - Execute method will go to State5
  * State5:
  *		- Skips waitUntil and executes momentarily

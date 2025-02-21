@@ -74,7 +74,11 @@ func doTestWfStateOptionsDataAttributesLoading(
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	time.Sleep(time.Second * 2)
+	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: wfId,
+	}).Execute()
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 

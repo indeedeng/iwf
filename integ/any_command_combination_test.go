@@ -108,8 +108,8 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// skip the timer for S1
-	time.Sleep(time.Second * 5) // wait for a few seconds so that timer is ready to be skipped
+	// Skip the timer for S1
+	time.Sleep(time.Second * 5) // Wait for a few seconds so that timer is ready to be skipped
 	req3 := apiClient.DefaultApi.ApiV1WorkflowTimerSkipPost(context.Background())
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
@@ -129,7 +129,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait and check the workflow, it should be still running
+	// Wait and check the workflow, it should be still running
 	time.Sleep(time.Second)
 	reqDesc := apiClient.DefaultApi.ApiV1WorkflowGetPost(context.Background())
 	descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -153,8 +153,9 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// workflow should be completed now
+	// Workflow should be completed now
 	if config == nil {
+		// Wait for workflow to move to execution
 		time.Sleep(time.Second)
 		descResp, httpResp, err = reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 			WorkflowId: wfId,

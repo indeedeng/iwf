@@ -91,6 +91,7 @@ func doTestStartDelay(t *testing.T, backendType service.BackendType, config *iwf
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// The WorkflowStartDelaySeconds is delayed 10s so we need to wait before trying to execute due to timeouts
 	time.Sleep(5 * time.Second)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{

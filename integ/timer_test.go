@@ -131,6 +131,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for timers to get initialized in state
 	time.Sleep(time.Second * 1)
 	timerInfos := service.GetCurrentTimerInfosQueryResponse{}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
@@ -171,6 +172,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for signal to be received and timer to be skipped
 	time.Sleep(time.Second * 1)
 	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
@@ -180,7 +182,6 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	timer2.Status = service.TimerSkipped
 	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
-	time.Sleep(time.Second * 1)
 	httpResp, err = req3.WorkflowSkipTimerRequest(iwfidl.WorkflowSkipTimerRequest{
 		WorkflowId:               wfId,
 		WorkflowStateExecutionId: "S1-1",
@@ -188,6 +189,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for signal to be received and timer to be skipped
 	time.Sleep(time.Second * 1)
 	timerInfos = service.GetCurrentTimerInfosQueryResponse{}
 	err = uclient.QueryWorkflow(context.Background(), &timerInfos, wfId, "", service.GetCurrentTimerInfosQueryType)
@@ -197,7 +199,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	timer3.Status = service.TimerSkipped
 	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
-	// wait for the workflow
+	// Wait for the workflow
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
@@ -215,7 +217,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	assertions.Equal("timer-cmd-id", data["timer_id"])
 	assertions.True(duration >= 9 && duration <= 11, duration)
 
-	// reset with all signals reserved (default behavior)
+	// Reset with all signals reserved (default behavior)
 	// Therefore, the skip timer would be reapplied
 	req4 := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
 	_, httpResp, err = req4.WorkflowResetRequest(iwfidl.WorkflowResetRequest{

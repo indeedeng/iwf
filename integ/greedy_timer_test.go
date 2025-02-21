@@ -103,6 +103,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for workflow to initialize
 	time.Sleep(time.Second * 1)
 
 	// assertions
@@ -125,6 +126,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for workflow to initialize
 	time.Sleep(time.Second * 1)
 
 	err = uClient.QueryWorkflow(context.Background(), &debug, wfId, "", service.DebugDumpQueryType)
@@ -176,6 +178,7 @@ func scheduleTimerAndAssertExpectedScheduled(
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for workflow to initialize
 	time.Sleep(time.Second * 1)
 
 	debug := service.DebugDumpResponse{}

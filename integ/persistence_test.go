@@ -178,7 +178,7 @@ func doTestPersistenceWorkflow(
 				break
 			}
 			// Loading data to a continuedAsNew workflow might take a few seconds thus retry mechanism is needed
-			time.Sleep(time.Millisecond * 1000)
+			time.Sleep(time.Second)
 			retryCount += 1
 			queryResult, httpResp, err = getDataAttributes(initReqQry, wfId, expectedDataAttribute, useMemo)
 		}
@@ -381,7 +381,7 @@ func doTestPersistenceWorkflow(
 		}).Execute()
 		failTestAtHttpErrorOrWorkflowUncompleted(err, httpResp, resp, t)
 
-		// wait for the search attribute index to be ready in ElasticSearch
+		// Wait for the search attribute index to be ready in ElasticSearch
 		time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
 		if config != nil {

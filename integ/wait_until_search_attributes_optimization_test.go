@@ -81,6 +81,7 @@ func doTestWaitUntilHistoryCompleted(
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Wait before sending the signal that would allow State 4 to proceed.
 	time.Sleep(time.Second * 5)
 
 	signalValue := iwfidl.EncodedObject{

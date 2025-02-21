@@ -75,6 +75,7 @@ func TestSetSearchAttributes(t *testing.T) {
 
 	failTestAtHttpError(err, httpResp2, t)
 
+	// Wait for state to store the search attributes
 	time.Sleep(time.Second)
 
 	getReq := apiClient.DefaultApi.ApiV1WorkflowSearchattributesGetPost(context.Background())
