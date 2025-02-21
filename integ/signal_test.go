@@ -112,6 +112,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for workflow update
+	if config != nil {
+		time.Sleep(2 * time.Second)
+	}
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		helpers.FailTestWithError(err, t)
