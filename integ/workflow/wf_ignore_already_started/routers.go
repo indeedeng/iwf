@@ -1,18 +1,14 @@
 package wf_ignore_already_started
 
 import (
-	"github.com/indeedeng/iwf/integ/helpers"
-	"github.com/indeedeng/iwf/service/common/ptr"
-	"log"
-	"net/http"
-	"strconv"
-	"sync"
-	"testing"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/ptr"
+	"log"
+	"net/http"
+	"sync"
+	"testing"
 )
 
 /**
@@ -29,7 +25,6 @@ const (
 
 type handler struct {
 	invokeHistory sync.Map
-	invokeData    sync.Map
 }
 
 func NewHandler() *handler {
@@ -55,12 +50,6 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 		}
 
 		if req.GetWorkflowStateId() == State1 {
-			nowInt, err := strconv.Atoi(req.StateInput.GetData())
-			if err != nil {
-				helpers.FailTestWithError(err, t)
-			}
-			now := int64(nowInt)
-			h.invokeData.Store("scheduled_at", now)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 				CommandRequest: &iwfidl.CommandRequest{
 					TimerCommands: []iwfidl.TimerCommand{
@@ -95,11 +84,6 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		}
 
 		if req.GetWorkflowStateId() == State1 {
-			now := time.Now().Unix()
-			h.invokeData.Store("fired_at", now)
-			timerResults := req.GetCommandResults()
-			timerId := timerResults.GetTimerResults()[0].GetCommandId()
-			h.invokeData.Store("timer_id", timerId)
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
@@ -122,10 +106,5 @@ func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {
 		invokeHistory[key.(string)] = value.(int64)
 		return true
 	})
-	invokeData := make(map[string]interface{})
-	h.invokeData.Range(func(key, value interface{}) bool {
-		invokeData[key.(string)] = value
-		return true
-	})
-	return invokeHistory, invokeData
+	return invokeHistory, nil
 }
