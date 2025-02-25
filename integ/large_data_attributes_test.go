@@ -110,7 +110,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 		failTestAtHttpError(err, httpResp2, t)
 	}
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

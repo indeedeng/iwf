@@ -133,7 +133,7 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 		}
 	}
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

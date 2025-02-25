@@ -117,7 +117,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 		failTestAtHttpError(err, httpResp, t)
 	}
 
-	// Short wait for workflow
+	// Wait for workflow to move to execution
 	time.Sleep(time.Second * 2)
 
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())

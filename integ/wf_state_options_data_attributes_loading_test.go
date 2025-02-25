@@ -94,11 +94,4 @@ func doTestWfStateOptionsDataAttributesLoading(
 		"S5_start":  1,
 		"S5_decide": 1,
 	}, history, "state options data attributes loading, %v", history)
-
-	// Terminate the workflow once tests completed
-	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
-	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
-		WorkflowId: wfId,
-		StopType:   iwfidl.TERMINATE.Ptr(),
-	}).Execute()
 }

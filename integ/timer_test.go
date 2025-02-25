@@ -199,7 +199,7 @@ func doTestTimerWorkflow(t *testing.T, backendType service.BackendType, config *
 	timer3.Status = service.TimerSkipped
 	assertTimerQueryResponseEqual(assertions, expectedTimerInfos, timerInfos)
 
-	// Wait for the workflow
+	// Wait for the workflow to complete
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

@@ -118,6 +118,9 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Add delay to wait for timer to be skipped
+	time.Sleep(time.Second)
+
 	// now it should be running at S2
 	// Future: we can check it is already done S1
 
@@ -129,8 +132,6 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// Wait and check the workflow, it should be still running
-	time.Sleep(time.Second)
 	reqDesc := apiClient.DefaultApi.ApiV1WorkflowGetPost(context.Background())
 	descResp, httpResp, err := reqDesc.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
