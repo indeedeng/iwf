@@ -132,6 +132,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 					ValueType: iwfidl.INT.Ptr(),
 				},
 			}
+			// Adding delay between rpc requests
 			time.Sleep(time.Second * 2)
 			reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 			rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
@@ -186,6 +187,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 		fmt.Println("rpc results, success, failure:", rpcIncrease, rpcLockingFailure)
 	}
 
+	// Wait for state to store the attributes
 	time.Sleep(time.Second * 1)
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
@@ -195,6 +197,8 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// State 2 of the workflow has a 1s sleep in both the start and execute phase. 10 instances of State 2 are called so we
+	// will match the 10*(1+1) = 20s sleep here.
 	time.Sleep(time.Second * 20)
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
@@ -271,6 +275,8 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// State 2 of the workflow has a 1s sleep in both the start and execute phase. 10 instances of State 2 are called so we
+	// will match the 10*(1+1) = 20s sleep here.
 	time.Sleep(time.Second * 20)
 	req2Reset := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2Reset, httpResp, err := req2Reset.WorkflowGetRequest(iwfidl.WorkflowGetRequest{

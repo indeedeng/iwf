@@ -107,7 +107,7 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait for a second so that query handler is ready for executing PRC
+	// Wait for a second so that query handler is ready for executing PRC
 	time.Sleep(time.Second)
 	// invoke RPC to send 1 messages to the internal channel to unblock the waitUntil
 	// then send another two messages
@@ -128,12 +128,12 @@ func doTestConditionalForceCompleteOnChannelEmptyWorkflow(
 
 		failTestAtHttpError(err, httpResp, t)
 		if i == 0 {
-			// wait for a second so that the workflow is in execute state
+			// Wait for a second so that the workflow is in execute state
 			time.Sleep(time.Second)
 		}
 	}
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

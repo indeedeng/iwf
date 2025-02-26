@@ -75,7 +75,7 @@ func doTestWaitUntilSearchAttributes(
 	_, httpResp, err := reqStart.WorkflowStartRequest(wfReq).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait for the search attribute index to be ready in ElasticSearch
+	// Wait for the search attribute index to be ready in ElasticSearch
 	time.Sleep(time.Duration(*searchWaitTimeIntegTest) * time.Millisecond)
 
 	switch mode := config.GetExecutingStateIdMode(); mode {

@@ -103,6 +103,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for ApiV1WorkflowStateStart to complete so the timers have been started
 	time.Sleep(time.Second * 1)
 
 	// assertions
@@ -125,6 +126,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for signal to be received and timer to be skipped
 	time.Sleep(time.Second * 1)
 
 	err = uClient.QueryWorkflow(context.Background(), &debug, wfId, "", service.DebugDumpQueryType)
@@ -138,7 +140,7 @@ func doTestGreedyTimerWorkflowCustomConfig(t *testing.T, backendType service.Bac
 	assertions.LessOrEqual(singleTimerScheduled, debug.FiringTimersUnixTimestamps[0])
 	scheduleTimerAndAssertExpectedScheduled(t, apiClient, uClient, wfId, 5, 2)
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,
@@ -176,6 +178,7 @@ func scheduleTimerAndAssertExpectedScheduled(
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for RPC request to complete
 	time.Sleep(time.Second * 1)
 
 	debug := service.DebugDumpResponse{}

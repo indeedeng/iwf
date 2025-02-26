@@ -96,7 +96,7 @@ func doTestAnyCommandCloseWorkflow(t *testing.T, backendType service.BackendType
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

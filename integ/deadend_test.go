@@ -88,6 +88,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 
 	// invoke RPC to trigger write to verify continue as new is happening with no states
 	for i := 0; i < 3; i++ {
+		// Delay between rpc requests
 		time.Sleep(time.Second * 2)
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
@@ -107,6 +108,7 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 
 	// invoke an RPC to trigger the state execution
 	for i := 0; i < 3; i++ {
+		// Delay between rpc requests
 		time.Sleep(time.Second * 2)
 		_, httpResp, err = reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
@@ -115,8 +117,9 @@ func doTestDeadEndWorkflow(t *testing.T, backendType service.BackendType, config
 		failTestAtHttpError(err, httpResp, t)
 	}
 
+	// Wait for workflow to move to execution
 	time.Sleep(time.Second * 2)
-	// wait for the workflow
+
 	reqCancel := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
 	httpResp, err = reqCancel.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
 		WorkflowId: wfId,

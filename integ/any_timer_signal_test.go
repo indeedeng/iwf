@@ -125,7 +125,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait for 3 secs and send the signal
+	// Delay for 3 secs and then send the signal
 	time.Sleep(time.Second * 3)
 	signalValue := iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
@@ -139,7 +139,7 @@ func doTestAnyTimerSignalWorkflow(t *testing.T, backendType service.BackendType,
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

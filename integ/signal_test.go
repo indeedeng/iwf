@@ -112,6 +112,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
+	// Short wait for workflow update
 	if config != nil {
 		time.Sleep(2 * time.Second)
 	}
@@ -200,7 +201,7 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		failTestAtHttpError(err, httpResp2, t)
 	}
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

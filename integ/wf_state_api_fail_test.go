@@ -73,7 +73,7 @@ func doTestStateApiFail(t *testing.T, backendType service.BackendType, config *i
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// wait for the workflow
+	// Wait for the workflow to complete
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	resp, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
 		WorkflowId: wfId,

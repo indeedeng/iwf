@@ -107,6 +107,7 @@ func doTestPersistenceLoadingPolicy(
 	}
 	failTestAtHttpError(err, httpResp, t)
 
+	// Wait for workflow
 	time.Sleep(time.Second * 2)
 
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
@@ -147,7 +148,11 @@ func doTestPersistenceLoadingPolicy(
 	}
 	failTestAtHttpError(err, httpResp, t)
 
-	time.Sleep(time.Second * 2)
+	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: wfId,
+	}).Execute()
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 

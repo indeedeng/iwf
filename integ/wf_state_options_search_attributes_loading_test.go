@@ -74,7 +74,11 @@ func doTestWfStateOptionsSearchAttributesLoading(
 	_, httpResp, err := req.WorkflowStartRequest(startReq).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	time.Sleep(time.Second * 2)
+	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	_, httpResp, err = reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId: wfId,
+	}).Execute()
+	failTestAtHttpError(err, httpResp, t)
 
 	history, _ := wfHandler.GetTestResult()
 
@@ -90,11 +94,4 @@ func doTestWfStateOptionsSearchAttributesLoading(
 		"S5_start":  1,
 		"S5_decide": 1,
 	}, history, "state options search attributes loading, %v", history)
-
-	// Terminate the workflow once tests completed
-	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())
-	_, err = stopReq.WorkflowStopRequest(iwfidl.WorkflowStopRequest{
-		WorkflowId: wfId,
-		StopType:   iwfidl.TERMINATE.Ptr(),
-	}).Execute()
 }
