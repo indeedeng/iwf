@@ -2,6 +2,7 @@ package cadence
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
@@ -91,8 +92,28 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 
 func (t *cadenceClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
 	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
-	// TODO: Error Details will be added under IWF-567
-	return errType, ""
+
+	var errDetailsPtr interface{}
+	var errDetails string
+
+	err2 := t.GetApplicationErrorDetails(err, &errDetailsPtr)
+	if err2 != nil {
+		errDetails = err2.Error()
+	} else {
+		errDetailsString, ok := errDetailsPtr.(string)
+		if ok {
+			errDetails = errDetailsString
+		} else {
+			// All other types, e.g. iwfidl.StateCompletionOutput, try to Marshal the object to JSON
+			var err error
+			jsonBytes, err := json.Marshal(errDetailsPtr)
+			if err == nil {
+				errDetails = string(jsonBytes)
+			}
+		}
+	}
+
+	return errType, errDetails
 }
 
 func NewCadenceClient(
