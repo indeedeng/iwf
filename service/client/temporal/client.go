@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -119,8 +120,33 @@ func (t *temporalClient) GetApplicationErrorDetails(err error, detailsPtr interf
 
 func (t *temporalClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
 	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
-	// TODO: Error Details will be added under IWF-567
-	return errType, ""
+
+	var errDetailsPtr interface{}
+	var errDetails string
+
+	// Get error details into a generic interface{} pointer that can hold any type
+	err2 := t.GetApplicationErrorDetails(err, &errDetailsPtr)
+	if err2 != nil {
+		errDetails = err2.Error()
+	} else {
+		// Check if the error details is a string
+		errDetailsString, ok := errDetailsPtr.(string)
+		// If it is a string, use it as the error details
+		if ok {
+			errDetails = errDetailsString
+		} else {
+			// All other types, try to marshal the object to JSON. If that fails, error message will say "couldn't parse the error details"
+			var err error
+			jsonBytes, err := json.Marshal(errDetailsPtr)
+			if err == nil {
+				errDetails = string(jsonBytes)
+			} else {
+				errDetails = "couldn't parse error details to JSON. Critical code bug"
+			}
+		}
+	}
+
+	return errType, errDetails
 }
 
 func (t *temporalClient) StartInterpreterWorkflow(

@@ -2,6 +2,7 @@ package cadence
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
@@ -91,8 +92,34 @@ func (t *cadenceClient) GetApplicationErrorDetails(err error, detailsPtr interfa
 
 func (t *cadenceClient) GetApplicationErrorTypeAndDetails(err error) (string, string) {
 	errType := t.GetApplicationErrorTypeIfIsApplicationError(err)
-	// TODO: Error Details will be added under IWF-567
-	return errType, ""
+
+	var errDetailsPtr interface{}
+	var errDetails string
+
+	// Get error details into a generic interface{} pointer that can hold any type
+	err2 := t.GetApplicationErrorDetails(err, &errDetailsPtr)
+	if err2 != nil {
+		errDetails = err2.Error()
+	} else {
+		// Check if the error details is a string
+		errDetailsString, ok := errDetailsPtr.(string)
+		// If it is a string, use it as the error details
+		if ok {
+			errDetails = errDetailsString
+		} else {
+			// For all other types, try to Marshal the object to JSON
+			var err error
+			jsonBytes, err := json.Marshal(errDetailsPtr)
+			if err == nil {
+				errDetails = string(jsonBytes)
+			} else {
+				// If Marshal fails, error message will say "couldn't parse the error details"
+				errDetails = "couldn't parse error details to JSON. Critical code bug"
+			}
+		}
+	}
+
+	return errType, errDetails
 }
 
 func NewCadenceClient(
