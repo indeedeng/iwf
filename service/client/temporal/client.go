@@ -124,24 +124,19 @@ func (t *temporalClient) GetApplicationErrorTypeAndDetails(err error) (string, s
 	var errDetailsPtr interface{}
 	var errDetails string
 
-	// Get error details into a generic interface{} pointer that can hold any type
 	err2 := t.GetApplicationErrorDetails(err, &errDetailsPtr)
 	if err2 != nil {
 		errDetails = err2.Error()
 	} else {
-		// Check if the error details is a string
 		errDetailsString, ok := errDetailsPtr.(string)
-		// If it is a string, use it as the error details
 		if ok {
 			errDetails = errDetailsString
 		} else {
-			// All other types, try to marshal the object to JSON. If that fails, error message will say "couldn't parse the error details"
+			// All other types, e.g. iwfidl.StateCompletionOutput, try to Marshal the object to JSON
 			var err error
 			jsonBytes, err := json.Marshal(errDetailsPtr)
 			if err == nil {
 				errDetails = string(jsonBytes)
-			} else {
-				errDetails = "couldn't parse error details to JSON. Critical code bug"
 			}
 		}
 	}
