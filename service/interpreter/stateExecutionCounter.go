@@ -223,9 +223,7 @@ func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() erro
 		}
 
 		var executingStateIds []string
-		for sid := range e.stateIdCurrentlyExecutingCounts {
-			executingStateIds = append(executingStateIds, sid)
-		}
+		executingStateIds = append(executingStateIds, DeterministicKeys(e.stateIdCurrentlyExecutingCounts)...)
 
 		slices.Sort(currentSAsValues)
 		slices.Sort(executingStateIds)
@@ -235,9 +233,7 @@ func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() erro
 	}
 
 	var executingStateIds []string
-	for sid := range e.stateIdCurrentlyExecutingCounts {
-		executingStateIds = append(executingStateIds, sid)
-	}
+	executingStateIds = append(executingStateIds, DeterministicKeys(e.stateIdCurrentlyExecutingCounts)...)
 
 	if e.globalVersioner.IsAfterVersionOfOptimizedUpsertSearchAttribute() && !e.globalVersioner.IsAfterVersionOfExecutingStateIdMode() && len(executingStateIds) == 0 {
 		// we don't clear search attributes because there are only two possible cases:

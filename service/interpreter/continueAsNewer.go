@@ -116,8 +116,8 @@ func LoadInternalsFromPreviousRun(
 
 func (c *ContinueAsNewer) GetSnapshot() service.ContinueAsNewDumpResponse {
 	localStateExecutionToResumeMap := map[string]service.StateExecutionResumeInfo{}
-	for key, state := range c.StateExecutionToResumeMap {
-		localStateExecutionToResumeMap[key] = state
+	for _, key := range DeterministicKeys(c.StateExecutionToResumeMap) {
+		localStateExecutionToResumeMap[key] = c.StateExecutionToResumeMap[key]
 	}
 	for _, value := range c.stateRequestQueue.GetAllStateResumeRequests() {
 		localStateExecutionToResumeMap[value.StateExecutionId] = value

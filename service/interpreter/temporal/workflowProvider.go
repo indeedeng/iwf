@@ -67,16 +67,16 @@ func (w *workflowProvider) UpsertMemo(ctx interfaces.UnifiedContext, rawMemo map
 	memo := map[string]interface{}{}
 	dataConverter, shouldEncrypt := env.CheckAndGetTemporalMemoEncryptionDataConverter()
 	if shouldEncrypt {
-		for k, v := range rawMemo {
-			pl, err := dataConverter.ToPayload(v)
+		for _, key := range workflow.DeterministicKeys(rawMemo) {
+			pl, err := dataConverter.ToPayload(rawMemo[key])
 			if err != nil {
 				return err
 			}
-			memo[k] = pl
+			memo[key] = pl
 		}
 	} else {
-		for k, v := range rawMemo {
-			memo[k] = v
+		for _, key := range workflow.DeterministicKeys(rawMemo) {
+			memo[key] = rawMemo[key]
 		}
 	}
 

@@ -79,9 +79,9 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataAttribu
 	for _, k := range request.Keys {
 		keyMap[k] = true
 	}
-	for key, value := range am.dataObjects {
+	for _, key := range DeterministicKeys(am.dataObjects) {
 		if keyMap[key] || all {
-			res = append(res, value)
+			res = append(res, am.dataObjects[key])
 		}
 	}
 	return service.GetDataAttributesQueryResponse{
@@ -114,9 +114,9 @@ func (am *PersistenceManager) LoadSearchAttributes(
 		for _, k := range partialLoadingKeys {
 			keyMap[k] = true
 		}
-		for key, value := range am.searchAttributes {
+		for _, key := range DeterministicKeys(am.searchAttributes) {
 			if keyMap[key] {
-				res = append(res, value)
+				res = append(res, am.searchAttributes[key])
 			}
 		}
 		return res
