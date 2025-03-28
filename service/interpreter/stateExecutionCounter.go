@@ -223,7 +223,7 @@ func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() erro
 		}
 
 		var executingStateIds []string
-		for sid := range e.stateIdCurrentlyExecutingCounts {
+		for _, sid := range DeterministicKeys(e.stateIdCurrentlyExecutingCounts) {
 			executingStateIds = append(executingStateIds, sid)
 		}
 
@@ -235,7 +235,7 @@ func (e *StateExecutionCounter) refreshIwfExecutingStateIdSearchAttribute() erro
 	}
 
 	var executingStateIds []string
-	for sid := range e.stateIdCurrentlyExecutingCounts {
+	for _, sid := range DeterministicKeys(e.stateIdCurrentlyExecutingCounts) {
 		executingStateIds = append(executingStateIds, sid)
 	}
 

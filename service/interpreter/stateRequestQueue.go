@@ -3,7 +3,6 @@ package interpreter
 import (
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
-	"sort"
 )
 
 type StateRequestQueue struct {
@@ -20,14 +19,8 @@ func NewStateRequestQueueWithResumeRequests(startReqs []iwfidl.StateMovement, re
 		queue = append(queue, NewStateStartRequest(r))
 	}
 
-	var keys []string
-	for k := range resumeReqs {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		r := resumeReqs[k]
-		queue = append(queue, NewStateResumeRequest(r))
+	for _, k := range DeterministicKeys(resumeReqs) {
+		queue = append(queue, NewStateResumeRequest(resumeReqs[k]))
 	}
 
 	return &StateRequestQueue{
