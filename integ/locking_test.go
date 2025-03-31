@@ -17,9 +17,6 @@ import (
 )
 
 func TestLockingWorkflowTemporal(t *testing.T) {
-	// TODO: Remove this line to enable the test
-	t.Skip("TestLockingWorkflowTemporal - Skipping this test - See: https://github.com/indeedeng/iwf/issues/536")
-
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -30,9 +27,6 @@ func TestLockingWorkflowTemporal(t *testing.T) {
 }
 
 func TestLockingWorkflowTemporalContinueAsNew(t *testing.T) {
-	// TODO: Remove this line to enable the test
-	t.Skip("TestLockingWorkflowTemporal - Skipping this test - See: https://github.com/indeedeng/iwf/issues/536")
-
 	if !*temporalIntegTest {
 		t.Skip()
 	}
@@ -270,8 +264,10 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	//reset here with reapply and compare counter
 	resetReq := apiClient.DefaultApi.ApiV1WorkflowResetPost(context.Background())
 	_, httpResp, err = resetReq.WorkflowResetRequest(iwfidl.WorkflowResetRequest{
-		WorkflowId: wfId,
-		ResetType:  iwfidl.BEGINNING,
+		WorkflowId:        wfId,
+		ResetType:         iwfidl.STATE_ID,
+		StateId:           ptr.Any("StateWaiting"),
+		SkipUpdateReapply: ptr.Any(true), // do not re-apply signals that happened after the reset point
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
