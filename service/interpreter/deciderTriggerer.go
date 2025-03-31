@@ -25,15 +25,15 @@ func IsDeciderTriggerConditionMet(
 				len(completedInterStateChannelCmds) > 0
 		} else if triggerType == iwfidl.ANY_COMMAND_COMBINATION_COMPLETED {
 			var completedCmdIds []string
-			for idx := range completedTimerCmds {
+			for _, idx := range DeterministicKeys(completedTimerCmds) {
 				cmdId := commandReq.GetTimerCommands()[idx].CommandId
 				completedCmdIds = append(completedCmdIds, *cmdId)
 			}
-			for idx := range completedSignalCmds {
+			for _, idx := range DeterministicKeys(completedSignalCmds) {
 				cmdId := commandReq.GetSignalCommands()[idx].CommandId
 				completedCmdIds = append(completedCmdIds, *cmdId)
 			}
-			for idx := range completedInterStateChannelCmds {
+			for _, idx := range DeterministicKeys(completedInterStateChannelCmds) {
 				cmdId := commandReq.GetInterStateChannelCommands()[idx].CommandId
 				completedCmdIds = append(completedCmdIds, *cmdId)
 			}
