@@ -100,10 +100,10 @@ func (u *WorkflowUpdater) handler(
 
 	if u.globalVersioner.IsAfterVersionOfSyncUpdateRPCUseLocalActivity() {
 		err = u.provider.ExecuteActivity(&activityOutput, true, ctx,
-			InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input)
+			InvokeWorkerRpc, u.provider.GetBackendType(), &rpcPrep, input)
 	} else {
 		err = u.provider.ExecuteActivity(&activityOutput, u.configer.ShouldOptimizeActivity(), ctx,
-			InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input)
+			InvokeWorkerRpc, u.provider.GetBackendType(), &rpcPrep, input)
 	}
 
 	u.persistenceManager.UnlockPersistence(input.SearchAttributesLoadingPolicy, input.DataAttributesLoadingPolicy)
