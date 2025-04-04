@@ -32,7 +32,11 @@ const StartingVersionNoIwfGlobalVersionSearchAttribute = 7
 
 // StartingVersionYieldOnConditionalComplete Bug fix to where published messages could be lost
 const StartingVersionYieldOnConditionalComplete = 8
-const MaxOfAllVersions = StartingVersionYieldOnConditionalComplete
+
+// SyncUpdateRPCUseLocalActivity Always use local activities for sync update based RPC
+const SyncUpdateRPCUseLocalActivity = 9
+
+const MaxOfAllVersions = SyncUpdateRPCUseLocalActivity
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
@@ -85,6 +89,10 @@ func (p *GlobalVersioner) IsAfterVersionOfNoIwfGlobalVersionSearchAttribute() bo
 
 func (p *GlobalVersioner) IsAfterVersionOfYieldOnConditionalComplete() bool {
 	return p.version >= StartingVersionYieldOnConditionalComplete
+}
+
+func (p *GlobalVersioner) IsAfterVersionOfSyncUpdateRPCUseLocalActivity() bool {
+	return p.version >= SyncUpdateRPCUseLocalActivity
 }
 
 // methods checking feature/functionality availability
