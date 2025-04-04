@@ -21,6 +21,7 @@ var _ MappedNullable = &WorkflowGetResponse{}
 type WorkflowGetResponse struct {
 	WorkflowRunId  string                  `json:"workflowRunId"`
 	WorkflowStatus WorkflowStatus          `json:"workflowStatus"`
+	WorkflowType   string                  `json:"workflowType"`
 	Results        []StateCompletionOutput `json:"results,omitempty"`
 	ErrorType      *WorkflowErrorType      `json:"errorType,omitempty"`
 	ErrorMessage   *string                 `json:"errorMessage,omitempty"`
@@ -30,10 +31,11 @@ type WorkflowGetResponse struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWorkflowGetResponse(workflowRunId string, workflowStatus WorkflowStatus) *WorkflowGetResponse {
+func NewWorkflowGetResponse(workflowRunId string, workflowStatus WorkflowStatus, workflowType string) *WorkflowGetResponse {
 	this := WorkflowGetResponse{}
 	this.WorkflowRunId = workflowRunId
 	this.WorkflowStatus = workflowStatus
+	this.WorkflowType = workflowType
 	return &this
 }
 
@@ -91,6 +93,30 @@ func (o *WorkflowGetResponse) GetWorkflowStatusOk() (*WorkflowStatus, bool) {
 // SetWorkflowStatus sets field value
 func (o *WorkflowGetResponse) SetWorkflowStatus(v WorkflowStatus) {
 	o.WorkflowStatus = v
+}
+
+// GetWorkflowType returns the WorkflowType field value
+func (o *WorkflowGetResponse) GetWorkflowType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.WorkflowType
+}
+
+// GetWorkflowTypeOk returns a tuple with the WorkflowType field value
+// and a boolean to check if the value has been set.
+func (o *WorkflowGetResponse) GetWorkflowTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.WorkflowType, true
+}
+
+// SetWorkflowType sets field value
+func (o *WorkflowGetResponse) SetWorkflowType(v string) {
+	o.WorkflowType = v
 }
 
 // GetResults returns the Results field value if set, zero value otherwise.
@@ -201,6 +227,7 @@ func (o WorkflowGetResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["workflowRunId"] = o.WorkflowRunId
 	toSerialize["workflowStatus"] = o.WorkflowStatus
+	toSerialize["workflowType"] = o.WorkflowType
 	if !IsNil(o.Results) {
 		toSerialize["results"] = o.Results
 	}

@@ -492,6 +492,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 	}
 
 	status := descResp.Status
+	wfType := descResp.Type
 	var output service.InterpreterWorkflowOutput
 	var getErr error
 	if !withWait {
@@ -514,6 +515,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		return &iwfidl.WorkflowGetResponse{
 			WorkflowRunId:  descResp.RunId,
 			WorkflowStatus: status,
+			WorkflowType:   wfType,
 			Results:        output.StateCompletionOutputs,
 		}, nil
 	}
@@ -551,6 +553,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		return &iwfidl.WorkflowGetResponse{
 			WorkflowRunId:  descResp.RunId,
 			WorkflowStatus: iwfidl.FAILED,
+			WorkflowType:   wfType,
 			ErrorType:      ptr.Any(errTypeEnum),
 			ErrorMessage:   errMsgPtr,
 			Results:        outputsToReturnWf,
@@ -583,6 +586,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 		return &iwfidl.WorkflowGetResponse{
 			WorkflowRunId:  descResp.RunId,
 			WorkflowStatus: descResp.Status,
+			WorkflowType:   wfType,
 			ErrorMessage:   errMsgPtr,
 		}, nil
 	}

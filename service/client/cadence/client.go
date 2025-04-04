@@ -322,10 +322,13 @@ func (t *cadenceClient) DescribeWorkflowExecution(
 
 	memo, err := t.decodeMemo(resp.GetWorkflowExecutionInfo().GetMemo())
 
+	wfType := resp.GetWorkflowExecutionInfo().GetType().GetName()
+
 	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:            resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
 		FirstRunId:       "", // Cadence does not provide FirstRunId
 		Status:           status,
+		Type:             wfType,
 		SearchAttributes: searchAttributes,
 		Memos:            memo,
 	}, nil
