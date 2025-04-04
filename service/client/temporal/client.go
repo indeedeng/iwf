@@ -337,10 +337,13 @@ func (t *temporalClient) DescribeWorkflowExecution(
 
 	memo, err := t.getMemoAndDecryptIfNeeded(resp.GetWorkflowExecutionInfo().GetMemo())
 
+	wfType := resp.GetWorkflowExecutionInfo().GetType().GetName()
+
 	return &uclient.DescribeWorkflowExecutionResponse{
 		RunId:                    resp.GetWorkflowExecutionInfo().GetExecution().GetRunId(),
 		FirstRunId:               resp.GetWorkflowExecutionInfo().GetFirstRunId(),
 		Status:                   status,
+		Type:                     wfType,
 		SearchAttributes:         searchAttributes,
 		Memos:                    memo,
 		WorkflowStartedTimestamp: utils.ToNanoSeconds(resp.GetWorkflowExecutionInfo().GetStartTime()),

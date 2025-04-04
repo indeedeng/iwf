@@ -75,6 +75,7 @@ type ListWorkflowExecutionsResponse struct {
 
 type DescribeWorkflowExecutionResponse struct {
 	Status                   iwfidl.WorkflowStatus
+	Type                     string
 	RunId                    string
 	FirstRunId               string
 	SearchAttributes         map[string]iwfidl.SearchAttribute
