@@ -232,6 +232,18 @@ func (w *workflowProvider) ExecuteActivity(
 	return f.Get(wfCtx, valuePtr)
 }
 
+func (w *workflowProvider) ExecuteLocalActivity(
+	valuePtr interface{}, ctx interfaces.UnifiedContext, activity interface{}, args ...interface{},
+) (err error) {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to cadence workflow context")
+	}
+
+	f := workflow.ExecuteLocalActivity(wfCtx, activity, args...)
+	return f.Get(wfCtx, valuePtr)
+}
+
 func (w *workflowProvider) Now(ctx interfaces.UnifiedContext) time.Time {
 	wfCtx, ok := ctx.GetContext().(workflow.Context)
 	if !ok {

@@ -99,7 +99,7 @@ func (u *WorkflowUpdater) handler(
 	var activityOutput interfaces.InvokeRpcActivityOutput
 
 	if u.globalVersioner.IsAfterVersionOfSyncUpdateRPCUseLocalActivity() {
-		err = u.provider.ExecuteActivity(&activityOutput, true, ctx,
+		err = u.provider.ExecuteLocalActivity(&activityOutput, ctx,
 			InvokeWorkerRpc, u.provider.GetBackendType(), &rpcPrep, input)
 	} else {
 		err = u.provider.ExecuteActivity(&activityOutput, u.configer.ShouldOptimizeActivity(), ctx,
