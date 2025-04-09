@@ -26,6 +26,8 @@ var jsonHistoryFiles = []string{
 	"v6-search-attributes-optimization-default.json",
 	"v7-no-global-version-search-attribute.json",
 	"v8-yield-on-conditional-complete.json",
+	"v8-activity-for-sync-updates-rpcs.json",
+	"v9-force-local-activity-for-sync-updates-rpcs.json",
 }
 
 func TestTemporalReplay(t *testing.T) {

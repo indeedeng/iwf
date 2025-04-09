@@ -118,6 +118,9 @@ type WorkflowProvider interface {
 		valuePtr interface{}, optimizeByLocalActivity bool, ctx UnifiedContext, activity interface{},
 		args ...interface{},
 	) (err error)
+	ExecuteLocalActivity(
+		valuePtr interface{}, ctx UnifiedContext, activity interface{}, args ...interface{},
+	) (err error)
 	Now(ctx UnifiedContext) time.Time
 	IsReplaying(ctx UnifiedContext) bool
 	Sleep(ctx UnifiedContext, d time.Duration) (err error)

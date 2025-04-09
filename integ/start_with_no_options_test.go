@@ -28,10 +28,6 @@ func TestStartWorkflowNoOptionsCadence(t *testing.T) {
 }
 
 func doTestStartWorkflowWithoutStartOptions(t *testing.T, backendType service.BackendType) {
-	if !*cadenceIntegTest {
-		t.Skip()
-	}
-
 	wfHandler := basic.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()

@@ -97,8 +97,15 @@ func (u *WorkflowUpdater) handler(
 	}
 	ctx = u.provider.WithActivityOptions(ctx, activityOptions)
 	var activityOutput interfaces.InvokeRpcActivityOutput
-	err = u.provider.ExecuteActivity(&activityOutput, u.configer.ShouldOptimizeActivity(), ctx,
-		InvokeWorkerRpc, u.provider.GetBackendType(), rpcPrep, input)
+
+	if u.globalVersioner.IsAfterVersionOfSyncUpdateRPCUseLocalActivity() {
+		err = u.provider.ExecuteLocalActivity(&activityOutput, ctx,
+			InvokeWorkerRpc, u.provider.GetBackendType(), &rpcPrep, input)
+	} else {
+		err = u.provider.ExecuteActivity(&activityOutput, u.configer.ShouldOptimizeActivity(), ctx,
+			InvokeWorkerRpc, u.provider.GetBackendType(), &rpcPrep, input)
+	}
+
 	u.persistenceManager.UnlockPersistence(input.SearchAttributesLoadingPolicy, input.DataAttributesLoadingPolicy)
 
 	if err != nil {
