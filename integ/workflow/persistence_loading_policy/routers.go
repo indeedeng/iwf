@@ -105,7 +105,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	}
 
 	var upsertSearchAttributes []iwfidl.SearchAttribute
-	var upsertDataObjects []iwfidl.KeyValue
+	var upsertDataAttributes []iwfidl.KeyValue
 
 	// Set search attributes and data attributes in State1
 	if req.GetWorkflowStateId() == State1 {
@@ -122,7 +122,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			},
 		}
 
-		upsertDataObjects = []iwfidl.KeyValue{
+		upsertDataAttributes = []iwfidl.KeyValue{
 			{
 				Key: iwfidl.PtrString("da_1"),
 				Value: &iwfidl.EncodedObject{
@@ -151,7 +151,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 		StateDecision:          getStateDecision(nextStateId, loadingTypeFromInput, loadingType),
 		UpsertSearchAttributes: upsertSearchAttributes,
-		UpsertDataObjects:      upsertDataObjects,
+		UpsertDataObjects:      upsertDataAttributes,
 	})
 }
 

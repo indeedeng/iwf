@@ -171,7 +171,7 @@ func getState1DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 				},
 			},
 		},
-		UpsertDataObjects: getUpsertDataObjects(),
+		UpsertDataObjects: getUpsertDataAttributes(),
 	}
 }
 
@@ -279,7 +279,7 @@ func verifyLoadedDataAttributes(t *testing.T, stateId string, method string, dat
 	}
 }
 
-func getUpsertDataObjects() []iwfidl.KeyValue {
+func getUpsertDataAttributes() []iwfidl.KeyValue {
 	return []iwfidl.KeyValue{
 		{
 			Key:   iwfidl.PtrString("da_wait_until1"),
@@ -357,7 +357,7 @@ func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl
 		}
 	}
 
-	return getUpsertDataObjects()
+	return getUpsertDataAttributes()
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

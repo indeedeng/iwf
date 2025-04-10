@@ -33,7 +33,7 @@ const (
 	RPCNameReadOnly           = "test-RPC-readonly"
 	RPCNameError              = "test-RPC-error"
 
-	TestDataObjectKey = "test-data-object"
+	TestDataAttributeKey = "test-data-object"
 
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
@@ -60,12 +60,12 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 	}
 }
 
-var TestDataObjectVal1 = iwfidl.EncodedObject{
+var TestDataAttributeVal1 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
 	Data:     iwfidl.PtrString("test-data-object-value1"),
 }
 
-var TestDataObjectVal2 = iwfidl.EncodedObject{
+var TestDataAttributeVal2 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
 	Data:     iwfidl.PtrString("test-data-object-value2"),
 }
@@ -149,8 +149,8 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 		UpsertSearchAttributes: upsertSAs,
 		UpsertDataAttributes: []iwfidl.KeyValue{
 			{
-				Key:   iwfidl.PtrString(TestDataObjectKey),
-				Value: &TestDataObjectVal2,
+				Key:   iwfidl.PtrString(TestDataAttributeKey),
+				Value: &TestDataAttributeVal2,
 			},
 		},
 		RecordEvents: []iwfidl.KeyValue{
@@ -216,8 +216,8 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 				UpsertSearchAttributes: upsertSAs,
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
-						Key:   iwfidl.PtrString(TestDataObjectKey),
-						Value: &TestDataObjectVal1,
+						Key:   iwfidl.PtrString(TestDataAttributeKey),
+						Value: &TestDataAttributeVal1,
 					},
 				},
 			})

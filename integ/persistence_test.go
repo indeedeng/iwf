@@ -198,7 +198,7 @@ func doTestPersistenceWorkflow(
 	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
+			persistence.TestDataAttributeKey, expectedDataAttribute.GetKey(),
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
@@ -262,19 +262,19 @@ func doTestPersistenceWorkflow(
 
 	expected1 := []iwfidl.KeyValue{
 		{
-			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
-			Value: &persistence.TestDataObjectVal2,
+			Key:   iwfidl.PtrString(persistence.TestDataAttributeKey),
+			Value: &persistence.TestDataAttributeVal2,
 		},
 		expectedDataAttribute,
 	}
 	expected2 := []iwfidl.KeyValue{
 		{
-			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
-			Value: &persistence.TestDataObjectVal2,
+			Key:   iwfidl.PtrString(persistence.TestDataAttributeKey),
+			Value: &persistence.TestDataAttributeVal2,
 		},
 		{
-			Key:   iwfidl.PtrString(persistence.TestDataObjectKey2),
-			Value: &persistence.TestDataObjectVal1,
+			Key:   iwfidl.PtrString(persistence.TestDataAttributeKey2),
+			Value: &persistence.TestDataAttributeVal1,
 		},
 		expectedDataAttribute,
 	}
@@ -408,7 +408,7 @@ func getDataAttributes(
 	return initReqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			persistence.TestDataObjectKey, expectedDataAttribute.GetKey(),
+			persistence.TestDataAttributeKey, expectedDataAttribute.GetKey(),
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()

@@ -241,8 +241,8 @@ func doTestRpcWorkflow(
 	assertions.Equalf(map[string]interface{}{
 		rpc.RPCName + "-data-attributes": []iwfidl.KeyValue{
 			{
-				Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
-				Value: &rpc.TestDataObjectVal1,
+				Key:   iwfidl.PtrString(rpc.TestDataAttributeKey),
+				Value: &rpc.TestDataAttributeVal1,
 			},
 		},
 		rpc.RPCName + "-search-attributes": []iwfidl.SearchAttribute{
@@ -257,8 +257,8 @@ func doTestRpcWorkflow(
 
 		rpc.RPCNameReadOnly + "-data-attributes": []iwfidl.KeyValue{
 			{
-				Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
-				Value: &rpc.TestDataObjectVal1,
+				Key:   iwfidl.PtrString(rpc.TestDataAttributeKey),
+				Value: &rpc.TestDataAttributeVal1,
 			},
 		},
 		rpc.RPCNameReadOnly + "-search-attributes": []iwfidl.SearchAttribute{
@@ -272,8 +272,8 @@ func doTestRpcWorkflow(
 
 		rpc.RPCNameError + "-data-attributes": []iwfidl.KeyValue{
 			{
-				Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
-				Value: &rpc.TestDataObjectVal1,
+				Key:   iwfidl.PtrString(rpc.TestDataAttributeKey),
+				Value: &rpc.TestDataAttributeVal1,
 			},
 		},
 		rpc.RPCNameError + "-search-attributes": []iwfidl.SearchAttribute{
@@ -314,8 +314,8 @@ func doTestRpcWorkflow(
 
 	assertions.Equalf([]iwfidl.KeyValue{
 		{
-			Key:   iwfidl.PtrString(rpc.TestDataObjectKey),
-			Value: &rpc.TestDataObjectVal2,
+			Key:   iwfidl.PtrString(rpc.TestDataAttributeKey),
+			Value: &rpc.TestDataAttributeVal2,
 		},
 	}, allDos.Objects, "rpc test fail")
 

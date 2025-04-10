@@ -34,8 +34,8 @@ const (
 	State1                        = "S1"
 	State2                        = "S2"
 	StateWaiting                  = "StateWaiting"
-	TestDataObjectKey1            = "test-data-object-1"
-	TestDataObjectKey2            = "test-data-object-2"
+	TestDataAttributeKey1         = "test-data-object-1"
+	TestDataAttributeKey2         = "test-data-object-2"
 	RPCName                       = "increase-counter"
 	InternalChannelName           = "test-channel"
 	TestSearchAttributeKeywordKey = "CustomKeywordField"
@@ -75,11 +75,11 @@ var state2Options = &iwfidl.WorkflowStateOptions{
 	DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 		PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
 		PartialLoadingKeys: []string{
-			TestDataObjectKey1,
-			TestDataObjectKey2,
+			TestDataAttributeKey1,
+			TestDataAttributeKey2,
 		},
 		LockingKeys: []string{
-			TestDataObjectKey1,
+			TestDataAttributeKey1,
 		},
 	},
 }
@@ -171,7 +171,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 
 	daInt := 0
 	for _, da := range req.DataAttributes {
-		if da.GetKey() == TestDataObjectKey1 {
+		if da.GetKey() == TestDataAttributeKey1 {
 			value := da.GetValue()
 			data := value.GetData()
 			if data != "" {
@@ -187,14 +187,14 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 
 	upsertDataAttributes := []iwfidl.KeyValue{
 		{
-			Key: iwfidl.PtrString(TestDataObjectKey1),
+			Key: iwfidl.PtrString(TestDataAttributeKey1),
 			Value: &iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString(fmt.Sprintf("%v", daInt)),
 			},
 		},
 		{
-			Key: iwfidl.PtrString(TestDataObjectKey2),
+			Key: iwfidl.PtrString(TestDataAttributeKey2),
 			Value: &iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString(context.GetStateExecutionId()),
@@ -359,7 +359,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			time.Sleep(time.Second)
 			daInt := 0
 			for _, da := range req.DataObjects {
-				if da.GetKey() == TestDataObjectKey1 {
+				if da.GetKey() == TestDataAttributeKey1 {
 					value := da.GetValue()
 					data := value.GetData()
 					if data != "" {
@@ -377,14 +377,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
-						Key: iwfidl.PtrString(TestDataObjectKey1),
+						Key: iwfidl.PtrString(TestDataAttributeKey1),
 						Value: &iwfidl.EncodedObject{
 							Encoding: iwfidl.PtrString("json"),
 							Data:     iwfidl.PtrString(fmt.Sprintf("%v", daInt)),
 						},
 					},
 					{
-						Key: iwfidl.PtrString(TestDataObjectKey2),
+						Key: iwfidl.PtrString(TestDataAttributeKey2),
 						Value: &iwfidl.EncodedObject{
 							Encoding: iwfidl.PtrString("json"),
 							Data:     iwfidl.PtrString(context.GetStateExecutionId()),
