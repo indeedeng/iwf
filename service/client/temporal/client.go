@@ -82,6 +82,12 @@ func (t *temporalClient) isQueryFailedError(err error) bool {
 	return ok
 }
 
+func (t *temporalClient) isWorkflowNotReadyError(err error) bool {
+	var serviceError *serviceerror.WorkflowNotReady
+	ok := errors.As(err, &serviceError)
+	return ok
+}
+
 func (t *temporalClient) IsRequestTimeoutError(err error) bool {
 	var deadlineExceeded *serviceerror.DeadlineExceeded
 	ok := errors.As(err, &deadlineExceeded)
@@ -304,7 +310,7 @@ func (t *temporalClient) QueryWorkflow(
 		if err == nil {
 			break
 		} else {
-			if t.isQueryFailedError(err) {
+			if t.isQueryFailedError(err) || t.isWorkflowNotReadyError(err) {
 				time.Sleep(time.Duration(t.queryWorkflowFailedRetryPolicy.InitialIntervalSeconds) * time.Second)
 				attempt++
 				continue
