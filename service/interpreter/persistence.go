@@ -57,7 +57,7 @@ func RebuildPersistenceManager(
 		searchAttributes[sa.GetKey()] = sa
 	}
 	return &PersistenceManager{
-		dataAttributes:      dataAttributes,
+		dataAttributes:   dataAttributes,
 		searchAttributes: searchAttributes,
 		provider:         provider,
 
