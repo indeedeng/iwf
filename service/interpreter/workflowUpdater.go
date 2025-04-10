@@ -78,7 +78,7 @@ func (u *WorkflowUpdater) handler(
 	}()
 
 	rpcPrep := service.PrepareRpcQueryResponse{
-		DataObjects:              u.persistenceManager.LoadDataObjects(ctx, input.DataAttributesLoadingPolicy),
+		DataObjects:              u.persistenceManager.LoadDataAttributes(ctx, input.DataAttributesLoadingPolicy),
 		SearchAttributes:         u.persistenceManager.LoadSearchAttributes(ctx, input.SearchAttributesLoadingPolicy),
 		WorkflowRunId:            info.WorkflowExecution.RunID,
 		WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),
@@ -122,7 +122,7 @@ func (u *WorkflowUpdater) handler(
 			Output: rpcOutput.Output,
 		}
 		u.continueAsNewCounter.IncSyncUpdateReceived()
-		_ = u.persistenceManager.ProcessUpsertDataObject(ctx, rpcOutput.UpsertDataAttributes)
+		_ = u.persistenceManager.ProcessUpsertDataAttribute(ctx, rpcOutput.UpsertDataAttributes)
 		_ = u.persistenceManager.ProcessUpsertSearchAttribute(ctx, rpcOutput.UpsertSearchAttributes)
 		u.internalChannel.ProcessPublishing(rpcOutput.PublishToInterStateChannel)
 		if rpcOutput.StateDecision != nil {

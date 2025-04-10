@@ -126,7 +126,7 @@ func (c *ContinueAsNewer) GetSnapshot() service.ContinueAsNewDumpResponse {
 		InterStateChannelReceived:  c.interStateChannel.GetAllReceived(),
 		SignalsReceived:            c.signalReceiver.GetAllReceived(),
 		StateExecutionCounterInfo:  c.stateExecutionCounter.Dump(),
-		DataObjects:                c.persistenceManager.GetAllDataObjects(),
+		DataObjects:                c.persistenceManager.GetAllDataAttributes(),
 		SearchAttributes:           c.persistenceManager.GetAllSearchAttributes(),
 		StatesToStartFromBeginning: c.stateRequestQueue.GetAllStateStartRequests(),
 		StateExecutionsToResume:    localStateExecutionToResumeMap,

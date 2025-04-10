@@ -172,7 +172,7 @@ func NewSignalReceiver(
 			}
 			if received {
 				continueAsNewCounter.IncSignalsReceived()
-				_ = sr.persistenceManager.ProcessUpsertDataObject(ctx, val.UpsertDataObjects)
+				_ = sr.persistenceManager.ProcessUpsertDataAttribute(ctx, val.UpsertDataObjects)
 				_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 				sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
 				if val.StateDecision != nil {
@@ -332,7 +332,7 @@ func (sr *SignalReceiver) DrainAllReceivedButUnprocessedSignals(ctx interfaces.U
 						val := service.ExecuteRpcSignalRequest{}
 						ok := ch.ReceiveAsync(&val)
 						if ok {
-							_ = sr.persistenceManager.ProcessUpsertDataObject(ctx, val.UpsertDataObjects)
+							_ = sr.persistenceManager.ProcessUpsertDataAttribute(ctx, val.UpsertDataObjects)
 							_ = sr.persistenceManager.ProcessUpsertSearchAttribute(ctx, val.UpsertSearchAttributes)
 							sr.interStateChannel.ProcessPublishing(val.InterStateChannelPublishing)
 							if val.StateDecision != nil {

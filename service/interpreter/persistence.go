@@ -9,11 +9,11 @@ import (
 )
 
 type PersistenceManager struct {
-	dataObjects      map[string]iwfidl.KeyValue
+	dataAttributes   map[string]iwfidl.KeyValue
 	searchAttributes map[string]iwfidl.SearchAttribute
 	provider         interfaces.WorkflowProvider
 
-	lockedDataObjectKeys      map[string]bool
+	lockedDataAttributesKeys  map[string]bool
 	lockedSearchAttributeKeys map[string]bool
 
 	useMemo bool
@@ -32,11 +32,11 @@ func NewPersistenceManager(
 		dataAttributes[da.GetKey()] = da
 	}
 	return &PersistenceManager{
-		dataObjects:      dataAttributes,
+		dataAttributes:   dataAttributes,
 		searchAttributes: searchAttributes,
 		provider:         provider,
 
-		lockedDataObjectKeys:      make(map[string]bool),
+		lockedDataAttributesKeys:  make(map[string]bool),
 		lockedSearchAttributeKeys: make(map[string]bool),
 
 		useMemo: useMemo,
@@ -48,28 +48,28 @@ func RebuildPersistenceManager(
 	dolist []iwfidl.KeyValue, salist []iwfidl.SearchAttribute,
 	useMemo bool,
 ) *PersistenceManager {
-	dataObjects := make(map[string]iwfidl.KeyValue)
+	dataAttributes := make(map[string]iwfidl.KeyValue)
 	searchAttributes := make(map[string]iwfidl.SearchAttribute)
 	for _, do := range dolist {
-		dataObjects[do.GetKey()] = do
+		dataAttributes[do.GetKey()] = do
 	}
 	for _, sa := range salist {
 		searchAttributes[sa.GetKey()] = sa
 	}
 	return &PersistenceManager{
-		dataObjects:      dataObjects,
+		dataAttributes:      dataAttributes,
 		searchAttributes: searchAttributes,
 		provider:         provider,
 
 		// locks will not be carried over during continueAsNew
-		lockedDataObjectKeys:      make(map[string]bool),
+		lockedDataAttributesKeys:  make(map[string]bool),
 		lockedSearchAttributeKeys: make(map[string]bool),
 
 		useMemo: useMemo,
 	}
 }
 
-func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataAttributesQueryRequest) service.GetDataAttributesQueryResponse {
+func (am *PersistenceManager) GetDataAttributesByKey(request service.GetDataAttributesQueryRequest) service.GetDataAttributesQueryResponse {
 	all := false
 	if len(request.Keys) == 0 {
 		all = true
@@ -79,9 +79,9 @@ func (am *PersistenceManager) GetDataObjectsByKey(request service.GetDataAttribu
 	for _, k := range request.Keys {
 		keyMap[k] = true
 	}
-	for _, key := range DeterministicKeys(am.dataObjects) {
+	for _, key := range DeterministicKeys(am.dataAttributes) {
 		if keyMap[key] || all {
-			res = append(res, am.dataObjects[key])
+			res = append(res, am.dataAttributes[key])
 		}
 	}
 	return service.GetDataAttributesQueryResponse{
@@ -127,7 +127,7 @@ func (am *PersistenceManager) LoadSearchAttributes(
 	}
 }
 
-func (am *PersistenceManager) LoadDataObjects(
+func (am *PersistenceManager) LoadDataAttributes(
 	ctx interfaces.UnifiedContext, loadingPolicy *iwfidl.PersistenceLoadingPolicy,
 ) []iwfidl.KeyValue {
 	var loadingType iwfidl.PersistenceLoadingType
@@ -140,14 +140,14 @@ func (am *PersistenceManager) LoadDataObjects(
 		}
 
 		if loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
-			am.awaitAndLockForKeys(ctx, am.lockedDataObjectKeys, loadingPolicy.GetLockingKeys())
+			am.awaitAndLockForKeys(ctx, am.lockedDataAttributesKeys, loadingPolicy.GetLockingKeys())
 		}
 	}
 
 	if loadingType == "" || loadingType == iwfidl.ALL_WITHOUT_LOCKING || loadingType == iwfidl.ALL_WITH_PARTIAL_LOCK {
-		return am.GetAllDataObjects()
+		return am.GetAllDataAttributes()
 	} else if loadingType == iwfidl.PARTIAL_WITHOUT_LOCKING || loadingType == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK {
-		res := am.GetDataObjectsByKey(service.GetDataAttributesQueryRequest{
+		res := am.GetDataAttributesByKey(service.GetDataAttributesQueryRequest{
 			Keys: partialLoadingKeys,
 		})
 		return res.DataAttributes
@@ -169,14 +169,14 @@ func (am *PersistenceManager) GetAllSearchAttributes() []iwfidl.SearchAttribute 
 	return res
 }
 
-func (am *PersistenceManager) GetAllDataObjects() []iwfidl.KeyValue {
+func (am *PersistenceManager) GetAllDataAttributes() []iwfidl.KeyValue {
 	var res []iwfidl.KeyValue
 
 	// NOTE: using DeterministicKeys so that the JSON snapshot for continueAsNew is stable for pagination
 	// TODO: we should use DeterministicKeys for every map iteration in interpreter for safety
 	// https://github.com/indeedeng/iwf/issues/510
-	for _, k := range DeterministicKeys(am.dataObjects) {
-		res = append(res, am.dataObjects[k])
+	for _, k := range DeterministicKeys(am.dataAttributes) {
+		res = append(res, am.dataAttributes[k])
 	}
 	return res
 }
@@ -198,12 +198,12 @@ func (am *PersistenceManager) ProcessUpsertSearchAttribute(
 	return am.provider.UpsertSearchAttributes(ctx, attrsToUpsert)
 }
 
-func (am *PersistenceManager) ProcessUpsertDataObject(ctx interfaces.UnifiedContext, attributes []iwfidl.KeyValue) error {
+func (am *PersistenceManager) ProcessUpsertDataAttribute(ctx interfaces.UnifiedContext, attributes []iwfidl.KeyValue) error {
 	if len(attributes) == 0 {
 		return nil
 	}
 	for _, attr := range attributes {
-		am.dataObjects[attr.GetKey()] = attr
+		am.dataAttributes[attr.GetKey()] = attr
 	}
 	if am.useMemo {
 		memo := map[string]iwfidl.EncodedObject{}
@@ -216,7 +216,7 @@ func (am *PersistenceManager) ProcessUpsertDataObject(ctx interfaces.UnifiedCont
 }
 
 func (am *PersistenceManager) CheckDataAndSearchAttributesKeysAreUnlocked(dataAttrKeysToCheck, searchAttrKeysToCheck []string) bool {
-	return am.checkKeysAreUnlocked(am.lockedDataObjectKeys, dataAttrKeysToCheck) &&
+	return am.checkKeysAreUnlocked(am.lockedDataAttributesKeys, dataAttrKeysToCheck) &&
 		am.checkKeysAreUnlocked(am.lockedSearchAttributeKeys, searchAttrKeysToCheck)
 }
 
@@ -266,6 +266,6 @@ func (am *PersistenceManager) UnlockPersistence(
 	if daPolicy != nil &&
 		(daPolicy.GetPersistenceLoadingType() == iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK ||
 			daPolicy.GetPersistenceLoadingType() == iwfidl.ALL_WITH_PARTIAL_LOCK) {
-		am.unlockKeys(am.lockedDataObjectKeys, daPolicy.GetLockingKeys())
+		am.unlockKeys(am.lockedDataAttributesKeys, daPolicy.GetLockingKeys())
 	}
 }
