@@ -33,7 +33,7 @@ const (
 	RPCNameReadOnly           = "test-RPC-readonly"
 	RPCNameError              = "test-RPC-error"
 
-	TestDataAttributeKey = "test-data-object"
+	TestDataAttributeKey = "test-data-attribute"
 
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
@@ -62,12 +62,12 @@ func NewHandler() common.WorkflowHandlerWithRpc {
 
 var TestDataAttributeVal1 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-data-object-value1"),
+	Data:     iwfidl.PtrString("test-data-attribute-value1"),
 }
 
 var TestDataAttributeVal2 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-data-object-value2"),
+	Data:     iwfidl.PtrString("test-data-attribute-value2"),
 }
 
 var TestInput = iwfidl.EncodedObject{

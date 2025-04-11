@@ -24,7 +24,7 @@ import (
  * 		- Execute method will move to State Waiting, and 10 instances of State 2
  * State2:
  * 		- WaitUntil update SA
- * 		- Execute method will update data objects and will gracefully complete workflow
+ * 		- Execute method will update data attributes and will gracefully complete workflow
  * StateWaiting:
  * 		- WaitUntil will proceed once the internal channel has been published to
  *      - Execute method will gracefully complete workflow
@@ -34,8 +34,8 @@ const (
 	State1                        = "S1"
 	State2                        = "S2"
 	StateWaiting                  = "StateWaiting"
-	TestDataAttributeKey1         = "test-data-object-1"
-	TestDataAttributeKey2         = "test-data-object-2"
+	TestDataAttributeKey1         = "test-data-attribute-1"
+	TestDataAttributeKey2         = "test-data-attribute-2"
 	RPCName                       = "increase-counter"
 	InternalChannelName           = "test-channel"
 	TestSearchAttributeKeywordKey = "CustomKeywordField"

@@ -31,8 +31,8 @@ const (
 	State1                = "S1"
 	State2                = "S2"
 	State3                = "S3"
-	TestDataAttributeKey  = "test-data-object"
-	TestDataAttributeKey2 = "test-data-object-2"
+	TestDataAttributeKey  = "test-data-attribute"
+	TestDataAttributeKey2 = "test-data-attribute-2"
 	TestStateLocalKey     = "test-state-local"
 
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
@@ -51,12 +51,12 @@ const (
 
 var TestDataAttributeVal1 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-data-object-value1"),
+	Data:     iwfidl.PtrString("test-data-attribute-value1"),
 }
 
 var TestDataAttributeVal2 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-data-object-value2"),
+	Data:     iwfidl.PtrString("test-data-attribute-value2"),
 }
 
 var testStateLocalVal = iwfidl.EncodedObject{

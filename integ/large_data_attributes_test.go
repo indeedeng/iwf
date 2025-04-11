@@ -75,7 +75,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 		Data:     iwfidl.PtrString(strings.Repeat("a", size)),
 	}
 
-	// setting a large data object to test, especially continueAsNew
+	// setting a large data attribute to test, especially continueAsNew
 	// because there is a 4MB limit for GRPC in temporal
 	setReq := apiClient.DefaultApi.ApiV1WorkflowDataobjectsSetPost(context.Background())
 	for i := 0; i < 5; i++ {
@@ -84,7 +84,7 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 			WorkflowId: wfId,
 			Objects: []iwfidl.KeyValue{
 				{
-					Key:   iwfidl.PtrString("large-data-object-" + strconv.Itoa(i)),
+					Key:   iwfidl.PtrString("large-data-attribute-" + strconv.Itoa(i)),
 					Value: &OneMbDataAttribute,
 				},
 			},

@@ -127,14 +127,14 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 				Key: iwfidl.PtrString("da_1"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-value1"),
+					Data:     iwfidl.PtrString("test-data-attribute-value1"),
 				},
 			},
 			{
 				Key: iwfidl.PtrString("da_2"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-value2"),
+					Data:     iwfidl.PtrString("test-data-attribute-value2"),
 				},
 			},
 		}
@@ -221,14 +221,14 @@ func verifyLoadedAttributes(
 				Key: iwfidl.PtrString("da_1"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-value1"),
+					Data:     iwfidl.PtrString("test-data-attribute-value1"),
 				},
 			},
 			{
 				Key: iwfidl.PtrString("da_2"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-value2"),
+					Data:     iwfidl.PtrString("test-data-attribute-value2"),
 				},
 			},
 		}
@@ -245,7 +245,7 @@ func verifyLoadedAttributes(
 				Key: iwfidl.PtrString("da_1"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-value1"),
+					Data:     iwfidl.PtrString("test-data-attribute-value1"),
 				},
 			},
 		}
