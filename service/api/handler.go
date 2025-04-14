@@ -203,7 +203,7 @@ func (h *handler) infoHealthCheck(c *gin.Context) {
 	return
 }
 
-func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
+func (h *handler) apiV1WorkflowGetDataAttributes(c *gin.Context) {
 	var req iwfidl.WorkflowGetDataObjectsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		invalidRequestSchema(c)
@@ -220,7 +220,7 @@ func (h *handler) apiV1WorkflowGetDataObjects(c *gin.Context) {
 	return
 }
 
-func (h *handler) apiV1WorkflowSetDataObjects(c *gin.Context) {
+func (h *handler) apiV1WorkflowSetDataAttributes(c *gin.Context) {
 	var req iwfidl.WorkflowSetDataObjectsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		invalidRequestSchema(c)

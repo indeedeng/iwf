@@ -152,7 +152,7 @@ func getState1DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 	noneLoadingType := iwfidl.NONE
 
-	// Move to State 2 with the provided options & input after updating data objects
+	// Move to State 2 with the provided options & input after updating data attributes
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{

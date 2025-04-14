@@ -70,12 +70,12 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 	// Define the size of the string in bytes (1 MB = 1024 * 1024 bytes)
 	const size = 1024 * 1024
 
-	OneMbDataObject := iwfidl.EncodedObject{
+	OneMbDataAttribute := iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
 		Data:     iwfidl.PtrString(strings.Repeat("a", size)),
 	}
 
-	// setting a large data object to test, especially continueAsNew
+	// setting a large data attribute to test, especially continueAsNew
 	// because there is a 4MB limit for GRPC in temporal
 	setReq := apiClient.DefaultApi.ApiV1WorkflowDataobjectsSetPost(context.Background())
 	for i := 0; i < 5; i++ {
@@ -84,8 +84,8 @@ func doTestLargeQueryAttributes(t *testing.T, backendType service.BackendType, c
 			WorkflowId: wfId,
 			Objects: []iwfidl.KeyValue{
 				{
-					Key:   iwfidl.PtrString("large-data-object-" + strconv.Itoa(i)),
-					Value: &OneMbDataObject,
+					Key:   iwfidl.PtrString("large-data-attribute-" + strconv.Itoa(i)),
+					Value: &OneMbDataAttribute,
 				},
 			},
 		}).Execute()
