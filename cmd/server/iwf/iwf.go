@@ -21,6 +21,7 @@
 package iwf
 
 import (
+	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
@@ -110,21 +111,35 @@ func start(c *cli.Context) {
 	// The client is a heavyweight object that should be created once per process.
 	var unifiedClient uclient.UnifiedClient
 	if config.Interpreter.Temporal != nil {
+		temporalConfig := config.Interpreter.Temporal
+
 		var metricHandler client.MetricsHandler
-		if config.Interpreter.Temporal.Prometheus != nil {
-			pscope := newPrometheusScope(*config.Interpreter.Temporal.Prometheus, logger)
+		if temporalConfig.Prometheus != nil {
+			pscope := newPrometheusScope(*temporalConfig.Prometheus, logger)
 			metricHandler = sdktally.NewMetricsHandler(pscope)
 		}
 
-		temporalClient, err := client.Dial(client.Options{
-			HostPort:       config.Interpreter.Temporal.HostPort,
-			Namespace:      config.Interpreter.Temporal.Namespace,
-			MetricsHandler: metricHandler,
-		})
+		var temporalClient client.Client
+		var err error
+		if temporalConfig.CloudAPIKey != "" {
+			input := TemporalCloudNamespaceClientInput{
+				Namespace:      temporalConfig.Namespace,
+				Auth:           &ApiKeyAuth{APIKey: temporalConfig.CloudAPIKey},
+				MetricsHandler: metricHandler,
+			}
+			temporalClient, err = GetTemporalCloudNamespaceClient(context.Background(), &input)
+		} else {
+			temporalClient, err = client.Dial(client.Options{
+				HostPort:       temporalConfig.HostPort,
+				Namespace:      temporalConfig.Namespace,
+				MetricsHandler: metricHandler,
+			})
+		}
+
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter(), false, &config.Api.QueryWorkflowFailedRetryPolicy)
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, temporalConfig.Namespace, converter.GetDefaultDataConverter(), false, &config.Api.QueryWorkflowFailedRetryPolicy)
 
 		for _, svcName := range services {
 			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger)

@@ -61,7 +61,10 @@ type (
 
 	TemporalConfig struct {
 		// HostPort to connect to, default to localhost:7233
+		// Not needed if using CloudAPIKey below
 		HostPort string `yaml:"hostPort"`
+		// API key to connect to Temporal Cloud, default to empty
+		CloudAPIKey string `yaml:"cloudAPIKey"`
 		// Namespace to connect to, default to default
 		Namespace string `yaml:"namespace"`
 		// Prometheus is configuring the metric exposer
