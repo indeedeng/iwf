@@ -9,14 +9,7 @@ api:
 interpreter:
   defaultWorkflowConfig:
     continueAsNewThreshold: 100
-  #  {{- be := default .Env.BACKEND_TYPE "temporal" | lower -}}
-  #    {{- if eq $be "temporal" }}
   temporal:
-    hostPort: "temporal:7233"
-    namespace: "default"
-#    {{- end }}
-#    {{- if eq $be "temporal" }}
-#    cadence:
-#      hostPort: {{ default .Env.CADENCE_HOST_PORT "127.0.0.1:7833" }}
-#      domain: {{ default .Env.CADENCE_NAMESPACE "default" }}
-#    {{- end }}
+    hostPort: {{ default .Env.TEMPORAL_HOST_PORT "temporal:7233" }}
+    namespace: {{ default .Env.TEMPORAL_NAMESPACE "default" }}
+    cloudAPIKey: {{ default .Env.TEMPORAL_CLOUD_API_KEY "" }}
