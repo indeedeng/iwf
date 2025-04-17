@@ -21,10 +21,14 @@
 package iwf
 
 import (
+	"context"
+	"crypto/tls"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
+	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	rawLog "log"
 	"strings"
 	"sync"
@@ -118,17 +122,38 @@ func start(c *cli.Context) {
 			metricHandler = sdktally.NewMetricsHandler(pscope)
 		}
 
-		var credentials client.Credentials
-		if temporalConfig.CloudAPIKey != "" {
-			credentials = client.NewAPIKeyStaticCredentials(temporalConfig.CloudAPIKey)
-		}
-
-		temporalClient, err := client.Dial(client.Options{
+		clientOptions := client.Options{
 			HostPort:       temporalConfig.HostPort,
 			Namespace:      temporalConfig.Namespace,
-			Credentials:    credentials,
 			MetricsHandler: metricHandler,
-		})
+		}
+		if temporalConfig.CloudAPIKey != "" {
+			clientOptions.Credentials = client.NewAPIKeyStaticCredentials(temporalConfig.CloudAPIKey)
+			// NOTE: this connectionOptions can be removed when upgrading temporal SDK to latest
+			// see https://docs.temporal.io/cloud/api-keys#sdk
+			clientOptions.ConnectionOptions = client.ConnectionOptions{
+				TLS: &tls.Config{},
+				DialOptions: []ggrpc.DialOption{
+					ggrpc.WithUnaryInterceptor(
+						func(
+							ctx context.Context, method string, req any, reply any, cc *ggrpc.ClientConn,
+							invoker ggrpc.UnaryInvoker, opts ...ggrpc.CallOption,
+						) error {
+							return invoker(
+								metadata.AppendToOutgoingContext(ctx, "temporal-namespace", temporalConfig.Namespace),
+								method,
+								req,
+								reply,
+								cc,
+								opts...,
+							)
+						},
+					),
+				},
+			}
+		}
+
+		temporalClient, err := client.Dial(clientOptions)
 
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)

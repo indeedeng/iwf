@@ -10,6 +10,6 @@ interpreter:
   defaultWorkflowConfig:
     continueAsNewThreshold: 100
   temporal:
-    hostPort: {{ default .Env.TEMPORAL_HOST_PORT "temporal:7233" }}
-    namespace: {{ default .Env.TEMPORAL_NAMESPACE "default" }}
-    cloudAPIKey: {{ default .Env.TEMPORAL_CLOUD_API_KEY "" }}
+    hostPort: "temporal:7233"
+    namespace: "default"
+    cloudAPIKey: ""
