@@ -12,7 +12,7 @@ require (
 	github.com/uber-go/tally/v4 v4.1.1
 	github.com/uber/cadence-idl v0.0.0-20220713235846-fda89e95df1e
 	github.com/urfave/cli v1.22.5
-	go.temporal.io/cloud-sdk v0.3.0
+	go.temporal.io/api v1.44.1
 	go.temporal.io/sdk v1.30.0
 	go.temporal.io/sdk/contrib/tally v0.1.0
 	go.temporal.io/sdk/contrib/tools/workflowcheck v0.0.0-20220331154559-fd0d1eb548eb
@@ -21,8 +21,6 @@ require (
 	go.uber.org/zap v1.21.0
 	gopkg.in/yaml.v3 v3.0.1
 )
-
-require go.temporal.io/api v1.44.1
 
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0 // indirect
@@ -103,7 +101,7 @@ require (
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
-	google.golang.org/grpc v1.70.0 // indirect
+	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.4
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.3.2 // indirect

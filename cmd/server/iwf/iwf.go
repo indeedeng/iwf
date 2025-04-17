@@ -21,7 +21,6 @@
 package iwf
 
 import (
-	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
@@ -119,22 +118,17 @@ func start(c *cli.Context) {
 			metricHandler = sdktally.NewMetricsHandler(pscope)
 		}
 
-		var temporalClient client.Client
-		var err error
+		var credentials client.Credentials
 		if temporalConfig.CloudAPIKey != "" {
-			input := TemporalCloudNamespaceClientInput{
-				Namespace:      temporalConfig.Namespace,
-				Auth:           &ApiKeyAuth{APIKey: temporalConfig.CloudAPIKey},
-				MetricsHandler: metricHandler,
-			}
-			temporalClient, err = GetTemporalCloudNamespaceClient(context.Background(), &input)
-		} else {
-			temporalClient, err = client.Dial(client.Options{
-				HostPort:       temporalConfig.HostPort,
-				Namespace:      temporalConfig.Namespace,
-				MetricsHandler: metricHandler,
-			})
+			credentials = client.NewAPIKeyStaticCredentials(temporalConfig.CloudAPIKey)
 		}
+
+		temporalClient, err := client.Dial(client.Options{
+			HostPort:       temporalConfig.HostPort,
+			Namespace:      temporalConfig.Namespace,
+			Credentials:    credentials,
+			MetricsHandler: metricHandler,
+		})
 
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)
