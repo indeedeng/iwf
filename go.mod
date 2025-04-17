@@ -2,8 +2,6 @@ module github.com/indeedeng/iwf
 
 go 1.23.0
 
-toolchain go1.23.2
-
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.6.0
@@ -23,7 +21,6 @@ require (
 )
 
 require (
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
 	github.com/nexus-rpc/sdk-go v0.0.11 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -101,7 +98,7 @@ require (
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
-	google.golang.org/grpc v1.70.0
+	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.4
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.3.2 // indirect
