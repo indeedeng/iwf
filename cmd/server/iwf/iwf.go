@@ -116,17 +116,16 @@ func start(c *cli.Context) {
 	if config.Interpreter.Temporal != nil {
 		temporalConfig := config.Interpreter.Temporal
 
-		var metricHandler client.MetricsHandler
-		if temporalConfig.Prometheus != nil {
-			pscope := newPrometheusScope(*temporalConfig.Prometheus, logger)
-			metricHandler = sdktally.NewMetricsHandler(pscope)
+		clientOptions := client.Options{
+			HostPort:  temporalConfig.HostPort,
+			Namespace: temporalConfig.Namespace,
 		}
 
-		clientOptions := client.Options{
-			HostPort:       temporalConfig.HostPort,
-			Namespace:      temporalConfig.Namespace,
-			MetricsHandler: metricHandler,
+		if temporalConfig.Prometheus != nil {
+			pscope := newPrometheusScope(*temporalConfig.Prometheus, logger)
+			clientOptions.MetricsHandler = sdktally.NewMetricsHandler(pscope)
 		}
+
 		if temporalConfig.CloudAPIKey != "" {
 			clientOptions.Credentials = client.NewAPIKeyStaticCredentials(temporalConfig.CloudAPIKey)
 			// NOTE: this connectionOptions can be removed when upgrading temporal SDK to latest
