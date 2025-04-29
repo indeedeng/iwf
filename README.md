@@ -11,7 +11,7 @@
 
 
 # What is iWF
-iWF streamlines workflows that involve waiting on external events, handling timeouts, 
+Indeed Workflow Framework(iWF) is a coding framework with service to streamlines workflows that involve waiting on external events, handling timeouts, 
 and persisting state over long durations. With iWF, developers can build scalable, maintainable workflows that adapt to real-time events and integrate seamlessly with external systems. 
 
 ## What Makes iWF Unique 
@@ -28,6 +28,7 @@ and persisting state over long durations. With iWF, developers can build scalabl
 * [Abstracted microservice orchestration in Java/Golang](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-Microservice-Orchestration)
 * Employer & JobSeeker engagement in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/engagement)
 * Subscription Workflow in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/subscription)
+* [Design Patterns](https://medium.com/@qlong/iwf-design-patterns-936a48336766)
 
 ## Basic concepts
 * [Basic concepts overview](https://github.com/indeedeng/iwf/wiki/Basic-concepts-overview)
