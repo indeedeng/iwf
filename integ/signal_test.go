@@ -113,9 +113,8 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 	failTestAtHttpError(err, httpResp, t)
 
 	// Short wait for workflow update
-	if config != nil {
-		time.Sleep(2 * time.Second)
-	}
+	time.Sleep(2 * time.Second)
+
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
 		helpers.FailTestWithError(err, t)
@@ -132,6 +131,9 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		},
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
+
+	// Short wait for workflow update
+	time.Sleep(2 * time.Second)
 
 	err = uclient.QueryWorkflow(context.Background(), &debugDump, wfId, "", service.DebugDumpQueryType)
 	if err != nil {
@@ -157,6 +159,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 			// see why in https://github.com/temporalio/temporal/issues/4801
 			unhandledSignalVals = append(unhandledSignalVals, sigVal)
 		}
+		// Cadence seems to be slower to process; short sleep needed
+		if *cadenceIntegTest {
+			time.Sleep(100 * time.Millisecond)
+		}
 		reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 		rpcResp, httpResp2, err2 := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 			WorkflowId: wfId,
@@ -169,7 +175,10 @@ func doTestSignalWorkflow(t *testing.T, backendType service.BackendType, config 
 		assertions.Equal(
 			map[string]iwfidl.ChannelInfo{signal.UnhandledSignalName: {Size: ptr.Any(int32(i + 1))}}, infos)
 	}
-
+	// Cadence seems to be slower to process; short sleep needed
+	if *cadenceIntegTest {
+		time.Sleep(100 * time.Millisecond)
+	}
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	rpcResp, httpResp2, err2 := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 		WorkflowId: wfId,
