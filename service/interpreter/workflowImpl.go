@@ -566,7 +566,7 @@ func processStateExecution(
 		StartToCloseTimeout: 30 * time.Second,
 	}
 
-	var errStartApi error
+	var errWaitUntilApi error
 	var startResponse *iwfidl.WorkflowStateStartResponse
 	var stateExecutionLocal []iwfidl.KeyValue
 	var commandReq iwfidl.CommandRequest
@@ -618,7 +618,7 @@ func processStateExecution(
 				SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 			})
 		}
-		errStartApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
+		errWaitUntilApi = provider.ExecuteActivity(&startResponse, configer.ShouldOptimizeActivity(), ctx,
 			waitUntilApi, provider.GetBackendType(), service.StateStartActivityInput{
 				IwfWorkerUrl: basicInfo.IwfWorkerUrl,
 				Request: iwfidl.WorkflowStateStartRequest{
@@ -632,7 +632,7 @@ func processStateExecution(
 			},
 			persistenceManager.GetAllSearchAttributes())
 		if !provider.IsReplaying(ctx) {
-			if errStartApi == nil {
+			if errWaitUntilApi == nil {
 				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_COMPLETE_EVENT,
 					WorkflowType:       basicInfo.IwfWorkflowType,
@@ -645,7 +645,7 @@ func processStateExecution(
 					SearchAttributes:   persistenceManager.GetAllSearchAttributes(),
 				})
 			} else {
-				errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(errStartApi)
+				errType, errDetails := env.GetUnifiedClient().GetApplicationErrorTypeAndDetails(errWaitUntilApi)
 
 				event.Handle(iwfidl.IwfEvent{
 					EventType:          iwfidl.STATE_WAIT_UNTIL_EE_FAIL_EVENT,
@@ -666,8 +666,8 @@ func processStateExecution(
 		}
 
 		persistenceManager.UnlockPersistence(saLoadingPolicy, doLoadingPolicy)
-		if errStartApi != nil && !shouldProceedOnStartApiError(state) {
-			return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errStartApi)
+		if errWaitUntilApi != nil && !shouldProceedOnStartApiError(state) {
+			return nil, service.FailureStateExecutionStatus, convertStateApiActivityError(provider, errWaitUntilApi)
 		}
 
 		err := persistenceManager.ProcessUpsertSearchAttribute(ctx, startResponse.GetUpsertSearchAttributes())
@@ -794,10 +794,8 @@ func processStateExecution(
 	}
 
 	commandRes := &iwfidl.CommandResults{}
-	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errStartApi == nil)
-	// todo: could possibly rename errStartApi to something more accurate - in line with current naming convention
-	// errStartApi -> errWaitUntilApi
-	commandRes.StateWaitUntilFailed = iwfidl.PtrBool(errStartApi != nil)
+	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errWaitUntilApi == nil)
+	commandRes.StateWaitUntilFailed = iwfidl.PtrBool(errWaitUntilApi != nil)
 
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.RemovePendingTimersOfState(stateExeId)
