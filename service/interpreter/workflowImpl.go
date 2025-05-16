@@ -795,6 +795,9 @@ func processStateExecution(
 
 	commandRes := &iwfidl.CommandResults{}
 	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errStartApi == nil)
+	// todo: could possibly rename errStartApi to something more accurate - in line with current naming convention
+	// errStartApi -> errWaitUntilApi
+	commandRes.StateWaitUntilFailed = iwfidl.PtrBool(errStartApi != nil)
 
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.RemovePendingTimersOfState(stateExeId)
