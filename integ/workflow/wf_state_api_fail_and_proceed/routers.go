@@ -71,6 +71,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		helpers.FailTestWithErrorMessage("stateStartApiSucceeded should be false", t)
 	}
 
+	if req.GetCommandResults().StateWaitUntilFailed == nil || !*req.GetCommandResults().StateWaitUntilFailed {
+		helpers.FailTestWithErrorMessage("stateWaitUntilFailed should be true", t)
+	}
+
 	if req.GetWorkflowType() == WorkflowType {
 		if value, ok := h.invokeHistory.Load(req.GetWorkflowStateId() + "_decide"); ok {
 			h.invokeHistory.Store(req.GetWorkflowStateId()+"_decide", value.(int64)+1)

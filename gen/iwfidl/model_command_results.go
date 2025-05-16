@@ -23,6 +23,7 @@ type CommandResults struct {
 	InterStateChannelResults []InterStateChannelResult `json:"interStateChannelResults,omitempty"`
 	TimerResults             []TimerResult             `json:"timerResults,omitempty"`
 	StateStartApiSucceeded   *bool                     `json:"stateStartApiSucceeded,omitempty"`
+	StateWaitUntilFailed     *bool                     `json:"stateWaitUntilFailed,omitempty"`
 }
 
 // NewCommandResults instantiates a new CommandResults object
@@ -170,6 +171,38 @@ func (o *CommandResults) SetStateStartApiSucceeded(v bool) {
 	o.StateStartApiSucceeded = &v
 }
 
+// GetStateWaitUntilFailed returns the StateWaitUntilFailed field value if set, zero value otherwise.
+func (o *CommandResults) GetStateWaitUntilFailed() bool {
+	if o == nil || IsNil(o.StateWaitUntilFailed) {
+		var ret bool
+		return ret
+	}
+	return *o.StateWaitUntilFailed
+}
+
+// GetStateWaitUntilFailedOk returns a tuple with the StateWaitUntilFailed field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CommandResults) GetStateWaitUntilFailedOk() (*bool, bool) {
+	if o == nil || IsNil(o.StateWaitUntilFailed) {
+		return nil, false
+	}
+	return o.StateWaitUntilFailed, true
+}
+
+// HasStateWaitUntilFailed returns a boolean if a field has been set.
+func (o *CommandResults) HasStateWaitUntilFailed() bool {
+	if o != nil && !IsNil(o.StateWaitUntilFailed) {
+		return true
+	}
+
+	return false
+}
+
+// SetStateWaitUntilFailed gets a reference to the given bool and assigns it to the StateWaitUntilFailed field.
+func (o *CommandResults) SetStateWaitUntilFailed(v bool) {
+	o.StateWaitUntilFailed = &v
+}
+
 func (o CommandResults) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o CommandResults) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.StateStartApiSucceeded) {
 		toSerialize["stateStartApiSucceeded"] = o.StateStartApiSucceeded
+	}
+	if !IsNil(o.StateWaitUntilFailed) {
+		toSerialize["stateWaitUntilFailed"] = o.StateWaitUntilFailed
 	}
 	return toSerialize, nil
 }

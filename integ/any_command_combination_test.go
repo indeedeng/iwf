@@ -189,7 +189,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"WAITING\"}" +
 		"],\"timerResults\":[" +
 		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"FIRED\"}]," +
-		"\"stateStartApiSucceeded\":true}"
+		"\"stateStartApiSucceeded\":true, \"stateWaitUntilFailed\": false}"
 	err = json.Unmarshal([]byte(s1ResultJsonStr), &s1CommandResults)
 	if err != nil {
 		helpers.FailTestWithError(err, t)
@@ -201,7 +201,7 @@ func doTestAnyCommandCombinationWorkflow(t *testing.T, backendType service.Backe
 		"{\"commandId\":\"test-signal-name3\",\"signalChannelName\":\"test-signal-name3\",\"signalRequestStatus\":\"RECEIVED\",\"signalValue\":{\"data\":\"test-data-1\",\"encoding\":\"json\"}}" +
 		"],\"timerResults\":[" +
 		"{\"commandId\":\"test-timer-1\",\"timerStatus\":\"SCHEDULED\"}]," +
-		"\"stateStartApiSucceeded\":true}"
+		"\"stateStartApiSucceeded\":true , \"stateWaitUntilFailed\": false}"
 	err = json.Unmarshal([]byte(s2ResultsJsonStr), &s2CommandResults)
 	if err != nil {
 		helpers.FailTestWithError(err, t)
