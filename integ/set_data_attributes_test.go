@@ -50,21 +50,21 @@ func TestSetDataAttributesTemporal(t *testing.T) {
 
 	assertions.Equal(httpResp.StatusCode, http.StatusOK)
 
-	smallDataObjects := []iwfidl.KeyValue{
+	smallDataAttributes := []iwfidl.KeyValue{
 		{
-			Key:   iwfidl.PtrString(persistence.TestDataObjectKey),
-			Value: &persistence.TestDataObjectVal1,
+			Key:   iwfidl.PtrString(persistence.TestDataAttributeKey),
+			Value: &persistence.TestDataAttributeVal1,
 		},
 		{
-			Key:   iwfidl.PtrString(persistence.TestDataObjectKey2),
-			Value: &persistence.TestDataObjectVal2,
+			Key:   iwfidl.PtrString(persistence.TestDataAttributeKey2),
+			Value: &persistence.TestDataAttributeVal2,
 		},
 	}
 
 	setReq := apiClient.DefaultApi.ApiV1WorkflowDataobjectsSetPost(context.Background())
 	httpResp2, err := setReq.WorkflowSetDataObjectsRequest(iwfidl.WorkflowSetDataObjectsRequest{
 		WorkflowId: wfId,
-		Objects:    smallDataObjects,
+		Objects:    smallDataAttributes,
 	}).Execute()
 
 	failTestAtHttpError(err, httpResp2, t)
@@ -76,11 +76,11 @@ func TestSetDataAttributesTemporal(t *testing.T) {
 	getResult, httpRespGet, err := getReq.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			persistence.TestDataObjectKey, persistence.TestDataObjectKey2,
+			persistence.TestDataAttributeKey, persistence.TestDataAttributeKey2,
 		}}).Execute()
 	failTestAtHttpError(err, httpRespGet, t)
 
-	assertions.ElementsMatch(smallDataObjects, getResult.Objects)
+	assertions.ElementsMatch(smallDataAttributes, getResult.Objects)
 
 	// Terminate the workflow once tests completed
 	stopReq := apiClient.DefaultApi.ApiV1WorkflowStopPost(context.Background())

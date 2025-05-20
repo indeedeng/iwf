@@ -45,7 +45,7 @@ func GetDecideApiRetryPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.
 	return stateOptions.ExecuteApiRetryPolicy
 }
 
-func GetWaitUntilApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+func GetWaitUntilApiDataAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
 	if stateOptions == nil {
 		return nil
 	}
@@ -61,7 +61,7 @@ func GetWaitUntilApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateO
 	return stateOptions.DataObjectsLoadingPolicy
 }
 
-func GetExecuteApiDataObjectsLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
+func GetExecuteApiDataAttributesLoadingPolicy(stateOptions *iwfidl.WorkflowStateOptions) *iwfidl.PersistenceLoadingPolicy {
 	if stateOptions == nil {
 		return nil
 	}

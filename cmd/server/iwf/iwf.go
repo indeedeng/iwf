@@ -21,10 +21,14 @@
 package iwf
 
 import (
+	"context"
+	"crypto/tls"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
+	ggrpc "google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	rawLog "log"
 	"strings"
 	"sync"
@@ -110,21 +114,50 @@ func start(c *cli.Context) {
 	// The client is a heavyweight object that should be created once per process.
 	var unifiedClient uclient.UnifiedClient
 	if config.Interpreter.Temporal != nil {
-		var metricHandler client.MetricsHandler
-		if config.Interpreter.Temporal.Prometheus != nil {
-			pscope := newPrometheusScope(*config.Interpreter.Temporal.Prometheus, logger)
-			metricHandler = sdktally.NewMetricsHandler(pscope)
+		temporalConfig := config.Interpreter.Temporal
+
+		clientOptions := client.Options{
+			HostPort:  temporalConfig.HostPort,
+			Namespace: temporalConfig.Namespace,
 		}
 
-		temporalClient, err := client.Dial(client.Options{
-			HostPort:       config.Interpreter.Temporal.HostPort,
-			Namespace:      config.Interpreter.Temporal.Namespace,
-			MetricsHandler: metricHandler,
-		})
+		if temporalConfig.Prometheus != nil {
+			pscope := newPrometheusScope(*temporalConfig.Prometheus, logger)
+			clientOptions.MetricsHandler = sdktally.NewMetricsHandler(pscope)
+		}
+
+		if temporalConfig.CloudAPIKey != "" {
+			clientOptions.Credentials = client.NewAPIKeyStaticCredentials(temporalConfig.CloudAPIKey)
+			// NOTE: this connectionOptions can be removed when upgrading temporal SDK to latest
+			// see https://docs.temporal.io/cloud/api-keys#sdk
+			clientOptions.ConnectionOptions = client.ConnectionOptions{
+				TLS: &tls.Config{},
+				DialOptions: []ggrpc.DialOption{
+					ggrpc.WithUnaryInterceptor(
+						func(
+							ctx context.Context, method string, req any, reply any, cc *ggrpc.ClientConn,
+							invoker ggrpc.UnaryInvoker, opts ...ggrpc.CallOption,
+						) error {
+							return invoker(
+								metadata.AppendToOutgoingContext(ctx, "temporal-namespace", temporalConfig.Namespace),
+								method,
+								req,
+								reply,
+								cc,
+								opts...,
+							)
+						},
+					),
+				},
+			}
+		}
+
+		temporalClient, err := client.Dial(clientOptions)
+
 		if err != nil {
 			rawLog.Fatalf("Unable to connect to Temporal because of error %v", err)
 		}
-		unifiedClient = temporalapi.NewTemporalClient(temporalClient, config.Interpreter.Temporal.Namespace, converter.GetDefaultDataConverter(), false, &config.Api.QueryWorkflowFailedRetryPolicy)
+		unifiedClient = temporalapi.NewTemporalClient(temporalClient, temporalConfig.Namespace, converter.GetDefaultDataConverter(), false, &config.Api.QueryWorkflowFailedRetryPolicy)
 
 		for _, svcName := range services {
 			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger)

@@ -4,18 +4,22 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/indeedeng/iwf.svg)](https://pkg.go.dev/github.com/indeedeng/iwf)
 [![Go Report Card](https://goreportcard.com/badge/github.com/indeedeng/iwf)](https://goreportcard.com/report/github.com/indeedeng/iwf)
 [![Coverage Status](https://codecov.io/github/indeedeng/iwf/coverage.svg?branch=main)](https://app.codecov.io/gh/indeedeng/iwf/branch/main)
+[![Static Badge for Temporal Code Exchange](https://img.shields.io/badge/Temporal-Code_Exchange_Featured-blue?style=flat-square&logo=temporal&labelColor=141414&color=444CE7)](https://temporal.io/code-exchange/indeed-workflow-framework-iwf)
 
 [![Build status](https://github.com/indeedeng/iwf/actions/workflows/ci-cadence-integ-test.yml/badge.svg?branch=main)](https://github.com/indeedeng/iwf/actions/workflows/ci-cadence-integ-test.yml)
 [![Build status](https://github.com/indeedeng/iwf/actions/workflows/ci-temporal-integ-test.yml/badge.svg?branch=main)](https://github.com/indeedeng/iwf/actions/workflows/ci-temporal-integ-test.yml)
 
-**iWF will make you a 10x developer!**
-
-iWF is an API orchestration platform for building resilient, fault-tolerant, scalable long-running applications. 
-It offers an orchestration **coding framework** with abstractions for durable timers, async/background execution with backoff retry, 
-KV storage,  RPC, and message queues. You will build long-running reliable processes faster than ever.
-
 
 # What is iWF
+Indeed Workflow Framework(iWF) is a coding framework with service to streamlines workflows that involve waiting on external events, handling timeouts, 
+and persisting state over long durations. With iWF, developers can build scalable, maintainable workflows that adapt to real-time events and integrate seamlessly with external systems. 
+
+## What Makes iWF Unique 
+* **Workflow-As-Code** uses native code to define everything: branching, looping, parallel threads, variables, schema etc.
+* **Simplified Architecture** iWF applications are all REST based micro-services which are easy to deploy, monitor, scale, maintain(version) and operate with industry standards.
+* **Simplicity and explicitness of APIs** uses as few concepts as possible to model complex logic. It uses clear abstractions to defines workflows in terms of discrete states, with waitUntil conditions and execute actions, declarative schema for data and search attributes for persistence, and RPC for external interaction for both read and write.
+* **Dynamic Interactions** allows external applications to interact with running workflows through RPC, signals, and internal channels.
+* **Extensive tooling** provides tooling to look up running state definitions, skipping timers, enhanced resetting etc.
 
 ## Use case study/examples
 * [SAGA pattern](https://medium.com/@qlong/saga-pattern-deep-dive-with-indeed-workflow-engine-b7e82c59e51f?sk=672abd70b0e092d4cda7788276c5a241)
@@ -24,6 +28,7 @@ KV storage,  RPC, and message queues. You will build long-running reliable proce
 * [Abstracted microservice orchestration in Java/Golang](https://github.com/indeedeng/iwf/wiki/Use-case-study-%E2%80%90%E2%80%90-Microservice-Orchestration)
 * Employer & JobSeeker engagement in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/engagement) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/engagement)
 * Subscription Workflow in [Java](https://github.com/indeedeng/iwf-java-samples/tree/main/src/main/java/io/iworkflow/workflow/subscription) or [Golang](https://github.com/indeedeng/iwf-golang-samples/blob/main/workflows/subscription)
+* [Design Patterns](https://medium.com/@qlong/iwf-design-patterns-936a48336766)
 
 ## Basic concepts
 * [Basic concepts overview](https://github.com/indeedeng/iwf/wiki/Basic-concepts-overview)
@@ -70,6 +75,9 @@ This by default will run Temporal server with it, again:
 * Temporal WebUI: http://localhost:8233/
 * Temporal service: localhost:7233
 
+## Production
+Check the [wiki](https://github.com/indeedeng/iwf/wiki/iWF-Server-Operations#how-to-deploy).
+
 # Support
 
 Join our Slack channel! [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](http://iworkflow-slack.work)
@@ -82,8 +90,11 @@ Check out our [CONTRIBUTING](https://github.com/indeedeng/iwf/blob/main/CONTRIBU
 
 
 # Posts & Articles & Reference
-* [Why I created Indeed Workflow Engine](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
-* [Durable Timers in Indeed Workflow Engine](https://medium.com/@qlong/iwf-deep-dive-workflowstate-durable-timer-1-0bb89e6d6fd4?sk=6095e32b5ad677b6ea4f3c604751ece5)
+* [Why I created Indeed Workflow Framework](https://medium.com/@qlong/a-letter-to-cadence-temporal-and-workflow-tech-community-b32e9fa97a0c)
+* [iWF on Temporal CodeExchange](https://temporal.io/code-exchange/indeed-workflow-framework-iwf)
+* [14 “Modern” Backend Software Design Patterns with Indeed Workflow Framework(iWF) on Temporal](https://medium.com/@qlong/iwf-design-patterns-936a48336766)
+* [iWF Overview for Temporal Users](https://medium.com/@qlong/iwf-overview-for-temporal-users-part1-programming-model-difference-9f58e4793cfa)
+* [Build Reliable AI Agents with Indeed Workflow Framework on Temporal](https://medium.com/@qlong/build-reliable-ai-agents-with-iwf-on-temporal-7f1a101e000b)
 * Cadence community spotlights
   * [#1](https://cadenceworkflow.io/blog/2023/01/31/community-spotlight-january-2023/)
   * [#2](https://cadenceworkflow.io/blog/2023/11/30/community-spotlight-update-november-2023/)

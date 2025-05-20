@@ -152,7 +152,7 @@ func getState1DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 	loadingType := iwfidl.PersistenceLoadingType(loadingTypeFromInput.GetData())
 	noneLoadingType := iwfidl.NONE
 
-	// Move to State 2 with provided options & input after updating data objects
+	// Move to State 2 with provided options & input after updating data attributes
 	return iwfidl.WorkflowStateDecideResponse{
 		StateDecision: &iwfidl.StateDecision{
 			NextStates: []iwfidl.StateMovement{
@@ -171,7 +171,7 @@ func getState1DecideResponse(req iwfidl.WorkflowStateDecideRequest) iwfidl.Workf
 				},
 			},
 		},
-		UpsertDataObjects: getUpsertDataObjects(),
+		UpsertDataObjects: getUpsertDataAttributes(),
 	}
 }
 
@@ -279,15 +279,15 @@ func verifyLoadedDataAttributes(t *testing.T, stateId string, method string, dat
 	}
 }
 
-func getUpsertDataObjects() []iwfidl.KeyValue {
+func getUpsertDataAttributes() []iwfidl.KeyValue {
 	return []iwfidl.KeyValue{
 		{
 			Key:   iwfidl.PtrString("da_wait_until1"),
-			Value: &iwfidl.EncodedObject{Encoding: iwfidl.PtrString("json"), Data: iwfidl.PtrString("test-data-object-wait-until")},
+			Value: &iwfidl.EncodedObject{Encoding: iwfidl.PtrString("json"), Data: iwfidl.PtrString("test-data-attribute-wait-until")},
 		},
 		{
 			Key:   iwfidl.PtrString("da_execute1"),
-			Value: &iwfidl.EncodedObject{Encoding: iwfidl.PtrString("json"), Data: iwfidl.PtrString("test-data-object-execute")},
+			Value: &iwfidl.EncodedObject{Encoding: iwfidl.PtrString("json"), Data: iwfidl.PtrString("test-data-attribute-execute")},
 		},
 		{
 			Key:   iwfidl.PtrString("da_other_key"),
@@ -303,7 +303,7 @@ func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl
 				Key: iwfidl.PtrString("da_wait_until1"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-wait-until"),
+					Data:     iwfidl.PtrString("test-data-attribute-wait-until"),
 				},
 			},
 		}
@@ -314,7 +314,7 @@ func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl
 				Key: iwfidl.PtrString("da_execute1"),
 				Value: &iwfidl.EncodedObject{
 					Encoding: iwfidl.PtrString("json"),
-					Data:     iwfidl.PtrString("test-data-object-execute"),
+					Data:     iwfidl.PtrString("test-data-attribute-execute"),
 				},
 			},
 		}
@@ -340,7 +340,7 @@ func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl
 					Key: iwfidl.PtrString("da_wait_until1"),
 					Value: &iwfidl.EncodedObject{
 						Encoding: iwfidl.PtrString("json"),
-						Data:     iwfidl.PtrString("test-data-object-wait-until"),
+						Data:     iwfidl.PtrString("test-data-attribute-wait-until"),
 					},
 				},
 			}
@@ -357,7 +357,7 @@ func getExpectedDataAttributes(stateId string, method string, loadingType iwfidl
 		}
 	}
 
-	return getUpsertDataObjects()
+	return getUpsertDataAttributes()
 }
 
 func (h *handler) GetTestResult() (map[string]int64, map[string]interface{}) {

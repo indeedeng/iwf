@@ -603,7 +603,7 @@ func processStateExecution(
 		ctx = provider.WithActivityOptions(ctx, activityOptions)
 
 		saLoadingPolicy := compatibility.GetWaitUntilApiSearchAttributesLoadingPolicy(state.StateOptions)
-		doLoadingPolicy := compatibility.GetWaitUntilApiDataObjectsLoadingPolicy(state.StateOptions)
+		doLoadingPolicy := compatibility.GetWaitUntilApiDataAttributesLoadingPolicy(state.StateOptions)
 
 		stateWaitUntilApiStartTime := provider.Now(ctx).UnixMilli()
 		if !provider.IsReplaying(ctx) {
@@ -627,7 +627,7 @@ func processStateExecution(
 					WorkflowStateId:  state.StateId,
 					StateInput:       state.StateInput,
 					SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
-					DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
+					DataObjects:      persistenceManager.LoadDataAttributes(ctx, doLoadingPolicy),
 				},
 			},
 			persistenceManager.GetAllSearchAttributes())
@@ -674,7 +674,7 @@ func processStateExecution(
 		if err != nil {
 			return nil, service.FailureStateExecutionStatus, err
 		}
-		err = persistenceManager.ProcessUpsertDataObject(ctx, startResponse.GetUpsertDataObjects())
+		err = persistenceManager.ProcessUpsertDataAttribute(ctx, startResponse.GetUpsertDataObjects())
 		if err != nil {
 			return nil, service.FailureStateExecutionStatus, err
 		}
@@ -886,7 +886,7 @@ func invokeStateExecute(
 	}
 
 	saLoadingPolicy := compatibility.GetExecuteApiSearchAttributesLoadingPolicy(state.StateOptions)
-	doLoadingPolicy := compatibility.GetExecuteApiDataObjectsLoadingPolicy(state.StateOptions)
+	doLoadingPolicy := compatibility.GetExecuteApiDataAttributesLoadingPolicy(state.StateOptions)
 
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	var decideResponse *iwfidl.WorkflowStateDecideResponse
@@ -914,7 +914,7 @@ func invokeStateExecute(
 				CommandResults:   commandRes,
 				StateLocals:      stateExecutionLocal,
 				SearchAttributes: persistenceManager.LoadSearchAttributes(ctx, saLoadingPolicy),
-				DataObjects:      persistenceManager.LoadDataObjects(ctx, doLoadingPolicy),
+				DataObjects:      persistenceManager.LoadDataAttributes(ctx, doLoadingPolicy),
 				StateInput:       state.StateInput,
 			},
 		}, persistenceManager.GetAllSearchAttributes())
@@ -989,7 +989,7 @@ func invokeStateExecute(
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
 	}
-	err = persistenceManager.ProcessUpsertDataObject(ctx, decideResponse.GetUpsertDataObjects())
+	err = persistenceManager.ProcessUpsertDataAttribute(ctx, decideResponse.GetUpsertDataObjects())
 	if err != nil {
 		return nil, service.FailureStateExecutionStatus, err
 	}

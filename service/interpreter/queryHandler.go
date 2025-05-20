@@ -19,7 +19,7 @@ func SetQueryHandlers(
 	basicInfo service.BasicInfo,
 ) error {
 	err := provider.SetQueryHandler(ctx, service.GetDataAttributesWorkflowQueryType, func(req service.GetDataAttributesQueryRequest) (service.GetDataAttributesQueryResponse, error) {
-		dos := persistenceManager.GetDataObjectsByKey(req)
+		dos := persistenceManager.GetDataAttributesByKey(req)
 		return dos, nil
 	})
 	if err != nil {
@@ -49,7 +49,7 @@ func SetQueryHandlers(
 		info := provider.GetWorkflowInfo(ctx) // TODO use firstRunId instead
 
 		return service.PrepareRpcQueryResponse{
-			DataObjects:              persistenceManager.LoadDataObjects(ctx, req.DataObjectsLoadingPolicy),
+			DataObjects:              persistenceManager.LoadDataAttributes(ctx, req.DataObjectsLoadingPolicy),
 			SearchAttributes:         persistenceManager.LoadSearchAttributes(ctx, req.SearchAttributesLoadingPolicy),
 			WorkflowRunId:            info.WorkflowExecution.RunID,
 			WorkflowStartedTimestamp: info.WorkflowStartTime.Unix(),

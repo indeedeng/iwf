@@ -27,13 +27,13 @@ import (
  * 		- Execute method performs checks on the attribute data and then gracefully completes the workflow
  */
 const (
-	WorkflowType       = "persistence"
-	State1             = "S1"
-	State2             = "S2"
-	State3             = "S3"
-	TestDataObjectKey  = "test-data-object"
-	TestDataObjectKey2 = "test-data-object-2"
-	TestStateLocalKey  = "test-state-local"
+	WorkflowType          = "persistence"
+	State1                = "S1"
+	State2                = "S2"
+	State3                = "S3"
+	TestDataAttributeKey  = "test-data-attribute"
+	TestDataAttributeKey2 = "test-data-attribute-2"
+	TestStateLocalKey     = "test-state-local"
 
 	TestSearchAttributeKeywordKey    = "CustomKeywordField"
 	TestSearchAttributeKeywordValue1 = "keyword-value1"
@@ -49,14 +49,14 @@ const (
 	TestSearchAttributeIntValue2       = 2
 )
 
-var TestDataObjectVal1 = iwfidl.EncodedObject{
+var TestDataAttributeVal1 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-data-object-value1"),
+	Data:     iwfidl.PtrString("test-data-attribute-value1"),
 }
 
-var TestDataObjectVal2 = iwfidl.EncodedObject{
+var TestDataAttributeVal2 = iwfidl.EncodedObject{
 	Encoding: iwfidl.PtrString("json"),
-	Data:     iwfidl.PtrString("test-data-object-value2"),
+	Data:     iwfidl.PtrString("test-data-attribute-value2"),
 }
 
 var testStateLocalVal = iwfidl.EncodedObject{
@@ -131,12 +131,12 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 				},
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
-						Key:   iwfidl.PtrString(TestDataObjectKey),
-						Value: &TestDataObjectVal1,
+						Key:   iwfidl.PtrString(TestDataAttributeKey),
+						Value: &TestDataAttributeVal1,
 					},
 					{
-						Key:   iwfidl.PtrString(TestDataObjectKey2),
-						Value: &TestDataObjectVal1,
+						Key:   iwfidl.PtrString(TestDataAttributeKey2),
+						Value: &TestDataAttributeVal1,
 					},
 				},
 				UpsertSearchAttributes: sa,
@@ -173,10 +173,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 			queryAtts := req.GetDataObjects()
 			for _, queryAtt := range queryAtts {
 				value := queryAtt.GetValue()
-				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
+				if queryAtt.GetKey() == TestDataAttributeKey && value.GetData() == TestDataAttributeVal2.GetData() && value.GetEncoding() == TestDataAttributeVal2.GetEncoding() {
 					queryAttFound = true
 				}
-				if queryAtt.GetKey() == TestDataObjectKey2 {
+				if queryAtt.GetKey() == TestDataAttributeKey2 {
 					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 			}
@@ -211,10 +211,10 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 			queryAttFound := 0
 			queryAtts := req.GetDataObjects()
 			for _, queryAtt := range queryAtts {
-				if queryAtt.GetKey() == TestDataObjectKey {
+				if queryAtt.GetKey() == TestDataAttributeKey {
 					queryAttFound++
 				}
-				if queryAtt.GetKey() == TestDataObjectKey2 {
+				if queryAtt.GetKey() == TestDataAttributeKey2 {
 					queryAttFound++
 				}
 			}
@@ -275,10 +275,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			// Determine how many query attributes are found
 			for _, queryAtt := range queryAtts {
 				value := queryAtt.GetValue()
-				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
+				if queryAtt.GetKey() == TestDataAttributeKey && value.GetData() == TestDataAttributeVal1.GetData() && value.GetEncoding() == TestDataAttributeVal1.GetEncoding() {
 					queryAttFound++
 				}
-				if queryAtt.GetKey() == TestDataObjectKey2 && value.GetData() == TestDataObjectVal1.GetData() && value.GetEncoding() == TestDataObjectVal1.GetEncoding() {
+				if queryAtt.GetKey() == TestDataAttributeKey2 && value.GetData() == TestDataAttributeVal1.GetData() && value.GetEncoding() == TestDataAttributeVal1.GetEncoding() {
 					queryAttFound++
 				}
 			}
@@ -324,7 +324,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 								DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
-										TestDataObjectKey,
+										TestDataAttributeKey,
 									},
 								},
 							},
@@ -333,8 +333,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 				},
 				UpsertDataObjects: []iwfidl.KeyValue{
 					{
-						Key:   iwfidl.PtrString(TestDataObjectKey),
-						Value: &TestDataObjectVal2,
+						Key:   iwfidl.PtrString(TestDataAttributeKey),
+						Value: &TestDataAttributeVal2,
 					},
 				},
 				UpsertSearchAttributes: sa,
@@ -365,10 +365,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			// Determine how many query attributes are found
 			for _, queryAtt := range queryAtts {
 				value := queryAtt.GetValue()
-				if queryAtt.GetKey() == TestDataObjectKey && value.GetData() == TestDataObjectVal2.GetData() && value.GetEncoding() == TestDataObjectVal2.GetEncoding() {
+				if queryAtt.GetKey() == TestDataAttributeKey && value.GetData() == TestDataAttributeVal2.GetData() && value.GetEncoding() == TestDataAttributeVal2.GetEncoding() {
 					queryAttFound = true
 				}
-				if queryAtt.GetKey() == TestDataObjectKey2 {
+				if queryAtt.GetKey() == TestDataAttributeKey2 {
 					helpers.FailTestWithErrorMessage("should not load key that is not included in partial loading", t)
 				}
 			}
@@ -391,8 +391,8 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 								DataObjectsLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 									PersistenceLoadingType: ptr.Any(iwfidl.PARTIAL_WITHOUT_LOCKING),
 									PartialLoadingKeys: []string{
-										TestDataObjectKey,
-										TestDataObjectKey2,
+										TestDataAttributeKey,
+										TestDataAttributeKey2,
 									},
 								},
 							},
@@ -424,10 +424,10 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 
 			// Determine how many query attributes are found
 			for _, queryAtt := range queryAtts {
-				if queryAtt.GetKey() == TestDataObjectKey {
+				if queryAtt.GetKey() == TestDataAttributeKey {
 					queryAttFound++
 				}
-				if queryAtt.GetKey() == TestDataObjectKey2 {
+				if queryAtt.GetKey() == TestDataAttributeKey2 {
 					queryAttFound++
 				}
 			}

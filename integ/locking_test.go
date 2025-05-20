@@ -146,11 +146,11 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 				DataAttributesLoadingPolicy: &iwfidl.PersistenceLoadingPolicy{
 					PersistenceLoadingType: iwfidl.PARTIAL_WITH_EXCLUSIVE_LOCK.Ptr(),
 					PartialLoadingKeys: []string{
-						locking.TestDataObjectKey2,
-						locking.TestDataObjectKey1,
+						locking.TestDataAttributeKey2,
+						locking.TestDataAttributeKey1,
 					},
 					LockingKeys: []string{
-						locking.TestDataObjectKey1,
+						locking.TestDataAttributeKey1,
 					},
 				},
 				TimeoutSeconds:   iwfidl.PtrInt32(2),
@@ -244,7 +244,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 	queryResult1, httpResp, err := reqQry.WorkflowGetDataObjectsRequest(iwfidl.WorkflowGetDataObjectsRequest{
 		WorkflowId: wfId,
 		Keys: []string{
-			locking.TestDataObjectKey1,
+			locking.TestDataAttributeKey1,
 		},
 		UseMemoForDataAttributes: ptr.Any(useMemo),
 	}).Execute()
@@ -252,7 +252,7 @@ func doTestLockingWorkflow(t *testing.T, backendType service.BackendType, config
 
 	expected1 := []iwfidl.KeyValue{
 		{
-			Key: iwfidl.PtrString(locking.TestDataObjectKey1),
+			Key: iwfidl.PtrString(locking.TestDataAttributeKey1),
 			Value: &iwfidl.EncodedObject{
 				Encoding: iwfidl.PtrString("json"),
 				Data:     iwfidl.PtrString(fmt.Sprintf("%v", finalCounterValue)),

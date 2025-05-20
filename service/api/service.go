@@ -359,7 +359,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 
 		response, err := s.client.DescribeWorkflowExecution(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), nil)
 		if err != nil {
-			return nil, s.handleError(err, WorkflowGetDataObjectsApiPath, req.GetWorkflowId())
+			return nil, s.handleError(err, WorkflowGetDataAttributesApiPath, req.GetWorkflowId())
 		}
 
 		for k, v := range response.Memos {
@@ -385,7 +385,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 			if s.config.Interpreter.FailAtMemoIncompatibility {
 				return nil, s.handleError(
 					fmt.Errorf("memo is not set correctly to use"),
-					WorkflowGetDataObjectsApiPath, req.GetWorkflowId())
+					WorkflowGetDataAttributesApiPath, req.GetWorkflowId())
 			}
 		}
 
@@ -402,7 +402,7 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 			})
 
 		if err != nil {
-			return nil, s.handleError(err, WorkflowGetDataObjectsApiPath, req.GetWorkflowId())
+			return nil, s.handleError(err, WorkflowGetDataAttributesApiPath, req.GetWorkflowId())
 		}
 	}
 
