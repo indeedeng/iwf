@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **InterStateChannelResults** | Pointer to [**[]InterStateChannelResult**](InterStateChannelResult.md) |  | [optional] 
 **TimerResults** | Pointer to [**[]TimerResult**](TimerResult.md) |  | [optional] 
 **StateStartApiSucceeded** | Pointer to **bool** |  | [optional] 
+**StateWaitUntilFailed** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -127,6 +128,31 @@ SetStateStartApiSucceeded sets StateStartApiSucceeded field to given value.
 `func (o *CommandResults) HasStateStartApiSucceeded() bool`
 
 HasStateStartApiSucceeded returns a boolean if a field has been set.
+
+### GetStateWaitUntilFailed
+
+`func (o *CommandResults) GetStateWaitUntilFailed() bool`
+
+GetStateWaitUntilFailed returns the StateWaitUntilFailed field if non-nil, zero value otherwise.
+
+### GetStateWaitUntilFailedOk
+
+`func (o *CommandResults) GetStateWaitUntilFailedOk() (*bool, bool)`
+
+GetStateWaitUntilFailedOk returns a tuple with the StateWaitUntilFailed field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetStateWaitUntilFailed
+
+`func (o *CommandResults) SetStateWaitUntilFailed(v bool)`
+
+SetStateWaitUntilFailed sets StateWaitUntilFailed field to given value.
+
+### HasStateWaitUntilFailed
+
+`func (o *CommandResults) HasStateWaitUntilFailed() bool`
+
+HasStateWaitUntilFailed returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
