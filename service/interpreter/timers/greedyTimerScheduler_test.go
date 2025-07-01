@@ -123,10 +123,6 @@ func TestPruneToNextTimer_PrunesCorrectly_WithOneScheduled(t *testing.T) {
 	}
 }
 
-type stubCounter struct{}
-
-func (s *stubCounter) IsThresholdMet() bool { return false }
-
 func TestStartGreedyTimerScheduler_AwaitErrorBreaksLoop(t *testing.T) {
 	provider := &mockProvider{awaitErr: errors.New("test error"), now: 100}
 	// Should not panic or loop forever

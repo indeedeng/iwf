@@ -107,6 +107,7 @@ func startGreedyTimerScheduler(
 				return (next != nil && (len(t.providerScheduledTimerUnixTs) == 0 || next.FiringUnixTimestampSeconds < t.providerScheduledTimerUnixTs[len(t.providerScheduledTimerUnixTs)-1])) || continueAsNewCounter.IsThresholdMet()
 			})
 
+			// Expecting CanceledError if the ctx is canceled
 			if err != nil {
 				break
 			}
