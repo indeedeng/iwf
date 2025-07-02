@@ -101,11 +101,16 @@ func startGreedyTimerScheduler(
 	t := timerScheduler{}
 	provider.GoNamed(ctx, "greedy-timer-scheduler", func(ctx interfaces.UnifiedContext) {
 		for {
-			_ = provider.Await(ctx, func() bool {
+			err := provider.Await(ctx, func() bool {
 				now := provider.Now(ctx).Unix()
 				next := t.pruneToNextTimer(now)
 				return (next != nil && (len(t.providerScheduledTimerUnixTs) == 0 || next.FiringUnixTimestampSeconds < t.providerScheduledTimerUnixTs[len(t.providerScheduledTimerUnixTs)-1])) || continueAsNewCounter.IsThresholdMet()
 			})
+
+			// Expecting CanceledError if the ctx is canceled
+			if err != nil {
+				break
+			}
 
 			if continueAsNewCounter.IsThresholdMet() {
 				break
