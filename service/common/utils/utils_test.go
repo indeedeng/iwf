@@ -94,7 +94,7 @@ func TestTrimContextByTimeoutWithCappedDDL(t *testing.T) {
 			// Create parent context
 			var parentCtx context.Context
 			var cancel context.CancelFunc
-			
+
 			if tt.parentContextTimeout != nil {
 				parentCtx, cancel = context.WithTimeout(context.Background(), *tt.parentContextTimeout)
 				defer cancel()
@@ -122,11 +122,6 @@ func TestTrimContextByTimeoutWithCappedDDL(t *testing.T) {
 			tolerance := 1.0
 			if actualTimeout < float64(tt.expectedTimeout)-tolerance || actualTimeout > float64(tt.expectedTimeout)+tolerance {
 				t.Errorf("Expected timeout ~%d seconds, got %.2f seconds", tt.expectedTimeout, actualTimeout)
-			}
-
-			// Verify that the new context inherits from the parent context
-			if newCtx.Value("test") != parentCtx.Value("test") {
-				// This is a basic check - in real scenarios you might add test values to verify inheritance
 			}
 		})
 	}
@@ -224,4 +219,4 @@ func intPtr(i int32) *int32 {
 
 func durationPtr(d time.Duration) *time.Duration {
 	return &d
-} 
+}
