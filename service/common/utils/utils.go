@@ -11,7 +11,6 @@ import (
 
 const (
 	defaultMaxApiTimeoutSeconds = 60
-	contextBufferSeconds        = 1
 )
 
 func MergeStringSlice(first, second []string) []string {
@@ -71,10 +70,10 @@ func TrimContextByTimeoutWithCappedDDL(parent context.Context, reqWaitSeconds *i
 
 	maxWaitTimestamp := time.Now().Unix() + maxWaitSeconds
 
-	// then capped by context minus contextBufferSeconds(so that the context doesn't timeout)
+	// then capped by context
 	ddl, ok := parent.Deadline()
 	if ok {
-		maxDdlUnix := ddl.Unix() - contextBufferSeconds
+		maxDdlUnix := ddl.Unix()
 		if maxDdlUnix < maxWaitTimestamp {
 			maxWaitTimestamp = maxDdlUnix
 		}
