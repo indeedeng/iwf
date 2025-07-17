@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// Note: TrimContextByTimeoutWithCappedDDL applies a 1-second buffer (contextBufferSeconds)
+// when using parent context deadlines to ensure the new context times out before the parent
+
 func TestTrimContextByTimeoutWithCappedDDL(t *testing.T) {
 	tests := []struct {
 		name                 string
@@ -57,11 +60,11 @@ func TestTrimContextByTimeoutWithCappedDDL(t *testing.T) {
 			expectedTimeout:      30,
 		},
 		{
-			name:                 "Parent context deadline caps the timeout when sooner",
+			name:                 "Parent context deadline caps the timeout when sooner (with buffer)",
 			reqWaitSeconds:       intPtr(50),
 			configuredMaxSeconds: 60,
 			parentContextTimeout: durationPtr(10 * time.Second),
-			expectedTimeout:      10,
+			expectedTimeout:      9, // 10 - 1 second buffer
 		},
 		{
 			name:                 "Parent context deadline doesn't affect when later",
@@ -76,6 +79,13 @@ func TestTrimContextByTimeoutWithCappedDDL(t *testing.T) {
 			configuredMaxSeconds: 25,
 			parentContextTimeout: durationPtr(40 * time.Second),
 			expectedTimeout:      15,
+		},
+		{
+			name:                 "Parent context deadline with small buffer becomes limiting factor",
+			reqWaitSeconds:       intPtr(10),
+			configuredMaxSeconds: 15,
+			parentContextTimeout: durationPtr(8 * time.Second),
+			expectedTimeout:      7, // 8 - 1 second buffer = 7, which is less than reqWaitSeconds(10)
 		},
 	}
 
@@ -140,9 +150,53 @@ func TestTrimContextByTimeoutWithCappedDDL_EdgeCases(t *testing.T) {
 			t.Fatal("Expected new context to have a deadline")
 		}
 
-		// The deadline should be very close to or before now
-		if deadline.After(time.Now().Add(1 * time.Second)) {
-			t.Error("Expected deadline to be very soon or in the past")
+		// The deadline should be in the past due to the 1-second buffer
+		if deadline.After(time.Now()) {
+			t.Error("Expected deadline to be in the past due to buffer")
+		}
+	})
+
+	t.Run("Context buffer seconds behavior", func(t *testing.T) {
+		// Test specifically that the 1-second buffer is applied correctly
+		parentCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		startTime := time.Now()
+		newCtx, newCancel := TrimContextByTimeoutWithCappedDDL(parentCtx, intPtr(10), 60)
+		defer newCancel()
+
+		deadline, ok := newCtx.Deadline()
+		if !ok {
+			t.Fatal("Expected new context to have a deadline")
+		}
+
+		// The deadline should be approximately 4 seconds from now (5 - 1 second buffer)
+		actualTimeout := deadline.Sub(startTime).Seconds()
+		expectedTimeout := 4.0 // 5 seconds parent timeout - 1 second buffer
+
+		if actualTimeout < expectedTimeout-1.0 || actualTimeout > expectedTimeout+1.0 {
+			t.Errorf("Expected timeout ~%.0f seconds (parent deadline minus buffer), got %.2f seconds", expectedTimeout, actualTimeout)
+		}
+	})
+
+	t.Run("Buffer results in very small or negative timeout", func(t *testing.T) {
+		// Test when parent deadline minus buffer is very small
+		parentCtx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+		defer cancel()
+
+		startTime := time.Now()
+		newCtx, newCancel := TrimContextByTimeoutWithCappedDDL(parentCtx, intPtr(10), 60)
+		defer newCancel()
+
+		deadline, ok := newCtx.Deadline()
+		if !ok {
+			t.Fatal("Expected new context to have a deadline")
+		}
+
+		// The deadline should be in the past or very soon (0.5 - 1 = -0.5 seconds)
+		actualTimeout := deadline.Sub(startTime).Seconds()
+		if actualTimeout > 0.5 {
+			t.Errorf("Expected timeout to be very small or negative due to buffer, got %.2f seconds", actualTimeout)
 		}
 	})
 
