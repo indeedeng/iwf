@@ -58,27 +58,28 @@ func TrimRpcTimeoutSeconds(ctx context.Context, req iwfidl.WorkflowRpcRequest) i
 	return secondsRemaining
 }
 
-func TrimContextByTimeoutWithCappedDDL(parent context.Context, waitSeconds *int32, configuredMaxSeconds int64) (context.Context, context.CancelFunc) {
+func TrimContextByTimeoutWithCappedDDL(parent context.Context, reqWaitSeconds *int32, configuredMaxSeconds int64) (context.Context, context.CancelFunc) {
 	maxWaitSeconds := configuredMaxSeconds
-	if waitSeconds != nil {
-		maxWaitSeconds = int64(*waitSeconds)
-	}
 	if maxWaitSeconds == 0 {
 		maxWaitSeconds = defaultMaxApiTimeoutSeconds
 	}
 
-	newDdlUnix := time.Now().Unix() + maxWaitSeconds
+	if reqWaitSeconds != nil && *reqWaitSeconds > 0 && int64(*reqWaitSeconds) < maxWaitSeconds {
+		maxWaitSeconds = int64(*reqWaitSeconds)
+	}
+
+	maxWaitTimestamp := time.Now().Unix() + maxWaitSeconds
 
 	// then capped by context
 	ddl, ok := parent.Deadline()
 	if ok {
 		maxDdlUnix := ddl.Unix()
-		if maxDdlUnix < newDdlUnix {
-			newDdlUnix = maxDdlUnix
+		if maxDdlUnix < maxWaitTimestamp {
+			maxWaitTimestamp = maxDdlUnix
 		}
 	}
 
-	newDdl := time.Unix(newDdlUnix, 0)
+	newDdl := time.Unix(maxWaitTimestamp, 0)
 	return context.WithDeadline(parent, newDdl)
 }
 
