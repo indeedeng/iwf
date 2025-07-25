@@ -16,6 +16,9 @@ and persisting state over long durations. With iWF, developers can build scalabl
 
 ## What Makes iWF Unique 
 * **Workflow-As-Code** uses native code to define everything: branching, looping, parallel threads, variables, schema etc.
+* **Structured Programming** provides well-orginized structure to maintain workflow that is natural and easy to read.
+* **Durable Timer** provides timer that is durable, resilient to system failure.
+* **Automatic Retry** the background execution units(WorkflowState) are inherently resilient to failure, with built in distributed backoff retry using durable timer.
 * **Simplified Architecture** iWF applications are all REST based micro-services which are easy to deploy, monitor, scale, maintain(version) and operate with industry standards.
 * **Simplicity and explicitness of APIs** uses as few concepts as possible to model complex logic. It uses clear abstractions to defines workflows in terms of discrete states, with waitUntil conditions and execute actions, declarative schema for data and search attributes for persistence, and RPC for external interaction for both read and write.
 * **Dynamic Interactions** allows external applications to interact with running workflows through RPC, signals, and internal channels.
