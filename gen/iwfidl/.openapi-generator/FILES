@@ -31,6 +31,7 @@ docs/IwfEventError.md
 docs/KeyValue.md
 docs/PersistenceLoadingPolicy.md
 docs/PersistenceLoadingType.md
+docs/PublishToInternalChannelRequest.md
 docs/RetryPolicy.md
 docs/SearchAttribute.md
 docs/SearchAttributeKeyAndType.md
@@ -117,6 +118,7 @@ model_iwf_event_error.go
 model_key_value.go
 model_persistence_loading_policy.go
 model_persistence_loading_type.go
+model_publish_to_internal_channel_request.go
 model_retry_policy.go
 model_search_attribute.go
 model_search_attribute_key_and_type.go

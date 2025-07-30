@@ -278,6 +278,21 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(
 	return nil
 }
 
+func (s *serviceImpl) ApiV1WorkflowPublishToInternalChannelPost(
+	ctx context.Context, req iwfidl.PublishToInternalChannelRequest,
+) (retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	sigVal := service.ExecuteRpcSignalRequest{
+		InterStateChannelPublishing: req.GetMessages(),
+	}
+	err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
+	if err != nil {
+		return s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
+	}
+	return nil
+}
+
 func (s *serviceImpl) ApiV1WorkflowConfigUpdate(
 	ctx context.Context, req iwfidl.WorkflowConfigUpdateRequest,
 ) (retError *errors.ErrorAndStatus) {

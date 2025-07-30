@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 [**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 [**ApiV1WorkflowInternalDumpPost**](DefaultApi.md#ApiV1WorkflowInternalDumpPost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
+[**ApiV1WorkflowPublishToInternalChannelPost**](DefaultApi.md#ApiV1WorkflowPublishToInternalChannelPost) | **Post** /api/v1/workflow/publishToInternalChannel | signal a workflow
 [**ApiV1WorkflowResetPost**](DefaultApi.md#ApiV1WorkflowResetPost) | **Post** /api/v1/workflow/reset | reset a workflow
 [**ApiV1WorkflowRpcPost**](DefaultApi.md#ApiV1WorkflowRpcPost) | **Post** /api/v1/workflow/rpc | execute an RPC of a workflow
 [**ApiV1WorkflowSearchPost**](DefaultApi.md#ApiV1WorkflowSearchPost) | **Post** /api/v1/workflow/search | search for workflows by a search attribute query
@@ -393,6 +394,68 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**WorkflowDumpResponse**](WorkflowDumpResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowPublishToInternalChannelPost
+
+> ApiV1WorkflowPublishToInternalChannelPost(ctx).PublishToInternalChannelRequest(publishToInternalChannelRequest).Execute()
+
+signal a workflow
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    publishToInternalChannelRequest := *openapiclient.NewPublishToInternalChannelRequest("WorkflowId_example") // PublishToInternalChannelRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    r, err := apiClient.DefaultApi.ApiV1WorkflowPublishToInternalChannelPost(context.Background()).PublishToInternalChannelRequest(publishToInternalChannelRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowPublishToInternalChannelPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowPublishToInternalChannelPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **publishToInternalChannelRequest** | [**PublishToInternalChannelRequest**](PublishToInternalChannelRequest.md) |  | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 
