@@ -19,8 +19,9 @@ var _ MappedNullable = &PublishToInternalChannelRequest{}
 
 // PublishToInternalChannelRequest struct for PublishToInternalChannelRequest
 type PublishToInternalChannelRequest struct {
-	WorkflowId string                        `json:"workflowId"`
-	Messages   []InterStateChannelPublishing `json:"messages,omitempty"`
+	WorkflowId    string                        `json:"workflowId"`
+	WorkflowRunId *string                       `json:"workflowRunId,omitempty"`
+	Messages      []InterStateChannelPublishing `json:"messages,omitempty"`
 }
 
 // NewPublishToInternalChannelRequest instantiates a new PublishToInternalChannelRequest object
@@ -63,6 +64,38 @@ func (o *PublishToInternalChannelRequest) GetWorkflowIdOk() (*string, bool) {
 // SetWorkflowId sets field value
 func (o *PublishToInternalChannelRequest) SetWorkflowId(v string) {
 	o.WorkflowId = v
+}
+
+// GetWorkflowRunId returns the WorkflowRunId field value if set, zero value otherwise.
+func (o *PublishToInternalChannelRequest) GetWorkflowRunId() string {
+	if o == nil || IsNil(o.WorkflowRunId) {
+		var ret string
+		return ret
+	}
+	return *o.WorkflowRunId
+}
+
+// GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PublishToInternalChannelRequest) GetWorkflowRunIdOk() (*string, bool) {
+	if o == nil || IsNil(o.WorkflowRunId) {
+		return nil, false
+	}
+	return o.WorkflowRunId, true
+}
+
+// HasWorkflowRunId returns a boolean if a field has been set.
+func (o *PublishToInternalChannelRequest) HasWorkflowRunId() bool {
+	if o != nil && !IsNil(o.WorkflowRunId) {
+		return true
+	}
+
+	return false
+}
+
+// SetWorkflowRunId gets a reference to the given string and assigns it to the WorkflowRunId field.
+func (o *PublishToInternalChannelRequest) SetWorkflowRunId(v string) {
+	o.WorkflowRunId = &v
 }
 
 // GetMessages returns the Messages field value if set, zero value otherwise.
@@ -108,6 +141,9 @@ func (o PublishToInternalChannelRequest) MarshalJSON() ([]byte, error) {
 func (o PublishToInternalChannelRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["workflowId"] = o.WorkflowId
+	if !IsNil(o.WorkflowRunId) {
+		toSerialize["workflowRunId"] = o.WorkflowRunId
+	}
 	if !IsNil(o.Messages) {
 		toSerialize["messages"] = o.Messages
 	}

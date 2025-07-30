@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **WorkflowId** | **string** |  | 
+**WorkflowRunId** | Pointer to **string** |  | [optional] 
 **Messages** | Pointer to [**[]InterStateChannelPublishing**](InterStateChannelPublishing.md) |  | [optional] 
 
 ## Methods
@@ -45,6 +46,31 @@ and a boolean to check if the value has been set.
 
 SetWorkflowId sets WorkflowId field to given value.
 
+
+### GetWorkflowRunId
+
+`func (o *PublishToInternalChannelRequest) GetWorkflowRunId() string`
+
+GetWorkflowRunId returns the WorkflowRunId field if non-nil, zero value otherwise.
+
+### GetWorkflowRunIdOk
+
+`func (o *PublishToInternalChannelRequest) GetWorkflowRunIdOk() (*string, bool)`
+
+GetWorkflowRunIdOk returns a tuple with the WorkflowRunId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetWorkflowRunId
+
+`func (o *PublishToInternalChannelRequest) SetWorkflowRunId(v string)`
+
+SetWorkflowRunId sets WorkflowRunId field to given value.
+
+### HasWorkflowRunId
+
+`func (o *PublishToInternalChannelRequest) HasWorkflowRunId() bool`
+
+HasWorkflowRunId returns a boolean if a field has been set.
 
 ### GetMessages
 

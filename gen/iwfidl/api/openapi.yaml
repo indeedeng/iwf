@@ -1144,9 +1144,12 @@ components:
           value:
             data: data
             encoding: encoding
+        workflowRunId: workflowRunId
         workflowId: workflowId
       properties:
         workflowId:
+          type: string
+        workflowRunId:
           type: string
         messages:
           items:
