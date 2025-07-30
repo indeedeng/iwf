@@ -15,6 +15,7 @@ type ApiService interface {
 		ctx context.Context, request iwfidl.WorkflowWaitForStateCompletionRequest,
 	) (*iwfidl.WorkflowWaitForStateCompletionResponse, *errors.ErrorAndStatus)
 	ApiV1WorkflowSignalPost(ctx context.Context, request iwfidl.WorkflowSignalRequest) *errors.ErrorAndStatus
+	ApiV1WorkflowPublishToInternalChannelPost(ctx context.Context, request iwfidl.PublishToInternalChannelRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowStopPost(ctx context.Context, request iwfidl.WorkflowStopRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowConfigUpdate(ctx context.Context, request iwfidl.WorkflowConfigUpdateRequest) *errors.ErrorAndStatus
 	ApiV1WorkflowTriggerContinueAsNew(

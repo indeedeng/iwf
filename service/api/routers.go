@@ -10,6 +10,7 @@ import (
 const WorkflowStartApiPath = "/api/v1/workflow/start"
 const WorkflowWaitForStateCompletionApiPath = "/api/v1/workflow/waitForStateCompletion"
 const WorkflowSignalApiPath = "/api/v1/workflow/signal"
+const WorkflowPublishToInternalChannelApiPath = "/api/v1/workflow/publishToInternalChannel"
 const WorkflowGetDataAttributesApiPath = "/api/v1/workflow/dataobjects/get"
 const WorkflowSetDataAttributesApiPath = "/api/v1/workflow/dataobjects/set"
 const WorkflowGetSearchAttributesApiPath = "/api/v1/workflow/searchattributes/get"
@@ -36,6 +37,7 @@ func NewService(config config.Config, client uclient.UnifiedClient, logger log.L
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStart)
 	router.POST(WorkflowWaitForStateCompletionApiPath, handler.apiV1WorkflowWaitForStateCompletion)
 	router.POST(WorkflowSignalApiPath, handler.apiV1WorkflowSignal)
+	router.POST(WorkflowPublishToInternalChannelApiPath, handler.apiV1PublishToInternalChannel)
 	router.POST(WorkflowGetDataAttributesApiPath, handler.apiV1WorkflowGetDataAttributes)
 	router.POST(WorkflowSetDataAttributesApiPath, handler.apiV1WorkflowSetDataAttributes)
 	router.POST(WorkflowGetSearchAttributesApiPath, handler.apiV1WorkflowGetSearchAttributes)

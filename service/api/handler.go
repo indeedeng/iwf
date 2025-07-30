@@ -92,6 +92,23 @@ func (h *handler) apiV1WorkflowSignal(c *gin.Context) {
 	return
 }
 
+func (h *handler) apiV1PublishToInternalChannel(c *gin.Context) {
+	var req iwfidl.PublishToInternalChannelRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		invalidRequestSchema(c)
+		return
+	}
+	h.logger.Debug("received API request", tag.Value(log.ToJsonAndTruncateForLogging(req)))
+
+	errResp := h.svc.ApiV1WorkflowPublishToInternalChannelPost(c.Request.Context(), req)
+	if errResp != nil {
+		h.processError(c, errResp)
+		return
+	}
+	c.JSON(http.StatusOK, struct{}{})
+	return
+}
+
 func (h *handler) apiV1WorkflowStop(c *gin.Context) {
 	var req iwfidl.WorkflowStopRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

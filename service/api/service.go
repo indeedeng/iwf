@@ -278,7 +278,7 @@ func (s *serviceImpl) ApiV1WorkflowSignalPost(
 	return nil
 }
 
-func (s *serviceImpl) ApiV1WorkflowPublishToInternalChannel(
+func (s *serviceImpl) ApiV1WorkflowPublishToInternalChannelPost(
 	ctx context.Context, req iwfidl.PublishToInternalChannelRequest,
 ) (retError *errors.ErrorAndStatus) {
 	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
