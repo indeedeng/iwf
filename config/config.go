@@ -2,14 +2,15 @@ package config
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"time"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/uber-go/tally/v4/prometheus"
 	temporalWorker "go.temporal.io/sdk/worker"
 	cadenceWorker "go.uber.org/cadence/worker"
 	"gopkg.in/yaml.v3"
-	"log"
-	"os"
-	"time"
 )
 
 type (
@@ -20,6 +21,23 @@ type (
 		Api ApiConfig `yaml:"api"`
 		// Interpreter is the service behind, either Cadence or Temporal is required
 		Interpreter Interpreter `yaml:"interpreter"`
+		// ExternalStorage is the external storage config
+		SupportedExternalStorages []ExternalStorage `yaml:"supportedExternalStorages"`
+	}
+
+	ExternalStorage struct {
+		// StorageId is the id of the external storage, it's used to identify the external storage in the EncodedObject that is stored in the workflow history
+		StorageId string `yaml:"storageId"`
+		// StorageType is the type of the external storage, currently only s3 is supported
+		StorageType string `yaml:"storageType"`
+		// S3Bucket is the bucket name of the S3 storage
+		S3Bucket string `yaml:"s3Bucket"`
+		// S3Region is the region of the S3 storage
+		S3Region string `yaml:"s3Region"`
+		// S3AccessKey is the access key of the S3 storage
+		S3AccessKey string `yaml:"s3AccessKey"`
+		// S3SecretKey is the secret key of the S3 storage
+		S3SecretKey string `yaml:"s3SecretKey"`
 	}
 
 	ApiConfig struct {
