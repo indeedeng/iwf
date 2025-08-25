@@ -29,14 +29,14 @@ func SetSharedEnv(
 	temporalMemoEncryptionDataConverter converter.DataConverter,
 	client uclient.UnifiedClient,
 	queue string,
-	s3Client *s3.Client,
+	s3ClientInput *s3.Client,
 ) {
 	sharedConfig = config
 	temporalDataConverter = temporalMemoEncryptionDataConverter
 	temporalMemoEncryption = memoEncryption
 	unifiedClient = client
 	taskQueue = queue
-	s3Client = s3Client
+	s3Client = s3ClientInput
 }
 
 func GetUnifiedClient() uclient.UnifiedClient {
