@@ -13,6 +13,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	StorageStatusActive   = "active"
+	StorageStatusInactive = "inactive"
+)
+
 type (
 	Config struct {
 		// Log is the logging config
@@ -22,10 +27,25 @@ type (
 		// Interpreter is the service behind, either Cadence or Temporal is required
 		Interpreter Interpreter `yaml:"interpreter"`
 		// ExternalStorage is the external storage config
-		SupportedExternalStorages []ExternalStorage `yaml:"supportedExternalStorages"`
+		ExternalStorage ExternalStorageConfig `yaml:"externalStorage"`
 	}
 
-	ExternalStorage struct {
+	ExternalStorageConfig struct {
+		// ThresholdInBytes is the size threshold of encodedObject
+		// that will be stored by external storage(picking the current active one)
+		ThresholdInBytes int `yaml:"thresholdInBytes"`
+		// SupportedStorage is the list of supported storage
+		// Only one can be active, meaning the one that will be used for writing.
+		// The non-active ones are for read only.
+		SupportedStorage []SupportedStorage `yaml:"supportedStorage"`
+	}
+
+	StorageStatus string
+
+	SupportedStorage struct {
+		// Status means whether this storage is active for writing.
+		// Only one of the supported storages can be active
+		Status StorageStatus
 		// StorageId is the id of the external storage, it's used to identify the external storage in the EncodedObject that is stored in the workflow history
 		StorageId string `yaml:"storageId"`
 		// StorageType is the type of the external storage, currently only s3 is supported
