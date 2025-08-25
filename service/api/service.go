@@ -3,14 +3,18 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/config"
-	"github.com/indeedeng/iwf/service/common/event"
-	"github.com/indeedeng/iwf/service/interpreter/env"
-	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/google/uuid"
+	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/common/event"
+	"github.com/indeedeng/iwf/service/interpreter/env"
+	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -27,10 +31,13 @@ import (
 )
 
 type serviceImpl struct {
-	client    uclient.UnifiedClient
-	taskQueue string
-	logger    log.Logger
-	config    config.Config
+	client        uclient.UnifiedClient
+	s3Client      *s3.Client
+	s3PathPrefix  string // it's recommended to be the Temporal namespace or Cadence domain + "/"
+	activeStorage *config.SupportedStorage
+	taskQueue     string
+	logger        log.Logger
+	config        config.Config
 }
 
 func (s *serviceImpl) Close() {
@@ -38,13 +45,25 @@ func (s *serviceImpl) Close() {
 }
 
 func NewApiService(
-	config config.Config, client uclient.UnifiedClient, taskQueue string, logger log.Logger,
+	cfg config.Config, client uclient.UnifiedClient, taskQueue string, logger log.Logger, s3Client *s3.Client, s3PathPrefix string,
 ) (ApiService, error) {
+	// get the first active storage
+	var activeStorage *config.SupportedStorage
+	for _, storage := range cfg.ExternalStorage.SupportedStorages {
+		if storage.Status == config.StorageStatusActive {
+			activeStorage = &storage
+			break
+		}
+	}
+
 	return &serviceImpl{
-		client:    client,
-		taskQueue: taskQueue,
-		logger:    logger,
-		config:    config,
+		client:        client,
+		s3Client:      s3Client,
+		s3PathPrefix:  s3PathPrefix,
+		activeStorage: activeStorage,
+		taskQueue:     taskQueue,
+		logger:        logger,
+		config:        cfg,
 	}, nil
 }
 
@@ -146,6 +165,32 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		WaitForCompletionStateIds:          req.GetWaitForCompletionStateIds(),
 	}
 
+	// inject some code to upload the large input to S3 and replace the input
+	if s.config.ExternalStorage.Enabled {
+		// 1. check the size of the input is larger than the threshold
+		if len(*input.StateInput.Data) > s.config.ExternalStorage.ThresholdInBytes {
+			// 2. if it is, upload the input to S3
+			uuid := uuid.New().String()
+			// namespace/yymmdd/workflowId/uuid
+			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix, time.Now().Format("060102"), req.GetWorkflowId(), uuid)
+			err := putObject(ctx, s.s3Client,
+				s.activeStorage.S3Bucket,
+				objectKey,
+				*input.StateInput.Data,
+				*input.StateInput.Encoding)
+			if err != nil {
+				return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
+			}
+			// 3. replace the input with the S3 object key
+			newStateInput := iwfidl.EncodedObject{
+				ExtStoreId: iwfidl.PtrString(s.activeStorage.StorageId),
+				ExtPath:    iwfidl.PtrString(objectKey),
+			}
+			input.StateInput = &newStateInput
+		}
+
+	}
+
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
 	if err != nil {
 		shouldReturnError := true
@@ -178,6 +223,16 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	return &iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
 	}, nil
+}
+
+func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content, contentType string) error {
+	_, err := client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket:      aws.String(bucketName),
+		Key:         aws.String(key),
+		Body:        strings.NewReader(content),
+		ContentType: aws.String(contentType),
+	})
+	return err
 }
 
 func overrideWorkflowConfig(configOverride iwfidl.WorkflowConfig, workflowConfig *iwfidl.WorkflowConfig) {

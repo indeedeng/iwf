@@ -391,7 +391,7 @@ func putObject(ctx context.Context, client *s3.Client, key, content string) erro
 		Bucket:      aws.String(bucketName),
 		Key:         aws.String(key),
 		Body:        strings.NewReader(content),
-		ContentType: aws.String("text/plain"),
+		ContentType: aws.String("json"),
 	})
 	return err
 }

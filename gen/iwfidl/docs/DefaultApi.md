@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**ApiV1WorkflowConfigUpdatePost**](DefaultApi.md#ApiV1WorkflowConfigUpdatePost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
 [**ApiV1WorkflowDataobjectsGetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsGetPost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects aka data attributes
 [**ApiV1WorkflowDataobjectsSetPost**](DefaultApi.md#ApiV1WorkflowDataobjectsSetPost) | **Post** /api/v1/workflow/dataobjects/set | set workflow data objects aka data attributes
+[**ApiV1WorkflowEncodedobjectLoadPost**](DefaultApi.md#ApiV1WorkflowEncodedobjectLoadPost) | **Post** /api/v1/workflow/encodedobject/load | load encoded object from storage
 [**ApiV1WorkflowGetPost**](DefaultApi.md#ApiV1WorkflowGetPost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 [**ApiV1WorkflowGetWithWaitPost**](DefaultApi.md#ApiV1WorkflowGetWithWaitPost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 [**ApiV1WorkflowInternalDumpPost**](DefaultApi.md#ApiV1WorkflowInternalDumpPost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow
@@ -202,6 +203,70 @@ Name | Type | Description  | Notes
 ### Return type
 
  (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiV1WorkflowEncodedobjectLoadPost
+
+> EncodedObject ApiV1WorkflowEncodedobjectLoadPost(ctx).EncodedObject(encodedObject).Execute()
+
+load encoded object from storage
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "github.com/indeedeng/iwf-idl"
+)
+
+func main() {
+    encodedObject := *openapiclient.NewEncodedObject() // EncodedObject |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.DefaultApi.ApiV1WorkflowEncodedobjectLoadPost(context.Background()).EncodedObject(encodedObject).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `DefaultApi.ApiV1WorkflowEncodedobjectLoadPost``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ApiV1WorkflowEncodedobjectLoadPost`: EncodedObject
+    fmt.Fprintf(os.Stdout, "Response from `DefaultApi.ApiV1WorkflowEncodedobjectLoadPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiV1WorkflowEncodedobjectLoadPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **encodedObject** | [**EncodedObject**](EncodedObject.md) |  | 
+
+### Return type
+
+[**EncodedObject**](EncodedObject.md)
 
 ### Authorization
 

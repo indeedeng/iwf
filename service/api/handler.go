@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
 	"net/http"
 
@@ -20,8 +21,8 @@ type handler struct {
 	logger log.Logger
 }
 
-func newHandler(config config.Config, client uclient.UnifiedClient, logger log.Logger) *handler {
-	svc, err := NewApiService(config, client, service.TaskQueue, logger)
+func newHandler(config config.Config, client uclient.UnifiedClient, logger log.Logger, s3Client *s3.Client, s3PathPrefix string) *handler {
+	svc, err := NewApiService(config, client, service.TaskQueue, logger, s3Client, s3PathPrefix)
 	if err != nil {
 		panic(err)
 	}

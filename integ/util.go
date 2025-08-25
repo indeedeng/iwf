@@ -122,7 +122,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		testCfg := createTestConfig(config)
 
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger)
+		iwfService := api.NewService(testCfg, uclient, logger, nil, "") // TODO pass s3 client for integ test
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -160,7 +160,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		testCfg := createTestConfig(config)
 
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger)
+		iwfService := api.NewService(testCfg, uclient, logger, nil, "") // pass in for integ tests
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,

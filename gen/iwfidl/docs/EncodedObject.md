@@ -4,6 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**ExtStoreId** | Pointer to **string** |  | [optional] 
+**ExtPath** | Pointer to **string** |  | [optional] 
 **Encoding** | Pointer to **string** |  | [optional] 
 **Data** | Pointer to **string** |  | [optional] 
 
@@ -25,6 +27,56 @@ will change when the set of required properties is changed
 NewEncodedObjectWithDefaults instantiates a new EncodedObject object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetExtStoreId
+
+`func (o *EncodedObject) GetExtStoreId() string`
+
+GetExtStoreId returns the ExtStoreId field if non-nil, zero value otherwise.
+
+### GetExtStoreIdOk
+
+`func (o *EncodedObject) GetExtStoreIdOk() (*string, bool)`
+
+GetExtStoreIdOk returns a tuple with the ExtStoreId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExtStoreId
+
+`func (o *EncodedObject) SetExtStoreId(v string)`
+
+SetExtStoreId sets ExtStoreId field to given value.
+
+### HasExtStoreId
+
+`func (o *EncodedObject) HasExtStoreId() bool`
+
+HasExtStoreId returns a boolean if a field has been set.
+
+### GetExtPath
+
+`func (o *EncodedObject) GetExtPath() string`
+
+GetExtPath returns the ExtPath field if non-nil, zero value otherwise.
+
+### GetExtPathOk
+
+`func (o *EncodedObject) GetExtPathOk() (*string, bool)`
+
+GetExtPathOk returns a tuple with the ExtPath field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExtPath
+
+`func (o *EncodedObject) SetExtPath(v string)`
+
+SetExtPath sets ExtPath field to given value.
+
+### HasExtPath
+
+`func (o *EncodedObject) HasExtPath() bool`
+
+HasExtPath returns a boolean if a field has been set.
 
 ### GetEncoding
 

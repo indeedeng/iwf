@@ -31,13 +31,14 @@ type (
 	}
 
 	ExternalStorageConfig struct {
+		Enabled bool `yaml:"enabled"`
 		// ThresholdInBytes is the size threshold of encodedObject
 		// that will be stored by external storage(picking the current active one)
 		ThresholdInBytes int `yaml:"thresholdInBytes"`
-		// SupportedStorage is the list of supported storage
+		// SupportedStorages is the list of supported storage
 		// Only one can be active, meaning the one that will be used for writing.
 		// The non-active ones are for read only.
-		SupportedStorage []SupportedStorage `yaml:"supportedStorage"`
+		SupportedStorages []SupportedStorage `yaml:"supportedStorages"`
 	}
 
 	StorageStatus string
@@ -50,6 +51,8 @@ type (
 		StorageId string `yaml:"storageId"`
 		// StorageType is the type of the external storage, currently only s3 is supported
 		StorageType string `yaml:"storageType"`
+		// S3Endpoint is the endpoint of s3 service
+		S3Endpoint string `yaml:"s3Endpoint"`
 		// S3Bucket is the bucket name of the S3 storage
 		S3Bucket string `yaml:"s3Bucket"`
 		// S3Region is the region of the S3 storage
