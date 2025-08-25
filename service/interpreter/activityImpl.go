@@ -477,7 +477,7 @@ func getObject(ctx context.Context, client *s3.Client, bucketName, key string) (
 	if err != nil {
 		return "", err
 	}
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	var buf bytes.Buffer
 	_, err = io.Copy(&buf, result.Body)

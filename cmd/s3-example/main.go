@@ -406,7 +406,7 @@ func getObject(ctx context.Context, client *s3.Client, key string) (string, erro
 	if err != nil {
 		return "", err
 	}
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
 	var buf bytes.Buffer
 	_, err = io.Copy(&buf, result.Body)
@@ -428,14 +428,14 @@ func listObjects(ctx context.Context, client *s3.Client) ([]types.Object, error)
 	return result.Contents, nil
 }
 
-func listObjectsWithPrefix(ctx context.Context, client *s3.Client, prefix string) ([]types.Object, error) {
-	result, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
-		Bucket: aws.String(bucketName),
-		Prefix: aws.String(prefix),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return result.Contents, nil
-}
+//func listObjectsWithPrefix(ctx context.Context, client *s3.Client, prefix string) ([]types.Object, error) {
+//	result, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+//		Bucket: aws.String(bucketName),
+//		Prefix: aws.String(prefix),
+//	})
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return result.Contents, nil
+//}
