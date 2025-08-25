@@ -1,8 +1,18 @@
 package interpreter
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"slices"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -13,11 +23,6 @@ import (
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
-	"io"
-	"net/http"
-	"os"
-	"slices"
-	"time"
 )
 
 // StateStart is Deprecated, will be removed in next release
@@ -51,6 +56,14 @@ func StateApiWaitUntil(
 	scheduledTs := activityInfo.ScheduledTime.Unix()
 	input.Request.Context.Attempt = &attempt
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
+
+	var err error
+	if input.Request.StateInput.ExtStoreId != nil {
+		input.Request.StateInput, err = loadFromExternalStorage(ctx, input.Request.StateInput)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(ctx)
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
@@ -159,6 +172,14 @@ func StateApiExecute(
 	scheduledTs := activityInfo.ScheduledTime.Unix()
 	input.Request.Context.Attempt = &attempt
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
+
+	var err error
+	if input.Request.StateInput.ExtStoreId != nil {
+		input.Request.StateInput, err = loadFromExternalStorage(ctx, input.Request.StateInput)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
@@ -415,4 +436,54 @@ func InvokeWorkerRpc(
 		RpcOutput:   resp,
 		StatusError: statusErr,
 	}, nil
+}
+
+func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (*iwfidl.EncodedObject, error) {
+	svcCfg := env.GetSharedConfig()
+	s3Client := env.GetS3Client()
+	if s3Client == nil {
+		panic("s3Client is nil")
+	}
+	var activeStorage *config.BlobStorageConfig
+	for _, storage := range svcCfg.ExternalStorage.SupportedStorages {
+		if storage.Status == config.StorageStatusActive {
+			activeStorage = &storage
+			break
+		}
+	}
+	if activeStorage == nil || activeStorage.StorageType != "s3" {
+		panic("active storage is not s3")
+	}
+
+	bucketName := activeStorage.S3Bucket
+	objectKey := input.GetExtPath()
+	object, err := getObject(ctx, s3Client, bucketName, objectKey)
+	if err != nil {
+		return nil, err
+	}
+
+	newEncodedObject := iwfidl.EncodedObject{
+		Data:     &object,
+		Encoding: input.Encoding,
+	}
+	return &newEncodedObject, nil
+}
+
+func getObject(ctx context.Context, client *s3.Client, bucketName, key string) (string, error) {
+	result, err := client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return "", err
+	}
+	defer result.Body.Close()
+
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, result.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type InterpreterWorker struct {
@@ -23,8 +24,9 @@ type InterpreterWorker struct {
 func NewInterpreterWorker(
 	config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(),
 	unifiedClient uclient.UnifiedClient,
+	s3Client *s3.Client,
 ) *InterpreterWorker {
-	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist)
+	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist, s3Client)
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,

@@ -3,13 +3,14 @@ package integ
 import (
 	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/integ/helpers"
-	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
-	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	"log"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/indeedeng/iwf/integ/helpers"
+	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
+	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
@@ -137,7 +138,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient)
+		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient, s3Client)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {
@@ -176,7 +177,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient)
+		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient, s3Client)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {

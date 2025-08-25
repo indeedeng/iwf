@@ -38,12 +38,12 @@ type (
 		// SupportedStorages is the list of supported storage
 		// Only one can be active, meaning the one that will be used for writing.
 		// The non-active ones are for read only.
-		SupportedStorages []SupportedStorage `yaml:"supportedStorages"`
+		SupportedStorages []BlobStorageConfig `yaml:"supportedStorages"`
 	}
 
 	StorageStatus string
 
-	SupportedStorage struct {
+	BlobStorageConfig struct {
 		// Status means whether this storage is active for writing.
 		// Only one of the supported storages can be active
 		Status StorageStatus

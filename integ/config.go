@@ -31,16 +31,16 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 	}
 	if testCfg.S3TestThreshold > 0 {
 		externalStorage := config.ExternalStorageConfig{
-			Enabled: true,
+			Enabled:          true,
 			ThresholdInBytes: testCfg.S3TestThreshold,
-			SupportedStorages: []config.SupportedStorage{
+			SupportedStorages: []config.BlobStorageConfig{
 				{
-					Status: config.StorageStatusActive,
-					StorageId: "s3",
+					Status:      config.StorageStatusActive,
+					StorageId:   "s3",
 					StorageType: "s3",
-					S3Endpoint: "http://localhost:9000",
-					S3Bucket: "iwf-test-bucket",
-					S3Region: "us-east-1",
+					S3Endpoint:  "http://localhost:9000",
+					S3Bucket:    "iwf-test-bucket",
+					S3Region:    "us-east-1",
 					S3AccessKey: "minioadmin",
 					S3SecretKey: "minioadmin",
 				},

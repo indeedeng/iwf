@@ -34,7 +34,7 @@ type serviceImpl struct {
 	client        uclient.UnifiedClient
 	s3Client      *s3.Client
 	s3PathPrefix  string // it's recommended to be the Temporal namespace or Cadence domain + "/"
-	activeStorage *config.SupportedStorage
+	activeStorage *config.BlobStorageConfig
 	taskQueue     string
 	logger        log.Logger
 	config        config.Config
@@ -48,7 +48,7 @@ func NewApiService(
 	cfg config.Config, client uclient.UnifiedClient, taskQueue string, logger log.Logger, s3Client *s3.Client, s3PathPrefix string,
 ) (ApiService, error) {
 	// get the first active storage
-	var activeStorage *config.SupportedStorage
+	var activeStorage *config.BlobStorageConfig
 	for _, storage := range cfg.ExternalStorage.SupportedStorages {
 		if storage.Status == config.StorageStatusActive {
 			activeStorage = &storage

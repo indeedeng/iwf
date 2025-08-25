@@ -2,6 +2,9 @@ package temporal
 
 import (
 	"fmt"
+	"log"
+
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/interpreter"
@@ -9,7 +12,6 @@ import (
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	"go.temporal.io/sdk/worker"
-	"log"
 )
 
 type InterpreterWorker struct {
@@ -21,8 +23,9 @@ type InterpreterWorker struct {
 func NewInterpreterWorker(
 	config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool,
 	memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient,
+	s3Client *s3.Client,
 ) *InterpreterWorker {
-	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue)
+	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue, s3Client)
 
 	return &InterpreterWorker{
 		temporalClient: temporalClient,

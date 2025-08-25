@@ -204,16 +204,17 @@ func launchTemporalService(
 	svcName string, config config.Config, unifiedClient uclient.UnifiedClient, temporalClient client.Client,
 	logger log.Logger,
 ) {
+	s3Client := CreateS3Client(config, context.Background())
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(
 			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
-			CreateS3Client(config, context.Background()),
+			s3Client,
 			config.Interpreter.Temporal.Namespace+"/",
 		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient)
+		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient, s3Client)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -229,16 +230,17 @@ func launchCadenceService(
 	closeFunc func(),
 	logger log.Logger,
 ) {
+	s3Client := CreateS3Client(config, context.Background())
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(
 			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
-			CreateS3Client(config, context.Background()),
+			s3Client,
 			config.Interpreter.Cadence.Domain+"/",
 		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient)
+		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient, s3Client)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -361,7 +363,7 @@ func CreateS3Client(cfg config.Config, ctx context.Context) *s3.Client {
 	}
 
 	// get the first active storage
-	var activeStorage *config.SupportedStorage
+	var activeStorage *config.BlobStorageConfig
 	for _, storage := range cfg.ExternalStorage.SupportedStorages {
 		if storage.Status == config.StorageStatusActive {
 			activeStorage = &storage
