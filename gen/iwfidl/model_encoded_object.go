@@ -19,8 +19,10 @@ var _ MappedNullable = &EncodedObject{}
 
 // EncodedObject struct for EncodedObject
 type EncodedObject struct {
-	Encoding *string `json:"encoding,omitempty"`
-	Data     *string `json:"data,omitempty"`
+	ExtStoreId *string `json:"extStoreId,omitempty"`
+	ExtPath    *string `json:"extPath,omitempty"`
+	Encoding   *string `json:"encoding,omitempty"`
+	Data       *string `json:"data,omitempty"`
 }
 
 // NewEncodedObject instantiates a new EncodedObject object
@@ -38,6 +40,70 @@ func NewEncodedObject() *EncodedObject {
 func NewEncodedObjectWithDefaults() *EncodedObject {
 	this := EncodedObject{}
 	return &this
+}
+
+// GetExtStoreId returns the ExtStoreId field value if set, zero value otherwise.
+func (o *EncodedObject) GetExtStoreId() string {
+	if o == nil || IsNil(o.ExtStoreId) {
+		var ret string
+		return ret
+	}
+	return *o.ExtStoreId
+}
+
+// GetExtStoreIdOk returns a tuple with the ExtStoreId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EncodedObject) GetExtStoreIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ExtStoreId) {
+		return nil, false
+	}
+	return o.ExtStoreId, true
+}
+
+// HasExtStoreId returns a boolean if a field has been set.
+func (o *EncodedObject) HasExtStoreId() bool {
+	if o != nil && !IsNil(o.ExtStoreId) {
+		return true
+	}
+
+	return false
+}
+
+// SetExtStoreId gets a reference to the given string and assigns it to the ExtStoreId field.
+func (o *EncodedObject) SetExtStoreId(v string) {
+	o.ExtStoreId = &v
+}
+
+// GetExtPath returns the ExtPath field value if set, zero value otherwise.
+func (o *EncodedObject) GetExtPath() string {
+	if o == nil || IsNil(o.ExtPath) {
+		var ret string
+		return ret
+	}
+	return *o.ExtPath
+}
+
+// GetExtPathOk returns a tuple with the ExtPath field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EncodedObject) GetExtPathOk() (*string, bool) {
+	if o == nil || IsNil(o.ExtPath) {
+		return nil, false
+	}
+	return o.ExtPath, true
+}
+
+// HasExtPath returns a boolean if a field has been set.
+func (o *EncodedObject) HasExtPath() bool {
+	if o != nil && !IsNil(o.ExtPath) {
+		return true
+	}
+
+	return false
+}
+
+// SetExtPath gets a reference to the given string and assigns it to the ExtPath field.
+func (o *EncodedObject) SetExtPath(v string) {
+	o.ExtPath = &v
 }
 
 // GetEncoding returns the Encoding field value if set, zero value otherwise.
@@ -114,6 +180,12 @@ func (o EncodedObject) MarshalJSON() ([]byte, error) {
 
 func (o EncodedObject) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.ExtStoreId) {
+		toSerialize["extStoreId"] = o.ExtStoreId
+	}
+	if !IsNil(o.ExtPath) {
+		toSerialize["extPath"] = o.ExtPath
+	}
 	if !IsNil(o.Encoding) {
 		toSerialize["encoding"] = o.Encoding
 	}

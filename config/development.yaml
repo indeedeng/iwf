@@ -19,3 +19,15 @@ interpreter:
       timerType: histogram
   defaultWorkflowConfig:
     continueAsNewThreshold: 100
+externalStorage:
+  enabled: true
+  thresholdInBytes: 100000 # 100 KB
+  supportedStorages:
+    - status: active
+      storageId: "local-dev-s3"
+      storageType: "s3"
+      s3Endpoint: "http://localhost:9000"
+      s3Bucket: "iwf-test-bucket"
+      s3Region: "us-east-1"
+      s3AccessKey: "minioadmin"
+      s3SecretKey: "minioadmin"

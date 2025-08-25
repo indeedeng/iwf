@@ -1,6 +1,7 @@
 package env
 
 import (
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"go.temporal.io/sdk/converter"
@@ -20,18 +21,22 @@ var unifiedClient uclient.UnifiedClient
 
 var taskQueue string
 
+var s3Client *s3.Client
+
 func SetSharedEnv(
 	config config.Config,
 	memoEncryption bool,
 	temporalMemoEncryptionDataConverter converter.DataConverter,
 	client uclient.UnifiedClient,
 	queue string,
+	s3ClientInput *s3.Client,
 ) {
 	sharedConfig = config
 	temporalDataConverter = temporalMemoEncryptionDataConverter
 	temporalMemoEncryption = memoEncryption
 	unifiedClient = client
 	taskQueue = queue
+	s3Client = s3ClientInput
 }
 
 func GetUnifiedClient() uclient.UnifiedClient {
@@ -48,4 +53,8 @@ func GetSharedConfig() config.Config {
 
 func CheckAndGetTemporalMemoEncryptionDataConverter() (converter.DataConverter, bool) {
 	return temporalDataConverter, temporalMemoEncryption
+}
+
+func GetS3Client() *s3.Client {
+	return s3Client
 }

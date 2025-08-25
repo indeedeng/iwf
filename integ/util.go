@@ -1,14 +1,16 @@
 package integ
 
 import (
+	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/integ/helpers"
-	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
-	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	"log"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/indeedeng/iwf/integ/helpers"
+	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
+	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/cmd/server/iwf"
@@ -76,6 +78,7 @@ type IwfServiceTestConfig struct {
 	MemoEncryption                   bool
 	DisableFailAtMemoIncompatibility bool // default to false so that we will fail at test
 	DefaultHeaders                   map[string]string
+	S3TestThreshold                  int
 }
 
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
@@ -120,9 +123,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}
 
 		testCfg := createTestConfig(config)
+		s3Client := iwf.CreateS3Client(testCfg, context.Background())
 
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger)
+		iwfService := api.NewService(testCfg, uclient, logger, s3Client, "test/") // TODO pass s3 client for integ test
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -134,7 +138,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient)
+		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient, s3Client)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {
@@ -158,9 +162,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}
 
 		testCfg := createTestConfig(config)
+		s3Client := iwf.CreateS3Client(testCfg, context.Background())
 
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger)
+		iwfService := api.NewService(testCfg, uclient, logger, s3Client, "test/") // pass in for integ tests
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -172,7 +177,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient)
+		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient, s3Client)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {

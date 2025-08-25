@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **PartialLoadingKeys** | Pointer to **[]string** |  | [optional] 
 **LockingKeys** | Pointer to **[]string** |  | [optional] 
 **UseKeyAsPrefix** | Pointer to **bool** |  | [optional] 
+**LazyLoadingLargeDataAttributes** | Pointer to **bool** |  | [optional] 
 
 ## Methods
 
@@ -127,6 +128,31 @@ SetUseKeyAsPrefix sets UseKeyAsPrefix field to given value.
 `func (o *PersistenceLoadingPolicy) HasUseKeyAsPrefix() bool`
 
 HasUseKeyAsPrefix returns a boolean if a field has been set.
+
+### GetLazyLoadingLargeDataAttributes
+
+`func (o *PersistenceLoadingPolicy) GetLazyLoadingLargeDataAttributes() bool`
+
+GetLazyLoadingLargeDataAttributes returns the LazyLoadingLargeDataAttributes field if non-nil, zero value otherwise.
+
+### GetLazyLoadingLargeDataAttributesOk
+
+`func (o *PersistenceLoadingPolicy) GetLazyLoadingLargeDataAttributesOk() (*bool, bool)`
+
+GetLazyLoadingLargeDataAttributesOk returns a tuple with the LazyLoadingLargeDataAttributes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetLazyLoadingLargeDataAttributes
+
+`func (o *PersistenceLoadingPolicy) SetLazyLoadingLargeDataAttributes(v bool)`
+
+SetLazyLoadingLargeDataAttributes sets LazyLoadingLargeDataAttributes field to given value.
+
+### HasLazyLoadingLargeDataAttributes
+
+`func (o *PersistenceLoadingPolicy) HasLazyLoadingLargeDataAttributes() bool`
+
+HasLazyLoadingLargeDataAttributes returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

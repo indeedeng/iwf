@@ -80,6 +80,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**ApiV1WorkflowConfigUpdatePost**](docs/DefaultApi.md#apiv1workflowconfigupdatepost) | **Post** /api/v1/workflow/config/update | update the config of a workflow
 *DefaultApi* | [**ApiV1WorkflowDataobjectsGetPost**](docs/DefaultApi.md#apiv1workflowdataobjectsgetpost) | **Post** /api/v1/workflow/dataobjects/get | get workflow data objects aka data attributes
 *DefaultApi* | [**ApiV1WorkflowDataobjectsSetPost**](docs/DefaultApi.md#apiv1workflowdataobjectssetpost) | **Post** /api/v1/workflow/dataobjects/set | set workflow data objects aka data attributes
+*DefaultApi* | [**ApiV1WorkflowEncodedobjectLoadPost**](docs/DefaultApi.md#apiv1workflowencodedobjectloadpost) | **Post** /api/v1/workflow/encodedobject/load | load encoded object from storage
 *DefaultApi* | [**ApiV1WorkflowGetPost**](docs/DefaultApi.md#apiv1workflowgetpost) | **Post** /api/v1/workflow/get | get a workflow&#39;s status and results(if completed &amp; requested)
 *DefaultApi* | [**ApiV1WorkflowGetWithWaitPost**](docs/DefaultApi.md#apiv1workflowgetwithwaitpost) | **Post** /api/v1/workflow/getWithWait | get a workflow&#39;s status and results(if completed &amp; requested), wait if the workflow is still running
 *DefaultApi* | [**ApiV1WorkflowInternalDumpPost**](docs/DefaultApi.md#apiv1workflowinternaldumppost) | **Post** /api/v1/workflow/internal/dump | dump internal info of a workflow

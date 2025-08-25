@@ -55,6 +55,18 @@ type DefaultApi interface {
 	ApiV1WorkflowDataobjectsSetPostExecute(r ApiApiV1WorkflowDataobjectsSetPostRequest) (*http.Response, error)
 
 	/*
+		ApiV1WorkflowEncodedobjectLoadPost load encoded object from storage
+
+		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+		@return ApiApiV1WorkflowEncodedobjectLoadPostRequest
+	*/
+	ApiV1WorkflowEncodedobjectLoadPost(ctx context.Context) ApiApiV1WorkflowEncodedobjectLoadPostRequest
+
+	// ApiV1WorkflowEncodedobjectLoadPostExecute executes the request
+	//  @return EncodedObject
+	ApiV1WorkflowEncodedobjectLoadPostExecute(r ApiApiV1WorkflowEncodedobjectLoadPostRequest) (*EncodedObject, *http.Response, error)
+
+	/*
 		ApiV1WorkflowGetPost get a workflow's status and results(if completed & requested)
 
 		@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -602,6 +614,122 @@ func (a *DefaultApiService) ApiV1WorkflowDataobjectsSetPostExecute(r ApiApiV1Wor
 	}
 
 	return localVarHTTPResponse, nil
+}
+
+type ApiApiV1WorkflowEncodedobjectLoadPostRequest struct {
+	ctx           context.Context
+	ApiService    DefaultApi
+	encodedObject *EncodedObject
+}
+
+func (r ApiApiV1WorkflowEncodedobjectLoadPostRequest) EncodedObject(encodedObject EncodedObject) ApiApiV1WorkflowEncodedobjectLoadPostRequest {
+	r.encodedObject = &encodedObject
+	return r
+}
+
+func (r ApiApiV1WorkflowEncodedobjectLoadPostRequest) Execute() (*EncodedObject, *http.Response, error) {
+	return r.ApiService.ApiV1WorkflowEncodedobjectLoadPostExecute(r)
+}
+
+/*
+ApiV1WorkflowEncodedobjectLoadPost load encoded object from storage
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiApiV1WorkflowEncodedobjectLoadPostRequest
+*/
+func (a *DefaultApiService) ApiV1WorkflowEncodedobjectLoadPost(ctx context.Context) ApiApiV1WorkflowEncodedobjectLoadPostRequest {
+	return ApiApiV1WorkflowEncodedobjectLoadPostRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return EncodedObject
+func (a *DefaultApiService) ApiV1WorkflowEncodedobjectLoadPostExecute(r ApiApiV1WorkflowEncodedobjectLoadPostRequest) (*EncodedObject, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *EncodedObject
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ApiV1WorkflowEncodedobjectLoadPost")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/workflow/encodedobject/load"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.encodedObject
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v ErrorResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
 type ApiApiV1WorkflowGetPostRequest struct {

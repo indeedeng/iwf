@@ -24,15 +24,20 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	rawLog "log"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	ggrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	rawLog "log"
-	"strings"
-	"sync"
-	"time"
 
 	isvc "github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
@@ -199,12 +204,17 @@ func launchTemporalService(
 	svcName string, config config.Config, unifiedClient uclient.UnifiedClient, temporalClient client.Client,
 	logger log.Logger,
 ) {
+	s3Client := CreateS3Client(config, context.Background())
 	switch svcName {
 	case serviceAPI:
-		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
+		svc := api.NewService(
+			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
+			s3Client,
+			config.Interpreter.Temporal.Namespace+"/",
+		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient)
+		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient, s3Client)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -220,12 +230,17 @@ func launchCadenceService(
 	closeFunc func(),
 	logger log.Logger,
 ) {
+	s3Client := CreateS3Client(config, context.Background())
 	switch svcName {
 	case serviceAPI:
-		svc := api.NewService(config, unifiedClient, logger.WithTags(tag.Service(svcName)))
+		svc := api.NewService(
+			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
+			s3Client,
+			config.Interpreter.Cadence.Domain+"/",
+		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient)
+		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient, s3Client)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -339,4 +354,79 @@ func newPrometheusScope(c prometheus.Configuration, logger log.Logger) tally.Sco
 
 	logger.Info("prometheus metrics scope created")
 	return scope
+}
+
+func CreateS3Client(cfg config.Config, ctx context.Context) *s3.Client {
+
+	if !cfg.ExternalStorage.Enabled {
+		return nil
+	}
+
+	// get the first active storage
+	var activeStorage *config.BlobStorageConfig
+	for _, storage := range cfg.ExternalStorage.SupportedStorages {
+		if storage.Status == config.StorageStatusActive {
+			activeStorage = &storage
+			break
+		}
+	}
+	if activeStorage == nil {
+		rawLog.Fatal("no active storage found")
+	}
+
+	if activeStorage.StorageType != "s3" {
+		rawLog.Fatal("only s3 is supported for external storage")
+	}
+
+	// Create custom resolver for MinIO endpoint
+	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+
+		if service == s3.ServiceID {
+			return aws.Endpoint{
+				URL:               activeStorage.S3Endpoint,
+				HostnameImmutable: true,
+				Source:            aws.EndpointSourceCustom,
+			}, nil
+		}
+		return aws.Endpoint{}, fmt.Errorf("unknown endpoint requested")
+	})
+
+	// Load AWS config with custom credentials and endpoint
+	cfg2, err := awsConfig.LoadDefaultConfig(ctx,
+		awsConfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(activeStorage.S3AccessKey, activeStorage.S3SecretKey, "")),
+		awsConfig.WithRegion(activeStorage.S3Region),
+		awsConfig.WithEndpointResolverWithOptions(customResolver),
+	)
+	if err != nil {
+		rawLog.Fatal("failed to load AWS config", tag.Error(err))
+	}
+
+	// Create S3 client with path-style addressing (required for MinIO)
+	client := s3.NewFromConfig(cfg2, func(o *s3.Options) {
+		o.UsePathStyle = true
+	})
+
+	createBucketIfNotExists(ctx, client, activeStorage.S3Bucket)
+
+	return client
+}
+
+func createBucketIfNotExists(ctx context.Context, client *s3.Client, bucketName string) {
+	// Check if bucket exists
+	_, err := client.HeadBucket(ctx, &s3.HeadBucketInput{
+		Bucket: aws.String(bucketName),
+	})
+
+	if err != nil {
+		// Bucket doesn't exist, create it
+		_, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
+			Bucket: aws.String(bucketName),
+		})
+		if err != nil {
+			rawLog.Fatal("failed to create bucket", tag.Error(err))
+		}
+		rawLog.Printf("bucket created successfully: %s", bucketName)
+	} else {
+		rawLog.Printf("bucket already exists: %s", bucketName)
+	}
 }

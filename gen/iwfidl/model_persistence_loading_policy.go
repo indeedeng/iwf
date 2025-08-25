@@ -19,10 +19,11 @@ var _ MappedNullable = &PersistenceLoadingPolicy{}
 
 // PersistenceLoadingPolicy struct for PersistenceLoadingPolicy
 type PersistenceLoadingPolicy struct {
-	PersistenceLoadingType *PersistenceLoadingType `json:"persistenceLoadingType,omitempty"`
-	PartialLoadingKeys     []string                `json:"partialLoadingKeys,omitempty"`
-	LockingKeys            []string                `json:"lockingKeys,omitempty"`
-	UseKeyAsPrefix         *bool                   `json:"useKeyAsPrefix,omitempty"`
+	PersistenceLoadingType         *PersistenceLoadingType `json:"persistenceLoadingType,omitempty"`
+	PartialLoadingKeys             []string                `json:"partialLoadingKeys,omitempty"`
+	LockingKeys                    []string                `json:"lockingKeys,omitempty"`
+	UseKeyAsPrefix                 *bool                   `json:"useKeyAsPrefix,omitempty"`
+	LazyLoadingLargeDataAttributes *bool                   `json:"lazyLoadingLargeDataAttributes,omitempty"`
 }
 
 // NewPersistenceLoadingPolicy instantiates a new PersistenceLoadingPolicy object
@@ -170,6 +171,38 @@ func (o *PersistenceLoadingPolicy) SetUseKeyAsPrefix(v bool) {
 	o.UseKeyAsPrefix = &v
 }
 
+// GetLazyLoadingLargeDataAttributes returns the LazyLoadingLargeDataAttributes field value if set, zero value otherwise.
+func (o *PersistenceLoadingPolicy) GetLazyLoadingLargeDataAttributes() bool {
+	if o == nil || IsNil(o.LazyLoadingLargeDataAttributes) {
+		var ret bool
+		return ret
+	}
+	return *o.LazyLoadingLargeDataAttributes
+}
+
+// GetLazyLoadingLargeDataAttributesOk returns a tuple with the LazyLoadingLargeDataAttributes field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PersistenceLoadingPolicy) GetLazyLoadingLargeDataAttributesOk() (*bool, bool) {
+	if o == nil || IsNil(o.LazyLoadingLargeDataAttributes) {
+		return nil, false
+	}
+	return o.LazyLoadingLargeDataAttributes, true
+}
+
+// HasLazyLoadingLargeDataAttributes returns a boolean if a field has been set.
+func (o *PersistenceLoadingPolicy) HasLazyLoadingLargeDataAttributes() bool {
+	if o != nil && !IsNil(o.LazyLoadingLargeDataAttributes) {
+		return true
+	}
+
+	return false
+}
+
+// SetLazyLoadingLargeDataAttributes gets a reference to the given bool and assigns it to the LazyLoadingLargeDataAttributes field.
+func (o *PersistenceLoadingPolicy) SetLazyLoadingLargeDataAttributes(v bool) {
+	o.LazyLoadingLargeDataAttributes = &v
+}
+
 func (o PersistenceLoadingPolicy) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -191,6 +224,9 @@ func (o PersistenceLoadingPolicy) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UseKeyAsPrefix) {
 		toSerialize["useKeyAsPrefix"] = o.UseKeyAsPrefix
+	}
+	if !IsNil(o.LazyLoadingLargeDataAttributes) {
+		toSerialize["lazyLoadingLargeDataAttributes"] = o.LazyLoadingLargeDataAttributes
 	}
 	return toSerialize, nil
 }

@@ -8,7 +8,7 @@ const testWorkflowServerPort = "9714"
 const testIwfServerPort = "9715"
 
 func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
-	return config.Config{
+	cfg := config.Config{
 		Api: config.ApiConfig{
 			Port:           9715,
 			MaxWaitSeconds: 12, // use 12 so that we can test it in the waiting test
@@ -29,4 +29,24 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 			},
 		},
 	}
+	if testCfg.S3TestThreshold > 0 {
+		externalStorage := config.ExternalStorageConfig{
+			Enabled:          true,
+			ThresholdInBytes: testCfg.S3TestThreshold,
+			SupportedStorages: []config.BlobStorageConfig{
+				{
+					Status:      config.StorageStatusActive,
+					StorageId:   "s3",
+					StorageType: "s3",
+					S3Endpoint:  "http://localhost:9000",
+					S3Bucket:    "iwf-test-bucket",
+					S3Region:    "us-east-1",
+					S3AccessKey: "minioadmin",
+					S3SecretKey: "minioadmin",
+				},
+			},
+		}
+		cfg.ExternalStorage = externalStorage
+	}
+	return cfg
 }

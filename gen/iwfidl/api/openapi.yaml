@@ -162,6 +162,27 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Invalid input
       summary: set workflow search attributes
+  /api/v1/workflow/encodedobject/load:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EncodedObject'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncodedObject'
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid input
+      summary: load encoded object from storage
   /api/v1/workflow/get:
     post:
       requestBody:
@@ -466,6 +487,8 @@ components:
       example:
         value:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         key: key
       properties:
@@ -477,8 +500,14 @@ components:
     EncodedObject:
       example:
         data: data
+        extStoreId: extStoreId
+        extPath: extPath
         encoding: encoding
       properties:
+        extStoreId:
+          type: string
+        extPath:
+          type: string
         encoding:
           type: string
         data:
@@ -593,6 +622,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -610,6 +640,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -621,6 +652,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -630,6 +662,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -647,6 +680,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -665,6 +699,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -676,6 +711,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -789,10 +825,14 @@ components:
         dataAttributes:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
       properties:
@@ -842,6 +882,7 @@ components:
         lockingKeys:
         - lockingKeys
         - lockingKeys
+        lazyLoadingLargeDataAttributes: true
         useKeyAsPrefix: true
         partialLoadingKeys:
         - partialLoadingKeys
@@ -859,6 +900,8 @@ components:
             type: string
           type: array
         useKeyAsPrefix:
+          type: boolean
+        lazyLoadingLargeDataAttributes:
           type: boolean
       type: object
     PersistenceLoadingType:
@@ -925,6 +968,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -942,6 +986,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -953,6 +998,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -962,6 +1008,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -979,6 +1026,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -997,6 +1045,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -1008,6 +1057,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -1063,16 +1113,22 @@ components:
           dataAttributes:
           - value:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             key: key
           - value:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             key: key
         iwfWorkerUrl: iwfWorkerUrl
         workflowId: workflowId
         stateInput:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         workflowId:
@@ -1119,6 +1175,8 @@ components:
         workflowId: workflowId
         signalValue:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         workflowId:
@@ -1139,10 +1197,14 @@ components:
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         workflowRunId: workflowRunId
         workflowId: workflowId
@@ -1209,10 +1271,14 @@ components:
         objects:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
       properties:
@@ -1226,10 +1292,14 @@ components:
         objects:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         workflowRunId: workflowRunId
@@ -1356,11 +1426,15 @@ components:
         results:
         - completedStateOutput:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           completedStateExecutionId: completedStateExecutionId
           completedStateId: completedStateId
         - completedStateOutput:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           completedStateExecutionId: completedStateExecutionId
           completedStateId: completedStateId
@@ -1404,6 +1478,8 @@ components:
       example:
         completedStateOutput:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         completedStateExecutionId: completedStateExecutionId
         completedStateId: completedStateId
@@ -1560,10 +1636,14 @@ components:
         dataObjects:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         workflowStateId: workflowStateId
@@ -1596,6 +1676,8 @@ components:
           key: key
         stateInput:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         context:
@@ -1667,11 +1749,14 @@ components:
       example:
         input:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         searchAttributesLoadingPolicy:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -1691,6 +1776,7 @@ components:
           lockingKeys:
           - lockingKeys
           - lockingKeys
+          lazyLoadingLargeDataAttributes: true
           useKeyAsPrefix: true
           partialLoadingKeys:
           - partialLoadingKeys
@@ -1725,6 +1811,8 @@ components:
       example:
         output:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         output:
@@ -1737,6 +1825,8 @@ components:
             size: 0
         input:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         signalChannelInfos:
           key:
@@ -1772,10 +1862,14 @@ components:
         dataAttributes:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
       properties:
@@ -1819,6 +1913,8 @@ components:
       example:
         output:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         upsertSearchAttributes:
         - stringValue: stringValue
@@ -1842,10 +1938,14 @@ components:
         recordEvents:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         stateDecision:
@@ -1856,6 +1956,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1873,6 +1974,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1884,6 +1986,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1893,6 +1996,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1910,6 +2014,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1928,6 +2033,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1939,6 +2045,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1952,6 +2059,8 @@ components:
                 backoffCoefficient: 5.637377
             stateInput:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             waitForKey: waitForKey
           - stateId: stateId
@@ -1960,6 +2069,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1977,6 +2087,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1988,6 +2099,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -1997,6 +2109,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2014,6 +2127,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2032,6 +2146,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2043,6 +2158,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2056,39 +2172,55 @@ components:
                 backoffCoefficient: 5.637377
             stateInput:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             waitForKey: waitForKey
           conditionalClose:
             closeInput:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             channelName: channelName
             conditionalCloseType: null
         upsertDataAttributes:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         publishToInterStateChannel:
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         upsertStateLocals:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
       properties:
@@ -2141,10 +2273,14 @@ components:
         recordEvents:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         localActivityInput: localActivityInput
@@ -2187,27 +2323,39 @@ components:
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         upsertStateLocals:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         upsertDataObjects:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
       properties:
@@ -2241,10 +2389,14 @@ components:
         stateLocals:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         workflowStateId: workflowStateId
@@ -2255,12 +2407,16 @@ components:
             commandId: commandId
             signalValue:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
           - signalRequestStatus: null
             signalChannelName: signalChannelName
             commandId: commandId
             signalValue:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
           stateWaitUntilFailed: true
           interStateChannelResults:
@@ -2268,12 +2424,16 @@ components:
             commandId: commandId
             value:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             requestStatus: null
           - channelName: channelName
             commandId: commandId
             value:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             requestStatus: null
           stateStartApiSucceeded: true
@@ -2312,14 +2472,20 @@ components:
         DataObjects:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         stateInput:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         context:
@@ -2373,10 +2539,14 @@ components:
         recordEvents:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         stateDecision:
@@ -2387,6 +2557,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2404,6 +2575,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2415,6 +2587,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2424,6 +2597,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2441,6 +2615,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2459,6 +2634,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2470,6 +2646,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2483,6 +2660,8 @@ components:
                 backoffCoefficient: 5.637377
             stateInput:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             waitForKey: waitForKey
           - stateId: stateId
@@ -2491,6 +2670,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2508,6 +2688,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2519,6 +2700,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2528,6 +2710,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2545,6 +2728,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2563,6 +2747,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2574,6 +2759,7 @@ components:
                 lockingKeys:
                 - lockingKeys
                 - lockingKeys
+                lazyLoadingLargeDataAttributes: true
                 useKeyAsPrefix: true
                 partialLoadingKeys:
                 - partialLoadingKeys
@@ -2587,11 +2773,15 @@ components:
                 backoffCoefficient: 5.637377
             stateInput:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             waitForKey: waitForKey
           conditionalClose:
             closeInput:
               data: data
+              extStoreId: extStoreId
+              extPath: extPath
               encoding: encoding
             channelName: channelName
             conditionalCloseType: null
@@ -2600,27 +2790,39 @@ components:
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         - channelName: channelName
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         upsertStateLocals:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         upsertDataObjects:
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
         - value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           key: key
       properties:
@@ -2675,6 +2877,8 @@ components:
         stateCompletionOutput:
           completedStateOutput:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           completedStateExecutionId: completedStateExecutionId
           completedStateId: completedStateId
@@ -2703,6 +2907,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2720,6 +2925,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2731,6 +2937,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2740,6 +2947,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2757,6 +2965,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2775,6 +2984,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2786,6 +2996,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2799,6 +3010,8 @@ components:
               backoffCoefficient: 5.637377
           stateInput:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           waitForKey: waitForKey
         - stateId: stateId
@@ -2807,6 +3020,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2824,6 +3038,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2835,6 +3050,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2844,6 +3060,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2861,6 +3078,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2879,6 +3097,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2890,6 +3109,7 @@ components:
               lockingKeys:
               - lockingKeys
               - lockingKeys
+              lazyLoadingLargeDataAttributes: true
               useKeyAsPrefix: true
               partialLoadingKeys:
               - partialLoadingKeys
@@ -2903,11 +3123,15 @@ components:
               backoffCoefficient: 5.637377
           stateInput:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           waitForKey: waitForKey
         conditionalClose:
           closeInput:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           channelName: channelName
           conditionalCloseType: null
@@ -2923,6 +3147,8 @@ components:
       example:
         closeInput:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         channelName: channelName
         conditionalCloseType: null
@@ -2948,6 +3174,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -2965,6 +3192,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -2976,6 +3204,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -2985,6 +3214,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -3002,6 +3232,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -3020,6 +3251,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -3031,6 +3263,7 @@ components:
             lockingKeys:
             - lockingKeys
             - lockingKeys
+            lazyLoadingLargeDataAttributes: true
             useKeyAsPrefix: true
             partialLoadingKeys:
             - partialLoadingKeys
@@ -3044,6 +3277,8 @@ components:
             backoffCoefficient: 5.637377
         stateInput:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         waitForKey: waitForKey
       properties:
@@ -3147,12 +3382,16 @@ components:
           commandId: commandId
           signalValue:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         - signalRequestStatus: null
           signalChannelName: signalChannelName
           commandId: commandId
           signalValue:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
         stateWaitUntilFailed: true
         interStateChannelResults:
@@ -3160,12 +3399,16 @@ components:
           commandId: commandId
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           requestStatus: null
         - channelName: channelName
           commandId: commandId
           value:
             data: data
+            extStoreId: extStoreId
+            extPath: extPath
             encoding: encoding
           requestStatus: null
         stateStartApiSucceeded: true
@@ -3268,6 +3511,8 @@ components:
         commandId: commandId
         signalValue:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         commandId:
@@ -3289,6 +3534,8 @@ components:
         commandId: commandId
         value:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
         requestStatus: null
       properties:
@@ -3315,6 +3562,8 @@ components:
         channelName: channelName
         value:
           data: data
+          extStoreId: extStoreId
+          extPath: extPath
           encoding: encoding
       properties:
         channelName:
