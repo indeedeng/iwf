@@ -390,10 +390,10 @@ func listWorkflowsPaginatedWithFilter(ctx context.Context, client *s3.Client, na
 
 func putObject(ctx context.Context, client *s3.Client, key, content string) error {
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(bucketName),
-		Key:         aws.String(key),
-		Body:        strings.NewReader(content),
-		ContentType: aws.String("json"),
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(key),
+		Body:   strings.NewReader(content),
+		//ContentType: aws.String("json"),
 	})
 	return err
 }

@@ -24,6 +24,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	rawLog "log"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -33,10 +38,6 @@ import (
 	temporalapi "github.com/indeedeng/iwf/service/client/temporal"
 	ggrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	rawLog "log"
-	"strings"
-	"sync"
-	"time"
 
 	isvc "github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/api"
@@ -400,7 +401,7 @@ func createS3Client(cfg config.Config, ctx context.Context) *s3.Client {
 	return client
 }
 
-func createBucketIfNotExists(ctx context.Context, client *s3.Client, bucketName string) error {
+func createBucketIfNotExists(ctx context.Context, client *s3.Client, bucketName string) {
 	// Check if bucket exists
 	_, err := client.HeadBucket(ctx, &s3.HeadBucketInput{
 		Bucket: aws.String(bucketName),
@@ -408,17 +409,14 @@ func createBucketIfNotExists(ctx context.Context, client *s3.Client, bucketName 
 
 	if err != nil {
 		// Bucket doesn't exist, create it
-		fmt.Printf("Creating bucket: %s\n", bucketName)
 		_, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
 			Bucket: aws.String(bucketName),
 		})
 		if err != nil {
-			return fmt.Errorf("failed to create bucket: %w", err)
+			rawLog.Fatal("failed to create bucket", tag.Error(err))
 		}
-		fmt.Printf("Bucket created successfully: %s\n", bucketName)
+		rawLog.Printf("bucket created successfully: %s", bucketName)
 	} else {
-		fmt.Printf("Bucket already exists: %s\n", bucketName)
+		rawLog.Printf("bucket already exists: %s", bucketName)
 	}
-
-	return nil
 }

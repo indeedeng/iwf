@@ -173,22 +173,19 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			uuid := uuid.New().String()
 			yymmdd := time.Now().Format("060102")
 			// namespace/yymmdd/workflowId/uuid
-			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix,yymmdd , req.GetWorkflowId(), uuid)
+			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix, yymmdd, req.GetWorkflowId(), uuid)
 			err := putObject(ctx, s.s3Client,
 				s.activeStorage.S3Bucket,
 				objectKey,
-				*input.StateInput.Data,
-				*input.StateInput.Encoding)
+				*input.StateInput.Data)
 			if err != nil {
 				return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 			}
-			// 3. replace the input with the S3 object key
-			// path can be shorter to save space
-			// yymmdd$workflowId$uuid
-			extPathInHistory := fmt.Sprintf("v0:%s$%s$%s", yymmdd, req.GetWorkflowId(), uuid)
+			// 3. replace the input with the S3 object
 			newStateInput := iwfidl.EncodedObject{
 				ExtStoreId: iwfidl.PtrString(s.activeStorage.StorageId),
-				ExtPath:    iwfidl.PtrString(extPathInHistory),
+				ExtPath:    iwfidl.PtrString(objectKey),
+				Encoding:   iwfidl.PtrString(*input.StateInput.Encoding),
 			}
 			input.StateInput = &newStateInput
 		}
@@ -228,12 +225,11 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	}, nil
 }
 
-func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content, contentType string) error {
+func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content string) error {
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(bucketName),
-		Key:         aws.String(key),
-		Body:        strings.NewReader(content),
-		ContentType: aws.String(contentType),
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(key),
+		Body:   strings.NewReader(content),
 	})
 	return err
 }
