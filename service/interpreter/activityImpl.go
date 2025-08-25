@@ -58,7 +58,7 @@ func StateApiWaitUntil(
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
 
 	var err error
-	if input.Request.StateInput.ExtStoreId != nil {
+	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
 		input.Request.StateInput, err = loadFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
 			return nil, err
@@ -174,7 +174,7 @@ func StateApiExecute(
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
 
 	var err error
-	if input.Request.StateInput.ExtStoreId != nil {
+	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
 		input.Request.StateInput, err = loadFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
 			return nil, err
