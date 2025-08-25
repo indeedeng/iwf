@@ -171,9 +171,9 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		if len(*input.StateInput.Data) > s.config.ExternalStorage.ThresholdInBytes {
 			// 2. if it is, upload the input to S3
 			uuid := uuid.New().String()
-			yymmdd := time.Now().Format("060102")
+			yyyymmdd := time.Now().Format("20060102")
 			// namespace/yymmdd/workflowId/uuid
-			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix, yymmdd, req.GetWorkflowId(), uuid)
+			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix, yyyymmdd, req.GetWorkflowId(), uuid)
 			err := putObject(ctx, s.s3Client,
 				s.activeStorage.S3Bucket,
 				objectKey,
@@ -227,9 +227,10 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content string) error {
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(key),
-		Body:   strings.NewReader(content),
+		Bucket:      aws.String(bucketName),
+		Key:         aws.String(key),
+		Body:        strings.NewReader(content),
+		ContentType: aws.String("application/json"),
 	})
 	return err
 }
