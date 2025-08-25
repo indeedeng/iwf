@@ -5,12 +5,12 @@ import (
 	"github.com/indeedeng/iwf/config"
 	"log"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"go.uber.org/cadence/.gen/go/cadence/workflowserviceclient"
 	"go.uber.org/cadence/worker"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 type InterpreterWorker struct {
