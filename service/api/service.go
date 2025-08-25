@@ -171,8 +171,9 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 		if len(*input.StateInput.Data) > s.config.ExternalStorage.ThresholdInBytes {
 			// 2. if it is, upload the input to S3
 			uuid := uuid.New().String()
+			yymmdd := time.Now().Format("060102")
 			// namespace/yymmdd/workflowId/uuid
-			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix, time.Now().Format("060102"), req.GetWorkflowId(), uuid)
+			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix,yymmdd , req.GetWorkflowId(), uuid)
 			err := putObject(ctx, s.s3Client,
 				s.activeStorage.S3Bucket,
 				objectKey,
@@ -182,13 +183,15 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 				return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 			}
 			// 3. replace the input with the S3 object key
+			// path can be shorter to save space
+			// yymmdd$workflowId$uuid
+			extPathInHistory := fmt.Sprintf("v0:%s$%s$%s", yymmdd, req.GetWorkflowId(), uuid)
 			newStateInput := iwfidl.EncodedObject{
 				ExtStoreId: iwfidl.PtrString(s.activeStorage.StorageId),
-				ExtPath:    iwfidl.PtrString(objectKey),
+				ExtPath:    iwfidl.PtrString(extPathInHistory),
 			}
 			input.StateInput = &newStateInput
 		}
-
 	}
 
 	runId, err := s.client.StartInterpreterWorkflow(ctx, workflowOptions, input)
