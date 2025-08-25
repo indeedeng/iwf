@@ -1,6 +1,7 @@
 package integ
 
 import (
+	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/integ/helpers"
 	cadenceapi "github.com/indeedeng/iwf/service/client/cadence"
@@ -76,6 +77,7 @@ type IwfServiceTestConfig struct {
 	MemoEncryption                   bool
 	DisableFailAtMemoIncompatibility bool // default to false so that we will fail at test
 	DefaultHeaders                   map[string]string
+	S3TestThreshold                  int
 }
 
 func startIwfService(backendType service.BackendType) (closeFunc func()) {
@@ -120,9 +122,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}
 
 		testCfg := createTestConfig(config)
+		s3Client := iwf.CreateS3Client(testCfg, context.Background())
 
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger, nil, "") // TODO pass s3 client for integ test
+		iwfService := api.NewService(testCfg, uclient, logger, s3Client, "test/") // TODO pass s3 client for integ test
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -158,9 +161,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}
 
 		testCfg := createTestConfig(config)
+		s3Client := iwf.CreateS3Client(testCfg, context.Background())
 
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger, nil, "") // pass in for integ tests
+		iwfService := api.NewService(testCfg, uclient, logger, s3Client, "test/") // pass in for integ tests
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,

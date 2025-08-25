@@ -208,7 +208,7 @@ func launchTemporalService(
 	case serviceAPI:
 		svc := api.NewService(
 			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
-			createS3Client(config, context.Background()),
+			CreateS3Client(config, context.Background()),
 			config.Interpreter.Temporal.Namespace+"/",
 		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
@@ -233,7 +233,7 @@ func launchCadenceService(
 	case serviceAPI:
 		svc := api.NewService(
 			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
-			createS3Client(config, context.Background()),
+			CreateS3Client(config, context.Background()),
 			config.Interpreter.Cadence.Domain+"/",
 		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
@@ -354,7 +354,11 @@ func newPrometheusScope(c prometheus.Configuration, logger log.Logger) tally.Sco
 	return scope
 }
 
-func createS3Client(cfg config.Config, ctx context.Context) *s3.Client {
+func CreateS3Client(cfg config.Config, ctx context.Context) *s3.Client {
+
+	if !cfg.ExternalStorage.Enabled {
+		return nil
+	}
 
 	// get the first active storage
 	var activeStorage *config.SupportedStorage
@@ -366,6 +370,10 @@ func createS3Client(cfg config.Config, ctx context.Context) *s3.Client {
 	}
 	if activeStorage == nil {
 		rawLog.Fatal("no active storage found")
+	}
+
+	if activeStorage.StorageType != "s3" {
+		rawLog.Fatal("only s3 is supported for external storage")
 	}
 
 	// Create custom resolver for MinIO endpoint
