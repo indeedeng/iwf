@@ -18,6 +18,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO remove this file when implementation of S3 is done
+
 const (
 	bucketName = "iwf-test-bucket"
 	region     = "us-east-1"
