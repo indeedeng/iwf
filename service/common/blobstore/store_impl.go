@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
 	"go.temporal.io/sdk/client"
@@ -74,14 +76,20 @@ func NewBlobStore(
 	}
 }
 
-func (b *blobStoreImpl) WriteObject(ctx context.Context, path, data string) (string, error) {
-	err := putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
+func (b *blobStoreImpl) WriteObject(ctx context.Context, workflowId, data string) (storeId, path string, err error) {
+	storeId = b.activeStorage.StorageId
+	randomUuid := uuid.New().String()
+	yyyymmdd := time.Now().Format("20060102")
+	// yymmdd/workflowId/uuid
+	path = fmt.Sprintf("%s/%s/%s", yyyymmdd, workflowId, randomUuid)
+
+	err = putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
 	if err != nil {
 		b.writeObjectErrorCounter.Inc(1)
-		return "", err
+		return
 	}
 	b.writeObjectSuccessHistogram.Record(time.Duration(len(data)))
-	return b.activeStorage.StorageId, nil
+	return
 }
 
 func (b *blobStoreImpl) ReadObject(ctx context.Context, storeId, path string) (string, error) {
@@ -126,4 +134,14 @@ func getObject(ctx context.Context, client *s3.Client, bucketName, key string) (
 	}
 
 	return buf.String(), nil
+}
+
+func (b *blobStoreImpl) DeleteObjectPath(ctx context.Context, storeId, path string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *blobStoreImpl) ListObjectPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
+	//TODO implement me
+	panic("implement me")
 }
