@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"log"
 	"net/http"
 	"testing"
@@ -124,9 +125,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 		s3Client := iwf.CreateS3Client(testCfg, context.Background())
+		store := blobstore.NewBlobStore(s3Client, testNamespace, testCfg.ExternalStorage, logger)
 
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger, s3Client, "test/") // TODO pass s3 client for integ test
+		iwfService := api.NewService(testCfg, uclient, logger, store)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -138,7 +140,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient, s3Client)
+		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient, store)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {
@@ -163,9 +165,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 		s3Client := iwf.CreateS3Client(testCfg, context.Background())
+		store := blobstore.NewBlobStore(s3Client, iwf.DefaultCadenceDomain, testCfg.ExternalStorage, logger)
 
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger, s3Client, "test/") // pass in for integ tests
+		iwfService := api.NewService(testCfg, uclient, logger, store)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -177,7 +180,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient, s3Client)
+		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient, store)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {

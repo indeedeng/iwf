@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"net/http"
 
 	"github.com/indeedeng/iwf/service"
@@ -21,8 +21,8 @@ type handler struct {
 	logger log.Logger
 }
 
-func newHandler(config config.Config, client uclient.UnifiedClient, logger log.Logger, s3Client *s3.Client, s3PathPrefix string) *handler {
-	svc, err := NewApiService(config, client, service.TaskQueue, logger, s3Client, s3PathPrefix)
+func newHandler(config config.Config, client uclient.UnifiedClient, logger log.Logger, store blobstore.BlobStore) *handler {
+	svc, err := NewApiService(config, client, service.TaskQueue, logger, store)
 	if err != nil {
 		panic(err)
 	}
