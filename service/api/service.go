@@ -10,7 +10,6 @@ import (
 
 	"github.com/indeedeng/iwf/service/common/blobstore"
 
-	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/interpreter/env"
@@ -124,11 +123,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 				// 1. check the size of the input is larger than the threshold
 				if len(*keyValue.Value.Data) > s.config.ExternalStorage.ThresholdInBytes {
 					// 2. if it is, upload the input to S3
-					uuid := uuid.New().String()
-					yyyymmdd := time.Now().Format("20060102")
-					// yymmdd/workflowId/uuid
-					objectKey := fmt.Sprintf("%s/%s/%s", yyyymmdd, req.GetWorkflowId(), uuid)
-					storeId, err := s.store.WriteObject(ctx, objectKey, *keyValue.Value.Data)
+					storeId, path, err := s.store.WriteObject(ctx, req.GetWorkflowId(), *keyValue.Value.Data)
 					if err != nil {
 						return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 					}
@@ -137,7 +132,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 						Key: keyValue.Key,
 						Value: &iwfidl.EncodedObject{
 							ExtStoreId: iwfidl.PtrString(storeId),
-							ExtPath:    iwfidl.PtrString(objectKey),
+							ExtPath:    iwfidl.PtrString(path),
 							Encoding:   iwfidl.PtrString(*keyValue.Value.Encoding),
 						},
 					}
@@ -187,21 +182,21 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 	// inject some code to upload the large input to S3 and replace the input
 	if s.config.ExternalStorage.Enabled {
+		// this feature requires workflowID not contains certain characters
+		if err := blobstore.ValidateWorkflowId(req.WorkflowId); err != nil {
+			return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
+		}
 		// 1. check the size of the input is larger than the threshold
 		if len(*input.StateInput.Data) > s.config.ExternalStorage.ThresholdInBytes {
 			// 2. if it is, upload the input to S3
-			uuid := uuid.New().String()
-			yyyymmdd := time.Now().Format("20060102")
-			// yymmdd/workflowId/uuid
-			objectKey := fmt.Sprintf("%s/%s/%s", yyyymmdd, req.GetWorkflowId(), uuid)
-			storeId, err := s.store.WriteObject(ctx, objectKey, input.StateInput.GetData())
+			storeId, path, err := s.store.WriteObject(ctx, req.GetWorkflowId(), input.StateInput.GetData())
 			if err != nil {
 				return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 			}
 			// 3. replace the input with the S3 object
 			newStateInput := iwfidl.EncodedObject{
 				ExtStoreId: iwfidl.PtrString(storeId),
-				ExtPath:    iwfidl.PtrString(objectKey),
+				ExtPath:    iwfidl.PtrString(path),
 				Encoding:   iwfidl.PtrString(*input.StateInput.Encoding),
 			}
 			input.StateInput = &newStateInput

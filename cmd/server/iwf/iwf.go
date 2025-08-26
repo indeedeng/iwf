@@ -127,9 +127,11 @@ func start(c *cli.Context) {
 			Namespace: temporalConfig.Namespace,
 		}
 
+		metrics := client.MetricsNopHandler
 		if temporalConfig.Prometheus != nil {
 			pscope := newPrometheusScope(*temporalConfig.Prometheus, logger)
-			clientOptions.MetricsHandler = sdktally.NewMetricsHandler(pscope)
+			metrics = sdktally.NewMetricsHandler(pscope)
+			clientOptions.MetricsHandler = metrics
 		}
 
 		if temporalConfig.CloudAPIKey != "" {
@@ -166,7 +168,7 @@ func start(c *cli.Context) {
 		unifiedClient = temporalapi.NewTemporalClient(temporalClient, temporalConfig.Namespace, converter.GetDefaultDataConverter(), false, &config.Api.QueryWorkflowFailedRetryPolicy)
 
 		for _, svcName := range services {
-			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger)
+			go launchTemporalService(svcName, *config, unifiedClient, temporalClient, logger, metrics)
 		}
 	} else if config.Interpreter.Cadence != nil {
 		hostPort := DefaultCadenceHostPort
@@ -203,7 +205,7 @@ func start(c *cli.Context) {
 
 func launchTemporalService(
 	svcName string, config config.Config, unifiedClient uclient.UnifiedClient, temporalClient client.Client,
-	logger log.Logger,
+	logger log.Logger, metrics client.MetricsHandler,
 ) {
 	s3Client := CreateS3Client(config, context.Background())
 	blobStore := blobstore.NewBlobStore(
@@ -211,6 +213,7 @@ func launchTemporalService(
 		config.Interpreter.Temporal.Namespace,
 		config.ExternalStorage,
 		logger,
+		metrics,
 	)
 	switch svcName {
 	case serviceAPI:
@@ -242,6 +245,7 @@ func launchCadenceService(
 		config.Interpreter.Cadence.Domain,
 		config.ExternalStorage,
 		logger,
+		client.MetricsNopHandler,
 	)
 	switch svcName {
 	case serviceAPI:

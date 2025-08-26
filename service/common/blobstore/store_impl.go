@@ -4,20 +4,28 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
+	"go.temporal.io/sdk/client"
 	"io"
 	"strings"
+	"time"
 )
 
 type blobStoreImpl struct {
-	s3Client       *s3.Client
-	pathPrefix     string // the Temporal namespace or Cadence domain + "/"
-	activeStorage  config.BlobStorageConfig
-	supportedStore map[string]config.BlobStorageConfig // storeId as key
-	logger         log.Logger
+	s3Client                    *s3.Client
+	pathPrefix                  string // the Temporal namespace or Cadence domain + "/"
+	activeStorage               config.BlobStorageConfig
+	supportedStore              map[string]config.BlobStorageConfig // storeId as key
+	logger                      log.Logger
+	writeObjectErrorCounter     client.MetricsCounter
+	readObjectErrorCounter      client.MetricsCounter
+	writeObjectSuccessHistogram client.MetricsTimer
+	readObjectSuccessHistogram  client.MetricsTimer
 }
 
 func NewBlobStore(
@@ -25,6 +33,7 @@ func NewBlobStore(
 	temporalOrCadenceNamespace string,
 	storeConfig config.ExternalStorageConfig,
 	logger log.Logger,
+	metrics client.MetricsHandler,
 ) BlobStore {
 	if !storeConfig.Enabled {
 		return nil
@@ -48,29 +57,55 @@ func NewBlobStore(
 		panic("no active storage found")
 	}
 
+	metricsHandler := metrics.WithTags(map[string]string{"prefix": temporalOrCadenceNamespace})
+	writeObjectErrorCounter := metricsHandler.Counter("write_object_error")
+	readObjectErrorCounter := metricsHandler.Counter("read_object_error")
+	writeObjectSuccessHistogram := metricsHandler.Timer("write_object_success")
+	readObjectSuccessHistogram := metricsHandler.Timer("read_object_success")
+
 	return &blobStoreImpl{
-		s3Client:       s3Client,
-		pathPrefix:     temporalOrCadenceNamespace + "/",
-		activeStorage:  *activeStorage,
-		supportedStore: supportedStores,
-		logger:         logger,
+		s3Client:                    s3Client,
+		pathPrefix:                  temporalOrCadenceNamespace + "/",
+		activeStorage:               *activeStorage,
+		supportedStore:              supportedStores,
+		logger:                      logger,
+		writeObjectErrorCounter:     writeObjectErrorCounter,
+		readObjectErrorCounter:      readObjectErrorCounter,
+		writeObjectSuccessHistogram: writeObjectSuccessHistogram,
+		readObjectSuccessHistogram:  readObjectSuccessHistogram,
 	}
 }
 
-func (b blobStoreImpl) WriteObject(ctx context.Context, path, data string) (string, error) {
-	err := putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
+func (b *blobStoreImpl) WriteObject(ctx context.Context, workflowId, data string) (storeId, path string, err error) {
+	storeId = b.activeStorage.StorageId
+	randomUuid := uuid.New().String()
+	yyyymmdd := time.Now().Format("20060102")
+	// yymmdd$workflowId/uuid
+	// Note: using $ here so that the listing can be much easier to implement for pagination
+	path = fmt.Sprintf("%s$%s/%s", yyyymmdd, workflowId, randomUuid)
+
+	err = putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
 	if err != nil {
-		return "", err
+		b.writeObjectErrorCounter.Inc(1)
+		return
 	}
-	return b.activeStorage.StorageId, nil
+	b.writeObjectSuccessHistogram.Record(time.Duration(len(data)))
+	return
 }
 
-func (b blobStoreImpl) ReadObject(ctx context.Context, storeId, path string) (string, error) {
+func (b *blobStoreImpl) ReadObject(ctx context.Context, storeId, path string) (string, error) {
 	storeConfig, ok := b.supportedStore[storeId]
 	if !ok {
+		b.readObjectErrorCounter.Inc(1)
 		return "", errors.New("store not found for " + storeId)
 	}
-	return getObject(ctx, b.s3Client, storeConfig.S3Bucket, b.pathPrefix+path)
+	data, err := getObject(ctx, b.s3Client, storeConfig.S3Bucket, b.pathPrefix+path)
+	if err != nil {
+		b.readObjectErrorCounter.Inc(1)
+		return "", err
+	}
+	b.readObjectSuccessHistogram.Record(time.Duration(len(data)))
+	return data, nil
 }
 
 func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content string) error {
@@ -100,4 +135,14 @@ func getObject(ctx context.Context, client *s3.Client, bucketName, key string) (
 	}
 
 	return buf.String(), nil
+}
+
+func (b *blobStoreImpl) DeleteObjectPath(ctx context.Context, storeId, path string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (b *blobStoreImpl) ListObjectPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
+	//TODO implement me
+	panic("implement me")
 }
