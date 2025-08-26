@@ -36,8 +36,8 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 			SupportedStorages: []config.BlobStorageConfig{
 				{
 					Status:      config.StorageStatusActive,
-					StorageId:   "s3",
-					StorageType: "s3",
+					StorageId:   "s3-store-id",
+					StorageType: config.StorageTypeS3,
 					S3Endpoint:  "http://localhost:9000",
 					S3Bucket:    "iwf-test-bucket",
 					S3Region:    "us-east-1",

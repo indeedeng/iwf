@@ -82,18 +82,6 @@ func doTestWorkflowWithS3StartInput(t *testing.T, backendType service.BackendTyp
 	assertions := assert.New(t)
 
 	_, history := wfHandler.GetTestResult()
-	// assertions.Equalf(map[string]interface{}{
-	// 	"S1_start":  1,
-	// 	"S1_decide": 1,
-	// 	"S1_start_input": iwfidl.EncodedObject{
-	// 		Encoding: iwfidl.PtrString("json"),
-	// 		Data:     iwfidl.PtrString("\"12345678901\""),
-	// 	},
-	// 	"S1_decide_input": iwfidl.EncodedObject{
-	// 		Encoding: iwfidl.PtrString("json"),
-	// 		Data:     iwfidl.PtrString("\"12345678901\""),
-	// 	},
-	// }, history, "headers test fail, %v", history)
 
 	assertions.Equal(history["S1_start_input"], iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),

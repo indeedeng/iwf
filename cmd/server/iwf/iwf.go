@@ -24,6 +24,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	rawLog "log"
 	"strings"
 	"sync"
@@ -205,16 +206,21 @@ func launchTemporalService(
 	logger log.Logger,
 ) {
 	s3Client := CreateS3Client(config, context.Background())
+	blobStore := blobstore.NewBlobStore(
+		s3Client,
+		config.Interpreter.Temporal.Namespace,
+		config.ExternalStorage,
+		logger,
+	)
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(
 			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
-			s3Client,
-			config.Interpreter.Temporal.Namespace+"/",
+			blobStore,
 		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient, s3Client)
+		interpreter := temporal.NewInterpreterWorker(config, temporalClient, isvc.TaskQueue, false, nil, unifiedClient, blobStore)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)
@@ -231,16 +237,21 @@ func launchCadenceService(
 	logger log.Logger,
 ) {
 	s3Client := CreateS3Client(config, context.Background())
+	blobStore := blobstore.NewBlobStore(
+		s3Client,
+		config.Interpreter.Cadence.Domain,
+		config.ExternalStorage,
+		logger,
+	)
 	switch svcName {
 	case serviceAPI:
 		svc := api.NewService(
 			config, unifiedClient, logger.WithTags(tag.Service(svcName)),
-			s3Client,
-			config.Interpreter.Cadence.Domain+"/",
+			blobStore,
 		)
 		rawLog.Fatal(svc.Run(fmt.Sprintf(":%v", config.Api.Port)))
 	case serviceInterpreter:
-		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient, s3Client)
+		interpreter := cadence.NewInterpreterWorker(config, service, domain, isvc.TaskQueue, closeFunc, unifiedClient, blobStore)
 		interpreter.Start()
 	default:
 		rawLog.Fatalf("Invalid service: %v", svcName)

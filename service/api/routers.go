@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"github.com/indeedeng/iwf/service/common/log"
 )
 
@@ -29,10 +29,10 @@ const WorkflowRpcApiPath = "/api/v1/workflow/rpc"
 const InfoHealthCheck = "/info/healthcheck"
 
 // NewService returns a new router.
-func NewService(config config.Config, client uclient.UnifiedClient, logger log.Logger, s3Client *s3.Client, s3PathPrefix string) *gin.Engine {
+func NewService(config config.Config, client uclient.UnifiedClient, logger log.Logger, store blobstore.BlobStore) *gin.Engine {
 	router := gin.Default()
 
-	handler := newHandler(config, client, logger, s3Client, s3PathPrefix)
+	handler := newHandler(config, client, logger, store)
 
 	router.GET("/", handler.index)
 	router.POST(WorkflowStartApiPath, handler.apiV1WorkflowStart)

@@ -3,9 +3,9 @@ package cadence
 import (
 	"fmt"
 	"github.com/indeedeng/iwf/config"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"log"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/interpreter"
 	"github.com/indeedeng/iwf/service/interpreter/env"
@@ -24,9 +24,9 @@ type InterpreterWorker struct {
 func NewInterpreterWorker(
 	config config.Config, service workflowserviceclient.Interface, domain, tasklist string, closeFunc func(),
 	unifiedClient uclient.UnifiedClient,
-	s3Client *s3.Client,
+	store blobstore.BlobStore,
 ) *InterpreterWorker {
-	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist, s3Client)
+	env.SetSharedEnv(config, false, nil, unifiedClient, tasklist, store)
 	return &InterpreterWorker{
 		service:   service,
 		domain:    domain,

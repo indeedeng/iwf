@@ -18,6 +18,10 @@ const (
 	StorageStatusInactive = "inactive"
 )
 
+const (
+	StorageTypeS3 = "s3"
+)
+
 type (
 	Config struct {
 		// Log is the logging config
@@ -42,6 +46,7 @@ type (
 	}
 
 	StorageStatus string
+	StorageType   string
 
 	BlobStorageConfig struct {
 		// Status means whether this storage is active for writing.
@@ -50,7 +55,7 @@ type (
 		// StorageId is the id of the external storage, it's used to identify the external storage in the EncodedObject that is stored in the workflow history
 		StorageId string `yaml:"storageId"`
 		// StorageType is the type of the external storage, currently only s3 is supported
-		StorageType string `yaml:"storageType"`
+		StorageType StorageType `yaml:"storageType"`
 		// S3Endpoint is the endpoint of s3 service
 		S3Endpoint string `yaml:"s3Endpoint"`
 		// S3Bucket is the bucket name of the S3 storage

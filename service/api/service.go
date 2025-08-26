@@ -3,13 +3,12 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/event"
@@ -31,13 +30,11 @@ import (
 )
 
 type serviceImpl struct {
-	client        uclient.UnifiedClient
-	s3Client      *s3.Client
-	s3PathPrefix  string // it's recommended to be the Temporal namespace or Cadence domain + "/"
-	activeStorage *config.BlobStorageConfig
-	taskQueue     string
-	logger        log.Logger
-	config        config.Config
+	client    uclient.UnifiedClient
+	store     blobstore.BlobStore
+	taskQueue string
+	logger    log.Logger
+	config    config.Config
 }
 
 func (s *serviceImpl) Close() {
@@ -45,25 +42,14 @@ func (s *serviceImpl) Close() {
 }
 
 func NewApiService(
-	cfg config.Config, client uclient.UnifiedClient, taskQueue string, logger log.Logger, s3Client *s3.Client, s3PathPrefix string,
+	cfg config.Config, client uclient.UnifiedClient, taskQueue string, logger log.Logger, store blobstore.BlobStore,
 ) (ApiService, error) {
-	// get the first active storage
-	var activeStorage *config.BlobStorageConfig
-	for _, storage := range cfg.ExternalStorage.SupportedStorages {
-		if storage.Status == config.StorageStatusActive {
-			activeStorage = &storage
-			break
-		}
-	}
-
 	return &serviceImpl{
-		client:        client,
-		s3Client:      s3Client,
-		s3PathPrefix:  s3PathPrefix,
-		activeStorage: activeStorage,
-		taskQueue:     taskQueue,
-		logger:        logger,
-		config:        cfg,
+		client:    client,
+		store:     store,
+		taskQueue: taskQueue,
+		logger:    logger,
+		config:    cfg,
 	}, nil
 }
 
@@ -172,18 +158,15 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			// 2. if it is, upload the input to S3
 			uuid := uuid.New().String()
 			yyyymmdd := time.Now().Format("20060102")
-			// namespace/yymmdd/workflowId/uuid
-			objectKey := fmt.Sprintf("%s%s/%s/%s", s.s3PathPrefix, yyyymmdd, req.GetWorkflowId(), uuid)
-			err := putObject(ctx, s.s3Client,
-				s.activeStorage.S3Bucket,
-				objectKey,
-				*input.StateInput.Data)
+			// yymmdd/workflowId/uuid
+			objectKey := fmt.Sprintf("%s/%s/%s", yyyymmdd, req.GetWorkflowId(), uuid)
+			storeId, err := s.store.WriteObject(ctx, objectKey, input.StateInput.GetData())
 			if err != nil {
 				return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 			}
 			// 3. replace the input with the S3 object
 			newStateInput := iwfidl.EncodedObject{
-				ExtStoreId: iwfidl.PtrString(s.activeStorage.StorageId),
+				ExtStoreId: iwfidl.PtrString(storeId),
 				ExtPath:    iwfidl.PtrString(objectKey),
 				Encoding:   iwfidl.PtrString(*input.StateInput.Encoding),
 			}
@@ -223,16 +206,6 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 	return &iwfidl.WorkflowStartResponse{
 		WorkflowRunId: iwfidl.PtrString(runId),
 	}, nil
-}
-
-func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content string) error {
-	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(bucketName),
-		Key:         aws.String(key),
-		Body:        strings.NewReader(content),
-		ContentType: aws.String("application/json"),
-	})
-	return err
 }
 
 func overrideWorkflowConfig(configOverride iwfidl.WorkflowConfig, workflowConfig *iwfidl.WorkflowConfig) {
