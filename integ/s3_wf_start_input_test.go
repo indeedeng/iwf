@@ -94,4 +94,8 @@ func doTestWorkflowWithS3StartInput(t *testing.T, backendType service.BackendTyp
 
 	assertions.Equal(history["S1_start"], int64(1), "S1_start is not equal")
 	assertions.Equal(history["S1_decide"], int64(1), "S1_decide is not equal")
+
+	objectCount, err := globalBlobStore.CountWorkflowObjectsForTesting(context.Background(), wfId)
+	assertions.Nil(err)
+	assertions.Equal(int64(1), objectCount)
 }
