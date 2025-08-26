@@ -2,9 +2,9 @@ package temporal
 
 import (
 	"fmt"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"log"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/interpreter"
@@ -23,9 +23,9 @@ type InterpreterWorker struct {
 func NewInterpreterWorker(
 	config config.Config, temporalClient client.Client, taskQueue string, memoEncryption bool,
 	memoEncryptionConverter converter.DataConverter, unifiedClient uclient.UnifiedClient,
-	s3Client *s3.Client,
+	store blobstore.BlobStore,
 ) *InterpreterWorker {
-	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue, s3Client)
+	env.SetSharedEnv(config, memoEncryption, memoEncryptionConverter, unifiedClient, taskQueue, store)
 
 	return &InterpreterWorker{
 		temporalClient: temporalClient,
