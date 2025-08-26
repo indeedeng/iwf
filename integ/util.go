@@ -110,6 +110,9 @@ func startIwfServiceWithClient(backendType service.BackendType) (uclient uclient
 //var integCadenceUclientCached api.UnifiedClient
 //var integTemporalUclientCached api.UnifiedClient
 
+// globalBlobStore is a global var in this package for testing
+var globalBlobStore blobstore.BlobStore
+
 func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.UnifiedClient, closeFunc func()) {
 	if config.BackendType == service.BackendTypeTemporal {
 		dataConverter := converter.GetDefaultDataConverter()
@@ -125,10 +128,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 		s3Client := iwf.CreateS3Client(testCfg, context.Background())
-		store := blobstore.NewBlobStore(s3Client, testNamespace, testCfg.ExternalStorage, logger, client.MetricsNopHandler)
+		globalBlobStore = blobstore.NewBlobStore(s3Client, testNamespace, testCfg.ExternalStorage, logger, client.MetricsNopHandler)
 
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger, store)
+		iwfService := api.NewService(testCfg, uclient, logger, globalBlobStore)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -140,7 +143,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient, store)
+		interpreter := temporal.NewInterpreterWorker(testCfg, temporalClient, service.TaskQueue, config.MemoEncryption, dataConverter, uclient, globalBlobStore)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {
@@ -165,10 +168,10 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 		s3Client := iwf.CreateS3Client(testCfg, context.Background())
-		store := blobstore.NewBlobStore(s3Client, iwf.DefaultCadenceDomain, testCfg.ExternalStorage, logger, client.MetricsNopHandler)
+		globalBlobStore = blobstore.NewBlobStore(s3Client, iwf.DefaultCadenceDomain, testCfg.ExternalStorage, logger, client.MetricsNopHandler)
 
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
-		iwfService := api.NewService(testCfg, uclient, logger, store)
+		iwfService := api.NewService(testCfg, uclient, logger, globalBlobStore)
 		iwfServer := &http.Server{
 			Addr:    ":" + testIwfServerPort,
 			Handler: iwfService,
@@ -180,7 +183,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 		}()
 
 		// start iwf interpreter worker
-		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient, store)
+		interpreter := cadence.NewInterpreterWorker(testCfg, serviceClient, iwf.DefaultCadenceDomain, service.TaskQueue, closeFunc, uclient, globalBlobStore)
 		if *disableStickyCache {
 			interpreter.StartWithStickyCacheDisabledForTest()
 		} else {
