@@ -125,7 +125,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 		s3Client := iwf.CreateS3Client(testCfg, context.Background())
-		store := blobstore.NewBlobStore(s3Client, testNamespace, testCfg.ExternalStorage, logger)
+		store := blobstore.NewBlobStore(s3Client, testNamespace, testCfg.ExternalStorage, logger, client.MetricsNopHandler)
 
 		uclient = temporalapi.NewTemporalClient(temporalClient, testNamespace, dataConverter, config.MemoEncryption, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
 		iwfService := api.NewService(testCfg, uclient, logger, store)
@@ -165,7 +165,7 @@ func doStartIwfServiceWithClient(config IwfServiceTestConfig) (uclient uclient.U
 
 		testCfg := createTestConfig(config)
 		s3Client := iwf.CreateS3Client(testCfg, context.Background())
-		store := blobstore.NewBlobStore(s3Client, iwf.DefaultCadenceDomain, testCfg.ExternalStorage, logger)
+		store := blobstore.NewBlobStore(s3Client, iwf.DefaultCadenceDomain, testCfg.ExternalStorage, logger, client.MetricsNopHandler)
 
 		uclient = cadenceapi.NewCadenceClient(iwf.DefaultCadenceDomain, cadenceClient, serviceClient, encoded.GetDefaultDataConverter(), closeFunc, &testCfg.Api.QueryWorkflowFailedRetryPolicy)
 		iwfService := api.NewService(testCfg, uclient, logger, store)

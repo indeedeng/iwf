@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
+	"go.temporal.io/sdk/client"
 	"io"
 	"strings"
 )
@@ -17,6 +18,7 @@ type blobStoreImpl struct {
 	pathPrefix     string // the Temporal namespace or Cadence domain + "/"
 	activeStorage  config.BlobStorageConfig
 	supportedStore map[string]config.BlobStorageConfig // storeId as key
+	metrics        client.MetricsHandler
 	logger         log.Logger
 }
 
@@ -25,6 +27,7 @@ func NewBlobStore(
 	temporalOrCadenceNamespace string,
 	storeConfig config.ExternalStorageConfig,
 	logger log.Logger,
+	metrics client.MetricsHandler,
 ) BlobStore {
 	if !storeConfig.Enabled {
 		return nil
@@ -54,6 +57,7 @@ func NewBlobStore(
 		activeStorage:  *activeStorage,
 		supportedStore: supportedStores,
 		logger:         logger,
+		metrics:        metrics,
 	}
 }
 
