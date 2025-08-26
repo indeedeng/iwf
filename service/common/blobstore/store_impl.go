@@ -11,15 +11,19 @@ import (
 	"go.temporal.io/sdk/client"
 	"io"
 	"strings"
+	"time"
 )
 
 type blobStoreImpl struct {
-	s3Client       *s3.Client
-	pathPrefix     string // the Temporal namespace or Cadence domain + "/"
-	activeStorage  config.BlobStorageConfig
-	supportedStore map[string]config.BlobStorageConfig // storeId as key
-	metrics        client.MetricsHandler
-	logger         log.Logger
+	s3Client                    *s3.Client
+	pathPrefix                  string // the Temporal namespace or Cadence domain + "/"
+	activeStorage               config.BlobStorageConfig
+	supportedStore              map[string]config.BlobStorageConfig // storeId as key
+	logger                      log.Logger
+	writeObjectErrorCounter     client.MetricsCounter
+	readObjectErrorCounter      client.MetricsCounter
+	writeObjectSuccessHistogram client.MetricsTimer
+	readObjectSuccessHistogram  client.MetricsTimer
 }
 
 func NewBlobStore(
@@ -51,30 +55,48 @@ func NewBlobStore(
 		panic("no active storage found")
 	}
 
+	metricsHandler := metrics.WithTags(map[string]string{"prefix": temporalOrCadenceNamespace})
+	writeObjectErrorCounter := metricsHandler.Counter("write_object_error")
+	readObjectErrorCounter := metricsHandler.Counter("read_object_error")
+	writeObjectSuccessHistogram := metricsHandler.Timer("write_object_success")
+	readObjectSuccessHistogram := metricsHandler.Timer("read_object_success")
+
 	return &blobStoreImpl{
-		s3Client:       s3Client,
-		pathPrefix:     temporalOrCadenceNamespace + "/",
-		activeStorage:  *activeStorage,
-		supportedStore: supportedStores,
-		logger:         logger,
-		metrics:        metrics,
+		s3Client:                    s3Client,
+		pathPrefix:                  temporalOrCadenceNamespace + "/",
+		activeStorage:               *activeStorage,
+		supportedStore:              supportedStores,
+		logger:                      logger,
+		writeObjectErrorCounter:     writeObjectErrorCounter,
+		readObjectErrorCounter:      readObjectErrorCounter,
+		writeObjectSuccessHistogram: writeObjectSuccessHistogram,
+		readObjectSuccessHistogram:  readObjectSuccessHistogram,
 	}
 }
 
-func (b blobStoreImpl) WriteObject(ctx context.Context, path, data string) (string, error) {
+func (b *blobStoreImpl) WriteObject(ctx context.Context, path, data string) (string, error) {
 	err := putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
 	if err != nil {
+		b.writeObjectErrorCounter.Inc(1)
 		return "", err
 	}
+	b.writeObjectSuccessHistogram.Record(time.Duration(len(data)))
 	return b.activeStorage.StorageId, nil
 }
 
-func (b blobStoreImpl) ReadObject(ctx context.Context, storeId, path string) (string, error) {
+func (b *blobStoreImpl) ReadObject(ctx context.Context, storeId, path string) (string, error) {
 	storeConfig, ok := b.supportedStore[storeId]
 	if !ok {
+		b.readObjectErrorCounter.Inc(1)
 		return "", errors.New("store not found for " + storeId)
 	}
-	return getObject(ctx, b.s3Client, storeConfig.S3Bucket, b.pathPrefix+path)
+	data, err := getObject(ctx, b.s3Client, storeConfig.S3Bucket, b.pathPrefix+path)
+	if err != nil {
+		b.readObjectErrorCounter.Inc(1)
+		return "", err
+	}
+	b.readObjectSuccessHistogram.Record(time.Duration(len(data)))
+	return data, nil
 }
 
 func putObject(ctx context.Context, client *s3.Client, bucketName string, key, content string) error {
