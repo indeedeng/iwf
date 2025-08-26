@@ -61,6 +61,12 @@ func StateApiWaitUntil(
 		}
 	}
 
+	// Load data attributes from external storage
+	err = loadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects)
+	if err != nil {
+		return nil, err
+	}
+
 	req := apiClient.DefaultApi.ApiV1WorkflowStateStartPost(ctx)
 	resp, httpResp, err := req.WorkflowStateStartRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
@@ -175,6 +181,12 @@ func StateApiExecute(
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	// Load data attributes from external storage
+	err = loadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects)
+	if err != nil {
+		return nil, err
 	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
@@ -447,4 +459,17 @@ func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (
 		Encoding: input.Encoding,
 	}
 	return &newEncodedObject, nil
+}
+
+func loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) error {
+	for i := range dataObjects {
+		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil {
+			loadedObject, err := loadFromExternalStorage(ctx, dataObjects[i].Value)
+			if err != nil {
+				return err
+			}
+			dataObjects[i].Value = loadedObject
+		}
+	}
+	return nil
 }

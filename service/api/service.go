@@ -3,11 +3,12 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/blobstore"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/indeedeng/iwf/service/common/blobstore"
 
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
@@ -114,6 +115,39 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			if workflowAlreadyStartedOptions.RequestId != nil {
 				requestId = workflowAlreadyStartedOptions.RequestId
 			}
+		}
+
+		// inject some code to upload the large input to S3 and replace the input
+		if s.config.ExternalStorage.Enabled {
+			processedDAs := make([]iwfidl.KeyValue, 0, len(initCustomDAs))
+			for _, keyValue := range initCustomDAs {
+				// 1. check the size of the input is larger than the threshold
+				if len(*keyValue.Value.Data) > s.config.ExternalStorage.ThresholdInBytes {
+					// 2. if it is, upload the input to S3
+					uuid := uuid.New().String()
+					yyyymmdd := time.Now().Format("20060102")
+					// yymmdd/workflowId/uuid
+					objectKey := fmt.Sprintf("%s/%s/%s", yyyymmdd, req.GetWorkflowId(), uuid)
+					storeId, err := s.store.WriteObject(ctx, objectKey, *keyValue.Value.Data)
+					if err != nil {
+						return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
+					}
+					// 3. replace the input with the S3 object
+					newKeyValue := iwfidl.KeyValue{
+						Key: keyValue.Key,
+						Value: &iwfidl.EncodedObject{
+							ExtStoreId: iwfidl.PtrString(storeId),
+							ExtPath:    iwfidl.PtrString(objectKey),
+							Encoding:   iwfidl.PtrString(*keyValue.Value.Encoding),
+						},
+					}
+					processedDAs = append(processedDAs, newKeyValue)
+				} else {
+					// Keep the original if it doesn't exceed threshold
+					processedDAs = append(processedDAs, keyValue)
+				}
+			}
+			initCustomDAs = processedDAs
 		}
 
 		if startOptions.GetUseMemoForDataAttributes() {
