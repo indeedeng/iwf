@@ -1,6 +1,21 @@
 package blobstore
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"strings"
+)
+
+var reservedCharacters = []string{"/", "$"}
+
+func ValidateWorkflowId(workflowId string) error {
+	for _, reservedCharacter := range reservedCharacters {
+		if strings.Contains(workflowId, reservedCharacter) {
+			return fmt.Errorf("workflowId contains reserved character: %s", reservedCharacter)
+		}
+	}
+	return nil
+}
 
 type BlobStore interface {
 	// WriteObject will write to the current active store
@@ -10,7 +25,7 @@ type BlobStore interface {
 	ReadObject(ctx context.Context, storeId, path string) (string, error)
 	// DeleteObjectPath will delete all the objects of the path
 	DeleteObjectPath(ctx context.Context, storeId, path string) error
-	// ListObjectPaths will list the paths, delimiter by "/"
+	// ListObjectPaths will list the paths of yyyymmdd$workflowId
 	ListObjectPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error)
 }
 

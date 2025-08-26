@@ -182,6 +182,10 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 	// inject some code to upload the large input to S3 and replace the input
 	if s.config.ExternalStorage.Enabled {
+		// this feature requires workflowID not contains certain characters
+		if err := blobstore.ValidateWorkflowId(req.WorkflowId); err != nil {
+			return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
+		}
 		// 1. check the size of the input is larger than the threshold
 		if len(*input.StateInput.Data) > s.config.ExternalStorage.ThresholdInBytes {
 			// 2. if it is, upload the input to S3

@@ -80,8 +80,9 @@ func (b *blobStoreImpl) WriteObject(ctx context.Context, workflowId, data string
 	storeId = b.activeStorage.StorageId
 	randomUuid := uuid.New().String()
 	yyyymmdd := time.Now().Format("20060102")
-	// yymmdd/workflowId/uuid
-	path = fmt.Sprintf("%s/%s/%s", yyyymmdd, workflowId, randomUuid)
+	// yymmdd$workflowId/uuid
+	// Note: using $ here so that the listing can be much easier to implement for pagination
+	path = fmt.Sprintf("%s$%s/%s", yyyymmdd, workflowId, randomUuid)
 
 	err = putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
 	if err != nil {
