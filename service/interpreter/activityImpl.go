@@ -488,6 +488,7 @@ func CleanupBlobStore(
 	stopChecingkUnixSeconds := time.Now().Unix() - int64(minAgeForCleanupCheckInDays)*24*3600
 	var continueToken *string
 
+	client := env.GetUnifiedClient()
 	for {
 		listOutput, err := store.ListWorkflowPaths(ctx, blobstore.ListObjectPathsInput{
 			StoreId:           storeId,
@@ -504,13 +505,21 @@ func CleanupBlobStore(
 				break
 			}
 
-			err := store.DeleteWorkflowObjects(ctx, storeId, workflowPath)
-			if err != nil {
-				logger.Error("CleanupBlobStore failed to delete workflow objects", "workflowPath", workflowPath, "error", err)
-				return err
+			workflowId := blobstore.MustExtractWorkflowId(workflowPath)
+			_, err := client.DescribeWorkflowExecution(ctx, workflowId, "", nil)
+			if client.IsNotFoundError(err) {
+				// this means workflow has been deleted from the history
+				err = store.DeleteWorkflowObjects(ctx, storeId, workflowPath)
+				if err != nil {
+					logger.Error("CleanupBlobStore failed to delete workflow objects", "workflowPath", workflowPath, "error", err)
+					return err
+				} else {
+					logger.Info("CleanupBlobStore deleted workflow objects", "workflowPath", workflowPath)
+				}
 			} else {
-				logger.Info("CleanupBlobStore deleted workflow objects", "workflowPath", workflowPath)
+				return err
 			}
+
 			// this is a long running activity
 			// using record heartbeat so that it won't timeout at startToClose timeout
 			provider.RecordHeartbeat(ctx)
