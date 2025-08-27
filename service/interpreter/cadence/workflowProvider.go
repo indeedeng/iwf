@@ -183,9 +183,10 @@ func (w *workflowProvider) WithActivityOptions(
 	}
 
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
-		StartToCloseTimeout: startToCloseTimeout,
-		HeartbeatTimeout:    options.HeartbeatTimeout,
-		RetryPolicy:         retry.ConvertCadenceActivityRetryPolicy(options.RetryPolicy),
+		StartToCloseTimeout:    startToCloseTimeout,
+		ScheduleToCloseTimeout: time.Second * 10,
+		HeartbeatTimeout:       options.HeartbeatTimeout,
+		RetryPolicy:            retry.ConvertCadenceActivityRetryPolicy(options.RetryPolicy),
 	})
 
 	// support local activity optimization
