@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
@@ -22,7 +24,6 @@ import (
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/converter"
 	realtemporal "go.temporal.io/sdk/temporal"
-	"time"
 )
 
 type temporalClient struct {
@@ -231,6 +232,14 @@ func (t *temporalClient) StartWaitForStateCompletionWorkflow(
 func (t *temporalClient) StartBlobStoreCleanupWorkflow(
 	ctx context.Context, taskQueue, workflowID, cronSchedule, storeId string,
 ) error {
+
+	if cronSchedule == "" {
+		_, err := t.tClient.ExecuteWorkflow(ctx, client.StartWorkflowOptions{
+			ID:        workflowID,
+			TaskQueue: taskQueue,
+		}, temporal.BlobStoreCleanup, storeId)
+		return err
+	}
 
 	_, err := t.tClient.ScheduleClient().Create(ctx, client.ScheduleOptions{
 		ID: workflowID,

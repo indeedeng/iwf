@@ -1082,5 +1082,5 @@ func BlobStoreCleanup(
 	}
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
 	// the workflow simply execute the long running activity :)
-	return provider.ExecuteActivity(nil, false, ctx, CleanupBlobStore, storeId)
+	return provider.ExecuteActivity(nil, false, ctx, CleanupBlobStore, provider.GetBackendType(), storeId)
 }

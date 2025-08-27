@@ -78,6 +78,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
+	iw.worker.RegisterWorkflow(BlobStoreCleanup)
 	iw.worker.RegisterActivity(interpreter.StateStart)  // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateDecide) // TODO: remove in next release
 	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)
