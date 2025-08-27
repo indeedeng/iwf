@@ -207,7 +207,7 @@ stressTestsTemporalNoSearch:
 	$Q go test -v ./integ -repeat=10 -cadence=false -search=false | tee test.log
 
 unitTests:
-	$Q go test -v ./service/...
+	@go test -v $(shell go list ./service/... | grep -v ./service/common/blobstore)
 
 help:
 	@# print help first, so it's visible

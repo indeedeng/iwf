@@ -11,6 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
@@ -81,7 +82,7 @@ func (b *blobStoreImpl) WriteObject(ctx context.Context, workflowId, data string
 	storeId = b.activeStorage.StorageId
 	randomUuid := uuid.New().String()
 	yyyymmdd := time.Now().Format("20060102")
-	// yymmdd$workflowId/uuid
+	// yyyymmdd$workflowId/uuid
 	// Note: using $ here so that the listing can be much easier to implement for pagination
 	path = fmt.Sprintf("%s$%s/%s", yyyymmdd, workflowId, randomUuid)
 
@@ -155,12 +156,122 @@ func (b *blobStoreImpl) CountWorkflowObjectsForTesting(ctx context.Context, work
 	return int64(len(result.Contents)), nil
 }
 
-func (b *blobStoreImpl) DeleteObjectPath(ctx context.Context, storeId, path string) error {
-	//TODO implement me
-	panic("implement me")
+func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, workflowPath string) error {
+	storeConfig, ok := b.supportedStore[storeId]
+	if !ok {
+		return errors.New("store not found for " + storeId)
+	}
+
+	// Construct the prefix for all objects of this workflow
+	prefix := fmt.Sprintf("%s%s/", b.pathPrefix, workflowPath)
+
+	// Paginate through all objects and delete them in batches
+	var continuationToken *string
+	for {
+		listInput := &s3.ListObjectsV2Input{
+			Bucket: aws.String(storeConfig.S3Bucket),
+			Prefix: aws.String(prefix),
+		}
+
+		if continuationToken != nil {
+			listInput.ContinuationToken = continuationToken
+		}
+
+		listResult, err := b.s3Client.ListObjectsV2(ctx, listInput)
+		if err != nil {
+			return fmt.Errorf("failed to list objects for deletion: %w", err)
+		}
+
+		// If no objects found, we're done
+		if len(listResult.Contents) == 0 {
+			break
+		}
+
+		// Prepare objects for batch deletion
+		var objectsToDelete []types.ObjectIdentifier
+		for _, obj := range listResult.Contents {
+			if obj.Key != nil {
+				objectsToDelete = append(objectsToDelete, types.ObjectIdentifier{
+					Key: obj.Key,
+				})
+			}
+		}
+
+		// Delete objects in batch
+		if len(objectsToDelete) > 0 {
+			deleteResult, err := b.s3Client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+				Bucket: aws.String(storeConfig.S3Bucket),
+				Delete: &types.Delete{
+					Objects: objectsToDelete,
+					Quiet:   aws.Bool(true), // Don't return successful deletions
+				},
+			})
+			if err != nil {
+				return fmt.Errorf("failed to delete objects: %w", err)
+			}
+
+			// Check for any delete errors
+			if len(deleteResult.Errors) > 0 {
+				var errorMsgs []string
+				for _, delErr := range deleteResult.Errors {
+					if delErr.Key != nil && delErr.Code != nil && delErr.Message != nil {
+						errorMsgs = append(errorMsgs, fmt.Sprintf("key=%s, code=%s, message=%s",
+							*delErr.Key, *delErr.Code, *delErr.Message))
+					}
+				}
+				return fmt.Errorf("some objects failed to delete: %s", strings.Join(errorMsgs, "; "))
+			}
+		}
+
+		// Check if there are more objects to process
+		if listResult.IsTruncated == nil || !*listResult.IsTruncated {
+			break
+		}
+		continuationToken = listResult.NextContinuationToken
+	}
+
+	return nil
 }
 
-func (b *blobStoreImpl) ListObjectPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
-	//TODO implement me
-	panic("implement me")
+func (b *blobStoreImpl) ListWorkflowPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
+	storeConfig, ok := b.supportedStore[input.StoreId]
+	if !ok {
+		return nil, errors.New("store not found for " + input.StoreId)
+	}
+
+	listInput := &s3.ListObjectsV2Input{
+		Bucket:    aws.String(storeConfig.S3Bucket),
+		Prefix:    aws.String(b.pathPrefix),
+		Delimiter: aws.String("/"),
+	}
+
+	// Set continuation token if provided
+	if input.ContinuationToken != nil {
+		listInput.ContinuationToken = input.ContinuationToken
+	}
+
+	result, err := b.s3Client.ListObjectsV2(ctx, listInput)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract workflow paths from common prefixes
+	workflowPaths := make([]string, 0, len(result.CommonPrefixes))
+	for _, commonPrefix := range result.CommonPrefixes {
+		if commonPrefix.Prefix != nil {
+			// Remove the pathPrefix to get the workflow path (yyyymmdd$workflowId)
+			prefixStr := *commonPrefix.Prefix
+			if strings.HasPrefix(prefixStr, b.pathPrefix) {
+				workflowPath := strings.TrimPrefix(prefixStr, b.pathPrefix)
+				// Remove trailing "/" if present
+				workflowPath = strings.TrimSuffix(workflowPath, "/")
+				workflowPaths = append(workflowPaths, workflowPath)
+			}
+		}
+	}
+
+	return &ListObjectPathsOutput{
+		ContinuationToken: result.NextContinuationToken,
+		WorkflowPaths:     workflowPaths,
+	}, nil
 }
