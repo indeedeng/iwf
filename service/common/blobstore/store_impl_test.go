@@ -45,6 +45,18 @@ func createTestBlobStore(t *testing.T) BlobStore {
 		o.UsePathStyle = true
 	})
 
+	// Create bucket if it doesn't exist
+	_, err = s3Client.HeadBucket(context.Background(), &s3.HeadBucketInput{
+		Bucket: aws.String(testBucket),
+	})
+	if err != nil {
+		// Bucket doesn't exist, create it
+		_, err = s3Client.CreateBucket(context.Background(), &s3.CreateBucketInput{
+			Bucket: aws.String(testBucket),
+		})
+		assert.NoError(t, err)
+	}
+
 	// Create test configuration
 	storeConfig := config.ExternalStorageConfig{
 		Enabled:          true,
