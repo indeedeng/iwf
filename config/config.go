@@ -47,9 +47,6 @@ type (
 		// if objects' createdTime > now-config value, we will stop checking.
 		// This can be the configured retention in temporal namespace/Cadence domain
 		MinAgeForCleanupCheckInDays int `yaml:"minAgeForCleanupCheckInDays"`
-		// CleanupCronSchedule is the cron schedule to run the cleanup workflow
-		// Default is daily at 00:00: "0 0 * * *" (see https://crontab.guru/every-day)
-		CleanupCronSchedule string `yaml:"cleanupCronSchedule"`
 	}
 
 	StorageStatus string
@@ -73,6 +70,10 @@ type (
 		S3AccessKey string `yaml:"s3AccessKey"`
 		// S3SecretKey is the secret key of the S3 storage
 		S3SecretKey string `yaml:"s3SecretKey"`
+		// CleanupCronSchedule is the cron schedule to run the cleanup workflow
+		// The format is the standard cron "0 0 * * *" (see https://crontab.guru/every-day)
+		// If empty, the cleanup workflow will not be started
+		CleanupCronSchedule string `yaml:"cleanupCronSchedule"`
 	}
 
 	ApiConfig struct {

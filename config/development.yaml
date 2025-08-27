@@ -32,3 +32,4 @@ externalStorage:
       s3Region: "us-east-1"
       s3AccessKey: "minioadmin"
       s3SecretKey: "minioadmin"
+      cleanupCronSchedule: "0 0 * * *" #every day at 00:00
