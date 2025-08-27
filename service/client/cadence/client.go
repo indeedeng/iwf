@@ -197,6 +197,22 @@ func (t *cadenceClient) StartWaitForStateCompletionWorkflow(
 	return run.RunID, nil
 }
 
+func (t *cadenceClient) StartBlobStoreCleanupWorkflow(
+	ctx context.Context, taskQueue, workflowID, cronSchedule, storeId string,
+) error {
+
+	workflowOptions := client.StartWorkflowOptions{
+		ID:                           workflowID,
+		TaskList:                     taskQueue,
+		ExecutionStartToCloseTimeout: time.Hour * 24 * 365,
+		CronSchedule:                 cronSchedule,
+	}
+
+	_, err := t.cClient.StartWorkflow(ctx, workflowOptions, cadence.BlobStoreCleanup, storeId)
+
+	return err
+}
+
 func (t *cadenceClient) SignalWithStartWaitForStateCompletionWorkflow(
 	ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput,
 ) error {
