@@ -100,6 +100,9 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 					storeCfg.CleanupCronSchedule,
 					storeCfg.StorageId)
 				if err != nil {
+					if env.GetUnifiedClient().IsWorkflowAlreadyStartedError(err) {
+						continue
+					}
 					log.Fatalln("Unable to start blobstore cleanup workflow", err)
 				}
 			}
