@@ -183,9 +183,6 @@ func doTestWorkflowWithS3Cleanup(t *testing.T, backendType service.BackendType) 
 	t.Logf("Waiting for cleanup workflow to complete")
 	_ = uclient.GetWorkflowResult(ctx, nil, cleanupWorkflowId, "")
 
-	t.Logf("Wait for 10 seconds")
-	time.Sleep(10 * time.Second)
-
 	// 5. verify all the objects are deleted for the last 12 workflows, but not for the first 12 workflows
 	t.Logf("Verifying cleanup results - objects should be deleted for non-existing workflows only")
 
