@@ -5,15 +5,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"strings"
+	"time"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
 	"go.temporal.io/sdk/client"
-	"io"
-	"strings"
-	"time"
 )
 
 type blobStoreImpl struct {
@@ -135,6 +136,23 @@ func getObject(ctx context.Context, client *s3.Client, bucketName, key string) (
 	}
 
 	return buf.String(), nil
+}
+
+func (b *blobStoreImpl) CountWorkflowObjectsForTesting(ctx context.Context, workflowId string) (int64, error) {
+	// Create the prefix to match objects for this workflowId for today
+	yyyymmdd := time.Now().Format("20060102")
+	prefix := fmt.Sprintf("%s%s$%s/", b.pathPrefix, yyyymmdd, workflowId)
+
+	// List objects with the prefix (limited to 1000 objects as documented)
+	result, err := b.s3Client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+		Bucket: aws.String(b.activeStorage.S3Bucket),
+		Prefix: aws.String(prefix),
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return int64(len(result.Contents)), nil
 }
 
 func (b *blobStoreImpl) DeleteObjectPath(ctx context.Context, storeId, path string) error {

@@ -76,7 +76,7 @@ func doTestWorkflowWithS3InitDataAttributes(t *testing.T, backendType service.Ba
 
 	wfInput := &iwfidl.EncodedObject{
 		Encoding: iwfidl.PtrString("json"),
-		Data:     iwfidl.PtrString("\"test-input\""),
+		Data:     iwfidl.PtrString("test"),
 	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
@@ -131,4 +131,8 @@ func doTestWorkflowWithS3InitDataAttributes(t *testing.T, backendType service.Ba
 	assertions.Equal(history["S2_decide_attr2_data"], *s3_init_data_attributes.TestDataAttributeVal2.Data, "S2_decide attr2 data should match initial value")
 	assertions.Equal(history["S2_decide_attr3_data"], *s3_init_data_attributes.TestDataAttributeVal3.Data, "S2_decide attr3 data should match initial value")
 	assertions.Equal(history["S2_decide_validation_pass"], true, "S2_decide validation should pass - all data attributes match initial values exactly")
+
+	objectCount, err := globalBlobStore.CountWorkflowObjectsForTesting(context.Background(), wfId)
+	assertions.Nil(err)
+	assertions.Equal(int64(2), objectCount)
 }
