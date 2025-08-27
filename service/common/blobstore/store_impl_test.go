@@ -1,9 +1,8 @@
-package integ
+package blobstore
 
 import (
 	"context"
 	"fmt"
-	"github.com/indeedeng/iwf/service/common/blobstore"
 	"strconv"
 	"testing"
 	"time"
@@ -24,10 +23,11 @@ const (
 	testEndpoint  = "http://localhost:9000"
 	testAccessKey = "minioadmin"
 	testSecretKey = "minioadmin"
+	testNamespace = "default"
 	testStorageId = "test-storage-id"
 )
 
-func createTestBlobStore(t *testing.T) blobstore.BlobStore {
+func createTestBlobStore(t *testing.T) BlobStore {
 	// Create S3 client for MinIO
 	cfg, err := awsconfig.LoadDefaultConfig(context.Background(),
 		awsconfig.WithRegion(testRegion),
@@ -65,7 +65,7 @@ func createTestBlobStore(t *testing.T) blobstore.BlobStore {
 
 	logger, err := loggerimpl.NewDevelopment()
 	assert.NoError(t, err)
-	blobStore := blobstore.NewBlobStore(s3Client, testNamespace, storeConfig, logger, client.MetricsNopHandler)
+	blobStore := NewBlobStore(s3Client, testNamespace, storeConfig, logger, client.MetricsNopHandler)
 	assert.NotNil(t, blobStore)
 
 	return blobStore
@@ -150,7 +150,7 @@ func TestBlobStoreIntegration(t *testing.T) {
 		assert.NoError(t, err)
 
 		// List workflow paths
-		input := blobstore.ListObjectPathsInput{
+		input := ListObjectPathsInput{
 			StoreId: testStorageId,
 		}
 		output, err := blobStore.ListWorkflowPaths(ctx, input)
@@ -247,7 +247,7 @@ func TestBlobStoreIntegration(t *testing.T) {
 
 	t.Run("ErrorHandling", func(t *testing.T) {
 		// Test with invalid store ID
-		input := blobstore.ListObjectPathsInput{
+		input := ListObjectPathsInput{
 			StoreId: "invalid-store-id",
 		}
 		_, err := blobStore.ListWorkflowPaths(ctx, input)
