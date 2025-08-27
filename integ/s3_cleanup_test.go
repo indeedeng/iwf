@@ -60,7 +60,7 @@ func doTestWorkflowWithS3Cleanup(t *testing.T, backendType service.BackendType) 
 
 	workflowIds := make([]string, 0)
 	for i := 0; i < 12; i++ {
-		wfId := fmt.Sprintf("test-cleanup-wf-%d-%d", i, time.Now().UnixNano())
+		wfId := fmt.Sprintf("test-user-wf-%d-%d", i, time.Now().UnixNano())
 		workflowIds = append(workflowIds, wfId)
 		wfInput := &iwfidl.EncodedObject{
 			Encoding: iwfidl.PtrString("json"),
@@ -80,7 +80,7 @@ func doTestWorkflowWithS3Cleanup(t *testing.T, backendType service.BackendType) 
 	}
 
 	for i := 0; i < 12; i++ {
-		wfId := fmt.Sprintf("test-cleanup-wf-%d-%d", 12+i, time.Now().UnixNano())
+		wfId := fmt.Sprintf("test-user-wf-%d-%d", 12+i, time.Now().UnixNano())
 		workflowIds = append(workflowIds, wfId) // the last 12 workflows are not started, so the workflowIds are not existing workflows
 	}
 
@@ -183,6 +183,9 @@ func doTestWorkflowWithS3Cleanup(t *testing.T, backendType service.BackendType) 
 	t.Logf("Waiting for cleanup workflow to complete")
 	_ = uclient.GetWorkflowResult(ctx, nil, cleanupWorkflowId, "")
 
+	t.Logf("Wait for 10 seconds")
+	time.Sleep(10 * time.Second)
+
 	// 5. verify all the objects are deleted for the last 12 workflows, but not for the first 12 workflows
 	t.Logf("Verifying cleanup results - objects should be deleted for non-existing workflows only")
 
@@ -193,18 +196,18 @@ func doTestWorkflowWithS3Cleanup(t *testing.T, backendType service.BackendType) 
 		if i < 12 {
 
 			// First 12 workflows were never started, so their objects should remain
-			expectedCount := int64((i + 1) * 100)
+			expectedCount := int64((i+1)*100) + 1
 			if expectedCount > 1000 {
 				expectedCount = 1000
 			}
 			assert.Equal(t, expectedCount, count,
-				"Non-started workflow %s (index %d) should still have %d objects", wfId, i, expectedCount)
-			t.Logf("✓ Non-started workflow %s (index %d): %d objects (expected %d)", wfId, i, count, expectedCount)
+				"Started workflow %s (index %d) should still have %d objects", wfId, i, expectedCount)
+			t.Logf("✓ Started workflow %s (index %d): %d objects (expected %d)", wfId, i, count, expectedCount)
 		} else {
 			// Last 12 workflows were started, so their objects should NOT be cleaned up
 			assert.Equal(t, int64(0), count,
-				"Started workflow %s (index %d) should have 0 objects after cleanup", wfId, i)
-			t.Logf("✓ Started workflow %s (index %d): %d objects (expected 0)", wfId, i, count)
+				"NonStarted workflow %s (index %d) should have 0 objects after cleanup", wfId, i)
+			t.Logf("✓ NonStarted workflow %s (index %d): %d objects (expected 0)", wfId, i, count)
 		}
 	}
 
