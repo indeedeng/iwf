@@ -521,7 +521,10 @@ func CleanupBlobStore(
 					logger.Info("CleanupBlobStore deleted workflow objects", "workflowPath", workflowPath)
 				}
 			} else {
-				return err
+				if err != nil {
+					logger.Error("CleanupBlobStore failed to delete workflow objects", "workflowPath", workflowPath, "error", err)
+					return err
+				}
 			}
 
 			// this is a long running activity
