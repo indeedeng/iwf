@@ -499,7 +499,11 @@ func CleanupBlobStore(
 		}
 		continueToken = listOutput.ContinuationToken
 		for _, workflowPath := range listOutput.WorkflowPaths {
-			currentTimestamp := blobstore.MustExtractYyyymmddToUnixSeconds(workflowPath)
+			currentTimestamp, valid := blobstore.ExtractYyyymmddToUnixSeconds(workflowPath)
+			if !valid {
+				logger.Info("CleanupBlobStore skipped workflow path", "path", workflowPath)
+				continue
+			}
 			if currentTimestamp < stopChecingkUnixSeconds {
 				logger.Info("CleanupBlobStore stopped checking at", "currentTimestamp", currentTimestamp, "stopChecingkUnixSeconds", stopChecingkUnixSeconds)
 				break

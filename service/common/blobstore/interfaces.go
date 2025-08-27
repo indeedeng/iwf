@@ -34,17 +34,17 @@ func ExtractWorkflowId(workflowPath string) (string, error) {
 	return parts[1], nil
 }
 
-func MustExtractYyyymmddToUnixSeconds(workflowPath string) int64 {
+func ExtractYyyymmddToUnixSeconds(workflowPath string) (int64, bool) {
 	// yyyymmdd$workflowId
 	yyyymmdd, err := ExtractYyyymmdd(workflowPath)
 	if err != nil {
-		panic(err)
+		return 0, false
 	}
 	parsedTime, err := time.Parse("20060102", yyyymmdd)
 	if err != nil {
 		panic(err)
 	}
-	return parsedTime.Unix()
+	return parsedTime.Unix(), true
 }
 
 func ExtractYyyymmdd(workflowPath string) (string, error) {
