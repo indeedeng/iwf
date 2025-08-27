@@ -125,6 +125,13 @@ func StateApiWaitUntil(
 		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
 	}
 
+	if env.GetSharedConfig().ExternalStorage.Enabled {
+		resp.UpsertDataObjects, err = writeDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	event.Handle(iwfidl.IwfEvent{
 		EventType:          iwfidl.STATE_WAIT_UNTIL_ATTEMPT_SUCC_EVENT,
 		WorkflowType:       input.Request.WorkflowType,
@@ -246,6 +253,17 @@ func StateApiExecute(
 	// But there are some small info that are important to record
 	if activityInfo.IsLocalActivity {
 		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
+	}
+
+	if env.GetSharedConfig().ExternalStorage.Enabled {
+		resp.StateDecision.NextStates, err = writeStateInputToExternalStorage(ctx, resp.StateDecision.NextStates, input.Request.StateInput, activityInfo.WorkflowExecution.ID)
+		if err != nil {
+			return nil, err
+		}
+		resp.UpsertDataObjects, err = writeDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	event.Handle(iwfidl.IwfEvent{
@@ -448,6 +466,71 @@ func InvokeWorkerRpc(
 	}, nil
 }
 
+func writeToExternalStorage(ctx context.Context, input *iwfidl.EncodedObject, workflowId string) (string, string, error) {
+	blobStore := env.GetBlobStore()
+
+	storeId, path, writeErr := blobStore.WriteObject(ctx, workflowId, *input.Data)
+	if writeErr != nil {
+		return "", "", writeErr
+	}
+	return storeId, path, nil
+}
+
+func writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
+	for i := range dataObjects {
+		if dataObjects[i].Value != nil && dataObjects[i].Value.Data != nil &&
+			len(*dataObjects[i].Value.Data) > env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
+			// Save data to external storage
+			storeId, path, writeErr := writeToExternalStorage(ctx, dataObjects[i].Value, workflowId)
+			if writeErr != nil {
+				return nil, writeErr
+			}
+			dataObjects[i].Value.ExtStoreId = &storeId
+			dataObjects[i].Value.ExtPath = &path
+			dataObjects[i].Value.Data = nil // Clear data since it's now in external storage
+		}
+	}
+	return dataObjects, nil
+}
+
+func writeStateInputToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInput *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {
+	for i := range nextStates {
+		if err := processStateInputForExternalStorage(ctx, nextStates[i].StateInput, currentInput, workflowId); err != nil {
+			return nil, err
+		}
+	}
+	return nextStates, nil
+}
+
+func processStateInputForExternalStorage(ctx context.Context, stateInput *iwfidl.EncodedObject, currentInput *iwfidl.EncodedObject, workflowId string) error {
+	// Check if external storage is needed
+	if stateInput.Data == nil || len(*stateInput.Data) <= env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
+		return nil
+	}
+
+	// Try to reuse existing external storage if data is identical
+	if currentInput != nil && currentInput.Data != nil && stateInput.Data != nil &&
+		*currentInput.Data == *stateInput.Data &&
+		currentInput.ExtStoreId != nil && currentInput.ExtPath != nil {
+		// Reuse existing external storage
+		stateInput.ExtStoreId = currentInput.ExtStoreId
+		stateInput.ExtPath = currentInput.ExtPath
+		stateInput.Encoding = currentInput.Encoding
+		stateInput.Data = nil
+		return nil
+	}
+
+	// Save to external storage
+	storeId, path, err := writeToExternalStorage(ctx, stateInput, workflowId)
+	if err != nil {
+		return err
+	}
+	stateInput.ExtStoreId = &storeId
+	stateInput.ExtPath = &path
+	stateInput.Data = nil
+	return nil
+}
+
 func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (*iwfidl.EncodedObject, error) {
 	blobStore := env.GetBlobStore()
 
@@ -457,8 +540,10 @@ func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (
 	}
 
 	newEncodedObject := iwfidl.EncodedObject{
-		Data:     &data,
-		Encoding: input.Encoding,
+		Data:       &data,
+		Encoding:   input.Encoding,
+		ExtStoreId: input.ExtStoreId,
+		ExtPath:    input.ExtPath,
 	}
 	return &newEncodedObject, nil
 }
