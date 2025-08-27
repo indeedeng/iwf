@@ -17,16 +17,38 @@ func ValidateWorkflowId(workflowId string) error {
 	return nil
 }
 
+func MustExtractWorkflowId(workflowPath string) string {
+	workflowId, err := ExtractWorkflowId(workflowPath)
+	if err != nil {
+		panic(err)
+	}
+	return workflowId
+}
+
+func ExtractWorkflowId(workflowPath string) (string, error) {
+	parts := strings.Split(workflowPath, "$")
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid workflow path: %s", workflowPath)
+	}
+	return parts[1], nil
+}
+
 type BlobStore interface {
 	// WriteObject will write to the current active store
 	// returns the active storeId
+	// The final path pattern is pathPrefix + yyyymmdd$workflowId/uuid
+	// But the returned path doesn't include pathPrefix, only yymmdd$workflowId/uuid
 	WriteObject(ctx context.Context, workflowId, data string) (storeId, path string, err error)
-	// ReadObject will read from the store by storeId
+	// ReadObject will read from the store by storeId and path
+	// The path should be the one returned from WriteObject, in format of yyyymmdd$workflowId/uuid
 	ReadObject(ctx context.Context, storeId, path string) (string, error)
-	// DeleteObjectPath will delete all the objects of the path
-	DeleteObjectPath(ctx context.Context, storeId, path string) error
-	// ListObjectPaths will list the paths of yyyymmdd$workflowId
-	ListObjectPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error)
+	// DeleteWorkflowObjects will delete all the objects of the workflowId
+	// workflowPath is yyyymmdd$workflowId, where yymmdd is needed to compose the path
+	DeleteWorkflowObjects(ctx context.Context, storeId, workflowPath string) error
+	// ListWorkflowPaths will list the workflowPaths ( yyyymmdd$workflowId ) as CommonPrefixes from S3
+	// It uses of delimiter "/" before the uuid to get all the CommonPrefixes
+	// StartAfterYyyymmdd is the yyyymmdd to exclude the date when listing
+	ListWorkflowPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error)
 	// CountWorkflowObjectsForTesting is for testing ONLY.
 	// count the number of S3 objects for this workflowId
 	// Limitation:
@@ -36,12 +58,12 @@ type BlobStore interface {
 }
 
 type ListObjectPathsInput struct {
-	StoreId           string
-	StartAfter        string
-	ContinuationToken *string
+	StoreId            string
+	StartAfterYyyymmdd string
+	ContinuationToken  *string
 }
 
 type ListObjectPathsOutput struct {
 	ContinuationToken *string
-	Paths             []string
+	WorkflowPaths     []string
 }

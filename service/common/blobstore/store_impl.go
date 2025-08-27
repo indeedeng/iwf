@@ -81,7 +81,7 @@ func (b *blobStoreImpl) WriteObject(ctx context.Context, workflowId, data string
 	storeId = b.activeStorage.StorageId
 	randomUuid := uuid.New().String()
 	yyyymmdd := time.Now().Format("20060102")
-	// yymmdd$workflowId/uuid
+	// yyyymmdd$workflowId/uuid
 	// Note: using $ here so that the listing can be much easier to implement for pagination
 	path = fmt.Sprintf("%s$%s/%s", yyyymmdd, workflowId, randomUuid)
 
@@ -155,12 +155,56 @@ func (b *blobStoreImpl) CountWorkflowObjectsForTesting(ctx context.Context, work
 	return int64(len(result.Contents)), nil
 }
 
-func (b *blobStoreImpl) DeleteObjectPath(ctx context.Context, storeId, path string) error {
+func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, workflowPath string) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (b *blobStoreImpl) ListObjectPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
-	//TODO implement me
-	panic("implement me")
+func (b *blobStoreImpl) ListWorkflowPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
+	storeConfig, ok := b.supportedStore[input.StoreId]
+	if !ok {
+		return nil, errors.New("store not found for " + input.StoreId)
+	}
+
+	listInput := &s3.ListObjectsV2Input{
+		Bucket:    aws.String(storeConfig.S3Bucket),
+		Prefix:    aws.String(b.pathPrefix),
+		Delimiter: aws.String("/"),
+	}
+
+	// Set StartAfter if provided
+	if input.StartAfterYyyymmdd != "" {
+		startAfter := fmt.Sprintf("%s%s$", b.pathPrefix, input.StartAfterYyyymmdd)
+		listInput.StartAfter = aws.String(startAfter)
+	}
+
+	// Set continuation token if provided
+	if input.ContinuationToken != nil {
+		listInput.ContinuationToken = input.ContinuationToken
+	}
+
+	result, err := b.s3Client.ListObjectsV2(ctx, listInput)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract workflow paths from common prefixes
+	workflowPaths := make([]string, 0, len(result.CommonPrefixes))
+	for _, commonPrefix := range result.CommonPrefixes {
+		if commonPrefix.Prefix != nil {
+			// Remove the pathPrefix to get the workflow path (yyyymmdd$workflowId)
+			prefixStr := *commonPrefix.Prefix
+			if strings.HasPrefix(prefixStr, b.pathPrefix) {
+				workflowPath := strings.TrimPrefix(prefixStr, b.pathPrefix)
+				// Remove trailing "/" if present
+				workflowPath = strings.TrimSuffix(workflowPath, "/")
+				workflowPaths = append(workflowPaths, workflowPath)
+			}
+		}
+	}
+
+	return &ListObjectPathsOutput{
+		ContinuationToken: result.NextContinuationToken,
+		WorkflowPaths:     workflowPaths,
+	}, nil
 }
