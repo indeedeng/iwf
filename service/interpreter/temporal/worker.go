@@ -92,11 +92,15 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	}
 
 	if cfg.ExternalStorage.Enabled {
+		schedule := cfg.ExternalStorage.CleanupCronSchedule
+		if schedule == "" {
+			schedule = "0 * * * * *"
+		}
 		for _, storeCfg := range cfg.ExternalStorage.SupportedStorages {
 			err = env.GetUnifiedClient().StartBlobStoreCleanupWorkflow(
 				context.Background(), iw.taskQueue,
 				"blobstore-cleanup-"+storeCfg.StorageId,
-				cfg.ExternalStorage.CleanupCronSchedule,
+				schedule,
 				storeCfg.StorageId)
 			if err != nil {
 				log.Fatalln("Unable to start blobstore cleanup workflow", err)
