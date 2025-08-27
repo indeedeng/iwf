@@ -99,7 +99,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 			err = env.GetUnifiedClient().StartBlobStoreCleanupWorkflow(
 				context.Background(), iw.tasklist,
 				"blobstore-cleanup-"+storeCfg.StorageId,
-				schedule
+				schedule,
 				storeCfg.StorageId)
 			if err != nil {
 				log.Fatalln("Unable to start blobstore cleanup workflow", err)
