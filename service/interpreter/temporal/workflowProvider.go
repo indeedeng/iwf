@@ -223,6 +223,7 @@ func (w *workflowProvider) WithActivityOptions(
 		ScheduleToCloseTimeout: scheduledToCloseTimeout,
 		StartToCloseTimeout:    options.StartToCloseTimeout,
 		RetryPolicy:            retry.ConvertTemporalActivityRetryPolicy(options.RetryPolicy),
+		HeartbeatTimeout:       options.HeartbeatTimeout,
 	})
 
 	// support local activity optimization

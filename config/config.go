@@ -43,6 +43,13 @@ type (
 		// Only one can be active, meaning the one that will be used for writing.
 		// The non-active ones are for read only.
 		SupportedStorages []BlobStorageConfig `yaml:"supportedStorages"`
+		// MinAgeForCleanupCheckInDays is for checking whether the objects can be deleted.
+		// if objects' createdTime > now-config value, we will stop checking.
+		// This can be the configured retention in temporal namespace/Cadence domain
+		MinAgeForCleanupCheckInDays int `yaml:"minAgeForCleanupCheckInDays"`
+		// CleanupCronSchedule is the cron schedule to run the cleanup workflow
+		// Default is daily at 00:00: "0 0 * * *" (see https://crontab.guru/every-day)
+		CleanupCronSchedule string `yaml:"cleanupCronSchedule"`
 	}
 
 	StorageStatus string

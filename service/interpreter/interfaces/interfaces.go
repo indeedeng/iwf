@@ -13,6 +13,7 @@ type ActivityProvider interface {
 	GetLogger(ctx context.Context) UnifiedLogger
 	NewApplicationError(errType string, details interface{}) error
 	GetActivityInfo(ctx context.Context) ActivityInfo
+	RecordHeartbeat(ctx context.Context, details ...interface{})
 }
 
 type ActivityInfo struct {
@@ -63,6 +64,7 @@ type WorkflowInfo struct {
 
 type ActivityOptions struct {
 	StartToCloseTimeout time.Duration
+	HeartbeatTimeout    time.Duration
 	RetryPolicy         *iwfidl.RetryPolicy
 }
 

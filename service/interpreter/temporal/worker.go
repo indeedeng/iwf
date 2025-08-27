@@ -1,6 +1,7 @@
 package temporal
 
 import (
+	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/service/common/blobstore"
 	"log"
@@ -47,11 +48,11 @@ func (iw *InterpreterWorker) Start() {
 }
 
 func (iw *InterpreterWorker) start(disableStickyCache bool) {
-	config := env.GetSharedConfig()
+	cfg := env.GetSharedConfig()
 	var options worker.Options
 
-	if config.Interpreter.Temporal != nil && config.Interpreter.Temporal.WorkerOptions != nil {
-		options = *config.Interpreter.Temporal.WorkerOptions
+	if cfg.Interpreter.Temporal != nil && cfg.Interpreter.Temporal.WorkerOptions != nil {
+		options = *cfg.Interpreter.Temporal.WorkerOptions
 	}
 
 	// override default
@@ -73,7 +74,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	}
 
 	iw.worker = worker.New(iw.temporalClient, iw.taskQueue, options)
-	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
+	worker.EnableVerboseLogging(cfg.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
@@ -83,9 +84,23 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	iw.worker.RegisterActivity(interpreter.StateApiExecute)
 	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
 	iw.worker.RegisterActivity(interpreter.InvokeWorkerRpc)
+	iw.worker.RegisterActivity(interpreter.CleanupBlobStore)
 
 	err := iw.worker.Start()
 	if err != nil {
 		log.Fatalln("Unable to start worker", err)
+	}
+
+	if cfg.ExternalStorage.Enabled {
+		for _, storeCfg := range cfg.ExternalStorage.SupportedStorages {
+			err = env.GetUnifiedClient().StartBlobStoreCleanupWorkflow(
+				context.Background(), iw.taskQueue,
+				"blobstore-cleanup-"+storeCfg.StorageId,
+				cfg.ExternalStorage.CleanupCronSchedule,
+				storeCfg.StorageId)
+			if err != nil {
+				log.Fatalln("Unable to start blobstore cleanup workflow", err)
+			}
+		}
 	}
 }

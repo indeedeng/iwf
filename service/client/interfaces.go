@@ -15,6 +15,9 @@ type UnifiedClient interface {
 		ctx context.Context, options StartWorkflowOptions, args ...interface{},
 	) (runId string, err error)
 	StartWaitForStateCompletionWorkflow(ctx context.Context, options StartWorkflowOptions) (runId string, err error)
+	StartBlobStoreCleanupWorkflow(
+		ctx context.Context, taskQueue, workflowID, cronSchedule, storeId string,
+	) error
 	SignalWorkflow(ctx context.Context, workflowID string, runID string, signalName string, arg interface{}) error
 	SignalWithStartWaitForStateCompletionWorkflow(
 		ctx context.Context, options StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput,

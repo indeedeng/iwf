@@ -1,6 +1,7 @@
 package cadence
 
 import (
+	"context"
 	"fmt"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/blobstore"
@@ -49,11 +50,11 @@ func (iw *InterpreterWorker) Start() {
 }
 
 func (iw *InterpreterWorker) start(disableStickyCache bool) {
-	config := env.GetSharedConfig()
+	cfg := env.GetSharedConfig()
 	var options worker.Options
 
-	if config.Interpreter.Cadence != nil && config.Interpreter.Cadence.WorkerOptions != nil {
-		options = *config.Interpreter.Cadence.WorkerOptions
+	if cfg.Interpreter.Cadence != nil && cfg.Interpreter.Cadence.WorkerOptions != nil {
+		options = *cfg.Interpreter.Cadence.WorkerOptions
 	}
 
 	// override default
@@ -73,7 +74,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	}
 
 	iw.worker = worker.New(iw.service, iw.domain, iw.tasklist, options)
-	worker.EnableVerboseLogging(config.Interpreter.VerboseDebug)
+	worker.EnableVerboseLogging(cfg.Interpreter.VerboseDebug)
 
 	iw.worker.RegisterWorkflow(Interpreter)
 	iw.worker.RegisterWorkflow(WaitforStateCompletionWorkflow)
@@ -82,9 +83,23 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	iw.worker.RegisterActivity(interpreter.StateApiWaitUntil)
 	iw.worker.RegisterActivity(interpreter.StateApiExecute)
 	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
+	iw.worker.RegisterActivity(interpreter.CleanupBlobStore)
 
 	err := iw.worker.Start()
 	if err != nil {
 		log.Fatalln("Unable to start worker", err)
+	}
+
+	if cfg.ExternalStorage.Enabled {
+		for _, storeCfg := range cfg.ExternalStorage.SupportedStorages {
+			err = env.GetUnifiedClient().StartBlobStoreCleanupWorkflow(
+				context.Background(), iw.tasklist,
+				"blobstore-cleanup-"+storeCfg.StorageId,
+				cfg.ExternalStorage.CleanupCronSchedule,
+				storeCfg.StorageId)
+			if err != nil {
+				log.Fatalln("Unable to start blobstore cleanup workflow", err)
+			}
+		}
 	}
 }

@@ -228,6 +228,26 @@ func (t *temporalClient) StartWaitForStateCompletionWorkflow(
 	return run.GetRunID(), nil
 }
 
+func (t *temporalClient) StartBlobStoreCleanupWorkflow(
+	ctx context.Context, taskQueue, workflowID, cronSchedule, storeId string,
+) error {
+
+	_, err := t.tClient.ScheduleClient().Create(ctx, client.ScheduleOptions{
+		ID: workflowID,
+		Spec: client.ScheduleSpec{
+			CronExpressions: []string{cronSchedule},
+		},
+		Action: &client.ScheduleWorkflowAction{
+			ID:                       workflowID,
+			TaskQueue:                taskQueue,
+			Workflow:                 temporal.BlobStoreCleanup,
+			Args:                     []interface{}{storeId},
+			WorkflowExecutionTimeout: 0,
+		},
+	})
+	return err
+}
+
 func (t *temporalClient) SignalWithStartWaitForStateCompletionWorkflow(
 	ctx context.Context, options uclient.StartWorkflowOptions, stateCompletionOutput iwfidl.StateCompletionOutput,
 ) error {
