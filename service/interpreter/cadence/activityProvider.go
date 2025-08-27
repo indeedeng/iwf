@@ -37,3 +37,7 @@ func (a *activityProvider) GetActivityInfo(ctx context.Context) interfaces.Activ
 		},
 	}
 }
+
+func (a *activityProvider) RecordHeartbeat(ctx context.Context, details ...interface{}) {
+	activity.RecordHeartbeat(ctx, details...)
+}

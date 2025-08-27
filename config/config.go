@@ -43,6 +43,10 @@ type (
 		// Only one can be active, meaning the one that will be used for writing.
 		// The non-active ones are for read only.
 		SupportedStorages []BlobStorageConfig `yaml:"supportedStorages"`
+		// MinAgeForCleanupCheckInDays is for checking whether the objects can be deleted.
+		// if objects' createdTime > now-config value, we will stop checking.
+		// This can be the configured retention in temporal namespace/Cadence domain
+		MinAgeForCleanupCheckInDays int `yaml:"minAgeForCleanupCheckInDays"`
 	}
 
 	StorageStatus string

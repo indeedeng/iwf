@@ -83,6 +83,7 @@ func (iw *InterpreterWorker) start(disableStickyCache bool) {
 	iw.worker.RegisterActivity(interpreter.StateApiExecute)
 	iw.worker.RegisterActivity(interpreter.DumpWorkflowInternal)
 	iw.worker.RegisterActivity(interpreter.InvokeWorkerRpc)
+	iw.worker.RegisterActivity(interpreter.CleanupBlobStore)
 
 	err := iw.worker.Start()
 	if err != nil {

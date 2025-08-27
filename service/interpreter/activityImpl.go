@@ -9,6 +9,8 @@ import (
 	"slices"
 	"time"
 
+	"github.com/indeedeng/iwf/service/common/blobstore"
+
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/compatibility"
@@ -469,6 +471,52 @@ func loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfid
 				return err
 			}
 			dataObjects[i].Value = loadedObject
+		}
+	}
+	return nil
+}
+
+func CleanupBlobStore(
+	ctx context.Context, backendType service.BackendType, storeId string,
+) error {
+	store := env.GetBlobStore()
+	provider := interfaces.GetActivityProviderByType(backendType)
+	logger := provider.GetLogger(ctx)
+	logger.Info("CleanupBlobStore started")
+	cfg := env.GetSharedConfig()
+	minAgeForCleanupCheckInDays := cfg.ExternalStorage.MinAgeForCleanupCheckInDays
+	stopChecingkUnixSeconds := time.Now().Unix() - int64(minAgeForCleanupCheckInDays)*24*3600
+	var continueToken *string
+
+	for {
+		listOutput, err := store.ListWorkflowPaths(ctx, blobstore.ListObjectPathsInput{
+			StoreId:           storeId,
+			ContinuationToken: continueToken,
+		})
+		if err != nil {
+			return err
+		}
+		continueToken = listOutput.ContinuationToken
+		for _, workflowPath := range listOutput.WorkflowPaths {
+			currentTimestamp := blobstore.MustExtractYyyymmddToUnixSeconds(workflowPath)
+			if currentTimestamp < stopChecingkUnixSeconds {
+				logger.Info("CleanupBlobStore stopped checking at", "currentTimestamp", currentTimestamp, "stopChecingkUnixSeconds", stopChecingkUnixSeconds)
+				break
+			}
+
+			err := store.DeleteWorkflowObjects(ctx, storeId, workflowPath)
+			if err != nil {
+				logger.Error("CleanupBlobStore failed to delete workflow objects", "workflowPath", workflowPath, "error", err)
+				return err
+			} else {
+				logger.Info("CleanupBlobStore deleted workflow objects", "workflowPath", workflowPath)
+			}
+			// this is a long running activity
+			// using record heartbeat so that it won't timeout at startToClose timeout
+			provider.RecordHeartbeat(ctx)
+		}
+		if continueToken == nil {
+			break
 		}
 	}
 	return nil

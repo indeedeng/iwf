@@ -22,6 +22,7 @@ interpreter:
 externalStorage:
   enabled: true
   thresholdInBytes: 100000 # 100 KB
+  minAgeForCleanupCheckInDays: 3
   supportedStorages:
     - status: active
       storageId: "local-dev-s3"
