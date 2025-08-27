@@ -245,12 +245,6 @@ func (b *blobStoreImpl) ListWorkflowPaths(ctx context.Context, input ListObjectP
 		Delimiter: aws.String("/"),
 	}
 
-	// Set StartAfter if provided
-	if input.StartAfterYyyymmdd != "" {
-		startAfter := fmt.Sprintf("%s%s$", b.pathPrefix, input.StartAfterYyyymmdd)
-		listInput.StartAfter = aws.String(startAfter)
-	}
-
 	// Set continuation token if provided
 	if input.ContinuationToken != nil {
 		listInput.ContinuationToken = input.ContinuationToken

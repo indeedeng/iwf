@@ -58,9 +58,8 @@ type BlobStore interface {
 }
 
 type ListObjectPathsInput struct {
-	StoreId            string
-	StartAfterYyyymmdd string
-	ContinuationToken  *string
+	StoreId           string
+	ContinuationToken *string
 }
 
 type ListObjectPathsOutput struct {

@@ -179,21 +179,6 @@ func TestBlobStoreIntegration(t *testing.T) {
 		assert.True(t, foundPath2, "Expected path for workflowId2 not found")
 	})
 
-	t.Run("ListWorkflowPathsWithStartAfter", func(t *testing.T) {
-		// Test with StartAfter filter
-		yesterday := time.Now().AddDate(0, 0, -1).Format("20060102")
-		input := ListObjectPathsInput{
-			StoreId:            testStorageId,
-			StartAfterYyyymmdd: yesterday,
-		}
-		output, err := blobStore.ListWorkflowPaths(ctx, input)
-		assert.NoError(t, err)
-		assert.NotNil(t, output)
-
-		// Should still contain today's workflow paths
-		assert.True(t, len(output.WorkflowPaths) >= 2)
-	})
-
 	t.Run("DeleteWorkflowObjects", func(t *testing.T) {
 		// Create a new workflow ID for this test
 		deleteTestWorkflowId := "delete-test-workflow-" + strconv.FormatInt(time.Now().UnixNano(), 10)
