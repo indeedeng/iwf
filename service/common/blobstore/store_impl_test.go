@@ -194,6 +194,72 @@ func TestBlobStoreIntegration(t *testing.T) {
 		assert.True(t, len(output.WorkflowPaths) >= 2)
 	})
 
+	t.Run("DeleteWorkflowObjects", func(t *testing.T) {
+		// Create a new workflow ID for this test
+		deleteTestWorkflowId := "delete-test-workflow-" + strconv.FormatInt(time.Now().UnixNano(), 10)
+
+		// Write multiple objects for the workflow
+		_, _, err := blobStore.WriteObject(ctx, deleteTestWorkflowId, "test data 1")
+		assert.NoError(t, err)
+		_, _, err = blobStore.WriteObject(ctx, deleteTestWorkflowId, "test data 2")
+		assert.NoError(t, err)
+		_, _, err = blobStore.WriteObject(ctx, deleteTestWorkflowId, "test data 3")
+		assert.NoError(t, err)
+
+		// Verify objects exist
+		count, err := blobStore.CountWorkflowObjectsForTesting(ctx, deleteTestWorkflowId)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(3), count)
+
+		// Delete all objects for the workflow
+		todayPrefix := time.Now().Format("20060102")
+		workflowPath := fmt.Sprintf("%s$%s", todayPrefix, deleteTestWorkflowId)
+		err = blobStore.DeleteWorkflowObjects(ctx, testStorageId, workflowPath)
+		assert.NoError(t, err)
+
+		// Verify objects are deleted
+		count, err = blobStore.CountWorkflowObjectsForTesting(ctx, deleteTestWorkflowId)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(0), count)
+	})
+
+	t.Run("DeleteWorkflowObjectsMultiple", func(t *testing.T) {
+		// Create a workflow with more objects to test pagination handling
+		multiDeleteWorkflowId := "multi-delete-workflow-" + strconv.FormatInt(time.Now().UnixNano(), 10)
+
+		// Create 10 objects for this workflow
+		numObjects := 10
+		for i := 0; i < numObjects; i++ {
+			data := fmt.Sprintf("test data %d", i)
+			_, _, err := blobStore.WriteObject(ctx, multiDeleteWorkflowId, data)
+			assert.NoError(t, err)
+		}
+
+		// Verify all objects exist
+		count, err := blobStore.CountWorkflowObjectsForTesting(ctx, multiDeleteWorkflowId)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(numObjects), count)
+
+		// Delete all objects for the workflow
+		todayPrefix := time.Now().Format("20060102")
+		workflowPath := fmt.Sprintf("%s$%s", todayPrefix, multiDeleteWorkflowId)
+		err = blobStore.DeleteWorkflowObjects(ctx, testStorageId, workflowPath)
+		assert.NoError(t, err)
+
+		// Verify all objects are deleted
+		count, err = blobStore.CountWorkflowObjectsForTesting(ctx, multiDeleteWorkflowId)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(0), count)
+	})
+
+	t.Run("DeleteWorkflowObjectsNonExistent", func(t *testing.T) {
+		// Try to delete objects for a workflow that doesn't exist
+		todayPrefix := time.Now().Format("20060102")
+		workflowPath := fmt.Sprintf("%s$%s", todayPrefix, "non-existent-workflow")
+		err := blobStore.DeleteWorkflowObjects(ctx, testStorageId, workflowPath)
+		assert.NoError(t, err) // Should succeed even if no objects to delete
+	})
+
 	t.Run("ErrorHandling", func(t *testing.T) {
 		// Test with invalid store ID
 		input := ListObjectPathsInput{
@@ -205,6 +271,11 @@ func TestBlobStoreIntegration(t *testing.T) {
 
 		// Test reading with invalid store ID
 		_, err = blobStore.ReadObject(ctx, "invalid-store-id", "some-path")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "store not found")
+
+		// Test delete with invalid store ID
+		err = blobStore.DeleteWorkflowObjects(ctx, "invalid-store-id", "some-workflow-path")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "store not found")
 	})

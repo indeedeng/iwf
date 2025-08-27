@@ -11,6 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
@@ -156,8 +157,80 @@ func (b *blobStoreImpl) CountWorkflowObjectsForTesting(ctx context.Context, work
 }
 
 func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, workflowPath string) error {
-	//TODO implement me
-	panic("implement me")
+	storeConfig, ok := b.supportedStore[storeId]
+	if !ok {
+		return errors.New("store not found for " + storeId)
+	}
+
+	// Construct the prefix for all objects of this workflow
+	prefix := fmt.Sprintf("%s%s/", b.pathPrefix, workflowPath)
+
+	// Paginate through all objects and delete them in batches
+	var continuationToken *string
+	for {
+		listInput := &s3.ListObjectsV2Input{
+			Bucket: aws.String(storeConfig.S3Bucket),
+			Prefix: aws.String(prefix),
+		}
+
+		if continuationToken != nil {
+			listInput.ContinuationToken = continuationToken
+		}
+
+		listResult, err := b.s3Client.ListObjectsV2(ctx, listInput)
+		if err != nil {
+			return fmt.Errorf("failed to list objects for deletion: %w", err)
+		}
+
+		// If no objects found, we're done
+		if len(listResult.Contents) == 0 {
+			break
+		}
+
+		// Prepare objects for batch deletion
+		var objectsToDelete []types.ObjectIdentifier
+		for _, obj := range listResult.Contents {
+			if obj.Key != nil {
+				objectsToDelete = append(objectsToDelete, types.ObjectIdentifier{
+					Key: obj.Key,
+				})
+			}
+		}
+
+		// Delete objects in batch
+		if len(objectsToDelete) > 0 {
+			deleteResult, err := b.s3Client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+				Bucket: aws.String(storeConfig.S3Bucket),
+				Delete: &types.Delete{
+					Objects: objectsToDelete,
+					Quiet:   aws.Bool(true), // Don't return successful deletions
+				},
+			})
+			if err != nil {
+				return fmt.Errorf("failed to delete objects: %w", err)
+			}
+
+			// Check for any delete errors
+			if len(deleteResult.Errors) > 0 {
+				var errorMsgs []string
+				for _, delErr := range deleteResult.Errors {
+					if delErr.Key != nil && delErr.Code != nil && delErr.Message != nil {
+						errorMsgs = append(errorMsgs, fmt.Sprintf("key=%s, code=%s, message=%s",
+							*delErr.Key, *delErr.Code, *delErr.Message))
+					}
+				}
+				return fmt.Errorf("some objects failed to delete: %s", strings.Join(errorMsgs, "; "))
+			}
+		}
+
+		// Check if there are more objects to process
+		if listResult.IsTruncated == nil || !*listResult.IsTruncated {
+			break
+		}
+		continuationToken = listResult.NextContinuationToken
+	}
+
+	return nil
 }
 
 func (b *blobStoreImpl) ListWorkflowPaths(ctx context.Context, input ListObjectPathsInput) (*ListObjectPathsOutput, error) {
