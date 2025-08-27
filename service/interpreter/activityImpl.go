@@ -144,16 +144,14 @@ func StateDecide(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input, searchAttributes)
+	return StateApiExecute(ctx, backendType, input)
 }
 
 func StateApiExecute(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	stateApiExecuteStartTime := time.Now().UnixMilli()
 	provider := interfaces.GetActivityProviderByType(backendType)
@@ -210,7 +208,7 @@ func StateApiExecute(
 			StateExecutionId:   input.Request.Context.StateExecutionId,
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
-			SearchAttributes:   searchAttributes,
+			SearchAttributes:   input.Request.SearchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -232,7 +230,7 @@ func StateApiExecute(
 			StateExecutionId:   input.Request.Context.StateExecutionId,
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
-			SearchAttributes:   searchAttributes,
+			SearchAttributes:   input.Request.SearchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -257,7 +255,7 @@ func StateApiExecute(
 		StateExecutionId:   input.Request.Context.StateExecutionId,
 		StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
-		SearchAttributes:   searchAttributes,
+		SearchAttributes:   input.Request.SearchAttributes,
 	})
 	return resp, nil
 }
