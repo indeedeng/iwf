@@ -191,11 +191,13 @@ func StateApiExecute(
 
 	// workflowImpl is only passing StateWaitUntilFailed, not StateStartApiSucceeded, to save the history from storing duplicate data
 	// So we need to construct the other for backward compatibility(to old SDK that is still using StateStartApiSucceeded)
-	if input.Request.CommandResults.StateWaitUntilFailed == nil {
-		input.Request.CommandResults.StateStartApiSucceeded = iwfidl.PtrBool(true)
-		input.Request.CommandResults.StateWaitUntilFailed = iwfidl.PtrBool(false)
-	} else {
-		input.Request.CommandResults.StateStartApiSucceeded = iwfidl.PtrBool(!*input.Request.CommandResults.StateWaitUntilFailed)
+	if input.Request.CommandResults != nil {
+		if input.Request.CommandResults.StateWaitUntilFailed == nil {
+			input.Request.CommandResults.StateStartApiSucceeded = iwfidl.PtrBool(true)
+			input.Request.CommandResults.StateWaitUntilFailed = iwfidl.PtrBool(false)
+		} else {
+			input.Request.CommandResults.StateStartApiSucceeded = iwfidl.PtrBool(!*input.Request.CommandResults.StateWaitUntilFailed)
+		}
 	}
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
