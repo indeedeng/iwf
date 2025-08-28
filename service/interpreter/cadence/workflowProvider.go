@@ -175,12 +175,17 @@ func (w *workflowProvider) WithActivityOptions(
 		panic("cannot convert to cadence workflow context")
 	}
 
-	// unlimited to match Temporal
-	unlimited := time.Hour * 24 * 365 * 1
+	unlimited := time.Hour * 24 * 365
+	startToCloseTimeout := options.StartToCloseTimeout
+	if startToCloseTimeout == 0 {
+		// unlimited to match Temporal for default
+		startToCloseTimeout = unlimited
+	}
 
 	wfCtx2 := workflow.WithActivityOptions(wfCtx, workflow.ActivityOptions{
-		StartToCloseTimeout:    options.StartToCloseTimeout,
-		ScheduleToStartTimeout: unlimited,
+		StartToCloseTimeout:    startToCloseTimeout,
+		ScheduleToStartTimeout: time.Second * 10,
+		HeartbeatTimeout:       options.HeartbeatTimeout,
 		RetryPolicy:            retry.ConvertCadenceActivityRetryPolicy(options.RetryPolicy),
 	})
 

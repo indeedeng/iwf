@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 )
 
 var reservedCharacters = []string{"/", "$"}
@@ -31,6 +32,27 @@ func ExtractWorkflowId(workflowPath string) (string, error) {
 		return "", fmt.Errorf("invalid workflow path: %s", workflowPath)
 	}
 	return parts[1], nil
+}
+
+func ExtractYyyymmddToUnixSeconds(workflowPath string) (int64, bool) {
+	// yyyymmdd$workflowId
+	yyyymmdd, err := ExtractYyyymmdd(workflowPath)
+	if err != nil {
+		return 0, false
+	}
+	parsedTime, err := time.Parse("20060102", yyyymmdd)
+	if err != nil {
+		panic(err)
+	}
+	return parsedTime.Unix(), true
+}
+
+func ExtractYyyymmdd(workflowPath string) (string, error) {
+	parts := strings.Split(workflowPath, "$")
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid workflow path: %s", workflowPath)
+	}
+	return parts[0], nil
 }
 
 type BlobStore interface {

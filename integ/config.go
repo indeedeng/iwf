@@ -31,8 +31,9 @@ func createTestConfig(testCfg IwfServiceTestConfig) config.Config {
 	}
 	if testCfg.S3TestThreshold > 0 {
 		externalStorage := config.ExternalStorageConfig{
-			Enabled:          true,
-			ThresholdInBytes: testCfg.S3TestThreshold,
+			Enabled:                     true,
+			ThresholdInBytes:            testCfg.S3TestThreshold,
+			MinAgeForCleanupCheckInDays: 3,
 			SupportedStorages: []config.BlobStorageConfig{
 				{
 					Status:      config.StorageStatusActive,

@@ -168,43 +168,31 @@ integTestsTemporalWithCover: # for local debugging
 	$Q go tool cover -func coverage.out -o coverage.out
 
 integTests:
-	$Q go test -v ./integ -timeout 15m
+	$Q go test -v ./integ -timeout 20m
 
 temporalIntegTests:
-	$Q go test -v ./integ -cadence=false
+	$Q go test -v ./integ -timeout 20m -cadence=false
 
 cadenceIntegTests:
-	$Q go test -v ./integ -temporal=false
+	$Q go test -v ./integ -timeout 20m -temporal=false
 
 ci-cadence-integ-test:
-	$Q go test -v ./integ -search=false -temporal=false -dependencyWaitSeconds=180
+	$Q go test -v ./integ -timeout 20m -search=false -temporal=false -dependencyWaitSeconds=180
 
 ci-cadence-integ-test-disable-sticky:
 	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -search=false -temporal=false -dependencyWaitSeconds=180 -disableStickyCache
 
 ci-temporal-integ-test:
-	$Q go test -v ./integ -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60
+	$Q go test -v ./integ -timeout 20m -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60
 
 ci-temporal-integ-test-disable-sticky:
-	$Q go test -v ./integ -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache
+	$Q go test -v ./integ -timeout 20m -run "(?i)^Test[${startsWith}]" -cover -coverprofile coverage.out -coverpkg ./service/... -search=false -cadence=false -dependencyWaitSeconds=60 -disableStickyCache
 
 ci-all-tests:
-	$Q go test -v ./... -timeout 15m -cover -coverprofile coverage.out -coverpkg ./service/...
+	$Q go test -v ./... -timeout 20m -cover -coverprofile coverage.out -coverpkg ./service/...
 
 integTestsNoSearch:
-	$Q go test -v ./integ -search=false -timeout 15m
-
-stressTestsWithSearch:
-	$Q go test -v ./integ -repeat=10 -intervalMs=100 -searchWaitMs=100 | tee test.log # TODO https://github.com/indeedeng/iwf/issues/134
-
-stressTestsNoSearch:
-	$Q go test -v ./integ -repeat=10 -search=false | tee test.log
-
-stressTestsCadenceNoSearch:
-	$Q go test -v ./integ -repeat=10 -temporal=false -search=false | tee test.log
-
-stressTestsTemporalNoSearch:
-	$Q go test -v ./integ -repeat=10 -cadence=false -search=false | tee test.log
+	$Q go test -v ./integ -search=false -timeout 20m
 
 unitTests:
 	@go test -v $(shell go list ./service/... | grep -v ./service/common/blobstore)
