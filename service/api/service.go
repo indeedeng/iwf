@@ -478,16 +478,38 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 		}
 	}
 
+	// Load data from external storage if necessary
+	processedDataAttributes := queryResp.DataAttributes
+	if s.config.ExternalStorage.Enabled && len(queryResp.DataAttributes) > 0 {
+		loadedDataAttributes, err := s.loadDataObjectsFromExternalStorage(ctx, queryResp.DataAttributes, req.GetWorkflowId())
+		if err != nil {
+			return nil, s.handleError(err, WorkflowGetDataAttributesApiPath, req.GetWorkflowId())
+		}
+		processedDataAttributes = loadedDataAttributes
+	}
+
 	return &iwfidl.WorkflowGetDataObjectsResponse{
-		Objects: queryResp.DataAttributes,
+		Objects: processedDataAttributes,
 	}, nil
 }
 
 func (s *serviceImpl) ApiV1WorkflowSetQueryAttributesPost(
 	ctx context.Context, req iwfidl.WorkflowSetDataObjectsRequest,
 ) (retError *errors.ErrorAndStatus) {
+	defer func() { log.CapturePanic(recover(), s.logger, &retError) }()
+
+	// Process data objects for external storage if necessary
+	processedDataObjects := req.Objects
+	if s.config.ExternalStorage.Enabled && len(req.Objects) > 0 {
+		var err error
+		processedDataObjects, err = s.writeDataObjectsToExternalStorage(ctx, req.Objects, req.GetWorkflowId())
+		if err != nil {
+			return s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
+		}
+	}
+
 	sigVal := service.ExecuteRpcSignalRequest{
-		UpsertDataObjects: req.Objects,
+		UpsertDataObjects: processedDataObjects,
 	}
 
 	err := s.client.SignalWorkflow(ctx, req.GetWorkflowId(), req.GetWorkflowRunId(), service.ExecuteRpcSignalChannelName, sigVal)
@@ -903,4 +925,63 @@ func (s *serviceImpl) handleError(err error, apiPath string, workflowId string) 
 		subStatus,
 		err.Error(),
 	)
+}
+
+// writeDataObjectsToExternalStorage processes data objects and writes large ones to external storage
+func (s *serviceImpl) writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
+	if !s.config.ExternalStorage.Enabled {
+		return dataObjects, nil
+	}
+
+	processedDAs := make([]iwfidl.KeyValue, 0, len(dataObjects))
+	for _, keyValue := range dataObjects {
+		if keyValue.Value != nil && keyValue.Value.Data != nil && len(*keyValue.Value.Data) > s.config.ExternalStorage.ThresholdInBytes {
+			storeId, path, err := s.store.WriteObject(ctx, workflowId, *keyValue.Value.Data)
+			if err != nil {
+				return nil, err
+			}
+			newKeyValue := iwfidl.KeyValue{
+				Key: keyValue.Key,
+				Value: &iwfidl.EncodedObject{
+					ExtStoreId: iwfidl.PtrString(storeId),
+					ExtPath:    iwfidl.PtrString(path),
+					Encoding:   keyValue.Value.Encoding,
+				},
+			}
+			processedDAs = append(processedDAs, newKeyValue)
+		} else {
+			processedDAs = append(processedDAs, keyValue)
+		}
+	}
+	return processedDAs, nil
+}
+
+// loadDataObjectsFromExternalStorage loads data from external storage for data objects that have external storage references
+func (s *serviceImpl) loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
+	if !s.config.ExternalStorage.Enabled {
+		return dataObjects, nil
+	}
+
+	processedDAs := make([]iwfidl.KeyValue, 0, len(dataObjects))
+	for _, keyValue := range dataObjects {
+		if keyValue.Value != nil && keyValue.Value.ExtStoreId != nil && keyValue.Value.ExtPath != nil {
+			data, err := s.store.ReadObject(ctx, *keyValue.Value.ExtStoreId, *keyValue.Value.ExtPath)
+			if err != nil {
+				return nil, err
+			}
+			newKeyValue := iwfidl.KeyValue{
+				Key: keyValue.Key,
+				Value: &iwfidl.EncodedObject{
+					Encoding:   keyValue.Value.Encoding,
+					Data:       iwfidl.PtrString(data),
+					ExtStoreId: keyValue.Value.ExtStoreId, // Preserve external storage reference
+					ExtPath:    keyValue.Value.ExtPath,    // Preserve external storage reference
+				},
+			}
+			processedDAs = append(processedDAs, newKeyValue)
+		} else {
+			processedDAs = append(processedDAs, keyValue)
+		}
+	}
+	return processedDAs, nil
 }
