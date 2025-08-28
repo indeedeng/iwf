@@ -475,22 +475,14 @@ func InvokeWorkerRpc(
 	}, nil
 }
 
-func writeToExternalStorage(ctx context.Context, input *iwfidl.EncodedObject, workflowId string) (string, string, error) {
+func writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
 	blobStore := env.GetBlobStore()
 
-	storeId, path, writeErr := blobStore.WriteObject(ctx, workflowId, *input.Data)
-	if writeErr != nil {
-		return "", "", writeErr
-	}
-	return storeId, path, nil
-}
-
-func writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
 	for i := range dataObjects {
 		if dataObjects[i].Value != nil && dataObjects[i].Value.Data != nil &&
 			len(*dataObjects[i].Value.Data) > env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
 			// Save data to external storage
-			storeId, path, writeErr := writeToExternalStorage(ctx, dataObjects[i].Value, workflowId)
+			storeId, path, writeErr := blobStore.WriteObject(ctx, workflowId, *dataObjects[i].Value.Data)
 			if writeErr != nil {
 				return nil, writeErr
 			}
@@ -512,6 +504,8 @@ func writeStateInputToExternalStorage(ctx context.Context, nextStates []iwfidl.S
 }
 
 func processStateInputForExternalStorage(ctx context.Context, stateInput *iwfidl.EncodedObject, currentInput *iwfidl.EncodedObject, workflowId string) error {
+	blobStore := env.GetBlobStore()
+
 	// Check if external storage is needed
 	if stateInput.Data == nil || len(*stateInput.Data) <= env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
 		return nil
@@ -529,7 +523,7 @@ func processStateInputForExternalStorage(ctx context.Context, stateInput *iwfidl
 	}
 
 	// Save to external storage
-	storeId, path, err := writeToExternalStorage(ctx, stateInput, workflowId)
+	storeId, path, err := blobStore.WriteObject(ctx, workflowId, *stateInput.Data)
 	if err != nil {
 		return err
 	}
