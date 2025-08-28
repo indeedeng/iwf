@@ -57,7 +57,7 @@ func StateApiWaitUntil(
 
 	var err error
 	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
-		input.Request.StateInput, err = loadFromExternalStorage(ctx, input.Request.StateInput)
+		input.Request.StateInput, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
 			return nil, err
 		}
@@ -186,7 +186,7 @@ func StateApiExecute(
 
 	var err error
 	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
-		input.Request.StateInput, err = loadFromExternalStorage(ctx, input.Request.StateInput)
+		input.Request.StateInput, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
 			return nil, err
 		}
@@ -530,16 +530,23 @@ func processStateInputForExternalStorage(ctx context.Context, stateInput *iwfidl
 	return nil
 }
 
-func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (*iwfidl.EncodedObject, error) {
-	blobStore := env.GetBlobStore()
+// loadStateInputFromExternalStorage is specifically for loading state input from external storage.
+// It loads the data and preserves the external storage identifiers for potential reuse optimization.
+func loadStateInputFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (*iwfidl.EncodedObject, error) {
+	if input == nil || input.ExtStoreId == nil || input.ExtPath == nil {
+		return input, nil
+	}
 
-	data, err := blobStore.ReadObject(ctx, input.GetExtStoreId(), input.GetExtPath())
+	_, _, data, err := loadFromExternalStorage(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
+	// Load the data but preserve external storage identifiers for potential reuse
+	// This allows us to optimize by reusing the same external storage location
+	// if the next state input has identical data
 	newEncodedObject := iwfidl.EncodedObject{
-		Data:       &data,
+		Data:       data.Data,
 		Encoding:   input.Encoding,
 		ExtStoreId: input.ExtStoreId,
 		ExtPath:    input.ExtPath,
@@ -547,10 +554,27 @@ func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (
 	return &newEncodedObject, nil
 }
 
+// loadFromExternalStorage loads data from external storage while preserving external storage identifiers.
+// This is primarily used for data objects where the identifiers may need to be preserved.
+func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (string, string, *iwfidl.EncodedObject, error) {
+	blobStore := env.GetBlobStore()
+
+	data, err := blobStore.ReadObject(ctx, input.GetExtStoreId(), input.GetExtPath())
+	if err != nil {
+		return "", "", nil, err
+	}
+
+	newEncodedObject := iwfidl.EncodedObject{
+		Data:     &data,
+		Encoding: input.Encoding,
+	}
+	return *input.ExtStoreId, *input.ExtPath, &newEncodedObject, nil
+}
+
 func loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) error {
 	for i := range dataObjects {
 		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil {
-			loadedObject, err := loadFromExternalStorage(ctx, dataObjects[i].Value)
+			_, _, loadedObject, err := loadFromExternalStorage(ctx, dataObjects[i].Value)
 			if err != nil {
 				return err
 			}
