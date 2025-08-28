@@ -486,16 +486,16 @@ func writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl
 	return dataObjects, nil
 }
 
-func writeNextStateInputsToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInput *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {
+func writeNextStateInputsToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInputCopy *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {
 	for i := range nextStates {
-		if err := processNextStateInputForExternalStorage(ctx, nextStates[i].StateInput, currentInput, workflowId); err != nil {
+		if err := processNextStateInputForExternalStorage(ctx, nextStates[i].StateInput, currentInputCopy, workflowId); err != nil {
 			return nil, err
 		}
 	}
 	return nextStates, nil
 }
 
-func processNextStateInputForExternalStorage(ctx context.Context, nextStateInput *iwfidl.EncodedObject, currentInput *iwfidl.EncodedObject, workflowId string) error {
+func processNextStateInputForExternalStorage(ctx context.Context, nextStateInput *iwfidl.EncodedObject, currentInputCopy *iwfidl.EncodedObject, workflowId string) error {
 	blobStore := env.GetBlobStore()
 
 	// Check if external storage is needed
@@ -504,12 +504,12 @@ func processNextStateInputForExternalStorage(ctx context.Context, nextStateInput
 	}
 
 	// Try to reuse existing external storage if data is identical
-	if currentInput != nil && currentInput.Data != nil && nextStateInput.Data != nil &&
-		*currentInput.Data == *nextStateInput.Data &&
-		currentInput.ExtStoreId != nil && currentInput.ExtPath != nil {
+	if currentInputCopy != nil && currentInputCopy.Data != nil && nextStateInput.Data != nil &&
+		*currentInputCopy.Data == *nextStateInput.Data &&
+		currentInputCopy.ExtStoreId != nil && currentInputCopy.ExtPath != nil {
 		// Reuse existing external storage
-		nextStateInput.ExtStoreId = currentInput.ExtStoreId
-		nextStateInput.ExtPath = currentInput.ExtPath
+		nextStateInput.ExtStoreId = currentInputCopy.ExtStoreId
+		nextStateInput.ExtPath = currentInputCopy.ExtPath
 		nextStateInput.Data = nil
 		return nil
 	}
