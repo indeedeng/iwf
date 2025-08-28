@@ -57,7 +57,7 @@ func StateApiWaitUntil(
 
 	var err error
 	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
-		input.Request.StateInput, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
+		_, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
 			return nil, err
 		}
@@ -184,9 +184,10 @@ func StateApiExecute(
 	input.Request.Context.Attempt = &attempt
 	input.Request.Context.FirstAttemptTimestamp = &scheduledTs
 
+	var wholeStateInputCopy *iwfidl.EncodedObject
 	var err error
 	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
-		input.Request.StateInput, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
+		wholeStateInputCopy, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
 			return nil, err
 		}
@@ -256,7 +257,7 @@ func StateApiExecute(
 	}
 
 	if env.GetSharedConfig().ExternalStorage.Enabled {
-		resp.StateDecision.NextStates, err = writeStateInputToExternalStorage(ctx, resp.StateDecision.NextStates, input.Request.StateInput, activityInfo.WorkflowExecution.ID)
+		resp.StateDecision.NextStates, err = writeNextStateInputsToExternalStorage(ctx, resp.StateDecision.NextStates, wholeStateInputCopy, activityInfo.WorkflowExecution.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -485,53 +486,57 @@ func writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl
 	return dataObjects, nil
 }
 
-func writeStateInputToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInput *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {
+func writeNextStateInputsToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInput *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {
 	for i := range nextStates {
-		if err := processStateInputForExternalStorage(ctx, nextStates[i].StateInput, currentInput, workflowId); err != nil {
+		if err := processNextStateInputForExternalStorage(ctx, nextStates[i].StateInput, currentInput, workflowId); err != nil {
 			return nil, err
 		}
 	}
 	return nextStates, nil
 }
 
-func processStateInputForExternalStorage(ctx context.Context, stateInput *iwfidl.EncodedObject, currentInput *iwfidl.EncodedObject, workflowId string) error {
+func processNextStateInputForExternalStorage(ctx context.Context, nextStateInput *iwfidl.EncodedObject, currentInput *iwfidl.EncodedObject, workflowId string) error {
 	blobStore := env.GetBlobStore()
 
 	// Check if external storage is needed
-	if stateInput.Data == nil || len(*stateInput.Data) <= env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
+	if nextStateInput.Data == nil || len(*nextStateInput.Data) <= env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
 		return nil
 	}
 
 	// Try to reuse existing external storage if data is identical
-	if currentInput != nil && currentInput.Data != nil && stateInput.Data != nil &&
-		*currentInput.Data == *stateInput.Data &&
+	if currentInput != nil && currentInput.Data != nil && nextStateInput.Data != nil &&
+		*currentInput.Data == *nextStateInput.Data &&
 		currentInput.ExtStoreId != nil && currentInput.ExtPath != nil {
 		// Reuse existing external storage
-		stateInput.ExtStoreId = currentInput.ExtStoreId
-		stateInput.ExtPath = currentInput.ExtPath
-		stateInput.Data = nil
+		nextStateInput.ExtStoreId = currentInput.ExtStoreId
+		nextStateInput.ExtPath = currentInput.ExtPath
+		nextStateInput.Data = nil
 		return nil
 	}
 
 	// Save to external storage
-	storeId, path, err := blobStore.WriteObject(ctx, workflowId, *stateInput.Data)
+	storeId, path, err := blobStore.WriteObject(ctx, workflowId, *nextStateInput.Data)
 	if err != nil {
 		return err
 	}
-	stateInput.ExtStoreId = &storeId
-	stateInput.ExtPath = &path
-	stateInput.Data = nil
+	nextStateInput.ExtStoreId = &storeId
+	nextStateInput.ExtPath = &path
+	nextStateInput.Data = nil
 	return nil
 }
 
 // loadStateInputFromExternalStorage is specifically for loading state input from external storage.
-// It loads the data and preserves the external storage identifiers for potential reuse optimization.
+// It loads the data and replace the field of input,
+// and it also preserves the external storage identifiers for potential reuse optimization by returning a "whole" encodedObject
 func loadStateInputFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (*iwfidl.EncodedObject, error) {
 	if input == nil || input.ExtStoreId == nil || input.ExtPath == nil {
 		return input, nil
 	}
 
-	_, _, data, err := loadFromExternalStorage(ctx, input)
+	extStoreId := *input.ExtStoreId
+	extPath := *input.ExtPath
+
+	err := doLoadFromExternalStorage(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -540,41 +545,38 @@ func loadStateInputFromExternalStorage(ctx context.Context, input *iwfidl.Encode
 	// This allows us to optimize by reusing the same external storage location
 	// if the next state input has identical data
 	newEncodedObject := iwfidl.EncodedObject{
-		Data:       data.Data,
+		Data:       input.Data,
 		Encoding:   input.Encoding,
-		ExtStoreId: input.ExtStoreId,
-		ExtPath:    input.ExtPath,
+		ExtStoreId: &extStoreId,
+		ExtPath:    &extPath,
 	}
 	return &newEncodedObject, nil
-}
-
-// loadFromExternalStorage loads data from external storage while preserving external storage identifiers.
-// This is primarily used for data objects where the identifiers may need to be preserved.
-func loadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) (string, string, *iwfidl.EncodedObject, error) {
-	blobStore := env.GetBlobStore()
-
-	data, err := blobStore.ReadObject(ctx, input.GetExtStoreId(), input.GetExtPath())
-	if err != nil {
-		return "", "", nil, err
-	}
-
-	newEncodedObject := iwfidl.EncodedObject{
-		Data:     &data,
-		Encoding: input.Encoding,
-	}
-	return *input.ExtStoreId, *input.ExtPath, &newEncodedObject, nil
 }
 
 func loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) error {
 	for i := range dataObjects {
 		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil {
-			_, _, loadedObject, err := loadFromExternalStorage(ctx, dataObjects[i].Value)
+			err := doLoadFromExternalStorage(ctx, dataObjects[i].Value)
 			if err != nil {
 				return err
 			}
-			dataObjects[i].Value = loadedObject
 		}
 	}
+	return nil
+}
+
+// doLoadFromExternalStorage loads data from external storage and replace the fields of the input
+func doLoadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject) error {
+	blobStore := env.GetBlobStore()
+
+	data, err := blobStore.ReadObject(ctx, input.GetExtStoreId(), input.GetExtPath())
+	if err != nil {
+		return err
+	}
+
+	input.Data = &data
+	input.ExtPath = nil
+	input.ExtStoreId = nil
 	return nil
 }
 
