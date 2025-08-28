@@ -794,8 +794,9 @@ func processStateExecution(
 	}
 
 	commandRes := &iwfidl.CommandResults{}
-	commandRes.StateStartApiSucceeded = iwfidl.PtrBool(errWaitUntilApi == nil)
-	commandRes.StateWaitUntilFailed = iwfidl.PtrBool(errWaitUntilApi != nil)
+	if errWaitUntilApi != nil {
+		commandRes.StateWaitUntilFailed = iwfidl.PtrBool(true)
+	}
 
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.RemovePendingTimersOfState(stateExeId)
@@ -804,7 +805,6 @@ func processStateExecution(
 		for idx, cmd := range commandReq.GetTimerCommands() {
 			status := iwfidl.SCHEDULED
 			if _, ok := completedTimerCmds[idx]; ok {
-				// TODO expose skipped status to external
 				status = iwfidl.FIRED
 			}
 			timerResults = append(timerResults, iwfidl.TimerResult{
@@ -917,7 +917,7 @@ func invokeStateExecute(
 				DataObjects:      persistenceManager.LoadDataAttributes(ctx, doLoadingPolicy),
 				StateInput:       state.StateInput,
 			},
-		}, persistenceManager.GetAllSearchAttributes())
+		})
 	if !provider.IsReplaying(ctx) {
 		if err == nil {
 			event.Handle(iwfidl.IwfEvent{

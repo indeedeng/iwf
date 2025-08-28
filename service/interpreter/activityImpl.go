@@ -144,16 +144,14 @@ func StateDecide(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
-	return StateApiExecute(ctx, backendType, input, searchAttributes)
+	return StateApiExecute(ctx, backendType, input)
 }
 
 func StateApiExecute(
 	ctx context.Context,
 	backendType service.BackendType,
 	input service.StateDecideActivityInput,
-	searchAttributes []iwfidl.SearchAttribute,
 ) (*iwfidl.WorkflowStateDecideResponse, error) {
 	stateApiExecuteStartTime := time.Now().UnixMilli()
 	provider := interfaces.GetActivityProviderByType(backendType)
@@ -191,6 +189,17 @@ func StateApiExecute(
 		return nil, err
 	}
 
+	// workflowImpl is only passing StateWaitUntilFailed, not StateStartApiSucceeded, to save the history from storing duplicate data
+	// So we need to construct the other for backward compatibility(to old SDK that is still using StateStartApiSucceeded)
+	if input.Request.CommandResults != nil {
+		if input.Request.CommandResults.StateWaitUntilFailed == nil {
+			input.Request.CommandResults.StateStartApiSucceeded = iwfidl.PtrBool(true)
+			input.Request.CommandResults.StateWaitUntilFailed = iwfidl.PtrBool(false)
+		} else {
+			input.Request.CommandResults.StateStartApiSucceeded = iwfidl.PtrBool(!*input.Request.CommandResults.StateWaitUntilFailed)
+		}
+	}
+
 	req := apiClient.DefaultApi.ApiV1WorkflowStateDecidePost(ctx)
 	resp, httpResp, err := req.WorkflowStateDecideRequest(input.Request).Execute()
 	printDebugMsg(logger, err, iwfWorkerBaseUrl)
@@ -210,7 +219,7 @@ func StateApiExecute(
 			StateExecutionId:   input.Request.Context.StateExecutionId,
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
-			SearchAttributes:   searchAttributes,
+			SearchAttributes:   input.Request.SearchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -232,7 +241,7 @@ func StateApiExecute(
 			StateExecutionId:   input.Request.Context.StateExecutionId,
 			StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 			EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
-			SearchAttributes:   searchAttributes,
+			SearchAttributes:   input.Request.SearchAttributes,
 			Error: &iwfidl.IwfEventError{
 				Type:    &errType,
 				Details: &errDetails,
@@ -257,7 +266,7 @@ func StateApiExecute(
 		StateExecutionId:   input.Request.Context.StateExecutionId,
 		StartTimestampInMs: ptr.Any(stateApiExecuteStartTime),
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
-		SearchAttributes:   searchAttributes,
+		SearchAttributes:   input.Request.SearchAttributes,
 	})
 	return resp, nil
 }
