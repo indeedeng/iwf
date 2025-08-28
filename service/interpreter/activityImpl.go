@@ -524,7 +524,6 @@ func processStateInputForExternalStorage(ctx context.Context, stateInput *iwfidl
 		// Reuse existing external storage
 		stateInput.ExtStoreId = currentInput.ExtStoreId
 		stateInput.ExtPath = currentInput.ExtPath
-		stateInput.Encoding = currentInput.Encoding
 		stateInput.Data = nil
 		return nil
 	}
