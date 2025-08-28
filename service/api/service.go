@@ -480,8 +480,8 @@ func (s *serviceImpl) ApiV1WorkflowGetQueryAttributesPost(
 
 	// Load data from external storage if necessary
 	processedDataAttributes := queryResp.DataAttributes
-	if s.config.ExternalStorage.Enabled && len(queryResp.DataAttributes) > 0 {
-		loadedDataAttributes, err := s.loadDataObjectsFromExternalStorage(ctx, queryResp.DataAttributes, req.GetWorkflowId())
+	if len(queryResp.DataAttributes) > 0 {
+		loadedDataAttributes, err := s.loadDataObjectsFromExternalStorage(ctx, queryResp.DataAttributes)
 		if err != nil {
 			return nil, s.handleError(err, WorkflowGetDataAttributesApiPath, req.GetWorkflowId())
 		}
@@ -933,55 +933,42 @@ func (s *serviceImpl) writeDataObjectsToExternalStorage(ctx context.Context, dat
 		return dataObjects, nil
 	}
 
-	processedDAs := make([]iwfidl.KeyValue, 0, len(dataObjects))
-	for _, keyValue := range dataObjects {
-		if keyValue.Value != nil && keyValue.Value.Data != nil && len(*keyValue.Value.Data) > s.config.ExternalStorage.ThresholdInBytes {
-			storeId, path, err := s.store.WriteObject(ctx, workflowId, *keyValue.Value.Data)
+	for i := range dataObjects {
+		if dataObjects[i].Value != nil && dataObjects[i].Value.Data != nil && len(*dataObjects[i].Value.Data) > s.config.ExternalStorage.ThresholdInBytes {
+			storeId, path, err := s.store.WriteObject(ctx, workflowId, *dataObjects[i].Value.Data)
 			if err != nil {
 				return nil, err
 			}
-			newKeyValue := iwfidl.KeyValue{
-				Key: keyValue.Key,
-				Value: &iwfidl.EncodedObject{
-					ExtStoreId: iwfidl.PtrString(storeId),
-					ExtPath:    iwfidl.PtrString(path),
-					Encoding:   keyValue.Value.Encoding,
-				},
+			dataObjects[i].Value = &iwfidl.EncodedObject{
+				ExtStoreId: iwfidl.PtrString(storeId),
+				ExtPath:    iwfidl.PtrString(path),
+				Encoding:   dataObjects[i].Value.Encoding,
+				Data:       nil, // Clear data since it's now in external storage
 			}
-			processedDAs = append(processedDAs, newKeyValue)
-		} else {
-			processedDAs = append(processedDAs, keyValue)
 		}
 	}
-	return processedDAs, nil
+	return dataObjects, nil
 }
 
 // loadDataObjectsFromExternalStorage loads data from external storage for data objects that have external storage references
-func (s *serviceImpl) loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
+func (s *serviceImpl) loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) ([]iwfidl.KeyValue, error) {
 	if !s.config.ExternalStorage.Enabled {
 		return dataObjects, nil
 	}
 
-	processedDAs := make([]iwfidl.KeyValue, 0, len(dataObjects))
-	for _, keyValue := range dataObjects {
-		if keyValue.Value != nil && keyValue.Value.ExtStoreId != nil && keyValue.Value.ExtPath != nil {
-			data, err := s.store.ReadObject(ctx, *keyValue.Value.ExtStoreId, *keyValue.Value.ExtPath)
+	for i := range dataObjects {
+		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil && dataObjects[i].Value.ExtPath != nil {
+			data, err := s.store.ReadObject(ctx, *dataObjects[i].Value.ExtStoreId, *dataObjects[i].Value.ExtPath)
 			if err != nil {
 				return nil, err
 			}
-			newKeyValue := iwfidl.KeyValue{
-				Key: keyValue.Key,
-				Value: &iwfidl.EncodedObject{
-					Encoding:   keyValue.Value.Encoding,
-					Data:       iwfidl.PtrString(data),
-					ExtStoreId: keyValue.Value.ExtStoreId, // Preserve external storage reference
-					ExtPath:    keyValue.Value.ExtPath,    // Preserve external storage reference
-				},
+			dataObjects[i].Value = &iwfidl.EncodedObject{
+				Encoding:   dataObjects[i].Value.Encoding,
+				Data:       iwfidl.PtrString(data),
+				ExtStoreId: dataObjects[i].Value.ExtStoreId, // Preserve external storage reference
+				ExtPath:    dataObjects[i].Value.ExtPath,    // Preserve external storage reference
 			}
-			processedDAs = append(processedDAs, newKeyValue)
-		} else {
-			processedDAs = append(processedDAs, keyValue)
 		}
 	}
-	return processedDAs, nil
+	return dataObjects, nil
 }
