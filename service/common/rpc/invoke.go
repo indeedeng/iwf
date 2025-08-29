@@ -31,6 +31,9 @@ func InvokeWorkerRpc(
 	})
 
 	err := blobstore.LoadDataObjectsFromExternalStorage(ctx, rpcPrep.DataObjects, blobStore)
+	if err != nil {
+		return nil, handleWorkerRpcResponseError(err, nil)
+	}
 
 	rpcCtx, cancel := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.TimeoutSeconds, apiMaxSeconds)
 	defer cancel()
