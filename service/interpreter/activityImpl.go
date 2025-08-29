@@ -508,7 +508,7 @@ func processNextStateInputForExternalStorage(ctx context.Context, nextStateInput
 	blobStore := env.GetBlobStore()
 
 	// Check if external storage is needed
-	if nextStateInput.Data == nil || len(*nextStateInput.Data) <= env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
+	if nextStateInput == nil || nextStateInput.Data == nil || len(*nextStateInput.Data) <= env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
 		return nil
 	}
 
