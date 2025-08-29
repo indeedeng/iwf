@@ -97,7 +97,7 @@ func doTestWorkflowWithS3StartInput(t *testing.T, backendType service.BackendTyp
 	assertions.Equal(*s1DecideInput.Encoding, "json", "S1_decide_input encoding should match")
 	assertions.Nil(s1DecideInput.ExtStoreId)
 	assertions.Nil(s1DecideInput.ExtPath)
-	
+
 	assertions.Equal(history["S1_start"], int64(1), "S1_start is not equal")
 	assertions.Equal(history["S1_decide"], int64(1), "S1_decide is not equal")
 
