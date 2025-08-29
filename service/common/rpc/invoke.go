@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"io"
+	"net/http"
+
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -12,8 +15,6 @@ import (
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/common/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 func InvokeWorkerRpc(
@@ -103,7 +104,7 @@ func handleWorkerRpcResponseError(err error, httpResp *http.Response) *errors.Er
 	var workerError iwfidl.WorkerErrorResponse
 	if httpResp != nil {
 		originalStatusCode = httpResp.StatusCode
-		body, err := ioutil.ReadAll(httpResp.Body)
+		body, err := io.ReadAll(httpResp.Body)
 		if err != nil {
 			detailedMessage = "cannot read body from http response"
 		} else {
