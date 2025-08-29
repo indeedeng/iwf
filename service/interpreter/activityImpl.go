@@ -467,12 +467,6 @@ func InvokeWorkerRpc(
 	logger := provider.GetLogger(ctx)
 	logger.Info("InvokeWorkerRpcActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
-	// Load data objects from external storage before sending to worker
-	err := blobstore.LoadDataObjectsFromExternalStorage(ctx, rpcPrep.DataObjects, env.GetBlobStore())
-	if err != nil {
-		return nil, err
-	}
-
 	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
 
 	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage)

@@ -5,9 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"io/ioutil"
-	"net/http"
-
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -15,6 +12,8 @@ import (
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/common/utils"
+	"io/ioutil"
+	"net/http"
 )
 
 func InvokeWorkerRpc(
