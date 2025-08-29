@@ -187,7 +187,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 		}
 		// 1. check the size of the input is larger than the threshold
-		if len(*input.StateInput.Data) > s.config.ExternalStorage.ThresholdInBytes {
+		if input.StateInput != nil && len(input.StateInput.GetData()) > s.config.ExternalStorage.ThresholdInBytes {
 			// 2. if it is, upload the input to S3
 			storeId, path, err := s.store.WriteObject(ctx, req.GetWorkflowId(), input.StateInput.GetData())
 			if err != nil {
