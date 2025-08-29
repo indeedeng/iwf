@@ -20,12 +20,12 @@ func TestRpcExternalStorageNonLockingTemporal(t *testing.T) {
 	doTestRpcExternalStorage(t, service.BackendTypeTemporal, false)
 }
 
-// func TestRpcExternalStorageSynchronousUpdateTemporal(t *testing.T) {
-// 	if !*temporalIntegTest {
-// 		t.Skip()
-// 	}
-// 	doTestRpcExternalStorage(t, service.BackendTypeTemporal, true)
-// }
+func TestRpcExternalStorageSynchronousUpdateTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	doTestRpcExternalStorage(t, service.BackendTypeTemporal, true)
+}
 
 func TestRpcExternalStorageNonLockingCadence(t *testing.T) {
 	if !*cadenceIntegTest {
@@ -76,8 +76,8 @@ func doTestRpcExternalStorage(t *testing.T, backendType service.BackendType, use
 	}).Execute()
 	failTestAtHttpError(err, httpResp, t)
 
-	// Wait for workflow to initialize
-	time.Sleep(time.Second * 2)
+	// Wait briefly for workflow to initialize
+	time.Sleep(time.Millisecond * 500)
 
 	var loadingPolicy *iwfidl.PersistenceLoadingPolicy
 	if useLocking {
@@ -101,8 +101,7 @@ func doTestRpcExternalStorage(t *testing.T, backendType service.BackendType, use
 	}
 
 	// Test 1: Make RPC call to test external storage loading functionality
-	// Note: The RPC call may fail because the workflow completes quickly,
-	// but the worker will still be invoked and we can verify it received the correct data
+	// The workflow waits for this RPC call to send an internal signal to close it
 	reqRpc := apiClient.DefaultApi.ApiV1WorkflowRpcPost(context.Background())
 	rpcResp, httpResp, err := reqRpc.WorkflowRpcRequest(iwfidl.WorkflowRpcRequest{
 		WorkflowId:                  wfId,
@@ -112,17 +111,12 @@ func doTestRpcExternalStorage(t *testing.T, backendType service.BackendType, use
 		TimeoutSeconds:              iwfidl.PtrInt32(10),
 	}).Execute()
 
-	// The RPC might fail if the workflow completed too quickly, but that's okay for this test
-	// The important thing is that the worker was called and received the right data
-	if err == nil {
-		// Verify RPC response if it succeeded
-		assertions.Equal(&iwfidl.WorkflowRpcResponse{
-			Output: &rpcStorage.TestOutput,
-		}, rpcResp)
-		t.Logf("✅ RPC call succeeded")
-	} else {
-		t.Logf("ℹ️  RPC call failed (expected if workflow completed quickly): %v", err)
-	}
+	// The RPC should succeed since the workflow waits for it
+	failTestAtHttpError(err, httpResp, t)
+	assertions.Equal(&iwfidl.WorkflowRpcResponse{
+		Output: &rpcStorage.TestOutput,
+	}, rpcResp)
+	t.Logf("✅ RPC call succeeded and sent signal to close workflow")
 
 	// Give a moment for the worker handler to be called and store test data
 	time.Sleep(time.Millisecond * 100)
@@ -156,7 +150,7 @@ func doTestRpcExternalStorage(t *testing.T, backendType service.BackendType, use
 
 	t.Logf("✅ External storage functionality verified: RPC handler received actual data content, proving that large data was correctly loaded from external storage")
 
-	// The workflow should complete automatically after setting up initial data
+	// The workflow should complete after the RPC sent the internal signal
 	// Wait for workflow to complete
 	reqWait := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
 	respWait, httpResp, err := reqWait.WorkflowGetRequest(iwfidl.WorkflowGetRequest{

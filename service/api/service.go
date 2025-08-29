@@ -720,16 +720,9 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 		})
 	}()
 
-	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds)
+	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds, s.store, s.config.ExternalStorage)
 	if retError != nil {
 		return nil, retError
-	}
-
-	if resp.UpsertDataAttributes != nil && s.config.ExternalStorage.Enabled {
-		resp.UpsertDataAttributes, err = s.writeDataObjectsToExternalStorage(ctx, resp.UpsertDataAttributes, req.GetWorkflowId())
-		if err != nil {
-			return nil, s.handleError(err, WorkflowRpcApiPath, req.GetWorkflowId())
-		}
 	}
 
 	decision := resp.GetStateDecision()
@@ -939,10 +932,6 @@ func (s *serviceImpl) writeDataObjectsToExternalStorage(ctx context.Context, dat
 
 // loadDataObjectsFromExternalStorage loads data from external storage for data objects that have external storage references
 func (s *serviceImpl) loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) ([]iwfidl.KeyValue, error) {
-	if !s.config.ExternalStorage.Enabled {
-		return dataObjects, nil
-	}
-
 	for i := range dataObjects {
 		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil && dataObjects[i].Value.ExtPath != nil {
 			data, err := s.store.ReadObject(ctx, *dataObjects[i].Value.ExtStoreId, *dataObjects[i].Value.ExtPath)

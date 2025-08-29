@@ -64,7 +64,7 @@ func StateApiWaitUntil(
 	}
 
 	// Load data attributes from external storage
-	err = loadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects)
+	err = blobstore.LoadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects, env.GetBlobStore())
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func StateApiWaitUntil(
 	}
 
 	if env.GetSharedConfig().ExternalStorage.Enabled {
-		resp.UpsertDataObjects, err = writeDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID)
+		err = blobstore.WriteDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID, env.GetSharedConfig().ExternalStorage.ThresholdInBytes, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage.Enabled)
 		if err != nil {
 			return nil, err
 		}
@@ -192,7 +192,7 @@ func StateApiExecute(
 	}
 
 	// Load data attributes from external storage
-	err = loadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects)
+	err = blobstore.LoadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects, env.GetBlobStore())
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func StateApiExecute(
 		if err != nil {
 			return nil, err
 		}
-		resp.UpsertDataObjects, err = writeDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID)
+		err = blobstore.WriteDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID, env.GetSharedConfig().ExternalStorage.ThresholdInBytes, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage.Enabled)
 		if err != nil {
 			return nil, err
 		}
@@ -468,37 +468,18 @@ func InvokeWorkerRpc(
 	logger.Info("InvokeWorkerRpcActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
 	// Load data objects from external storage before sending to worker
-	err := loadDataObjectsFromExternalStorage(ctx, rpcPrep.DataObjects)
+	err := blobstore.LoadDataObjectsFromExternalStorage(ctx, rpcPrep.DataObjects, env.GetBlobStore())
 	if err != nil {
 		return nil, err
 	}
 
 	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
 
-	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds)
+	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage)
 	return &interfaces.InvokeRpcActivityOutput{
 		RpcOutput:   resp,
 		StatusError: statusErr,
 	}, nil
-}
-
-func writeDataObjectsToExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue, workflowId string) ([]iwfidl.KeyValue, error) {
-	blobStore := env.GetBlobStore()
-
-	for i := range dataObjects {
-		if dataObjects[i].Value != nil && dataObjects[i].Value.Data != nil &&
-			len(*dataObjects[i].Value.Data) > env.GetSharedConfig().ExternalStorage.ThresholdInBytes {
-			// Save data to external storage
-			storeId, path, writeErr := blobStore.WriteObject(ctx, workflowId, *dataObjects[i].Value.Data)
-			if writeErr != nil {
-				return nil, writeErr
-			}
-			dataObjects[i].Value.ExtStoreId = &storeId
-			dataObjects[i].Value.ExtPath = &path
-			dataObjects[i].Value.Data = nil // Clear data since it's now in external storage
-		}
-	}
-	return dataObjects, nil
 }
 
 func writeNextStateInputsToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInputCopy *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {
@@ -566,18 +547,6 @@ func loadStateInputFromExternalStorage(ctx context.Context, input *iwfidl.Encode
 		ExtPath:    &extPath,
 	}
 	return &newEncodedObject, nil
-}
-
-func loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) error {
-	for i := range dataObjects {
-		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil {
-			err := doLoadFromExternalStorage(ctx, dataObjects[i].Value)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 // doLoadFromExternalStorage loads data from external storage and replace the fields of the input

@@ -4,17 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	"io/ioutil"
+	"net/http"
+
+	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
+	"github.com/indeedeng/iwf/service/common/blobstore"
 	"github.com/indeedeng/iwf/service/common/errors"
 	"github.com/indeedeng/iwf/service/common/urlautofix"
 	"github.com/indeedeng/iwf/service/common/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 func InvokeWorkerRpc(
-	ctx context.Context, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest, apiMaxSeconds int64,
+	ctx context.Context, rpcPrep *service.PrepareRpcQueryResponse, req iwfidl.WorkflowRpcRequest, apiMaxSeconds int64, blobStore blobstore.BlobStore, externalStorageConfig config.ExternalStorageConfig,
 ) (*iwfidl.WorkflowWorkerRpcResponse, *errors.ErrorAndStatus) {
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(rpcPrep.IwfWorkerUrl)
 	// invoke worker rpc
@@ -25,6 +29,8 @@ func InvokeWorkerRpc(
 			},
 		},
 	})
+
+	err := blobstore.LoadDataObjectsFromExternalStorage(ctx, rpcPrep.DataObjects, blobStore)
 
 	rpcCtx, cancel := utils.TrimContextByTimeoutWithCappedDDL(ctx, req.TimeoutSeconds, apiMaxSeconds)
 	defer cancel()
@@ -68,6 +74,14 @@ func InvokeWorkerRpc(
 	if decision.HasConditionalClose() {
 		return nil, handleWorkerRpcResponseError(fmt.Errorf("closing workflow in RPC is not supported yet"), nil)
 	}
+
+	if resp.UpsertDataAttributes != nil {
+		err = blobstore.WriteDataObjectsToExternalStorage(ctx, resp.UpsertDataAttributes, req.WorkflowId, externalStorageConfig.ThresholdInBytes, blobStore, externalStorageConfig.Enabled)
+		if err != nil {
+			return nil, handleWorkerRpcResponseError(err, nil)
+		}
+	}
+
 	for _, st := range decision.GetNextStates() {
 		if service.ValidClosingWorkflowStateId[st.GetStateId()] {
 			// TODO this need more work in workflow to support

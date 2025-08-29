@@ -126,7 +126,7 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 			}
 		}
 
-		// Update data attributes with new values
+		// Update data attributes with new values and send signal to close workflow
 		c.JSON(http.StatusOK, iwfidl.WorkflowWorkerRpcResponse{
 			Output: &TestOutput,
 			UpsertDataAttributes: []iwfidl.KeyValue{
@@ -137,6 +137,15 @@ func (h *handler) ApiV1WorkflowWorkerRpc(c *gin.Context, t *testing.T) {
 				{
 					Key:   iwfidl.PtrString(LargeDataKey),
 					Value: &LargeDataValue,
+				},
+			},
+			PublishToInterStateChannel: []iwfidl.InterStateChannelPublishing{
+				{
+					ChannelName: "close-workflow",
+					Value: &iwfidl.EncodedObject{
+						Encoding: iwfidl.PtrString("json"),
+						Data:     iwfidl.PtrString("\"close\""),
+					},
 				},
 			},
 		})
@@ -160,10 +169,15 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 	}
 
 	if req.GetWorkflowStateId() == State1 {
-		// Set up initial data attributes
+		// Set up initial data attributes and wait for internal signal
 		c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
 			CommandRequest: &iwfidl.CommandRequest{
 				DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
+				InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+					{
+						ChannelName: "close-workflow",
+					},
+				},
 			},
 			UpsertDataObjects: []iwfidl.KeyValue{
 				{
@@ -206,17 +220,24 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 	}
 
 	if req.GetWorkflowStateId() == State1 {
-		// Initially complete the workflow - RPC calls will be tested separately
-		// This simplifies the test to focus on external storage functionality
-		c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
-			StateDecision: &iwfidl.StateDecision{
-				NextStates: []iwfidl.StateMovement{
-					{
-						StateId: service.GracefulCompletingWorkflowStateId,
+		// Only complete workflow when we receive the close-workflow signal
+		if req.CommandResults != nil &&
+			req.CommandResults.InterStateChannelResults != nil &&
+			len(req.CommandResults.InterStateChannelResults) > 0 {
+			// We received the internal signal to close workflow
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: service.GracefulCompletingWorkflowStateId,
+						},
 					},
 				},
-			},
-		})
+			})
+		} else {
+			// Should not happen - wait until signal is received
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Expected internal signal"})
+		}
 		return
 	}
 
