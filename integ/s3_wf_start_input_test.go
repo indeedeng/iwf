@@ -83,14 +83,20 @@ func doTestWorkflowWithS3StartInput(t *testing.T, backendType service.BackendTyp
 
 	_, history := wfHandler.GetTestResult()
 
-	assertions.Equal(history["S1_start_input"], iwfidl.EncodedObject{
-		Encoding: iwfidl.PtrString("json"),
-		Data:     iwfidl.PtrString("\"12345678901\""),
-	}, "S1_start_input is not equal")
-	assertions.Equal(history["S1_decide_input"], iwfidl.EncodedObject{
-		Encoding: iwfidl.PtrString("json"),
-		Data:     iwfidl.PtrString("\"12345678901\""),
-	}, "S1_decide_input is not equal")
+	// The handler should receive objects with both the loaded data AND preserved external storage references
+	s1StartInput := history["S1_start_input"].(iwfidl.EncodedObject)
+	s1DecideInput := history["S1_decide_input"].(iwfidl.EncodedObject)
+
+	// Verify the data content is correct
+	assertions.Equal(*s1StartInput.Data, "\"12345678901\"", "S1_start_input data should match")
+	assertions.Equal(*s1StartInput.Encoding, "json", "S1_start_input encoding should match")
+	assertions.Nil(s1StartInput.ExtStoreId)
+	assertions.Nil(s1StartInput.ExtPath)
+
+	assertions.Equal(*s1DecideInput.Data, "\"12345678901\"", "S1_decide_input data should match")
+	assertions.Equal(*s1DecideInput.Encoding, "json", "S1_decide_input encoding should match")
+	assertions.Nil(s1DecideInput.ExtStoreId)
+	assertions.Nil(s1DecideInput.ExtPath)
 
 	assertions.Equal(history["S1_start"], int64(1), "S1_start is not equal")
 	assertions.Equal(history["S1_decide"], int64(1), "S1_decide is not equal")
