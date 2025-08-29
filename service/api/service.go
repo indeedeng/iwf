@@ -118,29 +118,9 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 
 		// inject some code to upload the large input to S3 and replace the input
 		if s.config.ExternalStorage.Enabled {
-			processedDAs := make([]iwfidl.KeyValue, 0, len(initCustomDAs))
-			for _, keyValue := range initCustomDAs {
-				// 1. check the size of the input is larger than the threshold
-				if len(*keyValue.Value.Data) > s.config.ExternalStorage.ThresholdInBytes {
-					// 2. if it is, upload the input to S3
-					storeId, path, err := s.store.WriteObject(ctx, req.GetWorkflowId(), *keyValue.Value.Data)
-					if err != nil {
-						return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
-					}
-					// 3. replace the input with the S3 object
-					newKeyValue := iwfidl.KeyValue{
-						Key: keyValue.Key,
-						Value: &iwfidl.EncodedObject{
-							ExtStoreId: iwfidl.PtrString(storeId),
-							ExtPath:    iwfidl.PtrString(path),
-							Encoding:   iwfidl.PtrString(*keyValue.Value.Encoding),
-						},
-					}
-					processedDAs = append(processedDAs, newKeyValue)
-				} else {
-					// Keep the original if it doesn't exceed threshold
-					processedDAs = append(processedDAs, keyValue)
-				}
+			processedDAs, err := s.writeDataObjectsToExternalStorage(ctx, initCustomDAs, req.GetWorkflowId())
+			if err != nil {
+				return nil, s.handleError(err, WorkflowStartApiPath, req.GetWorkflowId())
 			}
 			initCustomDAs = processedDAs
 		}
@@ -740,7 +720,7 @@ func (s *serviceImpl) ApiV1WorkflowRpcPost(
 		})
 	}()
 
-	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds)
+	resp, retError := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, s.config.Api.MaxWaitSeconds, s.store, s.config.ExternalStorage)
 	if retError != nil {
 		return nil, retError
 	}
@@ -952,10 +932,6 @@ func (s *serviceImpl) writeDataObjectsToExternalStorage(ctx context.Context, dat
 
 // loadDataObjectsFromExternalStorage loads data from external storage for data objects that have external storage references
 func (s *serviceImpl) loadDataObjectsFromExternalStorage(ctx context.Context, dataObjects []iwfidl.KeyValue) ([]iwfidl.KeyValue, error) {
-	if !s.config.ExternalStorage.Enabled {
-		return dataObjects, nil
-	}
-
 	for i := range dataObjects {
 		if dataObjects[i].Value != nil && dataObjects[i].Value.ExtStoreId != nil && dataObjects[i].Value.ExtPath != nil {
 			data, err := s.store.ReadObject(ctx, *dataObjects[i].Value.ExtStoreId, *dataObjects[i].Value.ExtPath)
