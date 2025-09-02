@@ -11,9 +11,13 @@ RUN apt-get update \
 
 RUN curl -sSf https://temporal.download/cli.sh | sh
 
+# Install MinIO
+RUN curl -sSf https://dl.min.io/server/minio/release/linux-amd64/minio -o /usr/local/bin/minio && \
+    chmod +x /usr/local/bin/minio
+
 RUN rm -rf iwf-server && \
     make bins && \
     chmod +x /iwf/lite/start-lite-server.sh
 
-EXPOSE  8801 7233 8233
+EXPOSE  8801 7233 8233 9000 9001
 CMD ["/iwf/lite/start-lite-server.sh"]
