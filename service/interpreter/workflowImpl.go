@@ -593,9 +593,10 @@ func processStateExecution(
 		completedCmds := resumeStateRequest.StateExecutionCompletedCommands
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds = completedCmds.CompletedTimerCommands, completedCmds.CompletedSignalCommands, completedCmds.CompletedInterStateChannelCommands
 
-		if IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
-			fmt.Printf("go to execute")
-		}
+		// this fix would work but may not be enough for other cases
+		//if IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
+		//	fmt.Printf("go to execute")
+		//}
 	} else {
 		if state.StateOptions != nil {
 			startApiTimeout := compatibility.GetStartApiTimeoutSeconds(state.StateOptions)
@@ -689,6 +690,9 @@ func processStateExecution(
 		stateExecutionLocal = startResponse.GetUpsertStateLocals()
 	}
 
+	// all the sub threads need to be completed for the state
+	waitForThreadNames := map[string]bool{}
+
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.AddTimers(stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
 		for idx, cmd := range commandReq.GetTimerCommands() {
@@ -698,7 +702,9 @@ func processStateExecution(
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
 			//Start timer in a new thread
-			provider.GoNamed(cmdCtx, getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx), func(ctx interfaces.UnifiedContext) {
+			threadName := getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx)
+			waitForThreadNames[threadName] = false
+			provider.GoNamed(cmdCtx, threadName, func(ctx interfaces.UnifiedContext) {
 				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
 					panic("critical code bug")
@@ -711,6 +717,7 @@ func processStateExecution(
 				if status == service.TimerSkipped || status == service.TimerFired {
 					completedTimerCmds[idx] = status
 				}
+				waitForThreadNames[threadName] = true
 			})
 		}
 	}
@@ -724,7 +731,9 @@ func processStateExecution(
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			//Process signal in new thread
-			provider.GoNamed(cmdCtx, getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx), func(ctx interfaces.UnifiedContext) {
+			threadName := getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx)
+			waitForThreadNames[threadName] = false
+			provider.GoNamed(cmdCtx, threadName, func(ctx interfaces.UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
 				if !ok {
 					panic("critical code bug")
@@ -744,6 +753,7 @@ func processStateExecution(
 				if received {
 					completedSignalCmds[idx] = signalReceiver.Retrieve(cmd.SignalChannelName)
 				}
+				waitForThreadNames[threadName] = true
 			})
 		}
 	}
@@ -757,7 +767,9 @@ func processStateExecution(
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			//Process interstate channel command in a new thread.
-			provider.GoNamed(cmdCtx, getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx), func(ctx interfaces.UnifiedContext) {
+			threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
+			waitForThreadNames[threadName] = false
+			provider.GoNamed(cmdCtx, threadName, func(ctx interfaces.UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
 				if !ok {
 					panic("critical code bug")
@@ -779,6 +791,7 @@ func processStateExecution(
 				if received {
 					completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
 				}
+				waitForThreadNames[threadName] = true
 			})
 		}
 	}
@@ -793,39 +806,19 @@ func processStateExecution(
 
 	commandReqDoneOrCanceled = true
 	// wait for all command threads to complete (timerCommands + signalCommands + internalChannelCommands)
-	if len(commandReq.GetTimerCommands()) > 0 {
-		for idx, cmd := range commandReq.GetTimerCommands() {
-			threadName := getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx)
-			if globalVersioner.IsAfterWaitingCommandSubThreads() {
-				if err := provider.WaitForThreadByName(ctx, threadName); err != nil {
-					return nil, service.WaitingCommandsStateExecutionStatus, err
-				}
-			}
 
-		}
-	}
-
-	if len(commandReq.GetSignalCommands()) > 0 {
-		for idx, cmd := range commandReq.GetSignalCommands() {
-			threadName := getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx)
-			if globalVersioner.IsAfterWaitingCommandSubThreads() {
-				if err := provider.WaitForThreadByName(ctx, threadName); err != nil {
-					return nil, service.WaitingCommandsStateExecutionStatus, err
-				}
+	//if globalVersioner.IsAfterWaitingCommandSubThreads() {
+	if err := provider.Await(ctx, func() bool {
+		for _, completed := range waitForThreadNames {
+			if !completed {
+				return false
 			}
 		}
+		return true
+	}); err != nil {
+		return nil, service.WaitingCommandsStateExecutionStatus, err
 	}
-
-	if len(commandReq.GetInterStateChannelCommands()) > 0 {
-		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
-			threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
-			if globalVersioner.IsAfterWaitingCommandSubThreads() {
-				if err := provider.WaitForThreadByName(ctx, threadName); err != nil {
-					return nil, service.WaitingCommandsStateExecutionStatus, err
-				}
-			}
-		}
-	}
+	//}
 
 	if !IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
 		// this means continueAsNewCounter.IsThresholdMet == true
