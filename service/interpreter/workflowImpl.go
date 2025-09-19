@@ -3,6 +3,8 @@ package interpreter
 import (
 	"context"
 	"fmt"
+	"time"
+
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -12,7 +14,6 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"github.com/indeedeng/iwf/service/interpreter/timers"
-	"time"
 
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"golang.org/x/exp/slices"
@@ -591,6 +592,10 @@ func processStateExecution(
 		commandReq = resumeStateRequest.CommandRequest
 		completedCmds := resumeStateRequest.StateExecutionCompletedCommands
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds = completedCmds.CompletedTimerCommands, completedCmds.CompletedSignalCommands, completedCmds.CompletedInterStateChannelCommands
+
+		if IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
+			fmt.Printf("go to execute")
+		}
 	} else {
 		if state.StateOptions != nil {
 			startApiTimeout := compatibility.GetStartApiTimeoutSeconds(state.StateOptions)
@@ -785,7 +790,43 @@ func processStateExecution(
 	_ = provider.Await(ctx, func() bool {
 		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
 	})
+
 	commandReqDoneOrCanceled = true
+	// wait for all command threads to complete (timerCommands + signalCommands + internalChannelCommands)
+	if len(commandReq.GetTimerCommands()) > 0 {
+		for idx, cmd := range commandReq.GetTimerCommands() {
+			threadName := getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx)
+			if globalVersioner.IsAfterWaitingCommandSubThreads() {
+				if err := provider.WaitForThreadByName(ctx, threadName); err != nil {
+					return nil, service.WaitingCommandsStateExecutionStatus, err
+				}
+			}
+
+		}
+	}
+
+	if len(commandReq.GetSignalCommands()) > 0 {
+		for idx, cmd := range commandReq.GetSignalCommands() {
+			threadName := getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx)
+			if globalVersioner.IsAfterWaitingCommandSubThreads() {
+				if err := provider.WaitForThreadByName(ctx, threadName); err != nil {
+					return nil, service.WaitingCommandsStateExecutionStatus, err
+				}
+			}
+		}
+	}
+
+	if len(commandReq.GetInterStateChannelCommands()) > 0 {
+		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
+			threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
+			if globalVersioner.IsAfterWaitingCommandSubThreads() {
+				if err := provider.WaitForThreadByName(ctx, threadName); err != nil {
+					return nil, service.WaitingCommandsStateExecutionStatus, err
+				}
+			}
+		}
+	}
+
 	if !IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
 		// this means continueAsNewCounter.IsThresholdMet == true
 		// not using continueAsNewCounter.IsThresholdMet because deciderTrigger is higher prioritized

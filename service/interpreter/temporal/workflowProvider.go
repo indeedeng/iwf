@@ -2,9 +2,10 @@ package temporal
 
 import (
 	"errors"
+	"time"
+
 	"github.com/indeedeng/iwf/service/common/mapper"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
-	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
 	"github.com/indeedeng/iwf/service"
@@ -187,6 +188,19 @@ func (w *workflowProvider) GoNamed(
 		w.threadCount--
 	}
 	workflow.GoNamed(wfCtx, name, f2)
+}
+
+func (w *workflowProvider) WaitForThreadByName(ctx interfaces.UnifiedContext, name string) error {
+	wfCtx, ok := ctx.GetContext().(workflow.Context)
+	if !ok {
+		panic("cannot convert to temporal workflow context")
+	}
+	return workflow.Await(wfCtx, func() bool {
+		_, ok := w.pendingThreadNames[name]
+		// when the threadName doesn't exist in the map anymore
+		// it means the thread has completed
+		return !ok
+	})
 }
 
 func (w *workflowProvider) GetPendingThreadNames() map[string]int {

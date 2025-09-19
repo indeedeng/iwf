@@ -114,6 +114,7 @@ type WorkflowProvider interface {
 	GoNamed(ctx UnifiedContext, name string, f func(ctx UnifiedContext))
 	GetThreadCount() int
 	GetPendingThreadNames() map[string]int
+	WaitForThreadByName(ctx UnifiedContext, name string) error
 	Await(ctx UnifiedContext, condition func() bool) error
 	WithActivityOptions(ctx UnifiedContext, options ActivityOptions) UnifiedContext
 	ExecuteActivity(
