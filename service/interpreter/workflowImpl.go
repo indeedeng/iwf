@@ -3,6 +3,8 @@ package interpreter
 import (
 	"context"
 	"fmt"
+	"time"
+
 	uclient "github.com/indeedeng/iwf/service/client"
 	"github.com/indeedeng/iwf/service/common/event"
 	"github.com/indeedeng/iwf/service/common/ptr"
@@ -12,7 +14,6 @@ import (
 	"github.com/indeedeng/iwf/service/interpreter/env"
 	"github.com/indeedeng/iwf/service/interpreter/interfaces"
 	"github.com/indeedeng/iwf/service/interpreter/timers"
-	"time"
 
 	"github.com/indeedeng/iwf/service/common/compatibility"
 	"golang.org/x/exp/slices"
@@ -684,6 +685,8 @@ func processStateExecution(
 		stateExecutionLocal = startResponse.GetUpsertStateLocals()
 	}
 
+	waitForThreads := map[string]bool{}
+
 	if len(commandReq.GetTimerCommands()) > 0 {
 		timerProcessor.AddTimers(stateExeId, commandReq.GetTimerCommands(), completedTimerCmds)
 		for idx, cmd := range commandReq.GetTimerCommands() {
@@ -693,7 +696,9 @@ func processStateExecution(
 			}
 			cmdCtx := provider.ExtendContextWithValue(ctx, "idx", idx)
 			//Start timer in a new thread
-			provider.GoNamed(cmdCtx, getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx), func(ctx interfaces.UnifiedContext) {
+			threadName := getCommandThreadName("timer", stateExeId, cmd.GetCommandId(), idx)
+			waitForThreads[threadName] = false
+			provider.GoNamed(cmdCtx, threadName, func(ctx interfaces.UnifiedContext) {
 				idx, ok := provider.GetContextValue(ctx, "idx").(int)
 				if !ok {
 					panic("critical code bug")
@@ -706,6 +711,7 @@ func processStateExecution(
 				if status == service.TimerSkipped || status == service.TimerFired {
 					completedTimerCmds[idx] = status
 				}
+				waitForThreads[threadName] = true
 			})
 		}
 	}
@@ -719,7 +725,9 @@ func processStateExecution(
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			//Process signal in new thread
-			provider.GoNamed(cmdCtx, getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx), func(ctx interfaces.UnifiedContext) {
+			threadName := getCommandThreadName("signal", stateExeId, cmd.GetCommandId(), idx)
+			waitForThreads[threadName] = false
+			provider.GoNamed(cmdCtx, threadName, func(ctx interfaces.UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.SignalCommand)
 				if !ok {
 					panic("critical code bug")
@@ -739,6 +747,7 @@ func processStateExecution(
 				if received {
 					completedSignalCmds[idx] = signalReceiver.Retrieve(cmd.SignalChannelName)
 				}
+				waitForThreads[threadName] = true
 			})
 		}
 	}
@@ -752,6 +761,8 @@ func processStateExecution(
 			cmdCtx := provider.ExtendContextWithValue(ctx, "cmd", cmd)
 			cmdCtx = provider.ExtendContextWithValue(cmdCtx, "idx", idx)
 			//Process interstate channel command in a new thread.
+			threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
+			waitForThreads[threadName] = false
 			provider.GoNamed(cmdCtx, getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx), func(ctx interfaces.UnifiedContext) {
 				cmd, ok := provider.GetContextValue(ctx, "cmd").(iwfidl.InterStateChannelCommand)
 				if !ok {
@@ -774,7 +785,23 @@ func processStateExecution(
 				if received {
 					completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
 				}
+				waitForThreads[threadName] = true
 			})
+		}
+	}
+
+	// wait for all command threads to complete (timerCommands + signalCommands + internalChannelCommands) before taking a snapshot.
+
+	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() {
+		if err := provider.Await(ctx, func() bool {
+			for _, completed := range waitForThreads {
+				if !completed {
+					return false
+				}
+			}
+			return true
+		}); err != nil {
+			return nil, service.WaitingCommandsStateExecutionStatus, err
 		}
 	}
 
@@ -785,7 +812,9 @@ func processStateExecution(
 	_ = provider.Await(ctx, func() bool {
 		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
 	})
+
 	commandReqDoneOrCanceled = true
+
 	if !IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
 		// this means continueAsNewCounter.IsThresholdMet == true
 		// not using continueAsNewCounter.IsThresholdMet because deciderTrigger is higher prioritized
