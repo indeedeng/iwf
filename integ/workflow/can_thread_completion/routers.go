@@ -33,6 +33,7 @@ const (
 	State1       = "S1"
 	State2       = "S2"
 	State3       = "S3"
+	StateAnyCmd  = "StateAnyCmd" // Tests ANY_COMMAND_COMPLETED with CAN
 
 	testChannel    = "test-channel"
 	testSignal     = "test-signal"
@@ -129,6 +130,29 @@ func (h *handler) ApiV1WorkflowStateStart(c *gin.Context, t *testing.T) {
 						{
 							CommandId:                  ptr.Any("s3-timer-cmd"),
 							FiringUnixTimestampSeconds: ptr.Any(time.Now().Add(2 * time.Second).Unix()),
+						},
+					},
+				},
+			})
+			return
+		}
+
+		if req.GetWorkflowStateId() == StateAnyCmd {
+			// StateAnyCmd: Tests ANY_COMMAND_COMPLETED with long timer + quick signal
+			// This validates that we don't wait for the timer when signal completes
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateStartResponse{
+				CommandRequest: &iwfidl.CommandRequest{
+					DeciderTriggerType: iwfidl.ANY_COMMAND_COMPLETED.Ptr(), // ANY, not ALL!
+					TimerCommands: []iwfidl.TimerCommand{
+						{
+							CommandId:                  ptr.Any("any-cmd-timer"),
+							FiringUnixTimestampSeconds: ptr.Any(time.Now().Add(20 * time.Second).Unix()), // Long timer
+						},
+					},
+					SignalCommands: []iwfidl.SignalCommand{
+						{
+							CommandId:         ptr.Any("any-cmd-signal-cmd"),
+							SignalChannelName: "any-cmd-signal",
 						},
 					},
 				},
@@ -269,6 +293,53 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 			if !timerFired {
 				log.Println("ERROR: Timer should have fired in State3")
 				h.recordData("s3_timer_fired", false)
+			}
+
+			// Complete workflow
+			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
+				StateDecision: &iwfidl.StateDecision{
+					NextStates: []iwfidl.StateMovement{
+						{
+							StateId: service.GracefulCompletingWorkflowStateId,
+						},
+					},
+				},
+			})
+			return
+		}
+
+		if req.GetWorkflowStateId() == StateAnyCmd {
+			// Verify that with ANY_COMMAND_COMPLETED, we proceeded when signal was received
+			// without waiting for the long timer
+			cmdResults := req.GetCommandResults()
+
+			signalReceived := false
+			timerFired := false
+
+			if cmdResults.HasSignalResults() {
+				for _, sr := range cmdResults.GetSignalResults() {
+					if sr.GetSignalChannelName() == "any-cmd-signal" && sr.GetSignalRequestStatus() == iwfidl.RECEIVED {
+						signalReceived = true
+						h.recordData("any_cmd_signal_received", true)
+					}
+				}
+			}
+
+			if cmdResults.HasTimerResults() {
+				for _, tr := range cmdResults.GetTimerResults() {
+					if tr.GetCommandId() == "any-cmd-timer" && tr.GetTimerStatus() == iwfidl.FIRED {
+						timerFired = true
+					}
+				}
+			}
+
+			if !signalReceived {
+				log.Println("ERROR: Signal should have been received in StateAnyCmd (ANY_COMMAND_COMPLETED)")
+				h.recordData("any_cmd_signal_received", false)
+			}
+
+			if timerFired {
+				log.Println("WARNING: Timer fired in StateAnyCmd - this suggests we waited for it instead of proceeding with signal")
 			}
 
 			// Complete workflow

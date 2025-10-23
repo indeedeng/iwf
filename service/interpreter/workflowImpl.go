@@ -790,13 +790,46 @@ func processStateExecution(
 		}
 	}
 
-	// wait for all command threads to complete (timerCommands + signalCommands + internalChannelCommands) before taking a snapshot.
+	// Wait for decider trigger (ANY/ALL command completed) OR continue-as-new threshold
+	_ = provider.Await(ctx, func() bool {
+		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
+	})
 
 	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() {
+		// For any commands that have completed (have entries in completedXXXCmds), wait for
+		// their threads to finish storing the data (set waitForThreads = true).
+		// This ensures all completed command data is captured before snapshotting for CAN.
+		// We only wait for threads of completed commands, not all threads, which preserves
+		// ANY_COMMAND_COMPLETED semantics (doesn't wait for unfinished timers/signals).
 		if err := provider.Await(ctx, func() bool {
-			for _, completed := range waitForThreads {
-				if !completed {
-					return false
+			// For each timer command that completed (fired), wait for its thread to finish
+			for idx := range commandReq.GetTimerCommands() {
+				if _, ok := completedTimerCmds[idx]; ok {
+					threadName := getCommandThreadName("timer", stateExeId, commandReq.GetTimerCommands()[idx].GetCommandId(), idx)
+					// If the thread hasn't finished (waitForThreads not true), keep waiting
+					if !waitForThreads[threadName] {
+						return false
+					}
+				}
+			}
+			// For each signal command that completed (received), wait for its thread to finish
+			for idx := range commandReq.GetSignalCommands() {
+				if _, ok := completedSignalCmds[idx]; ok {
+					threadName := getCommandThreadName("signal", stateExeId, commandReq.GetSignalCommands()[idx].GetCommandId(), idx)
+					// If the thread hasn't finished (waitForThreads not true), keep waiting
+					if !waitForThreads[threadName] {
+						return false
+					}
+				}
+			}
+			// For each internal channel command that completed (received), wait for its thread to finish
+			for idx := range commandReq.GetInterStateChannelCommands() {
+				if _, ok := completedInterStateChannelCmds[idx]; ok {
+					threadName := getCommandThreadName("interstate", stateExeId, commandReq.GetInterStateChannelCommands()[idx].GetCommandId(), idx)
+					// If the thread hasn't finished (waitForThreads not true), keep waiting
+					if !waitForThreads[threadName] {
+						return false
+					}
 				}
 			}
 			return true
@@ -809,9 +842,6 @@ func processStateExecution(
 		stateExeId, state, stateExecutionLocal, commandReq,
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
 	)
-	_ = provider.Await(ctx, func() bool {
-		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
-	})
 
 	commandReqDoneOrCanceled = true
 

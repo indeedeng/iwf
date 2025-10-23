@@ -3,6 +3,7 @@ package integ
 import (
 	"context"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -55,6 +56,125 @@ func TestCANThreadCompletionCadence(t *testing.T) {
 		})
 		smallWaitForFastTest()
 	}
+}
+
+// TestAnyCommandCompletedWithCANTemporal validates the critical fix:
+// With ANY_COMMAND_COMPLETED, if one command completes and CAN is triggered,
+// we should NOT wait for other unfinished commands before proceeding to execute.
+// This test ensures we only wait for threads that have retrieved data.
+func TestAnyCommandCompletedWithCANTemporal(t *testing.T) {
+	if !*temporalIntegTest {
+		t.Skip()
+	}
+	doTestAnyCommandCompletedWithCAN(t, service.BackendTypeTemporal)
+}
+
+func TestAnyCommandCompletedWithCANCadence(t *testing.T) {
+	if !*cadenceIntegTest {
+		t.Skip()
+	}
+	doTestAnyCommandCompletedWithCAN(t, service.BackendTypeCadence)
+}
+
+func doTestAnyCommandCompletedWithCAN(t *testing.T, backendType service.BackendType) {
+	// Start test workflow server
+	wfHandler := can_thread_completion.NewHandler()
+	closeFunc1 := startWorkflowWorker(wfHandler, t)
+	defer closeFunc1()
+
+	closeFunc2 := startIwfService(backendType)
+	defer closeFunc2()
+
+	// Start a workflow
+	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
+		Servers: []iwfidl.ServerConfiguration{
+			{
+				URL: "http://localhost:" + testIwfServerPort,
+			},
+		},
+	})
+
+	wfId := "any_cmd_can_test_" + strconv.Itoa(int(time.Now().UnixNano()))
+
+	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
+	startTime := time.Now()
+	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
+		WorkflowId:             wfId,
+		IwfWorkflowType:        can_thread_completion.WorkflowType,
+		WorkflowTimeoutSeconds: 60,
+		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
+		StartStateId:           ptr.Any(can_thread_completion.StateAnyCmd),
+		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
+			WorkflowConfigOverride: &iwfidl.WorkflowConfig{
+				ContinueAsNewThreshold: ptr.Any(int32(1)), // Force CAN immediately
+			},
+		},
+	}).Execute()
+	failTestAtHttpError(err, httpResp, t)
+
+	// Send signal quickly (timer will take much longer)
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+		signalReq := apiClient.DefaultApi.ApiV1WorkflowSignalPost(context.Background())
+		httpResp, err := signalReq.WorkflowSignalRequest(iwfidl.WorkflowSignalRequest{
+			WorkflowId:        wfId,
+			SignalChannelName: "any-cmd-signal",
+			SignalValue: &iwfidl.EncodedObject{
+				Encoding: ptr.Any("json"),
+				Data:     ptr.Any("signal-data"),
+			},
+		}).Execute()
+		if err != nil {
+			t.Logf("Warning: Failed to send signal: %v", err)
+		}
+		if httpResp != nil && httpResp.StatusCode != 200 {
+			t.Logf("Warning: Signal returned non-200 status: %d", httpResp.StatusCode)
+		}
+	}()
+
+	assertions := assert.New(t)
+
+	// Wait for workflow to complete (with longer timeout since we're testing timing)
+	req2 := apiClient.DefaultApi.ApiV1WorkflowGetWithWaitPost(context.Background())
+	resp2, httpResp, err := req2.WorkflowGetRequest(iwfidl.WorkflowGetRequest{
+		WorkflowId:      wfId,
+		WaitTimeSeconds: ptr.Any(int32(20)), // Wait up to 20 seconds
+	}).Execute()
+	if err != nil {
+		assertions.False(strings.Contains(err.Error(), "420"), "Workflow took too long to complete, which means that ANY_COMMAND_COMPLETED command was not completed as expected. Most likely the command was also waiting for the timer command, when it can complete after receiving a signal.")
+	}
+	failTestAtHttpError(err, httpResp, t)
+
+	elapsedTime := time.Since(startTime)
+
+	// Get test results
+	history, data := wfHandler.GetTestResult()
+
+	// Verify StateAnyCmd executed
+	assertions.Equalf(map[string]int64{
+		"StateAnyCmd_start":  1,
+		"StateAnyCmd_decide": 1,
+	}, history, "State execution history mismatch: %v", history)
+
+	// Verify workflow completed successfully
+	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus(),
+		"Workflow should complete successfully")
+
+	// CRITICAL: Verify signal was received (proves ANY_COMMAND_COMPLETED triggered)
+	signalReceived, ok := data["any_cmd_signal_received"].(bool)
+	assertions.True(ok, "any_cmd_signal_received data should be present")
+	assertions.True(signalReceived,
+		"ANY_COMMAND_COMPLETED: Signal should have been received, triggering the Execute API")
+
+	// Verify we didn't wait for the long timer
+	// The timer is set for 20 seconds, but with ANY_COMMAND_COMPLETED + signal,
+	// the workflow should complete in ~1-2 seconds, not 20+
+	assertions.Less(elapsedTime, 5*time.Second,
+		"Workflow took %v, which suggests we waited for the long timer. "+
+			"With ANY_COMMAND_COMPLETED, we should proceed as soon as the signal is received, "+
+			"not wait for all threads.", elapsedTime)
+
+	t.Logf("✅ ANY_COMMAND_COMPLETED + CAN test passed in %v (expected < 5s, timer was 20s)", elapsedTime)
 }
 
 func doTestCANThreadCompletion(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
