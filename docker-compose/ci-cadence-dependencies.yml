@@ -52,10 +52,11 @@ services:
     networks:
       - testing-network
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
       interval: 5s
       timeout: 10s
-      retries: 10
+      retries: 20
+      start_period: 30s
   cadence:
     image: ubercadence/server:v1.2.16-auto-setup
     ports:
