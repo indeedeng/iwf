@@ -808,57 +808,58 @@ func processStateExecution(
 	// retrieved data will be lost (the thread retrieved it but never stored it before we read the maps).
 	// We only wait for threads of completed commands (those with entries in completedXXXCmds),
 	// not all threads, which preserves ANY_COMMAND_COMPLETED semantics.
-	//if globalVersioner.IsAfterVersionOfWaitingCommandThreads() &&
-	if err := provider.Await(ctx, func() bool {
-		// For each timer command that completed (fired), wait for its thread to finish
-		for idx := range commandReq.GetTimerCommands() {
-			status := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
-			if status == service.TimerSkipped || status == service.TimerFired {
-				threadName := getCommandThreadName("timer", stateExeId, commandReq.GetTimerCommands()[idx].GetCommandId(), idx)
-				// Check if thread exists (it won't exist if resumed from CAN)
-				threadCompleted, threadExists := waitForThreads[threadName]
-				if !threadExists {
-					continue // Skip - thread doesn't exist (resumed from CAN)
-				}
-				// If the thread hasn't finished, keep waiting
-				if !threadCompleted {
-					return false
-				}
-			}
-		}
-		// For each signal command that completed (received), wait for its thread to finish
-		for idx, cmd := range commandReq.GetSignalCommands() {
-			if signalReceiver.HasSignal(cmd.SignalChannelName) {
-				threadName := getCommandThreadName("signal", stateExeId, commandReq.GetSignalCommands()[idx].GetCommandId(), idx)
-				// Check if thread exists (it won't exist if resumed from CAN)
-				threadCompleted, threadExists := waitForThreads[threadName]
-				if !threadExists {
-					continue // Skip - thread doesn't exist (resumed from CAN)
-				}
-				// If the thread hasn't finished, keep waiting
-				if !threadCompleted {
-					return false
+	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() {
+		if err := provider.Await(ctx, func() bool {
+			// For each timer command that completed (fired), wait for its thread to finish
+			for idx := range commandReq.GetTimerCommands() {
+				status := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
+				if status == service.TimerSkipped || status == service.TimerFired {
+					threadName := getCommandThreadName("timer", stateExeId, commandReq.GetTimerCommands()[idx].GetCommandId(), idx)
+					// Check if thread exists (it won't exist if resumed from CAN)
+					threadCompleted, threadExists := waitForThreads[threadName]
+					if !threadExists {
+						continue // Skip - thread doesn't exist (resumed from CAN)
+					}
+					// If the thread hasn't finished, keep waiting
+					if !threadCompleted {
+						return false
+					}
 				}
 			}
-		}
-		// For each internal channel command that completed (received), wait for its thread to finish
-		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
-			if interStateChannel.HasData(cmd.ChannelName) {
-				threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
-				// Check if thread exists (it won't exist if resumed from CAN)
-				threadCompleted, threadExists := waitForThreads[threadName]
-				if !threadExists {
-					continue // Skip - thread doesn't exist (resumed from CAN)
-				}
-				// If the thread hasn't finished, keep waiting
-				if !threadCompleted {
-					return false
+			// For each signal command that completed (received), wait for its thread to finish
+			for idx, cmd := range commandReq.GetSignalCommands() {
+				if signalReceiver.HasSignal(cmd.SignalChannelName) {
+					threadName := getCommandThreadName("signal", stateExeId, commandReq.GetSignalCommands()[idx].GetCommandId(), idx)
+					// Check if thread exists (it won't exist if resumed from CAN)
+					threadCompleted, threadExists := waitForThreads[threadName]
+					if !threadExists {
+						continue // Skip - thread doesn't exist (resumed from CAN)
+					}
+					// If the thread hasn't finished, keep waiting
+					if !threadCompleted {
+						return false
+					}
 				}
 			}
+			// For each internal channel command that completed (received), wait for its thread to finish
+			for idx, cmd := range commandReq.GetInterStateChannelCommands() {
+				if interStateChannel.HasData(cmd.ChannelName) {
+					threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
+					// Check if thread exists (it won't exist if resumed from CAN)
+					threadCompleted, threadExists := waitForThreads[threadName]
+					if !threadExists {
+						continue // Skip - thread doesn't exist (resumed from CAN)
+					}
+					// If the thread hasn't finished, keep waiting
+					if !threadCompleted {
+						return false
+					}
+				}
+			}
+			return true
+		}); err != nil {
+			return nil, service.WaitingCommandsStateExecutionStatus, err
 		}
-		return true
-	}); err != nil {
-		return nil, service.WaitingCommandsStateExecutionStatus, err
 	}
 
 	if !IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
