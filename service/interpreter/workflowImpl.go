@@ -795,12 +795,14 @@ func processStateExecution(
 		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
 	})
 
-	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() {
-		// For any commands that have completed (have entries in completedXXXCmds), wait for
-		// their threads to finish storing the data (set waitForThreads = true).
-		// This ensures all completed command data is captured before snapshotting for CAN.
-		// We only wait for threads of completed commands, not all threads, which preserves
-		// ANY_COMMAND_COMPLETED semantics (doesn't wait for unfinished timers/signals).
+	// For any commands that have completed (have entries in completedXXXCmds), wait for
+	// their threads to finish storing the data (set waitForThreads = true).
+	// This is necessary because AddPotentialStateExecutionToResume is always called (below),
+	// and we need to ensure all completed command data is stored before snapshotting.
+	// We only wait for threads of completed commands, not all threads, which preserves
+	// ANY_COMMAND_COMPLETED semantics (doesn't wait for unfinished timers/signals).
+	// Skip this if we're resuming from CAN - the threads don't exist in the new run.
+	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() && !isResumeFromContinueAsNew {
 		if err := provider.Await(ctx, func() bool {
 			// For each timer command that completed (fired), wait for its thread to finish
 			for idx := range commandReq.GetTimerCommands() {

@@ -1,9 +1,10 @@
 package replayTests
 
 import (
+	"testing"
+
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"github.com/stretchr/testify/assert"
-	"testing"
 
 	"go.temporal.io/sdk/worker"
 )
@@ -29,6 +30,11 @@ var jsonHistoryFiles = []string{
 	"v8-activity-for-sync-updates-rpcs.json",
 	"v9-force-local-activity-for-sync-updates-rpcs.json",
 	"v9-pass-search-attributes-in-execute-activity.json",
+	"v10-command-thread-completion-CAN1.json",
+	"v10-command-thread-completion-CAN2.json",
+	"v10-command-thread-completion-wf-finish.json",
+	"v10-any-command-thread-completion-CAN1.json",
+	"v10-any-command-thread-completion-wf-finish.json",
 }
 
 func TestTemporalReplay(t *testing.T) {
