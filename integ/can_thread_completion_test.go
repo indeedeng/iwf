@@ -14,69 +14,69 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// CAN = Continue-As-New
-// TestCANThreadCompletionTemporal tests that all command threads complete before continue-as-new
-// snapshots state. This validates the fix for the bug where internal channel signals were lost
-// during continue-as-new.
+// TestCommandThreadCompletionTemporal tests that all command threads complete before
+// command results are assembled. This validates the fix for the bug where internal channel
+// signals were lost due to a race condition.
 //
 // The bug scenario:
 //  1. State1 WaitUntil sets up timer, signal, and internal channel commands
-//  2. State1 Execute publishes to internal channel and moves to State2
-//  3. Continue-as-new is triggered
-//  4. BEFORE THE FIX: The internal channel signal would be lost because AddPotentialStateExecutionToResume
-//     was called before waiting for command threads to complete
-//  5. AFTER THE FIX: We wait for all command threads to complete before snapshotting, so the signal is preserved
-func TestCANThreadCompletionTemporal(t *testing.T) {
+//  2. Command threads run in parallel, retrieving data (timer fires, signal received, channel retrieved)
+//  3. After the command request await completes, command threads may still be storing data in completedXXXCmds
+//  4. BEFORE THE FIX: Command results were assembled before threads finished storing data,
+//     causing retrieved data to be lost (never included in command results)
+//  5. AFTER THE FIX: We wait for command threads that have retrieved data to finish storing it
+//     in completedXXXCmds before assembling command results, ensuring no data is lost
+func TestCommandThreadCompletionTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestCANThreadCompletion(t, service.BackendTypeTemporal, nil)
+		doTestCommandThreadCompletion(t, service.BackendTypeTemporal, nil)
 		smallWaitForFastTest()
 
 		// Test with continue-as-new threshold set very low to force CAN during the workflow
-		doTestCANThreadCompletion(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
+		doTestCommandThreadCompletion(t, service.BackendTypeTemporal, &iwfidl.WorkflowConfig{
 			ContinueAsNewThreshold: ptr.Any(int32(1)), // Trigger CAN very quickly
 		})
 		smallWaitForFastTest()
 	}
 }
 
-func TestCANThreadCompletionCadence(t *testing.T) {
+func TestCommandThreadCompletionCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
 	for i := 0; i < *repeatIntegTest; i++ {
-		doTestCANThreadCompletion(t, service.BackendTypeCadence, nil)
+		doTestCommandThreadCompletion(t, service.BackendTypeCadence, nil)
 		smallWaitForFastTest()
 
 		// Test with continue-as-new threshold set very low to force CAN during the workflow
-		doTestCANThreadCompletion(t, service.BackendTypeCadence, &iwfidl.WorkflowConfig{
+		doTestCommandThreadCompletion(t, service.BackendTypeCadence, &iwfidl.WorkflowConfig{
 			ContinueAsNewThreshold: ptr.Any(int32(1)), // Trigger CAN very quickly
 		})
 		smallWaitForFastTest()
 	}
 }
 
-// TestAnyCommandCompletedWithCANTemporal validates the critical fix:
-// With ANY_COMMAND_COMPLETED, if one command completes and CAN is triggered,
-// we should NOT wait for other unfinished commands before proceeding to execute.
+// TestAnyCommandCompletedTemporal validates:
+// With ANY_COMMAND_COMPLETED, if one command completes, we should NOT wait for
+// other unfinished commands before proceeding to execute.
 // This test ensures we only wait for threads that have retrieved data.
-func TestAnyCommandCompletedWithCANTemporal(t *testing.T) {
+func TestAnyCommandCompletedTemporal(t *testing.T) {
 	if !*temporalIntegTest {
 		t.Skip()
 	}
-	doTestAnyCommandCompletedWithCAN(t, service.BackendTypeTemporal)
+	doTestAnyCommandCompleted(t, service.BackendTypeTemporal)
 }
 
-func TestAnyCommandCompletedWithCANCadence(t *testing.T) {
+func TestAnyCommandCompletedCadence(t *testing.T) {
 	if !*cadenceIntegTest {
 		t.Skip()
 	}
-	doTestAnyCommandCompletedWithCAN(t, service.BackendTypeCadence)
+	doTestAnyCommandCompleted(t, service.BackendTypeCadence)
 }
 
-func doTestAnyCommandCompletedWithCAN(t *testing.T, backendType service.BackendType) {
+func doTestAnyCommandCompleted(t *testing.T, backendType service.BackendType) {
 	// Start test workflow server
 	wfHandler := can_thread_completion.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler, t)
@@ -174,10 +174,10 @@ func doTestAnyCommandCompletedWithCAN(t *testing.T, backendType service.BackendT
 			"With ANY_COMMAND_COMPLETED, we should proceed as soon as the signal is received, "+
 			"not wait for all threads.", elapsedTime)
 
-	t.Logf("✅ ANY_COMMAND_COMPLETED + CAN test passed in %v (expected < 5s, timer was 20s)", elapsedTime)
+	t.Logf("✅ ANY_COMMAND_COMPLETED test passed in %v (expected < 5s, timer was 20s)", elapsedTime)
 }
 
-func doTestCANThreadCompletion(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
+func doTestCommandThreadCompletion(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// Start test workflow server
 	wfHandler := can_thread_completion.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler, t)
@@ -251,7 +251,7 @@ func doTestCANThreadCompletion(t *testing.T, backendType service.BackendType, co
 		"S2_decide": 1,
 		"S3_start":  1,
 		"S3_decide": 1,
-	}, history, "CAN thread completion test failed - state execution history mismatch: %v", history)
+	}, history, "Command thread completion test failed - state execution history mismatch: %v", history)
 
 	// Verify workflow completed successfully
 	assertions.Equal(iwfidl.COMPLETED, resp2.GetWorkflowStatus(),
@@ -282,7 +282,7 @@ func doTestCANThreadCompletion(t *testing.T, backendType service.BackendType, co
 
 	// ========== State2 Assertion: Continue-as-new preservation ==========
 
-	// THE KEY ASSERTION: Verify that the internal channel signal was preserved through CAN
+	// THE KEY ASSERTION: Verify that the internal channel signal was preserved through continue-as-new
 	s2ChannelReceived, ok := data["s2_channel_received"].(bool)
 	assertions.True(ok, "s2_channel_received data should be present")
 	assertions.True(s2ChannelReceived,

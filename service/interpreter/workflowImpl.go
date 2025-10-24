@@ -790,62 +790,76 @@ func processStateExecution(
 		}
 	}
 
-	// Wait for decider trigger (ANY/ALL command completed) OR continue-as-new threshold
-	_ = provider.Await(ctx, func() bool {
-		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
-	})
-
-	// For any commands that have completed (have entries in completedXXXCmds), wait for
-	// their threads to finish storing the data (set waitForThreads = true).
-	// This is necessary because AddPotentialStateExecutionToResume is always called (below),
-	// and we need to ensure all completed command data is stored before snapshotting.
-	// We only wait for threads of completed commands, not all threads, which preserves
-	// ANY_COMMAND_COMPLETED semantics (doesn't wait for unfinished timers/signals).
-	// Skip this if we're resuming from CAN - the threads don't exist in the new run.
-	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() && !isResumeFromContinueAsNew {
-		if err := provider.Await(ctx, func() bool {
-			// For each timer command that completed (fired), wait for its thread to finish
-			for idx := range commandReq.GetTimerCommands() {
-				if _, ok := completedTimerCmds[idx]; ok {
-					threadName := getCommandThreadName("timer", stateExeId, commandReq.GetTimerCommands()[idx].GetCommandId(), idx)
-					// If the thread hasn't finished (waitForThreads not true), keep waiting
-					if !waitForThreads[threadName] {
-						return false
-					}
-				}
-			}
-			// For each signal command that completed (received), wait for its thread to finish
-			for idx := range commandReq.GetSignalCommands() {
-				if _, ok := completedSignalCmds[idx]; ok {
-					threadName := getCommandThreadName("signal", stateExeId, commandReq.GetSignalCommands()[idx].GetCommandId(), idx)
-					// If the thread hasn't finished (waitForThreads not true), keep waiting
-					if !waitForThreads[threadName] {
-						return false
-					}
-				}
-			}
-			// For each internal channel command that completed (received), wait for its thread to finish
-			for idx := range commandReq.GetInterStateChannelCommands() {
-				if _, ok := completedInterStateChannelCmds[idx]; ok {
-					threadName := getCommandThreadName("interstate", stateExeId, commandReq.GetInterStateChannelCommands()[idx].GetCommandId(), idx)
-					// If the thread hasn't finished (waitForThreads not true), keep waiting
-					if !waitForThreads[threadName] {
-						return false
-					}
-				}
-			}
-			return true
-		}); err != nil {
-			return nil, service.WaitingCommandsStateExecutionStatus, err
-		}
-	}
-
 	continueAsNewer.AddPotentialStateExecutionToResume(
 		stateExeId, state, stateExecutionLocal, commandReq,
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
 	)
 
+	// Wait for decider trigger (ANY/ALL command completed) OR continue-as-new threshold
+	_ = provider.Await(ctx, func() bool {
+		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
+	})
+
 	commandReqDoneOrCanceled = true
+
+	// Wait for command threads to drain. After the command request await completes, command threads
+	// may still be in the process of storing retrieved data into completedXXXCmds maps.
+	// We must wait for these threads to finish before assembling command results, otherwise
+	// retrieved data will be lost (the thread retrieved it but never stored it before we read the maps).
+	// We only wait for threads of completed commands (those with entries in completedXXXCmds),
+	// not all threads, which preserves ANY_COMMAND_COMPLETED semantics.
+	//if globalVersioner.IsAfterVersionOfWaitingCommandThreads() &&
+	if err := provider.Await(ctx, func() bool {
+		// For each timer command that completed (fired), wait for its thread to finish
+		for idx := range commandReq.GetTimerCommands() {
+			status := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
+			if status == service.TimerSkipped || status == service.TimerFired {
+				threadName := getCommandThreadName("timer", stateExeId, commandReq.GetTimerCommands()[idx].GetCommandId(), idx)
+				// Check if thread exists (it won't exist if resumed from CAN)
+				threadCompleted, threadExists := waitForThreads[threadName]
+				if !threadExists {
+					continue // Skip - thread doesn't exist (resumed from CAN)
+				}
+				// If the thread hasn't finished, keep waiting
+				if !threadCompleted {
+					return false
+				}
+			}
+		}
+		// For each signal command that completed (received), wait for its thread to finish
+		for idx, cmd := range commandReq.GetSignalCommands() {
+			if signalReceiver.HasSignal(cmd.SignalChannelName) {
+				threadName := getCommandThreadName("signal", stateExeId, commandReq.GetSignalCommands()[idx].GetCommandId(), idx)
+				// Check if thread exists (it won't exist if resumed from CAN)
+				threadCompleted, threadExists := waitForThreads[threadName]
+				if !threadExists {
+					continue // Skip - thread doesn't exist (resumed from CAN)
+				}
+				// If the thread hasn't finished, keep waiting
+				if !threadCompleted {
+					return false
+				}
+			}
+		}
+		// For each internal channel command that completed (received), wait for its thread to finish
+		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
+			if interStateChannel.HasData(cmd.ChannelName) {
+				threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
+				// Check if thread exists (it won't exist if resumed from CAN)
+				threadCompleted, threadExists := waitForThreads[threadName]
+				if !threadExists {
+					continue // Skip - thread doesn't exist (resumed from CAN)
+				}
+				// If the thread hasn't finished, keep waiting
+				if !threadCompleted {
+					return false
+				}
+			}
+		}
+		return true
+	}); err != nil {
+		return nil, service.WaitingCommandsStateExecutionStatus, err
+	}
 
 	if !IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) {
 		// this means continueAsNewCounter.IsThresholdMet == true
