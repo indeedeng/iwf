@@ -78,7 +78,7 @@ services:
     networks:
       - testing-network
   kafka:
-    image: docker.io/bitnami/kafka:3.7
+    image: docker.io/bitnami/kafka:3.8
     hostname: kafka
     container_name: kafka
     ports:
