@@ -29,34 +29,32 @@ services:
     networks:
       - testing-network
   kafka:
-    image: apache/kafka:latest
+    image: docker.io/bitnamilegacy/kafka:3.7
     hostname: kafka
     container_name: kafka
     ports:
       - "9092:9092"
     environment:
       # KRaft settings
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_LISTENERS: 'PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_NUM_PARTITIONS: 3
-      CLUSTER_ID: 'ciKafkaCluster'
+      - "KAFKA_CFG_NODE_ID=0"
+      - "KAFKA_CFG_PROCESS_ROLES=controller,broker"
+      - "KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093"
+      # Listeners
+      - "KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093"
+      - "KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092"
+      - "KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      - "KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER"
+      - "KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT"
+      # Topic settings
+      - "KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true"
     networks:
       - testing-network
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
-      interval: 5s
-      timeout: 10s
-      retries: 20
-      start_period: 30s
+      test:
+        [ "CMD", "kafka-topics.sh", "--list", '--bootstrap-server', 'kafka:9092' ]
+      interval: 1s
+      timeout: 60s
+      retries: 60
   cadence:
     image: ubercadence/server:v1.2.16-auto-setup
     ports:
