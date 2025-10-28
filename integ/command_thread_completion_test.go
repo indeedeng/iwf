@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/indeedeng/iwf/gen/iwfidl"
-	"github.com/indeedeng/iwf/integ/workflow/can_thread_completion"
+	"github.com/indeedeng/iwf/integ/workflow/command_thread_completion"
 	"github.com/indeedeng/iwf/service"
 	"github.com/indeedeng/iwf/service/common/ptr"
 	"github.com/stretchr/testify/assert"
@@ -78,7 +78,7 @@ func TestAnyCommandCompletedCadence(t *testing.T) {
 
 func doTestAnyCommandCompleted(t *testing.T, backendType service.BackendType) {
 	// Start test workflow server
-	wfHandler := can_thread_completion.NewHandler()
+	wfHandler := command_thread_completion.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
@@ -100,10 +100,10 @@ func doTestAnyCommandCompleted(t *testing.T, backendType service.BackendType) {
 	startTime := time.Now()
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        can_thread_completion.WorkflowType,
+		IwfWorkflowType:        command_thread_completion.WorkflowType,
 		WorkflowTimeoutSeconds: 60,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           ptr.Any(can_thread_completion.StateAnyCmd),
+		StartStateId:           ptr.Any(command_thread_completion.StateAnyCmd),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: &iwfidl.WorkflowConfig{
 				ContinueAsNewThreshold: ptr.Any(int32(1)), // Force CAN immediately
@@ -152,6 +152,8 @@ func doTestAnyCommandCompleted(t *testing.T, backendType service.BackendType) {
 
 	// Verify StateAnyCmd executed
 	assertions.Equalf(map[string]int64{
+		"S3_decide":          1,
+		"S3_start":           1,
 		"StateAnyCmd_start":  1,
 		"StateAnyCmd_decide": 1,
 	}, history, "State execution history mismatch: %v", history)
@@ -179,7 +181,7 @@ func doTestAnyCommandCompleted(t *testing.T, backendType service.BackendType) {
 
 func doTestCommandThreadCompletion(t *testing.T, backendType service.BackendType, config *iwfidl.WorkflowConfig) {
 	// Start test workflow server
-	wfHandler := can_thread_completion.NewHandler()
+	wfHandler := command_thread_completion.NewHandler()
 	closeFunc1 := startWorkflowWorker(wfHandler, t)
 	defer closeFunc1()
 
@@ -195,15 +197,15 @@ func doTestCommandThreadCompletion(t *testing.T, backendType service.BackendType
 		},
 	})
 
-	wfId := can_thread_completion.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
+	wfId := command_thread_completion.WorkflowType + strconv.Itoa(int(time.Now().UnixNano()))
 
 	req := apiClient.DefaultApi.ApiV1WorkflowStartPost(context.Background())
 	_, httpResp, err := req.WorkflowStartRequest(iwfidl.WorkflowStartRequest{
 		WorkflowId:             wfId,
-		IwfWorkflowType:        can_thread_completion.WorkflowType,
+		IwfWorkflowType:        command_thread_completion.WorkflowType,
 		WorkflowTimeoutSeconds: 30,
 		IwfWorkerUrl:           "http://localhost:" + testWorkflowServerPort,
-		StartStateId:           ptr.Any(can_thread_completion.State1),
+		StartStateId:           ptr.Any(command_thread_completion.State1),
 		WorkflowStartOptions: &iwfidl.WorkflowStartOptions{
 			WorkflowConfigOverride: config,
 		},

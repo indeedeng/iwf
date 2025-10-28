@@ -1,4 +1,4 @@
-package can_thread_completion
+package command_thread_completion
 
 import (
 	"log"
@@ -29,7 +29,7 @@ import (
  * This ensures the internal channel signal published by State1 is captured before continue-as-new.
  */
 const (
-	WorkflowType = "can_thread_completion"
+	WorkflowType = "command_thread_completion"
 	State1       = "S1"
 	State2       = "S2"
 	State3       = "S3"
@@ -347,7 +347,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 				StateDecision: &iwfidl.StateDecision{
 					NextStates: []iwfidl.StateMovement{
 						{
-							StateId: service.GracefulCompletingWorkflowStateId,
+							StateId: State3,
 						},
 					},
 				},

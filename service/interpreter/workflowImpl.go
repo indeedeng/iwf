@@ -790,6 +790,9 @@ func processStateExecution(
 		}
 	}
 
+	//Passing a map of references of completed or soon to be completed commands (once the above threads are complete) and the state execution variables to the continueAsNewer.
+	//After this method completes and if continueAsNewCounter.IsThresholdMet() is true, this snapshot will be used to start a new continueAsNew workflow while preserving the state of the workflow at the end of this method.
+	//This snapshot is also used to query the workflow state, which can be done at anytime.
 	continueAsNewer.AddPotentialStateExecutionToResume(
 		stateExeId, state, stateExecutionLocal, commandReq,
 		completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds,
@@ -800,60 +803,21 @@ func processStateExecution(
 		return IsDeciderTriggerConditionMet(commandReq, completedTimerCmds, completedSignalCmds, completedInterStateChannelCmds) || continueAsNewCounter.IsThresholdMet()
 	})
 
+	//This variable tells all command threads to stop waiting and exit, even if their specific command has not been completed.
+	//In both cases, the trigger condition has been met or the continue-as-new threshold has been reached we want the above command threads to stop waiting.
 	commandReqDoneOrCanceled = true
 
 	// Wait for command threads to drain. After the command request await completes, command threads
 	// may still be in the process of storing retrieved data into completedXXXCmds maps.
 	// We must wait for these threads to finish before assembling command results, otherwise
-	// retrieved data will be lost (the thread retrieved it but never stored it before we read the maps).
-	// We only wait for threads of completed commands (those with entries in completedXXXCmds),
-	// not all threads, which preserves ANY_COMMAND_COMPLETED semantics.
+	// retrieved data will be lost (the thread retrieved it but never stored it before we return the maps).
+	// We only wait for threads of commands that currently have data or has been canceled or fired.
+	// A thread that doesn't have data can be canceled when commandReqDoneOrCanceled is set to true. This preserves ANY_COMMAND_COMPLETED semantics.
 	if globalVersioner.IsAfterVersionOfWaitingCommandThreads() {
 		if err := provider.Await(ctx, func() bool {
-			// For each timer command that completed (fired), wait for its thread to finish
-			for idx := range commandReq.GetTimerCommands() {
-				status := timerProcessor.WaitForTimerFiredOrSkipped(ctx, stateExeId, idx, &commandReqDoneOrCanceled)
-				if status == service.TimerSkipped || status == service.TimerFired {
-					threadName := getCommandThreadName("timer", stateExeId, commandReq.GetTimerCommands()[idx].GetCommandId(), idx)
-					// Check if thread exists (it won't exist if resumed from CAN)
-					threadCompleted, threadExists := waitForThreads[threadName]
-					if !threadExists {
-						continue // Skip - thread doesn't exist (resumed from CAN)
-					}
-					// If the thread hasn't finished, keep waiting
-					if !threadCompleted {
-						return false
-					}
-				}
-			}
-			// For each signal command that completed (received), wait for its thread to finish
-			for idx, cmd := range commandReq.GetSignalCommands() {
-				if signalReceiver.HasSignal(cmd.SignalChannelName) {
-					threadName := getCommandThreadName("signal", stateExeId, commandReq.GetSignalCommands()[idx].GetCommandId(), idx)
-					// Check if thread exists (it won't exist if resumed from CAN)
-					threadCompleted, threadExists := waitForThreads[threadName]
-					if !threadExists {
-						continue // Skip - thread doesn't exist (resumed from CAN)
-					}
-					// If the thread hasn't finished, keep waiting
-					if !threadCompleted {
-						return false
-					}
-				}
-			}
-			// For each internal channel command that completed (received), wait for its thread to finish
-			for idx, cmd := range commandReq.GetInterStateChannelCommands() {
-				if interStateChannel.HasData(cmd.ChannelName) {
-					threadName := getCommandThreadName("interstate", stateExeId, cmd.GetCommandId(), idx)
-					// Check if thread exists (it won't exist if resumed from CAN)
-					threadCompleted, threadExists := waitForThreads[threadName]
-					if !threadExists {
-						continue // Skip - thread doesn't exist (resumed from CAN)
-					}
-					// If the thread hasn't finished, keep waiting
-					if !threadCompleted {
-						return false
-					}
+			for _, isCompleted := range waitForThreads {
+				if !isCompleted {
+					return false
 				}
 			}
 			return true
