@@ -36,7 +36,8 @@ const StartingVersionYieldOnConditionalComplete = 8
 // SyncUpdateRPCUseLocalActivity Always use local activities for sync update based RPC
 const SyncUpdateRPCUseLocalActivity = 9
 
-// StartingVersionWaitingCommandThreads Wait for all command threads to complete before taking a snapshot, so that commands don't get lost with continue as new.
+// StartingVersionWaitingCommandThreads waits for all command threads to complete before taking a snapshot.
+// This ensures that commands don't get lost during continueAsNew operations.
 const StartingVersionWaitingCommandThreads = 10
 
 const MaxOfAllVersions = StartingVersionWaitingCommandThreads
