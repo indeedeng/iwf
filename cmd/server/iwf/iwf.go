@@ -437,8 +437,18 @@ func createBucketIfNotExists(ctx context.Context, client *s3.Client, bucketName 
 		_, err = client.CreateBucket(ctx, &s3.CreateBucketInput{
 			Bucket: aws.String(bucketName),
 		})
+
 		if err != nil {
-			rawLog.Fatal("failed to create bucket", tag.Error(err))
+			bucketCreateError := err
+			// Its posible creating a bucket failed because the bucket was created by another service (api or interpreter)
+			// check the bucket still does not exist
+			_, err := client.HeadBucket(ctx, &s3.HeadBucketInput{
+				Bucket: aws.String(bucketName),
+			})
+
+			if err != nil {
+				rawLog.Fatal("failed to create bucket", tag.Error(bucketCreateError))
+			}
 		}
 		rawLog.Printf("bucket created successfully: %s", bucketName)
 	} else {
