@@ -36,7 +36,11 @@ const StartingVersionYieldOnConditionalComplete = 8
 // SyncUpdateRPCUseLocalActivity Always use local activities for sync update based RPC
 const SyncUpdateRPCUseLocalActivity = 9
 
-const MaxOfAllVersions = SyncUpdateRPCUseLocalActivity
+// StartingVersionWaitingCommandThreads waits for all command threads to complete before taking a snapshot.
+// This ensures that commands don't get lost during continueAsNew operations.
+const StartingVersionWaitingCommandThreads = 10
+
+const MaxOfAllVersions = StartingVersionWaitingCommandThreads
 
 // GlobalVersioner see https://stackoverflow.com/questions/73941723/what-is-a-good-way-pattern-to-use-temporal-cadence-versioning-api
 type GlobalVersioner struct {
@@ -93,6 +97,10 @@ func (p *GlobalVersioner) IsAfterVersionOfYieldOnConditionalComplete() bool {
 
 func (p *GlobalVersioner) IsAfterVersionOfSyncUpdateRPCUseLocalActivity() bool {
 	return p.version >= SyncUpdateRPCUseLocalActivity
+}
+
+func (p *GlobalVersioner) IsAfterVersionOfWaitingCommandThreads() bool {
+	return p.version >= StartingVersionWaitingCommandThreads
 }
 
 // methods checking feature/functionality availability
