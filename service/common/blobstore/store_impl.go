@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/indeedeng/iwf/config"
 	"github.com/indeedeng/iwf/service/common/log"
+	"github.com/indeedeng/iwf/service/common/log/tag"
 	"go.temporal.io/sdk/client"
 )
 
@@ -167,6 +168,7 @@ func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, work
 
 	// Paginate through all objects and delete them in batches
 	var continuationToken *string
+	var totalDeleted int
 	for {
 		listInput := &s3.ListObjectsV2Input{
 			Bucket: aws.String(storeConfig.S3Bucket),
@@ -179,6 +181,17 @@ func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, work
 
 		listResult, err := b.s3Client.ListObjectsV2(ctx, listInput)
 		if err != nil {
+			var re s3.ResponseError
+			if errors.As(err, &re) {
+				b.logger.Error("ListObjectsV2 S3 API error",
+					tag.Key("requestId"), tag.Value(re.ServiceRequestID()),
+					tag.Key("hostId"), tag.Value(re.ServiceHostID()),
+					tag.Key("bucket"), tag.Value(storeConfig.S3Bucket),
+					tag.Key("workflowPath"), tag.Value(workflowPath),
+					tag.Error(err))
+				return fmt.Errorf("failed to list objects for deletion (requestId=%s, hostId=%s): %w",
+					re.ServiceRequestID(), re.ServiceHostID(), err)
+			}
 			return fmt.Errorf("failed to list objects for deletion: %w", err)
 		}
 
@@ -207,6 +220,18 @@ func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, work
 				},
 			})
 			if err != nil {
+				// Log S3-specific request identifiers for debugging with AWS Support
+				var re s3.ResponseError
+				if errors.As(err, &re) {
+					b.logger.Error("DeleteObjects S3 API error",
+						tag.Key("requestId"), tag.Value(re.ServiceRequestID()),
+						tag.Key("hostId"), tag.Value(re.ServiceHostID()),
+						tag.Key("bucket"), tag.Value(storeConfig.S3Bucket),
+						tag.Key("workflowPath"), tag.Value(workflowPath),
+						tag.Error(err))
+					return fmt.Errorf("failed to delete objects (requestId=%s, hostId=%s): %w",
+						re.ServiceRequestID(), re.ServiceHostID(), err)
+				}
 				return fmt.Errorf("failed to delete objects: %w", err)
 			}
 
@@ -219,8 +244,15 @@ func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, work
 							*delErr.Key, *delErr.Code, *delErr.Message))
 					}
 				}
-				return fmt.Errorf("some objects failed to delete: %s", strings.Join(errorMsgs, "; "))
+				resultMetadata := fmt.Sprintf("%+v", deleteResult.ResultMetadata)
+				b.logger.Error("DeleteObjects failed",
+					tag.Key("bucket"), tag.Value(storeConfig.S3Bucket),
+					tag.Key("workflowPath"), tag.Value(workflowPath),
+					tag.Key("resultMetadata"), tag.Value(resultMetadata))
+				return fmt.Errorf("some objects failed to delete (resultMetadata=%s): %s", resultMetadata, strings.Join(errorMsgs, "; "))
 			}
+
+			totalDeleted += len(objectsToDelete)
 		}
 
 		// Check if there are more objects to process
@@ -229,6 +261,11 @@ func (b *blobStoreImpl) DeleteWorkflowObjects(ctx context.Context, storeId, work
 		}
 		continuationToken = listResult.NextContinuationToken
 	}
+
+	b.logger.Info("DeleteWorkflowObjects completed",
+		tag.Key("bucket"), tag.Value(storeConfig.S3Bucket),
+		tag.Key("workflowPath"), tag.Value(workflowPath),
+		tag.Key("totalDeleted"), tag.Value(totalDeleted))
 
 	return nil
 }
