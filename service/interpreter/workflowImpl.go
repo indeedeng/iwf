@@ -1113,7 +1113,7 @@ func WaitForStateCompletionWorkflowImpl(
 
 func BlobStoreCleanup(
 	ctx interfaces.UnifiedContext, provider interfaces.WorkflowProvider, storeId string,
-) error {
+) (int, error) {
 	activityOptions := interfaces.ActivityOptions{
 		StartToCloseTimeout: 24 * time.Hour,
 		RetryPolicy: &iwfidl.RetryPolicy{
@@ -1121,6 +1121,7 @@ func BlobStoreCleanup(
 		},
 	}
 	ctx = provider.WithActivityOptions(ctx, activityOptions)
-	// the workflow simply execute the long running activity :)
-	return provider.ExecuteActivity(nil, false, ctx, CleanupBlobStore, provider.GetBackendType(), storeId)
+	var totalDeleted int
+	err := provider.ExecuteActivity(&totalDeleted, false, ctx, CleanupBlobStore, provider.GetBackendType(), storeId)
+	return totalDeleted, err
 }

@@ -560,54 +560,52 @@ func doLoadFromExternalStorage(ctx context.Context, input *iwfidl.EncodedObject)
 
 func CleanupBlobStore(
 	ctx context.Context, backendType service.BackendType, storeId string,
-) error {
+) (int, error) {
 	store := env.GetBlobStore()
 	provider := interfaces.GetActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("CleanupBlobStore started")
-	cfg := env.GetSharedConfig()
-	minAgeForCleanupCheckInDays := cfg.ExternalStorage.MinAgeForCleanupCheckInDays
-	stopChecingkUnixSeconds := time.Now().Unix() - int64(minAgeForCleanupCheckInDays)*24*3600
-	var continueToken *string
 
 	client := env.GetUnifiedClient()
+
+	var continueToken *string
+	var totalDeleted int
+
 	for {
 		listOutput, err := store.ListWorkflowPaths(ctx, blobstore.ListObjectPathsInput{
 			StoreId:           storeId,
 			ContinuationToken: continueToken,
 		})
 		if err != nil {
-			return err
+			return totalDeleted, err
 		}
 		continueToken = listOutput.ContinuationToken
 		for _, workflowPath := range listOutput.WorkflowPaths {
-			currentTimestamp, valid := blobstore.ExtractYyyymmddToUnixSeconds(workflowPath)
+			_, valid := blobstore.ExtractYyyymmddToUnixSeconds(workflowPath)
 			if !valid {
 				logger.Info("CleanupBlobStore skipped workflow path", "path", workflowPath)
 				continue
 			}
-			if currentTimestamp < stopChecingkUnixSeconds {
-				logger.Info("CleanupBlobStore stopped checking at", "currentTimestamp", currentTimestamp, "stopChecingkUnixSeconds", stopChecingkUnixSeconds)
-				break
-			}
 
+			// Check if workflow still exists in Temporal
+			// We must always check because workflows can run indefinitely,
+			// and the retention period only applies after workflow closure
 			workflowId := blobstore.MustExtractWorkflowId(workflowPath)
 			_, err := client.DescribeWorkflowExecution(ctx, workflowId, "", nil)
 			if client.IsNotFoundError(err) {
-				// this means workflow has been deleted from the history
+				// Workflow has been removed from Temporal, safe to delete S3 objects
 				err = store.DeleteWorkflowObjects(ctx, storeId, workflowPath)
 				if err != nil {
 					logger.Error("CleanupBlobStore failed to delete workflow objects", "workflowPath", workflowPath, "error", err)
-					return err
-				} else {
-					logger.Info("CleanupBlobStore deleted workflow objects", "workflowPath", workflowPath)
+					return totalDeleted, err
 				}
-			} else {
-				if err != nil {
-					logger.Error("CleanupBlobStore failed to delete workflow objects", "workflowPath", workflowPath, "error", err)
-					return err
-				}
+				totalDeleted++
+				logger.Info("CleanupBlobStore deleted workflow objects", "workflowPath", workflowPath)
+			} else if err != nil {
+				logger.Error("CleanupBlobStore failed to describe workflow", "workflowPath", workflowPath, "error", err)
+				return totalDeleted, err
 			}
+			// If no error, workflow still exists (open or within retention), don't delete
 
 			// this is a long running activity
 			// using record heartbeat so that it won't timeout at startToClose timeout
@@ -617,5 +615,6 @@ func CleanupBlobStore(
 			break
 		}
 	}
-	return nil
+	logger.Info("CleanupBlobStore completed", "totalDeleted", totalDeleted)
+	return totalDeleted, nil
 }

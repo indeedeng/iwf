@@ -18,6 +18,6 @@ func WaitforStateCompletionWorkflow(ctx workflow.Context) (*service.WaitForState
 	return interpreter.WaitForStateCompletionWorkflowImpl(interfaces.NewUnifiedContext(ctx), newTemporalWorkflowProvider())
 }
 
-func BlobStoreCleanup(ctx workflow.Context, storeId string) error {
+func BlobStoreCleanup(ctx workflow.Context, storeId string) (int, error) {
 	return interpreter.BlobStoreCleanup(interfaces.NewUnifiedContext(ctx), newTemporalWorkflowProvider(), storeId)
 }
