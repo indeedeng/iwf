@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -59,6 +60,13 @@ func StateApiWaitUntil(
 	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
 		_, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
+			if activityInfo.IsLocalActivity {
+				reqBytes, _ := json.Marshal(input.Request)
+				logger.Info("StateApiWaitUntil local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 			return nil, err
 		}
 	}
@@ -66,6 +74,13 @@ func StateApiWaitUntil(
 	// Load data attributes from external storage
 	err = blobstore.LoadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects, env.GetBlobStore())
 	if err != nil {
+		if activityInfo.IsLocalActivity {
+			reqBytes, _ := json.Marshal(input.Request)
+			logger.Info("StateApiWaitUntil local activity return on error",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(reqBytes))
+		}
 		return nil, err
 	}
 
@@ -93,6 +108,13 @@ func StateApiWaitUntil(
 				Details: &errDetails,
 			},
 		})
+		if activityInfo.IsLocalActivity {
+			reqBytes, _ := json.Marshal(input.Request)
+			logger.Info("StateApiWaitUntil local activity return on error",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(reqBytes))
+		}
 		return nil, stateStartErr
 	}
 
@@ -115,6 +137,13 @@ func StateApiWaitUntil(
 				Details: &errDetails,
 			},
 		})
+		if activityInfo.IsLocalActivity {
+			reqBytes, _ := json.Marshal(input.Request)
+			logger.Info("StateApiWaitUntil local activity return on error",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(reqBytes))
+		}
 		return nil, stateStartErr
 	}
 
@@ -125,9 +154,16 @@ func StateApiWaitUntil(
 		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
 	}
 
-	if env.GetSharedConfig().ExternalStorage.Enabled {
+	if env.GetSharedConfig().ExternalStorage.Enabled && env.GetBlobStore() != nil {
 		err = blobstore.WriteDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID, env.GetSharedConfig().ExternalStorage.ThresholdInBytes, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage.Enabled)
 		if err != nil {
+			if activityInfo.IsLocalActivity {
+				reqBytes, _ := json.Marshal(input.Request)
+				logger.Info("StateApiWaitUntil local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 			return nil, err
 		}
 	}
@@ -143,6 +179,13 @@ func StateApiWaitUntil(
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 		SearchAttributes:   searchAttributes,
 	})
+	if activityInfo.IsLocalActivity {
+		respBytes, _ := json.Marshal(resp)
+		logger.Info("StateApiWaitUntil local activity return on success",
+			"workflowId", activityInfo.WorkflowExecution.ID,
+			"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+			"payloadSize", len(respBytes))
+	}
 	return resp, nil
 }
 
@@ -187,6 +230,13 @@ func StateApiExecute(
 	if input.Request.StateInput != nil && input.Request.StateInput.ExtStoreId != nil {
 		wholeStateInputCopy, err = loadStateInputFromExternalStorage(ctx, input.Request.StateInput)
 		if err != nil {
+			if activityInfo.IsLocalActivity {
+				reqBytes, _ := json.Marshal(input.Request)
+				logger.Info("StateApiExecute local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 			return nil, err
 		}
 	}
@@ -194,6 +244,13 @@ func StateApiExecute(
 	// Load data attributes from external storage
 	err = blobstore.LoadDataObjectsFromExternalStorage(ctx, input.Request.DataObjects, env.GetBlobStore())
 	if err != nil {
+		if activityInfo.IsLocalActivity {
+			reqBytes, _ := json.Marshal(input.Request)
+			logger.Info("StateApiExecute local activity return on error",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(reqBytes))
+		}
 		return nil, err
 	}
 
@@ -233,6 +290,13 @@ func StateApiExecute(
 				Details: &errDetails,
 			},
 		})
+		if activityInfo.IsLocalActivity {
+			reqBytes, _ := json.Marshal(input.Request)
+			logger.Info("StateApiExecute local activity return on error",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(reqBytes))
+		}
 		return nil, stateApiExecuteErr
 	}
 
@@ -255,6 +319,13 @@ func StateApiExecute(
 				Details: &errDetails,
 			},
 		})
+		if activityInfo.IsLocalActivity {
+			reqBytes, _ := json.Marshal(input.Request)
+			logger.Info("StateApiExecute local activity return on error",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(reqBytes))
+		}
 		return nil, stateApiExecuteErr
 	}
 
@@ -265,13 +336,28 @@ func StateApiExecute(
 		resp.LocalActivityInput = composeInputForDebug(input.Request.Context.GetStateExecutionId())
 	}
 
-	if env.GetSharedConfig().ExternalStorage.Enabled {
+	// Externalize only when enabled and blob store is available (nil when e.g. STAGING_LEVEL was empty at worker start).
+	if env.GetSharedConfig().ExternalStorage.Enabled && env.GetBlobStore() != nil {
 		resp.StateDecision.NextStates, err = writeNextStateInputsToExternalStorage(ctx, resp.StateDecision.NextStates, wholeStateInputCopy, activityInfo.WorkflowExecution.ID)
 		if err != nil {
+			if activityInfo.IsLocalActivity {
+				reqBytes, _ := json.Marshal(input.Request)
+				logger.Info("StateApiExecute local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 			return nil, err
 		}
 		err = blobstore.WriteDataObjectsToExternalStorage(ctx, resp.UpsertDataObjects, activityInfo.WorkflowExecution.ID, env.GetSharedConfig().ExternalStorage.ThresholdInBytes, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage.Enabled)
 		if err != nil {
+			if activityInfo.IsLocalActivity {
+				reqBytes, _ := json.Marshal(input.Request)
+				logger.Info("StateApiExecute local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 			return nil, err
 		}
 	}
@@ -287,6 +373,13 @@ func StateApiExecute(
 		EndTimestampInMs:   ptr.Any(time.Now().UnixMilli()),
 		SearchAttributes:   input.Request.SearchAttributes,
 	})
+	if activityInfo.IsLocalActivity {
+		respBytes, _ := json.Marshal(resp)
+		logger.Info("StateApiExecute local activity return on success",
+			"workflowId", activityInfo.WorkflowExecution.ID,
+			"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+			"payloadSize", len(respBytes))
+	}
 	return resp, nil
 }
 
@@ -466,14 +559,22 @@ func InvokeWorkerRpc(
 	provider := interfaces.GetActivityProviderByType(backendType)
 	logger := provider.GetLogger(ctx)
 	logger.Info("InvokeWorkerRpcActivity", "input", log.ToJsonAndTruncateForLogging(req))
+	activityInfo := provider.GetActivityInfo(ctx)
 
 	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
 
 	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage)
-	return &interfaces.InvokeRpcActivityOutput{
+	output := &interfaces.InvokeRpcActivityOutput{
 		RpcOutput:   resp,
 		StatusError: statusErr,
-	}, nil
+	}
+	if activityInfo.IsLocalActivity {
+		outputBytes, _ := json.Marshal(output)
+		logger.Info("InvokeWorkerRpc local activity return",
+			"workflowId", activityInfo.WorkflowExecution.ID,
+			"payloadSize", len(outputBytes))
+	}
+	return output, nil
 }
 
 func writeNextStateInputsToExternalStorage(ctx context.Context, nextStates []iwfidl.StateMovement, currentInputCopy *iwfidl.EncodedObject, workflowId string) ([]iwfidl.StateMovement, error) {

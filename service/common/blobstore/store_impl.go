@@ -90,6 +90,23 @@ func (b *blobStoreImpl) WriteObject(ctx context.Context, workflowId, data string
 	err = putObject(ctx, b.s3Client, b.activeStorage.S3Bucket, b.pathPrefix+path, data)
 	if err != nil {
 		b.writeObjectErrorCounter.Inc(1)
+		var re s3.ResponseError
+		if errors.As(err, &re) {
+			b.logger.Error("PutObject S3 API error",
+				tag.Key("requestId"), tag.Value(re.ServiceRequestID()),
+				tag.Key("hostId"), tag.Value(re.ServiceHostID()),
+				tag.Key("bucket"), tag.Value(b.activeStorage.S3Bucket),
+				tag.Key("workflowId"), tag.Value(workflowId),
+				tag.Error(err))
+			err = fmt.Errorf("failed to write object (requestId=%s, hostId=%s): %w",
+				re.ServiceRequestID(), re.ServiceHostID(), err)
+		} else {
+			b.logger.Error("PutObject error",
+				tag.Key("bucket"), tag.Value(b.activeStorage.S3Bucket),
+				tag.Key("workflowId"), tag.Value(workflowId),
+				tag.Error(err))
+			err = fmt.Errorf("failed to write object: %w", err)
+		}
 		return
 	}
 	b.writeObjectSuccessHistogram.Record(time.Duration(len(data)))
@@ -105,7 +122,24 @@ func (b *blobStoreImpl) ReadObject(ctx context.Context, storeId, path string) (s
 	data, err := getObject(ctx, b.s3Client, storeConfig.S3Bucket, b.pathPrefix+path)
 	if err != nil {
 		b.readObjectErrorCounter.Inc(1)
-		return "", err
+		var re s3.ResponseError
+		if errors.As(err, &re) {
+			b.logger.Error("GetObject S3 API error",
+				tag.Key("requestId"), tag.Value(re.ServiceRequestID()),
+				tag.Key("hostId"), tag.Value(re.ServiceHostID()),
+				tag.Key("bucket"), tag.Value(storeConfig.S3Bucket),
+				tag.Key("path"), tag.Value(path),
+				tag.Key("storeId"), tag.Value(storeId),
+				tag.Error(err))
+			return "", fmt.Errorf("failed to read object (requestId=%s, hostId=%s): %w",
+				re.ServiceRequestID(), re.ServiceHostID(), err)
+		}
+		b.logger.Error("GetObject error",
+			tag.Key("bucket"), tag.Value(storeConfig.S3Bucket),
+			tag.Key("path"), tag.Value(path),
+			tag.Key("storeId"), tag.Value(storeId),
+			tag.Error(err))
+		return "", fmt.Errorf("failed to read object: %w", err)
 	}
 	b.readObjectSuccessHistogram.Record(time.Duration(len(data)))
 	return data, nil
