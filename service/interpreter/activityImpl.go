@@ -62,7 +62,7 @@ func StateApiWaitUntil(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Info("StateApiWaitUntil local activity return on error",
+				logger.Warn("StateApiWaitUntil local activity return on error",
 					"workflowId", activityInfo.WorkflowExecution.ID,
 					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 					"payloadSize", len(reqBytes))
@@ -76,7 +76,7 @@ func StateApiWaitUntil(
 	if err != nil {
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Info("StateApiWaitUntil local activity return on error",
+			logger.Warn("StateApiWaitUntil local activity return on error",
 				"workflowId", activityInfo.WorkflowExecution.ID,
 				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 				"payloadSize", len(reqBytes))
@@ -110,7 +110,7 @@ func StateApiWaitUntil(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Info("StateApiWaitUntil local activity return on error",
+			logger.Warn("StateApiWaitUntil local activity return on error",
 				"workflowId", activityInfo.WorkflowExecution.ID,
 				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 				"payloadSize", len(reqBytes))
@@ -139,7 +139,7 @@ func StateApiWaitUntil(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Info("StateApiWaitUntil local activity return on error",
+			logger.Warn("StateApiWaitUntil local activity return on error",
 				"workflowId", activityInfo.WorkflowExecution.ID,
 				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 				"payloadSize", len(reqBytes))
@@ -159,7 +159,7 @@ func StateApiWaitUntil(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Info("StateApiWaitUntil local activity return on error",
+				logger.Warn("StateApiWaitUntil local activity return on error",
 					"workflowId", activityInfo.WorkflowExecution.ID,
 					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 					"payloadSize", len(reqBytes))
@@ -181,7 +181,7 @@ func StateApiWaitUntil(
 	})
 	if activityInfo.IsLocalActivity {
 		respBytes, _ := json.Marshal(resp)
-		logger.Info("StateApiWaitUntil local activity return on success",
+		logger.Warn("StateApiWaitUntil local activity return on success",
 			"workflowId", activityInfo.WorkflowExecution.ID,
 			"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 			"payloadSize", len(respBytes))
@@ -232,7 +232,7 @@ func StateApiExecute(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Info("StateApiExecute local activity return on error",
+				logger.Warn("StateApiExecute local activity return on error",
 					"workflowId", activityInfo.WorkflowExecution.ID,
 					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 					"payloadSize", len(reqBytes))
@@ -246,7 +246,7 @@ func StateApiExecute(
 	if err != nil {
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Info("StateApiExecute local activity return on error",
+			logger.Warn("StateApiExecute local activity return on error",
 				"workflowId", activityInfo.WorkflowExecution.ID,
 				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 				"payloadSize", len(reqBytes))
@@ -292,7 +292,7 @@ func StateApiExecute(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Info("StateApiExecute local activity return on error",
+			logger.Warn("StateApiExecute local activity return on error",
 				"workflowId", activityInfo.WorkflowExecution.ID,
 				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 				"payloadSize", len(reqBytes))
@@ -321,7 +321,7 @@ func StateApiExecute(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Info("StateApiExecute local activity return on error",
+			logger.Warn("StateApiExecute local activity return on error",
 				"workflowId", activityInfo.WorkflowExecution.ID,
 				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 				"payloadSize", len(reqBytes))
@@ -342,7 +342,7 @@ func StateApiExecute(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Info("StateApiExecute local activity return on error",
+				logger.Warn("StateApiExecute local activity return on error",
 					"workflowId", activityInfo.WorkflowExecution.ID,
 					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 					"payloadSize", len(reqBytes))
@@ -353,7 +353,7 @@ func StateApiExecute(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Info("StateApiExecute local activity return on error",
+				logger.Warn("StateApiExecute local activity return on error",
 					"workflowId", activityInfo.WorkflowExecution.ID,
 					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 					"payloadSize", len(reqBytes))
@@ -375,7 +375,7 @@ func StateApiExecute(
 	})
 	if activityInfo.IsLocalActivity {
 		respBytes, _ := json.Marshal(resp)
-		logger.Info("StateApiExecute local activity return on success",
+		logger.Warn("StateApiExecute local activity return on success",
 			"workflowId", activityInfo.WorkflowExecution.ID,
 			"stateExecutionId", input.Request.Context.GetStateExecutionId(),
 			"payloadSize", len(respBytes))
@@ -570,7 +570,7 @@ func InvokeWorkerRpc(
 	}
 	if activityInfo.IsLocalActivity {
 		outputBytes, _ := json.Marshal(output)
-		logger.Info("InvokeWorkerRpc local activity return",
+		logger.Warn("InvokeWorkerRpc local activity return",
 			"workflowId", activityInfo.WorkflowExecution.ID,
 			"payloadSize", len(outputBytes))
 	}
