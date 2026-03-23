@@ -275,5 +275,10 @@ func TestBlobStoreIntegration(t *testing.T) {
 		err = blobStore.DeleteWorkflowObjects(ctx, "invalid-store-id", "some-workflow-path")
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "store not found")
+
+		// Test reading a non-existent key from a valid store triggers the new error wrapping
+		_, err = blobStore.ReadObject(ctx, testStorageId, "nonexistent/path/that/does/not/exist")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to read object")
 	})
 }

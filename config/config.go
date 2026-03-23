@@ -111,6 +111,9 @@ type (
 		InterpreterActivityConfig InterpreterActivityConfig `yaml:"interpreterActivityConfig"`
 		VerboseDebug              bool
 		FailAtMemoIncompatibility bool
+		// LogLocalActivityThresholdBytes enables warn-level logging of local activity inputs/outputs when the
+		// serialized payload size meets or exceeds this value. Set to 0 (default) to disable.
+		LogLocalActivityThresholdBytes int `yaml:"logLocalActivityThresholdBytes"`
 	}
 
 	TemporalConfig struct {

@@ -40,9 +40,9 @@ func StateApiWaitUntil(
 	logger.Info("StateWaitUntilActivity", "input", log.ToJsonAndTruncateForLogging(input))
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
 
-	svcCfg := env.GetSharedConfig()
+	sharedCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
+		DefaultHeader: sharedCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: iwfWorkerBaseUrl,
@@ -62,10 +62,12 @@ func StateApiWaitUntil(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Warn("StateApiWaitUntil local activity return on error",
-					"workflowId", activityInfo.WorkflowExecution.ID,
-					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-					"payloadSize", len(reqBytes))
+				if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+					logger.Warn("StateApiWaitUntil local activity return on error",
+						"workflowId", activityInfo.WorkflowExecution.ID,
+						"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+						"payloadSize", len(reqBytes))
+				}
 			}
 			return nil, err
 		}
@@ -76,10 +78,12 @@ func StateApiWaitUntil(
 	if err != nil {
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Warn("StateApiWaitUntil local activity return on error",
-				"workflowId", activityInfo.WorkflowExecution.ID,
-				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-				"payloadSize", len(reqBytes))
+			if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+				logger.Warn("StateApiWaitUntil local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 		}
 		return nil, err
 	}
@@ -110,10 +114,12 @@ func StateApiWaitUntil(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Warn("StateApiWaitUntil local activity return on error",
-				"workflowId", activityInfo.WorkflowExecution.ID,
-				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-				"payloadSize", len(reqBytes))
+			if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+				logger.Warn("StateApiWaitUntil local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 		}
 		return nil, stateStartErr
 	}
@@ -139,10 +145,12 @@ func StateApiWaitUntil(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Warn("StateApiWaitUntil local activity return on error",
-				"workflowId", activityInfo.WorkflowExecution.ID,
-				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-				"payloadSize", len(reqBytes))
+			if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+				logger.Warn("StateApiWaitUntil local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 		}
 		return nil, stateStartErr
 	}
@@ -159,10 +167,12 @@ func StateApiWaitUntil(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Warn("StateApiWaitUntil local activity return on error",
-					"workflowId", activityInfo.WorkflowExecution.ID,
-					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-					"payloadSize", len(reqBytes))
+				if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+					logger.Warn("StateApiWaitUntil local activity return on error",
+						"workflowId", activityInfo.WorkflowExecution.ID,
+						"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+						"payloadSize", len(reqBytes))
+				}
 			}
 			return nil, err
 		}
@@ -181,10 +191,12 @@ func StateApiWaitUntil(
 	})
 	if activityInfo.IsLocalActivity {
 		respBytes, _ := json.Marshal(resp)
-		logger.Warn("StateApiWaitUntil local activity return on success",
-			"workflowId", activityInfo.WorkflowExecution.ID,
-			"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-			"payloadSize", len(respBytes))
+		if threshold := sharedCfg.Interpreter.LogLocalActivityThresholdBytes; threshold > 0 && len(respBytes) >= threshold {
+			logger.Warn("StateApiWaitUntil local activity return on success",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(respBytes))
+		}
 	}
 	return resp, nil
 }
@@ -209,9 +221,9 @@ func StateApiExecute(
 	logger.Info("StateExecuteActivity", "input", log.ToJsonAndTruncateForLogging(input))
 
 	iwfWorkerBaseUrl := urlautofix.FixWorkerUrl(input.IwfWorkerUrl)
-	svcCfg := env.GetSharedConfig()
+	sharedCfg := env.GetSharedConfig()
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
+		DefaultHeader: sharedCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: iwfWorkerBaseUrl,
@@ -232,10 +244,12 @@ func StateApiExecute(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Warn("StateApiExecute local activity return on error",
-					"workflowId", activityInfo.WorkflowExecution.ID,
-					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-					"payloadSize", len(reqBytes))
+				if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+					logger.Warn("StateApiExecute local activity return on error",
+						"workflowId", activityInfo.WorkflowExecution.ID,
+						"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+						"payloadSize", len(reqBytes))
+				}
 			}
 			return nil, err
 		}
@@ -246,10 +260,12 @@ func StateApiExecute(
 	if err != nil {
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Warn("StateApiExecute local activity return on error",
-				"workflowId", activityInfo.WorkflowExecution.ID,
-				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-				"payloadSize", len(reqBytes))
+			if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+				logger.Warn("StateApiExecute local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 		}
 		return nil, err
 	}
@@ -292,10 +308,12 @@ func StateApiExecute(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Warn("StateApiExecute local activity return on error",
-				"workflowId", activityInfo.WorkflowExecution.ID,
-				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-				"payloadSize", len(reqBytes))
+			if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+				logger.Warn("StateApiExecute local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 		}
 		return nil, stateApiExecuteErr
 	}
@@ -321,10 +339,12 @@ func StateApiExecute(
 		})
 		if activityInfo.IsLocalActivity {
 			reqBytes, _ := json.Marshal(input.Request)
-			logger.Warn("StateApiExecute local activity return on error",
-				"workflowId", activityInfo.WorkflowExecution.ID,
-				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-				"payloadSize", len(reqBytes))
+			if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+				logger.Warn("StateApiExecute local activity return on error",
+					"workflowId", activityInfo.WorkflowExecution.ID,
+					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+					"payloadSize", len(reqBytes))
+			}
 		}
 		return nil, stateApiExecuteErr
 	}
@@ -342,10 +362,12 @@ func StateApiExecute(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Warn("StateApiExecute local activity return on error",
-					"workflowId", activityInfo.WorkflowExecution.ID,
-					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-					"payloadSize", len(reqBytes))
+				if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+					logger.Warn("StateApiExecute local activity return on error",
+						"workflowId", activityInfo.WorkflowExecution.ID,
+						"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+						"payloadSize", len(reqBytes))
+				}
 			}
 			return nil, err
 		}
@@ -353,10 +375,12 @@ func StateApiExecute(
 		if err != nil {
 			if activityInfo.IsLocalActivity {
 				reqBytes, _ := json.Marshal(input.Request)
-				logger.Warn("StateApiExecute local activity return on error",
-					"workflowId", activityInfo.WorkflowExecution.ID,
-					"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-					"payloadSize", len(reqBytes))
+				if sharedCfg.Interpreter.LogLocalActivityThresholdBytes > 0 {
+					logger.Warn("StateApiExecute local activity return on error",
+						"workflowId", activityInfo.WorkflowExecution.ID,
+						"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+						"payloadSize", len(reqBytes))
+				}
 			}
 			return nil, err
 		}
@@ -375,10 +399,12 @@ func StateApiExecute(
 	})
 	if activityInfo.IsLocalActivity {
 		respBytes, _ := json.Marshal(resp)
-		logger.Warn("StateApiExecute local activity return on success",
-			"workflowId", activityInfo.WorkflowExecution.ID,
-			"stateExecutionId", input.Request.Context.GetStateExecutionId(),
-			"payloadSize", len(respBytes))
+		if threshold := sharedCfg.Interpreter.LogLocalActivityThresholdBytes; threshold > 0 && len(respBytes) >= threshold {
+			logger.Warn("StateApiExecute local activity return on success",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"stateExecutionId", input.Request.Context.GetStateExecutionId(),
+				"payloadSize", len(respBytes))
+		}
 	}
 	return resp, nil
 }
@@ -531,11 +557,11 @@ func DumpWorkflowInternal(
 	logger := provider.GetLogger(ctx)
 	logger.Info("DumpWorkflowInternalActivity", "input", log.ToJsonAndTruncateForLogging(req))
 
-	svcCfg := env.GetSharedConfig()
-	apiAddress := svcCfg.GetApiServiceAddressWithDefault()
+	sharedCfg := env.GetSharedConfig()
+	apiAddress := sharedCfg.GetApiServiceAddressWithDefault()
 
 	apiClient := iwfidl.NewAPIClient(&iwfidl.Configuration{
-		DefaultHeader: svcCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
+		DefaultHeader: sharedCfg.Interpreter.InterpreterActivityConfig.DefaultHeaders,
 		Servers: []iwfidl.ServerConfiguration{
 			{
 				URL: apiAddress,
@@ -560,19 +586,22 @@ func InvokeWorkerRpc(
 	logger := provider.GetLogger(ctx)
 	logger.Info("InvokeWorkerRpcActivity", "input", log.ToJsonAndTruncateForLogging(req))
 	activityInfo := provider.GetActivityInfo(ctx)
+	sharedCfg := env.GetSharedConfig()
 
-	apiMaxSeconds := env.GetSharedConfig().Api.MaxWaitSeconds
+	apiMaxSeconds := sharedCfg.Api.MaxWaitSeconds
 
-	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds, env.GetBlobStore(), env.GetSharedConfig().ExternalStorage)
+	resp, statusErr := rpc.InvokeWorkerRpc(ctx, rpcPrep, req, apiMaxSeconds, env.GetBlobStore(), sharedCfg.ExternalStorage)
 	output := &interfaces.InvokeRpcActivityOutput{
 		RpcOutput:   resp,
 		StatusError: statusErr,
 	}
 	if activityInfo.IsLocalActivity {
 		outputBytes, _ := json.Marshal(output)
-		logger.Warn("InvokeWorkerRpc local activity return",
-			"workflowId", activityInfo.WorkflowExecution.ID,
-			"payloadSize", len(outputBytes))
+		if threshold := sharedCfg.Interpreter.LogLocalActivityThresholdBytes; threshold > 0 && len(outputBytes) >= threshold {
+			logger.Warn("InvokeWorkerRpc local activity return",
+				"workflowId", activityInfo.WorkflowExecution.ID,
+				"payloadSize", len(outputBytes))
+		}
 	}
 	return output, nil
 }
