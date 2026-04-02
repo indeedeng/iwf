@@ -880,6 +880,10 @@ func (s *serviceImpl) handleError(err error, apiPath string, workflowId string) 
 		status = http.StatusBadRequest
 		subStatus = iwfidl.WORKFLOW_NOT_EXISTS_SUB_STATUS
 	}
+	if s.client.IsRequestTimeoutError(err) {
+		status = http.StatusRequestTimeout
+		subStatus = iwfidl.LONG_POLL_TIME_OUT_SUB_STATUS
+	}
 	if s.client.IsWorkflowAlreadyStartedError(err) {
 		status = http.StatusBadRequest
 		subStatus = iwfidl.WORKFLOW_ALREADY_STARTED_SUB_STATUS
