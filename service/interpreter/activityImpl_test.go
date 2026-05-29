@@ -74,6 +74,26 @@ func TestValidAnyCommandCombination(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestInvalidInterStateChannelCommandLimits(t *testing.T) {
+	resp := iwfidl.WorkflowStateStartResponse{
+		CommandRequest: &iwfidl.CommandRequest{
+			DeciderTriggerType: iwfidl.ALL_COMMAND_COMPLETED.Ptr(),
+			InterStateChannelCommands: []iwfidl.InterStateChannelCommand{
+				{
+					CommandId:   ptr.Any("internal-cmd1"),
+					ChannelName: "test-internal-name1",
+					AtLeast:     iwfidl.PtrInt32(3),
+					AtMost:      iwfidl.PtrInt32(2),
+				},
+			},
+		},
+	}
+
+	err := checkCommandRequestFromWaitUntilResponse(&resp)
+
+	assert.EqualError(t, err, "InterStateChannelCommand atMost cannot be less than atLeast")
+}
+
 func createCommands() ([]iwfidl.TimerCommand, []iwfidl.SignalCommand, []iwfidl.InterStateChannelCommand) {
 	validTimerCommands := []iwfidl.TimerCommand{
 		{

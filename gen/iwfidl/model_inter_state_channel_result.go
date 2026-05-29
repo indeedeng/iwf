@@ -23,10 +23,7 @@ type InterStateChannelResult struct {
 	RequestStatus ChannelRequestStatus `json:"requestStatus"`
 	ChannelName   string               `json:"channelName"`
 	Value         *EncodedObject       `json:"value,omitempty"`
-	// Values contains all consumed messages when AtLeast/AtMost is used.
-	// For single-message commands, this contains the same single value.
-	// NOTE: This field requires a corresponding update to the iwf-idl OpenAPI spec.
-	Values []EncodedObject `json:"values,omitempty"`
+	Values        []EncodedObject      `json:"values,omitempty"`
 }
 
 // NewInterStateChannelResult instantiates a new InterStateChannelResult object
@@ -153,6 +150,38 @@ func (o *InterStateChannelResult) SetValue(v EncodedObject) {
 	o.Value = &v
 }
 
+// GetValues returns the Values field value if set, zero value otherwise.
+func (o *InterStateChannelResult) GetValues() []EncodedObject {
+	if o == nil || IsNil(o.Values) {
+		var ret []EncodedObject
+		return ret
+	}
+	return o.Values
+}
+
+// GetValuesOk returns a tuple with the Values field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *InterStateChannelResult) GetValuesOk() ([]EncodedObject, bool) {
+	if o == nil || IsNil(o.Values) {
+		return nil, false
+	}
+	return o.Values, true
+}
+
+// HasValues returns a boolean if a field has been set.
+func (o *InterStateChannelResult) HasValues() bool {
+	if o != nil && !IsNil(o.Values) {
+		return true
+	}
+
+	return false
+}
+
+// SetValues gets a reference to the given []EncodedObject and assigns it to the Values field.
+func (o *InterStateChannelResult) SetValues(v []EncodedObject) {
+	o.Values = v
+}
+
 func (o InterStateChannelResult) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -169,7 +198,7 @@ func (o InterStateChannelResult) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Value) {
 		toSerialize["value"] = o.Value
 	}
-	if len(o.Values) > 0 {
+	if !IsNil(o.Values) {
 		toSerialize["values"] = o.Values
 	}
 	return toSerialize, nil

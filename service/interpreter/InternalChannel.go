@@ -99,3 +99,12 @@ func (i *InternalChannel) RetrieveUpToN(channelName string, n int) []*iwfidl.Enc
 	}
 	return data
 }
+
+// RetrieveAtLeastUpToN atomically retrieves up to n messages only when at least
+// atLeast messages are currently available.
+func (i *InternalChannel) RetrieveAtLeastUpToN(channelName string, atLeast, n int) ([]*iwfidl.EncodedObject, bool) {
+	if !i.HasAtLeastN(channelName, atLeast) {
+		return nil, false
+	}
+	return i.RetrieveUpToN(channelName, n), true
+}

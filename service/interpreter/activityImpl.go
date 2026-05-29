@@ -519,6 +519,11 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 				return fmt.Errorf("ANY_COMMAND_COMBINATION_COMPLETED can only be used when every command has an commandId that is found in TimerCommands, SignalCommands or InternalChannelCommand")
 			}
 		}
+		for _, cmd := range commandReq.GetInterStateChannelCommands() {
+			if err := validateChannelCommandLimits(cmd); err != nil {
+				return err
+			}
+		}
 	}
 	// NOTE: we don't require decider trigger type when there is no commands
 	return nil

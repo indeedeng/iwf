@@ -689,6 +689,10 @@ func processStateExecution(
 		stateExecutionLocal = startResponse.GetUpsertStateLocals()
 	}
 
+	if globalVersioner.IsAfterVersionOfChannelConsumeN() {
+		signalReceiver.DrainAllReceivedButUnprocessedSignals(ctx)
+	}
+
 	waitForThreads := map[string]bool{}
 
 	if len(commandReq.GetTimerCommands()) > 0 {
@@ -783,22 +787,36 @@ func processStateExecution(
 
 				atLeast, atMost := getChannelCommandLimits(cmd, globalVersioner)
 
-				received := false
-				_ = provider.Await(ctx, func() bool {
-					received = interStateChannel.HasAtLeastN(cmd.ChannelName, atLeast)
-					// Note that commandReqDoneOrCanceled is needed for two cases:
-					// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
-					// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
-					return received || commandReqDoneOrCanceled
-				})
+				for {
+					received := false
+					_ = provider.Await(ctx, func() bool {
+						received = interStateChannel.HasAtLeastN(cmd.ChannelName, atLeast)
+						// Note that commandReqDoneOrCanceled is needed for two cases:
+						// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
+						// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
+						return received || commandReqDoneOrCanceled
+					})
 
-				if received {
+					if !received {
+						break
+					}
+					values, ok := interStateChannel.RetrieveAtLeastUpToN(cmd.ChannelName, atLeast, atMost)
+					if !ok {
+						continue
+					}
 					if atMost > 1 || atLeast == 0 {
-						values := interStateChannel.RetrieveUpToN(cmd.ChannelName, atMost)
+						if values == nil {
+							values = []*iwfidl.EncodedObject{}
+						}
 						completedInterStateChannelMultiCmds[idx] = values
 					} else {
-						completedInterStateChannelCmds[idx] = interStateChannel.Retrieve(cmd.ChannelName)
+						if len(values) > 0 {
+							completedInterStateChannelCmds[idx] = values[0]
+						} else {
+							completedInterStateChannelMultiCmds[idx] = values
+						}
 					}
+					break
 				}
 				waitForThreads[threadName] = true
 			})
@@ -1162,6 +1180,19 @@ func getChannelCommandLimits(cmd iwfidl.InterStateChannelCommand, globalVersione
 	}
 
 	return atLeast, atMost
+}
+
+func validateChannelCommandLimits(cmd iwfidl.InterStateChannelCommand) error {
+	if cmd.HasAtLeast() && cmd.GetAtLeast() < 0 {
+		return fmt.Errorf("InterStateChannelCommand atLeast cannot be negative")
+	}
+	if cmd.HasAtMost() && cmd.GetAtMost() < 0 {
+		return fmt.Errorf("InterStateChannelCommand atMost cannot be negative")
+	}
+	if cmd.HasAtLeast() && cmd.HasAtMost() && cmd.GetAtMost() < cmd.GetAtLeast() {
+		return fmt.Errorf("InterStateChannelCommand atMost cannot be less than atLeast")
+	}
+	return nil
 }
 
 func createUserWorkflowError(provider interfaces.WorkflowProvider, message string) error {
