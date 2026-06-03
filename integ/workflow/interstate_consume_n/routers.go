@@ -223,8 +223,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		case State2:
 			results := req.GetCommandResults()
 			channelResult := results.GetInterStateChannelResults()[0]
-			h.invokeData.Store("exactN_values", channelResult.Values)
-			h.invokeData.Store("exactN_value", channelResult.GetValue())
+			h.invokeData.Store("exactN_values", channelResult.MultiValues)
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
@@ -238,8 +237,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		case State3:
 			results := req.GetCommandResults()
 			channelResult := results.GetInterStateChannelResults()[0]
-			h.invokeData.Store("oneToAll_values", channelResult.Values)
-			h.invokeData.Store("oneToAll_value", channelResult.GetValue())
+			h.invokeData.Store("oneToAll_values", channelResult.MultiValues)
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{
@@ -253,7 +251,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		case State4:
 			results := req.GetCommandResults()
 			channelResult := results.GetInterStateChannelResults()[0]
-			h.invokeData.Store("zeroToAll_values", channelResult.Values)
+			h.invokeData.Store("zeroToAll_values", channelResult.MultiValues)
 
 			// Move to S5 (waiter) and S6 (delayed publisher) concurrently
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
@@ -269,8 +267,7 @@ func (h *handler) ApiV1WorkflowStateDecide(c *gin.Context, t *testing.T) {
 		case State5:
 			results := req.GetCommandResults()
 			channelResult := results.GetInterStateChannelResults()[0]
-			h.invokeData.Store("atMostOnly_values", channelResult.Values)
-			h.invokeData.Store("atMostOnly_value", channelResult.GetValue())
+			h.invokeData.Store("atMostOnly_values", channelResult.MultiValues)
 
 			c.JSON(http.StatusOK, iwfidl.WorkflowStateDecideResponse{
 				StateDecision: &iwfidl.StateDecision{

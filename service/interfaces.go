@@ -157,8 +157,10 @@ type (
 	}
 
 	StateExecutionCompletedCommands struct {
-		CompletedTimerCommands             map[int]InternalTimerStatus   `json:"completedTimerCommands"`
-		CompletedSignalCommands            map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
+		CompletedTimerCommands  map[int]InternalTimerStatus   `json:"completedTimerCommands"`
+		CompletedSignalCommands map[int]*iwfidl.EncodedObject `json:"completedSignalCommands"`
+		// CompletedInterStateChannelCommands is still used for legacy single-message channel commands.
+		// New AtLeast/AtMost commands use CompletedInterStateChannelMultiCmds.
 		CompletedInterStateChannelCommands map[int]*iwfidl.EncodedObject `json:"completedInterStateChannelCommands"`
 		// CompletedInterStateChannelMultiCmds stores multiple messages consumed by a single command
 		// when AtLeast/AtMost are set. Keyed by command index.

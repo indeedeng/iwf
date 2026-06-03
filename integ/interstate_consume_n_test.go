@@ -98,17 +98,12 @@ func doTestInterStateConsumeNWorkflow(t *testing.T, backendType service.BackendT
 	assertions.Equal(*interstate_consume_n.TestValues[0].Data, *exactNValues[0].Data)
 	assertions.Equal(*interstate_consume_n.TestValues[1].Data, *exactNValues[1].Data)
 	assertions.Equal(*interstate_consume_n.TestValues[2].Data, *exactNValues[2].Data)
-	// Value field backward compat: first message
-	exactNValue := data["exactN_value"].(iwfidl.EncodedObject)
-	assertions.Equal(*interstate_consume_n.TestValues[0].Data, *exactNValue.Data)
 
 	// OneToAll (AtLeast=1, no AtMost): should consume all remaining 2 messages
 	oneToAllValues := data["oneToAll_values"].([]iwfidl.EncodedObject)
 	assertions.Equal(2, len(oneToAllValues), "OneToAll should consume all remaining messages")
 	assertions.Equal(*interstate_consume_n.TestValues[3].Data, *oneToAllValues[0].Data)
 	assertions.Equal(*interstate_consume_n.TestValues[4].Data, *oneToAllValues[1].Data)
-	oneToAllValue := data["oneToAll_value"].(iwfidl.EncodedObject)
-	assertions.Equal(*interstate_consume_n.TestValues[3].Data, *oneToAllValue.Data)
 
 	// ZeroToAll (AtLeast=0, no AtMost): channel empty, should consume 0 messages
 	zeroToAllValues := data["zeroToAll_values"]
@@ -124,6 +119,4 @@ func doTestInterStateConsumeNWorkflow(t *testing.T, backendType service.BackendT
 	assertions.Equal(2, len(atMostOnlyValues), "AtMostOnly should consume exactly 2 messages")
 	assertions.Equal(*interstate_consume_n.TestValuesCh2[0].Data, *atMostOnlyValues[0].Data)
 	assertions.Equal(*interstate_consume_n.TestValuesCh2[1].Data, *atMostOnlyValues[1].Data)
-	atMostOnlyValue := data["atMostOnly_value"].(iwfidl.EncodedObject)
-	assertions.Equal(*interstate_consume_n.TestValuesCh2[0].Data, *atMostOnlyValue.Data)
 }

@@ -2420,7 +2420,8 @@ components:
               encoding: encoding
           stateWaitUntilFailed: true
           interStateChannelResults:
-          - values:
+          - channelName: channelName
+            multiValues:
             - data: data
               extStoreId: extStoreId
               extPath: extPath
@@ -2429,7 +2430,6 @@ components:
               extStoreId: extStoreId
               extPath: extPath
               encoding: encoding
-            channelName: channelName
             commandId: commandId
             value:
               data: data
@@ -2437,7 +2437,8 @@ components:
               extPath: extPath
               encoding: encoding
             requestStatus: null
-          - values:
+          - channelName: channelName
+            multiValues:
             - data: data
               extStoreId: extStoreId
               extPath: extPath
@@ -2446,7 +2447,6 @@ components:
               extStoreId: extStoreId
               extPath: extPath
               encoding: encoding
-            channelName: channelName
             commandId: commandId
             value:
               data: data
@@ -3413,7 +3413,8 @@ components:
             encoding: encoding
         stateWaitUntilFailed: true
         interStateChannelResults:
-        - values:
+        - channelName: channelName
+          multiValues:
           - data: data
             extStoreId: extStoreId
             extPath: extPath
@@ -3422,7 +3423,6 @@ components:
             extStoreId: extStoreId
             extPath: extPath
             encoding: encoding
-          channelName: channelName
           commandId: commandId
           value:
             data: data
@@ -3430,7 +3430,8 @@ components:
             extPath: extPath
             encoding: encoding
           requestStatus: null
-        - values:
+        - channelName: channelName
+          multiValues:
           - data: data
             extStoreId: extStoreId
             extPath: extPath
@@ -3439,7 +3440,6 @@ components:
             extStoreId: extStoreId
             extPath: extPath
             encoding: encoding
-          channelName: channelName
           commandId: commandId
           value:
             data: data
@@ -3566,16 +3566,16 @@ components:
       type: object
     InterStateChannelResult:
       example:
-        values:
-        - data: data
-          extStoreId: extStoreId
-          extPath: extPath
-          encoding: encoding
-        - data: data
-          extStoreId: extStoreId
-          extPath: extPath
-          encoding: encoding
         channelName: channelName
+        multiValues:
+        - data: data
+          extStoreId: extStoreId
+          extPath: extPath
+          encoding: encoding
+        - data: data
+          extStoreId: extStoreId
+          extPath: extPath
+          encoding: encoding
         commandId: commandId
         value:
           data: data
@@ -3592,7 +3592,7 @@ components:
           type: string
         value:
           $ref: '#/components/schemas/EncodedObject'
-        values:
+        multiValues:
           items:
             $ref: '#/components/schemas/EncodedObject'
           type: array

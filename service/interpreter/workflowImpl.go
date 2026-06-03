@@ -690,6 +690,8 @@ func processStateExecution(
 	}
 
 	if globalVersioner.IsAfterVersionOfChannelConsumeN() {
+		// Process already-delivered signals before evaluating channel commands so
+		// AtLeast=0 and immediately-available channel reads see the latest data.
 		signalReceiver.DrainAllReceivedButUnprocessedSignals(ctx)
 	}
 
@@ -786,7 +788,11 @@ func processStateExecution(
 				}
 
 				atLeast, atMost := getChannelCommandLimits(cmd, globalVersioner)
+				multiMessageCommand := isMultiMessageChannelCommand(cmd, globalVersioner)
 
+				// Another command thread may consume from the same channel after this
+				// thread's Await condition is true. Re-check during retrieval; if data
+				// is no longer sufficient, wait again instead of partially consuming.
 				for {
 					received := false
 					_ = provider.Await(ctx, func() bool {
@@ -804,7 +810,7 @@ func processStateExecution(
 					if !ok {
 						continue
 					}
-					if atMost > 1 || atLeast == 0 {
+					if multiMessageCommand {
 						if values == nil {
 							values = []*iwfidl.EncodedObject{}
 						}
@@ -812,8 +818,6 @@ func processStateExecution(
 					} else {
 						if len(values) > 0 {
 							completedInterStateChannelCmds[idx] = values[0]
-						} else {
-							completedInterStateChannelMultiCmds[idx] = values
 						}
 					}
 					break
@@ -913,25 +917,19 @@ func processStateExecution(
 		for idx, cmd := range commandReq.GetInterStateChannelCommands() {
 			status := iwfidl.RECEIVED
 			var firstValue *iwfidl.EncodedObject
-			var allValues []iwfidl.EncodedObject
+			var multiValues []iwfidl.EncodedObject
 
 			multiResult, multiCompleted := completedInterStateChannelMultiCmds[idx]
 			singleResult, singleCompleted := completedInterStateChannelCmds[idx]
 
 			if multiCompleted {
-				if len(multiResult) > 0 {
-					firstValue = multiResult[0]
-				}
 				for _, v := range multiResult {
 					if v != nil {
-						allValues = append(allValues, *v)
+						multiValues = append(multiValues, *v)
 					}
 				}
 			} else if singleCompleted {
 				firstValue = singleResult
-				if singleResult != nil {
-					allValues = append(allValues, *singleResult)
-				}
 			} else {
 				status = iwfidl.WAITING
 			}
@@ -941,7 +939,7 @@ func processStateExecution(
 				ChannelName:   cmd.ChannelName,
 				RequestStatus: status,
 				Value:         firstValue,
-				Values:        allValues,
+				MultiValues:   multiValues,
 			})
 		}
 		commandRes.SetInterStateChannelResults(interStateChannelResults)
@@ -1182,17 +1180,8 @@ func getChannelCommandLimits(cmd iwfidl.InterStateChannelCommand, globalVersione
 	return atLeast, atMost
 }
 
-func validateChannelCommandLimits(cmd iwfidl.InterStateChannelCommand) error {
-	if cmd.HasAtLeast() && cmd.GetAtLeast() < 0 {
-		return fmt.Errorf("InterStateChannelCommand atLeast cannot be negative")
-	}
-	if cmd.HasAtMost() && cmd.GetAtMost() < 0 {
-		return fmt.Errorf("InterStateChannelCommand atMost cannot be negative")
-	}
-	if cmd.HasAtLeast() && cmd.HasAtMost() && cmd.GetAtMost() < cmd.GetAtLeast() {
-		return fmt.Errorf("InterStateChannelCommand atMost cannot be less than atLeast")
-	}
-	return nil
+func isMultiMessageChannelCommand(cmd iwfidl.InterStateChannelCommand, globalVersioner *GlobalVersioner) bool {
+	return globalVersioner.IsAfterVersionOfChannelConsumeN() && (cmd.HasAtLeast() || cmd.HasAtMost())
 }
 
 func createUserWorkflowError(provider interfaces.WorkflowProvider, message string) error {

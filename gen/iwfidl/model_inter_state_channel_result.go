@@ -23,7 +23,7 @@ type InterStateChannelResult struct {
 	RequestStatus ChannelRequestStatus `json:"requestStatus"`
 	ChannelName   string               `json:"channelName"`
 	Value         *EncodedObject       `json:"value,omitempty"`
-	Values        []EncodedObject      `json:"values,omitempty"`
+	MultiValues   []EncodedObject      `json:"multiValues,omitempty"`
 }
 
 // NewInterStateChannelResult instantiates a new InterStateChannelResult object
@@ -150,36 +150,36 @@ func (o *InterStateChannelResult) SetValue(v EncodedObject) {
 	o.Value = &v
 }
 
-// GetValues returns the Values field value if set, zero value otherwise.
-func (o *InterStateChannelResult) GetValues() []EncodedObject {
-	if o == nil || IsNil(o.Values) {
+// GetMultiValues returns the MultiValues field value if set, zero value otherwise.
+func (o *InterStateChannelResult) GetMultiValues() []EncodedObject {
+	if o == nil || IsNil(o.MultiValues) {
 		var ret []EncodedObject
 		return ret
 	}
-	return o.Values
+	return o.MultiValues
 }
 
-// GetValuesOk returns a tuple with the Values field value if set, nil otherwise
+// GetMultiValuesOk returns a tuple with the MultiValues field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *InterStateChannelResult) GetValuesOk() ([]EncodedObject, bool) {
-	if o == nil || IsNil(o.Values) {
+func (o *InterStateChannelResult) GetMultiValuesOk() ([]EncodedObject, bool) {
+	if o == nil || IsNil(o.MultiValues) {
 		return nil, false
 	}
-	return o.Values, true
+	return o.MultiValues, true
 }
 
-// HasValues returns a boolean if a field has been set.
-func (o *InterStateChannelResult) HasValues() bool {
-	if o != nil && !IsNil(o.Values) {
+// HasMultiValues returns a boolean if a field has been set.
+func (o *InterStateChannelResult) HasMultiValues() bool {
+	if o != nil && !IsNil(o.MultiValues) {
 		return true
 	}
 
 	return false
 }
 
-// SetValues gets a reference to the given []EncodedObject and assigns it to the Values field.
-func (o *InterStateChannelResult) SetValues(v []EncodedObject) {
-	o.Values = v
+// SetMultiValues gets a reference to the given []EncodedObject and assigns it to the MultiValues field.
+func (o *InterStateChannelResult) SetMultiValues(v []EncodedObject) {
+	o.MultiValues = v
 }
 
 func (o InterStateChannelResult) MarshalJSON() ([]byte, error) {
@@ -198,8 +198,8 @@ func (o InterStateChannelResult) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Value) {
 		toSerialize["value"] = o.Value
 	}
-	if !IsNil(o.Values) {
-		toSerialize["values"] = o.Values
+	if !IsNil(o.MultiValues) {
+		toSerialize["multiValues"] = o.MultiValues
 	}
 	return toSerialize, nil
 }

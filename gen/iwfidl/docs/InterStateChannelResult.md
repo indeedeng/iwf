@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **RequestStatus** | [**ChannelRequestStatus**](ChannelRequestStatus.md) |  | 
 **ChannelName** | **string** |  | 
 **Value** | Pointer to [**EncodedObject**](EncodedObject.md) |  | [optional] 
-**Values** | Pointer to [**[]EncodedObject**](EncodedObject.md) |  | [optional]
+**MultiValues** | Pointer to [**[]EncodedObject**](EncodedObject.md) |  | [optional]
 
 ## Methods
 
@@ -114,30 +114,30 @@ SetValue sets Value field to given value.
 
 HasValue returns a boolean if a field has been set.
 
-### GetValues
+### GetMultiValues
 
-`func (o *InterStateChannelResult) GetValues() []EncodedObject`
+`func (o *InterStateChannelResult) GetMultiValues() []EncodedObject`
 
-GetValues returns the Values field if non-nil, zero value otherwise.
+GetMultiValues returns the MultiValues field if non-nil, zero value otherwise.
 
-### GetValuesOk
+### GetMultiValuesOk
 
-`func (o *InterStateChannelResult) GetValuesOk() (*[]EncodedObject, bool)`
+`func (o *InterStateChannelResult) GetMultiValuesOk() (*[]EncodedObject, bool)`
 
-GetValuesOk returns a tuple with the Values field if it's non-nil, zero value otherwise
+GetMultiValuesOk returns a tuple with the MultiValues field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetValues
+### SetMultiValues
 
-`func (o *InterStateChannelResult) SetValues(v []EncodedObject)`
+`func (o *InterStateChannelResult) SetMultiValues(v []EncodedObject)`
 
-SetValues sets Values field to given value.
+SetMultiValues sets MultiValues field to given value.
 
-### HasValues
+### HasMultiValues
 
-`func (o *InterStateChannelResult) HasValues() bool`
+`func (o *InterStateChannelResult) HasMultiValues() bool`
 
-HasValues returns a boolean if a field has been set.
+HasMultiValues returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -521,11 +521,26 @@ func checkCommandRequestFromWaitUntilResponse(resp *iwfidl.WorkflowStateStartRes
 		}
 		for _, cmd := range commandReq.GetInterStateChannelCommands() {
 			if err := validateChannelCommandLimits(cmd); err != nil {
+				// StateStart wraps this error with composeStartApiRespError, returning
+				// an application error to fail the workflow instead of looping workflow tasks.
 				return err
 			}
 		}
 	}
 	// NOTE: we don't require decider trigger type when there is no commands
+	return nil
+}
+
+func validateChannelCommandLimits(cmd iwfidl.InterStateChannelCommand) error {
+	if cmd.HasAtLeast() && cmd.GetAtLeast() < 0 {
+		return fmt.Errorf("InterStateChannelCommand atLeast cannot be negative")
+	}
+	if cmd.HasAtMost() && cmd.GetAtMost() < 0 {
+		return fmt.Errorf("InterStateChannelCommand atMost cannot be negative")
+	}
+	if cmd.HasAtLeast() && cmd.HasAtMost() && cmd.GetAtMost() < cmd.GetAtLeast() {
+		return fmt.Errorf("InterStateChannelCommand atMost cannot be less than atLeast")
+	}
 	return nil
 }
 
