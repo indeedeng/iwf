@@ -790,26 +790,17 @@ func processStateExecution(
 				atLeast, atMost := getChannelCommandLimits(cmd, globalVersioner)
 				multiMessageCommand := isMultiMessageChannelCommand(cmd, globalVersioner)
 
-				// Another command thread may consume from the same channel after this
-				// thread's Await condition is true. Re-check during retrieval; if data
-				// is no longer sufficient, wait again instead of partially consuming.
-				for {
-					received := false
-					_ = provider.Await(ctx, func() bool {
-						received = interStateChannel.HasAtLeastN(cmd.ChannelName, atLeast)
-						// Note that commandReqDoneOrCanceled is needed for two cases:
-						// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
-						// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
-						return received || commandReqDoneOrCanceled
-					})
+				received := false
+				_ = provider.Await(ctx, func() bool {
+					received = interStateChannel.HasAtLeastN(cmd.ChannelName, atLeast)
+					// Note that commandReqDoneOrCanceled is needed for two cases:
+					// 1. will be true when trigger type of the commandReq is completed(e.g. AnyCommandCompleted) so we don't need to wait for all commands. Returning the thread to avoid thread leakage.
+					// 2. will be true to cancel the wait for unblocking continueAsNew(continueAsNew will wait for all threads to complete)
+					return received || commandReqDoneOrCanceled
+				})
 
-					if !received {
-						break
-					}
-					values, ok := interStateChannel.RetrieveAtLeastUpToN(cmd.ChannelName, atLeast, atMost)
-					if !ok {
-						continue
-					}
+				if received {
+					values := interStateChannel.RetrieveUpToN(cmd.ChannelName, atMost)
 					if multiMessageCommand {
 						if values == nil {
 							values = []*iwfidl.EncodedObject{}
@@ -820,7 +811,6 @@ func processStateExecution(
 							completedInterStateChannelCmds[idx] = values[0]
 						}
 					}
-					break
 				}
 				waitForThreads[threadName] = true
 			})
