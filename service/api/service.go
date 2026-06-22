@@ -641,7 +641,7 @@ func (s *serviceImpl) doApiV1WorkflowGetPost(
 			s.logger.Error(errMsg, tag.WorkflowID(req.GetWorkflowId()), tag.WorkflowRunID(descResp.RunId))
 			// we cannot return these status, which will be a wrong results
 			// TODO: maybe return 4xx
-			return nil, s.handleError(fmt.Errorf(errMsg), WorkflowGetApiPath, req.GetWorkflowId())
+			return nil, s.handleError(fmt.Errorf("%s", errMsg), WorkflowGetApiPath, req.GetWorkflowId())
 		}
 
 		if descResp.Status == iwfidl.FAILED {

@@ -17,7 +17,6 @@ import (
 	"github.com/indeedeng/iwf/service/common/utils"
 	"github.com/indeedeng/iwf/service/interpreter/temporal"
 	"go.temporal.io/api/common/v1"
-	commonpb "go.temporal.io/api/common/v1"
 	"go.temporal.io/api/enums/v1"
 	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/api/workflowservice/v1"
@@ -402,8 +401,13 @@ func (t *temporalClient) getMemoAndDecryptIfNeeded(memo *common.Memo) (map[strin
 	for k, payload := range memo.GetFields() {
 
 		if t.memoEncryption {
-			var encryptedPayload commonpb.Payload
-			err := converter.GetDefaultDataConverter().FromPayload(payload, &encryptedPayload)
+			// Newer Temporal SDKs apply the configured DataConverter (including its
+			// PayloadCodec) to memos (sdk-go #1045), whereas older SDKs used the default
+			// converter. iwf also pre-encrypts the memo value, so the stored memo is
+			// double-wrapped by the encrypting converter. Decode twice through that same
+			// converter: first to recover the inner (pre-encrypted) payload, then the value.
+			var encryptedPayload common.Payload
+			err := t.dataConverter.FromPayload(payload, &encryptedPayload)
 			if err != nil {
 				return nil, err
 			}
