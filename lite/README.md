@@ -17,3 +17,4 @@ Make sure you are at the root directory of this project (parent of current):
 docker build . -t iworkflowio/iwf-server-lite:<yourTag> -f lite/Dockerfile
 ```
 
+You can use `--platform` to test building for alternate architectues see [--platform](https://docs.docker.com/reference/cli/docker/buildx/build/#platform)
