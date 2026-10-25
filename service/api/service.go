@@ -177,7 +177,7 @@ func (s *serviceImpl) ApiV1WorkflowStartPost(
 			newStateInput := iwfidl.EncodedObject{
 				ExtStoreId: iwfidl.PtrString(storeId),
 				ExtPath:    iwfidl.PtrString(path),
-				Encoding:   iwfidl.PtrString(*input.StateInput.Encoding),
+				Encoding:   input.StateInput.Encoding,
 			}
 			input.StateInput = &newStateInput
 		}
