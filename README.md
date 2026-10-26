@@ -81,6 +81,23 @@ This by default will run Temporal server with it, again:
 ## Production
 Check the [wiki](https://github.com/indeedeng/iwf/wiki/iWF-Server-Operations#how-to-deploy).
 
+### Temporal visibility and data attributes
+
+`useMemoForDataAttributes` is opt-in. When enabled, iWF copies data attributes
+into the workflow's Temporal memo, including updates. Temporal visibility lists
+read that memo for each execution, even when the caller only needs workflow IDs.
+This can make Temporal UI lists expensive when attributes are large or the
+namespace contains many executions. Leave the option disabled unless reading
+attributes from memo is needed; changing it does not shrink existing workflows'
+memos.
+
+If memo reads are needed, enable iWF external storage for large data attributes
+and set a suitable `externalStorage.thresholdInBytes`. Values above that
+threshold are stored externally and the memo contains a reference instead. Many
+smaller attributes can still make a memo large. Filter lists by workflow or time
+range and use small pages. iWF's `/api/v1/workflow/search` page size does not
+control Temporal UI pagination.
+
 # Support
 
 Join our Slack channel! [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](http://iworkflow-slack.work)
